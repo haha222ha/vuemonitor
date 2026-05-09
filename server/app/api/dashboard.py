@@ -1,7 +1,7 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import case, func, select
+from sqlalchemy import case, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -237,3 +237,143 @@ async def get_dashboard_stats(
             "platform_distribution": platform_dist,
         },
     }
+
+
+@router.get("/trend")
+async def get_dashboard_trend(
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+    days: int = 7,
+):
+    now = datetime.now(timezone.utc)
+    start_date = now - timedelta(days=days)
+
+    dates = []
+    for i in range(days):
+        d = (now - timedelta(days=days - 1 - i)).date()
+        dates.append(d)
+
+    product_daily = []
+    collect_daily = []
+    ai_daily = []
+
+    for d in dates:
+        day_start = datetime.combine(d, datetime.min.time()).replace(tzinfo=timezone.utc)
+        day_end = day_start + timedelta(days=1)
+
+        p_result = await db.execute(
+            select(func.count()).select_from(Product).where(
+                Product.user_id == user.id,
+                Product.created_at >= day_start,
+                Product.created_at < day_end,
+            )
+        )
+        product_daily.append(p_result.scalar() or 0)
+
+        c_result = await db.execute(
+            select(func.count()).select_from(CollectTask).where(
+                CollectTask.user_id == user.id,
+                CollectTask.created_at >= day_start,
+                CollectTask.created_at < day_end,
+            )
+        )
+        collect_daily.append(c_result.scalar() or 0)
+
+        a_result = await db.execute(
+            select(func.count()).select_from(AIAnalysis).where(
+                AIAnalysis.user_id == user.id,
+                AIAnalysis.created_at >= day_start,
+                AIAnalysis.created_at < day_end,
+            )
+        )
+        ai_daily.append(a_result.scalar() or 0)
+
+    return {
+        "code": 0,
+        "data": {
+            "dates": [d.isoformat() for d in dates],
+            "products": product_daily,
+            "collects": collect_daily,
+            "ai_analyses": ai_daily,
+        },
+    }
+
+
+@router.get("/activities")
+async def get_recent_activities(
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+    limit: int = 10,
+):
+    activities = []
+
+    recent_tasks_result = await db.execute(
+        select(CollectTask)
+        .where(CollectTask.user_id == user.id)
+        .order_by(CollectTask.created_at.desc())
+        .limit(limit)
+    )
+    recent_tasks = recent_tasks_result.scalars().all()
+
+    for t in recent_tasks:
+        summary = ""
+        if t.status == "completed" and t.result_summary:
+            s = t.result_summary
+            summary = f"成功 {s.get('success', 0)} / 失败 {s.get('failed', 0)} / 风控 {s.get('risk_detected', 0)}"
+        elif t.status == "failed":
+            summary = t.error_message or "采集失败"
+        elif t.status == "running":
+            summary = f"进度 {t.progress or 0}%"
+        elif t.status == "pending":
+            summary = "等待执行"
+
+        activities.append({
+            "type": "collect",
+            "title": f"{_platform_label(t.platform)} 采集任务",
+            "status": t.status,
+            "summary": summary,
+            "time": t.created_at.isoformat() if t.created_at else None,
+            "id": str(t.id),
+        })
+
+    recent_ai_result = await db.execute(
+        select(AIAnalysis)
+        .where(AIAnalysis.user_id == user.id)
+        .order_by(AIAnalysis.created_at.desc())
+        .limit(limit)
+    )
+    recent_ai = recent_ai_result.scalars().all()
+
+    for a in recent_ai:
+        activities.append({
+            "type": "ai",
+            "title": f"AI {_analysis_label(a.analysis_type)}",
+            "status": a.status,
+            "summary": f"模型: {a.model or 'unknown'}" if a.status == "completed" else "分析中",
+            "time": a.created_at.isoformat() if a.created_at else None,
+            "id": str(a.id),
+        })
+
+    activities.sort(key=lambda x: x["time"] or "", reverse=True)
+
+    return {
+        "code": 0,
+        "data": {
+            "items": activities[:limit],
+        },
+    }
+
+
+def _platform_label(platform: str) -> str:
+    mapping = {"xhs": "小红书", "taobao": "淘宝", "jd": "京东", "pdd": "拼多多", "douyin": "抖音"}
+    return mapping.get(platform, platform)
+
+
+def _analysis_label(analysis_type: str) -> str:
+    mapping = {
+        "basic_analysis": "基础分析",
+        "trend_score": "趋势评分",
+        "prediction": "爆品预测",
+        "risk_warning": "风险预警",
+    }
+    return mapping.get(analysis_type, analysis_type)

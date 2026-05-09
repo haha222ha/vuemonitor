@@ -1,5 +1,16 @@
 <template>
   <div class="dashboard-home">
+    <div class="welcome-bar">
+      <div class="welcome-text">
+        <h2>{{ greeting }}，{{ auth.user?.nickname || auth.user?.email || '用户' }}</h2>
+        <p>以下是您的数据监控概览</p>
+      </div>
+      <div class="welcome-actions">
+        <el-tag :type="planTagType" effect="dark" size="large">{{ planLabel }}</el-tag>
+        <el-button size="small" :icon="Refresh" circle @click="refreshAll" :loading="refreshing" />
+      </div>
+    </div>
+
     <el-row :gutter="20" class="stats-row">
       <el-col :span="6">
         <div class="stat-card stat-card--indigo">
@@ -48,6 +59,7 @@
           <div class="stat-info">
             <div class="stat-value">{{ animatedStats.riskAlerts }}</div>
             <div class="stat-label">风险提示</div>
+            <div class="stat-sub" v-if="stats.riskAlerts > 0">需关注</div>
           </div>
         </div>
       </el-col>
@@ -56,6 +68,23 @@
     <el-row :gutter="20" style="margin-top: 20px;">
       <el-col :span="16">
         <div class="panel">
+          <div class="panel-header">
+            <h3>7日趋势</h3>
+            <div class="trend-legend">
+              <span class="legend-item"><span class="legend-dot" style="background:#6366f1;"></span>新增商品</span>
+              <span class="legend-item"><span class="legend-dot" style="background:#22c55e;"></span>采集任务</span>
+              <span class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span>AI分析</span>
+            </div>
+          </div>
+          <div class="chart-container" v-if="trendData.dates.length">
+            <v-chart :option="trendChartOption" autoresize style="height: 260px;" />
+          </div>
+          <div v-else class="chart-empty">
+            <p>暂无趋势数据</p>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top: 20px;">
           <div class="panel-header">
             <h3>商品监控列表</h3>
             <el-button type="primary" size="small" @click="$router.push('/dashboard/monitor')">查看全部</el-button>
@@ -166,6 +195,24 @@
           </div>
         </div>
 
+        <div class="panel" style="margin-top: 20px;">
+          <div class="panel-header">
+            <h3>最近活动</h3>
+          </div>
+          <div v-if="activities.length === 0" class="empty-hint">暂无活动记录</div>
+          <div v-else class="activity-timeline">
+            <div v-for="act in activities" :key="act.id" class="activity-item">
+              <div class="activity-dot" :class="`activity-dot--${act.type}`"></div>
+              <div class="activity-content">
+                <div class="activity-title">{{ act.title }}</div>
+                <div class="activity-summary">{{ act.summary }}</div>
+                <div class="activity-time">{{ timeAgo(act.time) }}</div>
+              </div>
+              <el-tag size="small" :type="activityStatusType(act.status)">{{ activityStatusLabel(act.status) }}</el-tag>
+            </div>
+          </div>
+        </div>
+
         <div class="panel quick-nav-panel" style="margin-top: 20px;">
           <div class="panel-header">
             <h3>快捷操作</h3>
@@ -195,9 +242,17 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from "vue";
+import { reactive, ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import api from "../../utils/api";
+import { Refresh } from "@element-plus/icons-vue";
+import VChart from "vue-echarts";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { LineChart } from "echarts/charts";
+import { GridComponent, TooltipComponent, LegendComponent } from "echarts/components";
+
+use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent]);
 
 const auth = useAuthStore();
 
@@ -224,6 +279,36 @@ const animatedStats = reactive({
 const recentProducts = ref<any[]>([]);
 const platformDist = ref<Record<string, number>>({});
 const collectRunning = ref(false);
+const activities = ref<any[]>([]);
+const refreshing = ref(false);
+
+const trendData = reactive({
+  dates: [] as string[],
+  products: [] as number[],
+  collects: [] as number[],
+  aiAnalyses: [] as number[],
+});
+
+let refreshTimer: ReturnType<typeof setInterval> | null = null;
+
+const greeting = computed(() => {
+  const h = new Date().getHours();
+  if (h < 6) return "夜深了";
+  if (h < 12) return "早上好";
+  if (h < 14) return "中午好";
+  if (h < 18) return "下午好";
+  return "晚上好";
+});
+
+const planLabel = computed(() => {
+  const map: Record<string, string> = { free: "免费版", pro: "Pro", premium: "Premium", enterprise: "Enterprise" };
+  return map[auth.userPlan] || "免费版";
+});
+
+const planTagType = computed(() => {
+  const map: Record<string, string> = { pro: "primary", premium: "warning", enterprise: "danger" };
+  return (map[auth.userPlan] || "info") as any;
+});
 
 const trendClass = computed(() => {
   if (stats.todayTrend.startsWith("+")) return "trend-up";
@@ -236,6 +321,62 @@ const successRateClass = computed(() => {
   if (stats.successRate >= 50) return "value-warn";
   return "value-bad";
 });
+
+const trendChartOption = computed(() => ({
+  tooltip: {
+    trigger: "axis",
+    backgroundColor: "rgba(20,20,30,0.9)",
+    borderColor: "rgba(255,255,255,0.1)",
+    textStyle: { color: "#e0e0ea", fontSize: 12 },
+  },
+  grid: { left: 40, right: 20, top: 20, bottom: 30 },
+  xAxis: {
+    type: "category",
+    data: trendData.dates.map((d) => d.slice(5)),
+    axisLine: { lineStyle: { color: "rgba(255,255,255,0.08)" } },
+    axisLabel: { color: "#6a6a7a", fontSize: 11 },
+  },
+  yAxis: {
+    type: "value",
+    splitLine: { lineStyle: { color: "rgba(255,255,255,0.04)" } },
+    axisLabel: { color: "#6a6a7a", fontSize: 11 },
+  },
+  series: [
+    {
+      name: "新增商品",
+      type: "line",
+      data: trendData.products,
+      smooth: true,
+      symbol: "circle",
+      symbolSize: 6,
+      lineStyle: { color: "#6366f1", width: 2 },
+      itemStyle: { color: "#6366f1" },
+      areaStyle: { color: { type: "linear", x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: "rgba(99,102,241,0.25)" }, { offset: 1, color: "rgba(99,102,241,0)" }] } },
+    },
+    {
+      name: "采集任务",
+      type: "line",
+      data: trendData.collects,
+      smooth: true,
+      symbol: "circle",
+      symbolSize: 6,
+      lineStyle: { color: "#22c55e", width: 2 },
+      itemStyle: { color: "#22c55e" },
+      areaStyle: { color: { type: "linear", x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: "rgba(34,197,94,0.2)" }, { offset: 1, color: "rgba(34,197,94,0)" }] } },
+    },
+    {
+      name: "AI分析",
+      type: "line",
+      data: trendData.aiAnalyses,
+      smooth: true,
+      symbol: "circle",
+      symbolSize: 6,
+      lineStyle: { color: "#f59e0b", width: 2 },
+      itemStyle: { color: "#f59e0b" },
+      areaStyle: { color: { type: "linear", x: 0, y: 0, x2: 0, y2: 1, colorStops: [{ offset: 0, color: "rgba(245,158,11,0.15)" }, { offset: 1, color: "rgba(245,158,11,0)" }] } },
+    },
+  ],
+}));
 
 function platformLabel(p: string) {
   const map: Record<string, string> = { xhs: "小红书", taobao: "淘宝", jd: "京东", pdd: "拼多多", douyin: "抖音" };
@@ -252,6 +393,27 @@ function barWidth(count: number) {
   return `${Math.round((count / max) * 100)}%`;
 }
 
+function timeAgo(dateStr: string | null) {
+  if (!dateStr) return "";
+  const now = new Date();
+  const d = new Date(dateStr);
+  const diff = (now.getTime() - d.getTime()) / 1000;
+  if (diff < 60) return "刚刚";
+  if (diff < 3600) return Math.floor(diff / 60) + "分钟前";
+  if (diff < 86400) return Math.floor(diff / 3600) + "小时前";
+  return Math.floor(diff / 86400) + "天前";
+}
+
+function activityStatusType(status: string) {
+  const map: Record<string, string> = { completed: "success", running: "primary", pending: "warning", failed: "danger", cancelled: "info" };
+  return (map[status] || "info") as any;
+}
+
+function activityStatusLabel(status: string) {
+  const map: Record<string, string> = { completed: "完成", running: "运行中", pending: "等待", failed: "失败", cancelled: "已取消" };
+  return map[status] || status;
+}
+
 function animateNumber(target: keyof typeof animatedStats, end: number, duration = 800) {
   const start = animatedStats[target];
   if (start === end) return;
@@ -266,7 +428,7 @@ function animateNumber(target: keyof typeof animatedStats, end: number, duration
   requestAnimationFrame(tick);
 }
 
-onMounted(async () => {
+async function fetchStats() {
   try {
     const { data } = await api.get("/dashboard/stats");
     const d = data?.data || {};
@@ -291,12 +453,81 @@ onMounted(async () => {
     animateNumber("aiRecommendations", stats.aiRecommendations);
     animateNumber("riskAlerts", stats.riskAlerts);
   } catch {}
+}
+
+async function fetchTrend() {
+  try {
+    const { data } = await api.get("/dashboard/trend", { params: { days: 7 } });
+    const d = data?.data || {};
+    trendData.dates = d.dates || [];
+    trendData.products = d.products || [];
+    trendData.collects = d.collects || [];
+    trendData.aiAnalyses = d.ai_analyses || [];
+  } catch {}
+}
+
+async function fetchActivities() {
+  try {
+    const { data } = await api.get("/dashboard/activities", { params: { limit: 8 } });
+    activities.value = data?.data?.items || [];
+  } catch {}
+}
+
+async function refreshAll() {
+  refreshing.value = true;
+  await Promise.all([fetchStats(), fetchTrend(), fetchActivities()]);
+  refreshing.value = false;
+}
+
+onMounted(() => {
+  refreshAll();
+  refreshTimer = setInterval(() => {
+    fetchStats();
+    fetchActivities();
+  }, 60000);
+});
+
+onUnmounted(() => {
+  if (refreshTimer) {
+    clearInterval(refreshTimer);
+    refreshTimer = null;
+  }
 });
 </script>
 
 <style scoped>
 .dashboard-home {
   padding: 4px;
+}
+
+.welcome-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(244, 114, 182, 0.06) 100%);
+  border: 1px solid rgba(99, 102, 241, 0.12);
+  border-radius: 14px;
+}
+
+.welcome-text h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+}
+
+.welcome-text p {
+  font-size: 13px;
+  color: #8a8a9a;
+  margin: 4px 0 0;
+}
+
+.welcome-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .stats-row .stat-card {
@@ -393,6 +624,36 @@ onMounted(async () => {
   font-weight: 600;
   color: #fff;
   margin: 0;
+}
+
+.trend-legend {
+  display: flex;
+  gap: 16px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: #8a8a9a;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.chart-container {
+  width: 100%;
+}
+
+.chart-empty {
+  text-align: center;
+  padding: 40px 0;
+  color: #4a4a5a;
+  font-size: 14px;
 }
 
 .product-cell {
@@ -598,6 +859,73 @@ onMounted(async () => {
   font-size: 12px;
   color: #6a6a7a;
   margin-top: 2px;
+}
+
+.activity-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.activity-dot--collect {
+  background: #22c55e;
+}
+
+.activity-dot--ai {
+  background: #f59e0b;
+}
+
+.activity-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.activity-title {
+  font-size: 13px;
+  color: #e0e0ea;
+  font-weight: 500;
+}
+
+.activity-summary {
+  font-size: 12px;
+  color: #6a6a7a;
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.activity-time {
+  font-size: 11px;
+  color: #4a4a5a;
+  margin-top: 2px;
+}
+
+.empty-hint {
+  text-align: center;
+  padding: 20px 0;
+  color: #4a4a5a;
+  font-size: 13px;
 }
 
 .platform-bars {
