@@ -136,6 +136,14 @@ npm install --legacy-peer-deps 2>/dev/null
 cd "$SCRIPT_DIR/web-admin"
 npm run build 2>/dev/null
 
+# 用户前端
+cd "$SCRIPT_DIR/web-user"
+npm install --legacy-peer-deps 2>/dev/null
+
+# 构建用户前端
+cd "$SCRIPT_DIR/web-user"
+npm run build 2>/dev/null
+
 echo -e "       依赖安装完成 ${GREEN}✓${NC}"
 
 # ===== 配置 systemd 服务 =====
@@ -166,46 +174,7 @@ systemctl enable vuemonitor > /dev/null 2>&1
 systemctl restart vuemonitor > /dev/null 2>&1
 
 # ===== 配置 Nginx =====
-cat > /etc/nginx/sites-available/vuemonitor << 'NGINX'
-server {
-    listen 80;
-    server_name _;
-
-    # 管理后台
-    location / {
-        root /opt/vuemonitor/web-admin/dist;
-        index index.html;
-        try_files $uri $uri/ /index.html;
-    }
-
-    # API 反向代理
-    location /api/ {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # WebSocket
-    location /ws {
-        proxy_pass http://127.0.0.1:8000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-        proxy_read_timeout 86400;
-    }
-
-    # API 文档
-    location /docs {
-        proxy_pass http://127.0.0.1:8000;
-    }
-    location /openapi.json {
-        proxy_pass http://127.0.0.1:8000;
-    }
-}
-NGINX
+cp "$SCRIPT_DIR/web-user/nginx.conf" /etc/nginx/sites-available/vuemonitor
 
 ln -sf /etc/nginx/sites-available/vuemonitor /etc/nginx/sites-enabled/ 2>/dev/null
 rm -f /etc/nginx/sites-enabled/default 2>/dev/null
@@ -218,8 +187,9 @@ echo ""
 echo "  ╔══════════════════════════════════════════╗"
 echo "  ║          🎉 部署完成！                    ║"
 echo "  ╠══════════════════════════════════════════╣"
-echo "  ║  管理后台:   http://${SERVER_IP}          ║"
-echo "  ║  API 文档:   http://${SERVER_IP}/docs    ║"
+echo "  ║  用户首页:   https://www.xhs365.cn       ║"
+echo "  ║  管理后台:   https://admin.xhs365.cn     ║"
+echo "  ║  API 文档:   https://api.xhs365.cn/docs  ║"
 echo "  ╠══════════════════════════════════════════╣"
 echo "  ║  服务管理:                                ║"
 echo "  ║    systemctl status vuemonitor           ║"
