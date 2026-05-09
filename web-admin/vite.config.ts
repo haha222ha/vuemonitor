@@ -17,5 +17,14 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vue-vendor": ["vue", "vue-router", "pinia"],
+          "element-plus": ["element-plus"],
+          "utility-vendor": ["axios"],
+        },
+      },
+    },
   },
 });
