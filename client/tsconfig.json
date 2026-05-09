@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@main/*": ["./src/main/*"],
+      "@renderer/*": ["./src/renderer/*"],
+      "@chromium/*": ["./src/chromium/*"],
+      "@playwright/*": ["./src/playwright/*"],
+      "@normalizer/*": ["./src/normalizer/*"],
+      "@data-mart/*": ["./src/data-mart/*"],
+      "@feature/*": ["./src/feature/*"],
+      "@storage/*": ["./src/storage/*"],
+      "@permission/*": ["./src/permission/*"],
+      "@communication/*": ["./src/communication/*"],
+      "@logger/*": ["./src/logger/*"],
+      "@shared/*": ["../shared/*"]
+    },
+    "types": ["node", "better-sqlite3"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "../shared/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
