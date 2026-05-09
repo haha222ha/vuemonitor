@@ -236,6 +236,43 @@ async def list_all_collect_tasks(
     }
 
 
+class AdminCollectTaskCreateRequest(BaseModel):
+    task_type: str = Field(..., pattern="^(product|shop|category)$")
+    platform: str = Field(..., pattern="^(xhs|douyin|taobao|jd|pdd)$")
+    target_type: str = Field(..., pattern="^(product_id|shop_id|category_url)$")
+    target_ids: list[str] = Field(..., min_length=1)
+
+
+@router.post("/collect/tasks", status_code=201)
+async def admin_create_collect_task(
+    req: AdminCollectTaskCreateRequest,
+    admin: AdminUser,
+    db: AsyncSession = Depends(get_db),
+):
+    from app.models.user import User as UserModel
+    first_admin = (await db.execute(select(UserModel).where(UserModel.role == "admin").limit(1))).scalar_one_or_none()
+    owner_id = first_admin.id if first_admin else admin.id
+
+    task = CollectTask(
+        user_id=owner_id,
+        task_type=req.task_type,
+        platform=req.platform,
+        target_type=req.target_type,
+        target_ids=req.target_ids,
+        status="pending",
+    )
+    db.add(task)
+    await db.flush()
+
+    from app.models.collect import CollectTaskItem
+    for target_id in req.target_ids:
+        item = CollectTaskItem(task_id=task.id, target_id=target_id)
+        db.add(item)
+
+    await _log_action(db, str(admin.id), "create_collect_task", f"task:{task.id}", f"type={req.task_type}, platform={req.platform}")
+    return {"code": 0, "data": {"id": str(task.id), "item_count": len(req.target_ids)}}
+
+
 @router.put("/collect/tasks/{task_id}/cancel")
 async def cancel_collect_task(
     task_id: str,

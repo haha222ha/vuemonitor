@@ -4,7 +4,6 @@ import { resolve } from "path";
 
 export default defineConfig({
   plugins: [vue()],
-  base: "/admin/",
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),
@@ -12,7 +11,13 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5174,
+    port: 5175,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     outDir: "dist",
