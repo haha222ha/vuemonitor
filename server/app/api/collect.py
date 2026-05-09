@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from datetime import datetime
 
@@ -6,11 +7,13 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db
+from app.collect.engine import CollectEngine
+from app.core.database import get_db, async_session_factory
 from app.core.exceptions import NotFoundException, ForbiddenException
 from app.middleware.auth import CurrentUser, AdminUser
 from app.middleware.feature_gate import FeatureGateMiddleware
 from app.models.collect import CollectTask, CollectTaskItem
+from app.ws.manager import manager
 
 router = APIRouter(prefix="/collect", tags=["collect"])
 
@@ -161,6 +164,97 @@ async def cancel_collect_task(
 
     task.status = "cancelled"
     return {"code": 0, "data": {"cancelled": True}}
+
+
+@router.post("/tasks/{task_id}/retry")
+async def retry_collect_task(
+    task_id: str,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+):
+    gate = FeatureGateMiddleware(db)
+    await gate.check_gate(user, "gate:collect:create")
+
+    result = await db.execute(
+        select(CollectTask).where(CollectTask.id == uuid.UUID(task_id), CollectTask.user_id == user.id)
+    )
+    task = result.scalar_one_or_none()
+    if not task:
+        raise NotFoundException(message="采集任务不存在")
+
+    if task.status not in ("failed", "cancelled", "completed"):
+        return {"code": 0, "data": {"message": "任务正在运行中，无需重试"}}
+
+    items_result = await db.execute(
+        select(CollectTaskItem).where(CollectTaskItem.task_id == task.id)
+    )
+    items = items_result.scalars().all()
+
+    new_task = CollectTask(
+        user_id=user.id,
+        task_type=task.task_type,
+        platform=task.platform,
+        target_type=task.target_type,
+        target_ids=task.target_ids,
+        status="pending",
+    )
+    db.add(new_task)
+    await db.flush()
+
+    failed_targets = []
+    for item in items:
+        if item.status in ("failed", "risk_detected"):
+            failed_targets.append(item.target_id)
+
+    retry_targets = failed_targets if failed_targets else task.target_ids
+
+    for target_id in retry_targets:
+        item = CollectTaskItem(task_id=new_task.id, target_id=target_id)
+        db.add(item)
+
+    await gate.record_usage(user.id, "gate:collect:create")
+
+    return {"code": 0, "data": {"id": str(new_task.id), "item_count": len(retry_targets), "retried_from": str(task.id)}}
+
+
+@router.post("/tasks/{task_id}/execute")
+async def execute_collect_task(
+    task_id: str,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(
+        select(CollectTask).where(CollectTask.id == uuid.UUID(task_id), CollectTask.user_id == user.id)
+    )
+    task = result.scalar_one_or_none()
+    if not task:
+        raise NotFoundException(message="采集任务不存在")
+
+    if task.status == "running":
+        return {"code": 0, "data": {"message": "任务正在执行中"}}
+
+    if task.status == "pending":
+        task.status = "pending"
+        await db.commit()
+
+    async def _run():
+        async with async_session_factory() as task_db:
+            try:
+                engine = CollectEngine(task_db)
+                summary = await engine.execute_task(uuid.UUID(task_id))
+                await task_db.commit()
+
+                await manager.send_to_user(str(user.id), {
+                    "type": "collect:completed",
+                    "data": {"task_id": task_id, "summary": summary},
+                })
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Task {task_id} execution failed: {e}")
+
+    asyncio.create_task(_run())
+
+    return {"code": 0, "data": {"task_id": task_id, "status": "running"}}
 
 
 @router.get("/admin/tasks")

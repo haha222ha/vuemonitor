@@ -1,3 +1,4 @@
+import re
 import uuid
 from datetime import datetime
 
@@ -15,11 +16,47 @@ from app.models.product import Product, ProductFeature
 
 router = APIRouter(prefix="/products", tags=["products"])
 
+PLATFORM_PATTERNS = {
+    "xhs": [
+        re.compile(r"xiaohongshu\.com/explore/([a-f0-9]{24})", re.I),
+        re.compile(r"xiaohongshu\.com/discovery/item/([a-f0-9]{24})", re.I),
+        re.compile(r"xhslink\.com/(\w+)", re.I),
+    ],
+    "taobao": [
+        re.compile(r"taobao\.com/item\.htm.*[?&]id=(\d+)", re.I),
+        re.compile(r"tmall\.com/item\.htm.*[?&]id=(\d+)", re.I),
+        re.compile(r"m\.taobao\.com.*[?&]id=(\d+)", re.I),
+    ],
+    "jd": [
+        re.compile(r"jd\.com/product/(\d+)", re.I),
+        re.compile(r"item\.jd\.com/(\d+)", re.I),
+        re.compile(r"item\.m\.jd\.com/product/(\d+)", re.I),
+    ],
+    "pdd": [
+        re.compile(r"yangkeduo\.com/goods\.html\?.*goods_id=(\d+)", re.I),
+        re.compile(r"pinduoduo\.com/goods\.html\?.*goods_id=(\d+)", re.I),
+    ],
+    "douyin": [
+        re.compile(r"douyin\.com/video/(\d+)", re.I),
+        re.compile(r"iesdouyin\.com/share/video/(\d+)", re.I),
+    ],
+}
+
+
+def parse_product_url(url: str) -> tuple[str | None, str | None]:
+    for platform, patterns in PLATFORM_PATTERNS.items():
+        for pattern in patterns:
+            m = pattern.search(url)
+            if m:
+                return platform, m.group(1)
+    return None, None
+
 
 class ProductCreateRequest(BaseModel):
-    platform: str = Field(..., pattern="^(xhs|douyin|taobao|jd|pdd)$")
-    platform_product_id: str = Field(..., min_length=1, max_length=255)
-    product_name: str = Field(..., min_length=1, max_length=500)
+    platform: str | None = Field(None, pattern="^(xhs|douyin|taobao|jd|pdd)$")
+    platform_product_id: str | None = Field(None, min_length=1, max_length=255)
+    product_name: str | None = Field(None, min_length=1, max_length=500)
+    url: str | None = None
     shop_name: str | None = None
     category: str | None = None
     image_url: str | None = None
@@ -32,35 +69,6 @@ class ProductUpdateRequest(BaseModel):
     category: str | None = None
     image_url: str | None = None
     is_active: bool | None = None
-
-
-class ProductFeatureResponse(BaseModel):
-    id: str
-    price: float | None
-    original_price: float | None
-    sales_count: int | None
-    monthly_sales: int | None
-    rating: float | None
-    review_count: int | None
-    favorite_count: int | None
-    stock_status: str | None
-    extra_features: dict
-    source: str
-    collected_at: str | None
-
-
-class ProductDetailResponse(BaseModel):
-    id: str
-    platform: str
-    platform_product_id: str
-    product_name: str
-    shop_name: str | None
-    category: str | None
-    image_url: str | None
-    product_url: str | None
-    is_active: bool
-    last_collected_at: str | None
-    latest_feature: ProductFeatureResponse | None
 
 
 @router.post("", status_code=201)
@@ -79,11 +87,29 @@ async def create_product(
     if limits["maxProducts"] > 0 and (count_result.scalar() or 0) >= limits["maxProducts"]:
         raise ForbiddenException(code=42011, message=f"当前套餐最多监控{limits['maxProducts']}个商品")
 
+    platform = req.platform
+    platform_product_id = req.platform_product_id
+    product_url = req.product_url
+
+    if req.url and (not platform or not platform_product_id):
+        parsed_platform, parsed_id = parse_product_url(req.url)
+        if parsed_platform and parsed_id:
+            platform = platform or parsed_platform
+            platform_product_id = platform_product_id or parsed_id
+            product_url = product_url or req.url
+        else:
+            raise BadRequestException(message="无法识别该链接，请手动选择平台并输入商品ID")
+
+    if not platform or not platform_product_id:
+        raise BadRequestException(message="请提供商品URL或手动选择平台和商品ID")
+
+    product_name = req.product_name or f"{platform}商品-{platform_product_id[:8]}"
+
     existing = await db.execute(
         select(Product).where(
             Product.user_id == user.id,
-            Product.platform == req.platform,
-            Product.platform_product_id == req.platform_product_id,
+            Product.platform == platform,
+            Product.platform_product_id == platform_product_id,
         )
     )
     if existing.scalar_one_or_none():
@@ -91,20 +117,20 @@ async def create_product(
 
     product = Product(
         user_id=user.id,
-        platform=req.platform,
-        platform_product_id=req.platform_product_id,
-        product_name=req.product_name,
+        platform=platform,
+        platform_product_id=platform_product_id,
+        product_name=product_name,
         shop_name=req.shop_name,
         category=req.category,
         image_url=req.image_url,
-        product_url=req.product_url,
+        product_url=product_url,
     )
     db.add(product)
     await db.flush()
 
     await gate.record_usage(user.id, "gate:monitor:add")
 
-    return {"code": 0, "data": {"id": str(product.id)}}
+    return {"code": 0, "data": {"id": str(product.id), "platform": platform, "platform_product_id": platform_product_id}}
 
 
 @router.get("")
@@ -136,6 +162,20 @@ async def list_products(
         )
         feat = feat_result.scalar_one_or_none()
 
+        prev_feat = None
+        if feat:
+            prev_result = await db.execute(
+                select(ProductFeature)
+                .where(ProductFeature.product_id == p.id, ProductFeature.id != feat.id)
+                .order_by(ProductFeature.collected_at.desc())
+                .limit(1)
+            )
+            prev_feat = prev_result.scalar_one_or_none()
+
+        trend = 0.0
+        if feat and prev_feat and feat.sales_count and prev_feat.sales_count and prev_feat.sales_count > 0:
+            trend = round((feat.sales_count - prev_feat.sales_count) / prev_feat.sales_count * 100, 1)
+
         items.append({
             "id": str(p.id),
             "platform": p.platform,
@@ -144,14 +184,19 @@ async def list_products(
             "shop_name": p.shop_name,
             "category": p.category,
             "image_url": p.image_url,
+            "product_url": p.product_url,
             "is_active": p.is_active,
             "last_collected_at": p.last_collected_at.isoformat() if p.last_collected_at else None,
+            "trend": trend,
             "latest_feature": {
                 "id": str(feat.id),
                 "price": float(feat.price) if feat and feat.price else None,
+                "original_price": float(feat.original_price) if feat and feat.original_price else None,
                 "sales_count": feat.sales_count if feat else None,
+                "monthly_sales": feat.monthly_sales if feat else None,
                 "rating": float(feat.rating) if feat and feat.rating else None,
                 "review_count": feat.review_count if feat else None,
+                "favorite_count": feat.favorite_count if feat else None,
                 "source": feat.source if feat else None,
                 "collected_at": feat.collected_at.isoformat() if feat and feat.collected_at else None,
             } if feat else None,

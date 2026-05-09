@@ -71,4 +71,8 @@ INSERT INTO feature_gates (id, gate_key, gate_name, gate_type, required_plan, de
 ('c0000000-0000-0000-0000-000000000009', 'gate:ai:report', 'AI报告生成', 'feature', 'pro', 'Pro及以上支持', '{}'),
 ('c0000000-0000-0000-0000-000000000010', 'gate:ai:batch_analysis', '批量AI分析', 'feature', 'premium', 'Premium及以上支持', '{}'),
 ('c0000000-0000-0000-0000-000000000011', 'gate:collect:cloud', '云端API采集', 'feature', 'pro', 'Pro及以上支持', '{}'),
-('c0000000-0000-0000-0000-000000000012', 'gate:collect:shop_full', '店铺全量采集', 'feature', 'pro', 'Pro及以上支持', '{}');
+('c0000000-0000-0000-0000-000000000012', 'gate:collect:shop_full', '店铺全量采集', 'feature', 'pro', 'Pro及以上支持', '{}'),
+('c0000000-0000-0000-0000-000000000013', 'gate:collect:create', '创建采集任务', 'quota', 'free', '每日采集任务配额', '{"free": 10, "pro": 100, "premium": 500, "enterprise": -1}'),
+('c0000000-0000-0000-0000-000000000014', 'gate:ai:daily_calls', 'AI分析每日调用', 'quota', 'free', 'AI分析每日调用次数', '{"free": 5, "pro": 50, "premium": -1, "enterprise": -1}'),
+('c0000000-0000-0000-0000-000000000015', 'gate:monitor:frequency', '采集频率控制', 'feature', 'pro', 'Pro及以上可自定义采集频率', '{}'),
+('c0000000-0000-0000-0000-000000000016', 'gate:monitor:concurrency', '并发控制', 'feature', 'pro', 'Pro及以上可调节并发数', '{}');
