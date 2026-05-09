@@ -4,8 +4,9 @@ import { createRouter, createWebHistory } from "vue-router";
 import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 import axios from "axios";
+import App from "./App.vue";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/v1";
 
 const routes = [
   { path: "/", redirect: "/admin/dashboard" },
@@ -51,8 +52,11 @@ router.beforeEach(async (to, _from, next) => {
   }
 });
 
-const app = createApp({ template: "<router-view />" });
+const app = createApp(App);
 app.use(createPinia());
 app.use(router);
 app.use(ElementPlus);
+app.config.errorHandler = (err) => {
+  console.error("[Vue Error]", err);
+};
 app.mount("#app");
