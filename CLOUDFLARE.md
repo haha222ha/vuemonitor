@@ -1,4 +1,4 @@
-# VueMonitor + Cloudflare 部署指南
+# XHS365 + Cloudflare 部署指南
 
 ---
 
@@ -248,7 +248,7 @@ systemctl restart vuemonitor
 双击 build.bat
 → 提示输入服务器地址时输入: https://api.yourdomain.com
 → 等构建完成
-→ 把 client\release\VueMonitor Setup.exe 发给用户
+→ 把 client\release\XHS365 Setup.exe 发给用户
 ```
 
 **关键**：填域名，不要填 IP！

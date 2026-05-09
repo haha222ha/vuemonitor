@@ -1,8 +1,8 @@
 {
-  "name": "vuemonitor-client",
+  "name": "xhs365-client",
   "version": "0.1.0",
   "private": true,
-  "description": "VueMonitor AI E-commerce Monitoring Platform - Electron Client",
+  "description": "XHS365 AI E-commerce Monitoring Platform - Electron Client",
   "main": "dist/main/index.js",
   "scripts": {
     "dev": "vite",

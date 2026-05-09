@@ -2,7 +2,7 @@
   <el-container class="main-layout">
     <el-aside width="220px" class="sidebar">
       <div class="logo">
-        <h2>VueMonitor</h2>
+        <h2>XHS365</h2>
       </div>
       <el-menu :default-active="route.path" router class="sidebar-menu">
         <el-menu-item index="/dashboard">

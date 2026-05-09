@@ -1,4 +1,4 @@
--- VueMonitor Seed Data
+-- XHS365 Seed Data
 
 INSERT INTO rbac_roles (id, role_name, display_name, description, data_scope, is_system) VALUES
 ('a0000000-0000-0000-0000-000000000001', 'super_admin', '超级管理员', '拥有全部权限', 'all', TRUE),

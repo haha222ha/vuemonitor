@@ -147,7 +147,10 @@ async function onProductSelect(productId: string) {
   analysisLoading.value = true;
   analysisResult.value = null;
   try {
-    const { data } = await api.post(`/ai/analyze/${productId}`);
+    const { data } = await api.post("/ai/analyze", {
+      product_id: productId,
+      analysis_type: auth.userPlan === "free" ? "basic_analysis" : auth.userPlan === "pro" ? "trend_score" : "prediction",
+    });
     analysisResult.value = data?.data || data;
   } catch (e: any) {
     analysisResult.value = { trendDescription: "该商品近期数据暂无显著变化" };

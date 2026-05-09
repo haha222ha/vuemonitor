@@ -9,7 +9,7 @@ NC='\033[0m'
 
 echo ""
 echo "  ╔══════════════════════════════════════════╗"
-echo "  ║       VueMonitor 一键部署工具 v0.1       ║"
+echo "  ║       XHS365 一键部署工具 v0.1          ║"
 echo "  ╚══════════════════════════════════════════╝"
 echo ""
 
@@ -84,7 +84,7 @@ if [ ! -f "$SCRIPT_DIR/server/.env" ]; then
     ENC_KEY=$(python3 -c "import secrets; print(secrets.token_hex(16))")
 
     cat > "$SCRIPT_DIR/server/.env" << EOF
-APP_NAME=VueMonitor
+APP_NAME=XHS365
 APP_VERSION=0.1.0
 DEBUG=false
 DB_HOST=localhost
@@ -144,7 +144,7 @@ echo -e "  ${CYAN}配置系统服务...${NC}"
 
 cat > /etc/systemd/system/vuemonitor.service << EOF
 [Unit]
-Description=VueMonitor API Server
+Description=XHS365 API Server
 After=network.target postgresql.service redis.service
 Requires=postgresql.service redis.service
 

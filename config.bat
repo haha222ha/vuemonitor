@@ -1,11 +1,11 @@
 @echo off
 chcp 65001 >nul 2>&1
-title VueMonitor 配置工具
+title XHS365 配置工具
 
 :MENU
 echo.
 echo  ╔══════════════════════════════════════════╗
-echo  ║       VueMonitor 配置工具                 ║
+echo  ║       XHS365 配置工具                 ║
 echo  ╠══════════════════════════════════════════╣
 echo  ║                                          ║
 echo  ║  1. 修改服务器地址（API 地址）             ║

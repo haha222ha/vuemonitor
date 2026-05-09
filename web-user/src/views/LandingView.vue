@@ -66,6 +66,12 @@
             <div class="stat-suffix">天</div>
             <div class="stat-label">提前发现潜力商品</div>
           </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <div class="stat-num" ref="stat4">0</div>
+            <div class="stat-suffix">+</div>
+            <div class="stat-label">每日新增监测</div>
+          </div>
         </div>
         <div class="hero-preview" v-observe>
           <div class="preview-frame">
@@ -590,6 +596,7 @@ const navScrolled = ref(false);
 const stat1 = ref<HTMLElement>();
 const stat2 = ref<HTMLElement>();
 const stat3 = ref<HTMLElement>();
+const stat4 = ref<HTMLElement>();
 
 const vObserve = {
   mounted(el: HTMLElement) {
@@ -631,9 +638,10 @@ onMounted(() => {
   statsObserver.value = new IntersectionObserver(
     ([entry]) => {
       if (entry.isIntersecting) {
-        if (stat1.value) animateNumber(stat1.value, 50000, "");
+        if (stat1.value) animateNumber(stat1.value, 200000, "");
         if (stat2.value) animateNumber(stat2.value, 92, "");
         if (stat3.value) animateNumber(stat3.value, 7, "");
+        if (stat4.value) animateNumber(stat4.value, 50000, "");
         statsObserver.value?.disconnect();
       }
     },

@@ -1,10 +1,10 @@
 @echo off
 chcp 65001 >nul 2>&1
-title VueMonitor 一键部署
+title XHS365 一键部署
 
 echo.
 echo  ╔══════════════════════════════════════════╗
-echo  ║       VueMonitor 一键部署工具 v0.1       ║
+echo  ║       XHS365 一键部署工具 v0.1          ║
 echo  ╚══════════════════════════════════════════╝
 echo.
 
@@ -123,7 +123,7 @@ if not exist "%~dp0server\.env" (
     for /f %%i in ('python -c "import secrets; print(secrets.token_hex(16))"') do set ENC_KEY=%%i
 
     (
-        echo APP_NAME=VueMonitor
+        echo APP_NAME=XHS365
         echo APP_VERSION=0.1.0
         echo DEBUG=true
         echo DB_HOST=localhost
@@ -188,17 +188,17 @@ if %errorlevel% neq 0 (
 
 :: 启动服务端
 cd /d "%~dp0server"
-start "VueMonitor-Server" cmd /k "poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 2>nul || python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
+start "XHS365-Server" cmd /k "poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 2>nul || python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
 timeout /t 3 >nul
 
 :: 启动客户端
 cd /d "%~dp0client"
-start "VueMonitor-Client" cmd /k "npm run dev"
+start "XHS365-Client" cmd /k "npm run dev"
 timeout /t 2 >nul
 
 :: 启动管理后台
 cd /d "%~dp0web-admin"
-start "VueMonitor-Admin" cmd /k "npm run dev"
+start "XHS365-Admin" cmd /k "npm run dev"
 
 :: ===== 完成 =====
 echo.

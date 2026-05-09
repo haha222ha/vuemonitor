@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "vuemonitor-server"
 version = "0.1.0"
-description = "VueMonitor AI E-commerce Monitoring Platform - Server"
-authors = ["VueMonitor Team"]
+description = "XHS365 AI E-commerce Monitoring Platform - Server"
+authors = ["XHS365 Team"]
 readme = "README.md"
 packages = [{include = "app"}, {include = "shared", from = ".."}]
 

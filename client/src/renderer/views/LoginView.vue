@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <el-card class="login-card">
-      <h2>VueMonitor 登录</h2>
+      <h2>XHS365 登录</h2>
       <el-form :model="form" :rules="loginRules" ref="loginFormRef" @submit.prevent="handleLogin">
         <el-form-item prop="email">
           <el-input v-model="form.email" placeholder="邮箱" type="email" />

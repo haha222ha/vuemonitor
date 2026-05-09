@@ -9,7 +9,7 @@ function createMainWindow(): BrowserWindow {
     height: 800,
     minWidth: 960,
     minHeight: 600,
-    title: "VueMonitor",
+    title: "XHS365",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,

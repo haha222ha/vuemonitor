@@ -9,7 +9,7 @@ NC='\033[0m'
 
 echo ""
 echo "  ╔══════════════════════════════════════════╗"
-echo "  ║   VueMonitor + Cloudflare 一键配置       ║"
+echo "  ║   XHS365 + Cloudflare 一键配置          ║"
 echo "  ╚══════════════════════════════════════════╝"
 echo ""
 
@@ -52,7 +52,7 @@ echo -e "  ${YELLOW}即将执行以下操作：${NC}"
 echo "  1. 安装 Nginx + Certbot"
 echo "  2. 申请 Let's Encrypt SSL 证书"
 echo "  3. 配置 Nginx 反向代理"
-echo "  4. 配置 VueMonitor 服务端"
+echo "  4. 配置 XHS365 服务端"
 echo "  5. 注册系统服务"
 echo ""
 read -p "  确认继续？(y/N): " CONFIRM
@@ -66,7 +66,7 @@ echo -e "  ${CYAN}[1/5]${NC} 安装依赖..."
 apt update -qq
 apt install -y -qq nginx certbot python3-certbot-nginx python3-certbot-dns-cloudflare > /dev/null 2>&1
 
-# ===== 2. 先部署 VueMonitor（如果还没部署）=====
+# ===== 2. 先部署 XHS365（如果还没部署）=====
 if [ ! -f "$SCRIPT_DIR/server/.env" ]; then
     echo -e "  ${CYAN}首次部署，运行 deploy.sh...${NC}"
     cd "$SCRIPT_DIR"
@@ -178,8 +178,8 @@ ln -sf /etc/nginx/sites-available/vuemonitor /etc/nginx/sites-enabled/
 rm -f /etc/nginx/sites-enabled/default
 nginx -t 2>/dev/null && systemctl reload nginx
 
-# ===== 5. 配置 VueMonitor =====
-echo -e "  ${CYAN}[4/5]${NC} 配置 VueMonitor..."
+# ===== 5. 配置 XHS365 =====
+echo -e "  ${CYAN}[4/5]${NC} 配置 XHS365..."
 
 ENV_FILE="$SCRIPT_DIR/server/.env"
 if [ -f "$ENV_FILE" ]; then

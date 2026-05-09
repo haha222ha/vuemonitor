@@ -1,10 +1,10 @@
 @echo off
 chcp 65001 >nul 2>&1
-title VueMonitor 一键构建
+title XHS365 一键构建
 
 echo.
 echo  ╔══════════════════════════════════════════╗
-echo  ║       VueMonitor 一键构建打包             ║
+echo  ║       XHS365 一键构建打包             ║
 echo  ╚══════════════════════════════════════════╝
 echo.
 

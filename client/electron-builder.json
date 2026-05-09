@@ -1,6 +1,6 @@
 {
-  "appId": "com.vuemonitor.app",
-  "productName": "VueMonitor",
+  "appId": "com.xhs365.app",
+  "productName": "XHS365",
   "directories": {
     "output": "release"
   },

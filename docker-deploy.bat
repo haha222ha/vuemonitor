@@ -1,10 +1,10 @@
 @echo off
 chcp 65001 >nul 2>&1
-title VueMonitor Docker 一键部署
+title XHS365 Docker 一键部署
 
 echo.
 echo  ╔══════════════════════════════════════════╗
-echo  ║     VueMonitor Docker 一键部署            ║
+echo  ║     XHS365 Docker 一键部署            ║
 echo  ╚══════════════════════════════════════════╝
 echo.
 

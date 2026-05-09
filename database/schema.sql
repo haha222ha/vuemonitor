@@ -1,4 +1,4 @@
--- VueMonitor Database Schema
+-- XHS365 Database Schema
 -- PostgreSQL 16+
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
