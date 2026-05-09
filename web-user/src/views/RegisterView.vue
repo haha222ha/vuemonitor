@@ -3,7 +3,7 @@
     <div class="auth-card">
       <div class="auth-header">
         <router-link to="/" class="auth-logo">
-          <span class="logo-icon">◆</span> VueMonitor
+          <span class="logo-icon">◆</span> XHS365
         </router-link>
         <h2>创建账户</h2>
         <p>免费注册，开始监控你的商品</p>

@@ -3,7 +3,7 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "VueMonitor"
+    APP_NAME: str = "XHS365"
     APP_VERSION: str = "0.1.0"
     DEBUG: bool = False
 
@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
-    SMTP_FROM: str = "noreply@vuemonitor.com"
+    SMTP_FROM: str = "noreply@xhs365.cn"
 
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:5174"]
 

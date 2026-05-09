@@ -4,7 +4,7 @@
       <div class="nav-inner">
         <div class="logo">
           <span class="logo-icon">◆</span>
-          <span class="logo-text">VueMonitor</span>
+          <span class="logo-text">XHS365</span>
         </div>
         <div class="nav-actions">
           <router-link to="/login" class="btn-ghost">登录</router-link>
@@ -102,8 +102,8 @@
 
     <footer class="footer">
       <div class="footer-inner">
-        <div class="footer-brand"><span class="logo-icon">◆</span> VueMonitor</div>
-        <div class="footer-copy">© 2026 VueMonitor. All rights reserved.</div>
+        <div class="footer-brand"><span class="logo-icon">◆</span> XHS365</div>
+        <div class="footer-copy">© 2026 XHS365. All rights reserved.</div>
       </div>
     </footer>
   </div>

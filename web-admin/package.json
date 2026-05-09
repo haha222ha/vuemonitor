@@ -1,8 +1,8 @@
 {
-  "name": "vuemonitor-web-admin",
+  "name": "xhs365-web-admin",
   "version": "0.1.0",
   "private": true,
-  "description": "VueMonitor Admin Dashboard",
+  "description": "XHS365 Admin Dashboard",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",

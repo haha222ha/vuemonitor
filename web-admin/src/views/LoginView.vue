@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <el-card class="login-card">
-      <h2>VueMonitor 管理后台</h2>
+      <h2>XHS365 管理后台</h2>
       <el-form :model="form" @submit.prevent="handleLogin">
         <el-form-item><el-input v-model="form.username" placeholder="管理员账号" /></el-form-item>
         <el-form-item><el-input v-model="form.password" placeholder="密码" type="password" show-password /></el-form-item>

@@ -1,8 +1,8 @@
 {
-  "name": "vuemonitor-web-user",
+  "name": "xhs365-web-user",
   "version": "0.1.0",
   "private": true,
-  "description": "VueMonitor User Web Frontend",
+  "description": "XHS365 User Web Frontend",
   "scripts": {
     "dev": "vite",
     "build": "npx vite build",

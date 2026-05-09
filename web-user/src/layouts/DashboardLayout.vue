@@ -3,7 +3,7 @@
     <el-aside width="240px" class="sidebar">
       <div class="sidebar-logo">
         <span class="logo-icon">◆</span>
-        <span class="logo-text">VueMonitor</span>
+        <span class="logo-text">XHS365</span>
         <el-tag v-if="auth.userPlan !== 'free'" size="small" :type="planTagType" class="plan-tag">{{ auth.userPlan.toUpperCase() }}</el-tag>
       </div>
       <el-menu :default-active="activeMenu" router class="sidebar-menu">
