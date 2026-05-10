@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -201,7 +201,7 @@ async def get_license_status(
 async def deactivate_device(
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
-    machine_fingerprint: str = Field(..., min_length=1, max_length=255),
+    machine_fingerprint: str = Body(..., min_length=1, max_length=255),
 ):
     activation_result = await db.execute(
         select(LicenseActivation).where(
