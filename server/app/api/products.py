@@ -198,7 +198,7 @@ async def get_product(
     )
     product = result.scalar_one_or_none()
     if not product:
-        raise NotFoundException(message="商品不存�?)
+        raise NotFoundException(message="商品不存在")
 
     feat_result = await db.execute(
         select(ProductFeature)
@@ -250,7 +250,7 @@ async def delete_product(
     )
     product = result.scalar_one_or_none()
     if not product:
-        raise NotFoundException(message="商品不存�?)
+        raise NotFoundException(message="商品不存在")
 
     await db.delete(product)
     return {"code": 0, "data": {"deleted": True}}
@@ -268,7 +268,7 @@ async def list_product_features(
         select(Product).where(Product.id == uuid.UUID(product_id), Product.user_id == user.id)
     )
     if not product_result.scalar_one_or_none():
-        raise NotFoundException(message="商品不存�?)
+        raise NotFoundException(message="商品不存在")
 
     query = (
         select(ProductFeature)
