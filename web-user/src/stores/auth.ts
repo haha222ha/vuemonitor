@@ -20,12 +20,8 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function register(email: string, password: string, nickname: string) {
-    const { data } = await api.post("/auth/register", { email, password, nickname });
-    if (data.access_token) {
-      token.value = data.access_token;
-      localStorage.setItem("access_token", data.access_token);
-    }
-    await fetchUser();
+    await api.post("/auth/register", { email, password, nickname });
+    await login(email, password);
   }
 
   async function fetchUser() {

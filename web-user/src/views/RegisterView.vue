@@ -53,7 +53,7 @@ const form = reactive({ nickname: "", email: "", password: "", confirmPassword: 
 const rules: FormRules = {
   nickname: [{ required: true, message: "请输入昵称", trigger: "blur" }],
   email: [{ required: true, message: "请输入邮箱", trigger: "blur" }, { type: "email", message: "邮箱格式不正确", trigger: "blur" }],
-  password: [{ required: true, message: "请输入密码", trigger: "blur" }, { min: 6, message: "密码至少6位", trigger: "blur" }],
+  password: [{ required: true, message: "请输入密码", trigger: "blur" }, { min: 8, message: "密码至少8位", trigger: "blur" }],
   confirmPassword: [
     { required: true, message: "请确认密码", trigger: "blur" },
     {
