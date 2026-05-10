@@ -44,6 +44,11 @@ const routes = [
         name: "Settings",
         component: () => import("./views/SettingsView.vue"),
       },
+      {
+        path: "license",
+        name: "License",
+        component: () => import("./views/LicenseView.vue"),
+      },
     ],
   },
 ];

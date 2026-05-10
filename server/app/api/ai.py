@@ -15,7 +15,7 @@ router = APIRouter(prefix="/ai", tags=["ai"])
 
 class AnalysisRequest(BaseModel):
     product_id: str
-    analysis_type: str = Field(..., pattern="^(basic_analysis|trend_score|prediction|risk_warning|report)$")
+    analysis_type: str = Field(..., pattern="^(basic_analysis|trend_score|prediction|risk_warning|report|product_optimization)$")
     provider: str | None = None
 
 

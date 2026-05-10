@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timezone
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -33,6 +34,12 @@ async def get_current_user(
         raise UnauthorizedException(message="用户不存在")
     if not user.is_active:
         raise UnauthorizedException(message="账户已禁用")
+
+    now = datetime.now(timezone.utc)
+    if user.plan != "free" and user.plan_expires_at and user.plan_expires_at < now:
+        user.plan = "free"
+        user.plan_expires_at = None
+        await db.flush()
 
     return user
 

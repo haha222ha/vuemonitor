@@ -72,9 +72,33 @@ export class SQLiteStorage {
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
 
+      CREATE TABLE IF NOT EXISTS ai_analysis (
+        id TEXT PRIMARY KEY,
+        product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+        analysis_type TEXT NOT NULL,
+        result TEXT NOT NULL DEFAULT '{}',
+        confidence REAL DEFAULT 0,
+        analyzed_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+
+      CREATE TABLE IF NOT EXISTS scheduled_tasks (
+        id TEXT PRIMARY KEY,
+        product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+        platform TEXT NOT NULL DEFAULT 'xhs',
+        platform_product_id TEXT NOT NULL,
+        product_name TEXT NOT NULL,
+        frequency_minutes INTEGER NOT NULL DEFAULT 60,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        last_run_at TEXT,
+        next_run_at TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+
       CREATE INDEX IF NOT EXISTS idx_product_features_product_id ON product_features(product_id);
       CREATE INDEX IF NOT EXISTS idx_product_features_collected_at ON product_features(collected_at);
       CREATE INDEX IF NOT EXISTS idx_sync_queue_synced ON sync_queue(synced);
+      CREATE INDEX IF NOT EXISTS idx_ai_analysis_product_id ON ai_analysis(product_id);
+      CREATE INDEX IF NOT EXISTS idx_scheduled_tasks_active ON scheduled_tasks(is_active);
     `);
   }
 
@@ -147,10 +171,17 @@ export class SQLiteStorage {
   }
 }
 
-export function getStorage(): SQLiteStorage {
+export function initStorage(): SQLiteStorage {
   if (!storage) {
     const dbPath = path.join(app.getPath("userData"), "vuemonitor.db");
     storage = new SQLiteStorage(dbPath);
+  }
+  return storage;
+}
+
+export function getStorage(): SQLiteStorage {
+  if (!storage) {
+    return initStorage();
   }
   return storage;
 }

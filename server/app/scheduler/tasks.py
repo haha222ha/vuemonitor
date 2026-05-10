@@ -92,6 +92,70 @@ async def cleanup_expired_tokens():
         logger.info(f"Cleaned up {len(expired)} expired refresh tokens")
 
 
+async def evaluate_monitor_rules():
+    from app.monitor.evaluator import RuleEvaluator
+
+    async with async_session_factory() as db:
+        try:
+            evaluator = RuleEvaluator(db)
+            triggered_count = await evaluator.evaluate_all_active_rules()
+            await db.commit()
+            if triggered_count > 0:
+                logger.info(f"Monitor rules evaluated: {triggered_count} rules triggered")
+        except Exception as e:
+            logger.error(f"Monitor rule evaluation failed: {e}")
+
+
+async def downgrade_expired_plans():
+    async with async_session_factory() as db:
+        from app.models.user import User
+        from app.models.license import LicenseCode, LicenseActivation
+        now = datetime.now(timezone.utc)
+
+        result = await db.execute(
+            select(User).where(
+                User.plan != "free",
+                User.plan_expires_at != None,
+                User.plan_expires_at < now,
+            )
+        )
+        expired_users = result.scalars().all()
+
+        downgraded_count = 0
+        for user in expired_users:
+            user.plan = "free"
+            user.plan_expires_at = None
+            downgraded_count += 1
+
+            await manager.send_to_user(str(user.id), {
+                "type": "plan:downgraded",
+                "data": {"reason": "套餐已过期", "current_plan": "free"},
+                "ts": now.isoformat(),
+            })
+
+        if downgraded_count > 0:
+            await db.commit()
+            logger.info(f"Auto-downgraded {downgraded_count} expired plan users to free")
+
+    async with async_session_factory() as db:
+        from app.models.license import LicenseCode
+        result = await db.execute(
+            select(LicenseCode).where(
+                LicenseCode.status == "active",
+                LicenseCode.expires_at != None,
+                LicenseCode.expires_at < now,
+            )
+        )
+        expired_licenses = result.scalars().all()
+
+        for lic in expired_licenses:
+            lic.status = "expired"
+
+        if expired_licenses:
+            await db.commit()
+            logger.info(f"Marked {len(expired_licenses)} licenses as expired")
+
+
 def setup_scheduler():
     scheduler.add_job(
         process_pending_tasks,
@@ -114,6 +178,22 @@ def setup_scheduler():
         CronTrigger(hour=3, minute=0),
         id="cleanup_expired_tokens",
         name="清理过期Token",
+        replace_existing=True,
+    )
+
+    scheduler.add_job(
+        evaluate_monitor_rules,
+        IntervalTrigger(minutes=5),
+        id="evaluate_monitor_rules",
+        name="评估监控规则",
+        replace_existing=True,
+    )
+
+    scheduler.add_job(
+        downgrade_expired_plans,
+        CronTrigger(hour=2, minute=0),
+        id="downgrade_expired_plans",
+        name="自动降级过期套餐",
         replace_existing=True,
     )
 

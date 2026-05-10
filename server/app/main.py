@@ -8,6 +8,7 @@ from app.config import get_settings
 from app.core.database import init_db
 from app.core.exceptions import register_exception_handlers
 from app.core.redis import close_redis
+from app.middleware.rate_limit import RedisRateLimitMiddleware
 from app.scheduler.tasks import setup_scheduler
 from app.ws.manager import router as ws_router
 
@@ -42,6 +43,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(RedisRateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,

@@ -15,8 +15,32 @@ def is_plan_sufficient(user_plan: PlanTier, required_plan: PlanTier) -> bool:
 
 
 PLAN_LIMITS: dict[PlanTier, dict] = {
-    "free": {"maxProducts": 3, "maxConcurrency": 2, "dailyCollectLimit": 50},
-    "pro": {"maxProducts": 50, "maxConcurrency": 8, "dailyCollectLimit": 500},
-    "premium": {"maxProducts": -1, "maxConcurrency": 16, "dailyCollectLimit": 2000},
-    "enterprise": {"maxProducts": -1, "maxConcurrency": 32, "dailyCollectLimit": -1},
+    "free": {"maxProducts": 10, "maxConcurrency": 2, "dailyCollectLimit": 50, "maxScheduleTasks": 0, "aiCallsPerDay": 5},
+    "pro": {"maxProducts": 100, "maxConcurrency": 5, "dailyCollectLimit": 500, "maxScheduleTasks": 20, "aiCallsPerDay": 50},
+    "premium": {"maxProducts": 500, "maxConcurrency": 8, "dailyCollectLimit": 2000, "maxScheduleTasks": 100, "aiCallsPerDay": 200},
+    "enterprise": {"maxProducts": -1, "maxConcurrency": 10, "dailyCollectLimit": -1, "maxScheduleTasks": -1, "aiCallsPerDay": -1},
+}
+
+PLAN_FEATURES_MAP: dict[str, list[str]] = {
+    "free": ["gate:monitor:add", "gate:monitor:manual_refresh", "gate:ai:basic_analysis"],
+    "pro": [
+        "gate:monitor:add", "gate:monitor:manual_refresh", "gate:monitor:auto_refresh",
+        "gate:monitor:history", "gate:monitor:export",
+        "gate:ai:basic_analysis", "gate:ai:trend_score", "gate:ai:report",
+        "gate:collect:playwright", "gate:collect:author_full", "gate:sync:cloud",
+    ],
+    "premium": [
+        "gate:monitor:add", "gate:monitor:manual_refresh", "gate:monitor:auto_refresh",
+        "gate:monitor:history", "gate:monitor:export",
+        "gate:ai:basic_analysis", "gate:ai:trend_score", "gate:ai:prediction",
+        "gate:ai:risk_warning", "gate:ai:report", "gate:ai:batch_analysis",
+        "gate:collect:playwright", "gate:collect:author_full", "gate:sync:cloud",
+    ],
+    "enterprise": [
+        "gate:monitor:add", "gate:monitor:manual_refresh", "gate:monitor:auto_refresh",
+        "gate:monitor:history", "gate:monitor:export",
+        "gate:ai:basic_analysis", "gate:ai:trend_score", "gate:ai:prediction",
+        "gate:ai:risk_warning", "gate:ai:report", "gate:ai:batch_analysis",
+        "gate:collect:playwright", "gate:collect:author_full", "gate:sync:cloud",
+    ],
 }

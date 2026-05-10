@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import case, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.cache import cache_get, cache_set
 from app.core.database import get_db
 from app.middleware.auth import CurrentUser
 from app.models.collect import CollectTask, CollectTaskItem
@@ -18,6 +19,10 @@ async def get_dashboard_stats(
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
+    cache_key = f"dashboard:stats:{user.id}"
+    cached = await cache_get(cache_key)
+    if cached is not None:
+        return {"code": 0, "data": cached}
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
 
     product_count_result = await db.execute(
@@ -218,24 +223,28 @@ async def get_dashboard_stats(
     )
     platform_dist = {row[0]: row[1] for row in platform_dist_result.all()}
 
+    stats_data = {
+        "product_count": product_count,
+        "active_product_count": active_product_count,
+        "today_trend": today_trend,
+        "trend_up_count": trend_up_count,
+        "trend_down_count": trend_down_count,
+        "ai_recommendations": ai_recommendations,
+        "risk_alerts": risk_alerts,
+        "today_collect": today_collect,
+        "active_tasks": active_tasks,
+        "success_rate": success_rate,
+        "collect_running": collect_running,
+        "today_ai_count": today_ai_count,
+        "recent_products": recent_items,
+        "platform_distribution": platform_dist,
+    }
+
+    await cache_set(cache_key, stats_data, ttl_seconds=120)
+
     return {
         "code": 0,
-        "data": {
-            "product_count": product_count,
-            "active_product_count": active_product_count,
-            "today_trend": today_trend,
-            "trend_up_count": trend_up_count,
-            "trend_down_count": trend_down_count,
-            "ai_recommendations": ai_recommendations,
-            "risk_alerts": risk_alerts,
-            "today_collect": today_collect,
-            "active_tasks": active_tasks,
-            "success_rate": success_rate,
-            "collect_running": collect_running,
-            "today_ai_count": today_ai_count,
-            "recent_products": recent_items,
-            "platform_distribution": platform_dist,
-        },
+        "data": stats_data,
     }
 
 

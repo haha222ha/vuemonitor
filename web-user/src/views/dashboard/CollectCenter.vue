@@ -1,11 +1,17 @@
 <template>
   <div class="collect-center">
     <div class="page-toolbar">
-      <h3>采集任务</h3>
-      <el-button type="primary" @click="showCreateDialog = true">+ 创建采集任务</el-button>
+      <h3>采集中心</h3>
+      <div class="toolbar-actions">
+        <el-tag v-if="wsConnected" type="success" size="small" effect="dark">
+          <span class="ws-dot"></span> 实时连接
+        </el-tag>
+        <el-tag v-else type="info" size="small" effect="dark">离线</el-tag>
+        <el-button type="primary" @click="openCreateDialog">+ 新建采集</el-button>
+      </div>
     </div>
 
-    <el-row :gutter="20" class="collect-stats">
+    <el-row :gutter="16" class="collect-stats">
       <el-col :span="6">
         <div class="mini-stat">
           <div class="mini-value">{{ taskStats.total }}</div>
@@ -27,7 +33,7 @@
       <el-col :span="6">
         <div class="mini-stat">
           <div class="mini-value" style="color: #ef4444;">{{ taskStats.failed }}</div>
-          <div class="mini-label">失败</div>
+          <div class="mini-label">失败/风控</div>
         </div>
       </el-col>
     </el-row>
@@ -39,6 +45,7 @@
         <el-option label="已完成" value="completed" />
         <el-option label="失败" value="failed" />
         <el-option label="已取消" value="cancelled" />
+        <el-option label="风控拦截" value="risk_detected" />
       </el-select>
       <el-select v-model="filterPlatform" placeholder="全部平台" clearable style="width: 130px" @change="fetchTasks">
         <el-option label="小红书" value="xhs" />
@@ -49,48 +56,65 @@
       </el-select>
     </div>
 
-    <el-table :data="tasks" stripe v-loading="loading" empty-text="暂无采集任务" @row-click="showTaskDetail">
-      <el-table-column prop="task_type" label="类型" width="100">
+    <el-table :data="tasks" stripe v-loading="loading" empty-text="暂无采集任务" @row-click="openTaskDetail">
+      <el-table-column prop="task_type" label="类型" width="80">
         <template #default="{ row }">
           <el-tag size="small">{{ taskTypeLabel(row.task_type) }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="platform" label="平台" width="90">
         <template #default="{ row }">
-          <el-tag size="small">{{ platformLabel(row.platform) }}</el-tag>
+          <span class="platform-badge" :style="{ borderColor: platformColors[row.platform] || '#6366f1' }">
+            {{ platformIcons[row.platform] || '' }} {{ platformLabel(row.platform) }}
+          </span>
         </template>
       </el-table-column>
-      <el-table-column prop="target_type" label="目标类型" width="100">
+      <el-table-column prop="target_type" label="目标" width="90">
         <template #default="{ row }">
           {{ targetTypeLabel(row.target_type) }}
         </template>
       </el-table-column>
-      <el-table-column label="目标" min-width="180">
+      <el-table-column label="目标ID" min-width="200">
         <template #default="{ row }">
-          <span class="target-ids">{{ (row.target_ids || []).join(', ') }}</span>
+          <div class="target-cell">
+            <span v-for="(tid, idx) in (row.target_ids || []).slice(0, 3)" :key="idx" class="target-chip">
+              {{ tid.length > 20 ? tid.slice(0, 20) + '...' : tid }}
+            </span>
+            <span v-if="(row.target_ids || []).length > 3" class="target-more">
+              +{{ row.target_ids.length - 3 }}
+            </span>
+          </div>
         </template>
       </el-table-column>
       <el-table-column prop="status" label="状态" width="100">
         <template #default="{ row }">
-          <el-tag :type="statusType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
+          <el-tag :type="statusType(row.status)" size="small" effect="dark">{{ statusLabel(row.status) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="progress" label="进度" width="120">
+      <el-table-column prop="progress" label="进度" width="140">
         <template #default="{ row }">
-          <el-progress :percentage="row.progress || 0" :stroke-width="6" :status="progressStatus(row)" />
+          <div class="progress-cell">
+            <el-progress
+              :percentage="row.progress || 0"
+              :stroke-width="6"
+              :status="progressStatus(row)"
+              :show-text="false"
+            />
+            <span class="progress-text">{{ row.progress || 0 }}%</span>
+          </div>
         </template>
       </el-table-column>
-      <el-table-column prop="created_at" label="创建时间" width="170">
+      <el-table-column prop="created_at" label="创建时间" width="160">
         <template #default="{ row }">
           {{ formatTime(row.created_at) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="180" fixed="right">
+      <el-table-column label="操作" width="200" fixed="right">
         <template #default="{ row }">
-          <el-button size="small" @click.stop="showTaskDetail(row)">详情</el-button>
+          <el-button size="small" @click.stop="openTaskDetail(row)">详情</el-button>
           <el-button v-if="row.status === 'pending'" size="small" type="primary" @click.stop="executeTask(row.id)">执行</el-button>
           <el-button v-if="row.status === 'running' || row.status === 'pending'" size="small" type="danger" @click.stop="cancelTask(row.id)">取消</el-button>
-          <el-button v-if="row.status === 'failed' || row.status === 'cancelled'" size="small" type="warning" @click.stop="retryTask(row.id)">重试</el-button>
+          <el-button v-if="row.status === 'failed' || row.status === 'cancelled' || row.status === 'risk_detected'" size="small" type="warning" @click.stop="retryTask(row.id)">重试</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -105,55 +129,106 @@
       />
     </div>
 
-    <el-dialog v-model="showCreateDialog" title="创建采集任务" width="520px" :close-on-click-modal="false">
-      <el-form :model="createForm" label-width="90px">
-        <el-form-item label="采集类型">
-          <el-select v-model="createForm.task_type" style="width: 100%">
-            <el-option label="商品采集" value="product" />
-            <el-option label="店铺采集" value="shop" />
-            <el-option label="分类采集" value="category" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="目标平台">
-          <el-select v-model="createForm.platform" style="width: 100%">
-            <el-option label="小红书" value="xhs" />
-            <el-option label="淘宝" value="taobao" />
-            <el-option label="京东" value="jd" />
-            <el-option label="拼多多" value="pdd" />
-            <el-option label="抖音" value="douyin" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="目标类型">
-          <el-select v-model="createForm.target_type" style="width: 100%">
-            <el-option label="商品ID" value="product_id" />
-            <el-option label="店铺ID" value="shop_id" />
-            <el-option label="分类URL" value="category_url" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="目标ID">
-          <el-input v-model="createForm.target_ids_text" type="textarea" :rows="3" placeholder="每行一个ID或URL" />
-        </el-form-item>
-      </el-form>
+    <el-dialog v-model="showCreateDialog" title="新建采集任务" width="600px" :close-on-click-modal="false" @opened="onCreateDialogOpened">
+      <div class="create-form">
+        <div class="url-input-section">
+          <div class="section-label">
+            <span>粘贴商品链接或ID</span>
+            <span class="section-hint">支持小红书、抖音、淘宝、京东、拼多多链接，自动识别</span>
+          </div>
+          <el-input
+            ref="urlInputRef"
+            v-model="createForm.urlInput"
+            type="textarea"
+            :rows="4"
+            placeholder="粘贴商品URL或输入商品ID，每行一个&#10;例如：https://www.xiaohongshu.com/explore/67a1b2c3d4e5f6"
+            @input="onUrlInput"
+          />
+          <div v-if="parsedResults.length" class="parsed-preview">
+            <div class="parsed-header">
+              <span>已识别 {{ parsedResults.length }} 个目标</span>
+              <el-button size="small" text type="danger" @click="clearParsed">清除</el-button>
+            </div>
+            <div class="parsed-list">
+              <div v-for="(p, idx) in parsedResults" :key="idx" class="parsed-item">
+                <span class="parsed-platform" :style="{ color: platformColors[p.platform] }">
+                  {{ platformIcons[p.platform] }} {{ platformLabel(p.platform) }}
+                </span>
+                <span class="parsed-type">{{ targetTypeLabel(p.targetType) }}</span>
+                <span class="parsed-id">{{ p.targetId }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <el-row :gutter="16" v-if="!parsedResults.length">
+          <el-col :span="8">
+            <div class="form-item">
+              <label>采集类型</label>
+              <el-select v-model="createForm.task_type" style="width: 100%">
+                <el-option label="商品采集" value="product" />
+                <el-option label="店铺采集" value="shop" />
+                <el-option label="分类采集" value="category" />
+              </el-select>
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div class="form-item">
+              <label>目标平台</label>
+              <el-select v-model="createForm.platform" style="width: 100%">
+                <el-option label="小红书" value="xhs" />
+                <el-option label="淘宝" value="taobao" />
+                <el-option label="京东" value="jd" />
+                <el-option label="拼多多" value="pdd" />
+                <el-option label="抖音" value="douyin" />
+              </el-select>
+            </div>
+          </el-col>
+          <el-col :span="8">
+            <div class="form-item">
+              <label>目标类型</label>
+              <el-select v-model="createForm.target_type" style="width: 100%">
+                <el-option label="商品ID" value="product_id" />
+                <el-option label="店铺ID" value="shop_id" />
+                <el-option label="分类URL" value="category_url" />
+              </el-select>
+            </div>
+          </el-col>
+        </el-row>
+      </div>
       <template #footer>
         <el-button @click="showCreateDialog = false">取消</el-button>
-        <el-button type="primary" :loading="creating" @click="createTask">创建任务</el-button>
+        <el-button type="primary" :loading="creating" @click="createTask">
+          创建任务 ({{ parsedResults.length || targetIdList.length || 0 }})
+        </el-button>
       </template>
     </el-dialog>
 
-    <el-dialog v-model="detailVisible" title="任务详情" width="640px" destroy-on-close>
+    <el-dialog v-model="detailVisible" title="任务详情" width="720px" destroy-on-close>
       <div v-if="detailLoading" style="text-align: center; padding: 30px;">
         <el-icon class="is-loading" :size="24"><Loading /></el-icon>
       </div>
       <template v-else-if="taskDetail">
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="任务ID">{{ taskDetail.id }}</el-descriptions-item>
+        <el-descriptions :column="2" border size="small">
+          <el-descriptions-item label="任务ID">
+            <span class="mono-text">{{ taskDetail.id }}</span>
+          </el-descriptions-item>
           <el-descriptions-item label="类型">{{ taskTypeLabel(taskDetail.task_type) }}</el-descriptions-item>
-          <el-descriptions-item label="平台">{{ platformLabel(taskDetail.platform) }}</el-descriptions-item>
+          <el-descriptions-item label="平台">
+            <span :style="{ color: platformColors[taskDetail.platform] }">
+              {{ platformIcons[taskDetail.platform] }} {{ platformLabel(taskDetail.platform) }}
+            </span>
+          </el-descriptions-item>
           <el-descriptions-item label="状态">
-            <el-tag :type="statusType(taskDetail.status)" size="small">{{ statusLabel(taskDetail.status) }}</el-tag>
+            <el-tag :type="statusType(taskDetail.status)" size="small" effect="dark">{{ statusLabel(taskDetail.status) }}</el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="目标类型">{{ targetTypeLabel(taskDetail.target_type) }}</el-descriptions-item>
-          <el-descriptions-item label="进度">{{ taskDetail.progress || 0 }}%</el-descriptions-item>
+          <el-descriptions-item label="进度">
+            <div class="progress-cell">
+              <el-progress :percentage="taskDetail.progress || 0" :stroke-width="6" :status="detailProgressStatus" :show-text="false" style="flex:1" />
+              <span class="progress-text">{{ taskDetail.progress || 0 }}%</span>
+            </div>
+          </el-descriptions-item>
           <el-descriptions-item label="创建时间">{{ formatTime(taskDetail.created_at) }}</el-descriptions-item>
           <el-descriptions-item label="完成时间">{{ formatTime(taskDetail.completed_at) }}</el-descriptions-item>
         </el-descriptions>
@@ -181,8 +256,8 @@
             </el-col>
             <el-col :span="6">
               <div class="rs-item total">
-                <div class="rs-val">{{ taskDetail.result_summary.total || 0 }}</div>
-                <div class="rs-lbl">总计</div>
+                <div class="rs-val">{{ taskDetail.result_summary.products_created || 0 }}</div>
+                <div class="rs-lbl">入库商品</div>
               </div>
             </el-col>
           </el-row>
@@ -195,36 +270,69 @@
 
         <div v-if="taskDetail.items && taskDetail.items.length" class="items-section">
           <h4>采集明细 ({{ taskDetail.items.length }})</h4>
-          <el-table :data="taskDetail.items" size="small" max-height="300">
-            <el-table-column prop="target_id" label="目标ID" min-width="180" />
-            <el-table-column prop="status" label="状态" width="100">
-              <template #default="{ row }">
-                <el-tag :type="statusType(row.status)" size="small">{{ statusLabel(row.status) }}</el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column label="结果" min-width="200">
-              <template #default="{ row }">
-                <span v-if="row.result && Object.keys(row.result).length">{{ JSON.stringify(row.result).slice(0, 80) }}...</span>
-                <span v-else-if="row.error_message" style="color: #ef4444;">{{ row.error_message }}</span>
-                <span v-else style="color: #4a4a5a;">—</span>
-              </template>
-            </el-table-column>
-          </el-table>
+          <div class="item-cards">
+            <div v-for="item in taskDetail.items" :key="item.id" class="item-card" :class="`item-card--${item.status}`">
+              <div class="item-card-header">
+                <span class="item-target-id">{{ item.target_id }}</span>
+                <el-tag :type="statusType(item.status)" size="small">{{ statusLabel(item.status) }}</el-tag>
+              </div>
+              <div v-if="item.result && item.result.product_name" class="item-card-body">
+                <div class="product-preview">
+                  <img v-if="item.result.image_url" :src="item.result.image_url" class="product-thumb" @error="onImgError" />
+                  <div class="product-info">
+                    <div class="product-name">{{ item.result.product_name }}</div>
+                    <div class="product-meta">
+                      <span v-if="item.result.price" class="product-price">¥{{ item.result.price }}</span>
+                      <span v-if="item.result.shop_name" class="product-shop">{{ item.result.shop_name }}</span>
+                    </div>
+                    <div class="product-stats-row">
+                      <span v-if="item.result.sales_count != null">销量 {{ item.result.sales_count }}</span>
+                      <span v-if="item.result.review_count != null">评论 {{ item.result.review_count }}</span>
+                      <span v-if="item.result.favorite_count != null">收藏 {{ item.result.favorite_count }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else-if="item.error_message" class="item-card-error">
+                {{ item.error_message }}
+              </div>
+            </div>
+          </div>
         </div>
       </template>
       <template #footer>
         <el-button @click="detailVisible = false">关闭</el-button>
-        <el-button v-if="taskDetail && (taskDetail.status === 'failed' || taskDetail.status === 'cancelled')" type="warning" @click="retryFromDetail">重试此任务</el-button>
+        <el-button v-if="taskDetail && (taskDetail.status === 'failed' || taskDetail.status === 'cancelled' || taskDetail.status === 'risk_detected')" type="warning" @click="retryFromDetail">重试此任务</el-button>
       </template>
     </el-dialog>
+
+    <transition-group name="notify-slide" tag="div" class="risk-notifications">
+      <div v-for="alert in riskAlerts" :key="alert.id" class="risk-alert" :class="`risk-alert--${alert.level}`">
+        <div class="risk-alert-icon">
+          <el-icon :size="18"><WarningFilled /></el-icon>
+        </div>
+        <div class="risk-alert-body">
+          <div class="risk-alert-title">{{ alert.title }}</div>
+          <div class="risk-alert-desc">{{ alert.desc }}</div>
+        </div>
+        <el-button size="small" text @click="dismissAlert(alert.id)">
+          <el-icon><Close /></el-icon>
+        </el-button>
+      </div>
+    </transition-group>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue";
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from "vue";
 import api from "../../utils/api";
 import { ElMessage } from "element-plus";
-import { Loading } from "@element-plus/icons-vue";
+import { Loading, WarningFilled, Close } from "@element-plus/icons-vue";
+import { useWebSocket } from "../../composables/useWebSocket";
+import { parseBatchInput, PLATFORM_ICONS, PLATFORM_COLORS } from "../../utils/urlParser";
+
+const platformIcons = PLATFORM_ICONS;
+const platformColors = PLATFORM_COLORS;
 
 const loading = ref(false);
 const creating = ref(false);
@@ -235,26 +343,46 @@ const pageSize = ref(20);
 const filterStatus = ref("");
 const filterPlatform = ref("");
 const showCreateDialog = ref(false);
+const urlInputRef = ref<any>(null);
 
 const detailVisible = ref(false);
 const detailLoading = ref(false);
 const taskDetail = ref<any>(null);
 
+const parsedResults = ref<any[]>([]);
+const riskAlerts = ref<any[]>([]);
+
 const createForm = reactive({
+  urlInput: "",
   task_type: "product",
   platform: "xhs",
   target_type: "product_id",
-  target_ids_text: "",
+});
+
+const { connected: wsConnected, on: wsOn, off: wsOff, connect: wsConnect } = useWebSocket();
+
+const targetIdList = computed(() => {
+  return createForm.urlInput
+    .split(/[\n,;，；]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 });
 
 const taskStats = computed(() => {
-  const total = tasks.value.length;
+  const t = tasks.value.length;
   return {
-    total,
-    running: tasks.value.filter((t) => t.status === "running" || t.status === "pending").length,
-    completed: tasks.value.filter((t) => t.status === "completed").length,
-    failed: tasks.value.filter((t) => t.status === "failed" || t.status === "cancelled").length,
+    total: t,
+    running: tasks.value.filter((x) => x.status === "running" || x.status === "pending").length,
+    completed: tasks.value.filter((x) => x.status === "completed").length,
+    failed: tasks.value.filter((x) => x.status === "failed" || x.status === "cancelled" || x.status === "risk_detected").length,
   };
+});
+
+const detailProgressStatus = computed(() => {
+  if (!taskDetail.value) return undefined;
+  if (taskDetail.value.status === "completed") return "success" as const;
+  if (taskDetail.value.status === "failed") return "exception" as const;
+  return undefined;
 });
 
 function taskTypeLabel(t: string) {
@@ -273,12 +401,18 @@ function targetTypeLabel(t: string) {
 }
 
 function statusType(s: string) {
-  const map: Record<string, string> = { pending: "warning", running: "primary", completed: "success", failed: "danger", cancelled: "info", risk_detected: "warning" };
+  const map: Record<string, string> = {
+    pending: "warning", running: "primary", completed: "success",
+    failed: "danger", cancelled: "info", risk_detected: "warning",
+  };
   return map[s] || "info";
 }
 
 function statusLabel(s: string) {
-  const map: Record<string, string> = { pending: "等待中", running: "运行中", completed: "已完成", failed: "失败", cancelled: "已取消", risk_detected: "风控拦截" };
+  const map: Record<string, string> = {
+    pending: "等待中", running: "运行中", completed: "已完成",
+    failed: "失败", cancelled: "已取消", risk_detected: "风控拦截",
+  };
   return map[s] || s;
 }
 
@@ -293,6 +427,96 @@ function formatTime(t: string | null) {
   const d = new Date(t);
   return d.toLocaleString("zh-CN", { hour12: false });
 }
+
+function onUrlInput() {
+  const text = createForm.urlInput.trim();
+  if (!text) {
+    parsedResults.value = [];
+    return;
+  }
+  const results = parseBatchInput(text);
+  if (results.length > 0) {
+    parsedResults.value = results;
+  } else {
+    parsedResults.value = [];
+  }
+}
+
+function clearParsed() {
+  parsedResults.value = [];
+  createForm.urlInput = "";
+}
+
+function openCreateDialog() {
+  createForm.urlInput = "";
+  createForm.task_type = "product";
+  createForm.platform = "xhs";
+  createForm.target_type = "product_id";
+  parsedResults.value = [];
+  showCreateDialog.value = true;
+}
+
+function onCreateDialogOpened() {
+  nextTick(() => {
+    urlInputRef.value?.focus();
+  });
+}
+
+function onImgError(e: Event) {
+  const img = e.target as HTMLImageElement;
+  img.style.display = "none";
+}
+
+function addRiskAlert(title: string, desc: string, level: string = "high") {
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  riskAlerts.value.push({ id, title, desc, level });
+  if (riskAlerts.value.length > 5) {
+    riskAlerts.value.shift();
+  }
+  setTimeout(() => {
+    dismissAlert(id);
+  }, 15000);
+}
+
+function dismissAlert(id: string) {
+  riskAlerts.value = riskAlerts.value.filter((a) => a.id !== id);
+}
+
+function handleWSProgress(data: any) {
+  if (!data?.task_id) return;
+  const idx = tasks.value.findIndex((t) => t.id === data.task_id);
+  if (idx >= 0) {
+    tasks.value[idx] = { ...tasks.value[idx], ...data, progress: data.progress ?? tasks.value[idx].progress };
+  }
+}
+
+function handleWSCompleted(data: any) {
+  if (!data?.task_id) return;
+  const idx = tasks.value.findIndex((t) => t.id === data.task_id);
+  if (idx >= 0) {
+    tasks.value[idx] = {
+      ...tasks.value[idx],
+      status: "completed",
+      progress: 100,
+      result_summary: data.summary,
+    };
+  }
+  if (data.summary) {
+    const s = data.summary;
+    ElMessage.success(`采集完成：成功 ${s.success || 0}，失败 ${s.failed || 0}，入库 ${s.products_created || 0}`);
+  }
+}
+
+function handleWSRiskAlert(data: any) {
+  addRiskAlert(
+    `风控告警 - ${platformLabel(data.platform || '')}`,
+    `${data.risk_type || '未知风险'}：${data.detail?.message || '请检查采集策略'}`,
+    data.risk_level === "critical" ? "critical" : "high"
+  );
+  fetchTasks();
+}
+
+let pollTimer: ReturnType<typeof setInterval> | null = null;
 
 async function fetchTasks() {
   loading.value = true;
@@ -311,27 +535,65 @@ async function fetchTasks() {
 }
 
 async function createTask() {
-  const targetIds = createForm.target_ids_text
-    .split("\n")
-    .map((s) => s.trim())
-    .filter(Boolean);
+  let targetIds: string[];
+  let platform = createForm.platform;
+  let targetType = createForm.target_type;
+  let taskType = createForm.task_type;
 
-  if (!targetIds.length) {
-    ElMessage.warning("请输入至少一个目标ID");
-    return;
+  if (parsedResults.value.length > 0) {
+    const grouped = new Map<string, any[]>();
+    for (const p of parsedResults.value) {
+      const key = `${p.platform}:${p.targetType}`;
+      if (!grouped.has(key)) grouped.set(key, []);
+      grouped.get(key)!.push(p);
+    }
+
+    if (grouped.size > 1) {
+      const entries = Array.from(grouped.entries());
+      for (const [key, items] of entries) {
+        const [p, t] = key.split(":");
+        try {
+          await api.post("/collect/tasks", {
+            task_type: t === "shop_id" ? "shop" : "product",
+            platform: p,
+            target_type: t,
+            target_ids: items.map((i) => i.targetId),
+          });
+        } catch (e: any) {
+          ElMessage.error(e?.response?.data?.message || `创建 ${platformLabel(p)} 任务失败`);
+        }
+      }
+      ElMessage.success(`已创建 ${grouped.size} 个采集任务`);
+      showCreateDialog.value = false;
+      fetchTasks();
+      return;
+    }
+
+    const first = parsedResults.value[0];
+    platform = first.platform;
+    targetType = first.targetType;
+    taskType = targetType === "shop_id" ? "shop" : "product";
+    targetIds = parsedResults.value.map((p) => p.targetId);
+  } else {
+    targetIds = targetIdList.value;
+    if (!targetIds.length) {
+      ElMessage.warning("请输入至少一个目标ID或链接");
+      return;
+    }
   }
 
   creating.value = true;
   try {
     await api.post("/collect/tasks", {
-      task_type: createForm.task_type,
-      platform: createForm.platform,
-      target_type: createForm.target_type,
+      task_type: taskType,
+      platform,
+      target_type: targetType,
       target_ids: targetIds,
     });
     ElMessage.success("采集任务已创建");
     showCreateDialog.value = false;
-    createForm.target_ids_text = "";
+    createForm.urlInput = "";
+    parsedResults.value = [];
     fetchTasks();
   } catch (e: any) {
     const msg = e?.response?.data?.message || "创建失败";
@@ -356,7 +618,6 @@ async function executeTask(id: string) {
     await api.post(`/collect/tasks/${id}/execute`);
     ElMessage.success("任务已开始执行");
     fetchTasks();
-    setTimeout(fetchTasks, 5000);
   } catch (e: any) {
     ElMessage.error(e?.response?.data?.message || "执行失败");
   }
@@ -372,7 +633,7 @@ async function retryTask(id: string) {
   }
 }
 
-async function showTaskDetail(row: any) {
+async function openTaskDetail(row: any) {
   detailVisible.value = true;
   detailLoading.value = true;
   taskDetail.value = null;
@@ -398,7 +659,31 @@ async function retryFromDetail() {
   }
 }
 
-onMounted(fetchTasks);
+function refreshRunningTasks() {
+  const hasRunning = tasks.value.some((t) => t.status === "running" || t.status === "pending");
+  if (hasRunning) {
+    fetchTasks();
+  }
+}
+
+onMounted(() => {
+  fetchTasks();
+  wsConnect();
+  wsOn("collect:progress", handleWSProgress);
+  wsOn("collect:completed", handleWSCompleted);
+  wsOn("collect:risk_alert", handleWSRiskAlert);
+  pollTimer = setInterval(refreshRunningTasks, 10000);
+});
+
+onUnmounted(() => {
+  wsOff("collect:progress", handleWSProgress);
+  wsOff("collect:completed", handleWSCompleted);
+  wsOff("collect:risk_alert", handleWSRiskAlert);
+  if (pollTimer) {
+    clearInterval(pollTimer);
+    pollTimer = null;
+  }
+});
 </script>
 
 <style scoped>
@@ -418,6 +703,27 @@ onMounted(fetchTasks);
   font-weight: 600;
   color: #fff;
   margin: 0;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ws-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  margin-right: 4px;
+  animation: pulse-dot 2s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 .collect-stats {
@@ -450,20 +756,145 @@ onMounted(fetchTasks);
   margin-bottom: 16px;
 }
 
-.target-ids {
+.platform-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 12px;
-  color: #9a9aaa;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 180px;
-  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid;
+  border-left-width: 3px;
+}
+
+.target-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.target-chip {
+  font-size: 11px;
+  color: #b0b0c0;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.target-more {
+  font-size: 11px;
+  color: #6366f1;
+  padding: 2px 4px;
+}
+
+.progress-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-text {
+  font-size: 12px;
+  color: #8a8a9a;
+  min-width: 32px;
+  text-align: right;
 }
 
 .pagination-bar {
   display: flex;
   justify-content: center;
   margin-top: 20px;
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.url-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section-label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #e0e0e6;
+}
+
+.section-hint {
+  font-size: 12px;
+  color: #6a6a7a;
+  font-weight: 400;
+}
+
+.parsed-preview {
+  background: rgba(99, 102, 241, 0.06);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.parsed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #a5b4fc;
+}
+
+.parsed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.parsed-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
+}
+
+.parsed-platform {
+  font-weight: 600;
+  min-width: 70px;
+}
+
+.parsed-type {
+  color: #8a8a9a;
+  min-width: 60px;
+}
+
+.parsed-id {
+  color: #b0b0c0;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-item label {
+  font-size: 13px;
+  color: #8a8a9a;
 }
 
 .result-summary {
@@ -529,5 +960,190 @@ onMounted(fetchTasks);
   font-size: 14px;
   color: #e0e0e6;
   margin: 0 0 12px;
+}
+
+.item-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.item-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 12px;
+  transition: border-color 0.2s;
+}
+
+.item-card--completed { border-left: 3px solid #22c55e; }
+.item-card--failed { border-left: 3px solid #ef4444; }
+.item-card--risk_detected { border-left: 3px solid #f59e0b; }
+.item-card--pending { border-left: 3px solid #6366f1; }
+.item-card--running { border-left: 3px solid #6366f1; }
+
+.item-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.item-target-id {
+  font-size: 12px;
+  font-family: monospace;
+  color: #8a8a9a;
+}
+
+.item-card-body {
+  margin-top: 4px;
+}
+
+.product-preview {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.product-thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-name {
+  font-size: 13px;
+  color: #e0e0e6;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.product-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.product-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ef4444;
+}
+
+.product-shop {
+  font-size: 12px;
+  color: #8a8a9a;
+}
+
+.product-stats-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #6a6a7a;
+}
+
+.item-card-error {
+  font-size: 12px;
+  color: #fca5a5;
+  margin-top: 4px;
+}
+
+.mono-text {
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.risk-notifications {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 380px;
+}
+
+.risk-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #1a1a24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  animation: slide-in 0.3s ease-out;
+}
+
+.risk-alert--critical {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.risk-alert--high {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.06);
+}
+
+.risk-alert-icon {
+  color: #f59e0b;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.risk-alert--critical .risk-alert-icon {
+  color: #ef4444;
+}
+
+.risk-alert-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.risk-alert-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e0e0e6;
+}
+
+.risk-alert-desc {
+  font-size: 12px;
+  color: #8a8a9a;
+  margin-top: 2px;
+}
+
+.notify-slide-enter-active {
+  animation: slide-in 0.3s ease-out;
+}
+
+.notify-slide-leave-active {
+  animation: slide-out 0.2s ease-in;
+}
+
+@keyframes slide-in {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slide-out {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
 }
 </style>

@@ -1,4 +1,4 @@
-import re
+﻿import re
 import uuid
 from datetime import datetime
 
@@ -22,24 +22,6 @@ PLATFORM_PATTERNS = {
         re.compile(r"xiaohongshu\.com/discovery/item/([a-f0-9]{24})", re.I),
         re.compile(r"xhslink\.com/(\w+)", re.I),
     ],
-    "taobao": [
-        re.compile(r"taobao\.com/item\.htm.*[?&]id=(\d+)", re.I),
-        re.compile(r"tmall\.com/item\.htm.*[?&]id=(\d+)", re.I),
-        re.compile(r"m\.taobao\.com.*[?&]id=(\d+)", re.I),
-    ],
-    "jd": [
-        re.compile(r"jd\.com/product/(\d+)", re.I),
-        re.compile(r"item\.jd\.com/(\d+)", re.I),
-        re.compile(r"item\.m\.jd\.com/product/(\d+)", re.I),
-    ],
-    "pdd": [
-        re.compile(r"yangkeduo\.com/goods\.html\?.*goods_id=(\d+)", re.I),
-        re.compile(r"pinduoduo\.com/goods\.html\?.*goods_id=(\d+)", re.I),
-    ],
-    "douyin": [
-        re.compile(r"douyin\.com/video/(\d+)", re.I),
-        re.compile(r"iesdouyin\.com/share/video/(\d+)", re.I),
-    ],
 }
 
 
@@ -53,7 +35,7 @@ def parse_product_url(url: str) -> tuple[str | None, str | None]:
 
 
 class ProductCreateRequest(BaseModel):
-    platform: str | None = Field(None, pattern="^(xhs|douyin|taobao|jd|pdd)$")
+    platform: str | None = Field(None, pattern="^xhs$")
     platform_product_id: str | None = Field(None, min_length=1, max_length=255)
     product_name: str | None = Field(None, min_length=1, max_length=500)
     url: str | None = None
@@ -85,7 +67,7 @@ async def create_product(
     )
     limits = PLAN_LIMITS.get(user.plan, PLAN_LIMITS["free"])
     if limits["maxProducts"] > 0 and (count_result.scalar() or 0) >= limits["maxProducts"]:
-        raise ForbiddenException(code=42011, message=f"当前套餐最多监控{limits['maxProducts']}个商品")
+        raise ForbiddenException(code=42011, message=f"当前套餐最多监控{limits['maxProducts']}个笔�?)
 
     platform = req.platform
     platform_product_id = req.platform_product_id
@@ -98,12 +80,12 @@ async def create_product(
             platform_product_id = platform_product_id or parsed_id
             product_url = product_url or req.url
         else:
-            raise BadRequestException(message="无法识别该链接，请手动选择平台并输入商品ID")
+            raise BadRequestException(message="无法识别该链接，请手动输入商品ID")
 
     if not platform or not platform_product_id:
-        raise BadRequestException(message="请提供商品URL或手动选择平台和商品ID")
+        raise BadRequestException(message="请提供商品URL或手动输入商品ID")
 
-    product_name = req.product_name or f"{platform}商品-{platform_product_id[:8]}"
+    product_name = req.product_name or f"小红书笔�?{platform_product_id[:8]}"
 
     existing = await db.execute(
         select(Product).where(
@@ -216,7 +198,7 @@ async def get_product(
     )
     product = result.scalar_one_or_none()
     if not product:
-        raise NotFoundException(message="商品不存在")
+        raise NotFoundException(message="商品不存�?)
 
     feat_result = await db.execute(
         select(ProductFeature)
@@ -268,7 +250,7 @@ async def delete_product(
     )
     product = result.scalar_one_or_none()
     if not product:
-        raise NotFoundException(message="商品不存在")
+        raise NotFoundException(message="商品不存�?)
 
     await db.delete(product)
     return {"code": 0, "data": {"deleted": True}}
@@ -286,7 +268,7 @@ async def list_product_features(
         select(Product).where(Product.id == uuid.UUID(product_id), Product.user_id == user.id)
     )
     if not product_result.scalar_one_or_none():
-        raise NotFoundException(message="商品不存在")
+        raise NotFoundException(message="商品不存�?)
 
     query = (
         select(ProductFeature)

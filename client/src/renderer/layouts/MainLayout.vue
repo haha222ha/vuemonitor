@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <el-container class="main-layout">
     <el-aside width="220px" class="sidebar">
       <div class="logo">
@@ -25,6 +25,10 @@
           <el-icon><Setting /></el-icon>
           <span>设置</span>
         </el-menu-item>
+        <el-menu-item index="/license">
+          <el-icon><Key /></el-icon>
+          <span>授权管理</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>
@@ -50,7 +54,7 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth";
-import { Monitor, Goods, Bell, MagicStick, Setting } from "@element-plus/icons-vue";
+import { Monitor, Goods, Bell, MagicStick, Setting, Key } from "@element-plus/icons-vue";
 
 const route = useRoute();
 const authStore = useAuthStore();
