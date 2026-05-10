@@ -56,7 +56,7 @@ class ProxyManager:
 
 class RiskDetector:
     RISK_PATTERNS = {
-        "captcha": {"keywords": ["验证�?, "captcha", "verify", "安全验证"], "level": "high"},
+        "captcha": {"keywords": ["验证码", "captcha", "verify", "安全验证"], "level": "high"},
         "login_required": {"keywords": ["登录", "login", "sign in"], "level": "high"},
         "rate_limit": {"keywords": ["频繁", "too many", "rate limit", "429", "请求过于频繁"], "level": "medium"},
         "ip_blocked": {"keywords": ["封禁", "blocked", "forbidden", "403"], "level": "critical"},
@@ -70,7 +70,7 @@ class RiskDetector:
             messages = {
                 403: "HTTP 403 - 风控拦截",
                 429: "HTTP 429 - 频率限制",
-                461: "HTTP 461 - 验证码触�?,
+                461: "HTTP 461 - 验证码触发",
             }
             return {
                 "risk_type": {403: "ip_blocked", 429: "rate_limit", 461: "captcha"}.get(status_code, "unknown"),
@@ -82,7 +82,7 @@ class RiskDetector:
             return {
                 "risk_type": "server_error",
                 "risk_level": "low",
-                "detail": {"status_code": status_code, "message": f"HTTP {status_code} - 服务端异�?},
+                "detail": {"status_code": status_code, "message": f"HTTP {status_code} - 服务端异常"},
             }
 
         text_lower = response_text.lower()
@@ -233,7 +233,7 @@ class CollectEngine:
         result = await self.db.execute(select(CollectTask).where(CollectTask.id == task_id))
         task = result.scalar_one_or_none()
         if not task:
-            return {"status": "error", "message": "任务不存�?}
+            return {"status": "error", "message": "任务不存在"}
 
         task.status = "running"
         task.started_at = datetime.now(timezone.utc)

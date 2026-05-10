@@ -14,10 +14,10 @@ logger = logging.getLogger(__name__)
 
 RULE_TYPE_LABELS = {
     "price_drop": "价格下跌",
-    "sales_surge": "销量激�?,
+    "sales_surge": "销量激增",
     "stock_change": "库存变化",
     "rating_drop": "评分下降",
-    "custom": "自定义规�?,
+    "custom": "自定义规则",
 }
 
 
@@ -255,17 +255,17 @@ class RuleEvaluator:
             old_price = float(prev.price) if prev.price else 0
             new_price = float(latest.price) if latest.price else 0
             drop_pct = ((old_price - new_price) / old_price * 100) if old_price > 0 else 0
-            return f"商品「{product_name}」价格从 ¥{old_price:.2f} 降至 ¥{new_price:.2f}，降�?{drop_pct:.1f}%"
+            return f"商品「{product_name}」价格从 ¥{old_price:.2f} 降至 ¥{new_price:.2f}，降�?{drop_pct:.1f}%"
 
         elif rule_type == "sales_surge":
             old_sales = prev.sales_count or 0
             new_sales = latest.sales_count or 0
             increase = new_sales - old_sales
             surge_pct = (increase / old_sales * 100) if old_sales > 0 else 0
-            return f"商品「{product_name}」销量从 {old_sales} 增至 {new_sales}，增�?{surge_pct:.1f}%"
+            return f"商品「{product_name}」销量从 {old_sales} 增至 {new_sales}，增幅{surge_pct:.1f}%"
 
         elif rule_type == "stock_change":
-            return f"商品「{product_name}」库存状态从「{prev.stock_status}」变为「{latest.stock_status}�?
+            return f"商品「{product_name}」库存状态从「{prev.stock_status}」变为「{latest.stock_status}」"
 
         elif rule_type == "rating_drop":
             old_rating = float(prev.rating) if prev.rating else 0
@@ -273,4 +273,4 @@ class RuleEvaluator:
             return f"商品「{product_name}」评分从 {old_rating:.1f} 降至 {new_rating:.1f}"
 
         else:
-            return f"商品「{product_name}」触发了监控规则「{rule.rule_name}�?
+            return f"商品「{product_name}」触发了监控规则「{rule.rule_name}」"
