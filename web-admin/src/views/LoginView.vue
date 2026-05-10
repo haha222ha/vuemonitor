@@ -26,7 +26,7 @@ async function handleLogin() {
   try {
     const { data } = await api.post("/admin/login", form);
     localStorage.setItem("admin_token", data.access_token);
-    router.push("/admin/dashboard");
+    router.push("/dashboard");
     ElMessage.success("登录成功");
   } catch { ElMessage.error("登录失败"); }
   finally { loading.value = false; }

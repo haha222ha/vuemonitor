@@ -3,13 +3,13 @@
     <el-aside width="220px" class="sidebar">
       <div class="logo"><h2>VM Admin</h2></div>
       <el-menu :default-active="route.path" router>
-        <el-menu-item index="/admin/dashboard">仪表盘</el-menu-item>
-        <el-menu-item index="/admin/users">用户管理</el-menu-item>
-        <el-menu-item index="/admin/licenses">授权码管理</el-menu-item>
-        <el-menu-item index="/admin/collect">采集管理</el-menu-item>
-        <el-menu-item index="/admin/proxies">代理池管理</el-menu-item>
-        <el-menu-item index="/admin/risk-events">风控事件</el-menu-item>
-        <el-menu-item index="/admin/audit-logs">操作日志</el-menu-item>
+        <el-menu-item index="/dashboard">仪表盘</el-menu-item>
+        <el-menu-item index="/users">用户管理</el-menu-item>
+        <el-menu-item index="/licenses">授权码管理</el-menu-item>
+        <el-menu-item index="/collect">采集管理</el-menu-item>
+        <el-menu-item index="/proxies">代理池管理</el-menu-item>
+        <el-menu-item index="/risk-events">风控事件</el-menu-item>
+        <el-menu-item index="/audit-logs">操作日志</el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>
@@ -27,7 +27,7 @@ const route = useRoute();
 const router = useRouter();
 function logout() {
   localStorage.removeItem("admin_token");
-  router.push("/admin/login");
+  router.push("/login");
 }
 </script>
 

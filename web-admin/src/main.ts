@@ -51,7 +51,7 @@ router.beforeEach(async (to, _from, next) => {
     next();
   } catch {
     localStorage.removeItem("admin_token");
-    next("/admin/login");
+    next(`${BASE_PATH}login`.replace("//", "/"));
   }
 });
 
