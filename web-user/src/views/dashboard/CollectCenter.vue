@@ -7,8 +7,18 @@
           <span class="ws-dot"></span> 实时连接
         </el-tag>
         <el-tag v-else type="info" size="small" effect="dark">离线</el-tag>
-        <el-button type="primary" @click="openCreateDialog">+ 新建采集</el-button>
       </div>
+    </div>
+
+    <div class="client-banner">
+      <div class="banner-content">
+        <span class="banner-icon">⚡</span>
+        <div class="banner-text">
+          <strong>采集功能需使用桌面客户端</strong>
+          <span>下载 XHS365 客户端，使用本地浏览器资源采集，更快更安全</span>
+        </div>
+      </div>
+      <el-button type="primary" size="small">下载客户端</el-button>
     </div>
 
     <el-row :gutter="16" class="collect-stats">
@@ -109,12 +119,9 @@
           {{ formatTime(row.created_at) }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="操作" width="80" fixed="right">
         <template #default="{ row }">
           <el-button size="small" @click.stop="openTaskDetail(row)">详情</el-button>
-          <el-button v-if="row.status === 'pending'" size="small" type="primary" @click.stop="executeTask(row.id)">执行</el-button>
-          <el-button v-if="row.status === 'running' || row.status === 'pending'" size="small" type="danger" @click.stop="cancelTask(row.id)">取消</el-button>
-          <el-button v-if="row.status === 'failed' || row.status === 'cancelled' || row.status === 'risk_detected'" size="small" type="warning" @click.stop="retryTask(row.id)">重试</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -128,81 +135,6 @@
         @current-change="fetchTasks"
       />
     </div>
-
-    <el-dialog v-model="showCreateDialog" title="新建采集任务" width="600px" :close-on-click-modal="false" @opened="onCreateDialogOpened">
-      <div class="create-form">
-        <div class="url-input-section">
-          <div class="section-label">
-            <span>粘贴商品链接或ID</span>
-            <span class="section-hint">支持小红书、抖音、淘宝、京东、拼多多链接，自动识别</span>
-          </div>
-          <el-input
-            ref="urlInputRef"
-            v-model="createForm.urlInput"
-            type="textarea"
-            :rows="4"
-            placeholder="粘贴商品URL或输入商品ID，每行一个&#10;例如：https://www.xiaohongshu.com/explore/67a1b2c3d4e5f6"
-            @input="onUrlInput"
-          />
-          <div v-if="parsedResults.length" class="parsed-preview">
-            <div class="parsed-header">
-              <span>已识别 {{ parsedResults.length }} 个目标</span>
-              <el-button size="small" text type="danger" @click="clearParsed">清除</el-button>
-            </div>
-            <div class="parsed-list">
-              <div v-for="(p, idx) in parsedResults" :key="idx" class="parsed-item">
-                <span class="parsed-platform" :style="{ color: platformColors[p.platform] }">
-                  {{ platformIcons[p.platform] }} {{ platformLabel(p.platform) }}
-                </span>
-                <span class="parsed-type">{{ targetTypeLabel(p.targetType) }}</span>
-                <span class="parsed-id">{{ p.targetId }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <el-row :gutter="16" v-if="!parsedResults.length">
-          <el-col :span="8">
-            <div class="form-item">
-              <label>采集类型</label>
-              <el-select v-model="createForm.task_type" style="width: 100%">
-                <el-option label="商品采集" value="product" />
-                <el-option label="店铺采集" value="shop" />
-                <el-option label="分类采集" value="category" />
-              </el-select>
-            </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="form-item">
-              <label>目标平台</label>
-              <el-select v-model="createForm.platform" style="width: 100%">
-                <el-option label="小红书" value="xhs" />
-                <el-option label="淘宝" value="taobao" />
-                <el-option label="京东" value="jd" />
-                <el-option label="拼多多" value="pdd" />
-                <el-option label="抖音" value="douyin" />
-              </el-select>
-            </div>
-          </el-col>
-          <el-col :span="8">
-            <div class="form-item">
-              <label>目标类型</label>
-              <el-select v-model="createForm.target_type" style="width: 100%">
-                <el-option label="商品ID" value="product_id" />
-                <el-option label="店铺ID" value="shop_id" />
-                <el-option label="分类URL" value="category_url" />
-              </el-select>
-            </div>
-          </el-col>
-        </el-row>
-      </div>
-      <template #footer>
-        <el-button @click="showCreateDialog = false">取消</el-button>
-        <el-button type="primary" :loading="creating" @click="createTask">
-          创建任务 ({{ parsedResults.length || targetIdList.length || 0 }})
-        </el-button>
-      </template>
-    </el-dialog>
 
     <el-dialog v-model="detailVisible" title="任务详情" width="720px" destroy-on-close>
       <div v-if="detailLoading" style="text-align: center; padding: 30px;">
@@ -302,7 +234,6 @@
       </template>
       <template #footer>
         <el-button @click="detailVisible = false">关闭</el-button>
-        <el-button v-if="taskDetail && (taskDetail.status === 'failed' || taskDetail.status === 'cancelled' || taskDetail.status === 'risk_detected')" type="warning" @click="retryFromDetail">重试此任务</el-button>
       </template>
     </el-dialog>
 
@@ -324,49 +255,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import api from "../../utils/api";
 import { ElMessage } from "element-plus";
 import { Loading, WarningFilled, Close } from "@element-plus/icons-vue";
 import { useWebSocket } from "../../composables/useWebSocket";
-import { parseBatchInput, PLATFORM_ICONS, PLATFORM_COLORS } from "../../utils/urlParser";
+import { PLATFORM_ICONS, PLATFORM_COLORS } from "../../utils/urlParser";
 
 const platformIcons = PLATFORM_ICONS;
 const platformColors = PLATFORM_COLORS;
 
 const loading = ref(false);
-const creating = ref(false);
 const tasks = ref<any[]>([]);
 const total = ref(0);
 const currentPage = ref(1);
 const pageSize = ref(20);
 const filterStatus = ref("");
 const filterPlatform = ref("");
-const showCreateDialog = ref(false);
-const urlInputRef = ref<any>(null);
 
 const detailVisible = ref(false);
 const detailLoading = ref(false);
 const taskDetail = ref<any>(null);
 
-const parsedResults = ref<any[]>([]);
 const riskAlerts = ref<any[]>([]);
 
-const createForm = reactive({
-  urlInput: "",
-  task_type: "product",
-  platform: "xhs",
-  target_type: "product_id",
-});
-
 const { connected: wsConnected, on: wsOn, off: wsOff, connect: wsConnect } = useWebSocket();
-
-const targetIdList = computed(() => {
-  return createForm.urlInput
-    .split(/[\n,;，；]+/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-});
 
 const taskStats = computed(() => {
   const t = tasks.value.length;
@@ -426,40 +339,6 @@ function formatTime(t: string | null) {
   if (!t) return "—";
   const d = new Date(t);
   return d.toLocaleString("zh-CN", { hour12: false });
-}
-
-function onUrlInput() {
-  const text = createForm.urlInput.trim();
-  if (!text) {
-    parsedResults.value = [];
-    return;
-  }
-  const results = parseBatchInput(text);
-  if (results.length > 0) {
-    parsedResults.value = results;
-  } else {
-    parsedResults.value = [];
-  }
-}
-
-function clearParsed() {
-  parsedResults.value = [];
-  createForm.urlInput = "";
-}
-
-function openCreateDialog() {
-  createForm.urlInput = "";
-  createForm.task_type = "product";
-  createForm.platform = "xhs";
-  createForm.target_type = "product_id";
-  parsedResults.value = [];
-  showCreateDialog.value = true;
-}
-
-function onCreateDialogOpened() {
-  nextTick(() => {
-    urlInputRef.value?.focus();
-  });
 }
 
 function onImgError(e: Event) {
@@ -534,105 +413,6 @@ async function fetchTasks() {
   }
 }
 
-async function createTask() {
-  let targetIds: string[];
-  let platform = createForm.platform;
-  let targetType = createForm.target_type;
-  let taskType = createForm.task_type;
-
-  if (parsedResults.value.length > 0) {
-    const grouped = new Map<string, any[]>();
-    for (const p of parsedResults.value) {
-      const key = `${p.platform}:${p.targetType}`;
-      if (!grouped.has(key)) grouped.set(key, []);
-      grouped.get(key)!.push(p);
-    }
-
-    if (grouped.size > 1) {
-      const entries = Array.from(grouped.entries());
-      for (const [key, items] of entries) {
-        const [p, t] = key.split(":");
-        try {
-          await api.post("/collect/tasks", {
-            task_type: t === "shop_id" ? "shop" : "product",
-            platform: p,
-            target_type: t,
-            target_ids: items.map((i) => i.targetId),
-          });
-        } catch (e: any) {
-          ElMessage.error(e?.response?.data?.message || `创建 ${platformLabel(p)} 任务失败`);
-        }
-      }
-      ElMessage.success(`已创建 ${grouped.size} 个采集任务`);
-      showCreateDialog.value = false;
-      fetchTasks();
-      return;
-    }
-
-    const first = parsedResults.value[0];
-    platform = first.platform;
-    targetType = first.targetType;
-    taskType = targetType === "shop_id" ? "shop" : "product";
-    targetIds = parsedResults.value.map((p) => p.targetId);
-  } else {
-    targetIds = targetIdList.value;
-    if (!targetIds.length) {
-      ElMessage.warning("请输入至少一个目标ID或链接");
-      return;
-    }
-  }
-
-  creating.value = true;
-  try {
-    await api.post("/collect/tasks", {
-      task_type: taskType,
-      platform,
-      target_type: targetType,
-      target_ids: targetIds,
-    });
-    ElMessage.success("采集任务已创建");
-    showCreateDialog.value = false;
-    createForm.urlInput = "";
-    parsedResults.value = [];
-    fetchTasks();
-  } catch (e: any) {
-    const msg = e?.response?.data?.message || "创建失败";
-    ElMessage.error(msg);
-  } finally {
-    creating.value = false;
-  }
-}
-
-async function cancelTask(id: string) {
-  try {
-    await api.post(`/collect/tasks/${id}/cancel`);
-    ElMessage.success("已取消");
-    fetchTasks();
-  } catch {
-    ElMessage.error("取消失败");
-  }
-}
-
-async function executeTask(id: string) {
-  try {
-    await api.post(`/collect/tasks/${id}/execute`);
-    ElMessage.success("任务已开始执行");
-    fetchTasks();
-  } catch (e: any) {
-    ElMessage.error(e?.response?.data?.message || "执行失败");
-  }
-}
-
-async function retryTask(id: string) {
-  try {
-    await api.post(`/collect/tasks/${id}/retry`);
-    ElMessage.success("重试任务已创建");
-    fetchTasks();
-  } catch (e: any) {
-    ElMessage.error(e?.response?.data?.message || "重试失败");
-  }
-}
-
 async function openTaskDetail(row: any) {
   detailVisible.value = true;
   detailLoading.value = true;
@@ -644,18 +424,6 @@ async function openTaskDetail(row: any) {
     ElMessage.error("获取任务详情失败");
   } finally {
     detailLoading.value = false;
-  }
-}
-
-async function retryFromDetail() {
-  if (!taskDetail.value) return;
-  try {
-    await api.post(`/collect/tasks/${taskDetail.value.id}/retry`);
-    ElMessage.success("重试任务已创建");
-    detailVisible.value = false;
-    fetchTasks();
-  } catch (e: any) {
-    ElMessage.error(e?.response?.data?.message || "重试失败");
   }
 }
 
@@ -689,6 +457,43 @@ onUnmounted(() => {
 <style scoped>
 .collect-center {
   padding: 4px;
+}
+
+.client-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(139, 92, 246, 0.08));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.banner-icon {
+  font-size: 24px;
+}
+
+.banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.banner-text strong {
+  color: #fff;
+  font-size: 14px;
+}
+
+.banner-text span {
+  color: #8a8a9a;
+  font-size: 12px;
 }
 
 .page-toolbar {
