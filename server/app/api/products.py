@@ -1,4 +1,4 @@
-﻿import re
+import re
 import uuid
 from datetime import datetime
 
@@ -67,7 +67,7 @@ async def create_product(
     )
     limits = PLAN_LIMITS.get(user.plan, PLAN_LIMITS["free"])
     if limits["maxProducts"] > 0 and (count_result.scalar() or 0) >= limits["maxProducts"]:
-        raise ForbiddenException(code=42011, message=f"当前套餐最多监控{limits['maxProducts']}个笔�?)
+        raise ForbiddenException(code=42011, message=f"当前套餐最多监控{limits['maxProducts']}个商品")
 
     platform = req.platform
     platform_product_id = req.platform_product_id
@@ -85,7 +85,7 @@ async def create_product(
     if not platform or not platform_product_id:
         raise BadRequestException(message="请提供商品URL或手动输入商品ID")
 
-    product_name = req.product_name or f"小红书笔�?{platform_product_id[:8]}"
+    product_name = req.product_name or f"小红书商品{platform_product_id[:8]}"
 
     existing = await db.execute(
         select(Product).where(
