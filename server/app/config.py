@@ -39,8 +39,9 @@ class Settings(BaseSettings):
 
     OPENAI_API_KEY: str = ""
     DEEPSEEK_API_KEY: str = ""
-    AI_DEFAULT_PROVIDER: str = "openai"
-    AI_DEFAULT_MODEL: str = "gpt-4o-mini"
+    DEEPSEEK_MODEL: str = "deepseek-v4-flash"
+    AI_DEFAULT_PROVIDER: str = "deepseek"
+    AI_DEFAULT_MODEL: str = "deepseek-v4-flash"
 
     SMTP_HOST: str = ""
     SMTP_PORT: int = 587

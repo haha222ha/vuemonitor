@@ -57,9 +57,9 @@ class DeepSeekProvider(AIProvider):
     def __init__(self):
         self.client = AsyncOpenAI(
             api_key=settings.DEEPSEEK_API_KEY,
-            base_url="https://api.deepseek.com/v1",
+            base_url="https://www.packyapi.com/v1",
         )
-        self.model = "deepseek-chat"
+        self.model = settings.DEEPSEEK_MODEL or "deepseek-v4-flash"
 
     async def analyze(self, prompt: str, system_prompt: str = "") -> dict:
         messages = []
