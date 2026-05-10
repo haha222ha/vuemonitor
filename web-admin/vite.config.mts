@@ -4,7 +4,7 @@ import { resolve } from "path";
 
 export default defineConfig({
   plugins: [vue()],
-  base: "/admin/",
+  base: process.env.VITE_BASE || "/admin/",
   resolve: {
     alias: {
       "@": resolve(__dirname, "src"),

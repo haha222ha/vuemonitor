@@ -8,11 +8,13 @@ import App from "./App.vue";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/v1";
 
+const BASE_PATH = import.meta.env.BASE_URL || "/admin/";
+
 const routes = [
-  { path: "/", redirect: "/admin/dashboard" },
-  { path: "/admin/login", component: () => import("./views/LoginView.vue") },
+  { path: "/", redirect: `${BASE_PATH}dashboard` },
+  { path: `${BASE_PATH}login`, component: () => import("./views/LoginView.vue") },
   {
-    path: "/admin",
+    path: BASE_PATH.slice(0, -1) || "/",
     component: () => import("./layouts/AdminLayout.vue"),
     children: [
       { path: "dashboard", component: () => import("./views/DashboardView.vue") },
@@ -26,18 +28,19 @@ const routes = [
   },
 ];
 
-const router = createRouter({ history: createWebHistory("/admin/"), routes });
+const router = createRouter({ history: createWebHistory(BASE_PATH), routes });
 
 router.beforeEach(async (to, _from, next) => {
   const token = localStorage.getItem("admin_token");
+  const loginPath = `${BASE_PATH}login`;
 
-  if (to.path === "/admin/login") {
+  if (to.path === loginPath) {
     next();
     return;
   }
 
   if (!token) {
-    next("/admin/login");
+    next(loginPath);
     return;
   }
 
