@@ -21,13 +21,13 @@
     <section class="hero">
       <div class="hero-glow"></div>
       <div class="hero-content">
-        <div class="hero-badge">Windows 桌面客户端</div>
-        <h1>下载 XHS365</h1>
-        <p>安装桌面客户端，获得实时采集、系统通知、本地存储等完整功能体验</p>
+        <div class="hero-badge" v-observe>Windows 桌面客户端</div>
+        <h1 v-observe>下载 XHS365</h1>
+        <p v-observe>安装桌面客户端，获得实时采集、系统通知、本地存储等完整功能体验</p>
       </div>
     </section>
 
-    <section class="download-section">
+    <section class="download-section" v-observe>
       <div class="download-card">
         <div class="dl-platform">
           <div class="dl-icon-wrap">
@@ -61,7 +61,7 @@
         </div>
 
         <div class="dl-buttons">
-          <a :href="installerUrl" class="btn-dl-primary" target="_blank">
+          <a :href="installerUrl" class="btn-dl-primary" download>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             免费下载 Windows 版
           </a>
@@ -72,21 +72,74 @@
     </section>
 
     <section class="features-section">
-      <h2>桌面客户端优势</h2>
-      <div class="features-grid">
-        <div class="feature-item" v-for="f in features" :key="f.title">
-          <div class="feature-icon-wrap" :style="{ background: f.bg }">
-            <span class="feature-icon">{{ f.icon }}</span>
+      <div class="section-header" v-observe>
+        <div class="section-tag">客户端优势</div>
+        <h2>桌面客户端优势</h2>
+        <p>安装桌面客户端，解锁更强大的监控能力</p>
+      </div>
+      <div class="waterfall">
+        <div class="waterfall-col">
+          <div class="wf-card wf-card-tall" v-observe>
+            <div class="wf-card-glow glow-indigo"></div>
+            <div class="wf-card-content">
+              <div class="wf-icon-wrap icon-indigo">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              </div>
+              <h3>实时数据采集</h3>
+              <p>Chromium 内核实时加载页面，DOM 数据精准提取，比 Web 版采集更快更准，支持定时自动采集。</p>
+              <div class="wf-mock-monitor">
+                <div class="mock-row" v-for="i in 4" :key="i">
+                  <div class="mock-dot" :class="{ up: i % 3 !== 0, down: i % 3 === 0 }"></div>
+                  <div class="mock-bar" :style="{width: (35 + Math.random()*55).toFixed(0) + '%'}"></div>
+                  <div class="mock-val">{{ i % 3 !== 0 ? '↑' : '↓' }} {{ (Math.random()*30).toFixed(1) }}%</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="feature-text">
-            <h4>{{ f.title }}</h4>
-            <p>{{ f.desc }}</p>
+          <div class="wf-card" v-observe>
+            <div class="wf-card-glow glow-green"></div>
+            <div class="wf-card-content">
+              <div class="wf-icon-wrap icon-green">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              </div>
+              <h3>本地加密存储</h3>
+              <p>数据本地加密存储，隐私安全有保障，无需担心云端泄露风险。</p>
+            </div>
+          </div>
+        </div>
+        <div class="waterfall-col">
+          <div class="wf-card" v-observe>
+            <div class="wf-card-glow glow-pink"></div>
+            <div class="wf-card-content">
+              <div class="wf-icon-wrap icon-pink">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </div>
+              <h3>系统通知推送</h3>
+              <p>价格异动、销量激增等关键事件桌面实时提醒，不错过任何商机。</p>
+            </div>
+          </div>
+          <div class="wf-card wf-card-tall" v-observe>
+            <div class="wf-card-glow glow-amber"></div>
+            <div class="wf-card-content">
+              <div class="wf-icon-wrap icon-amber">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9m-9 9a9 9 0 0 1 9-9"/></svg>
+              </div>
+              <h3>自动更新</h3>
+              <p>新版本自动检测和安装，始终保持最新，享受最新功能和性能优化。</p>
+              <div class="wf-update-timeline">
+                <div class="timeline-item" v-for="i in 3" :key="i">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-bar" :style="{width: (50 + Math.random()*40).toFixed(0) + '%'}"></div>
+                  <div class="timeline-label">v0.{{ 3 - i }}.0</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="guide-section">
+    <section class="guide-section" v-observe>
       <h2>安装指南</h2>
       <div class="guide-steps">
         <div class="step" v-for="(step, i) in installSteps" :key="i">
@@ -96,7 +149,7 @@
       </div>
     </section>
 
-    <section class="web-alt">
+    <section class="web-alt" v-observe>
       <div class="web-alt-card">
         <span class="web-alt-icon">🌐</span>
         <h3>不想安装？直接使用 Web 版</h3>
@@ -118,12 +171,20 @@ const navScrolled = ref(false);
 const version = "0.1.0";
 const installerUrl = `/downloads/XHS365-Setup-${version}.exe`;
 
-const features = [
-  { icon: "⚡", title: "实时数据采集", desc: "Chromium 内核实时加载，数据采集更快更准", bg: "rgba(99,102,241,0.12)" },
-  { icon: "🔔", title: "系统通知推送", desc: "价格异动、销量激增等关键事件桌面实时提醒", bg: "rgba(244,114,182,0.12)" },
-  { icon: "🔒", title: "本地加密存储", desc: "数据本地加密存储，隐私安全有保障", bg: "rgba(34,197,94,0.12)" },
-  { icon: "🔄", title: "自动更新", desc: "新版本自动检测和安装，始终保持最新", bg: "rgba(251,191,36,0.12)" },
-];
+const vObserve = {
+  mounted(el: HTMLElement) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("visible");
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.06, rootMargin: "0px 0px -40px 0px" }
+    );
+    observer.observe(el);
+  },
+};
 
 const installSteps = [
   "点击上方「下载安装包」按钮，下载 XHS365-Setup 安装程序",
@@ -138,16 +199,17 @@ function onScroll() {
   navScrolled.value = window.scrollY > 20;
 }
 
-onMounted(() => window.addEventListener("scroll", onScroll));
+onMounted(() => window.addEventListener("scroll", onScroll, { passive: true }));
 onUnmounted(() => window.removeEventListener("scroll", onScroll));
 </script>
 
 <style scoped>
 .download-page {
   min-height: 100vh;
-  background: #0a0a0f;
+  background: #06060f;
   color: #e0e0e0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
 }
 
 .nav {
@@ -157,13 +219,15 @@ onUnmounted(() => window.removeEventListener("scroll", onScroll));
   right: 0;
   z-index: 100;
   padding: 0 24px;
-  transition: all 0.3s;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   background: transparent;
+  border-bottom: 1px solid transparent;
 }
 .nav.scrolled {
-  background: rgba(10, 10, 15, 0.92);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  background: rgba(6, 6, 15, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom-color: rgba(255,255,255,0.06);
 }
 .nav-inner {
   max-width: 1100px;
@@ -220,25 +284,37 @@ onUnmounted(() => window.removeEventListener("scroll", onScroll));
   font-size: 13px;
   font-weight: 500;
   margin-bottom: 16px;
+  opacity: 0; transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.hero-badge.visible { opacity: 1; transform: translateY(0); }
 .hero h1 {
   font-size: 40px;
   font-weight: 800;
   color: #fff;
   margin-bottom: 12px;
   letter-spacing: -0.5px;
+  opacity: 0; transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
 }
+.hero h1.visible { opacity: 1; transform: translateY(0); }
 .hero p {
   font-size: 16px;
   color: rgba(255,255,255,0.45);
   max-width: 460px;
   margin: 0 auto;
   line-height: 1.6;
+  opacity: 0; transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
 }
+.hero p.visible { opacity: 1; transform: translateY(0); }
 
 .download-section {
   padding: 24px 24px 48px;
+  opacity: 0; transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.download-section.visible { opacity: 1; transform: translateY(0); }
 .download-card {
   max-width: 520px;
   margin: 0 auto;
@@ -246,6 +322,7 @@ onUnmounted(() => window.removeEventListener("scroll", onScroll));
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 16px;
   padding: 28px;
+  overflow: hidden;
 }
 .dl-platform {
   display: flex;
@@ -270,6 +347,7 @@ onUnmounted(() => window.removeEventListener("scroll", onScroll));
   margin-bottom: 20px;
   font-size: 13px;
   color: rgba(255,255,255,0.4);
+  flex-wrap: wrap;
 }
 .meta-item { display: flex; align-items: center; gap: 4px; }
 .meta-divider { color: rgba(255,255,255,0.15); }
@@ -296,27 +374,12 @@ onUnmounted(() => window.removeEventListener("scroll", onScroll));
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 .btn-dl-primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-}
-.btn-dl-secondary {
-  display: block;
-  text-align: center;
-  padding: 10px 20px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.6);
-  border-radius: 10px;
-  font-size: 13px;
-  text-decoration: none;
-  transition: all 0.2s;
-}
-.btn-dl-secondary:hover {
-  background: rgba(255,255,255,0.07);
-  color: #fff;
-  border-color: rgba(255,255,255,0.18);
 }
 
 .dl-hint {
@@ -328,50 +391,115 @@ onUnmounted(() => window.removeEventListener("scroll", onScroll));
 }
 
 .features-section {
-  padding: 48px 24px;
-  max-width: 700px;
+  padding: 80px 24px;
+  max-width: 900px;
   margin: 0 auto;
 }
-.features-section h2 {
+.section-header {
   text-align: center;
-  font-size: 22px;
-  font-weight: 700;
+  margin-bottom: 48px;
+  opacity: 0; transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.section-header.visible { opacity: 1; transform: translateY(0); }
+.section-tag {
+  display: inline-block;
+  padding: 6px 16px;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #818cf8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+}
+.section-header h2 {
+  font-size: 28px;
+  font-weight: 800;
   color: #fff;
-  margin-bottom: 28px;
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
 }
-.features-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
+.section-header p {
+  font-size: 16px;
+  color: rgba(255,255,255,0.45);
 }
-.feature-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.04);
-  border-radius: 10px;
-  padding: 16px;
+
+.waterfall { display: flex; gap: 24px; align-items: flex-start; }
+.waterfall-col { flex: 1; display: flex; flex-direction: column; gap: 24px; }
+.wf-card {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(15, 15, 35, 0.7);
+  backdrop-filter: blur(20px);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0; transform: translateY(40px);
 }
-.feature-icon-wrap {
-  width: 36px; height: 36px;
-  border-radius: 8px;
+.wf-card.visible { opacity: 1; transform: translateY(0); }
+.wf-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  background: rgba(20, 20, 50, 0.85);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+.wf-card-tall { }
+.wf-card-glow { position: absolute; top: -1px; left: -1px; right: -1px; height: 2px; }
+.glow-indigo { background: linear-gradient(90deg, transparent, #6366f1, transparent); }
+.glow-pink { background: linear-gradient(90deg, transparent, #f472b6, transparent); }
+.glow-green { background: linear-gradient(90deg, transparent, #22c55e, transparent); }
+.glow-amber { background: linear-gradient(90deg, transparent, #f59e0b, transparent); }
+.wf-card-content { position: relative; padding: 32px; z-index: 1; }
+.wf-icon-wrap {
+  width: 52px; height: 52px;
+  border-radius: 14px;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
+  margin-bottom: 20px;
 }
-.feature-icon { font-size: 18px; }
-.feature-text h4 { font-size: 14px; font-weight: 600; color: #fff; margin: 0 0 3px; }
-.feature-text p { font-size: 12px; color: rgba(255,255,255,0.35); line-height: 1.5; margin: 0; }
+.icon-indigo { background: rgba(99,102,241,0.12); color: #6366f1; }
+.icon-pink { background: rgba(244,114,182,0.12); color: #f472b6; }
+.icon-green { background: rgba(34,197,94,0.12); color: #22c55e; }
+.icon-amber { background: rgba(251,191,36,0.12); color: #f59e0b; }
+.wf-card-content h3 { font-size: 22px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.01em; color: #fff; }
+.wf-card-content p { font-size: 14px; line-height: 1.7; color: rgba(240,240,248,0.6); margin-bottom: 20px; }
+
+.wf-mock-monitor { display: flex; flex-direction: column; gap: 10px; }
+.mock-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: 8px;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+}
+.mock-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.mock-dot.up { background: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.4); }
+.mock-dot.down { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.4); }
+.mock-bar { height: 6px; border-radius: 3px; background: rgba(99,102,241,0.2); flex: 1; }
+.mock-val { font-size: 12px; font-family: 'JetBrains Mono', monospace, monospace; color: rgba(240,240,248,0.6); white-space: nowrap; }
+
+.wf-update-timeline { display: flex; flex-direction: column; gap: 12px; }
+.timeline-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 8px;
+  background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+}
+.timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: #f59e0b; box-shadow: 0 0 8px rgba(251,191,36,0.4); flex-shrink: 0; }
+.timeline-bar { height: 6px; border-radius: 3px; background: rgba(251,191,36,0.2); flex: 1; }
+.timeline-label { font-size: 12px; font-family: monospace; color: rgba(240,240,248,0.6); white-space: nowrap; }
 
 .guide-section {
-  padding: 48px 24px;
+  padding: 80px 24px;
   max-width: 560px;
   margin: 0 auto;
+  opacity: 0; transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.guide-section.visible { opacity: 1; transform: translateY(0); }
 .guide-section h2 {
   text-align: center;
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 800;
   color: #fff;
   margin-bottom: 24px;
 }
@@ -402,7 +530,10 @@ onUnmounted(() => window.removeEventListener("scroll", onScroll));
 
 .web-alt {
   padding: 32px 24px 56px;
+  opacity: 0; transform: translateY(30px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.web-alt.visible { opacity: 1; transform: translateY(0); }
 .web-alt-card {
   max-width: 440px;
   margin: 0 auto;
@@ -425,8 +556,13 @@ onUnmounted(() => window.removeEventListener("scroll", onScroll));
 
 @media (max-width: 768px) {
   .hero h1 { font-size: 28px; }
-  .features-grid { grid-template-columns: 1fr; }
+  .waterfall { flex-direction: column; }
   .nav-links { display: none; }
   .download-card { padding: 20px; }
+  .btn-dl-primary { font-size: 14px; padding: 12px 16px; }
+  .section-header h2 { font-size: 22px; }
+  .guide-section h2 { font-size: 22px; }
+  .wf-card-content { padding: 24px; }
+  .wf-card-content h3 { font-size: 18px; }
 }
 </style>
