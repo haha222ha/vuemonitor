@@ -129,14 +129,10 @@
 
     <section class="trust-section">
       <div class="trust-inner" v-observe>
-        <p class="trust-label">受到各平台电商从业者信赖</p>
+        <p class="trust-label">专注核心平台，深度数据洞察</p>
         <div class="trust-logos">
           <span class="trust-logo"><span class="trust-icon">📕</span>小红书</span>
-          <span class="trust-logo"><span class="trust-icon">🛒</span>淘宝</span>
-          <span class="trust-logo"><span class="trust-icon">🏪</span>京东</span>
-          <span class="trust-logo"><span class="trust-icon">💰</span>拼多多</span>
-          <span class="trust-logo"><span class="trust-icon">🎵</span>抖音</span>
-          <span class="trust-logo"><span class="trust-icon">🎬</span>快手</span>
+          <span class="trust-logo"><span class="trust-icon">🐟</span>闲鱼</span>
         </div>
       </div>
     </section>
@@ -157,13 +153,10 @@
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
                 </div>
                 <h3>商品监控</h3>
-                <p>添加关注的商品，实时追踪价格、销量、评价等关键指标变化。支持小红书、淘宝、京东、拼多多、抖音等多平台同步监控。</p>
+                <p>添加关注的商品，实时追踪价格、销量、评价等关键指标变化。支持小红书、闲鱼平台同步监控。</p>
                 <div class="wf-tags">
                   <span class="wf-tag">小红书</span>
-                  <span class="wf-tag">淘宝</span>
-                  <span class="wf-tag">京东</span>
-                  <span class="wf-tag">拼多多</span>
-                  <span class="wf-tag">抖音</span>
+                  <span class="wf-tag">闲鱼</span>
                 </div>
                 <div class="wf-mock-monitor">
                   <div class="mock-row" v-for="i in 5" :key="i">
@@ -271,57 +264,63 @@
     <section id="platforms" class="section platforms-section">
       <div class="section-inner">
         <div class="section-header" v-observe>
-          <div class="section-tag">多平台支持</div>
-          <h2>一个平台，覆盖全渠道数据</h2>
-          <p>无缝对接主流电商平台，数据一站式管理</p>
+          <div class="section-tag">平台支持</div>
+          <h2>深度对接核心平台</h2>
+          <p>专注小红书与闲鱼，提供最精准的数据采集与分析</p>
         </div>
-        <div class="platforms-waterfall">
-          <div class="platform-card" v-observe>
+        <div class="platforms-grid">
+          <div class="platform-card-lg" v-observe>
             <div class="platform-card-inner platform-xhs">
-              <div class="platform-icon">📕</div>
-              <h3>小红书</h3>
-              <p>笔记数据采集、商品销量追踪、达人分析、种草趋势监控</p>
-              <div class="platform-features"><span>笔记监控</span><span>商品追踪</span><span>达人分析</span><span>趋势预警</span></div>
+              <div class="platform-header">
+                <div class="platform-icon">📕</div>
+                <div>
+                  <h3>小红书</h3>
+                  <p class="platform-subtitle">笔记电商 · 种草生态</p>
+                </div>
+              </div>
+              <p>笔记数据采集、商品销量追踪、达人分析、种草趋势监控，深度洞察小红书电商生态</p>
+              <div class="platform-features"><span>笔记监控</span><span>商品追踪</span><span>达人分析</span><span>趋势预警</span><span>种草热度</span><span>品类排行</span></div>
+              <div class="platform-highlight">
+                <div class="highlight-item">
+                  <span class="highlight-num">5min</span>
+                  <span class="highlight-label">采集频率</span>
+                </div>
+                <div class="highlight-item">
+                  <span class="highlight-num">98%</span>
+                  <span class="highlight-label">数据完整度</span>
+                </div>
+                <div class="highlight-item">
+                  <span class="highlight-num">实时</span>
+                  <span class="highlight-label">趋势预警</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="platform-card" v-observe>
-            <div class="platform-card-inner platform-taobao">
-              <div class="platform-icon">🛒</div>
-              <h3>淘宝/天猫</h3>
-              <p>商品价格监控、销量趋势分析、竞品对比、店铺数据追踪</p>
-              <div class="platform-features"><span>价格监控</span><span>销量分析</span><span>竞品对比</span><span>店铺追踪</span></div>
-            </div>
-          </div>
-          <div class="platform-card" v-observe>
-            <div class="platform-card-inner platform-jd">
-              <div class="platform-icon">🏪</div>
-              <h3>京东</h3>
-              <p>商品评价分析、价格波动追踪、促销活动监控、库存预警</p>
-              <div class="platform-features"><span>评价分析</span><span>价格追踪</span><span>促销监控</span><span>库存预警</span></div>
-            </div>
-          </div>
-          <div class="platform-card" v-observe>
-            <div class="platform-card-inner platform-pdd">
-              <div class="platform-icon">💰</div>
-              <h3>拼多多</h3>
-              <p>爆款发现、拼团数据追踪、价格趋势、类目热度分析</p>
-              <div class="platform-features"><span>爆款发现</span><span>拼团追踪</span><span>价格趋势</span><span>类目分析</span></div>
-            </div>
-          </div>
-          <div class="platform-card" v-observe>
-            <div class="platform-card-inner platform-douyin">
-              <div class="platform-icon">🎵</div>
-              <h3>抖音</h3>
-              <p>短视频带货数据、直播间监控、达人带货分析、商品热度追踪</p>
-              <div class="platform-features"><span>带货数据</span><span>直播监控</span><span>达人分析</span><span>热度追踪</span></div>
-            </div>
-          </div>
-          <div class="platform-card" v-observe>
-            <div class="platform-card-inner platform-kuaishou">
-              <div class="platform-icon">🎬</div>
-              <h3>快手</h3>
-              <p>直播数据采集、商品销量监控、达人合作分析、选品推荐</p>
-              <div class="platform-features"><span>直播数据</span><span>销量监控</span><span>达人合作</span><span>选品推荐</span></div>
+          <div class="platform-card-lg" v-observe>
+            <div class="platform-card-inner platform-xianyu">
+              <div class="platform-header">
+                <div class="platform-icon">🐟</div>
+                <div>
+                  <h3>闲鱼</h3>
+                  <p class="platform-subtitle">二手电商 · 闲置交易</p>
+                </div>
+              </div>
+              <p>商品价格监控、供需分析、爆款发现、类目热度追踪，精准把握闲鱼交易动态</p>
+              <div class="platform-features"><span>价格监控</span><span>供需分析</span><span>爆款发现</span><span>类目热度</span><span>卖家分析</span><span>趋势追踪</span></div>
+              <div class="platform-highlight">
+                <div class="highlight-item">
+                  <span class="highlight-num">5min</span>
+                  <span class="highlight-label">采集频率</span>
+                </div>
+                <div class="highlight-item">
+                  <span class="highlight-num">95%</span>
+                  <span class="highlight-label">数据准确率</span>
+                </div>
+                <div class="highlight-item">
+                  <span class="highlight-num">实时</span>
+                  <span class="highlight-label">价格预警</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -340,35 +339,7 @@
             <div class="case-card" v-observe>
               <div class="case-card-inner">
                 <div class="case-header">
-                  <div class="case-avatar">L</div>
-                  <div><div class="case-name">林小姐 · 淘宝店主</div><div class="case-role">女装类目</div></div>
-                </div>
-                <div class="case-compare">
-                  <div class="compare-item before">
-                    <div class="compare-label">使用前</div>
-                    <div class="compare-metrics">
-                      <div class="metric"><span class="metric-val">2h</span><span class="metric-name">每日选品</span></div>
-                      <div class="metric"><span class="metric-val">23%</span><span class="metric-name">爆款率</span></div>
-                      <div class="metric"><span class="metric-val">3款</span><span class="metric-name">月上新</span></div>
-                    </div>
-                  </div>
-                  <div class="compare-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-                  <div class="compare-item after">
-                    <div class="compare-label">使用后</div>
-                    <div class="compare-metrics">
-                      <div class="metric"><span class="metric-val highlight">20min</span><span class="metric-name">每日选品</span></div>
-                      <div class="metric"><span class="metric-val highlight">67%</span><span class="metric-name">爆款率</span></div>
-                      <div class="metric"><span class="metric-val highlight">12款</span><span class="metric-name">月上新</span></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="case-improvement"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg> 选品效率提升 300%</div>
-              </div>
-            </div>
-            <div class="case-card" v-observe>
-              <div class="case-card-inner">
-                <div class="case-header">
-                  <div class="case-avatar" style="background:linear-gradient(135deg,#22c55e,#14b8a6)">Z</div>
+                  <div class="case-avatar">Z</div>
                   <div><div class="case-name">张女士 · 小红书博主</div><div class="case-role">家居类目</div></div>
                 </div>
                 <div class="case-compare">
@@ -393,41 +364,11 @@
                 <div class="case-improvement"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg> 爆文率提升 337%</div>
               </div>
             </div>
-          </div>
-          <div class="case-col">
-            <div class="case-card" v-observe>
-              <div class="case-card-inner">
-                <div class="case-header">
-                  <div class="case-avatar" style="background:linear-gradient(135deg,#f59e0b,#f97316)">W</div>
-                  <div><div class="case-name">王先生 · 抖音带货</div><div class="case-role">食品类目</div></div>
-                </div>
-                <div class="case-compare">
-                  <div class="compare-item before">
-                    <div class="compare-label">使用前</div>
-                    <div class="compare-metrics">
-                      <div class="metric"><span class="metric-val">1.5h</span><span class="metric-name">选品调研</span></div>
-                      <div class="metric"><span class="metric-val">15%</span><span class="metric-name">转化率</span></div>
-                      <div class="metric"><span class="metric-val">¥2k</span><span class="metric-name">月利润</span></div>
-                    </div>
-                  </div>
-                  <div class="compare-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
-                  <div class="compare-item after">
-                    <div class="compare-label">使用后</div>
-                    <div class="compare-metrics">
-                      <div class="metric"><span class="metric-val highlight">15min</span><span class="metric-name">选品调研</span></div>
-                      <div class="metric"><span class="metric-val highlight">42%</span><span class="metric-name">转化率</span></div>
-                      <div class="metric"><span class="metric-val highlight">¥12k</span><span class="metric-name">月利润</span></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="case-improvement"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg> 月利润提升 500%</div>
-              </div>
-            </div>
             <div class="case-card" v-observe>
               <div class="case-card-inner">
                 <div class="case-header">
                   <div class="case-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">C</div>
-                  <div><div class="case-name">陈总 · 电商团队</div><div class="case-role">多品类运营</div></div>
+                  <div><div class="case-name">陈总 · 电商团队</div><div class="case-role">小红书多品类运营</div></div>
                 </div>
                 <div class="case-compare">
                   <div class="compare-item before">
@@ -449,6 +390,64 @@
                   </div>
                 </div>
                 <div class="case-improvement"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg> 人力成本降低 60%</div>
+              </div>
+            </div>
+          </div>
+          <div class="case-col">
+            <div class="case-card" v-observe>
+              <div class="case-card-inner">
+                <div class="case-header">
+                  <div class="case-avatar" style="background:linear-gradient(135deg,#f59e0b,#f97316)">L</div>
+                  <div><div class="case-name">林小姐 · 闲鱼卖家</div><div class="case-role">二手数码类目</div></div>
+                </div>
+                <div class="case-compare">
+                  <div class="compare-item before">
+                    <div class="compare-label">使用前</div>
+                    <div class="compare-metrics">
+                      <div class="metric"><span class="metric-val">2h</span><span class="metric-name">每日选品</span></div>
+                      <div class="metric"><span class="metric-val">23%</span><span class="metric-name">成交率</span></div>
+                      <div class="metric"><span class="metric-val">3款</span><span class="metric-name">月上新</span></div>
+                    </div>
+                  </div>
+                  <div class="compare-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                  <div class="compare-item after">
+                    <div class="compare-label">使用后</div>
+                    <div class="compare-metrics">
+                      <div class="metric"><span class="metric-val highlight">20min</span><span class="metric-name">每日选品</span></div>
+                      <div class="metric"><span class="metric-val highlight">67%</span><span class="metric-name">成交率</span></div>
+                      <div class="metric"><span class="metric-val highlight">12款</span><span class="metric-name">月上新</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="case-improvement"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg> 选品效率提升 300%</div>
+              </div>
+            </div>
+            <div class="case-card" v-observe>
+              <div class="case-card-inner">
+                <div class="case-header">
+                  <div class="case-avatar" style="background:linear-gradient(135deg,#22c55e,#14b8a6)">W</div>
+                  <div><div class="case-name">王先生 · 闲鱼+小红书</div><div class="case-role">跨平台选品</div></div>
+                </div>
+                <div class="case-compare">
+                  <div class="compare-item before">
+                    <div class="compare-label">使用前</div>
+                    <div class="compare-metrics">
+                      <div class="metric"><span class="metric-val">1.5h</span><span class="metric-name">选品调研</span></div>
+                      <div class="metric"><span class="metric-val">15%</span><span class="metric-name">转化率</span></div>
+                      <div class="metric"><span class="metric-val">¥2k</span><span class="metric-name">月利润</span></div>
+                    </div>
+                  </div>
+                  <div class="compare-arrow"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+                  <div class="compare-item after">
+                    <div class="compare-label">使用后</div>
+                    <div class="compare-metrics">
+                      <div class="metric"><span class="metric-val highlight">15min</span><span class="metric-name">选品调研</span></div>
+                      <div class="metric"><span class="metric-val highlight">42%</span><span class="metric-name">转化率</span></div>
+                      <div class="metric"><span class="metric-val highlight">¥12k</span><span class="metric-name">月利润</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="case-improvement"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg> 月利润提升 500%</div>
               </div>
             </div>
           </div>
