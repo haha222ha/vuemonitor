@@ -5,8 +5,15 @@
   "description": "XHS365 AI E-commerce Monitoring Platform - Electron Client",
   "main": "dist/main/index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "dev:main": "vite --mode main",
+    "dev:preload": "vite --mode preload",
+    "dev:renderer": "vite",
+    "dev:electron": "node scripts/dev.js",
+    "build:main": "vite build --config vite.config.main.mts",
+    "build:preload": "vite build --config vite.config.preload.mts",
+    "build:renderer": "vite build --config vite.config.mts",
+    "build": "npm run build:main && npm run build:preload && npm run build:renderer",
+    "dist": "npm run build && electron-builder",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -15,31 +22,92 @@
   },
   "dependencies": {
     "@electron/remote": "^2.1.0",
-    "axios": "^1.7.2",
-    "better-sqlite3": "^11.0.0",
-    "echarts": "^5.5.0",
-    "element-plus": "^2.7.3",
-    "pinia": "^2.1.7",
+    "axios": "^1.16.0",
+    "echarts": "^5.6.0",
+    "electron-updater": "^6.8.3",
+    "element-plus": "^2.14.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
+    "pinia": "^2.3.1",
     "playwright": "^1.44.0",
     "playwright-core": "^1.59.1",
-    "vue": "^3.4.27",
-    "vue-router": "^4.3.2",
-    "zod": "^3.23.8"
+    "sql.js": "^1.14.1",
+    "vue": "^3.5.34",
+    "vue-router": "^4.6.4",
+    "vuedraggable": "^4.1.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.8",
     "@types/ws": "^8.18.1",
-    "@typescript-eslint/eslint-plugin": "^7.10.0",
-    "@typescript-eslint/parser": "^7.10.0",
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vitejs/plugin-vue": "^5.2.4",
     "@vitejs/plugin-vue-jsx": "^5.1.5",
-    "electron": "^30.0.0",
+    "canvas": "^3.2.3",
+    "electron": "^30.5.1",
     "electron-builder": "^24.13.3",
-    "eslint": "^8.56.0",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.12",
-    "vitest": "^1.6.0",
-    "vue-tsc": "^2.0.19",
+    "eslint": "^8.57.1",
+    "png-to-ico": "^3.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "vitest": "^1.6.1",
+    "vue-tsc": "^2.2.12",
     "ws": "^8.20.0"
+  },
+  "build": {
+    "appId": "com.xhs365.client",
+    "productName": "XHS365",
+    "copyright": "Copyright © 2026 XHS365",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "build/icon.png",
+      "!node_modules",
+      "!src",
+      "!release"
+    ],
+    "extraResources": [
+      {
+        "from": "node_modules/sql.js/dist/sql-wasm.wasm",
+        "to": "sql-wasm.wasm"
+      }
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "XHS365-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "XHS365",
+      "perMachine": false,
+      "allowElevation": true
+    },
+    "asar": true,
+    "asarUnpack": [
+      "**/*.wasm",
+      "**/node_modules/sql.js/**/*"
+    ],
+    "publish": {
+      "provider": "github",
+      "owner": "xhs365",
+      "repo": "client"
+    }
   }
 }
