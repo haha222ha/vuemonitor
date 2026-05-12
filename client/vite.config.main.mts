@@ -18,6 +18,7 @@ export default defineConfig({
         "electron-updater",
         "playwright-core",
         "playwright",
+        "sql.js",
         ...builtinModules,
         ...builtinModules.map((m) => `node:${m}`),
       ],

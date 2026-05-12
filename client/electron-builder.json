@@ -1,26 +1,147 @@
 {
   "appId": "com.xhs365.app",
   "productName": "XHS365",
+  "copyright": "Copyright © 2024 XHS365",
   "directories": {
-    "output": "release"
+    "output": "release",
+    "buildResources": "build"
   },
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "build/**/*",
+    "node_modules/**/*",
+    "package.json"
   ],
+  "extraResources": [
+    {
+      "from": "build/",
+      "to": "build/",
+      "filter": ["icon.*"]
+    },
+    {
+      "from": "node_modules/sql.js/dist/sql-wasm.wasm",
+      "to": "sql-wasm.wasm"
+    }
+  ],
+  "asar": true,
+  "asarUnpack": [
+    "node_modules/better-sqlite3/**",
+    "node_modules/playwright-core/**",
+    "node_modules/sql.js/**"
+  ],
+  "compression": "maximum",
   "win": {
-    "target": ["nsis"],
-    "icon": "build/icon.ico"
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64", "ia32"]
+      },
+      {
+        "target": "portable",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "build/icon.ico",
+    "sign": "./scripts/sign-windows.js",
+    "signingHashAlgorithms": ["sha256"],
+    "certificateFile": "",
+    "certificatePassword": "",
+    "publisherName": "XHS365",
+    "verifyUpdateCodeSignature": true
   },
   "mac": {
-    "target": ["dmg"],
-    "icon": "build/icon.icns"
+    "target": [
+      {
+        "target": "dmg",
+        "arch": ["x64", "arm64"]
+      },
+      {
+        "target": "zip",
+        "arch": ["x64", "arm64"]
+      }
+    ],
+    "icon": "build/icon.icns",
+    "category": "public.app-category.business",
+    "hardenedRuntime": true,
+    "gatekeeperAssess": false,
+    "entitlements": "build/entitlements.mac.plist",
+    "entitlementsInherit": "build/entitlements.mac.plist",
+    "provisioningProfile": "",
+    "type": "distribution"
   },
   "linux": {
-    "target": ["AppImage"],
-    "icon": "build/icon.png"
+    "target": [
+      {
+        "target": "AppImage",
+        "arch": ["x64"]
+      },
+      {
+        "target": "deb",
+        "arch": ["x64"]
+      },
+      {
+        "target": "rpm",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "build/icon.png",
+    "category": "Office",
+    "maintainer": "support@xhs365.com",
+    "synopsis": "小红书AI选品工具",
+    "description": "XHS365 - 小红书AI选品数据监控与分析工具"
   },
   "nsis": {
     "oneClick": false,
-    "allowToChangeInstallationDirectory": true
-  }
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "installerIcon": "build/icon.ico",
+    "uninstallerIcon": "build/icon.ico",
+    "installerHeaderIcon": "build/icon.ico",
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "XHS365",
+    "include": "build/installer.nsh",
+    "deleteAppDataOnUninstall": false,
+    "runAfterFinish": true,
+    "menuCategory": "XHS365",
+    "installerSidebar": null,
+    "unicode": true,
+    "warningsAsErrors": false
+  },
+  "dmg": {
+    "contents": [
+      {
+        "x": 130,
+        "y": 220
+      },
+      {
+        "x": 410,
+        "y": 220,
+        "type": "link",
+        "path": "/Applications"
+      }
+    ],
+    "window": {
+      "width": 540,
+      "height": 380
+    },
+    "backgroundColor": "#ffffff",
+    "iconSize": 80,
+    "title": "XHS365 Installer"
+  },
+  "publish": [
+    {
+      "provider": "generic",
+      "url": "https://releases.xhs365.com/updates",
+      "channel": "latest"
+    }
+  ],
+  "afterPack": "./scripts/after-pack.js",
+  "afterSign": "./scripts/after-sign.js",
+  "beforeBuild": "./scripts/before-build.js",
+  "npmRebuild": true,
+  "nodeGypRebuild": false,
+  "buildDependenciesFromSource": false,
+  "removePackageScripts": true,
+  "forceCodeSigning": false
 }
