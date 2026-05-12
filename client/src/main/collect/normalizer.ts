@@ -1,4 +1,4 @@
-﻿import { z } from "zod";
+﻿﻿﻿﻿﻿﻿import { z } from "zod";
 
 const XHSNoteSchema = z.object({
   platform: z.literal("xhs"),
@@ -20,7 +20,8 @@ const XHSNoteSchema = z.object({
   publish_date: z.string().optional().nullable(),
   fans_count: z.number().int().nonnegative().optional().nullable(),
   note_count: z.number().int().nonnegative().optional().nullable(),
-  targetType: z.enum(["note", "user"]).optional().nullable(),
+  shop_sales: z.number().int().nonnegative().optional().nullable(),
+  targetType: z.enum(["goods", "note", "user"]).optional().nullable(),
 });
 
 export type NormalizedXHSData = z.infer<typeof XHSNoteSchema>;

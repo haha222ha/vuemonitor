@@ -66,34 +66,34 @@ async def activate_license(
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
+    clean_code = req.code.strip().upper()
     result = await db.execute(
-        select(LicenseCode).where(LicenseCode.code == req.code.strip())
+        select(LicenseCode).where(LicenseCode.code == clean_code)
     )
     license_obj = result.scalar_one_or_none()
 
     if not license_obj:
         raise NotFoundException(message="授权码不存在")
 
-    if license_obj.status == "expired":
-        raise BadRequestException(message="授权码已过期")
-
     if license_obj.status == "revoked":
         raise BadRequestException(message="授权码已被吊销")
 
-    if license_obj.status == "active":
-        existing = await db.execute(
-            select(LicenseActivation).where(
-                LicenseActivation.license_id == license_obj.id,
-                LicenseActivation.user_id == user.id,
-            )
+    now = datetime.now(timezone.utc)
+
+    if license_obj.expires_at and license_obj.expires_at < now:
+        raise BadRequestException(message="授权码已过期")
+
+    existing = await db.execute(
+        select(LicenseActivation).where(
+            LicenseActivation.license_id == license_obj.id,
+            LicenseActivation.user_id == user.id,
         )
-        if existing.scalar_one_or_none():
-            raise BadRequestException(message="您已激活过此授权码")
+    )
+    if existing.scalar_one_or_none():
+        raise BadRequestException(message="您已激活过此授权码")
 
     if license_obj.current_activations >= license_obj.max_activations:
         raise BadRequestException(message="授权码激活次数已达上限")
-
-    now = datetime.now(timezone.utc)
 
     activation = LicenseActivation(
         license_id=license_obj.id,
@@ -103,9 +103,11 @@ async def activate_license(
     db.add(activation)
 
     license_obj.current_activations += 1
-    license_obj.status = "active"
-    license_obj.activated_at = now
-    license_obj.expires_at = now + timedelta(days=license_obj.duration_days)
+    if license_obj.status == "unused":
+        license_obj.status = "active"
+        license_obj.activated_at = now
+        if not license_obj.expires_at:
+            license_obj.expires_at = now + timedelta(days=license_obj.duration_days)
 
     plan_order = {"free": 0, "pro": 1, "premium": 2, "enterprise": 3}
     current_plan_level = plan_order.get(user.plan, 0)

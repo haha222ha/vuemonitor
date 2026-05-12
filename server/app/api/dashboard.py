@@ -192,29 +192,59 @@ async def get_dashboard_stats(
     )
     recent_products = recent_products_result.scalars().all()
 
+    recent_product_ids = [p.id for p in recent_products]
+
     recent_items = []
-    for p in recent_products:
-        feat_result = await db.execute(
-            select(ProductFeature)
-            .where(ProductFeature.product_id == p.id)
-            .order_by(ProductFeature.collected_at.desc())
-            .limit(2)
+    if recent_product_ids:
+        ranked_features = (
+            select(
+                ProductFeature.product_id,
+                ProductFeature.price,
+                ProductFeature.sales_count,
+                func.row_number()
+                .partition_by(ProductFeature.product_id)
+                .order_by(ProductFeature.collected_at.desc())
+                .label("rn"),
+            )
+            .where(ProductFeature.product_id.in_(recent_product_ids))
+            .subquery()
         )
-        features = feat_result.scalars().all()
 
-        trend = 0.0
-        if len(features) >= 2 and features[0].sales_count and features[1].sales_count and features[1].sales_count > 0:
-            trend = round((features[0].sales_count - features[1].sales_count) / features[1].sales_count * 100, 1)
+        feat_rows = await db.execute(
+            select(
+                ranked_features.c.product_id,
+                ranked_features.c.price,
+                ranked_features.c.sales_count,
+                ranked_features.c.rn,
+            )
+            .where(ranked_features.c.rn <= 2)
+            .order_by(ranked_features.c.product_id, ranked_features.c.rn)
+        )
+        feat_map: dict = {}
+        for row in feat_rows.all():
+            pid = row[0]
+            if pid not in feat_map:
+                feat_map[pid] = []
+            feat_map[pid].append({"price": row[1], "sales_count": row[2]})
 
-        recent_items.append({
-            "id": str(p.id),
-            "name": p.product_name,
-            "platform": p.platform,
-            "price": float(features[0].price) if features and features[0].price else None,
-            "trend": trend,
-            "image_url": p.image_url,
-            "is_active": p.is_active,
-        })
+        for p in recent_products:
+            feats = feat_map.get(p.id, [])
+            latest = feats[0] if len(feats) >= 1 else None
+            prev = feats[1] if len(feats) >= 2 else None
+
+            trend = 0.0
+            if latest and prev and prev["sales_count"] and prev["sales_count"] > 0 and latest["sales_count"]:
+                trend = round((latest["sales_count"] - prev["sales_count"]) / prev["sales_count"] * 100, 1)
+
+            recent_items.append({
+                "id": str(p.id),
+                "name": p.product_name,
+                "platform": p.platform,
+                "price": float(latest["price"]) if latest and latest["price"] else None,
+                "trend": trend,
+                "image_url": p.image_url,
+                "is_active": p.is_active,
+            })
 
     platform_dist_result = await db.execute(
         select(Product.platform, func.count().label("count"))
@@ -254,57 +284,71 @@ async def get_dashboard_trend(
     db: AsyncSession = Depends(get_db),
     days: int = 7,
 ):
+    cache_key = f"dashboard:trend:{user.id}:{days}"
+    cached = await cache_get(cache_key)
+    if cached is not None:
+        return {"code": 0, "data": cached}
+
     now = datetime.now(timezone.utc)
     start_date = now - timedelta(days=days)
 
-    dates = []
-    for i in range(days):
-        d = (now - timedelta(days=days - 1 - i)).date()
-        dates.append(d)
+    product_daily_result = await db.execute(
+        select(
+            func.date_trunc("day", Product.created_at).label("day"),
+            func.count().label("count"),
+        )
+        .where(Product.user_id == user.id, Product.created_at >= start_date)
+        .group_by(func.date_trunc("day", Product.created_at))
+        .order_by(text("day"))
+    )
+    product_map = {row[0].date(): row[1] for row in product_daily_result.all()}
 
+    collect_daily_result = await db.execute(
+        select(
+            func.date_trunc("day", CollectTask.created_at).label("day"),
+            func.count().label("count"),
+        )
+        .where(CollectTask.user_id == user.id, CollectTask.created_at >= start_date)
+        .group_by(func.date_trunc("day", CollectTask.created_at))
+        .order_by(text("day"))
+    )
+    collect_map = {row[0].date(): row[1] for row in collect_daily_result.all()}
+
+    ai_daily_result = await db.execute(
+        select(
+            func.date_trunc("day", AIAnalysis.created_at).label("day"),
+            func.count().label("count"),
+        )
+        .where(AIAnalysis.user_id == user.id, AIAnalysis.created_at >= start_date)
+        .group_by(func.date_trunc("day", AIAnalysis.created_at))
+        .order_by(text("day"))
+    )
+    ai_map = {row[0].date(): row[1] for row in ai_daily_result.all()}
+
+    dates = []
     product_daily = []
     collect_daily = []
     ai_daily = []
 
-    for d in dates:
-        day_start = datetime.combine(d, datetime.min.time()).replace(tzinfo=timezone.utc)
-        day_end = day_start + timedelta(days=1)
+    for i in range(days):
+        d = (now - timedelta(days=days - 1 - i)).date()
+        dates.append(d)
+        product_daily.append(product_map.get(d, 0))
+        collect_daily.append(collect_map.get(d, 0))
+        ai_daily.append(ai_map.get(d, 0))
 
-        p_result = await db.execute(
-            select(func.count()).select_from(Product).where(
-                Product.user_id == user.id,
-                Product.created_at >= day_start,
-                Product.created_at < day_end,
-            )
-        )
-        product_daily.append(p_result.scalar() or 0)
+    trend_data = {
+        "dates": [d.isoformat() for d in dates],
+        "products": product_daily,
+        "collects": collect_daily,
+        "ai_analyses": ai_daily,
+    }
 
-        c_result = await db.execute(
-            select(func.count()).select_from(CollectTask).where(
-                CollectTask.user_id == user.id,
-                CollectTask.created_at >= day_start,
-                CollectTask.created_at < day_end,
-            )
-        )
-        collect_daily.append(c_result.scalar() or 0)
-
-        a_result = await db.execute(
-            select(func.count()).select_from(AIAnalysis).where(
-                AIAnalysis.user_id == user.id,
-                AIAnalysis.created_at >= day_start,
-                AIAnalysis.created_at < day_end,
-            )
-        )
-        ai_daily.append(a_result.scalar() or 0)
+    await cache_set(cache_key, trend_data, ttl_seconds=300)
 
     return {
         "code": 0,
-        "data": {
-            "dates": [d.isoformat() for d in dates],
-            "products": product_daily,
-            "collects": collect_daily,
-            "ai_analyses": ai_daily,
-        },
+        "data": trend_data,
     }
 
 

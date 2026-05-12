@@ -12,6 +12,15 @@
         </el-select>
       </div>
       <el-button type="primary" @click="showAddDialog = true">+ 添加监控</el-button>
+      <el-dropdown style="margin-left: 8px" @command="handleExport">
+        <el-button>导出数据<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="csv">导出 CSV</el-dropdown-item>
+            <el-dropdown-item command="json">导出 JSON</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
 
     <div v-if="loading" style="text-align: center; padding: 40px;">
@@ -104,7 +113,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import api from "../../utils/api";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Loading } from "@element-plus/icons-vue";
+import { Loading, ArrowDown } from "@element-plus/icons-vue";
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -260,6 +269,35 @@ async function confirmDelete(row: any) {
     ElMessage.success("已删除");
     fetchProducts();
   } catch {}
+}
+
+async function handleExport(format: string) {
+  try {
+    const resp = await api.get(`/products/export/${format}`, {
+      params: { platform: platformFilter.value || undefined },
+      responseType: format === "csv" ? "blob" : "json",
+    });
+    if (format === "csv") {
+      const blob = new Blob([resp.data], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `products_export_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else {
+      const blob = new Blob([JSON.stringify(resp.data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `products_export_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+    ElMessage.success("导出成功");
+  } catch (e: any) {
+    ElMessage.error(e?.response?.data?.message || "导出失败");
+  }
 }
 
 onMounted(fetchProducts);

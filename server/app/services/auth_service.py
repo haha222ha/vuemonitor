@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime, timedelta, timezone
 
+from sqlalchemy import or_
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,9 +22,14 @@ class AuthService:
         self.db = db
 
     async def register(self, req: RegisterRequest) -> UserInfoResponse:
-        result = await self.db.execute(select(User).where(User.email == req.email))
+        if req.email:
+            result = await self.db.execute(select(User).where(User.email == req.email))
+            if result.scalar_one_or_none():
+                raise BadRequestException(message="邮箱已注册")
+
+        result = await self.db.execute(select(User).where(User.nickname == req.nickname))
         if result.scalar_one_or_none():
-            raise BadRequestException(message="邮箱已注册")
+            raise BadRequestException(message="昵称已被使用")
 
         user = User(
             email=req.email,
@@ -48,11 +54,16 @@ class AuthService:
         )
 
     async def login(self, req: LoginRequest) -> TokenResponse:
-        result = await self.db.execute(select(User).where(User.email == req.email))
+        account = req.account.strip()
+        result = await self.db.execute(
+            select(User).where(
+                or_(User.email == account, User.nickname == account)
+            )
+        )
         user = result.scalar_one_or_none()
 
         if not user or not verify_password(req.password, user.password_hash):
-            raise UnauthorizedException(message="邮箱或密码错误")
+            raise UnauthorizedException(message="账号或密码错误")
 
         if not user.is_active:
             raise UnauthorizedException(message="账户已禁用")

@@ -1,6 +1,7 @@
 import json
 import logging
-from typing import Any
+import functools
+from typing import Any, Callable
 
 from app.core.redis import redis_client
 
@@ -48,6 +49,74 @@ async def cache_delete_pattern(pattern: str) -> None:
             await redis_client.delete(*keys)
     except Exception as e:
         logger.warning(f"Redis cache_delete_pattern error for {pattern}: {e}")
+
+
+async def cache_mget(keys: list[str]) -> list[Any | None]:
+    if not keys:
+        return []
+    full_keys = [f"{_CACHE_PREFIX}{k}" for k in keys]
+    try:
+        raws = await redis_client.mget(*full_keys)
+        results = []
+        for raw in raws:
+            if raw is None:
+                results.append(None)
+            else:
+                try:
+                    results.append(json.loads(raw))
+                except (json.JSONDecodeError, TypeError):
+                    results.append(None)
+        return results
+    except Exception as e:
+        logger.warning(f"Redis cache_mget error: {e}")
+        return [None] * len(keys)
+
+
+async def cache_mset(items: dict[str, tuple[Any, int]]) -> None:
+    if not items:
+        return
+    try:
+        pipe = redis_client.pipeline()
+        for key, (value, ttl) in items.items():
+            full_key = f"{_CACHE_PREFIX}{key}"
+            pipe.setex(full_key, ttl, json.dumps(value, default=str))
+        await pipe.execute()
+    except Exception as e:
+        logger.warning(f"Redis cache_mset error: {e}")
+
+
+async def invalidate_user_cache(user_id: str) -> None:
+    patterns = [
+        f"dashboard:stats:{user_id}",
+        f"dashboard:trend:{user_id}:*",
+        f"products:list:{user_id}:*",
+        f"features:*:{user_id}:*",
+    ]
+    for pattern in patterns:
+        await cache_delete_pattern(pattern)
+
+
+def cached(ttl: int = 300, key_builder: Callable | None = None):
+    def decorator(func):
+        @functools.wraps(func)
+        async def wrapper(*args, **kwargs):
+            if key_builder:
+                cache_key = key_builder(*args, **kwargs)
+            else:
+                cache_key = f"{func.__module__}:{func.__name__}:{args}:{kwargs}"
+
+            cached_val = await cache_get(cache_key)
+            if cached_val is not None:
+                return cached_val
+
+            result = await func(*args, **kwargs)
+
+            if result is not None:
+                await cache_set(cache_key, result, ttl_seconds=ttl)
+
+            return result
+        return wrapper
+    return decorator
 
 
 async def rate_limit_check(

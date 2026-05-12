@@ -1,135 +1,111 @@
-﻿import { app, BrowserWindow, Tray, Menu, nativeImage } from "electron";
-import * as path from "path";
-import { registerIpcHandlers } from "./ipc/handlers";
-import { initStorage } from "./storage/sqlite";
+import { app, BrowserWindow, Tray } from "electron";
+import { initServices, AppLifecycle, WindowManager, TrayManager } from "./services";
 import { localScheduler } from "./collect/local-scheduler";
 import { dataMart } from "./collect/data-mart";
 import { licenseManager } from "./license/license-manager";
 import { cloudSync } from "./sync/cloud-sync";
 import { getCommunication } from "./communication/ws-client";
+import { crashRecovery } from "./recovery/crash-recovery";
+import { localRuleEvaluator } from "./monitor/local-evaluator";
+import { autoUpdateManager } from "./update/auto-updater";
+import { logger } from "./logger/logger";
+import { offlineMode } from "./services/offline-mode";
+import { performanceMonitor } from "./services/performance-monitor";
 
-let mainWindow: BrowserWindow | null = null;
-let tray: Tray | null = null;
+// Service layer singletons
+let lifecycle: AppLifecycle;
+let windowManager: WindowManager;
+let trayManager: TrayManager;
 
-function createMainWindow(): BrowserWindow {
-  mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 800,
-    minWidth: 960,
-    minHeight: 600,
-    title: "XHS365 - 小红书AI选品",
-    show: false,
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-      contextIsolation: true,
-      nodeIntegration: false,
-      session: undefined,
-    },
-  });
-
-  mainWindow.once("ready-to-show", () => {
-    mainWindow?.show();
-  });
-
-  if (process.env.NODE_ENV === "development") {
-    mainWindow.loadURL("http://localhost:5173");
-    mainWindow.webContents.openDevTools();
-  } else {
-    mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
-  }
-
-  mainWindow.on("closed", () => {
-    mainWindow = null;
-  });
-
-  mainWindow.on("minimize", (event) => {
-    event.preventDefault();
-    mainWindow?.hide();
-  });
-
-  const comm = getCommunication();
-  comm.setMainWindow(mainWindow);
-
-  return mainWindow;
-}
-
-function createTray(): void {
-  const iconPath = path.join(__dirname, "../../build/icon.png");
-  let icon: Electron.NativeImage;
-  try {
-    icon = nativeImage.createFromPath(iconPath);
-    if (icon.isEmpty()) {
-      icon = nativeImage.createEmpty();
-    }
-  } catch {
-    icon = nativeImage.createEmpty();
-  }
-
-  tray = new Tray(icon);
-  const contextMenu = Menu.buildFromTemplate([
-    { label: "显示主窗口", click: () => showMainWindow() },
-    { type: "separator" },
-    { label: "采集状态", click: () => sendTrayAction("show-collect-status") },
-    { label: "定时任务", click: () => sendTrayAction("show-scheduler") },
-    { type: "separator" },
-    { label: "授权信息", click: () => sendTrayAction("show-license") },
-    { type: "separator" },
-    { label: "退出", click: () => app.quit() },
-  ]);
-
-  tray.setToolTip("XHS365 小红书AI选品");
-  tray.setContextMenu(contextMenu);
-
-  tray.on("double-click", () => {
-    showMainWindow();
-  });
+function getMainWindowRef(): BrowserWindow | null {
+  return windowManager?.getMainWindow() ?? null;
 }
 
 function showMainWindow(): void {
-  if (!mainWindow) {
-    createMainWindow();
-  }
-  mainWindow?.show();
-  mainWindow?.focus();
-}
-
-function sendTrayAction(action: string): void {
-  showMainWindow();
-  mainWindow?.webContents.send("tray:action", action);
+  windowManager?.showMainWindow();
 }
 
 async function bootstrap(): Promise<void> {
-  initStorage();
+  // Initialize service layer
+  const services = initServices();
+  lifecycle = services.lifecycle;
+  windowManager = services.windows;
+  trayManager = services.tray;
 
-  registerIpcHandlers();
+  // Wire tray to window manager
+  trayManager.setMainWindowGetter(() => windowManager.getMainWindow());
 
-  createMainWindow();
-  createTray();
+  // Initialize core services (storage, crash recovery, IPC)
+  await lifecycle.initialize();
 
   const license = licenseManager.getCurrentLicense();
   if (license?.isValid) {
     await localScheduler.start();
   }
 
-  cloudSync.on("sync:complete", (info) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send("sync:complete", info);
+  // Create window and tray
+  const mainWindow = windowManager.createMainWindow();
+  trayManager.createTray();
+
+  offlineMode.setMainWindow(mainWindow);
+  offlineMode.start();
+
+  performanceMonitor.setMainWindow(mainWindow);
+  performanceMonitor.start();
+
+  logger.info("Main", "应用启动完成", { version: app.getVersion() });
+
+  // Crash recovery retry
+  const recoveryResult = crashRecovery.recoverPendingTasks();
+  if (recoveryResult.recovered > 0) {
+    for (const task of recoveryResult.tasks) {
+      if (task.retryCount < task.maxRetries) {
+        crashRecovery.incrementRetry(task.id);
+        logger.info("Main", `Retrying task ${task.id} (${task.targetUrl || task.targetId}), attempt ${task.retryCount + 1}/${task.maxRetries}`);
+      } else {
+        crashRecovery.updateSnapshotStatus(task.id, "failed", undefined, "Exceeded max retries after crash");
+        logger.info("Main", `Task ${task.id} exceeded max retries, marking as failed`);
+      }
     }
+  }
+
+  // Cloud sync events
+  cloudSync.on("sync:complete", (info) => {
+    windowManager.sendToRenderer("sync:complete", info);
   });
   cloudSync.on("ai:result", (result) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send("ai:result", result);
-    }
+    windowManager.sendToRenderer("ai:result", result);
   });
+  cloudSync.on("conflict:detected", (info) => {
+    windowManager.sendToRenderer("sync:conflict:detected", info);
+  });
+  cloudSync.on("conflict:resolved", (info) => {
+    windowManager.sendToRenderer("sync:conflict:resolved", info);
+  });
+
+  // Local monitor events
+  localRuleEvaluator.on("notification:created", (notification) => {
+    windowManager.sendToRenderer("notification:new", notification);
+  });
+  localRuleEvaluator.on("rule:triggered", (info) => {
+    windowManager.sendToRenderer("monitor:triggered", info);
+  });
+
+  // Auto-update check (delayed in production)
+  if (process.env.NODE_ENV !== "development") {
+    setTimeout(() => {
+      autoUpdateManager.checkForUpdate(true);
+    }, 10000);
+  }
 }
 
 app.whenReady().then(bootstrap);
 
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
-    createMainWindow();
+    windowManager?.createMainWindow();
   } else {
-    showMainWindow();
+    windowManager?.showMainWindow();
   }
 });
 
@@ -140,20 +116,9 @@ app.on("window-all-closed", () => {
 });
 
 app.on("before-quit", () => {
-  localScheduler.destroy();
-  dataMart.destroy();
-  cloudSync.destroy();
-  licenseManager.destroy();
-
-  try {
-    const { getStorage } = require("./storage/sqlite");
-    const storage = getStorage();
-    storage.flush();
-  } catch {}
+  lifecycle?.shutdown();
 });
 
 app.on("will-quit", () => {
-  if (tray) {
-    tray.destroy();
-  }
+  trayManager?.destroyTray();
 });

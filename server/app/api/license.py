@@ -1,17 +1,18 @@
 import uuid
 from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.exceptions import BadRequestException, NotFoundException, UnauthorizedException
-from app.middleware.auth import CurrentUser
+from app.core.exceptions import BadRequestException, NotFoundException
+from app.middleware.auth import CurrentUser, AdminUser
 from app.models.license import LicenseCode, LicenseActivation
 from app.models.user import User
-from shared.constants.feature_gates import PLAN_FEATURES_MAP
+from app.services.license_service import LicenseService
+from shared.constants.feature_gates import PLAN_FEATURES_MAP, PLAN_LIMITS
 
 router = APIRouter(prefix="/license", tags=["license"])
 
@@ -23,89 +24,58 @@ class LicenseVerifyRequest(BaseModel):
     app_version: str = Field("1.0.0", max_length=20)
 
 
+class LicenseActivateRequest(BaseModel):
+    license_key: str = Field(..., min_length=1, max_length=64)
+    device_name: str | None = Field(None, max_length=128)
+
+
 class LicenseHeartbeatRequest(BaseModel):
     license_key: str = Field(..., min_length=1, max_length=64)
     device_id: str = Field(..., min_length=1, max_length=64)
     machine_fingerprint: str = Field(..., min_length=1, max_length=255)
 
 
+class LicenseRenewRequest(BaseModel):
+    extra_days: int = Field(..., ge=1, le=3650)
+
+
+class LicenseUpgradeRequest(BaseModel):
+    new_plan: str = Field(..., pattern="^(pro|premium|enterprise)$")
+
+
 @router.post("/verify")
 async def verify_license(
     req: LicenseVerifyRequest,
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
-        select(LicenseCode).where(LicenseCode.code == req.license_key.strip())
+    svc = LicenseService(db)
+    ip_address = request.client.host if request.client else None
+    result = await svc.verify(req.license_key, req.machine_fingerprint, ip_address)
+    return result
+
+
+@router.post("/activate")
+async def activate_license(
+    req: LicenseActivateRequest,
+    user: CurrentUser,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    svc = LicenseService(db)
+    from app.main import licenseManager
+
+    fingerprint = licenseManager.getMachineFingerprint() if licenseManager else req.license_key
+    ip_address = request.client.host if request.client else None
+
+    result = await svc.activate(
+        code=req.license_key,
+        user_id=user.id,
+        device_fingerprint=fingerprint,
+        device_name=req.device_name,
+        ip_address=ip_address,
     )
-    license_obj = result.scalar_one_or_none()
-
-    if not license_obj:
-        return {"valid": False, "message": "授权码不存在"}
-
-    if license_obj.status == "revoked":
-        return {"valid": False, "message": "授权码已被吊销"}
-
-    now = datetime.now(timezone.utc)
-
-    if license_obj.expires_at and license_obj.expires_at < now:
-        license_obj.status = "expired"
-        await db.flush()
-        return {"valid": False, "message": "授权码已过期"}
-
-    if license_obj.status not in ("active", "unused"):
-        return {"valid": False, "message": f"授权码状态异常: {license_obj.status}"}
-
-    activation_result = await db.execute(
-        select(LicenseActivation).where(
-            LicenseActivation.license_id == license_obj.id,
-            LicenseActivation.device_fingerprint == req.machine_fingerprint,
-        )
-    )
-    existing_activation = activation_result.scalar_one_or_none()
-
-    if existing_activation:
-        return {
-            "valid": True,
-            "plan": license_obj.plan,
-            "expires_at": license_obj.expires_at.isoformat() if license_obj.expires_at else None,
-            "features": PLAN_FEATURES_MAP.get(license_obj.plan, []),
-            "activated_at": existing_activation.activated_at.isoformat() if existing_activation.activated_at else None,
-        }
-
-    if license_obj.current_activations >= license_obj.max_activations:
-        return {"valid": False, "message": f"授权码激活设备数已达上限({license_obj.max_activations}台)"}
-
-    user_result = await db.execute(
-        select(LicenseActivation).where(
-            LicenseActivation.license_id == license_obj.id,
-        )
-    )
-    first_activation = user_result.scalars().first()
-
-    user_id = first_activation.user_id if first_activation else None
-
-    activation = LicenseActivation(
-        license_id=license_obj.id,
-        user_id=user_id or uuid.uuid4(),
-        device_fingerprint=req.machine_fingerprint,
-        activated_at=now,
-    )
-    db.add(activation)
-
-    license_obj.current_activations += 1
-    if license_obj.status == "unused":
-        license_obj.status = "active"
-        license_obj.activated_at = now
-
-    await db.flush()
-
-    return {
-        "valid": True,
-        "plan": license_obj.plan,
-        "expires_at": license_obj.expires_at.isoformat() if license_obj.expires_at else None,
-        "features": PLAN_FEATURES_MAP.get(license_obj.plan, []),
-        "activated_at": now.isoformat(),
-    }
+    return {"code": 0, "data": result}
 
 
 @router.post("/heartbeat")
@@ -113,37 +83,34 @@ async def license_heartbeat(
     req: LicenseHeartbeatRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
-        select(LicenseCode).where(LicenseCode.code == req.license_key.strip())
+    svc = LicenseService(db)
+    result = await svc.verify(req.license_key, req.machine_fingerprint)
+    if not result.get("valid"):
+        return result
+
+    lic_result = await db.execute(
+        select(LicenseCode).where(LicenseCode.code == req.license_key.strip().upper())
     )
-    license_obj = result.scalar_one_or_none()
-
-    if not license_obj:
+    lic = lic_result.scalar_one_or_none()
+    if not lic:
         return {"valid": False, "message": "授权码不存在"}
-
-    if license_obj.status == "revoked":
-        return {"valid": False, "message": "授权码已被吊销"}
-
-    now = datetime.now(timezone.utc)
-    if license_obj.expires_at and license_obj.expires_at < now:
-        return {"valid": False, "message": "授权码已过期"}
 
     activation_result = await db.execute(
         select(LicenseActivation).where(
-            LicenseActivation.license_id == license_obj.id,
+            LicenseActivation.license_id == lic.id,
             LicenseActivation.device_fingerprint == req.machine_fingerprint,
         )
     )
     activation = activation_result.scalar_one_or_none()
-
     if not activation:
         return {"valid": False, "message": "设备未激活"}
 
     return {
         "valid": True,
-        "plan": license_obj.plan,
-        "expires_at": license_obj.expires_at.isoformat() if license_obj.expires_at else None,
-        "features": PLAN_FEATURES_MAP.get(license_obj.plan, []),
+        "plan": lic.plan,
+        "expires_at": lic.expires_at.isoformat() if lic.expires_at else None,
+        "features": PLAN_FEATURES_MAP.get(lic.plan, []),
+        "quotas": PLAN_LIMITS.get(lic.plan, PLAN_LIMITS["free"]),
     }
 
 
@@ -184,6 +151,7 @@ async def get_license_status(
                     "expires_at": lic.expires_at.isoformat() if lic.expires_at else None,
                     "activated_at": a.activated_at.isoformat() if a.activated_at else None,
                     "device_fingerprint": a.device_fingerprint[:8] + "****" if a.device_fingerprint else None,
+                    "device_name": a.device_name,
                 })
 
     return {
@@ -192,6 +160,7 @@ async def get_license_status(
             "current_plan": user.plan,
             "plan_expires_at": user.plan_expires_at.isoformat() if user.plan_expires_at else None,
             "features": PLAN_FEATURES_MAP.get(user.plan, []),
+            "quotas": PLAN_LIMITS.get(user.plan, PLAN_LIMITS["free"]),
             "licenses": licenses,
         },
     }
@@ -203,29 +172,63 @@ async def deactivate_device(
     db: AsyncSession = Depends(get_db),
     machine_fingerprint: str = Body(..., min_length=1, max_length=255),
 ):
-    activation_result = await db.execute(
-        select(LicenseActivation).where(
-            LicenseActivation.user_id == user.id,
-            LicenseActivation.device_fingerprint == machine_fingerprint,
-        )
-    )
-    activation = activation_result.scalar_one_or_none()
+    svc = LicenseService(db)
+    return await svc.deactivate_device(user.id, machine_fingerprint)
 
-    if not activation:
-        raise NotFoundException(message="未找到该设备的激活记录")
 
-    license_result = await db.execute(
-        select(LicenseCode).where(LicenseCode.id == activation.license_id)
-    )
-    license_obj = license_result.scalar_one_or_none()
+@router.post("/{license_id}/renew")
+async def renew_license(
+    license_id: uuid.UUID,
+    req: LicenseRenewRequest,
+    admin: AdminUser,
+    db: AsyncSession = Depends(get_db),
+):
+    svc = LicenseService(db)
+    return await svc.renew(license_id, req.extra_days, admin.id)
 
-    await db.delete(activation)
 
-    if license_obj and license_obj.current_activations > 0:
-        license_obj.current_activations -= 1
-        if license_obj.current_activations == 0:
-            license_obj.status = "unused"
+@router.post("/{license_id}/upgrade")
+async def upgrade_license(
+    license_id: uuid.UUID,
+    req: LicenseUpgradeRequest,
+    admin: AdminUser,
+    db: AsyncSession = Depends(get_db),
+):
+    svc = LicenseService(db)
+    return await svc.upgrade(license_id, req.new_plan, admin.id)
 
-    await db.flush()
 
-    return {"code": 0, "message": "设备已解绑"}
+@router.post("/{license_id}/revoke")
+async def revoke_license(
+    license_id: uuid.UUID,
+    admin: AdminUser,
+    db: AsyncSession = Depends(get_db),
+    reason: str = Body(None, max_length=500),
+):
+    svc = LicenseService(db)
+    return await svc.revoke(license_id, admin.id, reason)
+
+
+@router.get("/{license_id}/logs")
+async def get_license_logs(
+    license_id: uuid.UUID,
+    admin: AdminUser,
+    db: AsyncSession = Depends(get_db),
+):
+    svc = LicenseService(db)
+    logs = await svc.get_change_logs(license_id)
+    return {"code": 0, "data": {"items": logs}}
+
+
+@router.get("/quotas")
+async def get_plan_quotas(
+    user: CurrentUser,
+):
+    return {
+        "code": 0,
+        "data": {
+            "current_plan": user.plan,
+            "quotas": PLAN_LIMITS.get(user.plan, PLAN_LIMITS["free"]),
+            "features": PLAN_FEATURES_MAP.get(user.plan, []),
+        },
+    }

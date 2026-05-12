@@ -1,0 +1,1366 @@
+/**
+ * 小红书数据管理器 - 批量监控样式
+ * Batch Monitor Styles for Xiaohongshu Data Manager
+ */
+
+/* ================== 异常监控表格样式 ================== */
+
+.anomaly-row {
+    transition: background-color 0.2s ease;
+}
+
+.anomaly-row:hover {
+    background-color: #fff5f5;
+}
+
+.field-display {
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.field-name {
+    color: #64748b;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.field-value {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.field-col {
+    min-width: 120px;
+    padding: 8px 12px;
+}
+
+.sales-col,
+.revenue-col {
+    text-align: center;
+    min-width: 100px;
+}
+
+.anomaly-highlight {
+    color: #dc2626;
+    font-weight: bold;
+    background-color: #fef2f2;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.threshold-info {
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.product-name-col {
+    min-width: 200px;
+}
+
+.product-name {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+
+.product-id {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.actions-col {
+    min-width: 80px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-info {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-info:hover {
+    background-color: #2563eb;
+}
+
+.btn-warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.btn-warning:hover {
+    background-color: #d97706;
+}
+
+/* ================== 批量监控对话框样式 ================== */
+
+.batch-monitor-content {
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.monitor-section {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.section-icon {
+    font-size: 18px;
+}
+
+/* ================== 分类选择器样式 ================== */
+
+.category-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.category-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.category-checkbox-item:hover {
+    background: #f1f5f9;
+    border-color: #3b82f6;
+}
+
+.category-checkbox-item.selected {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.category-checkbox {
+    margin: 0;
+    cursor: pointer;
+}
+
+.category-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.category-name {
+    font-weight: 500;
+    color: #1e293b;
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.category-count {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.select-controls {
+    display: flex;
+    gap: 8px;
+}
+
+/* ================== 监控配置样式 ================== */
+
+.monitor-config {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.config-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.config-row label {
+    min-width: 100px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.config-input {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100px;
+}
+
+.config-help {
+    font-size: 12px;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* ================== 监控预览样式 ================== */
+
+.monitor-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+}
+
+.preview-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.preview-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.preview-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* ================== 监控进度对话框样式 ================== */
+
+.monitor-progress-content {
+    width: 95%;
+    max-width: 900px;
+    max-height: 85vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.monitor-progress-content .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.monitor-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-indicator {
+    font-size: 16px;
+    animation: spin 1s linear infinite;
+}
+
+.status-indicator.success {
+    animation: none;
+    color: #10b981;
+}
+
+.status-indicator.error {
+    animation: none;
+    color: #ef4444;
+}
+
+.status-indicator.paused {
+    animation: none;
+    color: #f59e0b;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.status-text {
+    font-size: 14px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.monitor-progress-content .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+}
+
+/* ================== 进度条样式 ================== */
+
+.progress-section {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.progress-title {
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 8px 0;
+}
+
+.progress-stats {
+    font-size: 14px;
+    color: #6b7280;
+    font-family: monospace;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* ================== 分类进度列表样式 ================== */
+
+.category-progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.category-progress-item {
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+
+.category-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.category-progress-name {
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.category-progress-stats {
+    font-size: 12px;
+    color: #6b7280;
+    font-family: monospace;
+}
+
+.category-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.category-progress-fill {
+    height: 100%;
+    background: #10b981;
+    transition: width 0.3s ease;
+}
+
+/* ================== 实时日志样式 ================== */
+
+.progress-log {
+    max-height: 200px;
+    overflow-y: auto;
+    background: #1e293b;
+    border: 1px solid #374151;
+    border-radius: 6px;
+    padding: 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.log-entry {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 4px;
+    word-wrap: break-word;
+}
+
+.log-timestamp {
+    color: #9ca3af;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.log-level {
+    width: 50px;
+    flex-shrink: 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.log-level.info {
+    color: #3b82f6;
+}
+
+.log-level.success {
+    color: #10b981;
+}
+
+.log-level.warning {
+    color: #f59e0b;
+}
+
+.log-level.error {
+    color: #ef4444;
+}
+
+.log-message {
+    color: #f3f4f6;
+    flex: 1;
+}
+
+/* ================== 结果统计样式 ================== */
+
+.result-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 16px;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: white;
+}
+
+.stat-item.success {
+    border-color: #10b981;
+    background: #ecfdf5;
+}
+
+.stat-item.error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.stat-item.skipped {
+    border-color: #6b7280;
+    background: #f9fafb;
+}
+
+.stat-icon {
+    font-size: 16px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-left: auto;
+}
+
+/* ================== 响应式设计 ================== */
+
+/* 1080p分辨率优化 (1920x1080) */
+@media (max-width: 1999px) and (min-width: 1600px) {
+    .batch-monitor-content {
+        max-width: 740px;
+    }
+
+    .monitor-progress-content {
+        max-width: 840px;
+    }
+
+    .section-title {
+        font-size: 15px;
+        margin-bottom: 14px;
+    }
+
+    .section-icon {
+        font-size: 16px;
+    }
+
+    .category-selector-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 10px;
+    }
+
+    .category-checkbox-item {
+        padding: 10px;
+    }
+
+    .category-name {
+        font-size: 13px;
+    }
+
+    .category-count {
+        font-size: 11px;
+    }
+
+    .config-row label {
+        min-width: 90px;
+        font-size: 13px;
+    }
+
+    .config-input {
+        padding: 5px 10px;
+        font-size: 13px;
+        width: 90px;
+    }
+
+    .config-help {
+        font-size: 11px;
+    }
+
+    .preview-label {
+        font-size: 11px;
+    }
+
+    .preview-value {
+        font-size: 16px;
+    }
+
+    .monitor-progress-content .modal-header {
+        padding: 18px 22px 14px;
+    }
+
+    .status-indicator {
+        font-size: 15px;
+    }
+
+    .status-text {
+        font-size: 13px;
+    }
+
+    .progress-section {
+        margin-bottom: 20px;
+        padding: 14px;
+    }
+
+    .progress-title {
+        font-size: 14px;
+    }
+
+    .progress-stats {
+        font-size: 13px;
+    }
+
+    .category-progress-name {
+        font-size: 13px;
+    }
+
+    .category-progress-stats {
+        font-size: 11px;
+    }
+
+    .progress-log {
+        max-height: 180px;
+        padding: 10px;
+        font-size: 11px;
+    }
+
+    .log-level {
+        width: 45px;
+        font-size: 11px;
+    }
+
+    .stat-label {
+        font-size: 13px;
+    }
+
+    .stat-value {
+        font-size: 16px;
+    }
+
+    .field-display {
+        font-size: 11px;
+    }
+
+    .field-name {
+        font-size: 11px;
+    }
+
+    .field-value {
+        font-size: 12px;
+    }
+
+    .product-name {
+        font-size: 13px;
+    }
+
+    .product-id {
+        font-size: 10px;
+    }
+
+    .btn-sm {
+        padding: 4px 7px;
+        font-size: 11px;
+    }
+
+    .chart-product-name {
+        font-size: 13px;
+    }
+
+    .chart-product-price {
+        font-size: 11px;
+    }
+
+    .chart-canvas-container {
+        height: 110px;
+    }
+
+    .chart-stats {
+        font-size: 11px;
+    }
+
+    .chart-no-data {
+        font-size: 13px;
+        height: 110px;
+    }
+}
+
+/* 1080p及以下分辨率 */
+@media (max-width: 1599px) {
+    .batch-monitor-content {
+        max-width: 660px;
+    }
+
+    .monitor-progress-content {
+        max-width: 760px;
+    }
+
+    .monitor-section {
+        margin-bottom: 16px;
+        padding: 12px;
+    }
+
+    .section-title {
+        font-size: 13px;
+        margin-bottom: 10px;
+        gap: 6px;
+    }
+
+    .section-icon {
+        font-size: 14px;
+    }
+
+    .category-selector-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 8px;
+    }
+
+    .category-checkbox-item {
+        padding: 8px;
+    }
+
+    .category-checkbox {
+        width: 14px;
+        height: 14px;
+    }
+
+    .category-name {
+        font-size: 11px;
+    }
+
+    .category-count {
+        font-size: 9px;
+    }
+
+    .select-controls {
+        gap: 6px;
+    }
+
+    .select-controls .btn {
+        padding: 4px 8px;
+        font-size: 10px;
+    }
+
+    .config-row {
+        gap: 8px;
+    }
+
+    .config-row label {
+        min-width: 80px;
+        font-size: 11px;
+    }
+
+    .config-input {
+        padding: 4px 8px;
+        font-size: 11px;
+        width: 80px;
+    }
+
+    .config-help {
+        font-size: 9px;
+    }
+
+    .monitor-preview {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 10px;
+    }
+
+    .preview-item {
+        padding: 8px;
+    }
+
+    .preview-label {
+        font-size: 9px;
+        margin-bottom: 2px;
+    }
+
+    .preview-value {
+        font-size: 14px;
+    }
+
+    .monitor-progress-content .modal-header {
+        padding: 14px 18px 12px;
+    }
+
+    .monitor-progress-content .modal-title {
+        font-size: 13px;
+    }
+
+    .monitor-status {
+        gap: 6px;
+    }
+
+    .status-indicator {
+        font-size: 13px;
+    }
+
+    .status-text {
+        font-size: 11px;
+    }
+
+    .monitor-progress-content .modal-body {
+        padding: 12px 18px;
+    }
+
+    .progress-section {
+        margin-bottom: 16px;
+        padding: 10px;
+    }
+
+    .progress-header {
+        margin-bottom: 10px;
+    }
+
+    .progress-title {
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .progress-stats {
+        font-size: 11px;
+    }
+
+    .progress-bar-container {
+        height: 6px;
+    }
+
+    .category-progress-list {
+        gap: 8px;
+    }
+
+    .category-progress-item {
+        padding: 8px;
+    }
+
+    .category-progress-header {
+        margin-bottom: 6px;
+    }
+
+    .category-progress-name {
+        font-size: 11px;
+    }
+
+    .category-progress-stats {
+        font-size: 9px;
+    }
+
+    .category-progress-bar {
+        height: 3px;
+    }
+
+    .progress-log {
+        max-height: 150px;
+        padding: 8px;
+        font-size: 10px;
+        line-height: 1.25;
+    }
+
+    .log-entry {
+        gap: 6px;
+        margin-bottom: 2px;
+    }
+
+    .log-timestamp {
+        font-size: 9px;
+    }
+
+    .log-level {
+        width: 40px;
+        font-size: 9px;
+    }
+
+    .log-message {
+        font-size: 10px;
+    }
+
+    .result-stats {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+    }
+
+    .stat-item {
+        padding: 8px;
+        gap: 6px;
+    }
+
+    .stat-icon {
+        font-size: 13px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+    }
+
+    .stat-value {
+        font-size: 14px;
+    }
+
+    .field-display {
+        font-size: 10px;
+        line-height: 1.2;
+    }
+
+    .field-name {
+        font-size: 9px;
+        margin-bottom: 1px;
+    }
+
+    .field-value {
+        font-size: 11px;
+    }
+
+    .field-col {
+        min-width: 100px;
+        padding: 6px 8px;
+    }
+
+    .sales-col,
+    .revenue-col {
+        min-width: 85px;
+    }
+
+    .anomaly-highlight {
+        padding: 1px 4px;
+        font-size: 11px;
+    }
+
+    .threshold-info {
+        font-size: 8px;
+        margin-top: 1px;
+    }
+
+    .product-name-col {
+        min-width: 170px;
+    }
+
+    .product-name {
+        font-size: 11px;
+        margin-bottom: 1px;
+    }
+
+    .product-id {
+        font-size: 9px;
+    }
+
+    .actions-col {
+        min-width: 65px;
+    }
+
+    .action-buttons {
+        gap: 3px;
+    }
+
+    .btn-sm {
+        padding: 3px 5px;
+        font-size: 10px;
+    }
+
+    .anomaly-chart-tooltip {
+        min-width: 260px;
+        max-width: 340px;
+        padding: 12px;
+    }
+
+    .chart-tooltip-header {
+        margin-bottom: 10px;
+        padding-bottom: 6px;
+    }
+
+    .chart-product-name {
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+
+    .chart-product-price {
+        font-size: 10px;
+    }
+
+    .chart-close-btn {
+        width: 18px;
+        height: 18px;
+        font-size: 14px;
+    }
+
+    .chart-canvas-container {
+        height: 90px;
+        margin-bottom: 10px;
+    }
+
+    .chart-stats {
+        font-size: 10px;
+    }
+
+    .chart-stat-item {
+        gap: 1px;
+    }
+
+    .chart-stat-label {
+        font-size: 9px;
+    }
+
+    .chart-stat-value {
+        font-size: 11px;
+    }
+
+    .chart-no-data {
+        font-size: 11px;
+        height: 90px;
+    }
+
+    .chart-loading {
+        height: 90px;
+    }
+
+    .chart-loading-spinner {
+        width: 16px;
+        height: 16px;
+    }
+
+    .loading-spinner-small {
+        width: 13px;
+        height: 13px;
+    }
+
+    .modal-footer .btn {
+        padding: 5px 10px;
+        font-size: 10px;
+    }
+
+    .btn-icon {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .batch-monitor-content,
+    .monitor-progress-content {
+        width: 95%;
+        max-height: 90vh;
+    }
+
+    .category-selector-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .monitor-preview {
+        grid-template-columns: 1fr;
+    }
+
+    .result-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .config-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .config-row label {
+        min-width: auto;
+    }
+}
+
+/* ================== 动画效果 ================== */
+
+.monitor-section,
+.progress-section {
+    animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.category-checkbox-item {
+    animation: fadeInScale 0.2s ease-out;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ================== 工具提示样式 ================== */
+
+.tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 6px 12px;
+    background: #1e293b;
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 1000;
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+}
+
+/* ================== 异常商品悬浮图表样式 ================== */
+
+.anomaly-chart-tooltip {
+    position: fixed;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    padding: 14px;
+    z-index: 1001;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    min-width: 300px;
+    max-width: 380px;
+}
+
+.anomaly-chart-tooltip.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.chart-tooltip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.chart-product-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.chart-product-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chart-product-price {
+    font-size: 12px;
+    color: #ef4444;
+    font-weight: 500;
+}
+
+.chart-close-btn {
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: #f8fafc;
+    border-radius: 4px;
+    color: #64748b;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-left: 8px;
+    transition: all 0.2s ease;
+}
+
+.chart-close-btn:hover {
+    background: #e2e8f0;
+    color: #374151;
+}
+
+.chart-canvas-container {
+    width: 100%;
+    height: 120px;
+    margin-bottom: 12px;
+    position: relative;
+    background: #f8fafc;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.chart-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.chart-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.chart-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.chart-stat-label {
+    color: #9ca3af;
+}
+
+.chart-stat-value {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.chart-no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    color: #9ca3af;
+    font-size: 14px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px dashed #d1d5db;
+}
+
+/* ================== 悬浮目标样式 ================== */
+
+.product-name.anomaly-hoverable {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.product-name.anomaly-hoverable:hover {
+    color: #3b82f6;
+    text-decoration: underline;
+}
+
+/* ================== 加载状态 ================== */
+
+.chart-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+    background: #f8fafc;
+    border-radius: 6px;
+}
+
+.chart-loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ================== 加载状态样式 ================== */
+
+.loading-spinner-small {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+    background: inherit;
+    border-color: inherit;
+    color: inherit;
+}
+
+/* ================== 表格排序样式 ================== */
+
+.sortable {
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.sortable::after {
+    content: '⇅';
+    margin-left: 5px;
+    opacity: 0.4;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.sortable:hover {
+    color: #3b82f6;
+}
+
+.sortable:hover::after {
+    opacity: 0.8;
+}
+
+.sortable.sort-desc::after {
+    content: '↓';
+    color: #3b82f6;
+    opacity: 1;
+}
+
+.sortable.sort-asc::after {
+    content: '↑';
+    color: #3b82f6;
+    opacity: 1;
+}

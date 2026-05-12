@@ -1,16 +1,18 @@
 import secrets
 import time
 import uuid
-from datetime import datetime, timezone
+import psutil
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db
+from app.core.database import get_db, engine, async_session_factory
 from app.core.exceptions import NotFoundException, ForbiddenException
 from app.core.security import verify_password, create_access_token
+from app.core.redis import get_redis
 from app.middleware.auth import CurrentUser, AdminUser
 from app.models.user import User
 from app.models.admin import ProxyPool, AdminAuditLog, RiskEvent
@@ -30,9 +32,11 @@ class AdminLoginRequest(BaseModel):
 
 
 class LicenseGenerateRequest(BaseModel):
-    plan: str = Field(..., pattern="^(pro|premium|enterprise)$")
+    plan: str = Field(..., pattern="^(free|pro|premium|enterprise)$")
     duration_days: int = Field(30, ge=1, le=3650)
-    count: int = Field(1, ge=1, le=100)
+    count: int = Field(1, ge=1, le=500)
+    max_activations: int = Field(1, ge=1, le=10)
+    note: str | None = Field(None, max_length=500)
 
 
 class ProxyAddRequest(BaseModel):
@@ -151,28 +155,17 @@ async def update_user(
 async def list_licenses(
     admin: AdminUser,
     db: AsyncSession = Depends(get_db),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    status: str | None = None,
+    plan: str | None = None,
+    batch_id: str | None = None,
+    search: str | None = None,
 ):
-    result = await db.execute(select(LicenseCode).order_by(LicenseCode.created_at.desc()))
-    licenses = result.scalars().all()
-
-    return {
-        "code": 0,
-        "data": {
-            "items": [
-                {
-                    "id": str(l.id),
-                    "code": l.code,
-                    "plan": l.plan,
-                    "duration_days": l.duration_days,
-                    "status": l.status,
-                    "current_activations": l.current_activations,
-                    "max_activations": l.max_activations,
-                    "created_at": l.created_at.isoformat() if l.created_at else None,
-                }
-                for l in licenses
-            ],
-        },
-    }
+    from app.services.license_service import LicenseService
+    svc = LicenseService(db)
+    result = await svc.list_licenses(page, page_size, status, plan, batch_id, search)
+    return {"code": 0, "data": result}
 
 
 @router.post("/licenses/generate")
@@ -181,22 +174,87 @@ async def generate_licenses(
     admin: AdminUser,
     db: AsyncSession = Depends(get_db),
 ):
-    created = []
-    for _ in range(req.count):
-        code = f"VM-{req.plan.upper()}-{secrets.token_hex(8).upper()}"
-        license_key = LicenseCode(
-            code=code,
-            plan=req.plan,
-            duration_days=req.duration_days,
-            status="unused",
-            created_by=admin.id,
-        )
-        db.add(license_key)
-        created.append(code)
-
-    await db.flush()
+    from app.services.license_service import LicenseService
+    svc = LicenseService(db)
+    licenses = await svc.batch_generate(
+        plan=req.plan,
+        duration_days=req.duration_days,
+        count=req.count,
+        max_activations=req.max_activations if hasattr(req, "max_activations") else 1,
+        note=req.note if hasattr(req, "note") else None,
+        created_by=admin.id,
+    )
+    codes = [l.code for l in licenses]
     await _log_action(db, str(admin.id), "generate_licenses", "batch", f"count={req.count}, plan={req.plan}")
-    return {"code": 0, "data": {"codes": created, "count": len(created)}}
+    return {"code": 0, "data": {"codes": codes, "count": len(codes), "batch_id": licenses[0].batch_id if licenses else None}}
+
+
+@router.post("/licenses/{license_id}/revoke")
+async def admin_revoke_license(
+    license_id: uuid.UUID,
+    admin: AdminUser,
+    db: AsyncSession = Depends(get_db),
+    reason: str | None = None,
+):
+    from app.services.license_service import LicenseService
+    svc = LicenseService(db)
+    result = await svc.revoke(license_id, admin.id, reason)
+    await _log_action(db, str(admin.id), "revoke_license", f"license:{license_id}", reason or "")
+    return result
+
+
+@router.post("/licenses/{license_id}/renew")
+async def admin_renew_license(
+    license_id: uuid.UUID,
+    extra_days: int = Query(..., ge=1, le=3650),
+    admin: AdminUser = Depends(),
+    db: AsyncSession = Depends(get_db),
+):
+    from app.services.license_service import LicenseService
+    svc = LicenseService(db)
+    result = await svc.renew(license_id, extra_days, admin.id)
+    await _log_action(db, str(admin.id), "renew_license", f"license:{license_id}", f"extra_days={extra_days}")
+    return result
+
+
+@router.post("/licenses/{license_id}/upgrade")
+async def admin_upgrade_license(
+    license_id: uuid.UUID,
+    new_plan: str = Query(..., pattern="^(pro|premium|enterprise)$"),
+    admin: AdminUser = Depends(),
+    db: AsyncSession = Depends(get_db),
+):
+    from app.services.license_service import LicenseService
+    svc = LicenseService(db)
+    result = await svc.upgrade(license_id, new_plan, admin.id)
+    await _log_action(db, str(admin.id), "upgrade_license", f"license:{license_id}", f"new_plan={new_plan}")
+    return result
+
+
+@router.get("/licenses/{license_id}/logs")
+async def admin_license_logs(
+    license_id: uuid.UUID,
+    admin: AdminUser,
+    db: AsyncSession = Depends(get_db),
+):
+    from app.services.license_service import LicenseService
+    svc = LicenseService(db)
+    logs = await svc.get_change_logs(license_id)
+    return {"code": 0, "data": {"items": logs}}
+
+
+@router.get("/licenses/export")
+async def export_licenses(
+    admin: AdminUser,
+    db: AsyncSession = Depends(get_db),
+    status: str | None = None,
+    plan: str | None = None,
+    batch_id: str | None = None,
+):
+    from app.services.license_service import LicenseService
+    svc = LicenseService(db)
+    result = await svc.list_licenses(page=1, page_size=10000, status=status, plan=plan, batch_id=batch_id)
+    return {"code": 0, "data": result}
 
 
 @router.get("/collect/tasks")
@@ -416,3 +474,298 @@ async def _log_action(db: AsyncSession, operator_id: str, action: str, resource_
     )
     db.add(log)
     await db.flush()
+
+
+@router.get("/monitoring/system")
+async def system_health(admin: AdminUser):
+    cpu_percent = psutil.cpu_percent(interval=1)
+    memory = psutil.virtual_memory()
+    disk = psutil.disk_usage("/")
+    boot_time = datetime.fromtimestamp(psutil.boot_time(), tz=timezone.utc)
+
+    return {
+        "code": 0,
+        "data": {
+            "cpu": {
+                "percent": cpu_percent,
+                "count": psutil.cpu_count(),
+                "load_avg": psutil.getloadavg() if hasattr(psutil, "getloadavg") else None,
+            },
+            "memory": {
+                "total_gb": round(memory.total / (1024**3), 2),
+                "used_gb": round(memory.used / (1024**3), 2),
+                "available_gb": round(memory.available / (1024**3), 2),
+                "percent": memory.percent,
+            },
+            "disk": {
+                "total_gb": round(disk.total / (1024**3), 2),
+                "used_gb": round(disk.used / (1024**3), 2),
+                "free_gb": round(disk.free / (1024**3), 2),
+                "percent": round(disk.used / disk.total * 100, 1),
+            },
+            "uptime_seconds": (datetime.now(timezone.utc) - boot_time).total_seconds(),
+            "processes": len(psutil.pids()),
+        },
+    }
+
+
+@router.get("/monitoring/performance")
+async def performance_metrics(
+    admin: AdminUser,
+    db: AsyncSession = Depends(get_db),
+):
+    now = datetime.now(timezone.utc)
+    one_hour_ago = now - timedelta(hours=1)
+    twenty_four_hours_ago = now - timedelta(hours=24)
+
+    recent_tasks = await db.execute(
+        select(func.count()).select_from(CollectTask).where(CollectTask.created_at >= one_hour_ago)
+    )
+    recent_count = recent_tasks.scalar() or 0
+
+    success_tasks = await db.execute(
+        select(func.count()).select_from(CollectTask).where(
+            CollectTask.created_at >= one_hour_ago,
+            CollectTask.status == "completed",
+        )
+    )
+    success_count = success_tasks.scalar() or 0
+
+    failed_tasks = await db.execute(
+        select(func.count()).select_from(CollectTask).where(
+            CollectTask.created_at >= one_hour_ago,
+            CollectTask.status == "failed",
+        )
+    )
+    failed_count = failed_tasks.scalar() or 0
+
+    total_24h = (await db.execute(
+        select(func.count()).select_from(CollectTask).where(CollectTask.created_at >= twenty_four_hours_ago)
+    )).scalar() or 0
+
+    success_24h = (await db.execute(
+        select(func.count()).select_from(CollectTask).where(
+            CollectTask.created_at >= twenty_four_hours_ago,
+            CollectTask.status == "completed",
+        )
+    )).scalar() or 0
+
+    error_rate = round(failed_count / recent_count * 100, 2) if recent_count > 0 else 0
+    qps = round(recent_count / 3600, 2)
+
+    return {
+        "code": 0,
+        "data": {
+            "last_hour": {
+                "total_tasks": recent_count,
+                "success_tasks": success_count,
+                "failed_tasks": failed_count,
+                "qps": qps,
+                "error_rate": error_rate,
+            },
+            "last_24h": {
+                "total_tasks": total_24h,
+                "success_tasks": success_24h,
+                "success_rate": round(success_24h / total_24h * 100, 2) if total_24h > 0 else 0,
+            },
+            "active_tasks": (await db.execute(
+                select(func.count()).select_from(CollectTask).where(CollectTask.status == "running")
+            )).scalar() or 0,
+            "pending_tasks": (await db.execute(
+                select(func.count()).select_from(CollectTask).where(CollectTask.status == "pending")
+            )).scalar() or 0,
+        },
+    }
+
+
+@router.get("/monitoring/infrastructure")
+async def infrastructure_status(admin: AdminUser, db: AsyncSession = Depends(get_db)):
+    db_status = "healthy"
+    db_pool_size = engine.pool.size() if hasattr(engine.pool, "size") else 0
+    db_checked_out = engine.pool.checkedout() if hasattr(engine.pool, "checkedout") else 0
+
+    try:
+        await db.execute(text("SELECT 1"))
+    except Exception:
+        db_status = "unhealthy"
+
+    redis_status = "healthy"
+    redis_info = {}
+    try:
+        redis = await get_redis()
+        redis_info_raw = await redis.info()
+        redis_info = {
+            "used_memory_human": redis_info_raw.get("used_memory_human"),
+            "connected_clients": redis_info_raw.get("connected_clients"),
+            "uptime_in_seconds": redis_info_raw.get("uptime_in_seconds"),
+            "total_commands_processed": redis_info_raw.get("total_commands_processed"),
+        }
+        await redis.ping()
+    except Exception:
+        redis_status = "unhealthy"
+
+    return {
+        "code": 0,
+        "data": {
+            "database": {
+                "status": db_status,
+                "pool_size": db_pool_size,
+                "checked_out": db_checked_out,
+                "available": db_pool_size - db_checked_out,
+            },
+            "redis": {
+                "status": redis_status,
+                **redis_info,
+            },
+        },
+    }
+
+
+@router.get("/monitoring/risk-stats")
+async def risk_statistics(
+    admin: AdminUser,
+    db: AsyncSession = Depends(get_db),
+):
+    now = datetime.now(timezone.utc)
+    twenty_four_hours_ago = now - timedelta(hours=24)
+    seven_days_ago = now - timedelta(days=7)
+
+    risk_24h = await db.execute(
+        select(RiskEvent.risk_type, func.count().label("count"))
+        .where(RiskEvent.occurred_at >= twenty_four_hours_ago)
+        .group_by(RiskEvent.risk_type)
+    )
+    risk_by_type = {row[0]: row[1] for row in risk_24h.all()}
+
+    risk_7d = await db.execute(
+        select(RiskEvent.risk_level, func.count().label("count"))
+        .where(RiskEvent.occurred_at >= seven_days_ago)
+        .group_by(RiskEvent.risk_level)
+    )
+    risk_by_level = {row[0]: row[1] for row in risk_7d.all()}
+
+    risk_by_platform = {}
+    try:
+        risk_platform_result = await db.execute(
+            select(RiskEvent.platform, func.count().label("count"))
+            .where(RiskEvent.occurred_at >= twenty_four_hours_ago)
+            .group_by(RiskEvent.platform)
+        )
+        risk_by_platform = {row[0]: row[1] for row in risk_platform_result.all()}
+    except Exception:
+        pass
+
+    total_24h = sum(risk_by_type.values())
+    total_7d = sum(risk_by_level.values())
+
+    return {
+        "code": 0,
+        "data": {
+            "last_24h": {
+                "total": total_24h,
+                "by_type": risk_by_type,
+                "by_platform": risk_by_platform,
+            },
+            "last_7d": {
+                "total": total_7d,
+                "by_level": risk_by_level,
+            },
+        },
+    }
+
+
+class BenchmarkRequest(BaseModel):
+    concurrency_levels: list[int] = Field([10, 50, 100], description="并发级别列表")
+    items_per_level: int = Field(50, ge=10, le=200, description="每个级别的请求数")
+    platform: str = Field("xhs", pattern="^(xhs|douyin|taobao|jd|pdd)$")
+    include_proxy_test: bool = Field(True)
+    include_risk_test: bool = Field(False)
+
+
+_benchmark_results: dict | None = None
+_benchmark_running: bool = False
+
+
+@router.post("/monitoring/benchmark")
+async def run_benchmark(
+    req: BenchmarkRequest,
+    admin: AdminUser,
+):
+    global _benchmark_running, _benchmark_results
+    if _benchmark_running:
+        return {"code": 1, "message": "基准测试正在运行中，请稍后查询结果"}
+
+    _benchmark_running = True
+    try:
+        from tests.benchmark_collect import (
+            run_concurrency_benchmark,
+            run_proxy_benchmark,
+            run_risk_threshold_test,
+        )
+        from dataclasses import asdict
+
+        results = {}
+
+        for conc in req.concurrency_levels:
+            result = await run_concurrency_benchmark(conc, req.items_per_level, req.platform)
+            results[f"concurrency_{conc}"] = asdict(result)
+
+        if req.include_proxy_test:
+            async with async_session_factory() as db:
+                proxy_result = await run_proxy_benchmark(db)
+                results["proxy"] = asdict(proxy_result)
+
+        if req.include_risk_test:
+            risk_result = await run_risk_threshold_test(req.platform)
+            results["risk_threshold"] = risk_result
+
+        _benchmark_results = {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "benchmarks": results,
+            "triggered_by": str(admin.id),
+        }
+
+        return {"code": 0, "data": _benchmark_results}
+    except Exception as e:
+        return {"code": 1, "message": f"基准测试失败: {str(e)}"}
+    finally:
+        _benchmark_running = False
+
+
+@router.get("/monitoring/benchmark")
+async def get_benchmark_results(admin: AdminUser):
+    if not _benchmark_results:
+        return {"code": 0, "data": None, "message": "暂无基准测试结果，请先运行测试"}
+    return {"code": 0, "data": _benchmark_results}
+
+
+@router.get("/monitoring/alerts")
+async def get_alerts(
+    admin: AdminUser,
+    level: str | None = None,
+    limit: int = Query(50, ge=1, le=200),
+):
+    from app.services.alert_service import alert_service
+    alerts = alert_service.get_alert_history(level=level, limit=limit)
+    return {"code": 0, "data": {"items": alerts, "total": len(alerts)}}
+
+
+@router.get("/monitoring/alerts/stats")
+async def get_alert_stats(admin: AdminUser):
+    from app.services.alert_service import alert_service
+    return {"code": 0, "data": alert_service.get_alert_stats()}
+
+
+class AlertChannelRequest(BaseModel):
+    channel_type: str = Field(..., pattern="^(webhook|email|log)$")
+    config: dict
+
+
+@router.post("/monitoring/alerts/channels")
+async def add_alert_channel(
+    req: AlertChannelRequest,
+    admin: AdminUser,
+):
+    from app.services.alert_service import alert_service
+    alert_service.add_channel(req.channel_type, req.config)
+    return {"code": 0, "message": "告警通道已添加"}

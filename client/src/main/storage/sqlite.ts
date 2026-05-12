@@ -1,22 +1,26 @@
-import Database from "better-sqlite3";
+import initSqlJs, { Database as SqlJsDatabase } from "sql.js";
 import * as path from "path";
+import * as fs from "fs";
 import { app } from "electron";
+import { encryptRow, decryptRow } from "../crypto/encryption";
 
-let db: Database.Database | null = null;
+let db: SqlJsDatabase | null = null;
 let storage: SQLiteStorage | null = null;
+let dbPath: string = "";
+let wasmPath: string = "";
 
 export class SQLiteStorage {
-  private db: Database.Database;
+  private db: SqlJsDatabase;
+  private dbPath: string;
 
-  constructor(dbPath: string) {
-    this.db = new Database(dbPath);
-    this.db.pragma("journal_mode = WAL");
-    this.db.pragma("foreign_keys = ON");
+  constructor(database: SqlJsDatabase, filePath: string) {
+    this.db = database;
+    this.dbPath = filePath;
     this.initTables();
   }
 
   private initTables(): void {
-    this.db.exec(`
+    this.db.run(`
       CREATE TABLE IF NOT EXISTS products (
         id TEXT PRIMARY KEY,
         platform TEXT NOT NULL,
@@ -32,7 +36,9 @@ export class SQLiteStorage {
         updated_at TEXT NOT NULL DEFAULT (datetime('now')),
         UNIQUE(platform, platform_product_id)
       );
+    `);
 
+    this.db.run(`
       CREATE TABLE IF NOT EXISTS product_features (
         id TEXT PRIMARY KEY,
         product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -49,7 +55,9 @@ export class SQLiteStorage {
         source TEXT NOT NULL DEFAULT 'local',
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
+    `);
 
+    this.db.run(`
       CREATE TABLE IF NOT EXISTS monitor_rules (
         id TEXT PRIMARY KEY,
         product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -61,7 +69,9 @@ export class SQLiteStorage {
         trigger_count INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
+    `);
 
+    this.db.run(`
       CREATE TABLE IF NOT EXISTS sync_queue (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         table_name TEXT NOT NULL,
@@ -71,7 +81,9 @@ export class SQLiteStorage {
         synced INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
+    `);
 
+    this.db.run(`
       CREATE TABLE IF NOT EXISTS ai_analysis (
         id TEXT PRIMARY KEY,
         product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -80,7 +92,9 @@ export class SQLiteStorage {
         confidence REAL DEFAULT 0,
         analyzed_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
+    `);
 
+    this.db.run(`
       CREATE TABLE IF NOT EXISTS scheduled_tasks (
         id TEXT PRIMARY KEY,
         product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
@@ -93,32 +107,81 @@ export class SQLiteStorage {
         next_run_at TEXT,
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
       );
-
-      CREATE INDEX IF NOT EXISTS idx_product_features_product_id ON product_features(product_id);
-      CREATE INDEX IF NOT EXISTS idx_product_features_collected_at ON product_features(collected_at);
-      CREATE INDEX IF NOT EXISTS idx_sync_queue_synced ON sync_queue(synced);
-      CREATE INDEX IF NOT EXISTS idx_ai_analysis_product_id ON ai_analysis(product_id);
-      CREATE INDEX IF NOT EXISTS idx_scheduled_tasks_active ON scheduled_tasks(is_active);
     `);
+
+    this.db.run(`CREATE INDEX IF NOT EXISTS idx_product_features_product_id ON product_features(product_id)`);
+    this.db.run(`CREATE INDEX IF NOT EXISTS idx_product_features_collected_at ON product_features(collected_at)`);
+    this.db.run(`CREATE INDEX IF NOT EXISTS idx_sync_queue_synced ON sync_queue(synced)`);
+    this.db.run(`CREATE INDEX IF NOT EXISTS idx_ai_analysis_product_id ON ai_analysis(product_id)`);
+    this.db.run(`CREATE INDEX IF NOT EXISTS idx_scheduled_tasks_active ON scheduled_tasks(is_active)`);
+
+    this.db.run(`
+      CREATE TABLE IF NOT EXISTS offline_operations (
+        id TEXT PRIMARY KEY,
+        type TEXT NOT NULL,
+        payload TEXT NOT NULL DEFAULT '{}',
+        created_at TEXT NOT NULL DEFAULT (datetime('now')),
+        retry_count INTEGER NOT NULL DEFAULT 0,
+        max_retries INTEGER NOT NULL DEFAULT 5
+      );
+    `);
+
+    this.save();
   }
 
   query(sql: string, params?: unknown[]): unknown[] {
-    return this.db.prepare(sql).all(...(params || []));
+    try {
+      const stmt = this.db.prepare(sql);
+      if (params && params.length > 0) {
+        stmt.bind(params as (string | number | null | Uint8Array)[]);
+      }
+      const results: unknown[] = [];
+      while (stmt.step()) {
+        const row = stmt.getAsObject() as Record<string, any>;
+        results.push(decryptRow(row));
+      }
+      stmt.free();
+      return results;
+    } catch {
+      return [];
+    }
   }
 
-  run(sql: string, params?: unknown[]): Database.RunResult {
-    return this.db.prepare(sql).run(...(params || []));
+  run(sql: string, params?: unknown[]): void {
+    try {
+      if (params && params.length > 0) {
+        this.db.run(sql, params as (string | number | null | Uint8Array)[]);
+      } else {
+        this.db.run(sql);
+      }
+      this.save();
+    } catch {}
   }
 
-  insertProduct(product: Record<string, unknown>): Database.RunResult {
-    const id = product.id || crypto.randomUUID();
-    const result = this.db.prepare(`
-      INSERT OR REPLACE INTO products (id, platform, platform_product_id, product_name, shop_name, category, image_url, product_url)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(id, product.platform, product.platform_product_id, product.product_name, product.shop_name || null, product.category || null, product.image_url || null, product.product_url || null);
+  secureRun(sql: string, params?: unknown[]): void {
+    try {
+      if (params && params.length > 0) {
+        const encryptedParams = (params as Record<string, any>[]).map((p) => {
+          if (p != null && typeof p === "object") return encryptRow(p);
+          return p;
+        });
+        this.db.run(sql, encryptedParams as (string | number | null | Uint8Array)[]);
+      } else {
+        this.db.run(sql);
+      }
+      this.save();
+    } catch {}
+  }
 
+  insertProduct(product: Record<string, unknown>): void {
+    const id = (product.id as string) || crypto.randomUUID();
+    this.db.run(
+      `INSERT OR REPLACE INTO products (id, platform, platform_product_id, product_name, shop_name, category, image_url, product_url)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [id, product.platform, product.platform_product_id, product.product_name, product.shop_name || null, product.category || null, product.image_url || null, product.product_url || null]
+    );
     this.addToSyncQueue("products", id, "upsert", product);
-    return result;
+    this.save();
   }
 
   getProducts(filters?: Record<string, unknown>): unknown[] {
@@ -129,59 +192,108 @@ export class SQLiteStorage {
       params.push(filters.platform);
     }
     sql += " ORDER BY updated_at DESC";
-    return this.db.prepare(sql).all(...params);
+    return this.query(sql, params);
   }
 
-  saveFeatures(productId: string, features: Record<string, unknown>): Database.RunResult {
-    const id = features.id || crypto.randomUUID();
-    const result = this.db.prepare(`
-      INSERT INTO product_features (id, product_id, price, original_price, sales_count, monthly_sales, rating, review_count, favorite_count, stock_status, extra_features, source)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      id, productId, features.price || null, features.original_price || null,
-      features.sales_count || null, features.monthly_sales || null,
-      features.rating || null, features.review_count || null,
-      features.favorite_count || null, features.stock_status || null,
-      JSON.stringify(features.extra_features || {}), features.source || "local"
+  saveFeatures(productId: string, features: Record<string, unknown>): void {
+    const id = (features.id as string) || crypto.randomUUID();
+    this.db.run(
+      `INSERT INTO product_features (id, product_id, price, original_price, sales_count, monthly_sales, rating, review_count, favorite_count, stock_status, extra_features, source)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        id, productId, features.price || null, features.original_price || null,
+        features.sales_count || null, features.monthly_sales || null,
+        features.rating || null, features.review_count || null,
+        features.favorite_count || null, features.stock_status || null,
+        JSON.stringify(features.extra_features || {}), features.source || "local"
+      ]
     );
-
-    this.db.prepare("UPDATE products SET last_collected_at = datetime('now'), updated_at = datetime('now') WHERE id = ?").run(productId);
+    this.db.run("UPDATE products SET last_collected_at = datetime('now'), updated_at = datetime('now') WHERE id = ?", [productId]);
     this.addToSyncQueue("product_features", id, "insert", features);
-    return result;
+    this.save();
   }
 
   private addToSyncQueue(table: string, recordId: string, action: string, data: unknown): void {
-    this.db.prepare(`
-      INSERT INTO sync_queue (table_name, record_id, action, data)
-      VALUES (?, ?, ?, ?)
-    `).run(table, recordId, action, JSON.stringify(data));
+    this.db.run(
+      `INSERT INTO sync_queue (table_name, record_id, action, data) VALUES (?, ?, ?, ?)`,
+      [table, recordId, action, JSON.stringify(data)]
+    );
   }
 
   getPendingSync(limit: number = 100): unknown[] {
-    return this.db.prepare("SELECT * FROM sync_queue WHERE synced = 0 ORDER BY created_at ASC LIMIT ?").all(limit);
+    return this.query("SELECT * FROM sync_queue WHERE synced = 0 ORDER BY created_at ASC LIMIT ?", [limit]);
   }
 
   markSynced(ids: number[]): void {
+    if (ids.length === 0) return;
     const placeholders = ids.map(() => "?").join(",");
-    this.db.prepare(`UPDATE sync_queue SET synced = 1 WHERE id IN (${placeholders})`).run(...ids);
+    this.db.run(`UPDATE sync_queue SET synced = 1 WHERE id IN (${placeholders})`, ids as number[]);
+    this.save();
+  }
+
+  private save(): void {
+    try {
+      const data = this.db.export();
+      const buffer = Buffer.from(data);
+      fs.writeFileSync(this.dbPath, buffer);
+    } catch {}
   }
 
   flush(): void {
-    this.db.pragma("wal_checkpoint(TRUNCATE)");
+    this.save();
   }
 }
 
-export function initStorage(): SQLiteStorage {
-  if (!storage) {
-    const dbPath = path.join(app.getPath("userData"), "vuemonitor.db");
-    storage = new SQLiteStorage(dbPath);
+export async function initStorage(): Promise<SQLiteStorage> {
+  if (storage) return storage;
+
+  const userDataPath = app.getPath("userData");
+  dbPath = path.join(userDataPath, "vuemonitor.db");
+
+  const isDev = process.env.NODE_ENV === "development";
+  let wasmBinary: Buffer;
+
+  const wasmSearchPaths = [
+    path.join(process.cwd(), "node_modules", "sql.js", "dist", "sql-wasm.wasm"),
+    path.join(app.getAppPath(), "node_modules", "sql.js", "dist", "sql-wasm.wasm"),
+    path.join(__dirname, "..", "sql-wasm.wasm"),
+    path.join(__dirname, "sql-wasm.wasm"),
+    path.join(process.resourcesPath, "sql-wasm.wasm"),
+  ];
+
+  let wasmPath = "";
+  for (const p of wasmSearchPaths) {
+    if (fs.existsSync(p)) {
+      wasmPath = p;
+      break;
+    }
   }
+
+  if (!wasmPath) {
+    throw new Error("sql-wasm.wasm not found in any search path");
+  }
+
+  wasmBinary = fs.readFileSync(wasmPath);
+
+  const SQL = await initSqlJs({
+    wasmBinary,
+  });
+
+  let database: SqlJsDatabase;
+  if (fs.existsSync(dbPath)) {
+    const fileBuffer = fs.readFileSync(dbPath);
+    database = new SQL.Database(fileBuffer);
+  } else {
+    database = new SQL.Database();
+  }
+
+  storage = new SQLiteStorage(database, dbPath);
   return storage;
 }
 
 export function getStorage(): SQLiteStorage {
   if (!storage) {
-    return initStorage();
+    throw new Error("Storage not initialized. Call initStorage() first.");
   }
   return storage;
 }

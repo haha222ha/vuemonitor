@@ -10,7 +10,7 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    email VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE,
     nickname VARCHAR(100) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     avatar_url VARCHAR(500),
@@ -19,6 +19,7 @@ CREATE TABLE users (
     role VARCHAR(20) NOT NULL DEFAULT 'user',
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     last_login_at TIMESTAMP,
+    email_notify_enabled BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
@@ -352,3 +353,303 @@ CREATE TABLE admin_audit_logs (
 
 CREATE INDEX idx_admin_audit_logs_user_id ON admin_audit_logs(user_id);
 CREATE INDEX idx_admin_audit_logs_created_at ON admin_audit_logs(created_at);
+
+-- ============================================================
+-- M12 修正 授权码表（对齐需求文档M12 §5）
+-- 注意：license_codes表中 code→license_key, max_activations→max_devices
+-- 新增 bound_user_id, bound_device_fingerprint 字段
+-- ============================================================
+
+-- ALTER license_codes: 添加需求文档M12规范字段
+ALTER TABLE license_codes ADD COLUMN IF NOT EXISTS license_key VARCHAR(19) UNIQUE;
+ALTER TABLE license_codes ADD COLUMN IF NOT EXISTS max_devices INTEGER DEFAULT 1;
+ALTER TABLE license_codes ADD COLUMN IF NOT EXISTS bound_user_id UUID REFERENCES users(id);
+ALTER TABLE license_codes ADD COLUMN IF NOT EXISTS bound_device_fingerprint VARCHAR(255);
+
+-- 迁移已有code到license_key（如已有数据）
+UPDATE license_codes SET license_key = code WHERE license_key IS NULL;
+
+-- ============================================================
+-- M13 用户配额
+-- ============================================================
+
+CREATE TABLE user_quotas (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    gate_key VARCHAR(100) NOT NULL,
+    used_count INTEGER NOT NULL DEFAULT 0,
+    limit_count INTEGER,
+    period VARCHAR(20) NOT NULL DEFAULT 'daily',
+    reset_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE(user_id, gate_key, period)
+);
+
+CREATE INDEX idx_user_quotas_user_id ON user_quotas(user_id);
+
+-- ============================================================
+-- M14 Feature Engine — 匿名特征值
+-- ============================================================
+
+CREATE TABLE features (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    product_id VARCHAR(255) NOT NULL,
+    platform VARCHAR(50) NOT NULL,
+    category VARCHAR(100),
+    growth_rate FLOAT,
+    acceleration FLOAT,
+    volatility FLOAT,
+    competition_index FLOAT,
+    lifecycle_stage VARCHAR(20),
+    price FLOAT,
+    sales_velocity FLOAT,
+    is_anonymized BOOLEAN NOT NULL DEFAULT TRUE,
+    calculated_at TIMESTAMP,
+    uploaded_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_features_user_id ON features(user_id);
+CREATE INDEX idx_features_platform ON features(platform);
+CREATE INDEX idx_features_category ON features(category);
+
+-- ============================================================
+-- M14 Feature Engine — 类目聚合统计
+-- ============================================================
+
+CREATE TABLE category_stats (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    category VARCHAR(100) NOT NULL,
+    platform VARCHAR(50) NOT NULL,
+    date DATE NOT NULL,
+    watch_count INTEGER,
+    unique_products INTEGER,
+    unique_users INTEGER,
+    avg_growth_rate FLOAT,
+    avg_volatility FLOAT,
+    heat_index FLOAT,
+    up_trend_ratio FLOAT,
+    down_trend_ratio FLOAT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE(category, platform, date)
+);
+
+CREATE INDEX idx_category_stats_category ON category_stats(category);
+CREATE INDEX idx_category_stats_date ON category_stats(date);
+
+-- ============================================================
+-- M14 Feature Engine — 增强特征
+-- ============================================================
+
+CREATE TABLE enhanced_features (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    product_id VARCHAR(255) NOT NULL,
+    category VARCHAR(100),
+    base_growth_rate FLOAT,
+    enhanced_growth_rate FLOAT,
+    market_share_percentile FLOAT,
+    heat_trend VARCHAR(20),
+    prediction_score FLOAT,
+    risk_level VARCHAR(20),
+    calculated_at TIMESTAMP
+);
+
+CREATE INDEX idx_enhanced_features_product_id ON enhanced_features(product_id);
+
+-- ============================================================
+-- M15 AI分析引擎 — 分析结果（正式表）
+-- ============================================================
+
+CREATE TABLE analysis_results (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    product_id VARCHAR(255),
+    analysis_type VARCHAR(50) NOT NULL,
+    input_snapshot JSONB,
+    result JSONB NOT NULL,
+    confidence FLOAT,
+    model_used VARCHAR(100),
+    prompt_version VARCHAR(50),
+    input_tokens INTEGER,
+    output_tokens INTEGER,
+    duration_ms INTEGER,
+    status VARCHAR(20) NOT NULL DEFAULT 'success',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_analysis_results_user_id ON analysis_results(user_id);
+CREATE INDEX idx_analysis_results_type ON analysis_results(analysis_type);
+CREATE INDEX idx_analysis_results_created_at ON analysis_results(created_at);
+
+-- ============================================================
+-- M15 AI分析引擎 — Prompt模板库
+-- ============================================================
+
+CREATE TABLE prompt_templates (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) UNIQUE NOT NULL,
+    analysis_type VARCHAR(50) NOT NULL,
+    version VARCHAR(20) NOT NULL,
+    template TEXT NOT NULL,
+    output_schema JSONB,
+    model VARCHAR(100),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_prompt_templates_type ON prompt_templates(analysis_type);
+
+-- ============================================================
+-- M17 匿名聚合 — 聚合审计
+-- ============================================================
+
+CREATE TABLE aggregation_audit (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    category VARCHAR(100) NOT NULL,
+    platform VARCHAR(50) NOT NULL,
+    date DATE NOT NULL,
+    sample_users INTEGER,
+    min_threshold INTEGER,
+    passed_threshold BOOLEAN,
+    status VARCHAR(20) NOT NULL DEFAULT 'success',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_aggregation_audit_date ON aggregation_audit(date);
+
+-- ============================================================
+-- M18 商业化 — 会员套餐
+-- ============================================================
+
+CREATE TABLE membership_plans (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(50) UNIQUE NOT NULL,
+    price DECIMAL(10, 2) NOT NULL DEFAULT 0,
+    ai_quota INTEGER NOT NULL DEFAULT 0,
+    task_limit INTEGER NOT NULL DEFAULT 5,
+    max_projects INTEGER NOT NULL DEFAULT 10,
+    features JSONB NOT NULL DEFAULT '{}',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- ============================================================
+-- M18 商业化 — 用户订阅
+-- ============================================================
+
+CREATE TABLE user_membership (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    plan_id UUID NOT NULL REFERENCES membership_plans(id) ON DELETE CASCADE,
+    start_time TIMESTAMP NOT NULL,
+    end_time TIMESTAMP NOT NULL,
+    status SMALLINT NOT NULL DEFAULT 1
+);
+
+CREATE INDEX idx_user_membership_user_id ON user_membership(user_id);
+CREATE INDEX idx_user_membership_plan_id ON user_membership(plan_id);
+
+-- ============================================================
+-- M18 商业化 — 商品动态指标
+-- ============================================================
+
+CREATE TABLE product_metrics (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    views INTEGER DEFAULT 0,
+    likes INTEGER DEFAULT 0,
+    favorites INTEGER DEFAULT 0,
+    comments INTEGER DEFAULT 0,
+    add_to_cart INTEGER DEFAULT 0,
+    sales_estimate INTEGER DEFAULT 0,
+    trend_score FLOAT,
+    ai_score FLOAT,
+    snapshot_time TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_product_metrics_product_id ON product_metrics(product_id);
+CREATE INDEX idx_product_metrics_snapshot_time ON product_metrics(snapshot_time);
+
+-- ============================================================
+-- M18 商业化 — AI爆品预测结果
+-- ============================================================
+
+CREATE TABLE ai_predictions (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    score FLOAT NOT NULL,
+    label VARCHAR(20) NOT NULL,
+    breakdown JSONB,
+    reason TEXT,
+    model_version VARCHAR(50),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_ai_predictions_product_id ON ai_predictions(product_id);
+CREATE INDEX idx_ai_predictions_score ON ai_predictions(score);
+
+-- ============================================================
+-- M18 商业化 — 采集任务（M18 §15.6 独立于collect_tasks）
+-- ============================================================
+
+CREATE TABLE tasks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    platform VARCHAR(50) NOT NULL,
+    keyword VARCHAR(255),
+    schedule_type VARCHAR(20) NOT NULL DEFAULT 'once',
+    cron_expression VARCHAR(50),
+    status SMALLINT NOT NULL DEFAULT 0,
+    last_run TIMESTAMP,
+    next_run TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_tasks_user_id ON tasks(user_id);
+CREATE INDEX idx_tasks_status ON tasks(status);
+
+-- ============================================================
+-- M18 商业化 — 任务日志
+-- ============================================================
+
+CREATE TABLE task_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    task_id UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+    status VARCHAR(20) NOT NULL,
+    log TEXT,
+    duration INTEGER,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_task_logs_task_id ON task_logs(task_id);
+
+-- ============================================================
+-- M18 商品ID映射（本地↔云端）
+-- ============================================================
+
+CREATE TABLE product_id_mapping (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    local_product_id VARCHAR(255) UNIQUE NOT NULL,
+    cloud_product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    platform VARCHAR(50) NOT NULL,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    sync_status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    last_synced_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_product_id_mapping_user_id ON product_id_mapping(user_id);
+CREATE INDEX idx_product_id_mapping_cloud ON product_id_mapping(cloud_product_id);
+CREATE INDEX idx_product_id_mapping_sync_status ON product_id_mapping(sync_status);
+
+-- ============================================================
+-- M18 数据库运行时配置
+-- ============================================================
+
+CREATE TABLE db_config (
+    key VARCHAR(100) PRIMARY KEY,
+    value TEXT,
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);

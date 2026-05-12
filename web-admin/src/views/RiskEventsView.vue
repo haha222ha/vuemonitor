@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>风控事件</h2>
-    <el-table :data="events" stripe v-loading="loading">
+    <el-table :data="store.events" stripe v-loading="store.loading">
       <el-table-column prop="platform" label="平台" width="80" />
       <el-table-column prop="risk_type" label="风险类型" width="120" />
       <el-table-column prop="severity" label="严重程度" width="100">
@@ -17,22 +17,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import api from "../utils/api";
+import { onMounted } from "vue";
 import { ElMessage } from "element-plus";
+import { useRiskEventsStore } from "../stores/riskEvents";
 
-const events = ref([]);
-const loading = ref(false);
+const store = useRiskEventsStore();
 
 onMounted(async () => {
-  loading.value = true;
   try {
-    const { data } = await api.get("/admin/risk-events");
-    events.value = data?.data?.items || [];
+    await store.fetchEvents();
   } catch {
     ElMessage.error("获取风控事件失败");
-  } finally {
-    loading.value = false;
   }
 });
 </script>

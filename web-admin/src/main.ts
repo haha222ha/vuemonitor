@@ -24,8 +24,14 @@ const routes = [
       { path: "proxies", component: () => import("./views/ProxiesView.vue") },
       { path: "risk-events", component: () => import("./views/RiskEventsView.vue") },
       { path: "audit-logs", component: () => import("./views/AuditLogsView.vue") },
+      { path: "system-monitor", component: () => import("./views/SystemMonitorView.vue") },
+      { path: "alert-config", component: () => import("./views/AlertConfigView.vue") },
+      { path: "security-audit", component: () => import("./views/SecurityAuditView.vue") },
+      { path: "gdpr", component: () => import("./views/GdprView.vue") },
+      { path: "benchmarks", component: () => import("./views/BenchmarkView.vue") },
     ],
   },
+  { path: `${BASE_PATH}:pathMatch(.*)*`, redirect: `${BASE_PATH}dashboard` },
 ];
 
 const router = createRouter({ history: createWebHistory(BASE_PATH), routes });

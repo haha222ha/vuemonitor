@@ -9,23 +9,32 @@
       <el-menu :default-active="activeMenu" router class="sidebar-menu">
         <el-menu-item index="/dashboard">
           <el-icon><Monitor /></el-icon>
-          <span>数据总览</span>
+          <span>{{ t('nav.dashboard') }}</span>
         </el-menu-item>
         <el-menu-item index="/dashboard/monitor">
           <el-icon><View /></el-icon>
-          <span>商品监控</span>
+          <span>{{ t('nav.products') }}</span>
         </el-menu-item>
         <el-menu-item index="/dashboard/collect">
           <el-icon><Upload /></el-icon>
-          <span>采集中心</span>
+          <span>{{ t('nav.monitor') }}</span>
         </el-menu-item>
         <el-menu-item index="/dashboard/ai">
           <el-icon><MagicStick /></el-icon>
-          <span>AI分析</span>
+          <span>{{ t('nav.ai') }}</span>
+        </el-menu-item>
+        <el-menu-item index="/dashboard/team">
+          <el-icon><User /></el-icon>
+          <span>{{ t('nav.team') }}</span>
+        </el-menu-item>
+        <el-menu-item index="/dashboard/notifications">
+          <el-icon><Bell /></el-icon>
+          <span>{{ t('nav.notifications') }}</span>
+          <el-badge v-if="unreadCount > 0" :value="unreadCount" :max="99" class="nav-badge" />
         </el-menu-item>
         <el-menu-item index="/dashboard/settings">
           <el-icon><Setting /></el-icon>
-          <span>设置</span>
+          <span>{{ t('nav.settings') }}</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -93,8 +102,11 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { useWebSocket } from "../composables/useWebSocket";
-import { Monitor, View, Upload, MagicStick, Setting, Bell } from "@element-plus/icons-vue";
+import { Monitor, View, Upload, MagicStick, Setting, Bell, User } from "@element-plus/icons-vue";
 import api from "../utils/api";
+import { useI18n } from "../i18n";
+
+const { t } = useI18n();
 
 const route = useRoute();
 const router = useRouter();
@@ -115,6 +127,8 @@ const pageTitle = computed(() => {
     "/dashboard/monitor": "商品监控",
     "/dashboard/collect": "采集中心",
     "/dashboard/ai": "AI分析",
+    "/dashboard/team": "团队协作",
+    "/dashboard/notifications": "通知中心",
     "/dashboard/settings": "设置",
   };
   return map[route.path] || "Dashboard";
@@ -405,5 +419,13 @@ onUnmounted(() => {
 .notification-more {
   text-align: center;
   padding: 12px 0;
+}
+
+.nav-badge {
+  margin-left: 6px;
+}
+
+.nav-badge :deep(.el-badge__content) {
+  background: #ef4444;
 }
 </style>

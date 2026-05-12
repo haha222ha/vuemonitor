@@ -8,46 +8,61 @@ const routes = [
   {
     path: "/login",
     name: "Login",
-    component: () => import("./views/LoginView.vue"),
+    component: () => import("../views/LoginView.vue"),
   },
   {
     path: "/",
-    component: () => import("./layouts/MainLayout.vue"),
+    component: () => import("../layouts/MainLayout.vue"),
     children: [
       {
         path: "dashboard",
         name: "Dashboard",
-        component: () => import("./views/DashboardView.vue"),
+        component: () => import("../views/DashboardView.vue"),
       },
       {
         path: "products",
         name: "Products",
-        component: () => import("./views/ProductsView.vue"),
+        component: () => import("../views/ProductsView.vue"),
       },
       {
         path: "products/:id",
         name: "ProductDetail",
-        component: () => import("./views/ProductDetailView.vue"),
+        component: () => import("../views/ProductDetailView.vue"),
       },
       {
         path: "monitor",
         name: "Monitor",
-        component: () => import("./views/MonitorView.vue"),
+        component: () => import("../views/MonitorView.vue"),
+      },
+      {
+        path: "notifications",
+        name: "Notifications",
+        component: () => import("../views/NotificationsView.vue"),
       },
       {
         path: "ai",
         name: "AIAnalysis",
-        component: () => import("./views/AIView.vue"),
+        component: () => import("../views/AIView.vue"),
       },
       {
         path: "settings",
         name: "Settings",
-        component: () => import("./views/SettingsView.vue"),
+        component: () => import("../views/SettingsView.vue"),
       },
       {
         path: "license",
         name: "License",
-        component: () => import("./views/LicenseView.vue"),
+        component: () => import("../views/LicenseView.vue"),
+      },
+      {
+        path: "compare",
+        name: "Compare",
+        component: () => import("../views/CompareView.vue"),
+      },
+      {
+        path: "scheduler",
+        name: "Scheduler",
+        component: () => import("../views/SchedulerView.vue"),
       },
     ],
   },

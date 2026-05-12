@@ -2,12 +2,13 @@ import { chromium, type Browser, type BrowserContext, type Page } from "playwrig
 import { EventEmitter } from "events";
 import * as path from "path";
 import * as fs from "fs";
-import { parseXHSUrl, buildXHSNoteUrl } from "../../../shared/constants/platforms";
+import { parseXHSUrl, buildXHSNoteUrl } from "@shared/constants/platforms";
+import { crashRecovery } from "../recovery/crash-recovery";
 
 export interface PlaywrightTask {
   id: string;
   targetUrl: string;
-  targetType: "note" | "user" | "search";
+  targetType: "note" | "goods" | "user" | "search";
   targetId: string;
   options?: PlaywrightTaskOptions;
 }
@@ -45,10 +46,57 @@ export class PlaywrightCollector extends EventEmitter {
   private maxConcurrency: number = 2;
   private taskQueue: PlaywrightTask[] = [];
   private screenshotDir: string;
+  private currentUAIndex: number = 0;
+  private consecutiveRiskCount: number = 0;
+  private isPaused: boolean = false;
+  private backoffMultiplier: number = 1.0;
+
+  private static UA_POOL = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{ver}.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/{ver}.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:{ver}.0) Gecko/20100101 Firefox/{ver}.0",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.{ver} Safari/605.1.15",
+  ];
+
+  private static CAPTCHA_SELECTORS = [
+    'iframe[src*="captcha"]',
+    'div[class*="captcha"]',
+    'div[class*="verify"]',
+    '#captcha',
+    '.geetest_panel',
+    '.nc_wrapper',
+    '[class*="slider-verify"]',
+    '[class*="puzzle-verify"]',
+  ];
 
   constructor(screenshotDir?: string) {
     super();
     this.screenshotDir = screenshotDir || path.join(process.cwd(), "data", "screenshots");
+  }
+
+  private generateUA(): string {
+    const template = PlaywrightCollector.UA_POOL[this.currentUAIndex % PlaywrightCollector.UA_POOL.length];
+    const ver = Math.floor(Math.random() * 16) + 115;
+    const ua = template.replace(/{ver}/g, String(ver));
+    this.currentUAIndex++;
+    return ua;
+  }
+
+  isQueuePaused(): boolean {
+    return this.isPaused;
+  }
+
+  resumeQueue(): void {
+    this.isPaused = false;
+    this.consecutiveRiskCount = 0;
+    this.backoffMultiplier = 1.0;
+    this.emit("queue:resumed");
+    this.processQueue();
+  }
+
+  pauseQueue(): void {
+    this.isPaused = true;
+    this.emit("queue:paused", { pendingCount: this.taskQueue.length });
   }
 
   getActiveCount(): number {
@@ -71,6 +119,7 @@ export class PlaywrightCollector extends EventEmitter {
     this.isLaunching = true;
     try {
       const chromePath = this.findChromePath();
+      const ua = this.generateUA();
 
       this.browser = await chromium.launch({
         executablePath: chromePath || undefined,
@@ -88,8 +137,7 @@ export class PlaywrightCollector extends EventEmitter {
 
       this.context = await this.browser.newContext({
         viewport: { width: 1440, height: 900 },
-        userAgent:
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        userAgent: ua,
         locale: "zh-CN",
         timezoneId: "Asia/Shanghai",
         extraHTTPHeaders: {
@@ -100,11 +148,16 @@ export class PlaywrightCollector extends EventEmitter {
 
       await this.context.addInitScript(() => {
         Object.defineProperty(navigator, "webdriver", { get: () => false });
+        Object.defineProperty(navigator, "languages", { get: () => ["zh-CN", "zh", "en"] });
+        Object.defineProperty(navigator, "plugins", {
+          get: () => [1, 2, 3, 4, 5],
+        });
         const originalQuery = window.navigator.permissions.query;
         window.navigator.permissions.query = (parameters: any) =>
           parameters.name === "notifications"
             ? Promise.resolve({ state: Notification.permission } as PermissionStatus)
             : originalQuery(parameters);
+        (window as any).chrome = { runtime: {} };
       });
 
       this.emit("launched");
@@ -170,6 +223,7 @@ export class PlaywrightCollector extends EventEmitter {
   }
 
   private processQueue(): void {
+    if (this.isPaused) return;
     while (this.activeTasks < this.maxConcurrency && this.taskQueue.length > 0) {
       const task = this.taskQueue.shift()!;
       this.executeTask(task);
@@ -177,8 +231,28 @@ export class PlaywrightCollector extends EventEmitter {
   }
 
   private async executeTask(task: PlaywrightTask): Promise<void> {
+    if (this.isPaused) {
+      this.taskQueue.unshift(task);
+      return;
+    }
+
     this.activeTasks++;
     this.emit("task:start", { taskId: task.id, activeCount: this.activeTasks });
+
+    crashRecovery.saveSnapshot({
+      id: task.id,
+      taskType: "playwright",
+      targetId: task.targetId,
+      targetType: task.targetType,
+      targetUrl: task.targetUrl,
+      status: "running",
+      progress: 0,
+      startedAt: new Date().toISOString(),
+      retryCount: 0,
+      maxRetries: 3,
+      error: null,
+      metadata: JSON.stringify({ queueLength: this.taskQueue.length }),
+    });
 
     if (!this.browser || !this.browser.isConnected()) {
       await this.launch();
@@ -187,6 +261,9 @@ export class PlaywrightCollector extends EventEmitter {
     const page = await this.context!.newPage();
 
     try {
+      const randomDelay = 2000 + Math.random() * 4000 * this.backoffMultiplier;
+      await this.delay(randomDelay);
+
       await page.goto(task.targetUrl, {
         waitUntil: "networkidle",
         timeout: task.options?.timeout || DEFAULT_OPTIONS.timeout,
@@ -194,20 +271,34 @@ export class PlaywrightCollector extends EventEmitter {
 
       await this.delay(2000);
 
-      const riskDetected = await this.checkRisk(page);
-      if (riskDetected) {
+      const riskResult = await this.checkRiskEnhanced(page);
+      if (riskResult) {
+        this.consecutiveRiskCount++;
+        this.backoffMultiplier = Math.min(this.backoffMultiplier * 2.0, 8.0);
+
+        if (this.consecutiveRiskCount >= 3) {
+          this.pauseQueue();
+        }
+
+        crashRecovery.updateSnapshotStatus(task.id, "risk_detected", undefined, riskResult);
         const result: PlaywrightResult = {
           taskId: task.id,
           targetId: task.targetId,
           targetType: task.targetType,
           status: "risk_detected",
-          error: riskDetected,
+          error: riskResult,
           collectedAt: new Date().toISOString(),
         };
         this.emit("task:risk", result);
         this.emit("task:result", result);
+        this.emit("risk:detected", { taskId: task.id, detail: riskResult, paused: this.isPaused });
         return;
       }
+
+      if (this.consecutiveRiskCount > 0) {
+        this.consecutiveRiskCount = Math.max(0, this.consecutiveRiskCount - 1);
+      }
+      this.backoffMultiplier = Math.max(1.0, this.backoffMultiplier * 0.85);
 
       const scrollCount = task.options?.scrollCount ?? DEFAULT_OPTIONS.scrollCount;
       await this.autoScroll(page, scrollCount);
@@ -237,8 +328,11 @@ export class PlaywrightCollector extends EventEmitter {
 
       this.emit("task:success", result);
       this.emit("task:result", result);
+      crashRecovery.updateSnapshotStatus(task.id, "completed", 100);
+      crashRecovery.removeSnapshot(task.id);
     } catch (err) {
       const errorMessage = (err as Error).message;
+      crashRecovery.updateSnapshotStatus(task.id, "failed", undefined, errorMessage);
       const result: PlaywrightResult = {
         taskId: task.id,
         targetId: task.targetId,
@@ -267,13 +361,45 @@ export class PlaywrightCollector extends EventEmitter {
     await this.delay(500);
   }
 
-  private async checkRisk(page: Page): Promise<string | null> {
+  private async checkRiskEnhanced(page: Page): Promise<string | null> {
     const url = page.url();
-    if (url.includes("login") || url.includes("verify") || url.includes("captcha")) {
-      return "风控检测: 页面被重定向到登录/验证页面";
+    const riskPatterns = ["/login", "/verify", "/captcha", "/safe", "/check", "/security", "/challenge"];
+    for (const pattern of riskPatterns) {
+      if (url.includes(pattern)) {
+        return `风控检测: 页面被重定向到${pattern}页面`;
+      }
     }
 
-    const riskKeywords = ["验证码", "captcha", "verify", "安全验证", "频繁", "封禁", "blocked", "forbidden"];
+    const captchaDetected = await page.evaluate((selectors: string[]) => {
+      for (const sel of selectors) {
+        const el = document.querySelector(sel);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          if (rect.width > 0 && rect.height > 0) return sel;
+        }
+      }
+      return null;
+    }, PlaywrightCollector.CAPTCHA_SELECTORS);
+
+    if (captchaDetected) {
+      return `风控检测: 发现验证码元素 (${captchaDetected})`;
+    }
+
+    const behaviorResult = await page.evaluate(() => {
+      const hasAutomation = !!(window as any)._phantom || !!(window as any).__nightmare || !!(window as any).callPhantom;
+      const hasWebDriver = navigator.webdriver === true;
+      const hasHeadless = /HeadlessChrome/.test(navigator.userAgent);
+      return { hasAutomation, hasWebDriver, hasHeadless };
+    });
+
+    if (behaviorResult.hasWebDriver || behaviorResult.hasAutomation || behaviorResult.hasHeadless) {
+      return "风控检测: 检测到自动化浏览器特征";
+    }
+
+    const riskKeywords = [
+      "验证码", "captcha", "verify", "安全验证", "频繁", "封禁", "blocked", "forbidden",
+      "滑动验证", "图形验证", "人机验证", "robot", "automated", "unusual traffic",
+    ];
     const bodyText = await page.evaluate(() => document.body?.innerText?.substring(0, 3000) || "");
     const title = await page.title();
 
@@ -288,6 +414,9 @@ export class PlaywrightCollector extends EventEmitter {
   }
 
   private async extractData(page: Page, targetType: string): Promise<Record<string, unknown>> {
+    if (targetType === "goods") {
+      return this.extractGoodsDetail(page);
+    }
     if (targetType === "user") {
       return this.extractUserProfile(page);
     }
@@ -295,6 +424,97 @@ export class PlaywrightCollector extends EventEmitter {
       return this.extractSearchResults(page);
     }
     return this.extractNoteDetail(page);
+  }
+
+  private async extractGoodsDetail(page: Page): Promise<Record<string, unknown>> {
+    return page.evaluate(() => {
+      const data: Record<string, unknown> = { platform: "xhs", targetType: "goods" };
+
+      const nameEl = document.querySelector("div.goods-name");
+      data.product_name = nameEl?.textContent?.trim().substring(0, 500) || "";
+
+      let price: number | null = null;
+      const priceElements = document.querySelectorAll("span[data-v-8686a314]");
+      if (priceElements && priceElements.length > 0) {
+        for (let i = 0; i < priceElements.length; i++) {
+          const priceText = priceElements[i].textContent?.trim() || "";
+          if (/^\d+(\.\d+)?$/.test(priceText)) {
+            price = parseFloat(priceText);
+            break;
+          }
+        }
+      }
+      if (price === null) {
+        const altPriceEl = document.querySelector(".price, .product-price, .goods-price");
+        if (altPriceEl) {
+          const match = altPriceEl.textContent?.match(/\d+(\.\d+)?/);
+          if (match) price = parseFloat(match[0]);
+        }
+      }
+      data.price = price;
+
+      let sales = 0;
+      const salesEl = document.querySelector("span.spu-text");
+      if (salesEl) {
+        const salesText = salesEl.textContent?.replace("已售", "").trim() || "";
+        if (salesText.includes("万")) {
+          const num = parseFloat(salesText.replace(/[^0-9.]/g, ""));
+          sales = Math.floor(num * 10000);
+        } else {
+          sales = parseInt(salesText.replace(/[^0-9]/g, "")) || 0;
+        }
+      }
+      data.sales_count = sales > 0 ? sales : null;
+      data.monthly_sales = data.sales_count;
+
+      const shopNameEl = document.querySelector("p.seller-name");
+      data.shop_name = shopNameEl?.textContent?.trim() || null;
+
+      let shopSales = 0;
+      const shopSalesElements = document.querySelectorAll("span.sub-title");
+      if (shopSalesElements && shopSalesElements.length > 0) {
+        for (let j = 0; j < shopSalesElements.length; j++) {
+          const sText = shopSalesElements[j].textContent?.trim() || "";
+          if (sText.includes("已售")) {
+            const sNum = sText.replace("已售", "").trim();
+            if (sNum.includes("万")) {
+              shopSales = Math.floor(parseFloat(sNum.replace(/[^0-9.]/g, "")) * 10000);
+            } else {
+              shopSales = parseInt(sNum.replace(/[^0-9]/g, "")) || 0;
+            }
+            break;
+          }
+        }
+      }
+      data.shop_sales = shopSales > 0 ? shopSales : null;
+
+      const imgEl = document.querySelector('div.goods-img img, .swiper-slide img, [class*="goods"] img, [class*="product"] img');
+      data.image_url = (imgEl as HTMLImageElement)?.src || null;
+
+      const pathname = window.location.pathname;
+      const goodsMatch = pathname.match(/\/goods-detail\/([a-f0-9]+)/);
+      data.platform_product_id = goodsMatch ? goodsMatch[1] : "";
+      data.product_url = window.location.href;
+
+      const descEl = document.querySelector('[class*="desc"], [class*="detail"], .goods-desc');
+      data.description = descEl?.textContent?.trim().substring(0, 1000) || null;
+
+      const tagEls = document.querySelectorAll('[class*="tag"] a, .tag, [class*="hash-tag"]');
+      data.category = tagEls.length > 0
+        ? Array.from(tagEls).map((t) => t.textContent?.trim().replace("#", "")).filter(Boolean).join(",")
+        : null;
+
+      const ratingEl = document.querySelector('[class*="rating"], [class*="score"]');
+      data.rating = ratingEl ? parseFloat(ratingEl.textContent?.replace(/[^0-9.]/g, "") || "") || null : null;
+
+      const reviewEl = document.querySelector('[class*="review-count"], [class*="comment-count"]');
+      data.review_count = reviewEl ? parseInt(reviewEl.textContent?.replace(/[^0-9]/g, "") || "") || null : null;
+
+      const favEl = document.querySelector('[class*="like"] .count, [class*="favorite"] .count, [class*="collect"] .count');
+      data.favorite_count = favEl ? parseInt(favEl.textContent?.replace(/[^0-9]/g, "") || "") || null : null;
+
+      return data;
+    });
   }
 
   private async extractNoteDetail(page: Page): Promise<Record<string, unknown>> {

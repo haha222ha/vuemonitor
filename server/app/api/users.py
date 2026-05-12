@@ -21,6 +21,7 @@ router = APIRouter(prefix="/user", tags=["user"])
 class UpdateProfileRequest(BaseModel):
     nickname: str | None = Field(None, min_length=2, max_length=50)
     avatar_url: str | None = Field(None, max_length=500)
+    email_notify_enabled: bool | None = None
 
 
 class ChangePasswordRequest(BaseModel):
@@ -74,6 +75,8 @@ async def update_profile(
         user.nickname = req.nickname
     if req.avatar_url is not None:
         user.avatar_url = req.avatar_url
+    if req.email_notify_enabled is not None:
+        user.email_notify_enabled = req.email_notify_enabled
 
     await db.flush()
 

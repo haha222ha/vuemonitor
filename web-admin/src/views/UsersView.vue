@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2>用户管理</h2>
-    <el-table :data="users" stripe v-loading="loading">
+    <el-table :data="store.users" stripe v-loading="store.loading">
       <el-table-column prop="email" label="邮箱" />
       <el-table-column prop="nickname" label="昵称" width="120" />
       <el-table-column prop="plan" label="套餐" width="100">
@@ -41,30 +41,26 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import api from "../utils/api";
 import { ElMessage } from "element-plus";
+import { useUsersStore } from "../stores/users";
 
-const users = ref([]);
-const loading = ref(false);
+const store = useUsersStore();
+
 const showChangePlan = ref(false);
 const currentUser = ref<any>(null);
 const newPlan = ref("free");
 
 async function fetchUsers() {
-  loading.value = true;
   try {
-    const { data } = await api.get("/admin/users");
-    users.value = data?.data?.items || [];
+    await store.fetchUsers();
   } catch {
     ElMessage.error("获取用户列表失败");
-  } finally {
-    loading.value = false;
   }
 }
 
 async function toggleActive(user: any) {
   try {
-    await api.put(`/admin/users/${user.id}`, { is_active: !user.is_active });
+    await store.updateUser(user.id, { is_active: !user.is_active } as any);
     ElMessage.success("操作成功");
     fetchUsers();
   } catch {
@@ -81,7 +77,7 @@ function openChangePlan(user: any) {
 async function submitChangePlan() {
   if (!currentUser.value) return;
   try {
-    await api.put(`/admin/users/${currentUser.value.id}`, { plan: newPlan.value });
+    await store.updateUser(currentUser.value.id, { plan: newPlan.value } as any);
     ElMessage.success("套餐修改成功");
     showChangePlan.value = false;
     fetchUsers();

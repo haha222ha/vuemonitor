@@ -8,7 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.monitor import MonitorRule, Notification
 from app.models.product import Product, ProductFeature
+from app.models.user import User
 from app.ws.manager import manager
+from app.services.email_service import email_service
 
 logger = logging.getLogger(__name__)
 
@@ -240,7 +242,20 @@ class RuleEvaluator:
             "ts": datetime.now(timezone.utc).isoformat(),
         })
 
-        return notification
+        try:
+            user_result = await self.db.execute(select(User).where(User.id == user_id))
+            user = user_result.scalar_one_or_none()
+            if user and user.email and user.email_notify_enabled:
+                await email_service.send_monitor_triggered_email(
+                    to_email=user.email,
+                    rule_name=rule.rule_name,
+                    product_name=product_name,
+                    trigger_detail=content,
+                )
+        except Exception as e:
+            logger.error(f"Failed to send email notification for rule {rule.id}: {e}")
+
+        return notification;
 
     def _build_notification_content(
         self,

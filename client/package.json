@@ -65,7 +65,6 @@
     "files": [
       "dist/**/*",
       "build/icon.png",
-      "!node_modules",
       "!src",
       "!release"
     ],
@@ -102,7 +101,8 @@
     "asar": true,
     "asarUnpack": [
       "**/*.wasm",
-      "**/node_modules/sql.js/**/*"
+      "**/node_modules/sql.js/**/*",
+      "**/node_modules/playwright-core/**/*"
     ],
     "publish": {
       "provider": "github",

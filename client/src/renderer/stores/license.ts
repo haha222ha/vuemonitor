@@ -13,10 +13,17 @@ export interface LicenseInfo {
   lastVerified: string;
 }
 
+export interface QuotaCheckResult {
+  allowed: boolean;
+  limit: number;
+  remaining: number;
+}
+
 export const useLicenseStore = defineStore("license", () => {
   const license = ref<LicenseInfo | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  const quotas = ref<Record<string, number>>({});
 
   const plan = computed(() => license.value?.isValid ? license.value.plan : "free");
   const planLabel = computed(() => {
@@ -56,6 +63,7 @@ export const useLicenseStore = defineStore("license", () => {
         license.value.plan = result.plan as LicenseInfo["plan"];
         license.value.features = result.features;
       }
+      quotas.value = result.quotas || {};
     } catch {}
   }
 
@@ -104,10 +112,35 @@ export const useLicenseStore = defineStore("license", () => {
     }
   }
 
+  async function checkFeature(gateKey: string): Promise<boolean> {
+    try {
+      return await window.electronAPI.invoke("license:check-feature", gateKey) as boolean;
+    } catch {
+      return false;
+    }
+  }
+
+  async function checkQuota(quotaKey: string, currentUsage: number): Promise<QuotaCheckResult> {
+    try {
+      return await window.electronAPI.invoke("license:check-quota", quotaKey, currentUsage) as QuotaCheckResult;
+    } catch {
+      return { allowed: true, limit: -1, remaining: -1 };
+    }
+  }
+
+  async function checkExpired(): Promise<boolean> {
+    try {
+      return await window.electronAPI.invoke("license:is-expired") as boolean;
+    } catch {
+      return false;
+    }
+  }
+
   return {
     license,
     loading,
     error,
+    quotas,
     plan,
     planLabel,
     isActivated,
@@ -118,5 +151,8 @@ export const useLicenseStore = defineStore("license", () => {
     activate,
     deactivate,
     getDeviceInfo,
+    checkFeature,
+    checkQuota,
+    checkExpired,
   };
 });

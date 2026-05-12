@@ -15,17 +15,17 @@
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
-import api from "../utils/api";
+import { useAdminStore } from "../stores/admin";
 
 const router = useRouter();
+const adminStore = useAdminStore();
 const loading = ref(false);
 const form = reactive({ username: "", password: "" });
 
 async function handleLogin() {
   loading.value = true;
   try {
-    const { data } = await api.post("/admin/login", form);
-    localStorage.setItem("admin_token", data.access_token);
+    await adminStore.login(form.username, form.password);
     router.push("/dashboard");
     ElMessage.success("登录成功");
   } catch { ElMessage.error("登录失败"); }

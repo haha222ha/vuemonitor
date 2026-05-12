@@ -1,6 +1,9 @@
 import { EventEmitter } from "events";
 import { getStorage } from "../storage/sqlite";
 import { normalizer, NormalizedXHSData, NormalizationResult } from "../collect/normalizer";
+import { featureEngine } from "../feature/feature-engine";
+import { localRuleEvaluator } from "../monitor/local-evaluator";
+import { logger } from "../logger/logger";
 
 export interface DataMartEntry {
   id: string;
@@ -46,8 +49,10 @@ export class DataMart extends EventEmitter {
     const existing = this.findExistingProduct(key);
 
     if (existing) {
+      logger.debug("DataMart", "更新已有商品数据", { key, productId: existing.id });
       return this.updateExisting(existing.id, normalized, anomalies, key);
     } else {
+      logger.debug("DataMart", "创建新商品数据", { key });
       return this.createNew(normalized, userId, anomalies, key);
     }
   }
@@ -128,6 +133,15 @@ export class DataMart extends EventEmitter {
     };
 
     this.emit("data:updated", result);
+    setImmediate(() => featureEngine.computeForProduct(existing.id));
+    setImmediate(() => {
+      try {
+        const triggered = localRuleEvaluator.evaluateForProduct(existing.id);
+        if (triggered > 0) {
+          this.emit("monitor:triggered", { productId: existing.id, count: triggered });
+        }
+      } catch {}
+    });
     return result;
   }
 
@@ -187,6 +201,7 @@ export class DataMart extends EventEmitter {
     };
 
     this.emit("data:created", result);
+    setImmediate(() => featureEngine.computeForProduct(productId));
     return result;
   }
 

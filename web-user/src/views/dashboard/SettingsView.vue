@@ -110,6 +110,18 @@
         </div>
 
         <div class="panel" style="margin-top: 20px;">
+          <h3>语言设置</h3>
+          <el-form label-width="100px">
+            <el-form-item label="界面语言">
+              <el-select v-model="currentLocale" @change="changeLocale" style="width: 200px">
+                <el-option label="简体中文" value="zh" />
+                <el-option label="English" value="en" />
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </div>
+
+        <div class="panel" style="margin-top: 20px;">
           <h3>通知偏好</h3>
           <el-form label-width="100px">
             <el-form-item label="采集完成">
@@ -134,8 +146,15 @@ import { useAuthStore } from "../../stores/auth";
 import api from "../../utils/api";
 import { ElMessage } from "element-plus";
 import { Key, Refresh, CircleCheckFilled, Loading } from "@element-plus/icons-vue";
+import { useI18n, type Locale } from "../../i18n";
 
 const auth = useAuthStore();
+const { t, setLocale, getLocale } = useI18n();
+const currentLocale = ref<Locale>(getLocale());
+
+function changeLocale(val: Locale) {
+  setLocale(val);
+}
 const licenseCode = ref("");
 const activating = ref(false);
 const activateResult = ref<any>(null);
@@ -216,16 +235,18 @@ async function activateLicense() {
   activating.value = true;
   activateResult.value = null;
   try {
-    const { data } = await api.post("/auth/license/activate", { code: licenseCode.value.trim() });
-    const result = data?.data || data;
+    const { data: resp } = await api.post("/auth/license/activate", { code: licenseCode.value.trim() });
+    const result = resp?.data || resp;
+    if (resp?.code !== undefined && resp.code !== 0) {
+      ElMessage.error(resp.message || "激活失败");
+      return;
+    }
     activateResult.value = result;
     ElMessage.success("授权码激活成功");
     licenseCode.value = "";
     auth.fetchUser();
     fetchLicenseStatus();
   } catch (e: any) {
-    const msg = e?.response?.data?.message || "激活失败";
-    ElMessage.error(msg);
   } finally {
     activating.value = false;
   }

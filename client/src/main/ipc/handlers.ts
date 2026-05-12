@@ -444,6 +444,21 @@ export function registerIpcHandlers(): void {
     }
   });
 
+  ipcMain.handle("auth:register", async (_event, nickname: string, password: string, email: string | undefined, serverUrl: string) => {
+    try {
+      const axios = require("axios");
+      const payload: Record<string, unknown> = { nickname, password };
+      if (email && email.trim()) {
+        payload.email = email.trim();
+      }
+      const { data } = await axios.post(`${serverUrl}/api/v1/auth/register`, payload);
+      return data;
+    } catch (err: any) {
+      const message = err?.response?.data?.message || err?.message || "注册失败";
+      return { error: true, message };
+    }
+  });
+
   ipcMain.handle("auth:logout", async () => {
     const comm = getCommunication();
     comm.disconnect();

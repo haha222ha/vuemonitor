@@ -11,6 +11,15 @@ from app.api.dashboard import router as dashboard_router
 from app.api.notifications import router as notifications_router
 from app.api.license import router as license_router
 from app.api.users import router as users_router
+from app.api.feature import router as feature_router
+from app.api.teams import router as teams_router
+from app.api.alert_rules import router as alert_rules_router
+from app.api.ai_templates import router as ai_templates_router
+from app.api.security_audit import router as security_audit_router
+from app.api.gdpr import router as gdpr_router
+from app.api.operation_audit import router as operation_audit_router
+from app.api.task_queue import router as task_queue_router
+from app.api.system import router as system_router
 
 api_router = APIRouter()
 
@@ -25,6 +34,15 @@ api_router.include_router(dashboard_router)
 api_router.include_router(notifications_router)
 api_router.include_router(license_router)
 api_router.include_router(users_router)
+api_router.include_router(feature_router)
+api_router.include_router(teams_router)
+api_router.include_router(alert_rules_router)
+api_router.include_router(ai_templates_router)
+api_router.include_router(security_audit_router)
+api_router.include_router(gdpr_router)
+api_router.include_router(operation_audit_router)
+api_router.include_router(task_queue_router)
+api_router.include_router(system_router)
 
 
 @api_router.get("/health", tags=["health"])

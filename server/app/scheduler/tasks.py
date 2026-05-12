@@ -156,6 +156,20 @@ async def downgrade_expired_plans():
             logger.info(f"Marked {len(expired_licenses)} licenses as expired")
 
 
+async def compute_feature_rankings():
+    from app.feature.cloud_engine import CloudFeatureEngine
+
+    async with async_session_factory() as db:
+        try:
+            engine = CloudFeatureEngine(db)
+            count = await engine.compute_all_rankings()
+            await db.commit()
+            if count > 0:
+                logger.info(f"Feature rankings computed for {count} products")
+        except Exception as e:
+            logger.error(f"Feature ranking computation failed: {e}")
+
+
 def setup_scheduler():
     scheduler.add_job(
         process_pending_tasks,
@@ -194,6 +208,14 @@ def setup_scheduler():
         CronTrigger(hour=2, minute=0),
         id="downgrade_expired_plans",
         name="自动降级过期套餐",
+        replace_existing=True,
+    )
+
+    scheduler.add_job(
+        compute_feature_rankings,
+        CronTrigger(hour="*/2", minute=30),
+        id="compute_feature_rankings",
+        name="计算商品群体排名",
         replace_existing=True,
     )
 

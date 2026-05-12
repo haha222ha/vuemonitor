@@ -3,8 +3,8 @@
     <el-card class="login-card">
       <h2>XHS365 登录</h2>
       <el-form :model="form" :rules="loginRules" ref="loginFormRef" @submit.prevent="handleLogin">
-        <el-form-item prop="email">
-          <el-input v-model="form.email" placeholder="邮箱" type="email" />
+        <el-form-item prop="account">
+          <el-input v-model="form.account" placeholder="昵称或邮箱" />
         </el-form-item>
         <el-form-item prop="password">
           <el-input v-model="form.password" placeholder="密码" type="password" show-password />
@@ -20,11 +20,11 @@
 
     <el-dialog v-model="showRegister" title="注册" width="400px">
       <el-form :model="regForm" :rules="regRules" ref="regFormRef">
-        <el-form-item prop="email">
-          <el-input v-model="regForm.email" placeholder="邮箱" />
-        </el-form-item>
         <el-form-item prop="nickname">
-          <el-input v-model="regForm.nickname" placeholder="昵称" />
+          <el-input v-model="regForm.nickname" placeholder="昵称（必填）" />
+        </el-form-item>
+        <el-form-item prop="email">
+          <el-input v-model="regForm.email" placeholder="邮箱（选填）" />
         </el-form-item>
         <el-form-item prop="password">
           <el-input v-model="regForm.password" placeholder="密码（至少8位，含大小写和数字）" type="password" show-password />
@@ -53,27 +53,38 @@ const showRegister = ref(false);
 const loginFormRef = ref<FormInstance>();
 const regFormRef = ref<FormInstance>();
 
-const form = reactive({ email: "", password: "" });
+const form = reactive({ account: "", password: "" });
 const regForm = reactive({ email: "", nickname: "", password: "" });
 
 const loginRules: FormRules = {
-  email: [
-    { required: true, message: "请输入邮箱", trigger: "blur" },
-    { type: "email", message: "请输入有效的邮箱地址", trigger: "blur" },
+  account: [
+    { required: true, message: "请输入昵称或邮箱", trigger: "blur" },
   ],
   password: [
     { required: true, message: "请输入密码", trigger: "blur" },
   ],
 };
 
+const emailPattern = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
 const regRules: FormRules = {
-  email: [
-    { required: true, message: "请输入邮箱", trigger: "blur" },
-    { type: "email", message: "请输入有效的邮箱地址", trigger: "blur" },
-  ],
   nickname: [
     { required: true, message: "请输入昵称", trigger: "blur" },
     { min: 2, max: 20, message: "昵称长度2-20个字符", trigger: "blur" },
+  ],
+  email: [
+    {
+      validator: (_rule, value, callback) => {
+        if (!value || value.trim() === "") {
+          callback();
+        } else if (!emailPattern.test(value.trim())) {
+          callback(new Error("邮箱格式不正确"));
+        } else {
+          callback();
+        }
+      },
+      trigger: "blur",
+    },
   ],
   password: [
     { required: true, message: "请输入密码", trigger: "blur" },
@@ -101,11 +112,11 @@ async function handleLogin() {
 
   loading.value = true;
   try {
-    await authStore.login(form.email, form.password);
+    await authStore.login(form.account, form.password);
     router.push("/dashboard");
     ElMessage.success("登录成功");
   } catch {
-    ElMessage.error("登录失败，请检查邮箱和密码");
+    ElMessage.error("登录失败，请检查账号和密码");
   } finally {
     loading.value = false;
   }
@@ -117,14 +128,16 @@ async function handleRegister() {
 
   regLoading.value = true;
   try {
-    await authStore.register(regForm.email, regForm.nickname, regForm.password);
+    await authStore.register(regForm.email || undefined, regForm.nickname, regForm.password);
     ElMessage.success("注册成功，请登录");
     showRegister.value = false;
+    form.account = regForm.nickname;
     regForm.email = "";
     regForm.nickname = "";
     regForm.password = "";
-  } catch {
-    ElMessage.error("注册失败，请稍后重试");
+  } catch (e: any) {
+    const msg = e?.response?.data?.message || e?.message || "注册失败，请稍后重试";
+    ElMessage.error(msg);
   } finally {
     regLoading.value = false;
   }

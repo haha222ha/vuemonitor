@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流量蜂小红书数据监控助手 v2.0</title>
+    <link rel="stylesheet" href="sidepanel.css">
+    <link rel="stylesheet" href="lib/category-selector-styles.css">
+    <style>
+        /* v2.0 新增样式 */
+        .data-management-section {
+            /* 使用标准card样式 */
+        }
+        
+        .category-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .category-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            display: block;
+        }
+        
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-top: 2px;
+        }
+        
+        .stat-value.anomaly {
+            color: #dc2626;
+        }
+        
+        .version-badge {
+            background: #10b981;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .upload-section .form-help {
+            color: #059669;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .local-storage-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #059669;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        
+        .local-storage-indicator::before {
+            content: "🔒";
+        }
+        
+        /* 高级批量监控配置样式 */
+        .advanced-batch-config {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .config-title {
+            margin: 0 0 16px 0;
+            color: #1f2937;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .config-section {
+            margin-bottom: 16px;
+        }
+        
+        .config-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        
+        .category-multiselect {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            padding: 12px;
+        }
+        
+        .category-selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .category-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .category-checkbox-item:hover {
+            background: #f3f4f6;
+        }
+        
+        .category-checkbox-item.selected {
+            background: #eff6ff;
+            border-color: #3b82f6;
+        }
+        
+        .category-selection-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-link {
+            background: none;
+            border: none;
+            color: #3b82f6;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+        
+        .btn-link:hover {
+            color: #2563eb;
+        }
+        
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .config-item label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .config-input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .config-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .monitor-preview {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 12px;
+        }
+        
+        .preview-stats {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        
+        .preview-item {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .preview-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+        
+        .preview-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .config-actions {
+            margin-top: 16px;
+        }
+        
+        /* 简化异常检测面板样式 */
+        .easy-anomaly-section {
+            /* 使用标准card样式 */
+        }
+
+        .easy-config-panel {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .threshold-settings {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .setting-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .setting-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 13px;
+        }
+
+        .input-with-unit {
+            display: flex;
+            align-items: center;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 2px;
+            transition: border-color 0.2s;
+        }
+
+        .input-with-unit:focus-within {
+            border-color: #3b82f6;
+        }
+
+        .input-with-unit input {
+            border: none;
+            outline: none;
+            padding: 6px 10px;
+            flex: 1;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .unit {
+            padding: 6px 10px;
+            color: #6b7280;
+            font-size: 12px;
+            background: #f9fafb;
+            border-radius: 4px;
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .easy-results-panel {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .results-header {
+            background: #f8fafc;
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .results-summary {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .anomaly-card {
+            padding: 16px;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background-color 0.2s;
+        }
+
+        .anomaly-card:hover {
+            background: #f9fafb;
+        }
+
+        .anomaly-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #111827;
+            font-size: 16px;
+        }
+
+        .anomaly-badges {
+            display: flex;
+            gap: 6px;
+        }
+
+        .anomaly-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-sales {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-revenue {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .anomaly-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: #f9fafb;
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            color: #6b7280;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .detail-value.anomaly {
+            color: #dc2626;
+        }
+
+        .no-anomaly {
+            text-align: center;
+            padding: 40px;
+            color: #10b981;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px;
+            color: #dc2626;
+            font-size: 16px;
+        }
+
+        /* 异常检测结果摘要和导出样式 */
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .summary-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .export-btn {
+            padding: 8px 16px;
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .export-btn:hover:not(:disabled) {
+            background: #047857;
+        }
+
+        .export-btn:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        /* 信息提示样式 */
+        .info-message {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            color: #0369a1;
+        }
+
+        .info-icon {
+            font-size: 18px;
+        }
+
+        .info-text {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+
+        .anomaly-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 6px;
+            border: 1px solid #fecaca;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6b7280;
+        }
+        
+        .status-dot.idle {
+            background: #6b7280;
+        }
+        
+        .status-dot.running {
+            background: #f59e0b;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.success {
+            background: #10b981;
+        }
+        
+        .status-dot.error {
+            background: #dc2626;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .status-text {
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .last-detection {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .anomaly-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .anomaly-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .anomaly-stats .stat-item {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #fecaca;
+        }
+        
+        .stat-value.critical {
+            color: #dc2626;
+        }
+        
+        .stat-value.warning {
+            color: #f59e0b;
+        }
+        
+        .stat-value.info {
+            color: #3b82f6;
+        }
+        
+        /* 异常检测设置面板 */
+        .anomaly-settings-panel {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+        }
+        
+        .panel-title {
+            margin: 0 0 16px 0;
+            color: #1f2937;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .rule-section {
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .rule-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .rule-section h4 {
+            margin: 0 0 12px 0;
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .rule-config {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .panel-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        /* 分类选择器状态样式 */
+        .category-selector-grid.loading {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px;
+            gap: 15px;
+        }
+        
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #e9ecef;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .error-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .error-text {
+            color: #dc3545;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .error-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .category-marker {
+            width: 4px;
+            height: 100%;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        
+        .category-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .category-checkbox-item:hover {
+            background: #f8f9fa;
+            border-color: #3b82f6;
+        }
+        
+        .category-checkbox-item.selected {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+        
+        .category-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .category-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        
+        .category-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .category-count {
+            font-size: 12px;
+            color: #059669;
+            font-weight: 500;
+        }
+        
+        .category-desc {
+            font-size: 11px;
+            color: #6b7280;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #6c757d;
+            color: #6c757d;
+        }
+        
+        .btn-outline:hover {
+            background: #6c757d;
+            color: white;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        
+        /* 批量监控按钮状态样式 */
+        .btn-warning {
+            background-color: #f59e0b;
+            border-color: #f59e0b;
+            color: white;
+        }
+        
+        .btn-warning:hover:not(:disabled) {
+            background-color: #d97706;
+            border-color: #d97706;
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+            border-color: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover:not(:disabled) {
+            background-color: #059669;
+            border-color: #059669;
+        }
+        
+        .btn-secondary {
+            background-color: #6b7280;
+            border-color: #6b7280;
+            color: white;
+        }
+        
+        .btn-secondary:disabled {
+            opacity: 0.7;
+        }
+
+        /* 使用说明帮助按钮样式 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .help-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1.5px solid rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .help-btn:hover {
+            transform: translateY(-50%) scale(1.08);
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .help-btn:active {
+            transform: translateY(-50%) scale(0.92);
+        }
+
+        .help-icon {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 使用说明弹窗样式 - 优化版 */
+        .help-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .help-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        .help-modal-content {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            max-height: 85vh;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .help-modal-header {
+            padding: 16px 20px;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .help-modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .help-modal-close {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .help-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .help-modal-body {
+            padding: 0;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .help-tabs {
+            display: flex;
+            gap: 0;
+            padding: 12px 20px 0;
+            border-bottom: 2px solid #e5e7eb;
+            background: #f8fafc;
+        }
+
+        .help-tab {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            position: relative;
+            top: 2px;
+        }
+
+        .help-tab:hover {
+            color: #2563EB;
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .help-tab.active {
+            color: #2563EB;
+            border-bottom-color: #2563EB;
+            background: white;
+        }
+
+        .help-tab-content {
+            padding: 20px;
+        }
+
+        .help-content {
+            display: none;
+        }
+
+        .help-content.active {
+            display: block;
+        }
+
+        .help-content h3 {
+            margin: 0 0 16px;
+            font-size: 18px;
+            color: #1f2937;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .help-section {
+            margin-bottom: 20px;
+        }
+
+        .help-section h4 {
+            margin: 0 0 10px;
+            font-size: 15px;
+            color: #374151;
+            font-weight: 600;
+            border-left: 3px solid #2563EB;
+            padding-left: 10px;
+        }
+
+        .help-section p {
+            margin: 6px 0;
+            color: #4b5563;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .help-steps {
+            list-style: none;
+            counter-reset: step-counter;
+            padding-left: 0;
+        }
+
+        .help-steps > li {
+            counter-increment: step-counter;
+            margin-bottom: 14px;
+            padding-left: 32px;
+            position: relative;
+        }
+
+        .help-steps > li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .help-steps strong {
+            display: block;
+            color: #1f2937;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .help-steps ul {
+            margin: 6px 0;
+            padding-left: 18px;
+        }
+
+        .help-steps li {
+            margin: 3px 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .help-steps code {
+            background: #EFF6FF;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #2563EB;
+            font-size: 12px;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        .help-tips {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .help-tips li {
+            padding: 8px 10px;
+            margin: 6px 0;
+            background: #f8fafc;
+            border-left: 3px solid #10b981;
+            border-radius: 4px;
+            color: #4b5563;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .help-tips li strong {
+            color: #1f2937;
+        }
+
+        .help-footer {
+            margin-top: 20px;
+            padding: 12px 14px;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            border-radius: 6px;
+        }
+
+        .help-footer p {
+            margin: 0;
+            color: #1E40AF;
+            line-height: 1.6;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <span class="logo-icon">📊</span>
+                <h1>小红书数据监控</h1>
+                <span class="version-badge">v2.0</span>
+            </div>
+            <button id="helpBtn" class="help-btn" title="使用说明">
+                <span class="help-icon">?</span>
+            </button>
+        </div>
+
+
+        <!-- 数据管理入口 -->
+        <div class="card data-management-section">
+            <h2 class="section-title">
+                <span class="icon">🗂️</span>
+                数据管理
+            </h2>
+            
+            <div class="management-actions">
+                <button id="openDataManagerBtn" class="btn btn-primary">
+                    <span class="btn-icon">📊</span>
+                    打开数据管理器
+                </button>
+                
+                <div class="quick-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">总商品数</span>
+                        <span class="stat-value" id="totalProductCount">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">活跃分类</span>
+                        <span class="stat-value" id="activeCategoryCount">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">异常商品</span>
+                        <span class="stat-value anomaly" id="anomalyCount">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="local-storage-indicator">
+                本地存储，数据隐私安全
+            </div>
+        </div>
+
+        <!-- 简化异常检测面板 -->
+        <div class="card easy-anomaly-section">
+            <h2 class="section-title">
+                <span class="icon">🔍</span>
+                异常检测
+            </h2>
+
+            <!-- 设置面板 -->
+            <div class="easy-config-panel">
+                <div class="threshold-settings">
+                    <div class="setting-row">
+                        <label class="setting-label">销量阈值</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="easySalesThreshold" value="20" min="0" max="9999">
+                            <span class="unit">件/24h</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <label class="setting-label">销售额阈值</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="easyRevenueThreshold" value="200" min="0" max="99999">
+                            <span class="unit">元/24h</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-row">
+                    <button id="easyRunDetection" class="btn btn-primary">
+                        <span class="btn-icon">🚀</span>
+                        开始检测
+                    </button>
+                    <div class="detection-status" id="easyDetectionStatus">
+                        <span class="status-dot ready" id="easyStatusDot"></span>
+                        <span class="status-text" id="easyStatusText">就绪</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <!-- Main Monitor Section -->
+        <div class="card main-monitor-section">
+            <h2 class="section-title">
+                <span class="icon">🎯</span>
+                数据监控
+            </h2>
+            
+            <div class="monitor-form">
+                <!-- 模式切换 -->
+                <div class="mode-switch">
+                    <label class="switch-option">
+                        <input type="radio" name="monitorMode" value="manual" checked>
+                        <span>手动输入</span>
+                    </label>
+                    <label class="switch-option">
+                        <input type="radio" name="monitorMode" value="batch">
+                        <span>批量监控</span>
+                    </label>
+                </div>
+
+                <!-- 手动输入模式内容 -->
+                <div class="manual-content" id="manualContent">
+                    <div class="input-group">
+                        <!-- 单行输入模式（默认显示）-->
+                        <input 
+                            type="text" 
+                            id="productUrl" 
+                            class="url-input" 
+                            placeholder="请输入小红书商品链接，或按Ctrl+Enter切换到多行模式..."
+                            autocomplete="off"
+                        >
+                        
+                        <!-- 多行输入模式（动态显示）-->
+                        <textarea 
+                            id="batchUrlInput"
+                            class="batch-url-input" 
+                            style="display: none;"
+                            rows="6"
+                            placeholder="输入多个链接，每行一个：&#10;https://www.xiaohongshu.com/goods/...&#10;https://www.xiaohongshu.com/goods/...&#10;&#10;按Ctrl+Enter切换回单行模式"
+                        ></textarea>
+                    </div>
+
+                    <!-- ✅ 新增: 分类选择器 -->
+                    <div class="form-group" style="margin-top: 16px; margin-bottom: 16px;">
+                        <label for="manualCategorySelect" class="form-label"
+                               style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                            选择保存分类
+                        </label>
+                        <select id="manualCategorySelect" class="category-dropdown"
+                                style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db;
+                                       border-radius: 6px; font-size: 14px; background-color: white;">
+                            <option value="">请选择分类...</option>
+                            <!-- 分类选项会通过JavaScript动态加载 -->
+                        </select>
+                    </div>
+
+                    <!-- ✅ 新增: 进度显示区域 -->
+                    <div id="manualProgressBar" style="display: none; margin-top: 16px; margin-bottom: 16px;">
+                        <div style="margin-bottom: 8px;">
+                            <span style="font-weight: 600; color: #374151;">提取进度</span>
+                            <span id="manualProgressText" style="float: right; color: #6b7280; font-size: 14px;">0/0</span>
+                        </div>
+                        <div style="width: 100%; height: 8px; background-color: #e5e7eb; border-radius: 4px; overflow: hidden;">
+                            <div id="manualProgressFill"
+                                 style="height: 100%; background-color: #10b981; width: 0%; transition: width 0.3s ease;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button id="extractBtn" class="btn btn-primary">
+                            <span class="btn-icon">🚀</span>
+                            开始提取
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 批量监控内容 -->
+                <div class="batch-content" id="batchContent" style="display: none;">
+                    <!-- 分类选择器 -->
+                    <div class="config-section">
+                        <label class="config-label">选择要监控的分类</label>
+                        <div class="category-multiselect" id="batchCategorySelect">
+                            <div class="category-selector-grid" id="categorySelectorGrid">
+                                <div style="padding: 20px; text-align: center; color: #6c757d; font-style: italic;">
+                                    🔄 正在加载分类...
+                                </div>
+                            </div>
+                            <div class="category-selection-actions">
+                                <button type="button" class="btn-link" id="selectAllCategories">全选</button>
+                                <button type="button" class="btn-link" id="selectNoneCategories">全不选</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 运存配置区域 -->
+                    <div class="config-section">
+                        <label class="config-label">电脑运存配置</label>
+                        <div class="category-multiselect">
+                            <div class="config-item" style="margin-bottom: 12px;">
+                                <label style="font-size: 14px; color: #6b7280; margin-bottom: 8px;">选择您的电脑运存大小</label>
+                                <select id="systemMemoryConfig" class="config-input" style="width: 100%;">
+                                    <option value="auto">自动检测（默认）</option>
+                                    <option value="8">8GB - 保守模式 (5个并发)</option>
+                                    <option value="16">16GB - 均衡模式 (8个并发)</option>
+                                    <option value="32">32GB - 性能模式 (11个并发)</option>
+                                    <option value="64">32GB以上 - 极限模式 (15个并发)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                        <!-- 监控控制按钮 -->
+                        <div class="config-actions" style="text-align: center; display: flex; gap: 12px; justify-content: center;">
+                            <button id="startAdvancedBatchBtn" class="btn btn-primary" disabled style="font-size: 16px; padding: 12px 24px; font-weight: bold;">
+                                <span class="btn-icon">🚀</span>
+                                启动批量监控
+                            </button>
+                            <button id="stopBatchBtn" class="btn btn-danger" disabled style="font-size: 16px; padding: 12px 24px; font-weight: bold; display: none;">
+                                <span class="btn-icon">⏹️</span>
+                                停止
+                            </button>
+                        </div>
+                        
+                        <!-- 批量监控进度条 -->
+                        <div class="batch-progress-section" id="batchProgressSection" style="display: none; margin-top: 20px;">
+                            <div class="progress-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div class="progress-title" style="font-weight: 600; color: #1f2937;">监控进度</div>
+                                <div class="progress-stats" id="batchProgressStats" style="font-size: 14px; color: #6b7280;">0/0</div>
+                            </div>
+                            <div class="progress-bar" style="width: 100%; height: 8px; background-color: #e5e7eb; border-radius: 4px; overflow: hidden;">
+                                <div class="progress-fill" id="batchProgressFill" style="height: 100%; background-color: #10b981; width: 0%; transition: width 0.3s ease;"></div>
+                            </div>
+                            <div class="progress-info" id="batchProgressInfo" style="margin-top: 8px; font-size: 12px; color: #6b7280; text-align: center;">准备开始...</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Upload Section (Excel导入) -->
+        <div class="card upload-section">
+            <h2 class="section-title">
+                <span class="icon">📊</span>
+                Excel数据导入
+            </h2>
+            
+            <div class="upload-form">
+                <!-- 分类选择器 -->
+                <div class="form-group">
+                    <label for="uploadCategorySelect" class="form-label">选择目标分类</label>
+                    <select id="uploadCategorySelect" class="category-dropdown">
+                        <option value="">请选择分类...</option>
+                        <!-- 动态加载分类 -->
+                    </select>
+                </div>
+                
+                <div class="file-input-group">
+                    <input type="file" id="excelUpload" accept=".xlsx,.xls" />
+                    <label for="excelUpload" class="file-input-label">
+                        <span class="icon">📁</span>
+                        选择Excel文件
+                    </label>
+                </div>
+                
+                <!-- 文件名显示 -->
+                <div id="selectedFileName" class="form-help" style="display: none; color: #10b981; margin-top: 8px;">
+                    <span class="icon">✅</span>
+                    <span id="fileNameText"></span>
+                </div>
+
+
+                <!-- 上传按钮 -->
+                <div class="upload-actions">
+                    <button id="startUploadBtn" class="btn btn-primary" disabled>
+                        <span class="btn-icon">🚀</span>
+                        开始导入
+                    </button>
+                </div>
+                
+                <div class="form-help">
+                    <span>💡 支持标准Excel格式，数据将导入到所选分类中</span>
+                </div>
+                
+                <div class="upload-progress" id="uploadProgress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="uploadProgressFill"></div>
+                    </div>
+                    <div class="progress-text" id="uploadProgressText"></div>
+                </div>
+                
+                <div class="upload-results" id="uploadResults">
+                    <!-- 上传结果显示 -->
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Settings Section (简化版本) -->
+        <div class="card settings-section" id="settingsSection" style="display: none;">
+            <h2 class="section-title">
+                <span class="icon">⚙️</span>
+                设置
+            </h2>
+            
+            <div class="settings-body">
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-icon">🔧</div>
+                        <div class="card-title">
+                            <h3>基本设置</h3>
+                            <p>配置应用基本参数</p>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-options">
+                        <div class="option-item">
+                            <label class="option-label">
+                                <input type="checkbox" id="autoExtractSetting">
+                                <span class="option-text">自动提取当前页面数据</span>
+                            </label>
+                        </div>
+                        
+                        <div class="option-item">
+                            <label class="option-label">
+                                <input type="checkbox" id="soundNotificationSetting">
+                                <span class="option-text">启用声音通知</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="card-header">
+                        <div class="card-icon">📊</div>
+                        <div class="card-title">
+                            <h3>数据管理</h3>
+                            <p>管理本地存储的数据</p>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-options">
+                        <div class="option-item">
+                            <button id="exportDataBtn" class="btn btn-secondary">
+                                <span class="btn-icon">📤</span>
+                                导出所有数据
+                            </button>
+                        </div>
+                        
+                        <div class="option-item">
+                            <button id="clearAllDataBtn" class="btn btn-danger">
+                                <span class="btn-icon">🗑️</span>
+                                清空所有数据
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 版本信息 -->
+        <div class="version-info" style="text-align: center; padding: 10px; color: #6b7280; font-size: 12px; border-top: 1px solid #e5e7eb; margin-top: 20px;">
+            流量蜂小红书数据监控助手 v2.0.0 | 本地存储版本
+        </div>
+    </div>
+
+    <!-- 使用说明弹窗 -->
+    <div id="helpModal" class="help-modal" style="display: none;">
+        <div class="help-modal-overlay"></div>
+        <div class="help-modal-content">
+            <div class="help-modal-header">
+                <h2>📖 使用说明</h2>
+                <button class="help-modal-close" id="closeHelpBtn">&times;</button>
+            </div>
+            <div class="help-modal-body">
+                <!-- 导航标签 -->
+                <div class="help-tabs">
+                    <button class="help-tab active" data-tab="import">数据导入</button>
+                    <button class="help-tab" data-tab="monitor">数据监控</button>
+                    <button class="help-tab" data-tab="anomaly">异常检测</button>
+                    <button class="help-tab" data-tab="manager">数据管理器</button>
+                </div>
+
+                <!-- 标签内容 -->
+                <div class="help-tab-content">
+                    <!-- 数据导入 -->
+                    <div class="help-content active" id="help-import">
+                        <h3>📥 数据导入</h3>
+                        <div class="help-section">
+                            <h4>功能说明</h4>
+                            <p>数据导入功能支持批量上传小红书商品数据到系统，方便后续监控和分析。建议配合RPA商品采集商品工具使用。</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h4>使用步骤</h4>
+                            <ol class="help-steps">
+                                <li>
+                                    <strong>准备Excel文件</strong>
+                                    <p>确保Excel文件包含以下必需字段：</p>
+                                    <ul>
+                                        <li><code>商品ID</code> - 商品的唯一标识</li>
+                                        <li><code>商品名称</code> - 商品的标题</li>
+                                        <li><code>商品价格</code> - 商品价格（数字）</li>
+                                        <li><code>商品销量</code> - 当前销量（数字）</li>
+                                        <li><code>好评人数</code> - 好评人数</li>
+                                        <li><code>加购件数</code> - 加购件数</li>
+                                        <li><code>近3个月销量</code> - 近3个月销量</li>
+                                        <li><code>店铺名称</code> - 店铺名称</li>
+                                        <li><code>店铺粉丝数</code> - 店铺粉丝数量</li>
+                                        <li><code>店铺销量</code> - 店铺总销量</li>
+                                        <li><code>商品链接</code> - 小红书商品页面URL</li>
+                                        <li><code>采集时间</code> - 数据采集时间</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <strong>选择分类</strong>
+                                    <p>在"选择分类"下拉框中选择商品所属的分类，如果没有合适的分类，可以先创建新分类。</p>
+                                </li>
+                                <li>
+                                    <strong>上传文件</strong>
+                                    <p>点击"选择文件"按钮，选择准备好的Excel文件（支持.xlsx和.xls格式）。</p>
+                                </li>
+                                <li>
+                                    <strong>开始导入</strong>
+                                    <p>点击"开始导入"按钮，系统会自动解析Excel并保存到数据库。</p>
+                                </li>
+                                <li>
+                                    <strong>查看结果</strong>
+                                    <p>导入完成后，系统会显示成功导入的商品数量，您可以在数据管理器中查看导入的数据。</p>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="help-section">
+                            <h4>注意事项</h4>
+                            <ul class="help-tips">
+                                <li>💡 建议配合RPA商品采集商品工具使用！直接传采集到的数据表格就行</li>
+                                <li>⚠️ Excel文件列名必须与系统要求的字段名完全匹配</li>
+                                <li>⚠️ 商品链接必须是有效的小红书URL</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 数据监控 -->
+                    <div class="help-content" id="help-monitor">
+                        <h3>🔍 数据监控</h3>
+                        <div class="help-section">
+                            <h4>功能说明</h4>
+                            <p>数据监控功能用于抓取小红书商品当前的销售数据（商品销量、店铺销量），用于动态监测销量变化情况。支持手动输入和批量监控两种方式。</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h4>手动输入</h4>
+                            <p><strong>首次输入商品链接时</strong>，会完整采集商品名称、商品标题、商品价格、店铺信息等核心数据，并自动保存到"未分类"中。</p>
+                            <ol class="help-steps">
+                                <li>
+                                    <strong>输入链接</strong>
+                                    <ul>
+                                        <li>单行模式：直接粘贴商品链接</li>
+                                        <li>多行模式：按 <code>Ctrl+Enter</code> 切换，每行一个链接</li>
+                                    </ul>
+                                </li>
+                            </ol>
+                            <p class="help-tips" style="margin-top: 12px; padding: 10px 12px; background: #f8fafc; border-left: 4px solid #10b981; border-radius: 4px; color: #4b5563;">
+                                💡 后续需要更新数据时，建议使用批量监控功能进行操作
+                            </p>
+                        </div>
+
+                        <div class="help-section">
+                            <h4>批量监控</h4>
+                            <ol class="help-steps">
+                                <li>
+                                    <strong>选择分类</strong>
+                                    <p>勾选需要监控的分类（支持全选/全不选）</p>
+                                </li>
+                                <li>
+                                    <strong>选择电脑运存</strong>
+                                    <p>用于控制同时监控的浏览器窗口并发数</p>
+                                </li>
+                                <li>
+                                    <strong>启动监控</strong>
+                                    <p>点击"启动批量监控"按钮，系统将自动逐个更新选中分类下的商品数据</p>
+                                </li>
+                                <li>
+                                    <strong>查看进度</strong>
+                                    <p>实时显示进度条、已完成数量和当前处理状态</p>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="help-section">
+                            <h4>注意事项</h4>
+                            <ul class="help-tips">
+                                <li>💡 批量监控支持自动检测或手动配置电脑运存，系统会根据运存大小自动调整并发数（5-15个）</li>
+                                <li>💡 若每天监控的商品数据超过2000条，建议在浏览器无痕模式下进行监控，避免平台限制访问</li>
+                                <li>💡 监控期间请保持浏览器打开，监控完成后销量数据会自动保存到本地数据库</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 异常检测 -->
+                    <div class="help-content" id="help-anomaly">
+                        <h3>⚠️ 异常检测</h3>
+                        <div class="help-section">
+                            <h4>功能说明</h4>
+                            <p>异常检测功能会自动分析商品的销量和销售额变化，当增长超过设定阈值时，系统会将其标记为异常商品，方便您快速发现爆款。</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h4>检测规则</h4>
+                            <ul class="help-steps">
+                                <li>
+                                    <strong>24小时销量增长</strong>
+                                    <p>系统会对比商品最近两次监控的销量数据，计算24小时内的销量增长。</p>
+                                    <p>计算公式：<code>24h销量 = (当前销量 - 上次销量) × (24 / 时间间隔小时数)</code></p>
+                                </li>
+                                <li>
+                                    <strong>24小时销售额增长</strong>
+                                    <p>基于销量增长和商品价格计算销售额增长。</p>
+                                    <p>计算公式：<code>24h销售额 = 24h销量 × 商品价格</code></p>
+                                </li>
+                                <li>
+                                    <strong>异常判定</strong>
+                                    <p>当满足以下任一条件时，商品会被标记为异常：</p>
+                                    <ul>
+                                        <li>24小时销量增长 ≥ 销量阈值（默认20件）</li>
+                                        <li>24小时销售额增长 ≥ 销售额阈值（默认200元）</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="help-section">
+                            <h4>查看异常商品</h4>
+                            <ol class="help-steps">
+                                <li>监控完成后，异常商品会自动显示在"异常检测结果"区域</li>
+                                <li>可以使用分类筛选功能，快速定位特定分类的异常商品</li>
+                                <li>点击商品名称可以直接跳转到小红书商品页面</li>
+                                <li>可以导出异常商品数据为Excel文件</li>
+                            </ol>
+                        </div>
+
+                        <div class="help-section">
+                            <h4>注意事项</h4>
+                            <ul class="help-tips">
+                                <li>💡 悬浮在商品标题上可以查看所有监控销量的变化曲线图</li>
+                                <li>💡 异常监控列表可以按照24h销量、24h销售额进行排序分析</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- 数据管理器 -->
+                    <div class="help-content" id="help-manager">
+                        <h3>🗂️ 数据管理器</h3>
+                        <div class="help-section">
+                            <h4>功能说明</h4>
+                            <p>数据管理器是一个独立的本地管理界面，提供商品数据、分类管理、异常监控等全面的数据管理功能。</p>
+                        </div>
+
+                        <div class="help-section">
+                            <h4>主要功能</h4>
+                            <ul class="help-steps">
+                                <li>
+                                    <strong>商品管理</strong>
+                                    <ul>
+                                        <li>查看所有商品列表，支持分页浏览</li>
+                                        <li>批量删除商品</li>
+                                        <li>导出商品数据为Excel</li>
+                                        <li>查看商品统计信息（总数、平均价格、总销量等）</li>
+                                        <li>左侧分类树可以快速筛选特定分类的商品</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <strong>分类管理</strong>
+                                    <ul>
+                                        <li>创建、编辑、删除商品分类</li>
+                                        <li>查看每个分类下的商品数量</li>
+                                        <li>查看分类详细信息</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <strong>异常监控</strong>
+                                    <ul>
+                                        <li>查看所有异常商品列表</li>
+                                        <li>按分类筛选异常商品</li>
+                                        <li>查看异常商品的销量和销售额数据</li>
+                                        <li>导出异常商品数据</li>
+                                        <li>支持按24h销量、24h销售额进行单独排序</li>
+                                        <li>悬浮在商品标题上可以查看所有监控销量的变化曲线图</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="help-section">
+                            <h4>打开数据管理器</h4>
+                            <p>点击侧边栏中的"打开数据管理器"按钮，系统会在新标签页中打开数据管理器界面。</p>
+
+                            <!-- 数据同步说明 -->
+                            <p style="margin-top: 12px; padding: 12px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px; color: #856404; font-size: 13px; line-height: 1.6;">
+                                <strong>⚠️ 数据同步提示：</strong>数据管理器和侧边栏是独立的界面，在数据管理器中修改数据（如添加/删除商品、调整分类）后，侧边栏不会立即同步更新。建议完成操作后重新打开侧边栏以查看最新数据。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 底部提示 -->
+                <div class="help-footer">
+                    <p>💡 <strong>小提示：</strong>所有数据都存储在本地浏览器中，更换浏览器或更换插件文件位置所有保存数据失效！请勿乱动</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载必要的脚本 -->
+    <script src="lib/xlsx.full.min.js"></script>
+    <script src="lib/shared-data-service.js"></script>
+    <script src="lib/simple-anomaly-detector.js"></script>
+    <script src="lib/easy-anomaly-detector.js"></script>
+    <script src="lib/easy-anomaly-manager.js"></script>
+    <script src="lib/category-selector-manager.js"></script>
+    <script src="lib/component-bridge.js"></script>
+    
+    <!-- 时间序列和增长计算相关脚本 -->
+    <script src="lib/date-formatter.js"></script>
+    <script src="lib/simple-growth-calculator.js"></script>
+    <script src="lib/time-series-data-manager.js"></script>
+    
+    <script src="lib/local-data-manager.js"></script>
+    <script src="lib/category-manager.js"></script>
+    <script src="lib/category-manager-fix.js"></script>
+    <script src="lib/data-migrator.js"></script>
+    <script src="lib/anomaly-detector.js"></script>
+    <script src="fix-data-mapping.js"></script>
+    <script src="lib/help-modal.js"></script>
+    <script src="sidepanel.js"></script>
+
+    <script>
+        // 验证必需的类是否正确加载
+        window.addEventListener('DOMContentLoaded', function() {
+            const requiredClasses = [
+                'DateFormatter',
+                'SimpleGrowthCalculator',
+                'TimeSeriesDataManager',
+                'LocalDataManager',
+                'EasyAnomalyManager',
+                'EasyAnomalyDetector'
+            ];
+            
+            const missingClasses = [];
+            requiredClasses.forEach(className => {
+                if (typeof window[className] === 'undefined') {
+                    missingClasses.push(className);
+                }
+            });
+            
+            if (missingClasses.length > 0) {
+                console.error('❌ 以下类未正确加载:', missingClasses);
+                alert('⚠️ 系统初始化失败，缺少必要组件：' + missingClasses.join(', '));
+            } else {
+                console.log('✅ 所有必需的类已正确加载');
+            }
+        });
+        
+
+
+        // 清空所有数据事件
+        document.getElementById('clearAllDataBtn').addEventListener('click', function() {
+            if (confirm('⚠️ 确定要清空所有本地数据吗？此操作不可恢复！')) {
+                if (confirm('再次确认：这将删除所有分类、商品数据和历史记录！')) {
+                    // 这里可以添加实际的数据清空逻辑
+                    console.log('清空所有数据');
+                    alert('数据清空功能将在后续版本中实现');
+                }
+            }
+        });
+
+        // 导出数据事件
+        document.getElementById('exportDataBtn').addEventListener('click', function() {
+            // 这里可以添加实际的数据导出逻辑
+            console.log('导出所有数据');
+            alert('数据导出功能将在数据管理器中实现');
+        });
+
+        // ultrathink: 直接异常检测按钮事件绑定（备用方案）
+        const setupDirectAnomalyDetection = () => {
+            console.log('🔧 设置直接异常检测事件绑定...');
+
+            const runBtn = document.getElementById('easyRunDetection');
+            if (!runBtn) {
+                console.warn('⚠️ 未找到异常检测按钮');
+                return;
+            }
+
+            // 移除现有的事件监听器（如果有）
+            runBtn.removeEventListener('click', runBtn.directAnomalyHandler);
+
+            // 创建直接事件处理器
+            runBtn.directAnomalyHandler = async () => {
+                console.log('🚀 直接异常检测触发');
+
+                try {
+                    // 检查是否有easyAnomalyManager实例
+                    if (window.easyAnomalyManager && window.easyAnomalyManager.runDetection) {
+                        console.log('✅ 使用现有的easyAnomalyManager');
+                        await window.easyAnomalyManager.runDetection();
+                        return;
+                    }
+
+                    // 检查是否有主应用实例
+                    if (window.xiaohongShuMonitor && window.xiaohongShuMonitor.easyAnomalyManager) {
+                        console.log('✅ 使用主应用的easyAnomalyManager');
+                        await window.xiaohongShuMonitor.easyAnomalyManager.runDetection();
+                        return;
+                    }
+
+                    // 尝试创建临时实例
+                    if (window.EasyAnomalyManager && window.LocalDataManager && window.CategoryManager) {
+                        console.log('🔧 创建临时异常检测实例');
+
+                        const tempManager = new window.EasyAnomalyManager();
+                        const localDataManager = new window.LocalDataManager();
+                        const categoryManager = new window.CategoryManager();
+
+                        await localDataManager.init();
+                        await categoryManager.init();
+                        await tempManager.init(localDataManager, categoryManager);
+
+                        await tempManager.runDetection();
+                        console.log('✅ 临时异常检测完成');
+                        return;
+                    }
+
+                    console.error('❌ 无法执行异常检测：缺少必要组件');
+                    alert('异常检测组件未正确加载，请刷新页面重试');
+
+                } catch (error) {
+                    console.error('❌ 直接异常检测失败:', error);
+                    alert('异常检测失败: ' + error.message);
+                }
+            };
+
+            // 绑定事件
+            runBtn.addEventListener('click', runBtn.directAnomalyHandler);
+            console.log('✅ 直接异常检测事件绑定完成');
+        };
+
+        // 延迟执行直接事件绑定
+        setTimeout(setupDirectAnomalyDetection, 2000);
+    </script>
+</body>
+</html>

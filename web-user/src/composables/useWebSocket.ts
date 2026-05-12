@@ -11,6 +11,9 @@ export function useWebSocket() {
   const ws = ref<WebSocket | null>(null);
   const connected = ref(false);
   const lastMessage = ref<WSMessage | null>(null);
+  const reconnectAttempts = ref(0);
+  const maxReconnectAttempts = 10;
+  const messageQueue: WSMessage[] = [];
   const listeners: Map<string, Set<(data: any) => void>> = new Map();
 
   function connect() {
@@ -27,14 +30,27 @@ export function useWebSocket() {
     socket.onopen = () => {
       connected.value = true;
       ws.value = socket;
+      reconnectAttempts.value = 0; // Reset on successful connection
+      // Flush message queue
+      while (messageQueue.length > 0) {
+        const msg = messageQueue.shift();
+        if (msg) {
+          socket.send(JSON.stringify(msg));
+        }
+      }
     };
 
     socket.onclose = () => {
       connected.value = false;
       ws.value = null;
-      setTimeout(() => {
-        if (auth.isLoggedIn) connect();
-      }, 5000);
+      // Exponential backoff with max delay of 30 seconds
+      if (auth.isLoggedIn && reconnectAttempts.value < maxReconnectAttempts) {
+        const delay = Math.min(1000 * 2 ** reconnectAttempts.value, 30000);
+        reconnectAttempts.value++;
+        setTimeout(() => {
+          connect();
+        }, delay);
+      }
     };
 
     socket.onerror = () => {
@@ -81,6 +97,9 @@ export function useWebSocket() {
   function send(msg: WSMessage) {
     if (ws.value && ws.value.readyState === WebSocket.OPEN) {
       ws.value.send(JSON.stringify(msg));
+    } else {
+      // Queue message when disconnected
+      messageQueue.push(msg);
     }
   }
 
@@ -90,11 +109,27 @@ export function useWebSocket() {
       ws.value = null;
     }
     connected.value = false;
+    reconnectAttempts.value = 0; // Reset on manual disconnect
+    messageQueue.length = 0; // Clear queue
+  }
+
+  function subscribe(channel: string) {
+    send({ type: "subscribe", channel });
   }
 
   onUnmounted(() => {
     disconnect();
   });
 
-  return { connected, lastMessage, connect, disconnect, on, off, send };
+  return { 
+    connected, 
+    lastMessage, 
+    connect, 
+    disconnect, 
+    on, 
+    off, 
+    send,
+    reconnectAttempts,
+    subscribe
+  };
 }

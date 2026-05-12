@@ -1,0 +1,131 @@
+/**
+ * 商品链接增强样式
+ * 用于异常监控页面的商品标题链接功能
+ */
+
+/* 可点击的商品名称样式 - 传统蓝色超链接风格 */
+.clickable-product {
+    cursor: pointer !important;
+    color: #0066cc !important;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: underline;
+    border-radius: 3px;
+    padding: 2px 4px;
+    margin: -2px -4px;
+    font-weight: 400;
+}
+
+/* 悬浮效果 - 经典超链接悬浮样式 */
+.clickable-product:hover {
+    cursor: pointer !important;
+    color: #0052cc !important;
+    background-color: rgba(0, 102, 204, 0.08);
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+/* 链接图标样式 */
+.product-link-icon {
+    margin-right: 6px;
+    font-size: 11px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.clickable-product:hover .product-link-icon {
+    opacity: 1;
+}
+
+/* 保持普通商品名称的原有样式 */
+.product-name:not(.clickable-product) {
+    color: inherit;
+    cursor: default;
+}
+
+/* 确保表格行的悬浮效果不被覆盖 */
+.anomaly-row:hover .clickable-product {
+    background-color: rgba(0, 102, 204, 0.12);
+}
+
+/* 活跃状态样式（点击时） */
+.clickable-product:active {
+    transform: translateY(1px);
+    background-color: rgba(0, 102, 204, 0.15);
+    color: #003d82 !important;
+}
+
+/* 焦点样式（键盘导航支持） */
+.clickable-product:focus {
+    outline: 2px solid #0066cc;
+    outline-offset: 2px;
+}
+
+/* 响应式设计 - 移动设备优化 */
+@media (max-width: 768px) {
+    .clickable-product {
+        padding: 4px 6px;
+        margin: -4px -6px;
+    }
+
+    .product-link-icon {
+        margin-right: 8px;
+        font-size: 12px;
+    }
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .clickable-product {
+        color: #0000ff !important;
+        font-weight: 600;
+        text-decoration: underline;
+    }
+
+    .clickable-product:hover {
+        color: #0000cc !important;
+        background-color: rgba(0, 0, 255, 0.15);
+    }
+}
+
+/* 减少动画模式支持 */
+@media (prefers-reduced-motion: reduce) {
+    .clickable-product {
+        transition: none;
+    }
+
+    .product-link-icon {
+        transition: none;
+    }
+}
+
+/* 深色主题支持（如果项目使用深色主题） */
+@media (prefers-color-scheme: dark) {
+    .clickable-product {
+        color: #66b3ff !important;
+        text-decoration: underline;
+    }
+
+    .clickable-product:hover {
+        color: #99ccff !important;
+        background-color: rgba(102, 179, 255, 0.12);
+    }
+}
+
+/* 确保链接在各种背景下都可见 */
+.product-name-col .clickable-product {
+    position: relative;
+    z-index: 1;
+}
+
+/* 防止链接文本被选中时的样式问题 */
+.clickable-product::selection {
+    background-color: rgba(25, 118, 210, 0.3);
+    color: inherit;
+}
+
+.clickable-product::-moz-selection {
+    background-color: rgba(25, 118, 210, 0.3);
+    color: inherit;
+}

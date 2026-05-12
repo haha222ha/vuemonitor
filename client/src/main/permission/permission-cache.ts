@@ -1,4 +1,6 @@
-import { FEATURE_GATES, PLAN_LIMITS, isPlanSufficient, PlanTier, FeatureGateDefinition } from "../../../shared/constants/feature-gates";
+import * as fs from "fs";
+import * as path from "path";
+import { FEATURE_GATES, PLAN_LIMITS, isPlanSufficient, PlanTier, FeatureGateDefinition } from "@shared/constants/feature-gates";
 
 export interface PermissionState {
   plan: PlanTier;
@@ -7,7 +9,7 @@ export interface PermissionState {
   lastRefreshed: string | null;
 }
 
-const CACHE_KEY = "permission_cache";
+const CACHE_FILE = "permission_cache.json";
 const CACHE_TTL_MS = 30 * 60 * 1000;
 
 export class LocalPermissionCache {
@@ -17,9 +19,15 @@ export class LocalPermissionCache {
     quotas: {},
     lastRefreshed: null,
   };
+  private cachePath: string;
 
-  constructor() {
-    this.loadFromLocalStorage();
+  constructor(dataDir?: string) {
+    const dir = dataDir || path.join(process.cwd(), "data");
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    this.cachePath = path.join(dir, CACHE_FILE);
+    this.loadFromDisk();
   }
 
   async refreshFromServer(serverUrl: string, token: string): Promise<void> {
@@ -34,14 +42,11 @@ export class LocalPermissionCache {
 
       this.rebuildGates();
       this.rebuildQuotas(data.usage || {});
-      this.saveToLocalStorage();
+      this.saveToDisk();
     } catch {}
   }
 
   checkGate(gateKey: string): boolean {
-    if (this.isCacheExpired()) {
-      return this.state.gates[gateKey] ?? false;
-    }
     return this.state.gates[gateKey] ?? false;
   }
 
@@ -67,7 +72,7 @@ export class LocalPermissionCache {
     const quota = this.state.quotas[quotaKey];
     if (quota) {
       quota.used += amount;
-      this.saveToLocalStorage();
+      this.saveToDisk();
     }
   }
 
@@ -83,7 +88,9 @@ export class LocalPermissionCache {
       lastRefreshed: null,
     };
     try {
-      localStorage.removeItem(CACHE_KEY);
+      if (fs.existsSync(this.cachePath)) {
+        fs.unlinkSync(this.cachePath);
+      }
     } catch {}
   }
 
@@ -92,7 +99,7 @@ export class LocalPermissionCache {
     this.state.plan = (license.plan || "free") as PlanTier;
     this.state.lastRefreshed = new Date().toISOString();
     this.rebuildGates();
-    this.saveToLocalStorage();
+    this.saveToDisk();
   }
 
   private rebuildGates(): void {
@@ -122,17 +129,11 @@ export class LocalPermissionCache {
     this.state.quotas = quotas;
   }
 
-  private isCacheExpired(): boolean {
-    if (!this.state.lastRefreshed) return true;
-    const elapsed = Date.now() - new Date(this.state.lastRefreshed).getTime();
-    return elapsed > CACHE_TTL_MS;
-  }
-
-  private loadFromLocalStorage(): void {
+  private loadFromDisk(): void {
     try {
-      const stored = localStorage.getItem(CACHE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
+      if (fs.existsSync(this.cachePath)) {
+        const raw = fs.readFileSync(this.cachePath, "utf-8");
+        const parsed = JSON.parse(raw);
         this.state = { ...this.state, ...parsed };
       } else {
         this.rebuildGates();
@@ -142,9 +143,9 @@ export class LocalPermissionCache {
     }
   }
 
-  private saveToLocalStorage(): void {
+  private saveToDisk(): void {
     try {
-      localStorage.setItem(CACHE_KEY, JSON.stringify(this.state));
+      fs.writeFileSync(this.cachePath, JSON.stringify(this.state, null, 2), "utf-8");
     } catch {}
   }
 }

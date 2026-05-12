@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import type { PlanTier } from "../../../shared/constants/feature-gates";
-import { FEATURE_GATES, PLAN_LIMITS, isPlanSufficient } from "../../../shared/constants/feature-gates";
+import type { PlanTier } from "@shared/constants/feature-gates";
+import { FEATURE_GATES, PLAN_LIMITS, isPlanSufficient } from "@shared/constants/feature-gates";
 
 export interface PermissionGate {
   key: string;

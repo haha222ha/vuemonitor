@@ -42,3 +42,25 @@ class AIReport(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     report_type: Mapped[str] = mapped_column(String(50), nullable=False)
     content: Mapped[dict] = mapped_column(JSONB, nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="draft")
+
+
+class AIReportTemplate(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+    __tablename__ = "ai_report_templates"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text)
+    report_type: Mapped[str] = mapped_column(String(50), nullable=False)
+    metrics: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    chart_types: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    output_format: Mapped[str] = mapped_column(String(20), nullable=False, default="pdf")
+    prompt_template: Mapped[str | None] = mapped_column(Text)
+    sections: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    is_default: Mapped[bool] = mapped_column(default=False)
+    is_active: Mapped[bool] = mapped_column(default=True)
+
+    user: Mapped["User"] = relationship()
+
+    __table_args__ = (
+        Index("idx_ai_report_templates_user_id", "user_id"),
+    )

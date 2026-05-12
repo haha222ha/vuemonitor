@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小红书数据管理器 v2.0</title>
+    <link rel="stylesheet" href="data-manager.css">
+    <link rel="stylesheet" href="styles/data-manager-modal.css">
+    <link rel="stylesheet" href="styles/data-manager-monitor.css">
+    <script src="lib/dexie.min.js"></script>
+    <script src="lib/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 顶部导航栏 -->
+        <nav class="top-navbar">
+            <div class="nav-left">
+                <div class="logo">
+                    <span class="logo-icon">📊</span>
+                    <h1>小红书数据管理器</h1>
+                    <span class="version-badge">v2.0</span>
+                </div>
+            </div>
+            <div class="nav-right">
+                <button id="refreshDataBtn" class="nav-btn" title="刷新数据">
+                    <span class="icon">🔄</span>
+                </button>
+                <button id="minimizeBtn" class="nav-btn" title="最小化">
+                    <span class="icon">➖</span>
+                </button>
+                <button id="closeBtn" class="nav-btn close-btn" title="关闭">
+                    <span class="icon">✖️</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <div class="main-layout">
+            <!-- 左侧导航面板 -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>数据概览</h3>
+                    <div class="sidebar-stats">
+                        <div class="stat-item">
+                            <div class="stat-icon">📦</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalProducts">-</div>
+                                <div class="stat-label">总商品数</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">📁</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalCategories">-</div>
+                                <div class="stat-label">总分类数</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">⚠️</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="anomalyProducts">-</div>
+                                <div class="stat-label">异常商品</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>快速操作</h3>
+                    <div class="quick-actions">
+                        <button class="action-btn" id="exportAllBtn">
+                            <span class="btn-icon">📤</span>
+                            导出所有数据
+                        </button>
+                        <button class="action-btn" id="exportAnomalyDataBtn">
+                            <span class="btn-icon">📋</span>
+                            导出异常商品
+                        </button>
+                        <!-- 备份数据和清理缓存按钮已移除 -->
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>分类管理</h3>
+                    <div class="category-tree" id="categoryTree">
+                        <!-- 动态加载分类树 -->
+                    </div>
+                    <button class="action-btn small" id="addCategoryBtn">
+                        <span class="btn-icon">➕</span>
+                        新建分类
+                    </button>
+                </div>
+            </aside>
+
+            <!-- 主内容区域 -->
+            <main class="content-area">
+                <!-- 工具栏 -->
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <div class="view-tabs">
+                            <button class="tab-btn active" data-view="products">
+                                <span class="tab-icon">📦</span>
+                                商品管理
+                            </button>
+                            <button class="tab-btn" data-view="categories">
+                                <span class="tab-icon">📁</span>
+                                分类管理
+                            </button>
+                            <button class="tab-btn" data-view="anomalies">
+                                <span class="tab-icon">⚠️</span>
+                                异常监控
+                            </button>
+                        </div>
+                    </div>
+                    <div class="toolbar-right">
+                        <!-- 搜索和筛选功能已移除 -->
+                    </div>
+                </div>
+
+                <!-- 内容视图区域 -->
+                <div class="content-views">
+                    <!-- 商品管理视图 -->
+                    <div class="view-panel active" id="productsView">
+                        <!-- 统计卡片区域 -->
+                        <div class="stats-cards">
+                            <div class="stat-card primary">
+                                <div class="card-header">
+                                    <div class="card-icon">📦</div>
+                                    <div class="card-title">商品总览</div>
+                                </div>
+                                <div class="card-content">
+                                    <div class="big-number" id="productsTotalProducts">0</div>
+                                    <div class="trend-info">
+                                        <span class="trend-indicator positive">↗ +0</span>
+                                        <span class="trend-text">本周新增</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card success">
+                                <div class="card-header">
+                                    <div class="card-icon">💰</div>
+                                    <div class="card-title">平均价格</div>
+                                </div>
+                                <div class="card-content">
+                                    <div class="big-number" id="productsAvgPrice">¥0.00</div>
+                                    <div class="trend-info">
+                                        <span class="trend-indicator positive">↗ +0%</span>
+                                        <span class="trend-text">比上周</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card warning">
+                                <div class="card-header">
+                                    <div class="card-icon">📈</div>
+                                    <div class="card-title">总销量</div>
+                                </div>
+                                <div class="card-content">
+                                    <div class="big-number" id="productsTotalSales">0</div>
+                                    <div class="trend-info">
+                                        <span class="trend-indicator neutral">→ 0%</span>
+                                        <span class="trend-text">比上周</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stat-card danger">
+                                <div class="card-header">
+                                    <div class="card-icon">⚠️</div>
+                                    <div class="card-title">异常监控</div>
+                                </div>
+                                <div class="card-content">
+                                    <div class="big-number" id="productsAnomalies">0</div>
+                                    <div class="trend-info">
+                                        <span class="trend-indicator neutral">→ 0</span>
+                                        <span class="trend-text">需要关注</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <div class="table-header">
+                                <div class="table-title">
+                                    <h3>商品列表</h3>
+                                    <div class="table-count">共 <span id="productCount">0</span> 件商品</div>
+                                </div>
+                                <div class="table-actions">
+                                    <button class="btn-danger" id="batchDeleteBtn" title="批量删除商品数据">
+                                        批量删除
+                                    </button>
+                                    <button class="btn-success" id="exportProductsBtn" title="导出商品数据">
+                                        导出数据
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 🆕 商品分类筛选区域 -->
+                            <div class="anomaly-filter-bar">
+                                <div class="filter-controls">
+                                    <div class="filter-group">
+                                        <label for="productCategoryFilterSelect" class="filter-label">筛选分类:</label>
+                                        <select id="productCategoryFilterSelect" class="filter-select">
+                                            <option value="">全部分类</option>
+                                            <!-- 动态加载分类选项 -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="data-table-wrapper">
+                                <table class="data-table" id="productsTable">
+                                    <thead>
+                                        <tr>
+                                            <th class="checkbox-col">
+                                                <input type="checkbox" id="selectAll">
+                                            </th>
+                                            <th class="sortable" data-sort="title">商品名称</th>
+                                            <th class="sortable" data-sort="category">分类</th>
+                                            <th class="sortable" data-sort="price">价格</th>
+                                            <th class="sortable" data-sort="sales">销量</th>
+                                            <th class="sortable" data-sort="store_followers">粉丝数</th>
+                                            <th class="sortable" data-sort="store_sales">店铺销量</th>
+                                            <th class="sortable" data-sort="store_name">店铺名称</th>
+                                            <th class="sortable" data-sort="recent_sales">近3个月销量</th>
+                                            <th class="sortable" data-sort="store_fan_sales_ratio" title="店铺销量 ÷ 粉丝数">店铺粉销比</th>
+                                            <th class="sortable" data-sort="product_fan_sales_ratio" title="商品销量 ÷ 粉丝数">商品粉销比</th>
+                                            <th class="sortable" data-sort="extracted_at">爬取时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productsTableBody">
+                                        <!-- 动态加载 -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 分页控件 -->
+                            <div class="pagination" id="productsPagination">
+                                <div class="pagination-info">
+                                    显示第 <span id="pageStart">1</span>-<span id="pageEnd">20</span> 条，共 <span id="totalCount">0</span> 条
+                                </div>
+                                <div class="pagination-controls">
+                                    <button class="page-btn" id="prevPageBtn">上一页</button>
+                                    <div class="page-numbers" id="pageNumbers"></div>
+                                    <button class="page-btn" id="nextPageBtn">下一页</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 分类管理视图 -->
+                    <div class="view-panel" id="categoriesView">
+                        <div class="categories-layout">
+                            <div class="category-list-section">
+                                <div class="section-header">
+                                    <h3>分类列表</h3>
+                                    <button class="btn-primary" id="newCategoryBtn">
+                                        <span class="btn-icon">➕</span>
+                                        新建分类
+                                    </button>
+                                </div>
+                                <div class="category-cards" id="categoryCards">
+                                    <!-- 动态加载 -->
+                                </div>
+                            </div>
+                            
+                            <div class="category-detail-section">
+                                <div id="categoryDetailPanel" class="detail-panel">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">📁</div>
+                                        <div class="empty-text">选择一个分类查看详情</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 异常监控视图 -->
+                    <div class="view-panel" id="anomaliesView">
+                        <div class="anomalies-dashboard">
+                            <!-- 异常汇总卡片已移除 -->
+
+                            <div class="anomaly-list" id="anomalyList">
+                                <div class="table-header">
+                                    <div class="table-title">
+                                        <h3>异常记录</h3>
+                                        <div class="table-count">共 <span id="anomalyCount">0</span> 个异常商品</div>
+                                    </div>
+                                    <div class="table-actions">
+                                        <button class="btn-success" id="exportAnomalyResultsBtn" style="display: none;">
+                                            <span class="btn-icon">📋</span>
+                                            导出异常商品
+                                        </button>
+                                        <!-- 异常检测按钮和筛选器已移除 -->
+                                    </div>
+                                </div>
+
+                                <!-- 🆕 分类筛选区域 -->
+                                <div class="anomaly-filter-bar">
+                                    <div class="filter-controls">
+                                        <div class="filter-group">
+                                            <label for="categoryFilterSelect" class="filter-label">筛选分类:</label>
+                                            <select id="categoryFilterSelect" class="filter-select">
+                                                <option value="">全部分类</option>
+                                                <!-- 动态加载分类选项 -->
+                                            </select>
+                                        </div>
+                                        <div class="filter-stats">
+                                            <span id="filterResultStats" class="stats-text">显示 0/0 项</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="data-table-wrapper">
+                                    <table class="data-table" id="anomaliesTable">
+                                        <thead>
+                                            <tr>
+                                                <th class="checkbox-col">
+                                                    <input type="checkbox" id="selectAllAnomalies">
+                                                </th>
+                                                <th class="sortable" data-sort="product_name">商品名称</th>
+                                                <th class="sortable" data-sort="category_name">分类</th>
+                                                <th class="sortable" data-sort="product_price">价格</th>
+                                                <th class="sortable" data-sort="sales_field">销量字段</th>
+                                                <th class="sortable" data-sort="store_sales_field">店铺销量字段</th>
+                                                <th class="sortable" data-sort="crawl_time_field">爬取时间字段</th>
+                                                <th class="sortable" data-sort="sales_24h">24h销量</th>
+                                                <th class="sortable" data-sort="revenue_24h">24h销售额</th>
+                                                <th class="sortable" data-sort="detection_time">检测时间</th>
+                                                <th>操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="anomaliesTableBody">
+                                            <!-- 动态加载 -->
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- 🆕 异常监控分页控件 -->
+                                <div class="pagination-container" id="anomalyPaginationContainer" style="display: none;">
+                                    <div class="pagination-info">
+                                        <span id="anomalyPaginationInfo">显示 1-50 / 共 0 条</span>
+                                    </div>
+                                    <div class="pagination-controls">
+                                        <button class="pagination-btn" id="anomalyFirstPage" title="首页">
+                                            <span>««</span>
+                                        </button>
+                                        <button class="pagination-btn" id="anomalyPrevPage" title="上一页">
+                                            <span>«</span>
+                                        </button>
+                                        <div class="pagination-pages" id="anomalyPaginationPages">
+                                            <!-- 动态生成页码按钮 -->
+                                        </div>
+                                        <button class="pagination-btn" id="anomalyNextPage" title="下一页">
+                                            <span>»</span>
+                                        </button>
+                                        <button class="pagination-btn" id="anomalyLastPage" title="末页">
+                                            <span>»»</span>
+                                        </button>
+                                    </div>
+                                    <div class="pagination-jump">
+                                        <span>跳转到</span>
+                                        <input type="number" id="anomalyPageJump" min="1" class="page-jump-input">
+                                        <span>页</span>
+                                        <button class="btn-sm" id="anomalyPageJumpBtn">确定</button>
+                                    </div>
+                                </div>
+
+                                <!-- 空状态显示 -->
+                                <div class="empty-state" id="anomalyEmptyState" style="display: none;">
+                                    <div class="empty-icon">🎉</div>
+                                    <div class="empty-text">暂无异常商品</div>
+                                    <div class="empty-hint">所有商品数据正常</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- 模态对话框 -->
+        <div class="modal-overlay" id="modalOverlay">
+            <div class="export-dialog" id="modalContent">
+                <!-- 动态内容 -->
+            </div>
+        </div>
+
+        <!-- 批量监控对话框 -->
+        <div class="modal-overlay" id="batchMonitorModal">
+            <div class="modal-content batch-monitor-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">📊 批量监控设置</h3>
+                    <button class="modal-close" id="closeBatchMonitorModal">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <!-- 分类选择器 -->
+                    <div class="monitor-section">
+                        <h4 class="section-title">
+                            <span class="section-icon">📁</span>
+                            选择监控分类
+                        </h4>
+                        <div class="category-selector-grid" id="categorySelectGrid">
+                            <!-- 动态生成分类选择项 -->
+                        </div>
+                        <div class="select-controls">
+                            <button class="btn btn-sm btn-secondary" id="selectAllCategories">全选</button>
+                            <button class="btn btn-sm btn-secondary" id="selectNoneCategories">全不选</button>
+                        </div>
+                    </div>
+
+                    <!-- 监控配置 -->
+                    <div class="monitor-section">
+                        <h4 class="section-title">
+                            <span class="section-icon">⚙️</span>
+                            监控设置
+                        </h4>
+                        <div class="monitor-config">
+                            <div class="config-row">
+                                <label for="monitorInterval">监控间隔 (秒):</label>
+                                <input type="number" id="monitorInterval" value="60" min="30" max="3600" class="config-input">
+                                <span class="config-help">建议60-300秒，避免被限制</span>
+                            </div>
+                            <div class="config-row">
+                                <label for="concurrentLimit">并发数量:</label>
+                                <input type="number" id="concurrentLimit" value="3" min="1" max="10" class="config-input">
+                                <span class="config-help">同时处理的商品数量</span>
+                            </div>
+                            <div class="config-row">
+                                <label>
+                                    <input type="checkbox" id="autoRetry" checked>
+                                    <span>失败自动重试</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 预览信息 -->
+                    <div class="monitor-section">
+                        <h4 class="section-title">
+                            <span class="section-icon">👁️</span>
+                            监控预览
+                        </h4>
+                        <div class="monitor-preview" id="monitorPreview">
+                            <div class="preview-item">
+                                <span class="preview-label">已选分类:</span>
+                                <span class="preview-value" id="selectedCategoryCount">0</span> 个
+                            </div>
+                            <div class="preview-item">
+                                <span class="preview-label">商品总数:</span>
+                                <span class="preview-value" id="selectedProductCount">0</span> 件
+                            </div>
+                            <div class="preview-item">
+                                <span class="preview-label">预计时间:</span>
+                                <span class="preview-value" id="estimatedTime">- 分钟</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelBatchMonitor">取消</button>
+                    <button type="button" class="btn btn-primary" id="startBatchMonitor" disabled>
+                        <span class="btn-icon">🚀</span>
+                        开始监控
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批量监控进度对话框 -->
+        <div class="modal-overlay" id="batchMonitorProgressModal">
+            <div class="modal-content monitor-progress-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">📊 批量监控进行中...</h3>
+                    <div class="monitor-status">
+                        <span class="status-indicator" id="monitorStatusIndicator">🔄</span>
+                        <span class="status-text" id="monitorStatusText">准备中...</span>
+                    </div>
+                </div>
+                
+                <div class="modal-body">
+                    <!-- 总体进度 -->
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <span class="progress-title">总体进度</span>
+                            <span class="progress-stats" id="overallProgressStats">0/0 (0%)</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="overallProgressBar">
+                                <div class="progress-fill" id="overallProgressFill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 分类进度详情 -->
+                    <div class="progress-section">
+                        <div class="progress-title">分类进度详情</div>
+                        <div class="category-progress-list" id="categoryProgressList">
+                            <!-- 动态生成分类进度项 -->
+                        </div>
+                    </div>
+
+                    <!-- 实时日志 -->
+                    <div class="progress-section">
+                        <div class="progress-title">
+                            实时日志
+                            <button class="btn btn-xs btn-secondary" id="clearProgressLog">清空</button>
+                        </div>
+                        <div class="progress-log" id="progressLog">
+                            <!-- 动态生成日志项 -->
+                        </div>
+                    </div>
+
+                    <!-- 结果统计 -->
+                    <div class="progress-section">
+                        <div class="progress-title">结果统计</div>
+                        <div class="result-stats">
+                            <div class="stat-item success">
+                                <span class="stat-icon">✅</span>
+                                <span class="stat-label">成功:</span>
+                                <span class="stat-value" id="successCount">0</span>
+                            </div>
+                            <div class="stat-item error">
+                                <span class="stat-icon">❌</span>
+                                <span class="stat-label">失败:</span>
+                                <span class="stat-value" id="errorCount">0</span>
+                            </div>
+                            <div class="stat-item skipped">
+                                <span class="stat-icon">⏭️</span>
+                                <span class="stat-label">跳过:</span>
+                                <span class="stat-value" id="skippedCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" id="pauseBatchMonitor">
+                        <span class="btn-icon">⏸️</span>
+                        暂停
+                    </button>
+                    <button type="button" class="btn btn-danger" id="stopBatchMonitor">
+                        <span class="btn-icon">⏹️</span>
+                        停止
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="closeBatchMonitorProgress" style="display: none;">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 通知提示 -->
+        <div class="toast-container" id="toastContainer">
+            <!-- 动态生成通知 -->
+        </div>
+
+        <!-- 加载指示器 -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <div class="loading-text">正在加载数据...</div>
+            </div>
+        </div>
+
+        <!-- 分类选择浮层 -->
+        <div id="categoryFloatSelector" class="category-float-selector" style="display: none;">
+            <div class="float-header">
+                <span class="float-title">▼ 选择分类</span>
+            </div>
+            <div class="float-body" id="categoryFloatList">
+                <!-- 动态生成分类列表 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载脚本 -->
+    <!-- 基础工具类 - 必须首先加载 -->
+    <script src="lib/date-formatter.js"></script>
+    <script src="lib/simple-growth-calculator.js"></script>
+    <script src="lib/time-series-data-manager.js"></script>
+    <script src="lib/simple-line-chart.js"></script>
+
+    <!-- 其他服务类 -->
+    <script src="lib/simple-anomaly-detector.js"></script>
+    <script src="lib/shared-data-service.js"></script>
+    <script src="lib/component-bridge.js"></script>
+    <script src="lib/local-data-manager.js"></script>
+    <script src="lib/category-manager.js"></script>
+    <script src="lib/category-manager-fix.js"></script>
+    <script src="lib/data-migrator.js"></script>
+    <script src="lib/category-selector-manager.js"></script>
+    <script src="lib/export-manager.js"></script>
+    <script src="lib/state-sync-manager.js"></script>
+    <script src="data-manager.js"></script>
+</body>
+</html>

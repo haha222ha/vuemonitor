@@ -4,7 +4,7 @@
       <h2>代理池管理</h2>
       <el-button type="primary" @click="showAdd = true">添加代理</el-button>
     </div>
-    <el-table :data="proxies" stripe v-loading="loading">
+    <el-table :data="store.proxies" stripe v-loading="store.loading">
       <el-table-column prop="ip" label="IP" />
       <el-table-column prop="port" label="端口" width="80" />
       <el-table-column prop="protocol" label="协议" width="80" />
@@ -33,12 +33,12 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
-import api from "../utils/api";
 import { ElMessage } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
+import { useProxiesStore } from "../stores/proxies";
 
-const proxies = ref([]);
-const loading = ref(false);
+const store = useProxiesStore();
+
 const showAdd = ref(false);
 const formRef = ref<FormInstance>();
 const form = reactive({ ip: "", port: 8080, protocol: "http" });
@@ -53,14 +53,10 @@ const addRules: FormRules = {
 };
 
 async function fetchProxies() {
-  loading.value = true;
   try {
-    const { data } = await api.get("/admin/proxies");
-    proxies.value = data?.data?.items || [];
+    await store.fetchProxies();
   } catch {
     ElMessage.error("获取代理列表失败");
-  } finally {
-    loading.value = false;
   }
 }
 
@@ -69,7 +65,7 @@ async function addProxy() {
   if (!valid) return;
 
   try {
-    await api.post("/admin/proxies", form);
+    await store.addProxy({ ip: form.ip, port: form.port, protocol: form.protocol });
     ElMessage.success("添加成功");
     showAdd.value = false;
     form.ip = "";
@@ -83,7 +79,7 @@ async function addProxy() {
 
 async function deleteProxy(id: string) {
   try {
-    await api.delete(`/admin/proxies/${id}`);
+    await store.deleteProxy(id);
     ElMessage.success("删除成功");
     fetchProxies();
   } catch {

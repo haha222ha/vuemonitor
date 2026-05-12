@@ -1,13 +1,25 @@
-from datetime import datetime
 import re
+from datetime import datetime
+from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field, field_validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class RegisterRequest(BaseModel):
-    email: EmailStr
+    email: Optional[str] = Field(default=None, max_length=255)
     nickname: str = Field(min_length=2, max_length=50)
     password: str = Field(min_length=8, max_length=128)
+
+    @field_validator("email")
+    @classmethod
+    def validate_email_format(cls, v: Optional[str]) -> Optional[str]:
+        if v is None or v.strip() == "":
+            return None
+        v = v.strip()
+        pattern = r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+        if not re.match(pattern, v):
+            raise ValueError("邮箱格式不正确")
+        return v
 
     @field_validator("password")
     @classmethod
@@ -22,7 +34,7 @@ class RegisterRequest(BaseModel):
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    account: str = Field(min_length=1, max_length=255)
     password: str
 
 
@@ -39,12 +51,13 @@ class RefreshTokenRequest(BaseModel):
 
 class UserInfoResponse(BaseModel):
     id: str
-    email: str
+    email: Optional[str] = None
     nickname: str
-    avatar_url: str | None
+    avatar_url: Optional[str] = None
     plan: str
-    plan_expires_at: datetime | None
+    plan_expires_at: Optional[datetime] = None
     role: str
     is_active: bool
+    email_notify_enabled: bool = True
 
     model_config = {"from_attributes": True}
