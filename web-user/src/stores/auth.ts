@@ -9,8 +9,8 @@ export const useAuthStore = defineStore("auth", () => {
   const isLoggedIn = computed(() => !!token.value);
   const userPlan = computed(() => user.value?.plan || "free");
 
-  async function login(email: string, password: string) {
-    const { data } = await api.post("/auth/login", { email, password });
+  async function login(account: string, password: string) {
+    const { data } = await api.post("/auth/login", { account, password });
     token.value = data.access_token;
     localStorage.setItem("access_token", data.access_token);
     if (data.refresh_token) {
@@ -19,9 +19,11 @@ export const useAuthStore = defineStore("auth", () => {
     await fetchUser();
   }
 
-  async function register(email: string, password: string, nickname: string) {
-    await api.post("/auth/register", { email, password, nickname });
-    await login(email, password);
+  async function register(email: string | undefined, password: string, nickname: string) {
+    const payload: any = { password, nickname };
+    if (email) payload.email = email;
+    await api.post("/auth/register", payload);
+    await login(nickname, password);
   }
 
   async function fetchUser() {

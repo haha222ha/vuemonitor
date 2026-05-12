@@ -1,17 +1,20 @@
 <template>
   <div class="auth-page">
     <div class="auth-card">
+      <button class="auth-close" @click="goBack" title="关闭">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
       <div class="auth-header">
         <router-link to="/" class="auth-logo">
           <span class="logo-icon">◆</span> XHS365
         </router-link>
         <h2>登录</h2>
-        <p>登录你的账户，继续使用监控服务</p>
+        <p>用户名或邮箱登录</p>
       </div>
 
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="handleLogin">
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="form.email" placeholder="请输入邮箱" size="large" />
+        <el-form-item label="用户名 / 邮箱" prop="account">
+          <el-input v-model="form.account" placeholder="输入用户名或邮箱" size="large" />
         </el-form-item>
         <el-form-item label="密码" prop="password">
           <el-input v-model="form.password" type="password" placeholder="请输入密码" size="large" show-password />
@@ -43,12 +46,16 @@ const auth = useAuthStore();
 const formRef = ref<FormInstance>();
 const loading = ref(false);
 
-const form = reactive({ email: "", password: "" });
+const form = reactive({ account: "", password: "" });
 
 const rules: FormRules = {
-  email: [{ required: true, message: "请输入邮箱", trigger: "blur" }, { type: "email", message: "邮箱格式不正确", trigger: "blur" }],
+  account: [{ required: true, message: "请输入用户名或邮箱", trigger: "blur" }],
   password: [{ required: true, message: "请输入密码", trigger: "blur" }],
 };
+
+function goBack() {
+  router.push("/");
+}
 
 async function handleLogin() {
   const valid = await formRef.value?.validate().catch(() => false);
@@ -56,12 +63,12 @@ async function handleLogin() {
 
   loading.value = true;
   try {
-    await auth.login(form.email, form.password);
+    await auth.login(form.account, form.password);
     ElMessage.success("登录成功");
     const redirect = (route.query.redirect as string) || "/dashboard";
     router.push(redirect);
   } catch (e: any) {
-    const msg = e?.response?.data?.message || "登录失败，请检查邮箱和密码";
+    const msg = e?.response?.data?.message || "登录失败，请检查账号和密码";
     ElMessage.error(msg);
   } finally {
     loading.value = false;
@@ -86,6 +93,30 @@ async function handleLogin() {
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 40px;
+  position: relative;
+}
+
+.auth-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: #6a6a7a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.auth-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .auth-header {

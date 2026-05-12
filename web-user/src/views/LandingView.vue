@@ -11,6 +11,7 @@
           <a href="#platforms">平台</a>
           <a href="#cases">案例</a>
           <a href="#pricing">价格</a>
+          <router-link to="/download" class="nav-download-link">下载客户端</router-link>
         </nav>
         <div class="nav-actions">
           <router-link to="/login" class="btn-ghost">登录</router-link>
@@ -45,6 +46,10 @@
           <router-link to="/register" class="btn-primary btn-lg">
             免费开始使用
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </router-link>
+          <router-link to="/download" class="btn-outline btn-lg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            下载客户端
           </router-link>
           <a href="#features" class="btn-outline btn-lg">了解更多</a>
         </div>
@@ -545,6 +550,10 @@
             免费开始使用
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </router-link>
+          <router-link to="/download" class="btn-outline btn-lg">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            下载客户端
+          </router-link>
         </div>
       </div>
     </section>
@@ -565,6 +574,7 @@
               <a href="#features">核心功能</a>
               <a href="#pricing">价格方案</a>
               <a href="#platforms">平台支持</a>
+              <router-link to="/download">下载客户端</router-link>
             </div>
             <div class="footer-col">
               <h4>支持</h4>
