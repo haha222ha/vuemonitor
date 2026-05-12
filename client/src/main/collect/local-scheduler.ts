@@ -207,7 +207,7 @@ export class LocalScheduler extends EventEmitter {
       this.scheduleTask(task);
     }
 
-    this.emit("task:executed", { taskId: task.id, nextRunAt: task.next_run_at });
+    this.emit("scheduler:task_executed", { taskId: task.id, nextRunAt: task.next_run_at });
   }
 
   private startMainLoop(): void {

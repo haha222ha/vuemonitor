@@ -115,6 +115,10 @@ const ALLOWED_CHANNELS: Record<string, boolean> = {
   "perf:alerts": true,
   "perf:summary": true,
   "perf:clear": true,
+  "recovery:get-active": true,
+  "recovery:get-all": true,
+  "recovery:clear-completed": true,
+  "recovery:clear-all": true,
 };
 
 const ALLOWED_LISTEN_CHANNELS: Record<string, boolean> = {

@@ -34,14 +34,19 @@ export class AppLifecycle {
       throw err;
     }
 
-    crashRecovery.init();
-    const recoveryResult = crashRecovery.recoverPendingTasks();
-    if (recoveryResult.recovered > 0) {
-      logger.info("AppLifecycle", "崩溃恢复完成", { recovered: recoveryResult.recovered, discarded: recoveryResult.discarded });
-    }
+  crashRecovery.init();
+  const recoveryResult = crashRecovery.recoverPendingTasks();
+  if (recoveryResult.recovered > 0) {
+    logger.info("AppLifecycle", "崩溃恢复完成", { recovered: recoveryResult.recovered, discarded: recoveryResult.discarded });
+  }
 
+  try {
     registerIpcHandlers();
     logger.info("AppLifecycle", "IPC处理器注册完成");
+  } catch (err) {
+    logger.error("AppLifecycle", "IPC处理器注册失败", err);
+    throw err;
+  }
 
     this.initialized = true;
     this.startTime = Date.now();

@@ -135,7 +135,7 @@ export class CloudSyncManager extends EventEmitter {
 
     this.incrementLocalVersion(conflict.type, conflict.localId);
 
-    this.emit("conflict:resolved", { conflictId, resolution });
+    this.emit("sync:conflict:resolved", { conflictId, resolution });
     return true;
   }
 
@@ -487,7 +487,7 @@ export class CloudSyncManager extends EventEmitter {
 
       this.emit("sync:pulled", { count: pulled });
       if (this.conflicts.filter(c => c.resolution === "pending").length > 0) {
-        this.emit("conflict:detected", { count: this.conflicts.filter(c => c.resolution === "pending").length });
+        this.emit("sync:conflict:detected", { count: this.conflicts.filter(c => c.resolution === "pending").length });
       }
       return pulled;
     } catch {
