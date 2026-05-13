@@ -166,7 +166,7 @@ async function approveRequest(id: string, type: string) {
   const label = type === "export" ? "导出" : "删除";
   try {
     await ElMessageBox.confirm(`确认批准此${label}请求？`, "操作确认", { type: "warning" });
-    await store.approveRequest(id);
+    await store.approveRequest(Number(id));
     ElMessage.success("已批准");
     if (type === "export") fetchExports(); else fetchDeletions();
     fetchStats();
@@ -176,7 +176,7 @@ async function approveRequest(id: string, type: string) {
 async function rejectRequest(id: string, type: string) {
   try {
     await ElMessageBox.confirm("确认拒绝此请求？", "操作确认", { type: "warning" });
-    await store.rejectRequest(id);
+    await store.rejectRequest(Number(id));
     ElMessage.success("已拒绝");
     if (type === "export") fetchExports(); else fetchDeletions();
     fetchStats();
@@ -185,7 +185,7 @@ async function rejectRequest(id: string, type: string) {
 
 async function downloadExport(id: string) {
   try {
-    const blob = await store.downloadExport(id);
+    const blob = await store.downloadExport(Number(id));
     const url = window.URL.createObjectURL(new Blob([blob as BlobPart]));
     const link = document.createElement("a");
     link.href = url;

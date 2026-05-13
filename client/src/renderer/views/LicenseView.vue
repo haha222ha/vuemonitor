@@ -1,129 +1,121 @@
-﻿﻿﻿﻿<template>
-  <div style="max-width: 640px; margin: 40px auto; padding: 0 20px">
-    <div style="text-align: center; margin-bottom: 32px">
-      <h2>小红书AI选品</h2>
-      <p style="color: #909399; margin-top: 8px">激活授权码以解锁完整功能</p>
-    </div>
+<template>
+  <div class="license fade-in">
+    <PageHeader title="授权管理" subtitle="激活授权码以解锁完整功能" />
 
-    <el-card v-if="licenseStore.isActivated" shadow="hover">
-      <div style="text-align: center; padding: 20px 0">
-        <el-icon style="font-size: 48px; color: #67c23a"><CircleCheckFilled /></el-icon>
-        <h3 style="margin-top: 12px">已激活</h3>
-        <div style="margin-top: 16px">
-          <el-descriptions :column="2" border>
-            <el-descriptions-item label="当前套餐">
-              <el-tag :type="planTagType">{{ licenseStore.planLabel }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="到期时间">
-              <span :style="{ color: licenseStore.isExpired ? '#f56c6c' : '' }">
+    <div class="license__content">
+      <div v-if="licenseStore.isActivated" class="license__activated">
+        <div class="license__status-icon">
+          <el-icon :size="56" color="#67c23a"><CircleCheckFilled /></el-icon>
+        </div>
+        <h3 class="license__status-title">已激活</h3>
+
+        <div class="license__info-card">
+          <div class="license__info-grid">
+            <div class="license__info-item">
+              <span class="license__info-label">当前套餐</span>
+              <el-tag :type="planTagType" size="large">{{ licenseStore.planLabel }}</el-tag>
+            </div>
+            <div class="license__info-item">
+              <span class="license__info-label">到期时间</span>
+              <span :class="['license__info-value', { expired: licenseStore.isExpired }]">
                 {{ licenseStore.expiresAtFormatted }}
               </span>
-            </el-descriptions-item>
-            <el-descriptions-item label="设备ID">
-              <span style="font-family: monospace; font-size: 12px">{{ licenseStore.license?.deviceId }}</span>
-            </el-descriptions-item>
-            <el-descriptions-item label="激活时间">
-              {{ licenseStore.license?.activatedAt ? new Date(licenseStore.license.activatedAt).toLocaleString("zh-CN") : '-' }}
-            </el-descriptions-item>
-          </el-descriptions>
+            </div>
+            <div class="license__info-item">
+              <span class="license__info-label">设备ID</span>
+              <span class="license__device-id">{{ licenseStore.license?.deviceId }}</span>
+            </div>
+            <div class="license__info-item">
+              <span class="license__info-label">激活时间</span>
+              <span class="license__info-value">
+                {{ licenseStore.license?.activatedAt ? new Date(licenseStore.license.activatedAt).toLocaleString("zh-CN") : '-' }}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div v-if="quotaItems.length" style="margin-top: 20px; text-align: left">
-          <h4 style="margin-bottom: 12px">配额使用</h4>
-          <div v-for="item in quotaItems" :key="item.key" style="margin-bottom: 10px">
-            <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px">
-              <span>{{ item.label }}</span>
-              <span>{{ item.limit === -1 ? '无限' : `${item.current}/${item.limit}` }}</span>
+        <div v-if="quotaItems.length" class="license__quotas">
+          <h4 class="license__section-title">配额使用</h4>
+          <div v-for="item in quotaItems" :key="item.key" class="quota-item">
+            <div class="quota-item__header">
+              <span class="quota-item__label">{{ item.label }}</span>
+              <span class="quota-item__value">{{ item.limit === -1 ? '无限' : `${item.current}/${item.limit}` }}</span>
             </div>
             <el-progress
               v-if="item.limit !== -1"
               :percentage="Math.min(100, Math.round((item.current / item.limit) * 100))"
               :color="item.current / item.limit > 0.9 ? '#f56c6c' : item.current / item.limit > 0.7 ? '#e6a23c' : '#67c23a'"
-              :stroke-width="8"
+              :stroke-width="6"
               :show-text="false"
             />
           </div>
         </div>
 
-        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center">
+        <div class="license__actions">
           <el-button @click="handleRefresh">刷新状态</el-button>
           <el-button type="danger" @click="handleDeactivate">解除绑定</el-button>
         </div>
       </div>
-    </el-card>
 
-    <el-card v-else shadow="hover">
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
-        <el-form-item label="授权码" prop="licenseKey">
-          <el-input
-            v-model="form.licenseKey"
-            placeholder="VM-XXXX-XXXX-XXXX-XXXX"
-            maxlength="27"
-            @input="formatLicenseKey"
-            style="font-family: monospace; letter-spacing: 2px"
-          />
-        </el-form-item>
-        <el-form-item label="验证方式">
-          <el-radio-group v-model="form.verifyMode">
-            <el-radio value="online">在线验证</el-radio>
-            <el-radio value="offline">离线验证</el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item v-if="form.verifyMode === 'online'" label="服务器" prop="serverUrl">
-          <el-input v-model="form.serverUrl" placeholder="https://api.example.com" />
-        </el-form-item>
-      </el-form>
+      <div v-else class="license__activate">
+        <div class="license__activate-card">
+          <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
+            <el-form-item label="授权码" prop="licenseKey">
+              <el-input
+                v-model="form.licenseKey"
+                placeholder="VM-XXXX-XXXX-XXXX-XXXX"
+                maxlength="27"
+                @input="formatLicenseKey"
+                style="font-family: monospace; letter-spacing: 2px"
+              />
+            </el-form-item>
+            <el-form-item label="验证方式">
+              <el-radio-group v-model="form.verifyMode">
+                <el-radio value="online">在线验证</el-radio>
+                <el-radio value="offline">离线验证</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item v-if="form.verifyMode === 'online'" label="服务器" prop="serverUrl">
+              <el-input v-model="form.serverUrl" placeholder="https://api.example.com" />
+            </el-form-item>
+          </el-form>
 
-      <div v-if="licenseStore.error" style="margin: 12px 0">
-        <el-alert :title="licenseStore.error" type="error" show-icon :closable="false" />
+          <div v-if="licenseStore.error" class="license__error">
+            <el-alert :title="licenseStore.error" type="error" show-icon :closable="false" />
+          </div>
+
+          <el-button
+            type="primary"
+            size="large"
+            :loading="licenseStore.loading"
+            @click="handleActivate"
+            class="license__activate-btn"
+          >
+            激活
+          </el-button>
+
+          <div class="license__device-info">
+            <span>设备ID: {{ deviceInfo?.deviceId || '获取中...' }}</span>
+            <span>指纹: {{ deviceInfo?.fingerprint?.substring(0, 16) || '...' }}...</span>
+          </div>
+        </div>
       </div>
 
-      <div style="text-align: center; margin-top: 20px">
-        <el-button
-          type="primary"
-          size="large"
-          :loading="licenseStore.loading"
-          @click="handleActivate"
-          style="width: 100%"
-        >
-          激活
-        </el-button>
+      <div class="license__plans">
+        <h4 class="license__section-title">套餐对比</h4>
+        <div class="license__plans-grid">
+          <div v-for="plan in planCards" :key="plan.name" :class="['plan-card', { 'plan-card--active': licenseStore.plan === plan.key }]">
+            <div class="plan-card__name">{{ plan.name }}</div>
+            <div class="plan-card__price">{{ plan.price }}</div>
+            <div class="plan-card__features">
+              <div v-for="f in plan.features" :key="f" class="plan-card__feature">
+                <el-icon :size="12" color="#67c23a"><CircleCheckFilled /></el-icon>
+                <span>{{ f }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-
-      <el-divider>设备信息</el-divider>
-      <div style="font-size: 12px; color: #909399; text-align: center">
-        <p>设备ID: {{ deviceInfo?.deviceId || '获取中...' }}</p>
-        <p>指纹: {{ deviceInfo?.fingerprint?.substring(0, 16) || '...' }}...</p>
-      </div>
-    </el-card>
-
-    <div style="margin-top: 24px">
-      <el-card shadow="never">
-        <template #header><span>套餐对比</span></template>
-        <el-table :data="planData" stripe size="small">
-          <el-table-column prop="feature" label="功能" width="140" />
-          <el-table-column prop="free" label="免费版" width="80" align="center">
-            <template #default="{ row }">
-              <span :style="{ color: row.free === '-' ? '#c0c4cc' : '' }">{{ row.free }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="pro" label="专业版" width="80" align="center">
-            <template #default="{ row }">
-              <span :style="{ color: row.pro === '✓' ? '#67c23a' : row.pro === '-' ? '#c0c4cc' : '' }">{{ row.pro }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="premium" label="高级版" width="80" align="center">
-            <template #default="{ row }">
-              <span :style="{ color: row.premium === '✓' ? '#67c23a' : row.premium === '-' ? '#c0c4cc' : '' }">{{ row.premium }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="enterprise" label="企业版" width="80" align="center">
-            <template #default="{ row }">
-              <span :style="{ color: row.enterprise === '✓' ? '#67c23a' : row.enterprise === '-' ? '#c0c4cc' : '' }">{{ row.enterprise }}</span>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-card>
     </div>
   </div>
 </template>
@@ -134,6 +126,7 @@ import { useLicenseStore } from "../stores/license";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { CircleCheckFilled } from "@element-plus/icons-vue";
 import type { FormInstance, FormRules } from "element-plus";
+import PageHeader from "../components/PageHeader.vue";
 
 const licenseStore = useLicenseStore();
 const formRef = ref<FormInstance>();
@@ -177,17 +170,11 @@ const quotaItems = computed(() => {
   ];
 });
 
-const planData = [
-  { feature: "监控商品数", free: "10", pro: "100", premium: "500", enterprise: "无限" },
-  { feature: "并发采集", free: "2", pro: "5", premium: "8", enterprise: "10" },
-  { feature: "日采集上限", free: "50", pro: "500", premium: "2000", enterprise: "无限" },
-  { feature: "定时采集", free: "-", pro: "20", premium: "100", enterprise: "无限" },
-  { feature: "AI分析/天", free: "5", pro: "50", premium: "200", enterprise: "无限" },
-  { feature: "趋势评分", free: "-", pro: "✓", premium: "✓", enterprise: "✓" },
-  { feature: "爆品预测", free: "-", pro: "-", premium: "✓", enterprise: "✓" },
-  { feature: "风险预警", free: "-", pro: "-", premium: "✓", enterprise: "✓" },
-  { feature: "数据导出", free: "-", pro: "✓", premium: "✓", enterprise: "✓" },
-  { feature: "团队协作", free: "-", pro: "-", premium: "✓", enterprise: "✓" },
+const planCards = [
+  { key: "free", name: "免费版", price: "免费", features: ["10个监控商品", "2并发采集", "50次/日采集", "5次AI分析/天"] },
+  { key: "pro", name: "专业版", price: "¥99/月", features: ["100个监控商品", "5并发采集", "500次/日采集", "50次AI分析/天", "趋势评分", "数据导出"] },
+  { key: "premium", name: "高级版", price: "¥299/月", features: ["500个监控商品", "8并发采集", "2000次/日采集", "200次AI分析/天", "爆品预测", "风险预警", "团队协作"] },
+  { key: "enterprise", name: "企业版", price: "联系销售", features: ["无限监控商品", "10并发采集", "无限日采集", "无限AI分析", "全部高级功能", "专属支持"] },
 ];
 
 function formatLicenseKey(val: string) {
@@ -202,7 +189,6 @@ function formatLicenseKey(val: string) {
 async function handleActivate() {
   const valid = await formRef.value?.validate().catch(() => false);
   if (!valid) return;
-
   const serverUrl = form.verifyMode === "online" ? form.serverUrl : undefined;
   const success = await licenseStore.activate(form.licenseKey, serverUrl);
   if (success) {
@@ -235,3 +221,219 @@ onMounted(async () => {
   deviceInfo.value = await licenseStore.getDeviceInfo();
 });
 </script>
+
+<style scoped>
+.license {
+  padding: 0;
+}
+
+.license__content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.license__activated {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.license__status-icon {
+  margin-bottom: 12px;
+}
+
+.license__status-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 24px;
+}
+
+.license__info-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.license__info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.license__info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.license__info-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.license__info-value {
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+}
+
+.license__info-value.expired {
+  color: var(--color-danger);
+}
+
+.license__device-id {
+  font-family: monospace;
+  font-size: var(--text-xs);
+  background: var(--color-bg-page);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+}
+
+.license__quotas {
+  text-align: left;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.license__section-title {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 16px;
+}
+
+.quota-item {
+  margin-bottom: 14px;
+}
+
+.quota-item:last-child {
+  margin-bottom: 0;
+}
+
+.quota-item__header {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+  margin-bottom: 6px;
+}
+
+.quota-item__label {
+  color: var(--color-text-secondary);
+}
+
+.quota-item__value {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.license__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.license__activate {
+  padding: 20px 0;
+}
+
+.license__activate-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.license__error {
+  margin: 12px 0;
+}
+
+.license__activate-btn {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.license__device-info {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border-light);
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.license__plans {
+  margin-top: 32px;
+}
+
+.license__plans-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.plan-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: all 0.2s;
+}
+
+.plan-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.1);
+}
+
+.plan-card--active {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.plan-card__name {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.plan-card__price {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: 16px;
+}
+
+.plan-card__features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.plan-card__feature {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+@media (max-width: 768px) {
+  .license__info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .license__plans-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+</style>

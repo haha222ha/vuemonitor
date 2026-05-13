@@ -78,8 +78,12 @@ class FeatureGateMiddleware:
                 "gate:ai:trend_score": "aiCallsPerDay",
                 "gate:ai:prediction": "aiCallsPerDay",
                 "gate:ai:risk_warning": "aiCallsPerDay",
+                "gate:ai:competitor_analysis": "aiCallsPerDay",
+                "gate:ai:product_selection": "aiCallsPerDay",
+                "gate:ai:product_optimization": "aiCallsPerDay",
                 "gate:ai:batch_analysis": "aiCallsPerDay",
                 "gate:ai:report": "aiCallsPerDay",
+                "gate:ai:note_optimization": "aiCallsPerDay",
             }
 
             limit_key = gate_key_mapping.get(gate_key)

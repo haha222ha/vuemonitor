@@ -52,7 +52,7 @@ export const useLicensesStore = defineStore("licenses", () => {
     } catch (error) {
       // Error handling silent; views can handle UI feedback
     }
-  });
+  }
 
   return { licenses, total, loading, fetchLicenses, generateLicense, revokeLicense };
 });

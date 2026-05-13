@@ -131,7 +131,7 @@ async function fetchBenchmark() {
     if (filters.platform && filters.category) {
       await store.fetchDistribution(filters.platform, filters.category, filters.metric);
     } else {
-      store.distribution.length = 0;
+      store.distribution = [];
     }
   } catch { ElMessage.error("获取基准数据失败"); }
 }
@@ -141,15 +141,8 @@ async function exportBenchmark() {
     const params: Record<string, unknown> = {};
     if (filters.platform) params.platform = filters.platform;
     if (filters.category) params.category = filters.category;
-    const blob = await store.exportBenchmark(params);
-    const url = window.URL.createObjectURL(new Blob([blob as BlobPart]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "benchmarks.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    await store.exportBenchmarks(params);
+    ElMessage.success("导出成功");
   } catch { ElMessage.error("导出失败"); }
 }
 

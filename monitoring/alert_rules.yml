@@ -1,0 +1,69 @@
+groups:
+  - name: vuemonitor_api
+    rules:
+      - alert: APIServerDown
+        expr: up{job="vuemonitor-server"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API Server is down"
+          description: "vuemonitor-server has been down for more than 1 minute."
+
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High 5xx error rate ({{ $value | humanizePercentage }})"
+          description: "More than 5% of requests are returning 5xx errors."
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High P95 latency ({{ $value }}s)"
+          description: "95th percentile request latency exceeds 2 seconds."
+
+  - name: vuemonitor_database
+    rules:
+      - alert: DatabasePoolExhausted
+        expr: db_pool_checked_out / db_pool_size > 0.9
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection pool near exhaustion"
+          description: "Over 90% of database connections are in use."
+
+      - alert: DatabasePoolOverflow
+        expr: db_pool_overflow > 0
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database pool overflow detected"
+          description: "Connection pool is overflowing ({{ $value }} connections)."
+
+  - name: vuemonitor_system
+    rules:
+      - alert: HighMemoryUsage
+        expr: process_memory_rss_bytes > 800000000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage ({{ $value | humanize }}B)"
+          description: "Process RSS memory exceeds 800MB."
+
+      - alert: HighCPUUsage
+        expr: process_cpu_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage ({{ $value }}%)"
+          description: "Process CPU usage exceeds 80%."

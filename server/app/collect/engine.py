@@ -56,13 +56,57 @@ class ProxyManager:
 
 class RiskDetector:
     RISK_PATTERNS = {
-        "captcha": {"keywords": ["验证码", "captcha", "verify", "安全验证"], "level": "high"},
-        "login_required": {"keywords": ["登录", "login", "sign in"], "level": "high"},
-        "rate_limit": {"keywords": ["频繁", "too many", "rate limit", "429", "请求过于频繁"], "level": "medium"},
-        "ip_blocked": {"keywords": ["封禁", "blocked", "forbidden", "403"], "level": "critical"},
+        "captcha": {
+            "keywords": [
+                "验证码", "captcha", "verify", "安全验证",
+                "slider", "滑块", "拼图验证", "图形验证",
+                "人机验证", "robot check", "challenge",
+                "incap_ses", "vi_apt", "xhs-sec",
+                "cf-challenge", "cloudflare",
+            ],
+            "level": "high",
+        },
+        "login_required": {
+            "keywords": [
+                "登录", "login", "sign in", "请先登录",
+                "需要登录", "unauthorized", "token过期",
+                "token expired", "登录已过期",
+            ],
+            "level": "high",
+        },
+        "rate_limit": {
+            "keywords": [
+                "频繁", "too many", "rate limit", "429",
+                "请求过于频繁", "slow down", "throttl",
+                "请求过快", "操作频繁", "limit exceeded",
+            ],
+            "level": "medium",
+        },
+        "ip_blocked": {
+            "keywords": [
+                "封禁", "blocked", "forbidden", "403",
+                "ip封禁", "访问被拒绝", "access denied",
+                "blacklist", "风控拦截", "异常访问",
+            ],
+            "level": "critical",
+        },
+        "account_risk": {
+            "keywords": [
+                "账号异常", "account risk", "安全风险",
+                "设备异常", "device risk", "环境异常",
+            ],
+            "level": "high",
+        },
     }
 
-    RISK_STATUS_CODES = {403, 429, 461}
+    RISK_STATUS_CODES = {403, 429, 461, 451, 503}
+
+    CAPTCHA_HTML_PATTERNS = [
+        "geetest", "gt_", "captcha", "verify-bar",
+        "nc_1_captcha", "ali-verify", "baxia",
+        "slider-verify", "puzzle-verify", "tencent-captcha",
+        "idc_captcha", "captcha_input",
+    ]
 
     @classmethod
     def detect(cls, response_text: str, status_code: int) -> dict | None:
@@ -71,10 +115,26 @@ class RiskDetector:
                 403: "HTTP 403 - 风控拦截",
                 429: "HTTP 429 - 频率限制",
                 461: "HTTP 461 - 验证码触发",
+                451: "HTTP 451 - 法律限制/内容屏蔽",
+                503: "HTTP 503 - 服务不可用(可能触发风控)",
+            }
+            risk_type_map = {
+                403: "ip_blocked",
+                429: "rate_limit",
+                461: "captcha",
+                451: "ip_blocked",
+                503: "rate_limit",
+            }
+            risk_level_map = {
+                403: "critical",
+                429: "medium",
+                461: "high",
+                451: "critical",
+                503: "medium",
             }
             return {
-                "risk_type": {403: "ip_blocked", 429: "rate_limit", 461: "captcha"}.get(status_code, "unknown"),
-                "risk_level": {403: "critical", 429: "medium", 461: "high"}.get(status_code, "medium"),
+                "risk_type": risk_type_map.get(status_code, "unknown"),
+                "risk_level": risk_level_map.get(status_code, "medium"),
                 "detail": {"status_code": status_code, "message": messages.get(status_code, f"HTTP {status_code}")},
             }
 
@@ -86,6 +146,14 @@ class RiskDetector:
             }
 
         text_lower = response_text.lower()
+        for pattern in cls.CAPTCHA_HTML_PATTERNS:
+            if pattern in text_lower:
+                return {
+                    "risk_type": "captcha",
+                    "risk_level": "high",
+                    "detail": {"html_pattern": pattern, "message": f"检测到验证码组件: {pattern}"},
+                }
+
         for risk_type, config in cls.RISK_PATTERNS.items():
             for keyword in config["keywords"]:
                 if keyword in text_lower:
@@ -98,12 +166,20 @@ class RiskDetector:
         try:
             data = json.loads(response_text)
             error_code = data.get("error_code", -1)
-            if error_code in (461, 300):
-                return {
-                    "risk_type": "captcha",
-                    "risk_level": "high",
-                    "detail": {"api_error_code": error_code, "message": f"API error_code={error_code} - 风控拦截"},
-                }
+            if error_code in (461, 300, -1):
+                api_msg = str(data.get("msg", "")).lower()
+                if error_code == 461 or "captcha" in api_msg or "验证" in api_msg:
+                    return {
+                        "risk_type": "captcha",
+                        "risk_level": "high",
+                        "detail": {"api_error_code": error_code, "message": f"API error_code={error_code} - 风控拦截"},
+                    }
+                if error_code == 300:
+                    return {
+                        "risk_type": "login_required",
+                        "risk_level": "high",
+                        "detail": {"api_error_code": error_code, "message": "API error_code=300 - 需要登录"},
+                    }
             msg = str(data.get("msg", "")).lower()
             for risk_type, config in cls.RISK_PATTERNS.items():
                 for keyword in config["keywords"]:
@@ -219,6 +295,9 @@ class DataPersister:
 
 
 class CollectEngine:
+    MAX_RETRIES = 3
+    RETRY_DELAYS = [2, 5, 10]
+
     def __init__(self, db: AsyncSession, max_concurrency: int = 8):
         self.db = db
         self.max_concurrency = max_concurrency
@@ -262,75 +341,95 @@ class CollectEngine:
             nonlocal success_count, fail_count, risk_count, product_count
             async with self._semaphore:
                 await self.rate_controller.acquire()
-                try:
-                    fetch_result = await self._fetch_item(task.platform, item.target_id)
-                    raw_text = fetch_result.get("raw_text", "")
-                    status_code = fetch_result.get("status_code", 200)
+                last_risk = None
+                for attempt in range(self.MAX_RETRIES + 1):
+                    try:
+                        fetch_result = await self._fetch_item(task.platform, item.target_id)
+                        raw_text = fetch_result.get("raw_text", "")
+                        status_code = fetch_result.get("status_code", 200)
+                        fetch_proxy_id = fetch_result.get("proxy_id")
 
-                    risk = self.risk_detector.detect(raw_text, status_code)
+                        risk = self.risk_detector.detect(raw_text, status_code)
 
-                    if risk:
-                        async with _lock:
-                            risk_count += 1
-                        self.rate_controller.on_risk_detected()
-                        await self.risk_detector.record_risk_event(
-                            self.db, task.id, task.platform, risk["risk_type"], risk["risk_level"], risk["detail"]
-                        )
-                        item.status = "risk_detected"
-                        item.error_message = risk["risk_type"]
+                        if risk:
+                            async with _lock:
+                                risk_count += 1
+                            if risk["risk_type"] == "captcha":
+                                self.rate_controller.on_captcha_detected()
+                            elif risk["risk_type"] == "ip_blocked":
+                                self.rate_controller.on_ip_blocked()
+                            else:
+                                self.rate_controller.on_risk_detected()
+                            await self.risk_detector.record_risk_event(
+                                self.db, task.id, task.platform, risk["risk_type"], risk["risk_level"], risk["detail"]
+                            )
+                            item.status = "risk_detected"
+                            item.error_message = risk["risk_type"]
 
-                        if risk["risk_level"] in ("high", "critical"):
-                            await self.session_manager.rotate_fingerprint(task.platform)
+                            if risk["risk_level"] in ("high", "critical"):
+                                await self.session_manager.rotate_fingerprint(task.platform)
+                                if risk["risk_type"] == "ip_blocked" and fetch_proxy_id:
+                                    await self.proxy_manager.mark_proxy_banned(fetch_proxy_id)
 
-                        try:
-                            await manager.send_to_user(str(task.user_id), {
-                                "type": "collect:risk_alert",
-                                "data": {
-                                    "task_id": str(task.id),
-                                    "platform": task.platform,
-                                    "risk_type": risk["risk_type"],
-                                    "risk_level": risk["risk_level"],
-                                    "detail": risk["detail"],
-                                    "target_id": item.target_id,
-                                },
-                                "ts": datetime.now(timezone.utc).isoformat(),
-                            })
-                        except Exception:
-                            pass
-                    else:
-                        parser = get_parser(task.platform)
-                        parsed = parser.parse(raw_text, status_code, item.target_id)
-
-                        if parsed:
-                            self.rate_controller.on_success()
-                            item.status = "completed"
-                            item.result = parsed
-                            item.completed_at = datetime.now(timezone.utc)
+                            if risk["risk_type"] in ("rate_limit", "server_error") and attempt < self.MAX_RETRIES:
+                                last_risk = risk
+                                await asyncio.sleep(self.RETRY_DELAYS[min(attempt, len(self.RETRY_DELAYS) - 1)])
+                                continue
 
                             try:
-                                product = await self.persister.save_parsed_data(task.user_id, parsed)
-                                async with _lock:
-                                    product_count += 1
-                            except Exception as e:
-                                logger.error(f"Failed to persist data for {item.target_id}: {e}")
-
-                            async with _lock:
-                                success_count += 1
+                                await manager.send_to_user(str(task.user_id), {
+                                    "type": "collect:risk_alert",
+                                    "data": {
+                                        "task_id": str(task.id),
+                                        "platform": task.platform,
+                                        "risk_type": risk["risk_type"],
+                                        "risk_level": risk["risk_level"],
+                                        "detail": risk["detail"],
+                                        "target_id": item.target_id,
+                                    },
+                                    "ts": datetime.now(timezone.utc).isoformat(),
+                                })
+                            except Exception:
+                                pass
+                            break
                         else:
-                            self.rate_controller.on_success()
-                            item.status = "completed"
-                            item.result = {"raw_captured": True, "target_id": item.target_id}
-                            item.completed_at = datetime.now(timezone.utc)
-                            async with _lock:
-                                success_count += 1
+                            parser = get_parser(task.platform)
+                            parsed = parser.parse(raw_text, status_code, item.target_id)
 
-                except Exception as e:
-                    self.rate_controller.on_error()
-                    item.status = "failed"
-                    item.error_message = str(e)[:500]
-                    async with _lock:
-                        fail_count += 1
-                    logger.error(f"Item {item.target_id} failed: {e}")
+                            if parsed:
+                                self.rate_controller.on_success()
+                                item.status = "completed"
+                                item.result = parsed
+                                item.completed_at = datetime.now(timezone.utc)
+
+                                try:
+                                    product = await self.persister.save_parsed_data(task.user_id, parsed)
+                                    async with _lock:
+                                        product_count += 1
+                                except Exception as e:
+                                    logger.error(f"Failed to persist data for {item.target_id}: {e}")
+
+                                async with _lock:
+                                    success_count += 1
+                            else:
+                                self.rate_controller.on_success()
+                                item.status = "completed"
+                                item.result = {"raw_captured": True, "target_id": item.target_id}
+                                item.completed_at = datetime.now(timezone.utc)
+                                async with _lock:
+                                    success_count += 1
+                            break
+
+                    except Exception as e:
+                        self.rate_controller.on_error()
+                        if attempt < self.MAX_RETRIES:
+                            await asyncio.sleep(self.RETRY_DELAYS[min(attempt, len(self.RETRY_DELAYS) - 1)])
+                            continue
+                        item.status = "failed"
+                        item.error_message = str(e)[:500]
+                        async with _lock:
+                            fail_count += 1
+                        logger.error(f"Item {item.target_id} failed after {attempt + 1} attempts: {e}")
 
                 async with _lock:
                     done = success_count + fail_count + risk_count
@@ -399,6 +498,7 @@ class CollectEngine:
 
         try:
             result = await fetcher(session, fingerprint, target_id, proxy_url)
+            result["proxy_id"] = proxy_id
             return result
         except aiohttp.ClientError as e:
             if proxy_id:

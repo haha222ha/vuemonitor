@@ -49,10 +49,18 @@ CREATE TABLE license_codes (
     current_activations SMALLINT NOT NULL DEFAULT 0,
     status VARCHAR(20) NOT NULL DEFAULT 'unused',
     batch_id VARCHAR(64),
+    note TEXT,
     created_by UUID REFERENCES users(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     activated_at TIMESTAMP,
-    expires_at TIMESTAMP
+    expires_at TIMESTAMP,
+    revoked_at TIMESTAMP,
+    revoked_by UUID REFERENCES users(id),
+    revoke_reason TEXT,
+    license_key VARCHAR(19) UNIQUE,
+    max_devices INTEGER DEFAULT 1,
+    bound_user_id UUID REFERENCES users(id),
+    bound_device_fingerprint VARCHAR(255)
 );
 
 CREATE INDEX idx_license_codes_code ON license_codes(code);
@@ -63,7 +71,10 @@ CREATE TABLE license_activations (
     license_id UUID NOT NULL REFERENCES license_codes(id) ON DELETE CASCADE,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     device_fingerprint VARCHAR(255),
-    activated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    device_name VARCHAR(128),
+    ip_address VARCHAR(45),
+    activated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    last_heartbeat TIMESTAMP
 );
 
 -- ============================================================
@@ -537,7 +548,7 @@ CREATE TABLE membership_plans (
 -- M18 商业化 — 用户订阅
 -- ============================================================
 
-CREATE TABLE user_membership (
+CREATE TABLE user_memberships (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     plan_id UUID NOT NULL REFERENCES membership_plans(id) ON DELETE CASCADE,
@@ -546,8 +557,9 @@ CREATE TABLE user_membership (
     status SMALLINT NOT NULL DEFAULT 1
 );
 
-CREATE INDEX idx_user_membership_user_id ON user_membership(user_id);
-CREATE INDEX idx_user_membership_plan_id ON user_membership(plan_id);
+CREATE INDEX idx_user_memberships_user_id ON user_memberships(user_id);
+CREATE INDEX idx_user_memberships_plan_id ON user_memberships(plan_id);
+CREATE INDEX idx_user_memberships_status ON user_memberships(status);
 
 -- ============================================================
 -- M18 商业化 — 商品动态指标
@@ -653,3 +665,203 @@ CREATE TABLE db_config (
     value TEXT,
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
+
+-- ============================================================
+-- 告警规则与事件
+-- ============================================================
+
+CREATE TABLE alert_rules (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(200) NOT NULL,
+    rule_type VARCHAR(30) NOT NULL,
+    metric VARCHAR(50) NOT NULL,
+    operator VARCHAR(10) NOT NULL,
+    threshold DOUBLE PRECISION NOT NULL,
+    window_minutes INTEGER NOT NULL DEFAULT 5,
+    cooldown_minutes INTEGER NOT NULL DEFAULT 30,
+    severity VARCHAR(10) NOT NULL DEFAULT 'warning',
+    channels JSONB NOT NULL DEFAULT '{}',
+    filters JSONB,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    last_triggered_at TIMESTAMP,
+    trigger_count INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_alert_rules_user_id ON alert_rules(user_id);
+CREATE INDEX idx_alert_rules_active ON alert_rules(user_id, is_active);
+
+CREATE TABLE alert_events (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    rule_id UUID NOT NULL REFERENCES alert_rules(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    severity VARCHAR(10) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    detail TEXT NOT NULL,
+    metric_value DOUBLE PRECISION,
+    threshold_value DOUBLE PRECISION,
+    context JSONB,
+    is_acknowledged BOOLEAN NOT NULL DEFAULT FALSE,
+    acknowledged_at TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_alert_events_user_id ON alert_events(user_id);
+CREATE INDEX idx_alert_events_rule_id ON alert_events(rule_id);
+CREATE INDEX idx_alert_events_created ON alert_events(created_at);
+
+-- ============================================================
+-- 授权码变更日志
+-- ============================================================
+
+CREATE TABLE license_change_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    license_id UUID NOT NULL REFERENCES license_codes(id) ON DELETE CASCADE,
+    action VARCHAR(32) NOT NULL,
+    old_value TEXT,
+    new_value TEXT,
+    operator_id UUID REFERENCES users(id),
+    detail TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_license_change_logs_license_id ON license_change_logs(license_id);
+
+-- ============================================================
+-- AI报告模板
+-- ============================================================
+
+CREATE TABLE ai_report_templates (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(200) NOT NULL,
+    description TEXT,
+    report_type VARCHAR(50) NOT NULL,
+    metrics JSONB NOT NULL DEFAULT '[]',
+    chart_types JSONB NOT NULL DEFAULT '[]',
+    output_format VARCHAR(20) NOT NULL DEFAULT 'pdf',
+    prompt_template TEXT,
+    sections JSONB NOT NULL DEFAULT '[]',
+    is_default BOOLEAN NOT NULL DEFAULT FALSE,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_ai_report_templates_user_id ON ai_report_templates(user_id);
+
+-- ============================================================
+-- 团队协作
+-- ============================================================
+
+CREATE TABLE teams (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    owner_id UUID NOT NULL REFERENCES users(id),
+    avatar_url VARCHAR(500),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    settings JSONB,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_teams_owner ON teams(owner_id);
+
+CREATE TABLE team_members (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    role VARCHAR(20) NOT NULL DEFAULT 'member',
+    invited_by UUID REFERENCES users(id),
+    status VARCHAR(20) NOT NULL DEFAULT 'active',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_team_members_team_user ON team_members(team_id, user_id);
+
+CREATE TABLE team_shared_rules (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+    rule_id UUID NOT NULL REFERENCES monitor_rules(id) ON DELETE CASCADE,
+    shared_by UUID NOT NULL REFERENCES users(id),
+    can_edit BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE team_shared_products (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    shared_by UUID NOT NULL REFERENCES users(id),
+    can_edit BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX idx_team_shared_product_unique ON team_shared_products(team_id, product_id);
+
+CREATE TABLE team_invitations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+    inviter_id UUID NOT NULL REFERENCES users(id),
+    invitee_email VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'member',
+    token VARCHAR(64) UNIQUE NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- ============================================================
+-- 安全审计日志
+-- ============================================================
+
+CREATE TABLE security_audit_log (
+    id SERIAL PRIMARY KEY,
+    request_id VARCHAR(8) NOT NULL,
+    timestamp VARCHAR(40) NOT NULL,
+    method VARCHAR(10) NOT NULL,
+    path VARCHAR(500) NOT NULL,
+    query TEXT,
+    client_ip VARCHAR(100) NOT NULL,
+    user_agent VARCHAR(500) NOT NULL DEFAULT '',
+    user_id VARCHAR(36),
+    risk_score INTEGER NOT NULL DEFAULT 0,
+    risk_flags JSONB NOT NULL DEFAULT '[]',
+    status_code INTEGER,
+    response_time_ms DOUBLE PRECISION
+);
+
+CREATE INDEX idx_security_audit_timestamp ON security_audit_log(timestamp);
+CREATE INDEX idx_security_audit_path ON security_audit_log(path);
+CREATE INDEX idx_security_audit_risk_score ON security_audit_log(risk_score);
+CREATE INDEX idx_security_audit_client_ip ON security_audit_log(client_ip);
+
+-- ============================================================
+-- 操作审计日志
+-- ============================================================
+
+CREATE TABLE operation_audit_log (
+    id SERIAL PRIMARY KEY,
+    user_id VARCHAR(36) NOT NULL,
+    action VARCHAR(100) NOT NULL,
+    resource_type VARCHAR(50) NOT NULL,
+    resource_id VARCHAR(36),
+    detail TEXT,
+    old_value JSONB,
+    new_value JSONB,
+    ip_address VARCHAR(100),
+    user_agent VARCHAR(500),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_operation_audit_user_id ON operation_audit_log(user_id);
+CREATE INDEX idx_operation_audit_action ON operation_audit_log(action);
+CREATE INDEX idx_operation_audit_resource ON operation_audit_log(resource_type, resource_id);
+CREATE INDEX idx_operation_audit_created_at ON operation_audit_log(created_at);

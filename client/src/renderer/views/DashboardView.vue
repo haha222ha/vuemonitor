@@ -1,218 +1,236 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿<template>
-  <div class="dashboard">
-    <div class="dashboard-header">
-      <div class="header-left">
-        <h1 class="page-title">{{ t('nav.dashboard') }}</h1>
-        <p class="page-subtitle">实时监控您的商品数据变化</p>
-      </div>
-      <div class="header-actions">
-        <el-button class="btn-customize" @click="showCustomize = true">
-          <el-icon><Setting /></el-icon>
-          自定义看板
-        </el-button>
-      </div>
+<template>
+  <div class="dashboard fade-in">
+    <PageHeader title="数据盘面" subtitle="实时监控您的商品数据变化">
+      <el-button @click="showCustomize = true" class="dashboard__customize-btn">
+        <el-icon><Setting /></el-icon>
+        自定义看板
+      </el-button>
+    </PageHeader>
+
+    <div class="dashboard__stats" v-if="layoutCards.includes('stats')">
+      <StatCard
+        :icon="Monitor"
+        variant="primary"
+        :label="t('dashboard.monitoredProducts')"
+        :value="productStore.productCount"
+        trend="监控中"
+        trend-type="neutral"
+      />
+      <StatCard
+        :icon="Download"
+        variant="success"
+        :label="t('dashboard.activeCollect')"
+        :value="collectStore.status.activeCount"
+        trend="采集中"
+        trend-type="up"
+      />
+      <StatCard
+        :icon="Clock"
+        variant="warning"
+        :label="t('dashboard.queueTasks')"
+        :value="collectStore.status.queueLength"
+        trend="队列中"
+        trend-type="neutral"
+      />
+      <StatCard
+        :icon="Calendar"
+        variant="info"
+        :label="t('dashboard.scheduledTasks')"
+        :value="schedulerStore.state.activeTasks"
+        trend="已调度"
+        trend-type="neutral"
+      />
     </div>
 
-    <div class="stats-grid" v-if="layoutCards.includes('stats')">
-      <div class="stat-card stat-card-primary">
-        <div class="stat-icon-wrapper">
-          <el-icon class="stat-icon"><Monitor /></el-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">{{ t('dashboard.monitoredProducts') }}</div>
-          <div class="stat-value">{{ productStore.productCount }}</div>
-          <div class="stat-trend">
-            <el-icon><TrendCharts /></el-icon>
-            <span>监控中</span>
+    <div class="dashboard__grid" v-if="layoutCards.includes('collect')">
+      <div class="card">
+        <div class="card__header">
+          <div class="card__title-group">
+            <el-icon class="card__icon" :size="20"><Cpu /></el-icon>
+            <h3 class="card__title">{{ t('dashboard.collectStatus') }}</h3>
           </div>
-        </div>
-      </div>
-
-      <div class="stat-card stat-card-success">
-        <div class="stat-icon-wrapper">
-          <el-icon class="stat-icon"><Download /></el-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">{{ t('dashboard.activeCollect') }}</div>
-          <div class="stat-value">{{ collectStore.status.activeCount }}</div>
-          <div class="stat-trend">
-            <el-icon><VideoPlay /></el-icon>
-            <span>采集中</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card stat-card-warning">
-        <div class="stat-icon-wrapper">
-          <el-icon class="stat-icon"><Clock /></el-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">{{ t('dashboard.queueTasks') }}</div>
-          <div class="stat-value">{{ collectStore.status.queueLength }}</div>
-          <div class="stat-trend">
-            <el-icon><Timer /></el-icon>
-            <span>队列中</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="stat-card stat-card-info">
-        <div class="stat-icon-wrapper">
-          <el-icon class="stat-icon"><Calendar /></el-icon>
-        </div>
-        <div class="stat-content">
-          <div class="stat-label">{{ t('dashboard.scheduledTasks') }}</div>
-          <div class="stat-value">{{ schedulerStore.state.activeTasks }}</div>
-          <div class="stat-trend">
-            <el-icon><Bell /></el-icon>
-            <span>已调度</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="content-grid" v-if="layoutCards.includes('collect')">
-      <div class="card collect-status-card">
-        <div class="card-header">
-          <div class="card-title-wrapper">
-            <el-icon class="card-icon"><Cpu /></el-icon>
-            <h3 class="card-title">{{ t('dashboard.collectStatus') }}</h3>
-          </div>
-          <el-tag 
-            :type="collectStore.isCollecting ? 'success' : 'info'" 
-            :class="['status-badge', { 'status-active': collectStore.isCollecting }]"
+          <el-tag
+            :type="collectStore.isCollecting ? 'success' : 'info'"
+            :class="{ 'animate-pulse': collectStore.isCollecting }"
             effect="dark"
           >
-            <el-icon v-if="collectStore.isCollecting" class="status-pulse"><Loading /></el-icon>
             {{ collectStore.isCollecting ? t('dashboard.collecting') : t('dashboard.idle') }}
           </el-tag>
         </div>
-        <div class="card-body">
+        <div class="card__body">
           <div class="info-row">
-            <div class="info-label">
-              <el-icon><Grid /></el-icon>
+            <div class="info-row__label">
+              <el-icon :size="16"><Grid /></el-icon>
               {{ t('dashboard.concurrency') }}
             </div>
-            <div class="info-value">
-              <el-slider v-model="concurrency" :min="1" :max="10" class="concurrency-slider" @change="handleConcurrencyChange" />
-              <span class="concurrency-value">{{ concurrency }}</span>
+            <div class="info-row__value">
+              <el-slider v-model="concurrency" :min="1" :max="10" class="info-row__slider" @change="handleConcurrencyChange" />
+              <span class="info-row__number">{{ concurrency }}</span>
             </div>
           </div>
           <div class="info-row">
-            <div class="info-label">
-              <el-icon><Histogram /></el-icon>
+            <div class="info-row__label">
+              <el-icon :size="16"><Histogram /></el-icon>
               {{ t('dashboard.memoryUsage') }}
             </div>
-            <div class="info-value">
+            <div class="info-row__value">
               <div class="memory-bar">
-                <div class="memory-fill" :style="{ width: `${Math.min((collectStore.status.resourceUsage.memoryMB / 1024) * 100, 100)}%` }"></div>
+                <div class="memory-bar__fill" :style="{ width: `${Math.min((collectStore.status.resourceUsage.memoryMB / 1024) * 100, 100)}%` }" />
               </div>
-              <span class="memory-text">{{ collectStore.status.resourceUsage.memoryMB }} MB</span>
+              <span class="info-row__number">{{ collectStore.status.resourceUsage.memoryMB }} MB</span>
             </div>
           </div>
           <div class="info-row">
-            <div class="info-label">
-              <el-icon><Trophy /></el-icon>
+            <div class="info-row__label">
+              <el-icon :size="16"><Trophy /></el-icon>
               {{ t('dashboard.currentPlan') }}
             </div>
-            <div class="info-value">
-              <el-tag class="plan-tag" effect="plain">{{ planLabels[permissionStore.plan] || permissionStore.plan }}</el-tag>
+            <div class="info-row__value">
+              <el-tag effect="plain">{{ planLabels[permissionStore.plan] || permissionStore.plan }}</el-tag>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="card risk-alerts-card" v-if="layoutCards.includes('risk')">
-        <div class="card-header">
-          <div class="card-title-wrapper">
-            <el-icon class="card-icon"><Warning /></el-icon>
-            <h3 class="card-title">{{ t('dashboard.riskAlerts') }}</h3>
-            <el-badge v-if="collectStore.riskAlerts.length > 0" :value="collectStore.riskAlerts.length" :max="99" class="risk-badge" />
+      <div class="card" v-if="layoutCards.includes('risk')">
+        <div class="card__header">
+          <div class="card__title-group">
+            <el-icon class="card__icon" :size="20"><Warning /></el-icon>
+            <h3 class="card__title">{{ t('dashboard.riskAlerts') }}</h3>
+            <el-badge v-if="collectStore.riskAlerts.length > 0" :value="collectStore.riskAlerts.length" :max="99" />
           </div>
         </div>
-        <div class="card-body">
-          <div v-if="collectStore.riskAlerts.length === 0" class="empty-state">
-            <el-icon class="empty-icon"><CircleCheck /></el-icon>
-            <p class="empty-text">{{ t('dashboard.noRiskAlerts') }}</p>
-          </div>
+        <div class="card__body">
+          <EmptyState
+            v-if="collectStore.riskAlerts.length === 0"
+            :icon="CircleCheck"
+            title="安全"
+            description="当前无风控告警"
+          />
           <div v-else class="risk-list">
             <div v-for="alert in collectStore.riskAlerts.slice(0, 5)" :key="alert.taskId" class="risk-item">
-              <div class="risk-item-header">
-                <span class="risk-target">{{ alert.targetId }}</span>
+              <div class="risk-item__header">
+                <span class="risk-item__target">{{ alert.targetId }}</span>
                 <el-tag type="danger" size="small" effect="light">风控</el-tag>
               </div>
-              <p class="risk-error">{{ alert.error }}</p>
+              <p class="risk-item__error">{{ alert.error }}</p>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="card results-card" v-if="layoutCards.includes('results')">
-      <div class="card-header">
-        <div class="card-title-wrapper">
-          <el-icon class="card-icon"><List /></el-icon>
-          <h3 class="card-title">{{ t('dashboard.recentResults') }}</h3>
+    <div class="card" v-if="layoutCards.includes('results')">
+      <div class="card__header">
+        <div class="card__title-group">
+          <el-icon class="card__icon" :size="20"><List /></el-icon>
+          <h3 class="card__title">{{ t('dashboard.recentResults') }}</h3>
         </div>
-        <el-button size="small" @click="collectStore.clearResults()" class="btn-clear">
+        <el-button size="small" @click="collectStore.clearResults()">
           <el-icon><Delete /></el-icon>
           {{ t('common.clear') }}
         </el-button>
       </div>
-      <div class="card-body">
-        <el-table :data="collectStore.results.slice(0, 10)" class="modern-table" stripe>
+      <div class="card__body">
+        <el-table :data="collectStore.results.slice(0, 10)" stripe>
           <el-table-column prop="targetId" :label="t('product.productId')" min-width="200">
             <template #default="{ row }">
-              <div class="table-cell-primary">{{ row.targetId }}</div>
+              <span class="cell-primary">{{ row.targetId }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="status" :label="t('common.status')" width="140">
             <template #default="{ row }">
-              <el-tag :type="statusTagType(row.status)" size="small" effect="light" class="status-tag">
+              <el-tag :type="statusTagType[row.status]" size="small" effect="light">
                 {{ statusLabels[row.status] || row.status }}
               </el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="collectedAt" :label="t('common.time')" width="180">
             <template #default="{ row }">
-              <div class="table-cell-time">{{ formatDate(row.collectedAt) }}</div>
+              <span class="cell-secondary">{{ formatDate(row.collectedAt) }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="error" :label="t('common.error')" min-width="200">
             <template #default="{ row }">
-              <div class="table-cell-error" v-if="row.error">{{ row.error }}</div>
-              <span v-else class="table-cell-success">✓</span>
+              <span v-if="row.error" class="cell-danger">{{ row.error }}</span>
+              <span v-else class="cell-success">✓</span>
             </template>
           </el-table-column>
         </el-table>
       </div>
     </div>
 
-    <el-dialog 
-      v-model="showCustomize" 
-      title="自定义看板" 
-      width="560px"
-      class="customize-dialog"
-      :close-on-click-modal="true"
-      :close-on-press-escape="true"
-      :show-close="true"
-    >
-      <div class="customize-content">
-        <p class="customize-desc">选择要显示的卡片模块，拖拽调整顺序</p>
-        <draggable v-model="editableCards" item-key="key" handle=".drag-handle" class="customize-list">
-          <template #item="{ element }">
-            <div class="customize-item">
-              <el-icon class="drag-handle"><Rank /></el-icon>
-              <el-checkbox v-model="element.visible" @change="saveLayout">{{ element.label }}</el-checkbox>
-            </div>
-          </template>
-        </draggable>
-      </div>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="resetLayout">重置默认</el-button>
-          <el-button type="primary" @click="showCustomize = false">完成</el-button>
+    <div class="card" v-if="layoutCards.includes('crowd')">
+      <div class="card__header">
+        <div class="card__title-group">
+          <el-icon class="card__icon" :size="20"><TrendCharts /></el-icon>
+          <h3 class="card__title">群体洞察</h3>
         </div>
+        <el-button size="small" @click="fetchCrowdInsights">
+          <el-icon><Refresh /></el-icon>
+          刷新
+        </el-button>
+      </div>
+      <div class="card__body">
+        <div v-if="crowdLoading" class="crowd-loading">
+          <el-skeleton :rows="3" animated />
+        </div>
+        <div v-else-if="crowdHeatmap.length > 0" class="crowd-section">
+          <h4 class="crowd-section__title">品类热度</h4>
+          <div class="crowd-heatmap">
+            <div v-for="item in crowdHeatmap.slice(0, 8)" :key="item.category" class="crowd-heatmap__item">
+              <div class="crowd-heatmap__label">{{ item.category }}</div>
+              <div class="crowd-heatmap__bar">
+                <div
+                  class="crowd-heatmap__fill"
+                  :style="{ width: `${item.heat_score}%` }"
+                  :class="item.heat_level"
+                />
+              </div>
+              <div class="crowd-heatmap__score">
+                <el-tag :type="item.heat_level === 'hot' ? 'danger' : item.heat_level === 'warm' ? 'warning' : 'info'" size="small" effect="light">
+                  {{ item.heat_score }}
+                </el-tag>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="crowdPatterns" class="crowd-patterns">
+            <div class="crowd-patterns__row" v-if="crowdPatterns.dominant_lifecycle">
+              <span class="crowd-patterns__label">主流生命周期</span>
+              <el-tag size="small" effect="light">{{ lifecycleLabel(crowdPatterns.dominant_lifecycle) }}</el-tag>
+            </div>
+            <div class="crowd-patterns__row" v-if="crowdPatterns.dominant_trend">
+              <span class="crowd-patterns__label">主流趋势</span>
+              <el-tag :type="crowdPatterns.dominant_trend === 'up' ? 'success' : crowdPatterns.dominant_trend === 'down' ? 'danger' : 'info'" size="small" effect="light">
+                {{ trendLabel(crowdPatterns.dominant_trend) }}
+              </el-tag>
+            </div>
+            <div class="crowd-patterns__row" v-if="crowdPatterns.best_seller_price_band">
+              <span class="crowd-patterns__label">最佳价格带</span>
+              <el-tag size="small" type="success" effect="light">{{ priceBandLabel(crowdPatterns.best_seller_price_band.band) }}</el-tag>
+            </div>
+          </div>
+        </div>
+        <div v-else class="crowd-empty">
+          <span class="cell-secondary">暂无群体数据，需连接云端服务</span>
+        </div>
+      </div>
+    </div>
+
+    <el-dialog v-model="showCustomize" title="自定义看板" width="560px">
+      <p class="customize-desc">选择要显示的卡片模块，拖拽调整顺序</p>
+      <draggable v-model="editableCards" item-key="key" handle=".drag-handle" class="customize-list">
+        <template #item="{ element }">
+          <div class="customize-item">
+            <el-icon class="drag-handle"><Rank /></el-icon>
+            <el-checkbox v-model="element.visible" @change="saveLayout">{{ element.label }}</el-checkbox>
+          </div>
+        </template>
+      </draggable>
+      <template #footer>
+        <el-button @click="resetLayout">重置默认</el-button>
+        <el-button type="primary" @click="showCustomize = false">完成</el-button>
       </template>
     </el-dialog>
   </div>
@@ -226,11 +244,14 @@ import { useSchedulerStore } from "../stores/scheduler";
 import { usePermissionStore } from "../stores/permission";
 import { useI18n } from "../i18n";
 import draggable from "vuedraggable";
-import { 
-  Monitor, Download, Clock, Calendar, Cpu, Grid, Histogram, Trophy, 
-  Warning, List, Delete, Setting, TrendCharts, VideoPlay, Timer, 
-  Bell, Loading, CircleCheck, Rank 
+import api from "../utils/api";
+import {
+  Monitor, Download, Clock, Calendar, Cpu, Grid, Histogram, Trophy,
+  Warning, List, Delete, Setting, CircleCheck, Rank, TrendCharts, Refresh
 } from "@element-plus/icons-vue";
+import PageHeader from "../components/PageHeader.vue";
+import StatCard from "../components/StatCard.vue";
+import EmptyState from "../components/EmptyState.vue";
 
 const { t } = useI18n();
 
@@ -247,6 +268,7 @@ const ALL_CARDS = [
   { key: "collect", label: "采集状态", visible: true },
   { key: "risk", label: "风控告警", visible: true },
   { key: "results", label: "最近结果", visible: true },
+  { key: "crowd", label: "群体洞察", visible: true },
 ];
 
 const editableCards = ref([...ALL_CARDS]);
@@ -256,9 +278,7 @@ function loadLayout() {
     const saved = localStorage.getItem("dashboard-layout");
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed)) {
-        editableCards.value = parsed;
-      }
+      if (Array.isArray(parsed)) editableCards.value = parsed;
     }
   } catch {}
 }
@@ -272,9 +292,7 @@ function resetLayout() {
   localStorage.removeItem("dashboard-layout");
 }
 
-const layoutCards = computed(() => {
-  return editableCards.value.filter((c) => c.visible).map((c) => c.key);
-});
+const layoutCards = computed(() => editableCards.value.filter((c) => c.visible).map((c) => c.key));
 
 const planLabels: Record<string, string> = { free: "免费版", pro: "专业版", premium: "高级版", enterprise: "企业版" };
 const statusLabels: Record<string, string> = { success: "成功", failed: "失败", risk_detected: "风控" };
@@ -289,6 +307,43 @@ async function handleConcurrencyChange(val: number) {
   await collectStore.setConcurrency(val);
 }
 
+const crowdHeatmap = ref<any[]>([]);
+const crowdPatterns = ref<any>(null);
+const crowdLoading = ref(false);
+
+async function fetchCrowdInsights() {
+  crowdLoading.value = true;
+  try {
+    const [heatmapRes, patternsRes] = await Promise.allSettled([
+      api.get("/feature/crowd/category-heatmap"),
+      api.get("/feature/crowd/behavior-patterns"),
+    ]);
+    if (heatmapRes.status === "fulfilled" && heatmapRes.value.data?.heatmap) {
+      crowdHeatmap.value = heatmapRes.value.data.heatmap;
+    }
+    if (patternsRes.status === "fulfilled" && patternsRes.value.data) {
+      crowdPatterns.value = patternsRes.value.data;
+    }
+  } catch {} finally {
+    crowdLoading.value = false;
+  }
+}
+
+function lifecycleLabel(stage: string): string {
+  const map: Record<string, string> = { new: "新品期", growth: "成长期", rising: "上升期", stable: "稳定期", declining: "衰退期", decline: "衰退期", mature: "成熟期" };
+  return map[stage] || stage;
+}
+
+function trendLabel(trend: string): string {
+  const map: Record<string, string> = { up: "上升", down: "下降", stable: "平稳", unknown: "未知" };
+  return map[trend] || trend;
+}
+
+function priceBandLabel(band: string): string {
+  const map: Record<string, string> = { under_50: "¥50以下", "50_100": "¥50-100", "100_200": "¥100-200", "200_500": "¥200-500", over_500: "¥500+" };
+  return map[band] || band;
+}
+
 let refreshTimer: ReturnType<typeof setInterval> | null = null;
 
 onMounted(() => {
@@ -298,7 +353,7 @@ onMounted(() => {
   collectStore.fetchStatus();
   schedulerStore.fetchState();
   permissionStore.fetchPermissions();
-
+  fetchCrowdInsights();
   refreshTimer = setInterval(() => {
     collectStore.fetchStatus();
     schedulerStore.fetchState();
@@ -306,150 +361,31 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (refreshTimer) {
-    clearInterval(refreshTimer);
-  }
+  if (refreshTimer) clearInterval(refreshTimer);
 });
 </script>
 
 <style scoped>
 .dashboard {
   padding: 24px;
-  background: #f5f7fa;
-  min-height: 100vh;
+  min-height: 100%;
 }
 
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-  gap: 16px;
-}
-
-.header-left {
-  flex: 1;
-}
-
-.page-title {
-  margin: 0 0 8px;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a2e;
-  letter-spacing: -0.5px;
-}
-
-.page-subtitle {
-  margin: 0;
-  font-size: 14px;
-  color: #6b7280;
-}
-
-.btn-customize {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 20px;
-  border-radius: 10px;
-  font-weight: 500;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  color: #374151;
-  transition: all 0.2s;
-}
-
-.btn-customize:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.stats-grid {
+.dashboard__stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin-bottom: 24px;
 }
 
-.stat-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 24px;
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f3f4f6;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-}
-
-.stat-icon-wrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+.dashboard__customize-btn {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  gap: 6px;
+  border-radius: var(--radius-base);
 }
 
-.stat-card-primary .stat-icon-wrapper {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-}
-
-.stat-card-success .stat-icon-wrapper {
-  background: linear-gradient(135deg, #10b981, #34d399);
-}
-
-.stat-card-warning .stat-icon-wrapper {
-  background: linear-gradient(135deg, #f59e0b, #fbbf24);
-}
-
-.stat-card-info .stat-icon-wrapper {
-  background: linear-gradient(135deg, #3b82f6, #60a5fa);
-}
-
-.stat-icon {
-  font-size: 24px;
-  color: #fff;
-}
-
-.stat-content {
-  flex: 1;
-}
-
-.stat-label {
-  font-size: 13px;
-  color: #6b7280;
-  margin-bottom: 8px;
-}
-
-.stat-value {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1a1a2e;
-  line-height: 1;
-  margin-bottom: 8px;
-}
-
-.stat-trend {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: #9ca3af;
-}
-
-.stat-trend .el-icon {
-  font-size: 14px;
-}
-
-.content-grid {
+.dashboard__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
@@ -457,58 +393,40 @@ onUnmounted(() => {
 }
 
 .card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f3f4f6;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
   overflow: hidden;
 }
 
-.card-header {
+.card__header {
   padding: 20px 24px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border-light);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.card-title-wrapper {
+.card__title-group {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.card-icon {
-  font-size: 20px;
-  color: #6366f1;
+.card__icon {
+  color: var(--color-primary);
 }
 
-.card-title {
+.card__title {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--color-text-primary);
 }
 
-.card-body {
+.card__body {
   padding: 20px 24px;
-}
-
-.status-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 8px;
-}
-
-.status-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
 }
 
 .info-row {
@@ -516,7 +434,7 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .info-row:last-child {
@@ -528,84 +446,49 @@ onUnmounted(() => {
   padding-top: 0;
 }
 
-.info-label {
+.info-row__label {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
-  color: #6b7280;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
 }
 
-.info-label .el-icon {
-  font-size: 16px;
-  color: #9ca3af;
+.info-row__label .el-icon {
+  color: var(--color-text-tertiary);
 }
 
-.info-value {
+.info-row__value {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.concurrency-slider {
+.info-row__slider {
   width: 120px;
 }
 
-.concurrency-value {
-  font-size: 16px;
+.info-row__number {
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: #6366f1;
-  min-width: 24px;
+  color: var(--color-primary);
+  min-width: 32px;
   text-align: center;
 }
 
 .memory-bar {
   width: 100px;
   height: 6px;
-  background: #f3f4f6;
+  background: var(--color-border-light);
   border-radius: 3px;
   overflow: hidden;
 }
 
-.memory-fill {
+.memory-bar__fill {
   height: 100%;
-  background: linear-gradient(90deg, #10b981, #34d399);
+  background: var(--gradient-success);
   border-radius: 3px;
   transition: width 0.3s;
-}
-
-.memory-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-  min-width: 60px;
-}
-
-.plan-tag {
-  padding: 6px 12px;
-  border-radius: 8px;
-  font-weight: 500;
-}
-
-.risk-badge {
-  margin-left: 8px;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 32px 0;
-}
-
-.empty-icon {
-  font-size: 48px;
-  color: #10b981;
-  margin-bottom: 12px;
-}
-
-.empty-text {
-  margin: 0;
-  font-size: 14px;
-  color: #6b7280;
 }
 
 .risk-list {
@@ -616,89 +499,60 @@ onUnmounted(() => {
 
 .risk-item {
   padding: 12px;
-  background: #fef2f2;
+  background: var(--color-danger-bg);
   border: 1px solid #fecaca;
-  border-radius: 10px;
-  transition: all 0.2s;
+  border-radius: var(--radius-base);
+  transition: background 0.2s;
 }
 
 .risk-item:hover {
   background: #fee2e2;
 }
 
-.risk-item-header {
+.risk-item__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
 
-.risk-target {
-  font-size: 14px;
+.risk-item__target {
+  font-size: var(--text-base);
   font-weight: 500;
-  color: #1a1a2e;
+  color: var(--color-text-primary);
 }
 
-.risk-error {
+.risk-item__error {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--text-sm);
   color: #991b1b;
   line-height: 1.5;
 }
 
-.btn-clear {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  border-radius: 8px;
-}
-
-.modern-table {
-  border-radius: 8px;
-}
-
-.table-cell-primary {
+.cell-primary {
   font-weight: 500;
-  color: #1a1a2e;
+  color: var(--color-text-primary);
 }
 
-.table-cell-time {
-  color: #6b7280;
-  font-size: 13px;
+.cell-secondary {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
 }
 
-.table-cell-error {
-  color: #dc2626;
-  font-size: 13px;
+.cell-danger {
+  color: var(--color-danger);
+  font-size: var(--text-sm);
 }
 
-.table-cell-success {
-  color: #10b981;
-  font-size: 16px;
-}
-
-.customize-dialog :deep(.el-dialog__header) {
-  padding: 20px 24px;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.customize-dialog :deep(.el-dialog__body) {
-  padding: 24px;
-}
-
-.customize-dialog :deep(.el-dialog__footer) {
-  padding: 16px 24px;
-  border-top: 1px solid #f3f4f6;
-}
-
-.customize-content {
-  padding: 8px 0;
+.cell-success {
+  color: var(--color-success);
+  font-size: var(--text-lg);
 }
 
 .customize-desc {
   margin: 0 0 16px;
-  font-size: 14px;
-  color: #6b7280;
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
 }
 
 .customize-list {
@@ -712,40 +566,32 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: #f9fafb;
-  border: 1px solid #f3f4f6;
-  border-radius: 10px;
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-base);
   cursor: move;
   transition: all 0.2s;
 }
 
 .customize-item:hover {
-  background: #f3f4f6;
-  border-color: #e5e7eb;
+  background: var(--color-bg-hover);
+  border-color: var(--color-border);
 }
 
 .drag-handle {
   cursor: grab;
-  color: #9ca3af;
-  font-size: 16px;
+  color: var(--color-text-tertiary);
 }
 
 .drag-handle:active {
   cursor: grabbing;
 }
 
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
 @media (max-width: 1200px) {
-  .stats-grid {
+  .dashboard__stats {
     grid-template-columns: repeat(2, 1fr);
   }
-  
-  .content-grid {
+  .dashboard__grid {
     grid-template-columns: 1fr;
   }
 }
@@ -754,18 +600,98 @@ onUnmounted(() => {
   .dashboard {
     padding: 16px;
   }
-  
-  .stats-grid {
+  .dashboard__stats {
     grid-template-columns: 1fr;
   }
-  
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .page-title {
-    font-size: 24px;
-  }
+}
+
+.crowd-loading {
+  padding: 16px 0;
+}
+
+.crowd-section__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.crowd-heatmap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.crowd-heatmap__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crowd-heatmap__label {
+  font-size: 12px;
+  color: var(--color-text-primary);
+  min-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crowd-heatmap__bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-bg-page);
+  overflow: hidden;
+}
+
+.crowd-heatmap__fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
+}
+
+.crowd-heatmap__fill.hot {
+  background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+.crowd-heatmap__fill.warm {
+  background: linear-gradient(90deg, #f59e0b, #eab308);
+}
+
+.crowd-heatmap__fill.cold {
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+}
+
+.crowd-heatmap__score {
+  min-width: 40px;
+  text-align: right;
+}
+
+.crowd-patterns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-lighter);
+}
+
+.crowd-patterns__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.crowd-patterns__label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.crowd-empty {
+  padding: 24px 0;
+  text-align: center;
 }
 </style>

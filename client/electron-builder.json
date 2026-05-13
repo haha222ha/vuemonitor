@@ -1,7 +1,7 @@
 {
   "appId": "com.xhs365.app",
   "productName": "XHS365",
-  "copyright": "Copyright © 2024 XHS365",
+  "copyright": "Copyright © 2026 XHS365",
   "directories": {
     "output": "release",
     "buildResources": "build"
@@ -10,7 +10,17 @@
     "dist/**/*",
     "build/**/*",
     "node_modules/**/*",
-    "package.json"
+    "package.json",
+    "!node_modules/playwright/**",
+    "!node_modules/canvas/**",
+    "!node_modules/@electron/remote/**",
+    "!**/*.ts",
+    "!**/README*",
+    "!**/CHANGELOG*",
+    "!**/*.md",
+    "!**/.eslintrc*",
+    "!**/tsconfig*",
+    "!**/.github"
   ],
   "extraResources": [
     {
@@ -25,7 +35,6 @@
   ],
   "asar": true,
   "asarUnpack": [
-    "node_modules/better-sqlite3/**",
     "node_modules/playwright-core/**",
     "node_modules/sql.js/**"
   ],
@@ -44,10 +53,8 @@
     "icon": "build/icon.ico",
     "sign": "./scripts/sign-windows.js",
     "signingHashAlgorithms": ["sha256"],
-    "certificateFile": "",
-    "certificatePassword": "",
     "publisherName": "XHS365",
-    "verifyUpdateCodeSignature": true
+    "verifyUpdateCodeSignature": false
   },
   "mac": {
     "target": [
@@ -139,7 +146,7 @@
   "afterPack": "./scripts/after-pack.js",
   "afterSign": "./scripts/after-sign.js",
   "beforeBuild": "./scripts/before-build.js",
-  "npmRebuild": true,
+  "npmRebuild": false,
   "nodeGypRebuild": false,
   "buildDependenciesFromSource": false,
   "removePackageScripts": true,

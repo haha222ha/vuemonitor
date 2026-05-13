@@ -54,7 +54,7 @@ function wireDataMartSync(): void {
   });
 }
 
-function getWorker(): ChromiumCollectWorker {
+export function getWorker(): ChromiumCollectWorker {
   if (!chromiumWorker) {
     chromiumWorker = new ChromiumCollectWorker();
     chromiumWorker.init();
@@ -66,6 +66,9 @@ function getWorker(): ChromiumCollectWorker {
           dataMart.ingest(normalized.data, "local-user");
         }
       }
+
+      localScheduler.reportTaskResult(result.taskId, result.status === "success" ? "success" : result.status === "risk_detected" ? "risk_detected" : "failed").catch(() => {});
+
       const mainWindow = BrowserWindow.getAllWindows()[0];
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send("collect:result", result);
@@ -106,6 +109,61 @@ function getPermissionCache(): LocalPermissionCache {
     permissionCache = new LocalPermissionCache();
   }
   return permissionCache;
+}
+
+export function getPlaywrightCollector(): PlaywrightCollector {
+  if (!playwrightCollector) {
+    playwrightCollector = new PlaywrightCollector();
+    playwrightCollector.on("task:result", (result: PlaywrightResult) => {
+      if (result.status === "success" && result.data) {
+        const normalized = normalizer.normalize(result.data);
+        if (normalized.success && normalized.data) {
+          dataMart.ingest(normalized.data, "local-user");
+        }
+      }
+
+      localScheduler.reportTaskResult(result.taskId, result.status === "success" ? "success" : result.status === "risk_detected" ? "risk_detected" : "failed").catch(() => {});
+
+      const mainWindow = BrowserWindow.getAllWindows()[0];
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("collect:result", result);
+      }
+    });
+    playwrightCollector.on("task:risk", (result: PlaywrightResult) => {
+      const mainWindow = BrowserWindow.getAllWindows()[0];
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send("collect:risk_alert", result);
+      }
+    });
+  }
+  return playwrightCollector;
+}
+
+let schedulerEventsWired = false;
+function wireSchedulerEvents(): void {
+  if (schedulerEventsWired) return;
+  schedulerEventsWired = true;
+
+  localScheduler.on("task:auto_disabled", (info) => {
+    const mainWindow = BrowserWindow.getAllWindows()[0];
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("scheduler:task_auto_disabled", info);
+    }
+  });
+
+  localScheduler.on("task:retry_scheduled", (info) => {
+    const mainWindow = BrowserWindow.getAllWindows()[0];
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("scheduler:task_retry_scheduled", info);
+    }
+  });
+
+  localScheduler.on("scheduler:task_executed", (info) => {
+    const mainWindow = BrowserWindow.getAllWindows()[0];
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("scheduler:task_executed", info);
+    }
+  });
 }
 
 export function registerIpcHandlers(): void {
@@ -336,6 +394,7 @@ export function registerIpcHandlers(): void {
   });
 
   ipcMain.handle("scheduler:start", async () => {
+    wireSchedulerEvents();
     await localScheduler.start();
     return localScheduler.getState();
   });
@@ -349,7 +408,7 @@ export function registerIpcHandlers(): void {
     return localScheduler.getState();
   });
 
-  ipcMain.handle("scheduler:add-task", async (_event, task: Omit<ScheduledTask, "id" | "last_run_at" | "next_run_at" | "created_at">) => {
+  ipcMain.handle("scheduler:add-task", async (_event, task: Omit<ScheduledTask, "id" | "last_run_at" | "last_run_status" | "next_run_at" | "retry_count" | "max_retries" | "consecutive_failures" | "created_at">) => {
     return localScheduler.addTask(task);
   });
 
@@ -384,15 +443,40 @@ export function registerIpcHandlers(): void {
         is_active: task.is_active,
         frequency_minutes: task.frequency_minutes,
         last_run_at: task.last_run_at,
+        last_run_status: task.last_run_status,
         next_run_at: task.next_run_at,
+        retry_count: task.retry_count,
+        max_retries: task.max_retries,
+        consecutive_failures: task.consecutive_failures,
         delay_ms: delay,
         progress: task.is_active && nextRun > 0 && lastRun > 0
           ? Math.min(100, Math.round(((now - lastRun) / (nextRun - lastRun)) * 100))
           : 0,
-        status: !task.is_active ? "paused" : delay <= 0 ? "due" : "scheduled",
+        status: !task.is_active ? (task.consecutive_failures >= 5 ? "auto_disabled" : "paused") : task.consecutive_failures > 0 ? "degraded" : delay <= 0 ? "due" : "scheduled",
       };
     });
     return { tasks: timeline, state };
+  });
+
+  ipcMain.handle("scheduler:report-result", async (_event, taskId: string, status: "success" | "failed" | "risk_detected") => {
+    await localScheduler.reportTaskResult(taskId, status);
+    return { reported: true };
+  });
+
+  ipcMain.handle("scheduler:retry-failed", async (_event, taskId: string) => {
+    return localScheduler.retryFailedTask(taskId);
+  });
+
+  ipcMain.handle("scheduler:failed-tasks", async () => {
+    return localScheduler.getFailedTasks();
+  });
+
+  ipcMain.handle("scheduler:stats", async () => {
+    return localScheduler.getStats();
+  });
+
+  ipcMain.handle("scheduler:set-max-retries", async (_event, taskId: string, maxRetries: number) => {
+    return localScheduler.setMaxRetries(taskId, maxRetries);
   });
 
   ipcMain.handle("datamart:list-products", async (_event, platform?: string, limit?: number) => {
@@ -496,30 +580,10 @@ export function registerIpcHandlers(): void {
   });
 
   ipcMain.handle("playwright:start", async (_event, tasks: PlaywrightTask[]) => {
-    if (!playwrightCollector) {
-      playwrightCollector = new PlaywrightCollector();
-      playwrightCollector.on("task:result", (result: PlaywrightResult) => {
-        if (result.status === "success" && result.data) {
-          const normalized = normalizer.normalize(result.data);
-          if (normalized.success && normalized.data) {
-            dataMart.ingest(normalized.data, "local-user");
-          }
-        }
-        const mainWindow = BrowserWindow.getAllWindows()[0];
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send("collect:result", result);
-        }
-      });
-      playwrightCollector.on("task:risk", (result: PlaywrightResult) => {
-        const mainWindow = BrowserWindow.getAllWindows()[0];
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send("collect:risk_alert", result);
-        }
-      });
-    }
-    await playwrightCollector.launch();
-    playwrightCollector.enqueueBatch(tasks);
-    return { queued: tasks.length, activeCount: playwrightCollector.getActiveCount(), queueLength: playwrightCollector.getQueueLength() };
+    const collector = getPlaywrightCollector();
+    await collector.launch();
+    collector.enqueueBatch(tasks);
+    return { queued: tasks.length, activeCount: collector.getActiveCount(), queueLength: collector.getQueueLength() };
   });
 
   ipcMain.handle("playwright:status", async () => {
@@ -629,6 +693,22 @@ export function registerIpcHandlers(): void {
   });
 
   ipcMain.handle("sync:ai-analyze", async (_event, productId: string, analysisType: string) => {
+    const gateKeyMap: Record<string, string> = {
+      basic_analysis: "gate:ai:basic_analysis",
+      trend_score: "gate:ai:trend_score",
+      prediction: "gate:ai:prediction",
+      risk_warning: "gate:ai:risk_warning",
+      report: "gate:ai:report",
+      product_optimization: "gate:ai:trend_score",
+    };
+    const gateKey = gateKeyMap[analysisType];
+    if (gateKey) {
+      const cache = getPermissionCache();
+      const allowed = cache.checkGate(gateKey);
+      if (!allowed) {
+        throw new Error(`permission: 当前套餐不支持「${analysisType}」分析，请升级套餐`);
+      }
+    }
     return await cloudSync.requestAIAnalysis(productId, analysisType);
   });
 
@@ -684,6 +764,51 @@ export function registerIpcHandlers(): void {
   ipcMain.handle("recovery:clear-all", async () => {
     crashRecovery.clearAll();
     return { cleared: true };
+  });
+
+  ipcMain.handle("recovery:stats", async () => {
+    return crashRecovery.getRecoveryStats();
+  });
+
+  ipcMain.handle("recovery:retry-task", async (_event, taskId: string) => {
+    const snapshots = crashRecovery.getAllSnapshots();
+    const task = snapshots.find((s) => s.id === taskId);
+    if (!task) return { success: false, error: "Task not found" };
+
+    crashRecovery.incrementRetry(task.id);
+    crashRecovery.updateSnapshotStatus(task.id, "pending", 0, null);
+
+    try {
+      if (task.taskType === "chromium") {
+        const worker = getWorker();
+        const collectTask: CollectTask = {
+          id: task.id,
+          targetId: task.targetId,
+          targetType: task.targetType as CollectTask["targetType"],
+          targetUrl: task.targetUrl || undefined,
+        };
+        worker.enqueueBatchSharded([collectTask]);
+      } else if (task.taskType === "playwright") {
+        const collector = getPlaywrightCollector();
+        await collector.launch();
+        const pwTask: PlaywrightTask = {
+          id: task.id,
+          targetId: task.targetId,
+          targetType: task.targetType as PlaywrightTask["targetType"],
+          targetUrl: task.targetUrl || "",
+        };
+        collector.enqueue(pwTask);
+      }
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: String(err) };
+    }
+  });
+
+  ipcMain.handle("recovery:discard-task", async (_event, taskId: string) => {
+    crashRecovery.updateSnapshotStatus(taskId, "failed", undefined, "Manually discarded");
+    crashRecovery.removeSnapshot(taskId);
+    return { success: true };
   });
 
   ipcMain.handle("notifications:get", async (_event, limit?: number) => {

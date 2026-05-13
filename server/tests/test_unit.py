@@ -114,9 +114,9 @@ class TestFeatureGates:
         assert is_plan_sufficient("premium", "enterprise") is False
 
     def test_plan_limits(self):
-        assert PLAN_LIMITS["free"]["maxProducts"] == 3
-        assert PLAN_LIMITS["pro"]["maxProducts"] == 50
-        assert PLAN_LIMITS["premium"]["maxProducts"] == -1
+        assert PLAN_LIMITS["free"]["maxProducts"] == 10
+        assert PLAN_LIMITS["pro"]["maxProducts"] == 100
+        assert PLAN_LIMITS["premium"]["maxProducts"] == 500
         assert PLAN_LIMITS["enterprise"]["maxProducts"] == -1
 
 

@@ -63,8 +63,8 @@ export class AppLifecycle {
       dataMart.destroy();
       cloudSync.destroy();
       licenseManager.destroy();
+      crashRecovery.destroy();
 
-      // Flush storage
       try {
         const { getStorage } = require("../storage/sqlite");
         const storage = getStorage();

@@ -11,6 +11,7 @@ from app.core.redis import close_redis
 from app.middleware.rate_limit import RedisRateLimitMiddleware
 from app.middleware.logging import StructuredLoggingMiddleware
 from app.middleware.security_audit import SecurityAuditMiddleware
+from app.middleware.security_headers import SecurityHeadersMiddleware
 from app.middleware.quota import QuotaEnforcementMiddleware
 from app.middleware.prometheus import PrometheusMiddleware, generate_prometheus_output, collect_system_metrics
 from app.middleware.tracing import TracingMiddleware
@@ -22,6 +23,7 @@ from app.task_queue.handlers import register_builtin_handlers
 from app.task_queue.queue import start_worker, stop_worker
 from app.core.graceful_shutdown import graceful_shutdown, setup_signal_handlers
 from app.ws.manager import router as ws_router
+from app.core.seed import seed_feature_gates
 
 settings = get_settings()
 
@@ -39,6 +41,7 @@ _INSECURE_DEFAULTS = {
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()
+    await seed_feature_gates()
     scheduler.start()
     register_builtin_handlers()
     await start_worker()
@@ -65,6 +68,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(QuotaEnforcementMiddleware)
 app.add_middleware(PrometheusMiddleware)
 app.add_middleware(TracingMiddleware)
@@ -73,7 +77,7 @@ app.add_middleware(StructuredLoggingMiddleware)
 app.add_middleware(RedisRateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=settings.CORS_ORIGINS_SAFE,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "X-Request-ID"],

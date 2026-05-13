@@ -183,10 +183,10 @@ def upgrade() -> None:
     )
 
     # ============================================================
-    # M18 — user_membership
+    # M18 — user_memberships
     # ============================================================
     op.create_table(
-        "user_membership",
+        "user_memberships",
         sa.Column("id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")),
         sa.Column("user_id", UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
         sa.Column("plan_id", UUID(as_uuid=True), sa.ForeignKey("membership_plans.id", ondelete="CASCADE"), nullable=False),
@@ -194,8 +194,9 @@ def upgrade() -> None:
         sa.Column("end_time", sa.DateTime(timezone=True), nullable=False),
         sa.Column("status", sa.SmallInteger, nullable=False, server_default=sa.text("1")),
     )
-    op.create_index("idx_user_membership_user_id", "user_membership", ["user_id"])
-    op.create_index("idx_user_membership_plan_id", "user_membership", ["plan_id"])
+    op.create_index("idx_user_memberships_user_id", "user_memberships", ["user_id"])
+    op.create_index("idx_user_memberships_plan_id", "user_memberships", ["plan_id"])
+    op.create_index("idx_user_memberships_status", "user_memberships", ["status"])
 
     # ============================================================
     # M18 — product_metrics
@@ -306,7 +307,7 @@ def downgrade() -> None:
     op.drop_table("tasks")
     op.drop_table("ai_predictions")
     op.drop_table("product_metrics")
-    op.drop_table("user_membership")
+    op.drop_table("user_memberships")
     op.drop_table("membership_plans")
     op.drop_table("aggregation_audit")
     op.drop_table("prompt_templates")

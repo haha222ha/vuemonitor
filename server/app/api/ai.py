@@ -9,13 +9,16 @@ from app.core.database import get_db
 from app.core.exceptions import NotFoundException
 from app.middleware.auth import CurrentUser
 from app.ai.service import AIService
+from app.ai.providers import ANALYSIS_PROMPTS, get_available_providers
 
 router = APIRouter(prefix="/ai", tags=["ai"])
+
+_VALID_ANALYSIS_TYPES = "|".join(ANALYSIS_PROMPTS.keys())
 
 
 class AnalysisRequest(BaseModel):
     product_id: str
-    analysis_type: str = Field(..., pattern="^(basic_analysis|trend_score|prediction|risk_warning|report|product_optimization)$")
+    analysis_type: str = Field(..., description=f"分析类型，可选: {_VALID_ANALYSIS_TYPES}")
     provider: str | None = None
 
 
@@ -26,12 +29,31 @@ class ReportRequest(BaseModel):
     provider: str | None = None
 
 
+@router.get("/status")
+async def ai_status():
+    available = get_available_providers()
+    analysis_types = list(ANALYSIS_PROMPTS.keys())
+    return {
+        "code": 0,
+        "data": {
+            "available_providers": available,
+            "default_provider": available[0] if available else None,
+            "analysis_types": analysis_types,
+            "ai_enabled": len(available) > 0,
+        },
+    }
+
+
 @router.post("/analyze")
 async def analyze_product(
     req: AnalysisRequest,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
+    if req.analysis_type not in ANALYSIS_PROMPTS:
+        from app.core.exceptions import BadRequestException
+        raise BadRequestException(message=f"不支持的分析类型：{req.analysis_type}，可选类型：{', '.join(ANALYSIS_PROMPTS.keys())}")
+
     svc = AIService(db)
     result = await svc.analyze_product(
         user_id=user.id,
@@ -110,26 +132,35 @@ async def list_analyses(
 async def list_reports(
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
 ):
     from app.models.ai import AIReport
 
+    query = select(AIReport).where(AIReport.user_id == user.id)
+    total_result = await db.execute(select(func.count()).select_from(query.subquery()))
+    total = total_result.scalar() or 0
+
     result = await db.execute(
-        select(AIReport).where(AIReport.user_id == user.id).order_by(AIReport.created_at.desc())
+        query.order_by(AIReport.created_at.desc()).offset((page - 1) * page_size).limit(page_size)
     )
     reports = result.scalars().all()
 
     return {
         "code": 0,
-        "data": [
-            {
-                "id": str(r.id),
-                "title": r.title,
-                "report_type": r.report_type,
-                "status": r.status,
-                "created_at": r.created_at.isoformat() if r.created_at else None,
-            }
-            for r in reports
-        ],
+        "data": {
+            "total": total,
+            "items": [
+                {
+                    "id": str(r.id),
+                    "title": r.title,
+                    "report_type": r.report_type,
+                    "status": r.status,
+                    "created_at": r.created_at.isoformat() if r.created_at else None,
+                }
+                for r in reports
+            ],
+        },
     }
 
 
@@ -159,3 +190,43 @@ async def get_report(
             "created_at": report.created_at.isoformat() if report.created_at else None,
         },
     }
+
+
+@router.delete("/reports/{report_id}")
+async def delete_report(
+    report_id: str,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+):
+    from app.models.ai import AIReport
+
+    result = await db.execute(
+        select(AIReport).where(AIReport.id == uuid.UUID(report_id), AIReport.user_id == user.id)
+    )
+    report = result.scalar_one_or_none()
+    if not report:
+        raise NotFoundException(message="报告不存在")
+
+    await db.delete(report)
+    await db.flush()
+    return {"code": 0, "data": {"deleted": True}}
+
+
+@router.delete("/analyses/{analysis_id}")
+async def delete_analysis(
+    analysis_id: str,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+):
+    from app.models.ai import AIAnalysis
+
+    result = await db.execute(
+        select(AIAnalysis).where(AIAnalysis.id == uuid.UUID(analysis_id), AIAnalysis.user_id == user.id)
+    )
+    analysis = result.scalar_one_or_none()
+    if not analysis:
+        raise NotFoundException(message="分析记录不存在")
+
+    await db.delete(analysis)
+    await db.flush()
+    return {"code": 0, "data": {"deleted": True}}

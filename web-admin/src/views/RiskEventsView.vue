@@ -25,7 +25,7 @@ const store = useRiskEventsStore();
 
 onMounted(async () => {
   try {
-    await store.fetchEvents();
+    await store.fetchEvents(1, 20);
   } catch {
     ElMessage.error("获取风控事件失败");
   }

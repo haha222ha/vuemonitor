@@ -1,24 +1,30 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import api from '@/utils/api'
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import api from "../utils/api";
 
-export const useAuditLogsStore = defineStore('auditLogs', () => {
-  const logs = ref([])
-  const total = ref(0)
-  const loading = ref(false)
-  const error = ref<string | null>(null)
+interface AuditLog {
+  id: number;
+  [key: string]: any;
+}
 
-  async function fetchLogs(params = {}) {
-    loading.value = true
-    error.value = null
+export const useAuditLogsStore = defineStore("auditLogs", () => {
+  const logs = ref<AuditLog[]>([]);
+  const total = ref(0);
+  const loading = ref(false);
+  const error = ref<string | null>(null);
+
+  async function fetchLogs(page: number = 1, pageSize: number = 20, filters?: Record<string, any>) {
+    loading.value = true;
+    error.value = null;
     try {
-      const { data } = await api.get('/admin/audit-logs', { params })
-      logs.value = data.items || []
-      total.value = data.total || 0
-    } catch (err) {
-      error.value = err.message || 'Failed to fetch audit logs'
+      const params: Record<string, any> = { page, pageSize, ...filters };
+      const { data } = await api.get("/admin/audit-logs", { params });
+      logs.value = data.items || data || [];
+      total.value = data.total || 0;
+    } catch (err: any) {
+      error.value = err.message || "Failed to fetch audit logs";
     } finally {
-      loading.value = false
+      loading.value = false;
     }
   }
 
@@ -28,5 +34,5 @@ export const useAuditLogsStore = defineStore('auditLogs', () => {
     loading,
     error,
     fetchLogs
-  }
-})
+  };
+});

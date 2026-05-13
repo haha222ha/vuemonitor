@@ -1,16 +1,19 @@
 import { app, BrowserWindow, Tray } from "electron";
 import { initServices, AppLifecycle, WindowManager, TrayManager } from "./services";
 import { localScheduler } from "./collect/local-scheduler";
-import { dataMart } from "./collect/data-mart";
 import { licenseManager } from "./license/license-manager";
 import { cloudSync } from "./sync/cloud-sync";
 import { getCommunication } from "./communication/ws-client";
-import { crashRecovery } from "./recovery/crash-recovery";
+import { crashRecovery, RecoveryPlan } from "./recovery/crash-recovery";
 import { localRuleEvaluator } from "./monitor/local-evaluator";
 import { autoUpdateManager } from "./update/auto-updater";
 import { logger } from "./logger/logger";
 import { offlineMode } from "./services/offline-mode";
 import { performanceMonitor } from "./services/performance-monitor";
+import { ChromiumCollectWorker, CollectTask } from "./collect/chromium-worker";
+import { PlaywrightCollector, PlaywrightTask } from "./collect/playwright-collector";
+import { normalizer } from "./collect/normalizer";
+import { dataMart } from "./collect/data-mart";
 
 // Service layer singletons
 let lifecycle: AppLifecycle;
@@ -55,17 +58,75 @@ async function bootstrap(): Promise<void> {
 
   logger.info("Main", "应用启动完成", { version: app.getVersion() });
 
-  // Crash recovery retry
+  // Enhanced crash recovery with auto-restart
   const recoveryResult = crashRecovery.recoverPendingTasks();
   if (recoveryResult.recovered > 0) {
-    for (const task of recoveryResult.tasks) {
-      if (task.retryCount < task.maxRetries) {
-        crashRecovery.incrementRetry(task.id);
-        logger.info("Main", `Retrying task ${task.id} (${task.targetUrl || task.targetId}), attempt ${task.retryCount + 1}/${task.maxRetries}`);
+    logger.info("Main", "崩溃恢复发现待恢复任务", {
+      recovered: recoveryResult.recovered,
+      discarded: recoveryResult.discarded,
+    });
+
+    const retryablePlans = recoveryResult.plans.filter(
+      (p) => p.strategy === "retry" || p.strategy === "resume_from_checkpoint"
+    );
+
+    for (const plan of retryablePlans) {
+      const task = recoveryResult.tasks.find((t) => t.id === plan.taskId);
+      if (!task) continue;
+
+      crashRecovery.incrementRetry(task.id);
+
+      const retryTask = async () => {
+        try {
+          if (task.taskType === "chromium") {
+            const { getWorker } = require("./ipc/handlers");
+            const worker = getWorker() as ChromiumCollectWorker;
+            const collectTask: CollectTask = {
+              id: task.id,
+              targetId: task.targetId,
+              targetType: task.targetType as CollectTask["targetType"],
+              targetUrl: task.targetUrl || undefined,
+            };
+            worker.enqueueBatchSharded([collectTask]);
+          } else if (task.taskType === "playwright") {
+            const { getPlaywrightCollector } = require("./ipc/handlers");
+            const collector = getPlaywrightCollector() as PlaywrightCollector;
+            const pwTask: PlaywrightTask = {
+              id: task.id,
+              targetId: task.targetId,
+              targetType: task.targetType as PlaywrightTask["targetType"],
+              targetUrl: task.targetUrl || "",
+            };
+            collector.enqueue(pwTask);
+          }
+          logger.info("Main", `自动重启任务 ${task.id}`, {
+            strategy: plan.strategy,
+            type: task.taskType,
+            target: task.targetUrl || task.targetId,
+          });
+        } catch (err) {
+          logger.error("Main", `自动重启任务失败 ${task.id}`, { error: String(err) });
+          crashRecovery.updateSnapshotStatus(task.id, "failed", undefined, `Auto-restart failed: ${String(err)}`);
+        }
+      };
+
+      if (plan.retryDelay > 0) {
+        setTimeout(retryTask, plan.retryDelay);
       } else {
-        crashRecovery.updateSnapshotStatus(task.id, "failed", undefined, "Exceeded max retries after crash");
-        logger.info("Main", `Task ${task.id} exceeded max retries, marking as failed`);
+        retryTask();
       }
+    }
+
+    for (const plan of recoveryResult.plans.filter((p) => p.strategy === "skip")) {
+      crashRecovery.updateSnapshotStatus(plan.taskId, "failed", undefined, plan.reason);
+      logger.info("Main", `跳过不可恢复任务 ${plan.taskId}`, { reason: plan.reason });
+    }
+
+    const manualPlans = recoveryResult.plans.filter((p) => p.strategy === "manual");
+    if (manualPlans.length > 0) {
+      windowManager.sendToRenderer("recovery:manual_required", {
+        tasks: manualPlans.map((p) => ({ taskId: p.taskId, reason: p.reason })),
+      });
     }
   }
 

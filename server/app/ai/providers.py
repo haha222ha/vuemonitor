@@ -1,14 +1,20 @@
+import asyncio
 import json
 import logging
+import time
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 
-from openai import AsyncOpenAI
+from openai import AsyncOpenAI, APIConnectionError, APIStatusError, APITimeoutError
 
 from app.config import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+
+_MAX_RETRIES = 2
+_RETRY_DELAY = 1.0
+_REQUEST_TIMEOUT = 60
 
 
 class AIProvider(ABC):
@@ -16,10 +22,44 @@ class AIProvider(ABC):
     async def analyze(self, prompt: str, system_prompt: str = "") -> dict:
         pass
 
+    async def analyze_with_retry(self, prompt: str, system_prompt: str = "") -> dict:
+        last_error = None
+        for attempt in range(_MAX_RETRIES + 1):
+            try:
+                return await self.analyze(prompt, system_prompt)
+            except APITimeoutError as e:
+                last_error = e
+                logger.warning(f"AI provider timeout (attempt {attempt + 1}/{_MAX_RETRIES + 1})")
+            except APIConnectionError as e:
+                last_error = e
+                logger.warning(f"AI provider connection error (attempt {attempt + 1}/{_MAX_RETRIES + 1})")
+            except APIStatusError as e:
+                if e.status_code == 429:
+                    wait = min(2 ** attempt * 2, 30)
+                    logger.warning(f"AI provider rate limited, waiting {wait}s (attempt {attempt + 1})")
+                    await asyncio.sleep(wait)
+                    last_error = e
+                elif e.status_code >= 500:
+                    last_error = e
+                    logger.warning(f"AI provider server error {e.status_code} (attempt {attempt + 1})")
+                else:
+                    raise
+            except Exception as e:
+                last_error = e
+                logger.warning(f"AI provider error (attempt {attempt + 1}): {e}")
+
+            if attempt < _MAX_RETRIES:
+                await asyncio.sleep(_RETRY_DELAY * (attempt + 1))
+
+        raise last_error or Exception("AI provider failed after retries")
+
 
 class OpenAIProvider(AIProvider):
     def __init__(self):
-        self.client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+        self.client = AsyncOpenAI(
+            api_key=settings.OPENAI_API_KEY,
+            timeout=_REQUEST_TIMEOUT,
+        )
         self.model = settings.AI_DEFAULT_MODEL
 
     async def analyze(self, prompt: str, system_prompt: str = "") -> dict:
@@ -28,6 +68,7 @@ class OpenAIProvider(AIProvider):
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
+        start = time.time()
         try:
             response = await self.client.chat.completions.create(
                 model=self.model,
@@ -47,7 +88,12 @@ class OpenAIProvider(AIProvider):
             except json.JSONDecodeError:
                 parsed = {"raw_content": content}
 
+            elapsed = time.time() - start
+            logger.info(f"OpenAI analysis completed in {elapsed:.2f}s, tokens: {usage}")
+
             return {"result": parsed, "usage": usage, "model": self.model}
+        except (APITimeoutError, APIConnectionError, APIStatusError):
+            raise
         except Exception as e:
             logger.error(f"OpenAI API error: {e}")
             raise
@@ -58,6 +104,7 @@ class DeepSeekProvider(AIProvider):
         self.client = AsyncOpenAI(
             api_key=settings.DEEPSEEK_API_KEY,
             base_url="https://www.packyapi.com/v1",
+            timeout=_REQUEST_TIMEOUT,
         )
         self.model = settings.DEEPSEEK_MODEL or "deepseek-v4-flash"
 
@@ -67,6 +114,7 @@ class DeepSeekProvider(AIProvider):
             messages.append({"role": "system", "content": system_prompt})
         messages.append({"role": "user", "content": prompt})
 
+        start = time.time()
         try:
             response = await self.client.chat.completions.create(
                 model=self.model,
@@ -86,7 +134,12 @@ class DeepSeekProvider(AIProvider):
             except json.JSONDecodeError:
                 parsed = {"raw_content": content}
 
+            elapsed = time.time() - start
+            logger.info(f"DeepSeek analysis completed in {elapsed:.2f}s, tokens: {usage}")
+
             return {"result": parsed, "usage": usage, "model": self.model}
+        except (APITimeoutError, APIConnectionError, APIStatusError):
+            raise
         except Exception as e:
             logger.error(f"DeepSeek API error: {e}")
             raise
@@ -97,6 +150,15 @@ def get_provider(provider_name: str | None = None) -> AIProvider:
     if name == "deepseek":
         return DeepSeekProvider()
     return OpenAIProvider()
+
+
+def get_available_providers() -> list[str]:
+    providers = []
+    if settings.DEEPSEEK_API_KEY:
+        providers.append("deepseek")
+    if settings.OPENAI_API_KEY:
+        providers.append("openai")
+    return providers
 
 
 ANALYSIS_PROMPTS = {
@@ -115,6 +177,14 @@ ANALYSIS_PROMPTS = {
     "risk_warning": {
         "system": "你是小红书电商风险预警专家。你熟悉小红书商品合规要求、平台审核标准和常见经营风险。请根据商品数据，识别潜在风险。",
         "template": "请识别以下小红书商品的风险：\n{data}\n\n请以JSON格式返回：\n- risk_level：风险等级（high/medium/low）\n- risk_types：风险类型列表（合规风险/售后风险/竞争风险/库存风险/价格风险）\n- risk_details：风险详情描述\n- compliance_score：合规评分（0-100）\n- mitigation_suggestions：风险缓解建议列表\n- market_competition：市场竞争程度评估",
+    },
+    "competitor_analysis": {
+        "system": "你是小红书竞品分析专家。你擅长横向对比同类商品的关键指标，识别竞争优劣势，为商家提供差异化竞争策略。请根据商品数据，输出竞品对比分析。",
+        "template": "请对比分析以下小红书竞品数据：\n{data}\n\n请以JSON格式返回：\n- comparison_summary：对比摘要（100字以内）\n- price_ranking：价格排名（从低到高，返回商品名和价格列表）\n- sales_ranking：销量排名（从高到低，返回商品名和销量列表）\n- rating_ranking：评分排名（从高到低，返回商品名和评分列表）\n- competitive_advantages：各商品竞争优势列表\n- competitive_disadvantages：各商品竞争劣势列表\n- market_position_map：市场定位图描述（价格vs销量四象限）\n- differentiation_suggestions：差异化建议列表\n- market_gap：市场空白点识别",
+    },
+    "product_selection": {
+        "system": "你是小红书选品建议专家。你深谙小红书平台各品类的市场容量、竞争强度和增长潜力。请根据商品数据和市场趋势，给出选品方向建议。",
+        "template": "请根据以下小红书商品数据，给出选品方向建议：\n{data}\n\n请以JSON格式返回：\n- category_score：品类评分（0-100）\n- market_size：市场规模评估（large/medium/small）\n- competition_level：竞争程度（high/medium/low）\n- growth_potential：增长潜力（high/medium/low）\n- entry_barrier：进入壁垒（high/medium/low）\n- recommended_categories：推荐品类方向列表（每个包含name, reason, confidence）\n- avoid_categories：建议回避品类列表（每个包含name, reason）\n- timing_assessment：时机评估（good/neutral/poor）\n- action_plan：选品行动计划（3-5步具体行动）",
     },
     "report": {
         "system": "你是小红书选品分析报告撰写专家。你擅长从商品数据中提炼选品洞察，为电商运营者提供可执行的选品建议。请根据商品数据，生成结构化选品分析报告。",

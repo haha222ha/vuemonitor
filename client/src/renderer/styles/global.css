@@ -1,0 +1,119 @@
+@import './variables.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #app {
+  height: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-base);
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-tertiary);
+}
+
+.el-menu {
+  border-right: none !important;
+}
+
+.el-dialog {
+  border-radius: var(--radius-xl) !important;
+}
+
+.el-dialog__header {
+  padding: 20px 24px !important;
+  border-bottom: 1px solid var(--color-border-light);
+  margin-right: 0 !important;
+}
+
+.el-dialog__title {
+  font-size: var(--text-lg) !important;
+  font-weight: 600 !important;
+  color: var(--color-text-primary) !important;
+}
+
+.el-dialog__body {
+  padding: 24px !important;
+}
+
+.el-dialog__footer {
+  padding: 16px 24px !important;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.el-table {
+  --el-table-border-color: var(--color-border-light);
+  --el-table-header-bg-color: var(--color-bg-page);
+}
+
+.el-table th.el-table__cell {
+  font-weight: 600 !important;
+  color: var(--color-text-secondary) !important;
+  font-size: var(--text-sm) !important;
+}
+
+.el-button--primary {
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.el-button--primary:hover {
+  background: var(--color-primary-light) !important;
+  border-color: var(--color-primary-light) !important;
+}
+
+.el-tag {
+  border-radius: var(--radius-sm) !important;
+}
+
+.el-input__wrapper {
+  border-radius: var(--radius-base) !important;
+}
+
+.el-card {
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--color-border-light) !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

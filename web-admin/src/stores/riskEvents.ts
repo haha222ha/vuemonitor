@@ -39,7 +39,7 @@ export const useRiskEventsStore = defineStore("riskEvents", () => {
     } catch (error) {
       // Error handling silent; views can handle UI feedback
     }
-  });
+  }
 
   return { events, total, loading, fetchEvents, resolveEvent };
 });

@@ -19,10 +19,14 @@
           <el-icon><Upload /></el-icon>
           <span>{{ t('nav.monitor') }}</span>
         </el-menu-item>
-        <el-menu-item index="/dashboard/ai">
-          <el-icon><MagicStick /></el-icon>
-          <span>{{ t('nav.ai') }}</span>
-        </el-menu-item>
+        <el-sub-menu index="/dashboard/ai-group">
+          <template #title>
+            <el-icon><MagicStick /></el-icon>
+            <span>{{ t('nav.ai') }}</span>
+          </template>
+          <el-menu-item index="/dashboard/ai">AI分析</el-menu-item>
+          <el-menu-item index="/dashboard/ai/reports">分析报告</el-menu-item>
+        </el-sub-menu>
         <el-menu-item index="/dashboard/team">
           <el-icon><User /></el-icon>
           <span>{{ t('nav.team') }}</span>
@@ -35,6 +39,10 @@
         <el-menu-item index="/dashboard/settings">
           <el-icon><Setting /></el-icon>
           <span>{{ t('nav.settings') }}</span>
+        </el-menu-item>
+        <el-menu-item v-if="isAdmin" index="/dashboard/admin/monitor">
+          <el-icon><DataAnalysis /></el-icon>
+          <span>系统监控</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -102,7 +110,7 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { useWebSocket } from "../composables/useWebSocket";
-import { Monitor, View, Upload, MagicStick, Setting, Bell, User } from "@element-plus/icons-vue";
+import { Monitor, View, Upload, MagicStick, Setting, Bell, User, DataAnalysis } from "@element-plus/icons-vue";
 import api from "../utils/api";
 import { useI18n } from "../i18n";
 
@@ -130,6 +138,7 @@ const pageTitle = computed(() => {
     "/dashboard/team": "团队协作",
     "/dashboard/notifications": "通知中心",
     "/dashboard/settings": "设置",
+    "/dashboard/admin/monitor": "系统监控",
   };
   return map[route.path] || "Dashboard";
 });
@@ -138,6 +147,8 @@ const planTagType = computed(() => {
   const map: Record<string, string> = { pro: "primary", premium: "warning", enterprise: "danger" };
   return (map[auth.userPlan] || "info") as any;
 });
+
+const isAdmin = computed(() => auth.user?.role === "admin");
 
 function handleCommand(cmd: string) {
   if (cmd === "logout") {

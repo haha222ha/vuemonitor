@@ -1,9 +1,6 @@
 <template>
   <div class="settings-page">
-    <div class="settings-header">
-      <h1 class="page-title">设置</h1>
-      <p class="page-subtitle">管理您的账户、应用和系统配置</p>
-    </div>
+    <PageHeader title="设置" subtitle="管理您的账户、应用和系统配置" />
 
     <div class="settings-container">
       <aside class="settings-sidebar">
@@ -308,6 +305,77 @@
           </div>
         </div>
 
+        <div v-show="activeSection === 'privacy'" class="settings-section">
+          <h2 class="section-title">隐私管理</h2>
+          <div class="settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <h3 class="setting-title">数据收集偏好</h3>
+                <p class="setting-desc">控制您的数据如何被收集和使用</p>
+              </div>
+            </div>
+            <div class="privacy-toggles">
+              <div class="privacy-toggle-item">
+                <div class="privacy-toggle-info">
+                  <span class="privacy-toggle-label">使用数据收集</span>
+                  <span class="privacy-toggle-desc">帮助我们改进产品功能</span>
+                </div>
+                <el-switch v-model="clientPrivacy.dataCollection" />
+              </div>
+              <div class="privacy-toggle-item">
+                <div class="privacy-toggle-info">
+                  <span class="privacy-toggle-label">匿名聚合贡献</span>
+                  <span class="privacy-toggle-desc">您的数据将匿名化后用于群体洞察</span>
+                </div>
+                <el-switch v-model="clientPrivacy.anonymousAggregation" />
+              </div>
+              <div class="privacy-toggle-item">
+                <div class="privacy-toggle-info">
+                  <span class="privacy-toggle-label">AI分析数据使用</span>
+                  <span class="privacy-toggle-desc">允许AI分析使用您的监控数据</span>
+                </div>
+                <el-switch v-model="clientPrivacy.aiDataUsage" />
+              </div>
+              <div class="privacy-toggle-item">
+                <div class="privacy-toggle-info">
+                  <span class="privacy-toggle-label">错误报告自动发送</span>
+                  <span class="privacy-toggle-desc">自动发送崩溃和错误信息帮助排查问题</span>
+                </div>
+                <el-switch v-model="clientPrivacy.autoErrorReport" />
+              </div>
+            </div>
+            <div class="setting-divider"></div>
+            <div class="setting-item">
+              <div class="setting-info">
+                <h3 class="setting-title">云端数据管理 (GDPR)</h3>
+                <p class="setting-desc">管理您在云端服务器上的个人数据</p>
+              </div>
+            </div>
+            <div class="privacy-cloud-actions">
+              <el-button size="small" @click="handleCloudDataSummary" :loading="cloudDataLoading">查看数据摘要</el-button>
+              <el-button size="small" @click="handleCloudDataExport" :loading="cloudExportLoading">导出云端数据</el-button>
+              <el-button size="small" @click="handleShowPrivacyPolicy">隐私政策</el-button>
+            </div>
+            <div v-if="cloudDataSummary" class="cloud-data-summary">
+              <div class="cloud-data-grid">
+                <div v-for="(count, table) in cloudDataSummary.tables" :key="table" class="cloud-data-item">
+                  <span class="cloud-data-label">{{ cloudTableLabel(table as string) }}</span>
+                  <span class="cloud-data-value">{{ count < 0 ? '?' : count }}</span>
+                </div>
+              </div>
+              <div class="cloud-data-total">总记录数: <strong>{{ cloudDataSummary.total_records }}</strong></div>
+            </div>
+            <div class="setting-divider"></div>
+            <div class="privacy-danger-zone">
+              <h4 class="danger-zone-title">危险区域</h4>
+              <p class="danger-zone-desc">删除数据操作不可逆。根据 GDPR 被遗忘权，您可以请求删除所有云端个人数据。删除后账户将被匿名化且无法恢复。</p>
+              <el-button type="danger" size="small" @click="handleCloudDataDeletion" :loading="cloudDeleteLoading">
+                请求删除所有云端数据
+              </el-button>
+            </div>
+          </div>
+        </div>
+
         <div v-show="activeSection === 'logs'" class="settings-section">
           <h2 class="section-title">日志管理</h2>
           <div class="settings-card">
@@ -333,11 +401,53 @@
                 <span class="stat-label">会话ID</span>
                 <code class="session-id">{{ logStats.sessionId || '-' }}</code>
               </div>
+              <div class="stat-item">
+                <span class="stat-label">缓冲区</span>
+                <span class="stat-value">{{ logStats.bufferSize || 0 }} 条</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">上传队列</span>
+                <span class="stat-value">{{ logStats.uploadQueueSize || 0 }} 条</span>
+              </div>
+            </div>
+            <div class="log-level-stats" v-if="logLevelCounts.total > 0">
+              <h4 class="log-level-stats__title">日志级别分布</h4>
+              <div class="log-level-stats__bars">
+                <div class="log-level-stats__item">
+                  <span class="log-level-stats__label">Error</span>
+                  <div class="log-level-stats__track">
+                    <div class="log-level-stats__fill log-level-stats__fill--error" :style="{ width: logLevelBarWidth(logLevelCounts.error) }" />
+                  </div>
+                  <span class="log-level-stats__count">{{ logLevelCounts.error }}</span>
+                </div>
+                <div class="log-level-stats__item">
+                  <span class="log-level-stats__label">Warn</span>
+                  <div class="log-level-stats__track">
+                    <div class="log-level-stats__fill log-level-stats__fill--warn" :style="{ width: logLevelBarWidth(logLevelCounts.warn) }" />
+                  </div>
+                  <span class="log-level-stats__count">{{ logLevelCounts.warn }}</span>
+                </div>
+                <div class="log-level-stats__item">
+                  <span class="log-level-stats__label">Info</span>
+                  <div class="log-level-stats__track">
+                    <div class="log-level-stats__fill log-level-stats__fill--info" :style="{ width: logLevelBarWidth(logLevelCounts.info) }" />
+                  </div>
+                  <span class="log-level-stats__count">{{ logLevelCounts.info }}</span>
+                </div>
+                <div class="log-level-stats__item">
+                  <span class="log-level-stats__label">Debug</span>
+                  <div class="log-level-stats__track">
+                    <div class="log-level-stats__fill log-level-stats__fill--debug" :style="{ width: logLevelBarWidth(logLevelCounts.debug) }" />
+                  </div>
+                  <span class="log-level-stats__count">{{ logLevelCounts.debug }}</span>
+                </div>
+              </div>
             </div>
             <div class="log-actions">
               <el-button @click="handleViewLogs">查看日志</el-button>
               <el-button @click="handleExportLogs('json')">导出JSON</el-button>
               <el-button @click="handleExportLogs('text')">导出文本</el-button>
+              <el-button @click="handleUploadLogs" :loading="logUploading">上传日志</el-button>
               <el-button type="danger" @click="handleClearLogs">清除日志</el-button>
             </div>
           </div>
@@ -402,9 +512,11 @@
         <el-select v-model="logFilterModule" placeholder="模块筛选" clearable class="modern-select" @change="loadRecentLogs">
           <el-option v-for="m in logModules" :key="m" :value="m" :label="m" />
         </el-select>
+        <el-input v-model="logSearchQuery" placeholder="搜索日志内容..." clearable class="log-search-input" @input="filterLogEntries" />
         <el-button @click="loadRecentLogs">刷新</el-button>
+        <el-switch v-model="logAutoRefresh" active-text="实时" @change="toggleLogAutoRefresh" />
       </div>
-      <el-table :data="logEntries" class="modern-table log-table" stripe>
+      <el-table :data="filteredLogEntries" class="modern-table log-table" stripe max-height="500">
         <el-table-column label="时间" width="170" prop="timestamp">
           <template #default="{ row }">
             {{ row.timestamp.replace('T', ' ').substring(0, 19) }}
@@ -433,13 +545,15 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted } from "vue";
+import PageHeader from "../components/PageHeader.vue";
 import { useAuthStore } from "../stores/auth";
 import { useLicenseStore } from "../stores/license";
+import { usePermissionStore } from "../stores/permission";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { shortcutManager, type ShortcutBinding } from "../composables/shortcuts";
+import { shortcutManager, type ShortcutBinding } from "../utils/shortcuts";
 import { 
   User, Bell, Refresh, Cpu, Download, Folder, Document, Connection, 
-  Key, Loading 
+  Key, Loading, Lock
 } from "@element-plus/icons-vue";
 
 const authStore = useAuthStore();
@@ -454,6 +568,7 @@ const sections = [
   { key: "collection", label: "采集配置", icon: Cpu },
   { key: "updates", label: "自动更新", icon: Download },
   { key: "data", label: "数据管理", icon: Folder },
+  { key: "privacy", label: "隐私管理", icon: Lock },
   { key: "logs", label: "日志管理", icon: Document },
   { key: "shortcuts", label: "快捷键", icon: Connection },
 ];
@@ -528,7 +643,183 @@ const logDialogVisible = ref(false);
 const logEntries = ref<Array<Record<string, unknown>>>([]);
 const logFilterLevel = ref("");
 const logFilterModule = ref("");
+const logSearchQuery = ref("");
+const logAutoRefresh = ref(false);
+const logUploading = ref(false);
+let logAutoRefreshTimer: ReturnType<typeof setInterval> | null = null;
 const logModules = ref(["Main", "ChromiumWorker", "CloudSync", "DataMart", "FeatureEngine", "LocalEvaluator", "PlaywrightCollector", "CrashRecovery", "LicenseManager"]);
+
+const logLevelCounts = reactive({ debug: 0, info: 0, warn: 0, error: 0, total: 0 });
+
+const clientPrivacy = reactive({
+  dataCollection: true,
+  anonymousAggregation: true,
+  aiDataUsage: true,
+  autoErrorReport: false,
+});
+
+const cloudDataSummary = ref<any>(null);
+const cloudDataLoading = ref(false);
+const cloudExportLoading = ref(false);
+const cloudDeleteLoading = ref(false);
+
+const CLOUD_TABLE_LABELS: Record<string, string> = {
+  products: "商品数据",
+  product_features: "商品特征",
+  monitor_rules: "监控规则",
+  ai_analyses: "AI分析",
+  ai_reports: "AI报告",
+  notifications: "通知",
+  sync_records: "同步记录",
+  alert_rules: "告警规则",
+  alert_events: "告警事件",
+  team_members: "团队成员",
+  scheduled_tasks: "定时任务",
+};
+
+function cloudTableLabel(table: string): string {
+  return CLOUD_TABLE_LABELS[table] || table;
+}
+
+async function handleCloudDataSummary() {
+  cloudDataLoading.value = true;
+  try {
+    const api = (await import("../utils/api")).default;
+    const { data } = await api.get("/gdpr/data-summary");
+    cloudDataSummary.value = data?.data || data;
+  } catch {
+    ElMessage.error("获取数据摘要失败");
+  } finally {
+    cloudDataLoading.value = false;
+  }
+}
+
+async function handleCloudDataExport() {
+  cloudExportLoading.value = true;
+  try {
+    const api = (await import("../utils/api")).default;
+    const { data } = await api.post("/gdpr/export", null, { params: { format: "json" } });
+    const exportData = data?.data || data;
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `vuemonitor_cloud_export_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    ElMessage.success("云端数据导出成功");
+  } catch {
+    ElMessage.error("云端数据导出失败");
+  } finally {
+    cloudExportLoading.value = false;
+  }
+}
+
+async function handleShowPrivacyPolicy() {
+  try {
+    const api = (await import("../utils/api")).default;
+    const { data } = await api.get("/gdpr/privacy-policy");
+    const policy = data?.data || data;
+    ElMessageBox.alert(
+      `<div style="max-height: 400px; overflow-y: auto; text-align: left; font-size: 13px; line-height: 1.6;">
+        <p><strong>数据控制者:</strong> ${policy.policy?.data_controller || "-"}</p>
+        <p><strong>生效日期:</strong> ${policy.effective_date || "-"}</p>
+        <p><strong>收集的数据类型:</strong></p>
+        <ul>${(policy.policy?.data_types_collected || []).map((i: string) => `<li>${i}</li>`).join("")}</ul>
+        <p><strong>数据处理目的:</strong></p>
+        <ul>${(policy.policy?.data_purposes || []).map((i: string) => `<li>${i}</li>`).join("")}</ul>
+        <p><strong>您的权利:</strong></p>
+        <ul>${(policy.policy?.user_rights || []).map((i: string) => `<li>${i}</li>`).join("")}</ul>
+        <p><strong>数据保留:</strong> ${policy.policy?.data_retention || "-"}</p>
+        <p><strong>联系方式:</strong> ${policy.policy?.contact || "-"}</p>
+      </div>`,
+      "隐私政策",
+      { dangerouslyUseHTMLString: true, confirmButtonText: "我已了解" }
+    );
+  } catch {
+    ElMessage.error("获取隐私政策失败");
+  }
+}
+
+async function handleCloudDataDeletion() {
+  try {
+    await ElMessageBox.confirm(
+      "此操作将永久删除您的所有云端个人数据，账户将被匿名化且无法恢复。请确认您了解此操作的后果。",
+      "确认删除所有云端数据",
+      { confirmButtonText: "确认删除", cancelButtonText: "取消", type: "warning" }
+    );
+    const authStore = useAuthStore();
+    const email = authStore.user?.email;
+    if (!email) {
+      ElMessage.error("无法获取邮箱信息");
+      return;
+    }
+    await ElMessageBox.prompt("请输入您的邮箱地址以确认删除操作", "邮箱确认", {
+      confirmButtonText: "确认",
+      cancelButtonText: "取消",
+      inputPattern: new RegExp(`^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),
+      inputErrorMessage: "邮箱地址不匹配",
+    });
+    cloudDeleteLoading.value = true;
+    const api = (await import("../utils/api")).default;
+    const { data } = await api.post("/gdpr/deletion-request", null, {
+      params: { confirm_email: email },
+    });
+    const result = data?.data || data;
+    ElMessage.success(`数据删除成功，共删除 ${result.total_deleted} 条记录`);
+    authStore.logout();
+  } catch (e: any) {
+    if (e !== "cancel" && e?.message !== "cancel") {
+      ElMessage.error("数据删除失败");
+    }
+  } finally {
+    cloudDeleteLoading.value = false;
+  }
+}
+
+const filteredLogEntries = computed(() => {
+  if (!logSearchQuery.value) return logEntries.value;
+  const q = logSearchQuery.value.toLowerCase();
+  return logEntries.value.filter((e: any) => {
+    const msg = (e.message || "").toLowerCase();
+    const mod = (e.module || "").toLowerCase();
+    const err = (e.error || "").toLowerCase();
+    return msg.includes(q) || mod.includes(q) || err.includes(q);
+  });
+});
+
+function logLevelBarWidth(count: number): string {
+  if (logLevelCounts.total === 0) return "0%";
+  return `${Math.min((count / logLevelCounts.total) * 100, 100)}%`;
+}
+
+function filterLogEntries() {}
+
+function toggleLogAutoRefresh(on: boolean) {
+  if (logAutoRefreshTimer) {
+    clearInterval(logAutoRefreshTimer);
+    logAutoRefreshTimer = null;
+  }
+  if (on) {
+    logAutoRefreshTimer = setInterval(loadRecentLogs, 3000);
+  }
+}
+
+async function handleUploadLogs() {
+  logUploading.value = true;
+  try {
+    const result = await window.electronAPI.invoke("log:upload") as { success: boolean; uploaded: number };
+    if (result.success) {
+      ElMessage.success(`已上传 ${result.uploaded} 条日志`);
+    } else {
+      ElMessage.warning("日志上传失败，请检查上传端点配置");
+    }
+  } catch {
+    ElMessage.error("日志上传失败");
+  } finally {
+    logUploading.value = false;
+  }
+}
 
 let statusTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -587,6 +878,9 @@ onMounted(async () => {
 onUnmounted(() => {
   if (statusTimer) {
     clearInterval(statusTimer);
+  }
+  if (logAutoRefreshTimer) {
+    clearInterval(logAutoRefreshTimer);
   }
 });
 
@@ -862,6 +1156,18 @@ async function loadRecentLogs() {
   try {
     const result = await window.electronAPI.invoke("log:get-recent", 200, logFilterLevel.value || undefined, logFilterModule.value || undefined) as Array<Record<string, unknown>>;
     logEntries.value = (result || []).reverse();
+    logLevelCounts.debug = 0;
+    logLevelCounts.info = 0;
+    logLevelCounts.warn = 0;
+    logLevelCounts.error = 0;
+    logLevelCounts.total = logEntries.value.length;
+    for (const e of logEntries.value) {
+      const lvl = (e as any).level as string;
+      if (lvl === "debug") logLevelCounts.debug++;
+      else if (lvl === "info") logLevelCounts.info++;
+      else if (lvl === "warn") logLevelCounts.warn++;
+      else if (lvl === "error" || lvl === "fatal") logLevelCounts.error++;
+    }
   } catch {
     logEntries.value = [];
   }
@@ -901,44 +1207,24 @@ async function handleClearLogs() {
 
 <style scoped>
 .settings-page {
-  padding: 24px;
-  background: #f5f7fa;
-  min-height: 100vh;
-}
-
-.settings-header {
-  margin-bottom: 24px;
-}
-
-.page-title {
-  margin: 0 0 8px;
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a2e;
-  letter-spacing: -0.5px;
-}
-
-.page-subtitle {
-  margin: 0;
-  font-size: 14px;
-  color: #6b7280;
+  padding: 0;
 }
 
 .settings-container {
   display: flex;
-  gap: 24px;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f3f4f6;
+  gap: 0;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border-light);
   overflow: hidden;
   min-height: calc(100vh - 140px);
 }
 
 .settings-sidebar {
   width: 220px;
-  background: #f9fafb;
-  border-right: 1px solid #f3f4f6;
+  background: var(--color-bg-page);
+  border-right: 1px solid var(--color-border-light);
   padding: 16px 0;
   flex-shrink: 0;
 }
@@ -946,7 +1232,7 @@ async function handleClearLogs() {
 .settings-nav {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .nav-item {
@@ -956,20 +1242,21 @@ async function handleClearLogs() {
   padding: 10px 16px;
   cursor: pointer;
   transition: all 0.2s;
-  color: #6b7280;
-  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  border-left: 3px solid transparent;
 }
 
 .nav-item:hover {
-  background: #f3f4f6;
-  color: #374151;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
 }
 
 .nav-item.active {
-  background: #fff;
-  color: #6366f1;
-  font-weight: 500;
-  border-right: 3px solid #6366f1;
+  background: var(--color-bg-card);
+  color: var(--color-primary);
+  font-weight: 600;
+  border-left-color: var(--color-primary);
 }
 
 .nav-icon {
@@ -992,15 +1279,15 @@ async function handleClearLogs() {
 
 .section-title {
   margin: 0 0 16px;
-  font-size: 20px;
+  font-size: var(--text-xl);
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--color-text-primary);
 }
 
 .settings-card {
-  background: #fff;
-  border: 1px solid #f3f4f6;
-  border-radius: 12px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
   padding: 20px;
 }
 
@@ -1017,7 +1304,7 @@ async function handleClearLogs() {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: var(--gradient-hero);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1040,19 +1327,19 @@ async function handleClearLogs() {
 }
 
 .detail-label {
-  font-size: 14px;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   min-width: 80px;
 }
 
 .detail-value {
-  font-size: 14px;
-  color: #1a1a2e;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
 }
 
 .plan-tag {
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .license-info {
@@ -1072,33 +1359,33 @@ async function handleClearLogs() {
 }
 
 .license-label {
-  font-size: 12px;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
 }
 
 .license-value {
-  font-size: 14px;
-  color: #1a1a2e;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
 }
 
 .device-id {
   font-family: monospace;
-  font-size: 12px;
-  background: #f9fafb;
+  font-size: var(--text-xs);
+  background: var(--color-bg-page);
   padding: 4px 8px;
-  border-radius: 6px;
-  color: #374151;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
 }
 
 .license-empty {
   text-align: center;
   padding: 32px 0;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .empty-icon {
   font-size: 48px;
-  color: #d1d5db;
+  color: var(--color-text-tertiary);
   margin-bottom: 12px;
 }
 
@@ -1106,7 +1393,7 @@ async function handleClearLogs() {
   display: flex;
   justify-content: flex-end;
   padding-top: 16px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--color-border-light);
 }
 
 .setting-item {
@@ -1122,20 +1409,20 @@ async function handleClearLogs() {
 
 .setting-title {
   margin: 0 0 4px;
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
-  color: #1a1a2e;
+  color: var(--color-text-primary);
 }
 
 .setting-desc {
   margin: 0;
-  font-size: 13px;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
 }
 
 .setting-divider {
   height: 1px;
-  background: #f3f4f6;
+  background: var(--color-border-light);
 }
 
 .quiet-hours-config {
@@ -1168,8 +1455,8 @@ async function handleClearLogs() {
   gap: 12px;
   margin-bottom: 20px;
   padding: 16px;
-  background: #f9fafb;
-  border-radius: 10px;
+  background: var(--color-bg-page);
+  border-radius: var(--radius-lg);
 }
 
 .stat-item {
@@ -1179,13 +1466,13 @@ async function handleClearLogs() {
 }
 
 .stat-label {
-  font-size: 12px;
-  color: #6b7280;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
 }
 
 .stat-value {
-  font-size: 14px;
-  color: #1a1a2e;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
 }
 
 .server-config {
@@ -1196,16 +1483,16 @@ async function handleClearLogs() {
 
 .modern-input {
   flex: 1;
-  border-radius: 10px;
+  border-radius: var(--radius-base);
 }
 
 .modern-select {
-  border-radius: 10px;
+  border-radius: var(--radius-base);
 }
 
 .auto-sync-config {
   padding-top: 16px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--color-border-light);
 }
 
 .sync-frequency {
@@ -1216,12 +1503,12 @@ async function handleClearLogs() {
 }
 
 .frequency-label {
-  font-size: 14px;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .modern-input-number {
-  border-radius: 10px;
+  border-radius: var(--radius-base);
 }
 
 .conflict-card {
@@ -1242,7 +1529,7 @@ async function handleClearLogs() {
   align-items: center;
   padding: 12px;
   background: #fef2f2;
-  border-radius: 8px;
+  border-radius: var(--radius-base);
 }
 
 .conflict-actions {
@@ -1256,7 +1543,7 @@ async function handleClearLogs() {
   gap: 8px;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--color-border-light);
 }
 
 .update-actions {
@@ -1265,17 +1552,17 @@ async function handleClearLogs() {
   gap: 12px;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--color-border-light);
 }
 
 .update-status {
-  font-size: 14px;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .update-error {
-  font-size: 13px;
-  color: #ef4444;
+  font-size: var(--text-xs);
+  color: var(--color-danger);
 }
 
 .cleanup-controls {
@@ -1291,26 +1578,87 @@ async function handleClearLogs() {
 }
 
 .storage-size {
-  font-size: 16px;
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--color-text-primary);
 }
 
 .log-stats {
   display: flex;
   gap: 24px;
   padding: 16px;
-  background: #f9fafb;
-  border-radius: 10px;
+  background: var(--color-bg-page);
+  border-radius: var(--radius-lg);
   margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.log-level-stats {
+  padding: 16px;
+  background: var(--color-bg-page);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+}
+
+.log-level-stats__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 12px;
+}
+
+.log-level-stats__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.log-level-stats__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.log-level-stats__label {
+  width: 44px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.log-level-stats__track {
+  flex: 1;
+  height: 6px;
+  background: var(--color-bg-card);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.log-level-stats__fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.log-level-stats__fill--error { background: var(--color-danger); }
+.log-level-stats__fill--warn { background: var(--color-warning); }
+.log-level-stats__fill--info { background: var(--color-success); }
+.log-level-stats__fill--debug { background: var(--color-info); }
+
+.log-level-stats__count {
+  width: 32px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-align: right;
 }
 
 .session-id {
   font-family: monospace;
-  font-size: 12px;
-  background: #fff;
+  font-size: var(--text-xs);
+  background: var(--color-bg-card);
   padding: 4px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .log-actions {
@@ -1324,10 +1672,10 @@ async function handleClearLogs() {
   grid-template-columns: 160px 1fr 80px 100px;
   gap: 16px;
   padding: 12px 0;
-  border-bottom: 1px solid #f3f4f6;
-  font-size: 13px;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: var(--text-xs);
   font-weight: 500;
-  color: #6b7280;
+  color: var(--color-text-secondary);
 }
 
 .shortcuts-list {
@@ -1341,7 +1689,7 @@ async function handleClearLogs() {
   gap: 16px;
   align-items: center;
   padding: 12px 0;
-  border-bottom: 1px solid #f9fafb;
+  border-bottom: 1px solid var(--color-border-light);
 }
 
 .shortcut-item:last-child {
@@ -1358,8 +1706,8 @@ async function handleClearLogs() {
 }
 
 .shortcut-label {
-  font-size: 14px;
-  color: #1a1a2e;
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
 }
 
 .shortcut-actions {
@@ -1371,19 +1719,19 @@ async function handleClearLogs() {
   display: flex;
   justify-content: flex-end;
   padding-top: 16px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--color-border-light);
 }
 
 .modern-dialog :deep(.el-dialog__header) {
   padding: 20px 24px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border-light);
   margin-right: 0;
 }
 
 .modern-dialog :deep(.el-dialog__title) {
-  font-size: 18px;
+  font-size: var(--text-lg);
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--color-text-primary);
 }
 
 .modern-dialog :deep(.el-dialog__body) {
@@ -1392,26 +1740,136 @@ async function handleClearLogs() {
 
 .modern-dialog :deep(.el-dialog__footer) {
   padding: 16px 24px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--color-border-light);
 }
 
 .log-filters {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.log-search-input {
+  width: 200px;
+}
+
+.privacy-toggles {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.privacy-toggle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--color-bg-page);
+  border-radius: var(--radius-base);
+}
+
+.privacy-toggle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.privacy-toggle-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.privacy-toggle-desc {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.privacy-cloud-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+}
+
+.cloud-data-summary {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--color-bg-page);
+  border-radius: var(--radius-lg);
+}
+
+.cloud-data-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.cloud-data-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-sm);
+}
+
+.cloud-data-label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.cloud-data-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.cloud-data-total {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.cloud-data-total strong {
+  color: var(--color-text-primary);
+}
+
+.privacy-danger-zone {
+  border: 1px solid var(--color-danger-light);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  background: rgba(245, 108, 108, 0.03);
+}
+
+.danger-zone-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-danger);
+  margin: 0 0 8px;
+}
+
+.danger-zone-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 0 0 12px;
+  line-height: 1.6;
 }
 
 .log-table {
-  border-radius: 8px;
+  border-radius: var(--radius-base);
 }
 
 .log-error {
-  color: #ef4444;
-  font-size: 12px;
+  color: var(--color-danger);
+  font-size: var(--text-xs);
 }
 
 .log-data {
-  color: #6b7280;
+  color: var(--color-text-secondary);
   font-size: 11px;
 }
 
@@ -1423,7 +1881,7 @@ async function handleClearLogs() {
   .settings-sidebar {
     width: 100%;
     border-right: none;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--color-border-light);
   }
   
   .settings-nav {
@@ -1432,8 +1890,8 @@ async function handleClearLogs() {
   }
   
   .nav-item.active {
-    border-right: none;
-    border-bottom: 3px solid #6366f1;
+    border-left: none;
+    border-bottom: 3px solid var(--color-primary);
   }
   
   .license-grid {
@@ -1442,10 +1900,6 @@ async function handleClearLogs() {
 }
 
 @media (max-width: 768px) {
-  .settings-page {
-    padding: 16px;
-  }
-  
   .settings-content {
     padding: 20px;
   }

@@ -52,7 +52,7 @@ const newPlan = ref("free");
 
 async function fetchUsers() {
   try {
-    await store.fetchUsers();
+    await store.fetchUsers(1, 20);
   } catch {
     ElMessage.error("获取用户列表失败");
   }

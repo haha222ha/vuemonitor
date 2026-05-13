@@ -686,6 +686,15 @@ export class ChromiumCollectWorker extends EventEmitter {
       metadata: JSON.stringify({ queueLength: this.taskQueue.length }),
     });
 
+    let currentPhase: "loading" | "extracting" | "risk_check" | "normalizing" | "saving" = "loading";
+    let currentProgress = 0;
+
+    crashRecovery.startPeriodicCheckpoint(task.id, () => ({
+      phase: currentPhase,
+      progress: currentProgress,
+      partialData: null,
+    }));
+
     const url = XHS_COLLECT_CONFIG.buildUrl(task.targetId, task.targetType, task.targetUrl);
     let extractScript: string;
     if (task.targetType === "goods") {
@@ -711,12 +720,18 @@ export class ChromiumCollectWorker extends EventEmitter {
 
     try {
       await this.rateLimitGuard();
-      await this.loadAndExtract(view, task, url, extractScript);
+      currentPhase = "loading";
+      currentProgress = 10;
+      await this.loadAndExtract(view, task, url, extractScript, (phase, progress) => {
+        currentPhase = phase;
+        currentProgress = progress;
+      });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       crashRecovery.updateSnapshotStatus(task.id, "failed", undefined, errorMessage);
       this.emit("task:failed", { taskId: task.id, error: errorMessage });
     } finally {
+      crashRecovery.stopPeriodicCheckpoint(task.id);
       this.destroyView(task.id);
       this.finishTask();
     }
@@ -726,7 +741,8 @@ export class ChromiumCollectWorker extends EventEmitter {
     view: BrowserView,
     task: CollectTask,
     url: string,
-    extractScript: string
+    extractScript: string,
+    onPhase: (phase: "loading" | "extracting" | "risk_check" | "normalizing" | "saving", progress: number) => void
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
@@ -746,6 +762,7 @@ export class ChromiumCollectWorker extends EventEmitter {
         try {
           await this.delay(2000);
 
+          onPhase("risk_check", 30);
           const riskResult = await this.checkRiskEnhanced(view);
           if (riskResult) {
             settle(() => {
@@ -779,8 +796,10 @@ export class ChromiumCollectWorker extends EventEmitter {
 
           await this.delay(1500);
 
+          onPhase("extracting", 50);
           const extracted = await view.webContents.executeJavaScript(extractScript);
 
+          onPhase("saving", 80);
           const result: CollectResult = {
             taskId: task.id,
             targetId: task.targetId,

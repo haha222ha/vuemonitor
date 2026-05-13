@@ -1,6 +1,8 @@
 node_modules/
 dist/
 out/
+release/
+release-new/
 .vite/
 *.pyc
 __pycache__/

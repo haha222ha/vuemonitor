@@ -254,6 +254,15 @@ export class PlaywrightCollector extends EventEmitter {
       metadata: JSON.stringify({ queueLength: this.taskQueue.length }),
     });
 
+    let currentPhase: "loading" | "extracting" | "risk_check" | "normalizing" | "saving" = "loading";
+    let currentProgress = 0;
+
+    crashRecovery.startPeriodicCheckpoint(task.id, () => ({
+      phase: currentPhase,
+      progress: currentProgress,
+      partialData: null,
+    }));
+
     if (!this.browser || !this.browser.isConnected()) {
       await this.launch();
     }
@@ -264,6 +273,9 @@ export class PlaywrightCollector extends EventEmitter {
       const randomDelay = 2000 + Math.random() * 4000 * this.backoffMultiplier;
       await this.delay(randomDelay);
 
+      currentPhase = "loading";
+      currentProgress = 10;
+
       await page.goto(task.targetUrl, {
         waitUntil: "networkidle",
         timeout: task.options?.timeout || DEFAULT_OPTIONS.timeout,
@@ -271,6 +283,8 @@ export class PlaywrightCollector extends EventEmitter {
 
       await this.delay(2000);
 
+      currentPhase = "risk_check";
+      currentProgress = 30;
       const riskResult = await this.checkRiskEnhanced(page);
       if (riskResult) {
         this.consecutiveRiskCount++;
@@ -309,7 +323,12 @@ export class PlaywrightCollector extends EventEmitter {
 
       await this.delay(1500);
 
+      currentPhase = "extracting";
+      currentProgress = 50;
       const extracted = await this.extractData(page, task.targetType);
+
+      currentPhase = "saving";
+      currentProgress = 80;
 
       let screenshotPath: string | undefined;
       if (task.options?.screenshot ?? DEFAULT_OPTIONS.screenshot) {
@@ -344,6 +363,7 @@ export class PlaywrightCollector extends EventEmitter {
       this.emit("task:failed", result);
       this.emit("task:result", result);
     } finally {
+      crashRecovery.stopPeriodicCheckpoint(task.id);
       await page.close().catch(() => {});
       this.activeTasks--;
       this.processQueue();

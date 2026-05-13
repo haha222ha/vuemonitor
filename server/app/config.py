@@ -62,6 +62,13 @@ class Settings(BaseSettings):
 
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:5174"]
 
+    @property
+    def CORS_ORIGINS_SAFE(self) -> list[str]:
+        if self.is_production:
+            localhost_origins = {"http://localhost:5173", "http://localhost:5174", "http://localhost:5175"}
+            return [o for o in self.CORS_ORIGINS if o not in localhost_origins]
+        return self.CORS_ORIGINS
+
     LOG_LEVEL: str = "info"
     LOG_FORMAT: str = "json"
 
@@ -90,6 +97,11 @@ class Settings(BaseSettings):
                 issues.append("DEBUG should be False in production")
             if self.DB_PASSWORD == "saas_pass":
                 issues.append("DB_PASSWORD must be changed in production")
+            if not self.REDIS_PASSWORD:
+                issues.append("REDIS_PASSWORD must be set in production")
+            localhost_in_cors = [o for o in self.CORS_ORIGINS if "localhost" in o]
+            if localhost_in_cors:
+                issues.append(f"CORS_ORIGINS contains localhost origins in production: {localhost_in_cors}")
         return issues
 
     class Config:

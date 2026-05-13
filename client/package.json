@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "XHS365 AI E-commerce Monitoring Platform - Electron Client",
+  "author": "XHS365",
   "main": "dist/main/index.js",
   "scripts": {
     "dev:main": "vite --mode main",

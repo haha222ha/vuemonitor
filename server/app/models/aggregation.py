@@ -1,6 +1,6 @@
 import uuid
 from datetime import date, datetime
-from sqlalchemy import Boolean, DateTime, Index, Integer, String
+from sqlalchemy import Boolean, Date, DateTime, Index, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import UUIDPrimaryKeyMixin, Base
@@ -11,7 +11,7 @@ class AggregationAudit(UUIDPrimaryKeyMixin, Base):
 
     category: Mapped[str] = mapped_column(String(100), nullable=False)
     platform: Mapped[str] = mapped_column(String(50), nullable=False)
-    date: Mapped[date] = mapped_column(nullable=False, index=True)
+    date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     sample_users: Mapped[int] = mapped_column(Integer, nullable=False)
     min_threshold: Mapped[int] = mapped_column(Integer, nullable=False)
     passed_threshold: Mapped[bool] = mapped_column(Boolean, nullable=False)

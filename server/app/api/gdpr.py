@@ -62,7 +62,7 @@ async def get_data_summary(
 async def export_user_data(
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
-    format: str = Query("json", regex="^(json|csv)$"),
+    format: str = Query("json", pattern="^(json|csv)$"),
 ):
     from sqlalchemy import text
 

@@ -79,7 +79,7 @@ async function addProxy() {
 
 async function deleteProxy(id: string) {
   try {
-    await store.deleteProxy(id);
+    await store.deleteProxy(Number(id));
     ElMessage.success("删除成功");
     fetchProxies();
   } catch {

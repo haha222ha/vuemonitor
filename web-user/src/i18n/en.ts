@@ -46,6 +46,7 @@ export const en: LocaleMessages = {
     ai: "AI Analysis",
     team: "Team",
     settings: "Settings",
+    adminMonitor: "System Monitor",
   },
   auth: {
     login: "Login",

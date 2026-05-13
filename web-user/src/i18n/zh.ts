@@ -44,6 +44,7 @@ export const zh = {
     ai: "AI分析",
     team: "团队协作",
     settings: "设置",
+    adminMonitor: "系统监控",
   },
   auth: {
     login: "登录",

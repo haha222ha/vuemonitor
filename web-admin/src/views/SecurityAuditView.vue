@@ -100,7 +100,7 @@ async function fetchEvents() {
       params.start_date = filters.dateRange[0];
       params.end_date = filters.dateRange[1];
     }
-    await store.fetchEvents(page.value, 20, params);
+    await store.fetchEvents(page.value, 20);
   } catch {
     ElMessage.error("获取安全审计数据失败");
   }
@@ -115,15 +115,8 @@ async function exportCsv() {
       params.start_date = filters.dateRange[0];
       params.end_date = filters.dateRange[1];
     }
-    const blob = await store.exportCsv(params);
-    const url = window.URL.createObjectURL(new Blob([blob as BlobPart]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "security-audit.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    await store.exportCsv(params);
+    ElMessage.success("导出成功");
   } catch { ElMessage.error("导出失败"); }
 }
 

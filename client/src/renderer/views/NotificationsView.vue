@@ -1,20 +1,17 @@
 <template>
-  <div>
-    <div style="display: flex; justify-content: space-between; align-items: center">
-      <h2>通知中心</h2>
-      <div style="display: flex; gap: 8px; align-items: center">
-        <el-badge :value="notificationStore.unreadCount" :hidden="!notificationStore.hasUnread" :max="99">
-          <el-button size="small" :disabled="!notificationStore.hasUnread" @click="handleMarkAllRead">
-            全部已读
-          </el-button>
-        </el-badge>
-        <el-button size="small" type="danger" plain :disabled="readCount === 0" @click="handleDeleteRead">
-          清除已读
+  <div class="notifications fade-in">
+    <PageHeader title="通知中心" subtitle="查看和管理系统通知与预警">
+      <el-badge :value="notificationStore.unreadCount" :hidden="!notificationStore.hasUnread" :max="99">
+        <el-button size="small" :disabled="!notificationStore.hasUnread" @click="handleMarkAllRead">
+          全部已读
         </el-button>
-      </div>
-    </div>
+      </el-badge>
+      <el-button size="small" type="danger" plain :disabled="readCount === 0" @click="handleDeleteRead">
+        清除已读
+      </el-button>
+    </PageHeader>
 
-    <div style="display: flex; gap: 12px; align-items: center; margin-top: 16px; flex-wrap: wrap">
+    <div class="notifications__toolbar">
       <el-radio-group v-model="filterRead" size="small" @change="handleFilterChange">
         <el-radio-button :value="undefined">全部</el-radio-button>
         <el-radio-button :value="false">未读</el-radio-button>
@@ -33,13 +30,16 @@
       </el-select>
 
       <div style="flex: 1" />
-      <span style="font-size: 12px; color: #909399">共 {{ notificationStore.filteredNotifications.length }} 条</span>
+      <span class="notifications__count">共 {{ notificationStore.filteredNotifications.length }} 条</span>
     </div>
 
-    <div v-loading="notificationStore.loading" style="margin-top: 12px">
-      <div v-if="notificationStore.filteredNotifications.length === 0 && !notificationStore.loading" style="text-align: center; padding: 60px 0">
-        <el-empty description="暂无通知" />
-      </div>
+    <div v-loading="notificationStore.loading" class="notifications__body">
+      <EmptyState
+        v-if="notificationStore.filteredNotifications.length === 0 && !notificationStore.loading"
+        :icon="Bell"
+        title="暂无通知"
+        description="当有价格变动、销量变化等事件时会在此提醒"
+      />
 
       <div v-else class="notification-list">
         <div
@@ -58,7 +58,7 @@
           <div class="notification-body">
             <div class="notification-header">
               <span class="notification-title">{{ item.title }}</span>
-              <div style="display: flex; gap: 4px; align-items: center; flex-shrink: 0">
+              <div class="notification-tags">
                 <el-tag size="small" :type="typeTagType(item.type)" effect="plain">{{ typeLabel(item.type) }}</el-tag>
                 <el-tag size="small" :type="item.source === 'local' ? 'warning' : 'primary'" effect="plain" class="source-tag">
                   {{ item.source === 'local' ? '本地' : '云端' }}
@@ -96,6 +96,8 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useNotificationStore, type NotificationItem } from "../stores/notification";
 import { ElMessage, ElMessageBox } from "element-plus";
+import PageHeader from "../components/PageHeader.vue";
+import EmptyState from "../components/EmptyState.vue";
 import {
   Warning,
   TrendCharts,
@@ -249,19 +251,34 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  if (refreshTimer) {
-    clearInterval(refreshTimer);
-  }
-  if (unsubscribeLocal) {
-    unsubscribeLocal();
-  }
-  if (unsubscribeWs) {
-    unsubscribeWs();
-  }
+  if (refreshTimer) clearInterval(refreshTimer);
+  if (unsubscribeLocal) unsubscribeLocal();
+  if (unsubscribeWs) unsubscribeWs();
 });
 </script>
 
 <style scoped>
+.notifications {
+  padding: 0;
+}
+
+.notifications__toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.notifications__count {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.notifications__body {
+  min-height: 200px;
+}
+
 .notification-list {
   display: flex;
   flex-direction: column;
@@ -273,22 +290,22 @@ onUnmounted(() => {
   align-items: flex-start;
   gap: 12px;
   padding: 14px 16px;
-  border-radius: 8px;
-  border: 1px solid #ebeef5;
-  background: #fff;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+  background: var(--color-bg-card);
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
 }
 
 .notification-item:hover {
-  border-color: #409eff;
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
 }
 
 .notification-item.unread {
-  background: #f0f7ff;
-  border-color: #d0e3ff;
+  background: #f0f4ff;
+  border-color: #d0dfff;
 }
 
 .notification-dot {
@@ -298,14 +315,14 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #409eff;
+  background: var(--color-primary);
 }
 
 .notification-icon {
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  border-radius: 8px;
+  border-radius: var(--radius-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,18 +341,25 @@ onUnmounted(() => {
 }
 
 .notification-title {
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
-  color: #303133;
+  color: var(--color-text-primary);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.notification-tags {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .notification-content {
-  font-size: 13px;
-  color: #606266;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
   line-height: 1.5;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -352,8 +376,8 @@ onUnmounted(() => {
 }
 
 .notification-time {
-  font-size: 12px;
-  color: #909399;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
 }
 
 .notification-actions {

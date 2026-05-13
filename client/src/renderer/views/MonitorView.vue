@@ -1,62 +1,56 @@
 <template>
-  <div>
-    <div style="display: flex; justify-content: space-between; align-items: center">
-      <h2>监控规则</h2>
-      <div style="display: flex; gap: 8px">
-        <el-button size="small" @click="showTemplateDialog = true">从模板创建</el-button>
-        <el-button type="primary" size="small" @click="openCreateDialog">新建规则</el-button>
+  <div class="monitor fade-in">
+    <PageHeader title="监控规则" subtitle="设置商品价格、销量、库存等监控预警规则">
+      <el-button @click="showTemplateDialog = true">从模板创建</el-button>
+      <el-button type="primary" @click="openCreateDialog">新建规则</el-button>
+    </PageHeader>
+
+    <div v-if="rules.length === 0 && !loading" class="monitor__empty">
+      <EmptyState :icon="Bell" title="暂无监控规则" description="创建监控规则，当商品价格、销量等发生变化时自动通知您" />
+    </div>
+
+    <div v-else class="monitor__grid">
+      <div v-for="rule in rules" :key="rule.id" class="rule-card">
+        <div class="rule-card__header">
+          <div class="rule-card__icon" :style="{ background: typeBg(rule.rule_type) }">
+            <el-icon :size="18" :color="typeColor(rule.rule_type)">
+              <component :is="typeIcon(rule.rule_type)" />
+            </el-icon>
+          </div>
+          <div class="rule-card__info">
+            <div class="rule-card__name">{{ rule.rule_name }}</div>
+            <el-tag size="small" :type="typeTagType(rule.rule_type)">{{ typeLabel(rule.rule_type) }}</el-tag>
+          </div>
+          <el-switch :model-value="rule.is_active" size="small" @change="toggleRule(rule)" />
+        </div>
+
+        <div class="rule-card__conditions">
+          <span
+            v-for="(cond, idx) in parseConditions(rule.conditions)"
+            :key="idx"
+            class="condition-chip"
+            :style="{ background: cond.bg, color: cond.color }"
+          >
+            {{ cond.text }}
+          </span>
+        </div>
+
+        <div class="rule-card__footer">
+          <div class="rule-card__meta">
+            <el-badge :value="rule.trigger_count" :type="rule.trigger_count > 0 ? 'danger' : 'info'" :hidden="rule.trigger_count === 0" />
+            <span class="rule-card__time" v-if="rule.last_triggered_at">
+              最近触发: {{ formatTime(rule.last_triggered_at) }}
+            </span>
+          </div>
+          <div class="rule-card__actions">
+            <el-button size="small" text type="primary" @click="openEditDialog(rule)">编辑</el-button>
+            <el-button size="small" text type="danger" @click="confirmDeleteRule(rule.id)">删除</el-button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <el-table :data="rules" stripe v-loading="loading" style="margin-top: 16px">
-      <el-table-column prop="rule_name" label="规则名称" min-width="160">
-        <template #default="{ row }">
-          <div style="display: flex; align-items: center; gap: 8px">
-            <el-icon :size="16" :color="typeColor(row.rule_type)">
-              <component :is="typeIcon(row.rule_type)" />
-            </el-icon>
-            <span>{{ row.rule_name }}</span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="rule_type" label="类型" width="120">
-        <template #default="{ row }">
-          <el-tag size="small" :type="typeTagType(row.rule_type)">{{ typeLabel(row.rule_type) }}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="条件" min-width="200">
-        <template #default="{ row }">
-          <div class="condition-cells">
-            <span v-for="(cond, idx) in parseConditions(row.conditions)" :key="idx" class="condition-chip" :style="{ background: cond.bg, color: cond.color }">
-              {{ cond.text }}
-            </span>
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column prop="is_active" label="状态" width="80">
-        <template #default="{ row }">
-          <el-switch :model-value="row.is_active" size="small" @change="toggleRule(row)" />
-        </template>
-      </el-table-column>
-      <el-table-column prop="trigger_count" label="触发" width="70" align="center">
-        <template #default="{ row }">
-          <el-badge :value="row.trigger_count" :type="row.trigger_count > 0 ? 'danger' : 'info'" :hidden="row.trigger_count === 0" />
-        </template>
-      </el-table-column>
-      <el-table-column prop="last_triggered_at" label="最近触发" width="160">
-        <template #default="{ row }">
-          <span style="font-size: 12px; color: #909399">{{ row.last_triggered_at ? formatTime(row.last_triggered_at) : '-' }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="120" fixed="right">
-        <template #default="{ row }">
-          <el-button link size="small" type="primary" @click="openEditDialog(row)">编辑</el-button>
-          <el-button link size="small" type="danger" @click="confirmDeleteRule(row.id)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <el-dialog v-model="showCreateDialog" :title="editingRule ? '编辑规则' : '新建规则'" width="600px" @close="resetForm">
+    <el-dialog v-model="showCreateDialog" :title="editingRule ? '编辑规则' : '新建规则'" width="600px" @close="resetForm" class="modern-dialog">
       <el-form :model="ruleForm" label-width="100px" :rules="formRules" ref="formRef">
         <el-form-item label="规则名称" prop="rule_name">
           <el-input v-model="ruleForm.rule_name" placeholder="如：价格跌破50元" />
@@ -178,7 +172,7 @@
       </template>
     </el-dialog>
 
-    <el-dialog v-model="showTemplateDialog" title="从模板创建规则" width="520px">
+    <el-dialog v-model="showTemplateDialog" title="从模板创建规则" width="520px" class="modern-dialog">
       <div class="template-grid">
         <div
           v-for="tpl in ruleTemplates"
@@ -204,6 +198,8 @@ import { ref, reactive, computed, onMounted } from "vue";
 import api from "../utils/api";
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
+import PageHeader from "../components/PageHeader.vue";
+import EmptyState from "../components/EmptyState.vue";
 import {
   PriceTag,
   TrendCharts,
@@ -264,151 +260,46 @@ const pricePreview = computed(() => {
   return parts.length > 0 ? `当${parts.join("或")}时触发通知` : "";
 });
 
-const TYPE_CONFIG: Record<string, { label: string; icon: typeof PriceTag; color: string; tagType: string }> = {
-  price_drop: { label: "价格下跌", icon: PriceTag, color: "#F56C6C", tagType: "danger" },
-  sales_surge: { label: "销量飙升", icon: TrendCharts, color: "#67C23A", tagType: "success" },
-  stock_change: { label: "库存变化", icon: ShoppingCart, color: "#E6A23C", tagType: "warning" },
-  rating_drop: { label: "评分下降", icon: Star, color: "#F56C6C", tagType: "danger" },
-  custom: { label: "自定义", icon: Setting, color: "#909399", tagType: "info" },
+const TYPE_CONFIG: Record<string, { label: string; icon: typeof PriceTag; color: string; tagType: string; bg: string }> = {
+  price_drop: { label: "价格下跌", icon: PriceTag, color: "#F56C6C", tagType: "danger", bg: "#FEF0F0" },
+  sales_surge: { label: "销量飙升", icon: TrendCharts, color: "#67C23A", tagType: "success", bg: "#F0F9EB" },
+  stock_change: { label: "库存变化", icon: ShoppingCart, color: "#E6A23C", tagType: "warning", bg: "#FDF6EC" },
+  rating_drop: { label: "评分下降", icon: Star, color: "#F56C6C", tagType: "danger", bg: "#FEF0F0" },
+  custom: { label: "自定义", icon: Setting, color: "#909399", tagType: "info", bg: "#F4F4F5" },
 };
 
+function typeIcon(type: string) { return TYPE_CONFIG[type]?.icon || Setting; }
+function typeColor(type: string) { return TYPE_CONFIG[type]?.color || "#909399"; }
+function typeBg(type: string) { return TYPE_CONFIG[type]?.bg || "#F5F7FA"; }
+function typeLabel(type: string) { return TYPE_CONFIG[type]?.label || type; }
+function typeTagType(type: string) { return TYPE_CONFIG[type]?.tagType || "info"; }
+
 const ruleTemplates = [
-  {
-    id: "price_alert_20",
-    name: "价格下跌20%预警",
-    description: "当商品价格跌幅超过20%时立即通知",
-    rule_type: "price_drop",
-    icon: PriceTag,
-    color: "#F56C6C",
-    bg: "#FEF0F0",
-    conditions: { threshold: 20 },
-  },
-  {
-    id: "price_below_50",
-    name: "价格低于50元",
-    description: "当商品价格跌破50元时通知",
-    rule_type: "price_drop",
-    icon: PriceTag,
-    color: "#F56C6C",
-    bg: "#FEF0F0",
-    conditions: { threshold: 0, below_price: 50 },
-  },
-  {
-    id: "sales_2x",
-    name: "销量翻倍监控",
-    description: "24小时内销量增长超过100%",
-    rule_type: "sales_surge",
-    icon: TrendCharts,
-    color: "#67C23A",
-    bg: "#F0F9EB",
-    conditions: { threshold: 100, window_hours: 24 },
-  },
-  {
-    id: "sales_surge_50",
-    name: "销量激增50%",
-    description: "6小时内销量增长超过50%",
-    rule_type: "sales_surge",
-    icon: TrendCharts,
-    color: "#67C23A",
-    bg: "#F0F9EB",
-    conditions: { threshold: 50, window_hours: 6 },
-  },
-  {
-    id: "stock_out",
-    name: "缺货提醒",
-    description: "商品变为缺货状态时通知",
-    rule_type: "stock_change",
-    icon: ShoppingCart,
-    color: "#E6A23C",
-    bg: "#FDF6EC",
-    conditions: { stock_events: ["out_of_stock"] },
-  },
-  {
-    id: "rating_below_4",
-    name: "评分低于4.0",
-    description: "商品评分降至4.0以下时预警",
-    rule_type: "rating_drop",
-    icon: Star,
-    color: "#F56C6C",
-    bg: "#FEF0F0",
-    conditions: { below_rating: 4.0 },
-  },
-  {
-    id: "rating_drop_05",
-    name: "评分骤降0.5",
-    description: "评分单次下降超过0.5分时通知",
-    rule_type: "rating_drop",
-    icon: Warning,
-    color: "#E6A23C",
-    bg: "#FDF6EC",
-    conditions: { rating_decrease: 0.5 },
-  },
-  {
-    id: "comprehensive",
-    name: "综合监控",
-    description: "价格跌10%+销量增50%+缺货+评分降",
-    rule_type: "price_drop",
-    icon: Bell,
-    color: "#409EFF",
-    bg: "#ECF5FF",
-    conditions: { threshold: 10 },
-  },
+  { id: "price_alert_20", name: "价格下跌20%预警", description: "当商品价格跌幅超过20%时立即通知", rule_type: "price_drop", icon: PriceTag, color: "#F56C6C", bg: "#FEF0F0", conditions: { threshold: 20 } },
+  { id: "price_below_50", name: "价格低于50元", description: "当商品价格跌破50元时通知", rule_type: "price_drop", icon: PriceTag, color: "#F56C6C", bg: "#FEF0F0", conditions: { threshold: 0, below_price: 50 } },
+  { id: "sales_2x", name: "销量翻倍监控", description: "24小时内销量增长超过100%", rule_type: "sales_surge", icon: TrendCharts, color: "#67C23A", bg: "#F0F9EB", conditions: { threshold: 100, window_hours: 24 } },
+  { id: "sales_surge_50", name: "销量激增50%", description: "6小时内销量增长超过50%", rule_type: "sales_surge", icon: TrendCharts, color: "#67C23A", bg: "#F0F9EB", conditions: { threshold: 50, window_hours: 6 } },
+  { id: "stock_out", name: "缺货提醒", description: "商品变为缺货状态时通知", rule_type: "stock_change", icon: ShoppingCart, color: "#E6A23C", bg: "#FDF6EC", conditions: { stock_events: ["out_of_stock"] } },
+  { id: "rating_below_4", name: "评分低于4.0", description: "商品评分降至4.0以下时预警", rule_type: "rating_drop", icon: Star, color: "#F56C6C", bg: "#FEF0F0", conditions: { below_rating: 4.0 } },
+  { id: "rating_drop_05", name: "评分骤降0.5", description: "评分单次下降超过0.5分时通知", rule_type: "rating_drop", icon: Warning, color: "#E6A23C", bg: "#FDF6EC", conditions: { rating_decrease: 0.5 } },
+  { id: "comprehensive", name: "综合监控", description: "价格跌10%+销量增50%+缺货+评分降", rule_type: "price_drop", icon: Bell, color: "#409EFF", bg: "#ECF5FF", conditions: { threshold: 10 } },
 ];
-
-function typeIcon(type: string) {
-  return TYPE_CONFIG[type]?.icon || Setting;
-}
-
-function typeColor(type: string) {
-  return TYPE_CONFIG[type]?.color || "#909399";
-}
-
-function typeLabel(type: string) {
-  return TYPE_CONFIG[type]?.label || type;
-}
-
-function typeTagType(type: string) {
-  return TYPE_CONFIG[type]?.tagType || "info";
-}
 
 function parseConditions(conditions: Record<string, any>): Array<{ text: string; bg: string; color: string }> {
   if (!conditions) return [{ text: "-", bg: "#F5F7FA", color: "#909399" }];
   const chips: Array<{ text: string; bg: string; color: string }> = [];
-
-  if (conditions.threshold) {
-    chips.push({ text: `阈值 ${conditions.threshold}%`, bg: "#FEF0F0", color: "#F56C6C" });
-  }
-  if (conditions.below_price) {
-    chips.push({ text: `低于¥${conditions.below_price}`, bg: "#FEF0F0", color: "#F56C6C" });
-  }
-  if (conditions.absolute_increase) {
-    chips.push({ text: `增量>${conditions.absolute_increase}件`, bg: "#F0F9EB", color: "#67C23A" });
-  }
-  if (conditions.window_hours) {
-    chips.push({ text: `${conditions.window_hours}h窗口`, bg: "#ECF5FF", color: "#409EFF" });
-  }
+  if (conditions.threshold) chips.push({ text: `阈值 ${conditions.threshold}%`, bg: "#FEF0F0", color: "#F56C6C" });
+  if (conditions.below_price) chips.push({ text: `低于¥${conditions.below_price}`, bg: "#FEF0F0", color: "#F56C6C" });
+  if (conditions.absolute_increase) chips.push({ text: `增量>${conditions.absolute_increase}件`, bg: "#F0F9EB", color: "#67C23A" });
+  if (conditions.window_hours) chips.push({ text: `${conditions.window_hours}h窗口`, bg: "#ECF5FF", color: "#409EFF" });
   if (conditions.stock_events?.length) {
     const labels: Record<string, string> = { out_of_stock: "缺货", restocked: "补货" };
-    for (const e of conditions.stock_events) {
-      chips.push({ text: labels[e] || e, bg: "#FDF6EC", color: "#E6A23C" });
-    }
+    for (const e of conditions.stock_events) chips.push({ text: labels[e] || e, bg: "#FDF6EC", color: "#E6A23C" });
   }
-  if (conditions.stock_drop_percent) {
-    chips.push({ text: `库存降${conditions.stock_drop_percent}%`, bg: "#FDF6EC", color: "#E6A23C" });
-  }
-  if (conditions.below_rating) {
-    chips.push({ text: `评分<${conditions.below_rating}`, bg: "#FEF0F0", color: "#F56C6C" });
-  }
-  if (conditions.rating_decrease) {
-    chips.push({ text: `评分降${conditions.rating_decrease}`, bg: "#FDF6EC", color: "#E6A23C" });
-  }
-  if (conditions.review_count_above) {
-    chips.push({ text: `评论>${conditions.review_count_above}`, bg: "#ECF5FF", color: "#409EFF" });
-  }
-  if (conditions.description) {
-    chips.push({ text: conditions.description, bg: "#F5F7FA", color: "#606266" });
-  }
-
+  if (conditions.stock_drop_percent) chips.push({ text: `库存降${conditions.stock_drop_percent}%`, bg: "#FDF6EC", color: "#E6A23C" });
+  if (conditions.below_rating) chips.push({ text: `评分<${conditions.below_rating}`, bg: "#FEF0F0", color: "#F56C6C" });
+  if (conditions.rating_decrease) chips.push({ text: `评分降${conditions.rating_decrease}`, bg: "#FDF6EC", color: "#E6A23C" });
+  if (conditions.review_count_above) chips.push({ text: `评论>${conditions.review_count_above}`, bg: "#ECF5FF", color: "#409EFF" });
   return chips.length > 0 ? chips : [{ text: JSON.stringify(conditions), bg: "#F5F7FA", color: "#909399" }];
 }
 
@@ -425,24 +316,10 @@ function resetForm() {
   ruleForm.conditions = {};
   ruleForm.notify_channels = ["app", "desktop"];
   ruleForm.is_active = true;
-  Object.assign(conditionToggles, {
-    price_threshold: true,
-    price_below: false,
-    sales_threshold: true,
-    sales_absolute: false,
-    stock_out: true,
-    stock_restock: true,
-    stock_drop: false,
-    rating_below: true,
-    rating_decrease: false,
-    review_count: false,
-  });
+  Object.assign(conditionToggles, { price_threshold: true, price_below: false, sales_threshold: true, sales_absolute: false, stock_out: true, stock_restock: true, stock_drop: false, rating_below: true, rating_decrease: false, review_count: false });
 }
 
-function openCreateDialog() {
-  resetForm();
-  showCreateDialog.value = true;
-}
+function openCreateDialog() { resetForm(); showCreateDialog.value = true; }
 
 function openEditDialog(rule: any) {
   editingRule.value = rule;
@@ -452,7 +329,6 @@ function openEditDialog(rule: any) {
   ruleForm.conditions = { ...rule.conditions };
   ruleForm.notify_channels = rule.notify_channels || ["app", "desktop"];
   ruleForm.is_active = rule.is_active;
-
   const c = rule.conditions || {};
   conditionToggles.price_threshold = !!c.threshold;
   conditionToggles.price_below = !!c.below_price;
@@ -464,7 +340,6 @@ function openEditDialog(rule: any) {
   conditionToggles.rating_below = !!c.below_rating;
   conditionToggles.rating_decrease = !!c.rating_decrease;
   conditionToggles.review_count = !!c.review_count_above;
-
   showCreateDialog.value = true;
 }
 
@@ -473,20 +348,10 @@ function applyTemplate(tpl: any) {
   ruleForm.rule_name = tpl.name;
   ruleForm.rule_type = tpl.rule_type;
   ruleForm.conditions = { ...tpl.conditions };
-
-  if (tpl.rule_type === "price_drop") {
-    conditionToggles.price_threshold = !!tpl.conditions.threshold;
-    conditionToggles.price_below = !!tpl.conditions.below_price;
-  } else if (tpl.rule_type === "sales_surge") {
-    conditionToggles.sales_threshold = !!tpl.conditions.threshold;
-  } else if (tpl.rule_type === "stock_change") {
-    conditionToggles.stock_out = tpl.conditions.stock_events?.includes("out_of_stock") ?? false;
-    conditionToggles.stock_restock = tpl.conditions.stock_events?.includes("restocked") ?? false;
-  } else if (tpl.rule_type === "rating_drop") {
-    conditionToggles.rating_below = !!tpl.conditions.below_rating;
-    conditionToggles.rating_decrease = !!tpl.conditions.rating_decrease;
-  }
-
+  if (tpl.rule_type === "price_drop") { conditionToggles.price_threshold = !!tpl.conditions.threshold; conditionToggles.price_below = !!tpl.conditions.below_price; }
+  else if (tpl.rule_type === "sales_surge") { conditionToggles.sales_threshold = !!tpl.conditions.threshold; }
+  else if (tpl.rule_type === "stock_change") { conditionToggles.stock_out = tpl.conditions.stock_events?.includes("out_of_stock") ?? false; conditionToggles.stock_restock = tpl.conditions.stock_events?.includes("restocked") ?? false; }
+  else if (tpl.rule_type === "rating_drop") { conditionToggles.rating_below = !!tpl.conditions.below_rating; conditionToggles.rating_decrease = !!tpl.conditions.rating_decrease; }
   showTemplateDialog.value = false;
   showCreateDialog.value = true;
 }
@@ -494,17 +359,10 @@ function applyTemplate(tpl: any) {
 async function fetchData() {
   loading.value = true;
   try {
-    const [rulesRes, productsRes] = await Promise.all([
-      api.get("/monitor/rules"),
-      api.get("/products", { params: { page_size: 200 } }),
-    ]);
+    const [rulesRes, productsRes] = await Promise.all([api.get("/monitor/rules"), api.get("/products", { params: { page_size: 200 } })]);
     rules.value = rulesRes.data?.data || [];
     products.value = productsRes.data?.data?.items || [];
-  } catch {
-    ElMessage.error("获取数据失败");
-  } finally {
-    loading.value = false;
-  }
+  } catch { ElMessage.error("获取数据失败"); } finally { loading.value = false; }
 }
 
 async function toggleRule(rule: any) {
@@ -512,18 +370,12 @@ async function toggleRule(rule: any) {
     await api.put(`/monitor/rules/${rule.id}`, { is_active: !rule.is_active });
     rule.is_active = !rule.is_active;
     ElMessage.success(rule.is_active ? "已启用" : "已停用");
-  } catch {
-    ElMessage.error("操作失败");
-  }
+  } catch { ElMessage.error("操作失败"); }
 }
 
 async function confirmDeleteRule(id: string) {
   try {
-    await ElMessageBox.confirm("确定要删除该规则吗？", "确认删除", {
-      confirmButtonText: "删除",
-      cancelButtonText: "取消",
-      type: "warning",
-    });
+    await ElMessageBox.confirm("确定要删除该规则吗？", "确认删除", { confirmButtonText: "删除", cancelButtonText: "取消", type: "warning" });
     await api.delete(`/monitor/rules/${id}`);
     ElMessage.success("删除成功");
     fetchData();
@@ -533,97 +385,143 @@ async function confirmDeleteRule(id: string) {
 function buildConditions(): Record<string, any> {
   const c: Record<string, any> = {};
   const t = ruleForm.rule_type;
-
   if (t === "price_drop") {
-    if (conditionToggles.price_threshold && ruleForm.conditions.threshold) {
-      c.threshold = ruleForm.conditions.threshold;
-    }
-    if (conditionToggles.price_below && ruleForm.conditions.below_price) {
-      c.below_price = ruleForm.conditions.below_price;
-    }
+    if (conditionToggles.price_threshold && ruleForm.conditions.threshold) c.threshold = ruleForm.conditions.threshold;
+    if (conditionToggles.price_below && ruleForm.conditions.below_price) c.below_price = ruleForm.conditions.below_price;
   } else if (t === "sales_surge") {
-    if (conditionToggles.sales_threshold && ruleForm.conditions.threshold) {
-      c.threshold = ruleForm.conditions.threshold;
-    }
-    if (ruleForm.conditions.window_hours) {
-      c.window_hours = ruleForm.conditions.window_hours;
-    }
-    if (conditionToggles.sales_absolute && ruleForm.conditions.absolute_increase) {
-      c.absolute_increase = ruleForm.conditions.absolute_increase;
-    }
+    if (conditionToggles.sales_threshold && ruleForm.conditions.threshold) c.threshold = ruleForm.conditions.threshold;
+    if (ruleForm.conditions.window_hours) c.window_hours = ruleForm.conditions.window_hours;
+    if (conditionToggles.sales_absolute && ruleForm.conditions.absolute_increase) c.absolute_increase = ruleForm.conditions.absolute_increase;
   } else if (t === "stock_change") {
     const events: string[] = [];
     if (conditionToggles.stock_out) events.push("out_of_stock");
     if (conditionToggles.stock_restock) events.push("restocked");
     if (events.length > 0) c.stock_events = events;
-    if (conditionToggles.stock_drop && ruleForm.conditions.stock_drop_percent) {
-      c.stock_drop_percent = ruleForm.conditions.stock_drop_percent;
-    }
+    if (conditionToggles.stock_drop && ruleForm.conditions.stock_drop_percent) c.stock_drop_percent = ruleForm.conditions.stock_drop_percent;
   } else if (t === "rating_drop") {
-    if (conditionToggles.rating_below && ruleForm.conditions.below_rating) {
-      c.below_rating = ruleForm.conditions.below_rating;
-    }
-    if (conditionToggles.rating_decrease && ruleForm.conditions.rating_decrease) {
-      c.rating_decrease = ruleForm.conditions.rating_decrease;
-    }
-    if (conditionToggles.review_count && ruleForm.conditions.review_count_above) {
-      c.review_count_above = ruleForm.conditions.review_count_above;
-    }
+    if (conditionToggles.rating_below && ruleForm.conditions.below_rating) c.below_rating = ruleForm.conditions.below_rating;
+    if (conditionToggles.rating_decrease && ruleForm.conditions.rating_decrease) c.rating_decrease = ruleForm.conditions.rating_decrease;
+    if (conditionToggles.review_count && ruleForm.conditions.review_count_above) c.review_count_above = ruleForm.conditions.review_count_above;
   }
-
   return c;
 }
 
 async function handleSubmitRule() {
   if (!formRef.value) return;
   await formRef.value.validate();
-
   submitting.value = true;
   try {
     const conditions = buildConditions();
     if (editingRule.value) {
-      await api.put(`/monitor/rules/${editingRule.value.id}`, {
-        rule_name: ruleForm.rule_name,
-        conditions,
-        notify_channels: ruleForm.notify_channels,
-        is_active: ruleForm.is_active,
-      });
+      await api.put(`/monitor/rules/${editingRule.value.id}`, { rule_name: ruleForm.rule_name, conditions, notify_channels: ruleForm.notify_channels, is_active: ruleForm.is_active });
       ElMessage.success("规则已更新");
     } else {
-      await api.post("/monitor/rules", {
-        product_id: ruleForm.product_id,
-        rule_name: ruleForm.rule_name,
-        rule_type: ruleForm.rule_type,
-        conditions,
-        notify_channels: ruleForm.notify_channels,
-      });
+      await api.post("/monitor/rules", { product_id: ruleForm.product_id, rule_name: ruleForm.rule_name, rule_type: ruleForm.rule_type, conditions, notify_channels: ruleForm.notify_channels });
       ElMessage.success("规则已创建");
     }
     showCreateDialog.value = false;
     fetchData();
-  } catch {
-    ElMessage.error(editingRule.value ? "更新失败" : "创建失败");
-  } finally {
-    submitting.value = false;
-  }
+  } catch { ElMessage.error(editingRule.value ? "更新失败" : "创建失败"); } finally { submitting.value = false; }
 }
 
 onMounted(fetchData);
 </script>
 
 <style scoped>
-.condition-cells {
+.monitor {
+  padding: 0;
+}
+
+.monitor__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.rule-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  transition: all 0.2s;
+}
+
+.rule-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 12px rgba(79, 70, 229, 0.08);
+}
+
+.rule-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.rule-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.rule-card__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rule-card__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rule-card__conditions {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  margin-bottom: 12px;
 }
 
 .condition-chip {
   display: inline-block;
   padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
   line-height: 1.5;
+}
+
+.rule-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.rule-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rule-card__time {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+}
+
+.rule-card__actions {
+  display: flex;
+  gap: 4px;
 }
 
 .condition-builder {
@@ -640,19 +538,19 @@ onMounted(fetchData);
 }
 
 .condition-label {
-  font-size: 13px;
-  color: #606266;
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
   min-width: 70px;
 }
 
 .condition-unit {
-  font-size: 12px;
-  color: #909399;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
 }
 
 .condition-desc {
-  font-size: 12px;
-  color: #909399;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
   margin-left: 4px;
 }
 
@@ -662,8 +560,8 @@ onMounted(fetchData);
   gap: 6px;
   padding: 8px 12px;
   background: #FDF6EC;
-  border-radius: 6px;
-  font-size: 13px;
+  border-radius: var(--radius-base);
+  font-size: var(--text-xs);
   color: #E6A23C;
 }
 
@@ -678,22 +576,22 @@ onMounted(fetchData);
   align-items: center;
   gap: 12px;
   padding: 14px;
-  border: 1px solid #ebeef5;
-  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .template-card:hover {
-  border-color: #409eff;
-  box-shadow: 0 2px 8px rgba(64, 158, 255, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
 }
 
 .template-icon {
   flex-shrink: 0;
   width: 44px;
   height: 44px;
-  border-radius: 8px;
+  border-radius: var(--radius-base);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -705,14 +603,35 @@ onMounted(fetchData);
 }
 
 .template-name {
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 500;
-  color: #303133;
+  color: var(--color-text-primary);
 }
 
 .template-desc {
-  font-size: 12px;
-  color: #909399;
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
   margin-top: 2px;
+}
+
+.modern-dialog :deep(.el-dialog__header) {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-border-light);
+  margin-right: 0;
+}
+
+.modern-dialog :deep(.el-dialog__title) {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.modern-dialog :deep(.el-dialog__body) {
+  padding: 24px;
+}
+
+.modern-dialog :deep(.el-dialog__footer) {
+  padding: 16px 24px;
+  border-top: 1px solid var(--color-border-light);
 }
 </style>

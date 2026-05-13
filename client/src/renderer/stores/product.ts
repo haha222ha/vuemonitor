@@ -56,9 +56,11 @@ export const useProductStore = defineStore("product", () => {
 
   async function fetchProductDetail(productId: string) {
     loading.value = true;
+    error.value = null;
     try {
       const result = await window.electronAPI.invoke("datamart:get-product", productId);
       currentProduct.value = result as Product;
+      await fetchFeatures(productId);
     } catch (err) {
       error.value = String(err);
     } finally {

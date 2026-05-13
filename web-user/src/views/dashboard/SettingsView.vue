@@ -135,6 +135,69 @@
             </el-form-item>
           </el-form>
         </div>
+
+        <div class="panel" style="margin-top: 20px;">
+          <h3>隐私与数据管理</h3>
+
+          <div class="privacy-section">
+            <h4 class="privacy-subtitle">数据收集偏好</h4>
+            <el-form label-width="140px" size="small">
+              <el-form-item label="使用数据收集">
+                <el-switch v-model="privacyConsent.data_collection" @change="saveConsent" />
+                <span class="privacy-hint">帮助我们改进产品功能</span>
+              </el-form-item>
+              <el-form-item label="匿名聚合贡献">
+                <el-switch v-model="privacyConsent.analytics" @change="saveConsent" />
+                <span class="privacy-hint">您的数据将匿名化后用于群体洞察</span>
+              </el-form-item>
+              <el-form-item label="营销通信">
+                <el-switch v-model="privacyConsent.marketing" @change="saveConsent" />
+                <span class="privacy-hint">接收产品更新和优惠信息</span>
+              </el-form-item>
+              <el-form-item label="第三方数据共享">
+                <el-switch v-model="privacyConsent.third_party_sharing" @change="saveConsent" />
+                <span class="privacy-hint">与合作伙伴共享匿名统计数据</span>
+              </el-form-item>
+            </el-form>
+          </div>
+
+          <el-divider />
+
+          <div class="privacy-section">
+            <h4 class="privacy-subtitle">我的数据</h4>
+            <div class="data-summary" v-if="dataSummary">
+              <div class="data-summary-grid">
+                <div v-for="(count, table) in dataSummary.tables" :key="table" class="data-summary-item">
+                  <span class="data-summary-label">{{ tableLabel(table as string) }}</span>
+                  <span class="data-summary-value" :class="{ 'data-summary-error': count < 0 }">{{ count < 0 ? '?' : count }}</span>
+                </div>
+              </div>
+              <div class="data-summary-total">
+                总记录数: <strong>{{ dataSummary.total_records }}</strong>
+              </div>
+            </div>
+            <div class="data-actions">
+              <el-button size="small" @click="exportMyData" :loading="exportingData">
+                <el-icon><Download /></el-icon>
+                导出我的数据 (JSON)
+              </el-button>
+              <el-button size="small" @click="showPrivacyPolicy">
+                <el-icon><Document /></el-icon>
+                隐私政策
+              </el-button>
+            </div>
+          </div>
+
+          <el-divider />
+
+          <div class="privacy-section privacy-danger-zone">
+            <h4 class="privacy-subtitle">危险区域</h4>
+            <p class="privacy-warning">删除数据操作不可逆。根据 GDPR 被遗忘权，您可以请求删除所有个人数据。删除后账户将被匿名化且无法恢复。</p>
+            <el-button type="danger" size="small" @click="confirmDeleteData" :loading="deletingData">
+              请求删除所有数据
+            </el-button>
+          </div>
+        </div>
       </el-col>
     </el-row>
   </div>
@@ -144,8 +207,8 @@
 import { ref, reactive, computed, onMounted } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import api from "../../utils/api";
-import { ElMessage } from "element-plus";
-import { Key, Refresh, CircleCheckFilled, Loading } from "@element-plus/icons-vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { Key, Refresh, CircleCheckFilled, Loading, Download, Document } from "@element-plus/icons-vue";
 import { useI18n, type Locale } from "../../i18n";
 
 const auth = useAuthStore();
@@ -166,6 +229,145 @@ const notifSettings = reactive({
   aiDone: true,
   riskAlert: true,
 });
+
+const privacyConsent = reactive({
+  data_collection: true,
+  analytics: true,
+  marketing: false,
+  third_party_sharing: false,
+});
+
+const dataSummary = ref<any>(null);
+const exportingData = ref(false);
+const deletingData = ref(false);
+
+const TABLE_LABELS: Record<string, string> = {
+  products: "商品数据",
+  product_features: "商品特征",
+  monitor_rules: "监控规则",
+  ai_analyses: "AI分析",
+  ai_reports: "AI报告",
+  notifications: "通知",
+  sync_records: "同步记录",
+  alert_rules: "告警规则",
+  alert_events: "告警事件",
+  team_members: "团队成员",
+  scheduled_tasks: "定时任务",
+};
+
+function tableLabel(table: string): string {
+  return TABLE_LABELS[table] || table;
+}
+
+async function fetchDataSummary() {
+  try {
+    const { data } = await api.get("/gdpr/data-summary");
+    dataSummary.value = data?.data || data;
+  } catch {
+    dataSummary.value = null;
+  }
+}
+
+async function saveConsent() {
+  try {
+    await api.post("/gdpr/consent", null, {
+      params: {
+        data_collection: privacyConsent.data_collection,
+        analytics: privacyConsent.analytics,
+        marketing: privacyConsent.marketing,
+        third_party_sharing: privacyConsent.third_party_sharing,
+      },
+    });
+    ElMessage.success("隐私偏好已保存");
+  } catch {
+    ElMessage.error("保存失败");
+  }
+}
+
+async function exportMyData() {
+  exportingData.value = true;
+  try {
+    const { data } = await api.post("/gdpr/export", null, { params: { format: "json" } });
+    const exportData = data?.data || data;
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `vuemonitor_data_export_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    ElMessage.success("数据导出成功");
+  } catch {
+    ElMessage.error("数据导出失败");
+  } finally {
+    exportingData.value = false;
+  }
+}
+
+async function confirmDeleteData() {
+  try {
+    await ElMessageBox.confirm(
+      "此操作将永久删除您的所有个人数据，账户将被匿名化且无法恢复。请确认您了解此操作的后果。",
+      "确认删除所有数据",
+      {
+        confirmButtonText: "确认删除",
+        cancelButtonText: "取消",
+        type: "warning",
+        dangerouslyUseHTMLString: false,
+      }
+    );
+    const email = auth.user?.email;
+    if (!email) {
+      ElMessage.error("无法获取邮箱信息");
+      return;
+    }
+    await ElMessageBox.prompt("请输入您的邮箱地址以确认删除操作", "邮箱确认", {
+      confirmButtonText: "确认",
+      cancelButtonText: "取消",
+      inputPattern: new RegExp(`^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),
+      inputErrorMessage: "邮箱地址不匹配",
+    });
+    deletingData.value = true;
+    const { data } = await api.post("/gdpr/deletion-request", null, {
+      params: { confirm_email: email },
+    });
+    const result = data?.data || data;
+    ElMessage.success(`数据删除成功，共删除 ${result.total_deleted} 条记录`);
+    auth.logout();
+    window.location.href = "/login";
+  } catch (e: any) {
+    if (e !== "cancel" && e?.message !== "cancel") {
+      ElMessage.error("数据删除失败");
+    }
+  } finally {
+    deletingData.value = false;
+  }
+}
+
+async function showPrivacyPolicy() {
+  try {
+    const { data } = await api.get("/gdpr/privacy-policy");
+    const policy = data?.data || data;
+    ElMessageBox.alert(
+      `<div style="max-height: 400px; overflow-y: auto; text-align: left; font-size: 13px; line-height: 1.6;">
+        <p><strong>数据控制者:</strong> ${policy.policy?.data_controller || "-"}</p>
+        <p><strong>生效日期:</strong> ${policy.effective_date || "-"}</p>
+        <p><strong>收集的数据类型:</strong></p>
+        <ul>${(policy.policy?.data_types_collected || []).map((i: string) => `<li>${i}</li>`).join("")}</ul>
+        <p><strong>数据处理目的:</strong></p>
+        <ul>${(policy.policy?.data_purposes || []).map((i: string) => `<li>${i}</li>`).join("")}</ul>
+        <p><strong>您的权利:</strong></p>
+        <ul>${(policy.policy?.user_rights || []).map((i: string) => `<li>${i}</li>`).join("")}</ul>
+        <p><strong>数据保留:</strong> ${policy.policy?.data_retention || "-"}</p>
+        <p><strong>联系方式:</strong> ${policy.policy?.contact || "-"}</p>
+      </div>`,
+      "隐私政策",
+      { dangerouslyUseHTMLString: true, confirmButtonText: "我已了解" }
+    );
+  } catch {
+    ElMessage.error("获取隐私政策失败");
+  }
+}
 
 const PLAN_LIMITS_MAP: Record<string, { maxProducts: number; maxConcurrency: number; dailyCollectLimit: number }> = {
   free: { maxProducts: 3, maxConcurrency: 2, dailyCollectLimit: 50 },
@@ -267,6 +469,7 @@ async function fetchLicenseStatus() {
 
 onMounted(() => {
   fetchLicenseStatus();
+  fetchDataSummary();
 });
 </script>
 
@@ -388,5 +591,87 @@ onMounted(() => {
   margin-top: 6px;
   font-size: 12px;
   color: #6a6a7a;
+}
+
+.privacy-section {
+  margin-bottom: 8px;
+}
+
+.privacy-subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e0e0e6;
+  margin: 0 0 12px;
+}
+
+.privacy-hint {
+  font-size: 11px;
+  color: #6a6a7a;
+  margin-left: 8px;
+}
+
+.data-summary {
+  margin-bottom: 16px;
+}
+
+.data-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.data-summary-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.data-summary-label {
+  font-size: 12px;
+  color: #8a8a9a;
+}
+
+.data-summary-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e0e0e6;
+}
+
+.data-summary-error {
+  color: #6a6a7a;
+}
+
+.data-summary-total {
+  font-size: 13px;
+  color: #8a8a9a;
+}
+
+.data-summary-total strong {
+  color: #e0e0e6;
+}
+
+.data-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.privacy-danger-zone {
+  border: 1px solid rgba(245, 108, 108, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba(245, 108, 108, 0.03);
+}
+
+.privacy-warning {
+  font-size: 12px;
+  color: #f5a3a3;
+  margin: 0 0 12px;
+  line-height: 1.6;
 }
 </style>

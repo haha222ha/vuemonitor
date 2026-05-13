@@ -1,6 +1,6 @@
 import uuid
 from datetime import date, datetime
-from sqlalchemy import Boolean, DateTime, Float, Index, Integer, String, UniqueConstraint
+from sqlalchemy import Boolean, Date, DateTime, Float, Index, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import UUIDPrimaryKeyMixin, Base
@@ -40,7 +40,7 @@ class CategoryStat(UUIDPrimaryKeyMixin, Base):
 
     category: Mapped[str] = mapped_column(String(100), nullable=False)
     platform: Mapped[str] = mapped_column(String(50), nullable=False)
-    date: Mapped[date] = mapped_column(nullable=False)
+    date: Mapped[date] = mapped_column(Date, nullable=False)
     watch_count: Mapped[int] = mapped_column(Integer, nullable=False)
     unique_products: Mapped[int] = mapped_column(Integer, nullable=False)
     unique_users: Mapped[int] = mapped_column(Integer, nullable=False)

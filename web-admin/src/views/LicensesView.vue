@@ -45,7 +45,7 @@ const formRules: FormRules = {
 
 async function fetchLicenses() {
   try {
-    await store.fetchLicenses();
+    await store.fetchLicenses(1, 20);
   } catch {
     ElMessage.error("获取授权码列表失败");
   }

@@ -682,7 +682,9 @@ export class CloudSyncManager extends EventEmitter {
   }
 
   async requestAIAnalysis(productId: string, analysisType: string): Promise<AIAnalysisResult | null> {
-    if (!this.serverUrl || !this.token) return null;
+    if (!this.serverUrl || !this.token) {
+      throw new Error("network: 未连接到服务器，请先登录");
+    }
 
     try {
       const { data } = await axios.post(
@@ -709,9 +711,27 @@ export class CloudSyncManager extends EventEmitter {
         return aiResult;
       }
 
-      return null;
-    } catch {
-      return null;
+      const errMsg = data?.message || data?.data?.message || "AI分析请求失败";
+      if (errMsg.includes("permission") || errMsg.includes("gate") || errMsg.includes("权限")) {
+        throw new Error(`permission: ${errMsg}`);
+      }
+      if (errMsg.includes("quota") || errMsg.includes("配额") || errMsg.includes("limit")) {
+        throw new Error(`quota: ${errMsg}`);
+      }
+      throw new Error(`provider: ${errMsg}`);
+    } catch (err) {
+      if (err instanceof Error && (err.message.startsWith("permission:") || err.message.startsWith("quota:") || err.message.startsWith("provider:"))) {
+        throw err;
+      }
+      const axiosErr = err as { code?: string; message?: string };
+      if (axiosErr.code === "ECONNREFUSED" || axiosErr.code === "ETIMEDOUT" || axiosErr.code === "ERR_NETWORK") {
+        throw new Error("network: 网络连接失败，请检查网络后重试");
+      }
+      if (axiosErr.message?.includes("timeout")) {
+        throw new Error("network: 请求超时，请稍后重试");
+      }
+      logger.error("CloudSync", "AI分析请求失败", err);
+      throw new Error(`unknown: ${err instanceof Error ? err.message : "AI分析请求失败"}`);
     }
   }
 

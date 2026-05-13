@@ -206,8 +206,8 @@ async def admin_revoke_license(
 @router.post("/licenses/{license_id}/renew")
 async def admin_renew_license(
     license_id: uuid.UUID,
+    admin: AdminUser,
     extra_days: int = Query(..., ge=1, le=3650),
-    admin: AdminUser = Depends(),
     db: AsyncSession = Depends(get_db),
 ):
     from app.services.license_service import LicenseService
@@ -220,8 +220,8 @@ async def admin_renew_license(
 @router.post("/licenses/{license_id}/upgrade")
 async def admin_upgrade_license(
     license_id: uuid.UUID,
+    admin: AdminUser,
     new_plan: str = Query(..., pattern="^(pro|premium|enterprise)$"),
-    admin: AdminUser = Depends(),
     db: AsyncSession = Depends(get_db),
 ):
     from app.services.license_service import LicenseService

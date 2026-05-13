@@ -3,6 +3,11 @@
     <div class="page-toolbar">
       <h3>AI分析中心</h3>
       <div class="toolbar-right">
+        <el-tag v-if="!aiStatus.enabled" type="danger" size="small" style="margin-right: 8px;">AI未连接</el-tag>
+        <el-tag v-else type="success" size="small" style="margin-right: 8px;">AI已就绪({{ aiStatus.defaultProvider }})</el-tag>
+        <router-link to="/dashboard/ai/reports" style="margin-right: 8px;">
+          <el-button size="small" text type="primary">查看报告</el-button>
+        </router-link>
         <el-tag v-if="auth.userPlan === 'free'" type="info">免费版 — 基础趋势描述</el-tag>
         <el-tag v-else-if="auth.userPlan === 'pro'" type="primary">Pro — 趋势评分</el-tag>
         <el-tag v-else-if="auth.userPlan === 'premium'" type="warning">Premium — 完整AI决策</el-tag>
@@ -35,8 +40,10 @@
             <el-radio-group v-model="analysisType" size="small" @change="onTypeChange">
               <el-radio-button value="basic_analysis">基础分析</el-radio-button>
               <el-radio-button v-if="auth.userPlan !== 'free'" value="trend_score">趋势评分</el-radio-button>
+              <el-radio-button v-if="auth.userPlan !== 'free'" value="competitor_analysis">竞品分析</el-radio-button>
               <el-radio-button v-if="auth.userPlan === 'premium' || auth.userPlan === 'enterprise'" value="prediction">爆品预测</el-radio-button>
               <el-radio-button v-if="auth.userPlan === 'premium' || auth.userPlan === 'enterprise'" value="risk_warning">风险预警</el-radio-button>
+              <el-radio-button v-if="auth.userPlan === 'premium' || auth.userPlan === 'enterprise'" value="product_selection">选品建议</el-radio-button>
             </el-radio-group>
             <el-button type="primary" size="small" :loading="analysisLoading" @click="runAnalysis" style="margin-left: auto;">
               {{ analysisLoading ? '分析中...' : '开始分析' }}
@@ -206,6 +213,124 @@
                 </div>
               </template>
 
+              <template v-else-if="analysisType === 'competitor_analysis'">
+                <div v-if="extractField('comparison_summary')" class="result-card">
+                  <h4>对比摘要</h4>
+                  <p class="trend-text">{{ extractField('comparison_summary') }}</p>
+                </div>
+                <el-row :gutter="16" style="margin-top: 12px;">
+                  <el-col :span="8">
+                    <div class="result-card">
+                      <h4>价格排名</h4>
+                      <div class="factors-list">
+                        <template v-if="Array.isArray(extractField('price_ranking'))">
+                          <el-tag v-for="(p, i) in extractField('price_ranking')" :key="i" size="small" style="margin: 2px 4px;">{{ typeof p === 'object' ? `${p.name}: ¥${p.price}` : p }}</el-tag>
+                        </template>
+                        <p v-else>{{ extractField('price_ranking') || '暂无' }}</p>
+                      </div>
+                    </div>
+                  </el-col>
+                  <el-col :span="8">
+                    <div class="result-card">
+                      <h4>销量排名</h4>
+                      <div class="factors-list">
+                        <template v-if="Array.isArray(extractField('sales_ranking'))">
+                          <el-tag v-for="(s, i) in extractField('sales_ranking')" :key="i" size="small" type="success" style="margin: 2px 4px;">{{ typeof s === 'object' ? `${s.name}: ${s.sales}` : s }}</el-tag>
+                        </template>
+                        <p v-else>{{ extractField('sales_ranking') || '暂无' }}</p>
+                      </div>
+                    </div>
+                  </el-col>
+                  <el-col :span="8">
+                    <div class="result-card">
+                      <h4>评分排名</h4>
+                      <div class="factors-list">
+                        <template v-if="Array.isArray(extractField('rating_ranking'))">
+                          <el-tag v-for="(r, i) in extractField('rating_ranking')" :key="i" size="small" type="warning" style="margin: 2px 4px;">{{ typeof r === 'object' ? `${r.name}: ${r.rating}` : r }}</el-tag>
+                        </template>
+                        <p v-else>{{ extractField('rating_ranking') || '暂无' }}</p>
+                      </div>
+                    </div>
+                  </el-col>
+                </el-row>
+                <div v-if="extractField('differentiation_suggestions')" class="result-card" style="margin-top: 12px;">
+                  <h4>差异化建议</h4>
+                  <div class="factors-list">
+                    <template v-if="Array.isArray(extractField('differentiation_suggestions'))">
+                      <el-tag v-for="(d, i) in extractField('differentiation_suggestions')" :key="i" size="small" type="primary" style="margin: 2px 4px;">{{ typeof d === 'object' ? d.suggestion || d : d }}</el-tag>
+                    </template>
+                    <p v-else>{{ extractField('differentiation_suggestions') }}</p>
+                  </div>
+                </div>
+                <div v-if="extractField('market_gap')" class="result-card" style="margin-top: 12px;">
+                  <h4>市场空白点</h4>
+                  <p class="trend-text">{{ typeof extractField('market_gap') === 'object' ? JSON.stringify(extractField('market_gap')) : extractField('market_gap') }}</p>
+                </div>
+              </template>
+
+              <template v-else-if="analysisType === 'product_selection'">
+                <el-row :gutter="16">
+                  <el-col :span="6">
+                    <div class="result-card highlight">
+                      <h4>品类评分</h4>
+                      <div class="big-number accent">{{ extractField('category_score') || 0 }}</div>
+                      <div class="sub-label">/100</div>
+                    </div>
+                  </el-col>
+                  <el-col :span="6">
+                    <div class="result-card">
+                      <h4>市场规模</h4>
+                      <el-tag :type="extractField('market_size') === 'large' ? 'success' : extractField('market_size') === 'medium' ? 'warning' : 'info'" size="large">
+                        {{ { large: '大', medium: '中', small: '小' }[extractField('market_size')] || extractField('market_size') || 'N/A' }}
+                      </el-tag>
+                    </div>
+                  </el-col>
+                  <el-col :span="6">
+                    <div class="result-card">
+                      <h4>竞争程度</h4>
+                      <el-tag :type="extractField('competition_level') === 'low' ? 'success' : extractField('competition_level') === 'medium' ? 'warning' : 'danger'" size="large">
+                        {{ { high: '激烈', medium: '中等', low: '温和' }[extractField('competition_level')] || extractField('competition_level') || 'N/A' }}
+                      </el-tag>
+                    </div>
+                  </el-col>
+                  <el-col :span="6">
+                    <div class="result-card">
+                      <h4>增长潜力</h4>
+                      <el-tag :type="extractField('growth_potential') === 'high' ? 'success' : extractField('growth_potential') === 'medium' ? 'warning' : 'info'" size="large">
+                        {{ { high: '高', medium: '中', low: '低' }[extractField('growth_potential')] || extractField('growth_potential') || 'N/A' }}
+                      </el-tag>
+                    </div>
+                  </el-col>
+                </el-row>
+                <div v-if="extractField('recommended_categories')" class="result-card" style="margin-top: 16px;">
+                  <h4>推荐品类方向</h4>
+                  <div class="factors-list">
+                    <template v-if="Array.isArray(extractField('recommended_categories'))">
+                      <el-tag v-for="(c, i) in extractField('recommended_categories')" :key="i" size="small" type="success" style="margin: 2px 4px;">{{ typeof c === 'object' ? `${c.name}（${c.reason}）` : c }}</el-tag>
+                    </template>
+                    <p v-else>{{ extractField('recommended_categories') }}</p>
+                  </div>
+                </div>
+                <div v-if="extractField('avoid_categories')" class="result-card" style="margin-top: 12px;">
+                  <h4>建议回避品类</h4>
+                  <div class="factors-list">
+                    <template v-if="Array.isArray(extractField('avoid_categories'))">
+                      <el-tag v-for="(c, i) in extractField('avoid_categories')" :key="i" size="small" type="danger" style="margin: 2px 4px;">{{ typeof c === 'object' ? `${c.name}（${c.reason}）` : c }}</el-tag>
+                    </template>
+                    <p v-else>{{ extractField('avoid_categories') }}</p>
+                  </div>
+                </div>
+                <div v-if="extractField('action_plan')" class="result-card" style="margin-top: 12px;">
+                  <h4>选品行动计划</h4>
+                  <div class="factors-list">
+                    <template v-if="Array.isArray(extractField('action_plan'))">
+                      <el-tag v-for="(a, i) in extractField('action_plan')" :key="i" size="small" style="margin: 2px 4px;">{{ i + 1 }}. {{ typeof a === 'object' ? a.action || a.step || JSON.stringify(a) : a }}</el-tag>
+                    </template>
+                    <p v-else>{{ extractField('action_plan') }}</p>
+                  </div>
+                </div>
+              </template>
+
               <template v-else>
                 <el-row :gutter="16">
                   <el-col :span="12">
@@ -298,6 +423,7 @@ const history = ref<any[]>([]);
 const historyLoading = ref(false);
 
 const quotaInfo = reactive({ used: 0, limit: 0 });
+const aiStatus = reactive({ enabled: false, providers: [] as string[], defaultProvider: "" });
 
 const planQuotaMap: Record<string, number> = {
   free: 5,
@@ -361,12 +487,12 @@ function potentialLabel(level: string) {
 }
 
 function analysisTypeTag(type: string) {
-  const map: Record<string, string> = { basic_analysis: "", trend_score: "primary", prediction: "warning", risk_warning: "danger", report: "success" };
+  const map: Record<string, string> = { basic_analysis: "", trend_score: "primary", prediction: "warning", risk_warning: "danger", report: "success", competitor_analysis: "primary", product_selection: "warning" };
   return (map[type] || "info") as any;
 }
 
 function analysisTypeLabel(type: string) {
-  const map: Record<string, string> = { basic_analysis: "基础分析", trend_score: "趋势评分", prediction: "爆品预测", risk_warning: "风险预警", report: "分析报告" };
+  const map: Record<string, string> = { basic_analysis: "基础分析", trend_score: "趋势评分", prediction: "爆品预测", risk_warning: "风险预警", report: "分析报告", competitor_analysis: "竞品分析", product_selection: "选品建议" };
   return map[type] || type;
 }
 
@@ -459,6 +585,18 @@ async function fetchQuota() {
   } catch {}
 }
 
+async function fetchAIStatus() {
+  try {
+    const { data } = await api.get("/ai/status");
+    const s = data?.data;
+    if (s) {
+      aiStatus.enabled = s.ai_enabled ?? false;
+      aiStatus.providers = s.available_providers ?? [];
+      aiStatus.defaultProvider = s.default_provider ?? "";
+    }
+  } catch {}
+}
+
 onMounted(async () => {
   try {
     const { data } = await api.get("/products", { params: { page_size: 100 } });
@@ -466,6 +604,7 @@ onMounted(async () => {
   } catch {}
   fetchHistory();
   fetchQuota();
+  fetchAIStatus();
 });
 </script>
 
@@ -704,5 +843,27 @@ onMounted(async () => {
   font-size: 12px;
   color: #6366f1;
   margin-top: 2px;
+}
+
+.big-number {
+  font-size: 36px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.big-number.accent {
+  color: #6366f1;
+}
+
+.sub-label {
+  font-size: 13px;
+  color: #6a6a7a;
+  margin-top: 4px;
+}
+
+.result-card.highlight {
+  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(99, 102, 241, 0.05);
 }
 </style>
