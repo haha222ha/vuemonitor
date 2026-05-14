@@ -1,8 +1,10 @@
-import initSqlJs, { Database as SqlJsDatabase } from "sql.js";
 import * as path from "path";
 import * as fs from "fs";
 import { app } from "electron";
 import { encryptRow, decryptRow } from "../crypto/encryption";
+
+let initSqlJs: typeof import("sql.js").default;
+let SqlJsDatabase: typeof import("sql.js").Database;
 
 let db: SqlJsDatabase | null = null;
 let storage: SQLiteStorage | null = null;
@@ -247,33 +249,38 @@ export class SQLiteStorage {
 export async function initStorage(): Promise<SQLiteStorage> {
   if (storage) return storage;
 
+  const sqlJsModule = require("sql.js");
+  initSqlJs = sqlJsModule.default || sqlJsModule;
+  SqlJsDatabase = sqlJsModule.Database;
+
   const userDataPath = app.getPath("userData");
   dbPath = path.join(userDataPath, "vuemonitor.db");
 
-  const isDev = process.env.NODE_ENV === "development";
   let wasmBinary: Buffer;
 
   const wasmSearchPaths = [
+    path.join(process.resourcesPath, "sql-wasm.wasm"),
+    path.join(__dirname, "..", "node_modules", "sql.js", "dist", "sql-wasm.wasm"),
     path.join(process.cwd(), "node_modules", "sql.js", "dist", "sql-wasm.wasm"),
     path.join(app.getAppPath(), "node_modules", "sql.js", "dist", "sql-wasm.wasm"),
-    path.join(__dirname, "..", "sql-wasm.wasm"),
     path.join(__dirname, "sql-wasm.wasm"),
-    path.join(process.resourcesPath, "sql-wasm.wasm"),
   ];
 
-  let wasmPath = "";
+  let foundWasmPath = "";
   for (const p of wasmSearchPaths) {
-    if (fs.existsSync(p)) {
-      wasmPath = p;
-      break;
-    }
+    try {
+      if (fs.existsSync(p)) {
+        foundWasmPath = p;
+        break;
+      }
+    } catch {}
   }
 
-  if (!wasmPath) {
+  if (!foundWasmPath) {
     throw new Error("sql-wasm.wasm not found in any search path");
   }
 
-  wasmBinary = fs.readFileSync(wasmPath);
+  wasmBinary = fs.readFileSync(foundWasmPath);
 
   const SQL = await initSqlJs({
     wasmBinary,
