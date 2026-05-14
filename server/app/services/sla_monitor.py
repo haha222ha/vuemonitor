@@ -91,10 +91,9 @@ class SLAMonitor:
 
         if error_budget < 3600:
             await alert_service.send_alert(
+                level="critical",
                 title="SLO 告警: 错误预算不足",
-                message=f"API 可用性错误预算仅剩 {error_budget:.0f} 秒，低于 1 小时阈值",
-                severity="critical",
-                channel="webhook",
+                detail=f"API 可用性错误预算仅剩 {error_budget:.0f} 秒，低于 1 小时阈值",
             )
 
     async def _eval_latency(self, slo: dict, window_start: float, now: float):
@@ -107,17 +106,15 @@ class SLAMonitor:
 
         if burn_rate > 10:
             await alert_service.send_alert(
+                level="critical",
                 title="SLO 严重告警: 错误预算快速消耗",
-                message=f"错误预算消耗速率 = {burn_rate:.1f}x，超过 10x 阈值",
-                severity="critical",
-                channel="webhook",
+                detail=f"错误预算消耗速率 = {burn_rate:.1f}x，超过 10x 阈值",
             )
         elif burn_rate > 2:
             await alert_service.send_alert(
+                level="warning",
                 title="SLO 告警: 错误预算消耗加速",
-                message=f"错误预算消耗速率 = {burn_rate:.1f}x，超过 2x 阈值",
-                severity="warning",
-                channel="webhook",
+                detail=f"错误预算消耗速率 = {burn_rate:.1f}x，超过 2x 阈值",
             )
 
     def get_slos(self) -> dict:
