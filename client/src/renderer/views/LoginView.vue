@@ -71,7 +71,7 @@
 
         <div class="login__register-link">
           <span>没有账号？</span>
-          <el-button link type="primary" @click="showRegister = true">立即注册</el-button>
+          <el-button type="primary" plain @click="showRegister = true" class="login__register-btn">立即注册</el-button>
         </div>
       </div>
     </div>
@@ -365,6 +365,14 @@ async function handleRegister() {
   text-align: center;
   font-size: var(--text-sm);
   color: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.login__register-btn {
+  font-weight: 600;
 }
 
 .login__register-dialog :deep(.el-dialog) {
