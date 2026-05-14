@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, func, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -17,7 +17,7 @@ class AIPrediction(UUIDPrimaryKeyMixin, Base):
     )
     score: Mapped[float] = mapped_column(Integer, nullable=False)  # Stored as integer percentage (0-100)
     label: Mapped[str] = mapped_column(String(50), nullable=False)
-    breakdown: Mapped[dict] = mapped_column(JSONB, nullable=False, server_default="'{}'")
+    breakdown: Mapped[dict] = mapped_column(JSONB, nullable=False, server_default=text("'{}'"))
     reason: Mapped[str | None] = mapped_column(Text)
     model_version: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)

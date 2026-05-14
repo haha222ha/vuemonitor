@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, func, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -17,7 +17,7 @@ class MembershipPlan(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     ai_quota: Mapped[int] = mapped_column(Integer, nullable=False)
     task_limit: Mapped[int] = mapped_column(Integer, nullable=False)
     max_projects: Mapped[int] = mapped_column(Integer, nullable=False)
-    features: Mapped[dict] = mapped_column(JSONB, nullable=False, server_default="'{}'")
+    features: Mapped[dict] = mapped_column(JSONB, nullable=False, server_default=text("'{}'"))
 
     # Relationships
     user_memberships: Mapped[list["UserMembership"]] = relationship(
