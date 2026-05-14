@@ -3,6 +3,7 @@ import { getStorage } from "../storage/sqlite";
 import { normalizer, NormalizedXHSData, NormalizationResult } from "../collect/normalizer";
 import { featureEngine } from "../feature/feature-engine";
 import { localRuleEvaluator } from "../monitor/local-evaluator";
+import { offlineMode } from "../services/offline-mode";
 import { logger } from "../logger/logger";
 
 export interface DataMartEntry {
@@ -136,9 +137,11 @@ export class DataMart extends EventEmitter {
     setImmediate(() => featureEngine.computeForProduct(existing.id));
     setImmediate(() => {
       try {
-        const triggered = localRuleEvaluator.evaluateForProduct(existing.id);
-        if (triggered > 0) {
-          this.emit("monitor:triggered", { productId: existing.id, count: triggered });
+        if (!offlineMode.getStatus().isOnline) {
+          const triggered = localRuleEvaluator.evaluateForProduct(existing.id);
+          if (triggered > 0) {
+            this.emit("monitor:triggered", { productId: existing.id, count: triggered });
+          }
         }
       } catch {}
     });

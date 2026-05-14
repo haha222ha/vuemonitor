@@ -1,12 +1,13 @@
 <template>
   <div class="monitor fade-in">
-    <PageHeader title="监控规则" subtitle="设置商品价格、销量、库存等监控预警规则">
+    <PageHeader title="异动规则" subtitle="设置商品异动监控，价格/销量/评分变化自动预警">
+      <el-tag v-if="!cloudAvailable" type="warning" effect="dark" size="small" style="margin-right: 8px">离线模式</el-tag>
       <el-button @click="showTemplateDialog = true">从模板创建</el-button>
       <el-button type="primary" @click="openCreateDialog">新建规则</el-button>
     </PageHeader>
 
     <div v-if="rules.length === 0 && !loading" class="monitor__empty">
-      <EmptyState :icon="Bell" title="暂无监控规则" description="创建监控规则，当商品价格、销量等发生变化时自动通知您" />
+      <EmptyState :icon="Bell" title="暂无异动规则" description="创建异动规则，当商品价格、销量、评分等发生变化时自动预警" />
     </div>
 
     <div v-else class="monitor__grid">
@@ -20,6 +21,7 @@
           <div class="rule-card__info">
             <div class="rule-card__name">{{ rule.rule_name }}</div>
             <el-tag size="small" :type="typeTagType(rule.rule_type)">{{ typeLabel(rule.rule_type) }}</el-tag>
+            <el-tag v-if="rule.severity && rule.severity !== 'warning'" size="small" :type="severityTagType(rule.severity)" effect="dark">{{ severityLabel(rule.severity) }}</el-tag>
           </div>
           <el-switch :model-value="rule.is_active" size="small" @change="toggleRule(rule)" />
         </div>
@@ -195,7 +197,6 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from "vue";
-import api from "../utils/api";
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
 import PageHeader from "../components/PageHeader.vue";
@@ -210,6 +211,7 @@ import {
   Warning,
   Bell,
 } from "@element-plus/icons-vue";
+import api from "../utils/api";
 
 const rules = ref<any[]>([]);
 const products = ref<any[]>([]);
@@ -219,6 +221,7 @@ const showCreateDialog = ref(false);
 const showTemplateDialog = ref(false);
 const editingRule = ref<any>(null);
 const formRef = ref<FormInstance>();
+const cloudAvailable = ref(true);
 
 const conditionToggles = reactive({
   price_threshold: true,
@@ -273,6 +276,16 @@ function typeColor(type: string) { return TYPE_CONFIG[type]?.color || "#909399";
 function typeBg(type: string) { return TYPE_CONFIG[type]?.bg || "#F5F7FA"; }
 function typeLabel(type: string) { return TYPE_CONFIG[type]?.label || type; }
 function typeTagType(type: string) { return TYPE_CONFIG[type]?.tagType || "info"; }
+
+function severityTagType(severity: string): string {
+  const map: Record<string, string> = { critical: "danger", high: "danger", warning: "warning", info: "info", low: "info" };
+  return map[severity] || "info";
+}
+
+function severityLabel(severity: string): string {
+  const map: Record<string, string> = { critical: "紧急", high: "高", warning: "中", info: "低", low: "低" };
+  return map[severity] || severity;
+}
 
 const ruleTemplates = [
   { id: "price_alert_20", name: "价格下跌20%预警", description: "当商品价格跌幅超过20%时立即通知", rule_type: "price_drop", icon: PriceTag, color: "#F56C6C", bg: "#FEF0F0", conditions: { threshold: 20 } },
@@ -359,15 +372,81 @@ function applyTemplate(tpl: any) {
 async function fetchData() {
   loading.value = true;
   try {
-    const [rulesRes, productsRes] = await Promise.all([api.get("/monitor/rules"), api.get("/products", { params: { page_size: 200 } })]);
-    rules.value = rulesRes.data?.data || [];
-    products.value = productsRes.data?.data?.items || [];
-  } catch { ElMessage.error("获取数据失败"); } finally { loading.value = false; }
+    const productsRes = await window.electronAPI.invoke("storage:get-products");
+    products.value = productsRes || [];
+  } catch {}
+
+  try {
+    const { data: rulesRes } = await api.get("/alert-rules");
+    if (rulesRes?.code === 0 && Array.isArray(rulesRes.data)) {
+      rules.value = rulesRes.data.map((r: any) => adaptServerRule(r));
+      cloudAvailable.value = true;
+    } else {
+      throw new Error("invalid response");
+    }
+  } catch {
+    cloudAvailable.value = false;
+    try {
+      const localRules = await window.electronAPI.invoke("monitor:get-rules");
+      rules.value = localRules || [];
+    } catch {
+      rules.value = [];
+    }
+  } finally {
+    loading.value = false;
+  }
+}
+
+function adaptServerRule(r: any) {
+  const ruleType = metricToRuleType(r.metric, r.rule_type);
+  return {
+    id: r.id,
+    rule_name: r.name,
+    rule_type: ruleType,
+    product_id: r.filters?.product_id || null,
+    conditions: buildConditionsFromServer(r),
+    notify_channels: r.channels?.notify || ["app"],
+    is_active: r.is_active,
+    trigger_count: r.trigger_count || 0,
+    last_triggered_at: r.last_triggered_at,
+    severity: r.severity,
+    window_minutes: r.window_minutes,
+    cooldown_minutes: r.cooldown_minutes,
+  };
+}
+
+function metricToRuleType(metric: string, ruleType?: string): string {
+  if (ruleType && ["price_drop", "sales_surge", "stock_change", "rating_drop"].includes(ruleType)) return ruleType;
+  const map: Record<string, string> = {
+    price: "price_drop", sales_count: "sales_surge", stock: "stock_change",
+    rating: "rating_drop", review_count: "rating_drop", favorite_count: "sales_surge",
+  };
+  return map[metric] || "custom";
+}
+
+function buildConditionsFromServer(r: any): Record<string, any> {
+  const c: Record<string, any> = {};
+  const metric = r.metric || "";
+  const op = r.operator || "";
+  const threshold = r.threshold;
+  if (metric === "price" && op === "decrease_by_percent" && threshold) c.threshold = threshold;
+  else if (metric === "price" && op === "less_than" && threshold) c.below_price = threshold;
+  else if (metric === "sales_count" && op === "increase_by_percent" && threshold) c.threshold = threshold;
+  else if (metric === "sales_count" && op === "increase_by" && threshold) c.absolute_increase = threshold;
+  else if (metric === "stock" && op === "equals" && threshold === 0) c.stock_events = ["out_of_stock"];
+  else if (metric === "rating" && op === "less_than" && threshold) c.below_rating = threshold;
+  else if (metric === "rating" && op === "decrease_by" && threshold) c.rating_decrease = threshold;
+  if (r.window_minutes) c.window_hours = Math.round(r.window_minutes / 60) || 1;
+  return c;
 }
 
 async function toggleRule(rule: any) {
   try {
-    await api.put(`/monitor/rules/${rule.id}`, { is_active: !rule.is_active });
+    if (cloudAvailable.value) {
+      await api.put(`/alert-rules/${rule.id}`, { is_active: !rule.is_active });
+    } else {
+      await window.electronAPI.invoke("monitor:toggle-rule", rule.id, !rule.is_active);
+    }
     rule.is_active = !rule.is_active;
     ElMessage.success(rule.is_active ? "已启用" : "已停用");
   } catch { ElMessage.error("操作失败"); }
@@ -376,7 +455,11 @@ async function toggleRule(rule: any) {
 async function confirmDeleteRule(id: string) {
   try {
     await ElMessageBox.confirm("确定要删除该规则吗？", "确认删除", { confirmButtonText: "删除", cancelButtonText: "取消", type: "warning" });
-    await api.delete(`/monitor/rules/${id}`);
+    if (cloudAvailable.value) {
+      await api.delete(`/alert-rules/${id}`);
+    } else {
+      await window.electronAPI.invoke("monitor:delete-rule", id);
+    }
     ElMessage.success("删除成功");
     fetchData();
   } catch {}
@@ -412,16 +495,60 @@ async function handleSubmitRule() {
   submitting.value = true;
   try {
     const conditions = buildConditions();
-    if (editingRule.value) {
-      await api.put(`/monitor/rules/${editingRule.value.id}`, { rule_name: ruleForm.rule_name, conditions, notify_channels: ruleForm.notify_channels, is_active: ruleForm.is_active });
-      ElMessage.success("规则已更新");
+    if (cloudAvailable.value) {
+      const serverPayload = buildServerPayload(ruleForm.rule_name, ruleForm.rule_type, conditions, ruleForm.notify_channels, ruleForm.is_active, ruleForm.product_id);
+      if (editingRule.value) {
+        await api.put(`/alert-rules/${editingRule.value.id}`, serverPayload);
+        ElMessage.success("规则已更新");
+      } else {
+        await api.post("/alert-rules", serverPayload);
+        ElMessage.success("规则已创建");
+      }
     } else {
-      await api.post("/monitor/rules", { product_id: ruleForm.product_id, rule_name: ruleForm.rule_name, rule_type: ruleForm.rule_type, conditions, notify_channels: ruleForm.notify_channels });
-      ElMessage.success("规则已创建");
+      if (editingRule.value) {
+        await window.electronAPI.invoke("monitor:update-rule", editingRule.value.id, { rule_name: ruleForm.rule_name, conditions, notify_channels: ruleForm.notify_channels, is_active: ruleForm.is_active });
+        ElMessage.success("规则已更新");
+      } else {
+        await window.electronAPI.invoke("monitor:create-rule", { product_id: ruleForm.product_id, rule_name: ruleForm.rule_name, rule_type: ruleForm.rule_type, conditions, notify_channels: ruleForm.notify_channels, is_active: ruleForm.is_active });
+        ElMessage.success("规则已创建");
+      }
     }
     showCreateDialog.value = false;
     fetchData();
   } catch { ElMessage.error(editingRule.value ? "更新失败" : "创建失败"); } finally { submitting.value = false; }
+}
+
+function buildServerPayload(name: string, ruleType: string, conditions: Record<string, any>, channels: string[], isActive: boolean, productId?: string) {
+  const metricMap: Record<string, string> = {
+    price_drop: "price", sales_surge: "sales_count", stock_change: "stock", rating_drop: "rating",
+  };
+  const metric = metricMap[ruleType] || "price";
+  let operator = "decrease_by_percent";
+  let threshold = 10;
+  const windowMinutes = (conditions.window_hours || 1) * 60;
+
+  if (ruleType === "price_drop") {
+    if (conditions.threshold) { operator = "decrease_by_percent"; threshold = conditions.threshold; }
+    else if (conditions.below_price) { operator = "less_than"; threshold = conditions.below_price; }
+  } else if (ruleType === "sales_surge") {
+    if (conditions.threshold) { operator = "increase_by_percent"; threshold = conditions.threshold; }
+    else if (conditions.absolute_increase) { operator = "increase_by"; threshold = conditions.absolute_increase; }
+  } else if (ruleType === "stock_change") {
+    if (conditions.stock_events?.includes("out_of_stock")) { operator = "equals"; threshold = 0; }
+    else if (conditions.stock_drop_percent) { operator = "decrease_by_percent"; threshold = conditions.stock_drop_percent; }
+  } else if (ruleType === "rating_drop") {
+    if (conditions.below_rating) { operator = "less_than"; threshold = conditions.below_rating; }
+    else if (conditions.rating_decrease) { operator = "decrease_by"; threshold = conditions.rating_decrease; }
+  }
+
+  const params: Record<string, any> = {
+    name, rule_type: ruleType, metric, operator, threshold,
+    window_minutes: windowMinutes, cooldown_minutes: 30,
+    severity: "warning", is_active: isActive,
+  };
+  if (channels.length > 0) params.channels = { notify: channels };
+  if (productId) params.filters = { product_id: productId };
+  return params;
 }
 
 onMounted(fetchData);

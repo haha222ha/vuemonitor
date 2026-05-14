@@ -54,10 +54,12 @@ function wireDataMartSync(): void {
   });
 }
 
+let workerInitPromise: Promise<void> | null = null;
+
 export function getWorker(): ChromiumCollectWorker {
   if (!chromiumWorker) {
     chromiumWorker = new ChromiumCollectWorker();
-    chromiumWorker.init();
+    workerInitPromise = chromiumWorker.init();
 
     chromiumWorker.on("task:result", (result: CollectResult) => {
       if (result.status === "success" && result.data) {
@@ -263,22 +265,29 @@ export function registerIpcHandlers(): void {
 
   ipcMain.handle("collect:start", async (_event, tasks: CollectTask[]) => {
     const worker = getWorker();
+    if (workerInitPromise) {
+      await workerInitPromise;
+      workerInitPromise = null;
+    }
     worker.enqueueBatch(tasks);
     return { queued: tasks.length, activeCount: worker.getActiveCount(), queueLength: worker.getQueueLength() };
   });
 
   ipcMain.handle("collect:cancel", async (_event, taskId: string) => {
     const worker = getWorker();
+    if (workerInitPromise) { await workerInitPromise; workerInitPromise = null; }
     return worker.cancelTask(taskId);
   });
 
   ipcMain.handle("collect:clear-queue", async () => {
     const worker = getWorker();
+    if (workerInitPromise) { await workerInitPromise; workerInitPromise = null; }
     return worker.clearQueue();
   });
 
   ipcMain.handle("collect:status", async () => {
     const worker = getWorker();
+    if (workerInitPromise) { await workerInitPromise; workerInitPromise = null; }
     const ctrl = getConcurrencyCtrl();
     return {
       isRunning: worker.getActiveCount() > 0,
@@ -849,11 +858,109 @@ export function registerIpcHandlers(): void {
     }
   });
 
+  ipcMain.handle("monitor:get-rules", async () => {
+    const storage = getStorage();
+    const rules = storage.query("SELECT * FROM monitor_rules ORDER BY created_at DESC") as Record<string, unknown>[];
+    return rules.map((r) => ({
+      ...r,
+      conditions: typeof r.conditions === "string" ? JSON.parse(r.conditions) : r.conditions,
+      is_active: !!r.is_active,
+      trigger_count: r.trigger_count || 0,
+    }));
+  });
+
+  ipcMain.handle("monitor:create-rule", async (_event, rule: { product_id: string; rule_name: string; rule_type: string; conditions: Record<string, unknown>; notify_channels?: string[]; is_active?: boolean }) => {
+    const storage = getStorage();
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    storage.run(
+      "INSERT INTO monitor_rules (id, product_id, rule_name, rule_type, conditions, is_active, trigger_count, created_at) VALUES (?, ?, ?, ?, ?, ?, 0, ?)",
+      [id, rule.product_id, rule.rule_name, rule.rule_type, JSON.stringify(rule.conditions || {}), rule.is_active !== false ? 1 : 0, now]
+    );
+    return { id, ...rule, is_active: rule.is_active !== false, trigger_count: 0, created_at: now };
+  });
+
+  ipcMain.handle("monitor:update-rule", async (_event, ruleId: string, updates: Record<string, unknown>) => {
+    const storage = getStorage();
+    const sets: string[] = [];
+    const params: unknown[] = [];
+    if (updates.rule_name !== undefined) { sets.push("rule_name = ?"); params.push(updates.rule_name); }
+    if (updates.conditions !== undefined) { sets.push("conditions = ?"); params.push(JSON.stringify(updates.conditions)); }
+    if (updates.is_active !== undefined) { sets.push("is_active = ?"); params.push(updates.is_active ? 1 : 0); }
+    if (updates.notify_channels !== undefined) { sets.push("conditions = ?"); params.push(JSON.stringify({ ...(typeof updates.conditions === "object" ? updates.conditions as Record<string, unknown> : {}), _notify_channels: updates.notify_channels })); }
+    if (sets.length === 0) return { updated: false };
+    params.push(ruleId);
+    storage.run(`UPDATE monitor_rules SET ${sets.join(", ")} WHERE id = ?`, params);
+    return { updated: true };
+  });
+
+  ipcMain.handle("monitor:delete-rule", async (_event, ruleId: string) => {
+    const storage = getStorage();
+    storage.run("DELETE FROM monitor_rules WHERE id = ?", [ruleId]);
+    return { deleted: true };
+  });
+
+  ipcMain.handle("monitor:toggle-rule", async (_event, ruleId: string, active: boolean) => {
+    const storage = getStorage();
+    storage.run("UPDATE monitor_rules SET is_active = ? WHERE id = ?", [active ? 1 : 0, ruleId]);
+    return { updated: true };
+  });
+
   ipcMain.handle("monitor:evaluate", async (_event, productId?: string) => {
-    if (productId) {
-      return { triggered: localRuleEvaluator.evaluateForProduct(productId) };
+    if (!offlineMode.getStatus().isOnline) {
+      if (productId) {
+        return { triggered: localRuleEvaluator.evaluateForProduct(productId) };
+      }
+      return { triggered: localRuleEvaluator.evaluateAll() };
     }
-    return { triggered: localRuleEvaluator.evaluateAll() };
+    return { triggered: 0, skipped: true, reason: "online_mode" };
+  });
+
+  ipcMain.handle("ai:get-analyses", async (_event, params?: { page?: number; pageSize?: number }) => {
+    const storage = getStorage();
+    const page = params?.page || 1;
+    const pageSize = params?.pageSize || 50;
+    const offset = (page - 1) * pageSize;
+    const items = storage.query("SELECT * FROM ai_analysis ORDER BY analyzed_at DESC LIMIT ? OFFSET ?", [pageSize, offset]) as Record<string, unknown>[];
+    return {
+      items: items.map((a) => ({
+        ...a,
+        result: typeof a.result === "string" ? JSON.parse(a.result) : a.result,
+      })),
+      total: items.length,
+    };
+  });
+
+  ipcMain.handle("ai:get-reports", async () => {
+    const storage = getStorage();
+    const items = storage.query("SELECT * FROM ai_analysis WHERE analysis_type = 'report' ORDER BY analyzed_at DESC") as Record<string, unknown>[];
+    return items.map((a) => ({
+      id: a.id,
+      title: (typeof a.result === "string" ? JSON.parse(a.result as string) : a.result)?.title || "分析报告",
+      report_type: (typeof a.result === "string" ? JSON.parse(a.result as string) : a.result)?.report_type || "product",
+      status: "completed",
+      content: typeof a.result === "string" ? JSON.parse(a.result as string) : a.result,
+      created_at: a.analyzed_at,
+    }));
+  });
+
+  ipcMain.handle("ai:create-report", async (_event, params: { title: string; report_type: string; product_ids: string[] }) => {
+    const storage = getStorage();
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    const content = {
+      title: params.title,
+      report_type: params.report_type,
+      executive_summary: "报告正在生成中，请稍后查看",
+      product_analysis: null,
+      recommendations: [],
+      conclusion: "数据采集中，分析报告将在数据充足后自动生成",
+    };
+    storage.run(
+      "INSERT INTO ai_analysis (id, product_id, analysis_type, result, confidence, analyzed_at) VALUES (?, ?, ?, ?, ?, ?)",
+      [id, params.product_ids[0] || "", "report", JSON.stringify(content), 0, now]
+    );
+    return { id, status: "processing" };
   });
 
   ipcMain.handle("update:check", async (_event, silent?: boolean) => {

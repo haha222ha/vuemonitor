@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeImage } from "electron";
+import { app, BrowserWindow, nativeImage, Menu } from "electron";
 import * as path from "path";
 import { getCommunication } from "../communication/ws-client";
 import { autoUpdateManager } from "../update/auto-updater";
@@ -25,6 +25,7 @@ export class WindowManager {
       minHeight: 600,
       title: "XHS365 - 小红书AI选品",
       show: false,
+      autoHideMenuBar: true,
       webPreferences: {
         preload: path.join(__dirname, "../preload/preload.js"),
         contextIsolation: true,
@@ -32,6 +33,8 @@ export class WindowManager {
         session: undefined,
       },
     });
+
+    Menu.setApplicationMenu(null);
 
     this.mainWindow.once("ready-to-show", () => {
       this.mainWindow?.show();

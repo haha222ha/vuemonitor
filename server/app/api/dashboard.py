@@ -430,3 +430,172 @@ def _analysis_label(analysis_type: str) -> str:
         "risk_warning": "风险预警",
     }
     return mapping.get(analysis_type, analysis_type)
+
+
+@router.get("/home")
+async def get_home_data(
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+):
+    cache_key = f"dashboard:home:{user.id}"
+    cached = await cache_get(cache_key)
+    if cached is not None:
+        return {"code": 0, "data": cached}
+
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+
+    product_count_result = await db.execute(
+        select(func.count()).select_from(Product).where(Product.user_id == user.id)
+    )
+    product_count = product_count_result.scalar() or 0
+
+    latest_features_subq = (
+        select(
+            ProductFeature.product_id,
+            ProductFeature.sales_count,
+            func.row_number()
+            .partition_by(ProductFeature.product_id)
+            .order_by(ProductFeature.collected_at.desc())
+            .label("rn"),
+        )
+        .where(ProductFeature.product_id.in_(
+            select(Product.id).where(Product.user_id == user.id)
+        ))
+        .subquery()
+    )
+
+    prev_features_subq = (
+        select(
+            ProductFeature.product_id,
+            ProductFeature.sales_count,
+            func.row_number()
+            .partition_by(ProductFeature.product_id)
+            .order_by(ProductFeature.collected_at.desc())
+            .label("rn"),
+        )
+        .where(ProductFeature.product_id.in_(
+            select(Product.id).where(Product.user_id == user.id)
+        ))
+        .subquery()
+    )
+
+    trend_up_result = await db.execute(
+        select(func.count()).select_from(
+            select(latest_features_subq.c.product_id)
+            .select_from(latest_features_subq)
+            .join(
+                prev_features_subq,
+                (latest_features_subq.c.product_id == prev_features_subq.c.product_id)
+                & (prev_features_subq.c.rn == 2),
+            )
+            .where(latest_features_subq.c.rn == 1)
+            .where(latest_features_subq.c.sales_count > prev_features_subq.c.sales_count)
+            .where(prev_features_subq.c.sales_count > 0)
+            .subquery()
+        )
+    )
+    trend_up_count = trend_up_result.scalar() or 0
+
+    trend_down_result = await db.execute(
+        select(func.count()).select_from(
+            select(latest_features_subq.c.product_id)
+            .select_from(latest_features_subq)
+            .join(
+                prev_features_subq,
+                (latest_features_subq.c.product_id == prev_features_subq.c.product_id)
+                & (prev_features_subq.c.rn == 2),
+            )
+            .where(latest_features_subq.c.rn == 1)
+            .where(latest_features_subq.c.sales_count < prev_features_subq.c.sales_count)
+            .where(prev_features_subq.c.sales_count > 0)
+            .subquery()
+        )
+    )
+    trend_down_count = trend_down_result.scalar() or 0
+
+    if trend_up_count + trend_down_count > 0:
+        trend_pct = round((trend_up_count - trend_down_count) / (trend_up_count + trend_down_count) * 100, 1)
+        today_trend = f"+{trend_pct}%" if trend_pct >= 0 else f"{trend_pct}%"
+    else:
+        today_trend = "0%"
+
+    today_ai_result = await db.execute(
+        select(func.count()).select_from(AIAnalysis).where(
+            AIAnalysis.user_id == user.id,
+            AIAnalysis.created_at >= today_start,
+            AIAnalysis.status == "completed",
+        )
+    )
+    today_ai_count = today_ai_result.scalar() or 0
+
+    rankings_result = await db.execute(
+        text("""
+            SELECT pr.product_id, pr.overall_rank, pr.overall_score,
+                   pr.trend_short, pr.lifecycle_stage, p.product_name, p.category
+            FROM product_rankings pr
+            JOIN products p ON p.id = pr.product_id
+            WHERE p.user_id = :uid
+            ORDER BY pr.overall_rank ASC NULLS LAST
+            LIMIT 5
+        """),
+        {"uid": user.id},
+    )
+    rankings = [
+        {
+            "product_id": str(r.product_id),
+            "product_name": r.product_name,
+            "category": r.category,
+            "overall_rank": r.overall_rank,
+            "overall_score": float(r.overall_score) if r.overall_score else None,
+            "trend_short": r.trend_short,
+            "lifecycle_stage": r.lifecycle_stage,
+        }
+        for r in rankings_result.mappings().all()
+    ]
+
+    from app.models.alert_rule import AlertEvent
+    alert_events_result = await db.execute(
+        select(AlertEvent)
+        .where(AlertEvent.user_id == user.id, AlertEvent.is_acknowledged == False)
+        .order_by(AlertEvent.created_at.desc())
+        .limit(5)
+    )
+    alert_events = [
+        {
+            "id": str(e.id),
+            "rule_id": str(e.rule_id),
+            "severity": e.severity,
+            "title": e.title,
+            "detail": e.detail,
+            "metric_value": e.metric_value,
+            "threshold_value": e.threshold_value,
+            "is_acknowledged": e.is_acknowledged,
+            "created_at": e.created_at.isoformat() if e.created_at else None,
+        }
+        for e in alert_events_result.scalars().all()
+    ]
+
+    unack_alert_count_result = await db.execute(
+        select(func.count()).select_from(AlertEvent).where(
+            AlertEvent.user_id == user.id, AlertEvent.is_acknowledged == False
+        )
+    )
+    unack_alert_count = unack_alert_count_result.scalar() or 0
+
+    home_data = {
+        "biz_stats": {
+            "opportunity_count": len(rankings),
+            "today_trend": today_trend,
+            "trend_up_count": trend_up_count,
+            "trend_down_count": trend_down_count,
+            "alert_count": unack_alert_count,
+            "ai_insight_count": today_ai_count,
+            "product_count": product_count,
+        },
+        "rankings": rankings,
+        "alert_events": alert_events,
+    }
+
+    await cache_set(cache_key, home_data, ttl_seconds=60)
+
+    return {"code": 0, "data": home_data}

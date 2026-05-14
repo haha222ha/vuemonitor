@@ -1,6 +1,6 @@
 <template>
   <div class="notifications fade-in">
-    <PageHeader title="通知中心" subtitle="查看和管理系统通知与预警">
+    <PageHeader title="通知中心" subtitle="异动预警、AI分析、系统通知统一管理">
       <el-badge :value="notificationStore.unreadCount" :hidden="!notificationStore.hasUnread" :max="99">
         <el-button size="small" :disabled="!notificationStore.hasUnread" @click="handleMarkAllRead">
           全部已读
@@ -18,10 +18,11 @@
         <el-radio-button :value="true">已读</el-radio-button>
       </el-radio-group>
 
-      <el-radio-group v-model="sourceFilter" size="small" @change="handleSourceChange">
-        <el-radio-button value="all">全部来源</el-radio-button>
-        <el-radio-button value="local">本地</el-radio-button>
-        <el-radio-button value="cloud">云端</el-radio-button>
+      <el-radio-group v-model="categoryFilter" size="small" @change="handleCategoryChange">
+        <el-radio-button value="all">全部</el-radio-button>
+        <el-radio-button value="alert">异动预警</el-radio-button>
+        <el-radio-button value="ai">AI分析</el-radio-button>
+        <el-radio-button value="system">系统</el-radio-button>
       </el-radio-group>
 
       <el-select v-model="typeFilter" size="small" placeholder="通知类型" clearable style="width: 140px" @change="handleTypeChange">
@@ -30,23 +31,23 @@
       </el-select>
 
       <div style="flex: 1" />
-      <span class="notifications__count">共 {{ notificationStore.filteredNotifications.length }} 条</span>
+      <span class="notifications__count">共 {{ displayNotifications.length }} 条</span>
     </div>
 
-    <div v-loading="notificationStore.loading" class="notifications__body">
+    <div v-loading="notificationStore.loading || alertLoading" class="notifications__body">
       <EmptyState
-        v-if="notificationStore.filteredNotifications.length === 0 && !notificationStore.loading"
+        v-if="displayNotifications.length === 0 && !notificationStore.loading && !alertLoading"
         :icon="Bell"
         title="暂无通知"
-        description="当有价格变动、销量变化等事件时会在此提醒"
+        description="异动预警、AI分析完成等事件会在此提醒"
       />
 
       <div v-else class="notification-list">
         <div
-          v-for="item in notificationStore.filteredNotifications"
-          :key="item.id"
+          v-for="item in displayNotifications"
+          :key="item.source + '-' + item.id"
           class="notification-item"
-          :class="{ unread: !item.is_read }"
+          :class="{ unread: !item.is_read, [`severity-${item.severity}`]: item.severity }"
           @click="handleClick(item)"
         >
           <div class="notification-dot" v-if="!item.is_read" />
@@ -60,8 +61,9 @@
               <span class="notification-title">{{ item.title }}</span>
               <div class="notification-tags">
                 <el-tag size="small" :type="typeTagType(item.type)" effect="plain">{{ typeLabel(item.type) }}</el-tag>
-                <el-tag size="small" :type="item.source === 'local' ? 'warning' : 'primary'" effect="plain" class="source-tag">
-                  {{ item.source === 'local' ? '本地' : '云端' }}
+                <el-tag v-if="item.severity" size="small" :type="severityTagType(item.severity)" effect="dark">{{ severityLabel(item.severity) }}</el-tag>
+                <el-tag size="small" :type="categoryTagType(item.type)" effect="plain" class="category-tag">
+                  {{ categoryLabel(item.type) }}
                 </el-tag>
               </div>
             </div>
@@ -70,17 +72,24 @@
               <span class="notification-time">{{ formatTime(item.created_at) }}</span>
               <div class="notification-actions">
                 <el-button
-                  v-if="!item.is_read"
+                  v-if="item.source === 'alert_event' && !item.is_acknowledged"
+                  link
+                  size="small"
+                  type="warning"
+                  @click.stop="handleAcknowledgeAlert(item)"
+                >确认告警</el-button>
+                <el-button
+                  v-if="!item.is_read && item.source !== 'alert_event'"
                   link
                   size="small"
                   type="primary"
-                  @click.stop="handleMarkRead(item.id, item.source)"
+                  @click.stop="handleMarkRead(item.id, item.source === 'alert_event' ? 'cloud' : item.source)"
                 >标为已读</el-button>
                 <el-button
                   link
                   size="small"
                   type="danger"
-                  @click.stop="handleDelete(item.id, item.source)"
+                  @click.stop="handleDelete(item.id, item.source === 'alert_event' ? 'cloud' : item.source)"
                 >删除</el-button>
               </div>
             </div>
@@ -108,13 +117,24 @@ import {
   Bell,
   Monitor,
 } from "@element-plus/icons-vue";
+import api from "../utils/api";
+
+interface AlertEventItem extends NotificationItem {
+  severity?: string;
+  is_acknowledged?: boolean;
+  rule_id?: string;
+  metric_value?: number;
+  threshold_value?: number;
+}
 
 const router = useRouter();
 const notificationStore = useNotificationStore();
 
 const filterRead = ref<boolean | undefined>(undefined);
-const sourceFilter = ref<"all" | "cloud" | "local">("all");
+const categoryFilter = ref<"all" | "alert" | "ai" | "system">("all");
 const typeFilter = ref<string>("all");
+const alertEvents = ref<AlertEventItem[]>([]);
+const alertLoading = ref(false);
 
 const allTypes = [
   "price_drop",
@@ -124,8 +144,20 @@ const allTypes = [
   "risk_warning",
   "ai_analysis",
   "monitor_triggered",
+  "alert_event",
   "system",
 ];
+
+const ALERT_TYPES = new Set(["price_drop", "sales_surge", "stock_change", "rating_drop", "risk_warning", "monitor_triggered", "alert_event"]);
+const AI_TYPES = new Set(["ai_analysis"]);
+const SYSTEM_TYPES = new Set(["system"]);
+
+const CATEGORY_MAP: Record<string, "alert" | "ai" | "system"> = {
+  price_drop: "alert", sales_surge: "alert", stock_change: "alert", rating_drop: "alert",
+  risk_warning: "alert", monitor_triggered: "alert", alert_event: "alert",
+  ai_analysis: "ai",
+  system: "system",
+};
 
 const readCount = computed(() => notificationStore.notifications.filter((n) => n.is_read).length);
 
@@ -137,6 +169,7 @@ const TYPE_CONFIG: Record<string, { label: string; icon: typeof Warning; color: 
   risk_warning: { label: "风险预警", icon: Warning, color: "#F56C6C", tagType: "danger", bg: "#FEF0F0" },
   ai_analysis: { label: "AI分析", icon: InfoFilled, color: "#409EFF", tagType: "", bg: "#ECF5FF" },
   monitor_triggered: { label: "监控触发", icon: Monitor, color: "#E6A23C", tagType: "warning", bg: "#FDF6EC" },
+  alert_event: { label: "异动告警", icon: Warning, color: "#F56C6C", tagType: "danger", bg: "#FEF0F0" },
   system: { label: "系统通知", icon: Bell, color: "#909399", tagType: "info", bg: "#F4F4F5" },
 };
 
@@ -158,6 +191,89 @@ function typeLabel(type: string) {
 
 function typeTagType(type: string) {
   return TYPE_CONFIG[type]?.tagType || "info";
+}
+
+function severityTagType(severity: string): string {
+  const map: Record<string, string> = { critical: "danger", high: "danger", warning: "warning", info: "info", low: "info" };
+  return map[severity] || "info";
+}
+
+function severityLabel(severity: string): string {
+  const map: Record<string, string> = { critical: "紧急", high: "高", warning: "中", info: "低", low: "低" };
+  return map[severity] || severity;
+}
+
+function categoryTagType(type: string): string {
+  const cat = CATEGORY_MAP[type];
+  if (cat === "alert") return "danger";
+  if (cat === "ai") return "";
+  return "info";
+}
+
+function categoryLabel(type: string): string {
+  const cat = CATEGORY_MAP[type];
+  if (cat === "alert") return "异动预警";
+  if (cat === "ai") return "AI分析";
+  return "系统";
+}
+
+const displayNotifications = computed(() => {
+  let list: (NotificationItem | AlertEventItem)[] = [
+    ...notificationStore.filteredNotifications,
+    ...alertEvents.value,
+  ];
+
+  list.sort((a, b) => {
+    const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const tb = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return tb - ta;
+  });
+
+  if (categoryFilter.value !== "all") {
+    list = list.filter((n) => CATEGORY_MAP[n.type] === categoryFilter.value);
+  }
+
+  return list;
+});
+
+async function fetchAlertEvents() {
+  alertLoading.value = true;
+  try {
+    const { data } = await api.get("/alert-rules/events/all", { params: { limit: 50 } });
+    if (data?.code === 0 && Array.isArray(data.data)) {
+      alertEvents.value = data.data.map((e: any) => ({
+        id: e.id,
+        type: "alert_event",
+        title: e.title || "异动告警",
+        content: e.detail || "",
+        is_read: e.is_acknowledged || false,
+        is_acknowledged: e.is_acknowledged || false,
+        related_id: e.rule_id || null,
+        related_type: "monitor_rule" as const,
+        created_at: e.created_at,
+        source: "alert_event" as const,
+        severity: e.severity,
+        rule_id: e.rule_id,
+        metric_value: e.metric_value,
+        threshold_value: e.threshold_value,
+      }));
+    }
+  } catch {
+    alertEvents.value = [];
+  } finally {
+    alertLoading.value = false;
+  }
+}
+
+async function handleAcknowledgeAlert(item: AlertEventItem) {
+  try {
+    await api.post(`/alert-rules/events/${item.id}/acknowledge`);
+    item.is_acknowledged = true;
+    item.is_read = true;
+    ElMessage.success("告警已确认");
+  } catch {
+    ElMessage.error("确认失败");
+  }
 }
 
 function formatTime(dateStr: string | null): string {
@@ -213,9 +329,7 @@ function handleFilterChange() {
   notificationStore.fetchNotifications(1, filterRead.value);
 }
 
-function handleSourceChange(val: "all" | "cloud" | "local") {
-  notificationStore.setSourceFilter(val);
-}
+function handleCategoryChange() {}
 
 function handleTypeChange(val: string) {
   notificationStore.setTypeFilter(val || "all");
@@ -228,9 +342,11 @@ let unsubscribeWs: (() => void) | null = null;
 onMounted(() => {
   notificationStore.fetchNotifications(1);
   notificationStore.fetchUnreadCount();
+  fetchAlertEvents();
 
   refreshTimer = setInterval(() => {
     notificationStore.fetchUnreadCount();
+    fetchAlertEvents();
   }, 30000);
 
   try {
@@ -396,5 +512,28 @@ onUnmounted(() => {
   padding: 0 4px;
   height: 20px;
   line-height: 18px;
+}
+
+.category-tag {
+  font-size: 11px;
+  padding: 0 4px;
+  height: 20px;
+  line-height: 18px;
+}
+
+.notification-item.severity-critical {
+  border-left: 3px solid #F56C6C;
+}
+
+.notification-item.severity-high {
+  border-left: 3px solid #E6A23C;
+}
+
+.notification-item.severity-warning {
+  border-left: 3px solid #E6A23C;
+}
+
+.notification-item.severity-info {
+  border-left: 3px solid #909399;
 }
 </style>

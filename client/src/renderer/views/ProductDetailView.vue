@@ -1,6 +1,6 @@
 <template>
   <div class="product-detail fade-in">
-    <PageHeader :title="productStore.currentProduct?.product_name || '商品详情'" subtitle="查看商品详细数据、趋势分析和AI洞察">
+    <PageHeader :title="productStore.currentProduct?.product_name || '商品详情'" subtitle="深度分析商品数据、排名和AI决策洞察">
       <el-button @click="$router.back()">
         <el-icon><ArrowLeft /></el-icon>返回
       </el-button>

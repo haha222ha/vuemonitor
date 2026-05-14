@@ -16,7 +16,7 @@
 
       <nav class="sidebar__nav">
         <div class="sidebar__group">
-          <div v-if="!collapsed" class="sidebar__group-label">核心功能</div>
+          <div v-if="!collapsed" class="sidebar__group-label">决策中心</div>
           <router-link
             v-for="item in coreItems"
             :key="item.path"
@@ -39,7 +39,7 @@
         </div>
 
         <div class="sidebar__group">
-          <div v-if="!collapsed" class="sidebar__group-label">工具</div>
+          <div v-if="!collapsed" class="sidebar__group-label">运营工具</div>
           <router-link
             v-for="item in toolItems"
             :key="item.path"
@@ -175,7 +175,8 @@ import { useCollectStore } from "../stores/collect";
 import { useI18n } from "../i18n";
 import {
   Monitor, Goods, MagicStick, Timer, Bell, Setting, Key,
-  Fold, Expand, SwitchButton, DataAnalysis, ChatDotRound
+  Fold, Expand, SwitchButton, DataAnalysis, ChatDotRound,
+  Opportunity, Warning
 } from "@element-plus/icons-vue";
 import SearchInput from "../components/SearchInput.vue";
 import StatusDot from "../components/StatusDot.vue";
@@ -196,16 +197,16 @@ const searchRef = ref<InstanceType<typeof SearchInput>>();
 const isMobile = computed(() => windowWidth.value < 768);
 
 const coreItems = computed(() => [
-  { path: "/dashboard", icon: Monitor, label: t('nav.dashboard') },
-  { path: "/products", icon: Goods, label: t('nav.products') },
-  { path: "/ai", icon: MagicStick, label: t('nav.ai') },
+  { path: "/dashboard", icon: Opportunity, label: "机会雷达" },
+  { path: "/products", icon: Goods, label: "选品库" },
+  { path: "/ai", icon: MagicStick, label: "AI 决策" },
 ]);
 
 const toolItems = computed(() => [
-  { path: "/scheduler", icon: Timer, label: "采集调度" },
-  { path: "/monitor", icon: Bell, label: t('nav.monitor') },
+  { path: "/scheduler", icon: Timer, label: "数据采集" },
+  { path: "/monitor", icon: Warning, label: "异动规则" },
   { path: "/notifications", icon: ChatDotRound, label: t('nav.notifications'), badge: notificationStore.unreadCount || undefined },
-  { path: "/compare", icon: DataAnalysis, label: "商品对比" },
+  { path: "/compare", icon: DataAnalysis, label: "竞品对比" },
 ]);
 
 const systemItems = computed(() => [
@@ -214,21 +215,21 @@ const systemItems = computed(() => [
 ]);
 
 const mobileNavItems = computed(() => [
-  { path: "/dashboard", icon: Monitor, label: t('nav.dashboard') },
-  { path: "/products", icon: Goods, label: t('nav.products') },
-  { path: "/ai", icon: MagicStick, label: t('nav.ai') },
-  { path: "/monitor", icon: Bell, label: t('nav.monitor') },
+  { path: "/dashboard", icon: Opportunity, label: "机会雷达" },
+  { path: "/products", icon: Goods, label: "选品库" },
+  { path: "/ai", icon: MagicStick, label: "AI 决策" },
+  { path: "/monitor", icon: Warning, label: "异动规则" },
   { path: "/settings", icon: Setting, label: t('nav.settings') },
 ]);
 
 const PAGE_TITLES: Record<string, string> = {
-  "/dashboard": "数据盘面",
-  "/products": "商品监控",
-  "/ai": "AI 分析",
-  "/scheduler": "采集调度",
-  "/monitor": "监控规则",
+  "/dashboard": "机会雷达",
+  "/products": "选品库",
+  "/ai": "AI 决策",
+  "/scheduler": "数据采集",
+  "/monitor": "异动规则",
   "/notifications": "通知中心",
-  "/compare": "商品对比",
+  "/compare": "竞品对比",
   "/settings": "设置",
   "/license": "授权管理",
 };

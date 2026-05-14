@@ -1,6 +1,6 @@
 <template>
   <div class="products fade-in">
-    <PageHeader title="商品监控" subtitle="管理和监控您的小红书商品数据">
+    <PageHeader title="选品库" subtitle="管理您的商品监控，发现选品机会">
       <el-button v-permission="'gate:monitor:add'" type="primary" @click="showAdd = true">
         <el-icon><Plus /></el-icon>
         添加商品
@@ -53,16 +53,41 @@
             <div class="product-card__name">{{ product.product_name }}</div>
             <div class="product-card__shop">{{ product.shop_name || '未知店铺' }}</div>
           </div>
+          <div v-if="getRankingInfo(product.id)" class="product-card__rank-badge">
+            <span class="rank-badge__number">#{{ getRankingInfo(product.id).rank }}</span>
+            <span class="rank-badge__total" v-if="getRankingInfo(product.id).total">/{{ getRankingInfo(product.id).total }}</span>
+          </div>
         </div>
         <div class="product-card__body">
           <div class="product-card__meta">
             <span class="product-card__id">{{ product.platform_product_id }}</span>
             <span class="product-card__time">{{ product.last_collected_at ? formatDate(product.last_collected_at) : '未采集' }}</span>
           </div>
+          <div v-if="getRankingInfo(product.id)" class="product-card__rank-tags">
+            <el-tag v-if="getRankingInfo(product.id).lifecycle" size="small" effect="light" type="warning">
+              {{ getRankingInfo(product.id).lifecycle }}
+            </el-tag>
+            <el-tag v-if="getRankingInfo(product.id).trend" size="small" effect="light"
+              :type="getRankingInfo(product.id).trend === '上升' ? 'success' : getRankingInfo(product.id).trend === '下降' ? 'danger' : 'info'">
+              {{ trendIcon(getRankingInfo(product.id).trend) }} {{ getRankingInfo(product.id).trend }}
+            </el-tag>
+          </div>
         </div>
         <div class="product-card__actions">
           <el-button size="small" @click="$router.push(`/products/${product.id}`)">详情</el-button>
           <el-button size="small" type="primary" @click="collectSingle(product)">采集</el-button>
+          <el-dropdown v-permission="'gate:ai:basic_analysis'" @command="(cmd: string) => quickAIAnalysis(product, cmd)" size="small">
+            <el-button size="small" type="warning">
+              <el-icon><MagicStick /></el-icon>AI
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="trend_score">趋势评分</el-dropdown-item>
+                <el-dropdown-item command="prediction">爆品预测</el-dropdown-item>
+                <el-dropdown-item command="risk_warning">风险预警</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
           <el-button v-permission="'gate:monitor:auto_refresh'" size="small" @click="addSchedule(product)">定时</el-button>
           <el-button size="small" type="danger" plain @click="confirmDelete(product.id)">删除</el-button>
         </div>
@@ -95,11 +120,36 @@
             <span class="cell-secondary">{{ row.last_collected_at ? formatDate(row.last_collected_at) : '未采集' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="320" fixed="right">
+        <el-table-column label="排名" width="120">
+          <template #default="{ row }">
+            <div v-if="getRankingInfo(row.id)" class="cell-rank">
+              <span class="cell-rank__number">#{{ getRankingInfo(row.id).rank }}</span>
+              <span class="cell-rank__total" v-if="getRankingInfo(row.id).total">/{{ getRankingInfo(row.id).total }}</span>
+              <el-tag v-if="getRankingInfo(row.id).trend" size="small" effect="light"
+                :type="getRankingInfo(row.id).trend === '上升' ? 'success' : getRankingInfo(row.id).trend === '下降' ? 'danger' : 'info'">
+                {{ getRankingInfo(row.id).trend }}
+              </el-tag>
+            </div>
+            <span v-else class="cell-secondary">-</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="360" fixed="right">
           <template #default="{ row }">
             <div class="product-cell__actions">
               <el-button size="small" @click="$router.push(`/products/${row.id}`)">详情</el-button>
               <el-button size="small" type="primary" @click="collectSingle(row)">采集</el-button>
+              <el-dropdown v-permission="'gate:ai:basic_analysis'" @command="(cmd: string) => quickAIAnalysis(row, cmd)" size="small">
+                <el-button size="small" type="warning">
+                  <el-icon><MagicStick /></el-icon>AI
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="trend_score">趋势评分</el-dropdown-item>
+                    <el-dropdown-item command="prediction">爆品预测</el-dropdown-item>
+                    <el-dropdown-item command="risk_warning">风险预警</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
               <el-button v-permission="'gate:monitor:auto_refresh'" size="small" @click="addSchedule(row)">定时</el-button>
               <el-button size="small" type="danger" plain @click="confirmDelete(row.id)">删除</el-button>
             </div>
@@ -173,15 +223,19 @@ import { usePermissionStore } from "../stores/permission";
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
 import { parseXHSUrl } from "@shared/constants/platforms";
-import { Plus, Download, Goods, Grid, List, Search } from "@element-plus/icons-vue";
+import { Plus, Download, Goods, Grid, List, Search, Opportunity, MagicStick, TrendCharts } from "@element-plus/icons-vue";
 import PageHeader from "../components/PageHeader.vue";
 import SearchInput from "../components/SearchInput.vue";
 import EmptyState from "../components/EmptyState.vue";
+import api from "../utils/api";
 
 const productStore = useProductStore();
 const collectStore = useCollectStore();
 const schedulerStore = useSchedulerStore();
 const permissionStore = usePermissionStore();
+
+const productRankings = ref<Record<string, { rank: number; total: number; trend: string; lifecycle: string }>>({});
+const rankingsLoading = ref(false);
 
 const showAdd = ref(false);
 const showCollect = ref(false);
@@ -298,11 +352,67 @@ async function confirmDelete(id: string) {
   } catch {}
 }
 
+async function fetchRankings() {
+  if (productStore.products.length === 0) return;
+  rankingsLoading.value = true;
+  try {
+    const { data } = await api.get("/feature/product-rankings", { params: { limit: 50 } });
+    if (data?.rankings) {
+      const map: Record<string, { rank: number; total: number; trend: string; lifecycle: string }> = {};
+      for (const r of data.rankings) {
+        if (r.product_id) {
+          map[r.product_id] = {
+            rank: r.overall_rank || r.category_rank || 0,
+            total: r.total_in_category || r.category_total || 0,
+            trend: r.trend_direction || "",
+            lifecycle: r.lifecycle_stage || "",
+          };
+        }
+      }
+      productRankings.value = map;
+    }
+  } catch {
+    productRankings.value = {};
+  } finally {
+    rankingsLoading.value = false;
+  }
+}
+
+function getRankingInfo(productId: string) {
+  return productRankings.value[productId] || null;
+}
+
+function trendIcon(trend: string) {
+  if (trend === "上升") return "📈";
+  if (trend === "下降") return "📉";
+  return "➡️";
+}
+
+async function quickAIAnalysis(product: Record<string, unknown>, type: string) {
+  const gateMap: Record<string, boolean> = {
+    trend_score: permissionStore.canAITrend,
+    prediction: permissionStore.canAIPrediction,
+    risk_warning: permissionStore.canAIRisk,
+  };
+  if (!gateMap[type]) {
+    ElMessage.warning("当前套餐不支持此AI分析，请升级");
+    return;
+  }
+  try {
+    const productId = product.id as string;
+    await api.post("/ai/analyze", { product_id: productId, analysis_type: type });
+    ElMessage.success("AI分析已提交，请稍后在AI决策页查看结果");
+  } catch {
+    ElMessage.error("AI分析提交失败");
+  }
+}
+
 onMounted(() => {
   productStore.fetchProducts();
   collectStore.setupListeners();
   collectStore.fetchStatus();
   permissionStore.fetchPermissions();
+  fetchRankings();
 });
 </script>
 
@@ -412,6 +522,50 @@ onMounted(() => {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.product-card__rank-badge {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #F59E0B, #D97706);
+  color: #fff;
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.rank-badge__number {
+  font-size: 14px;
+}
+
+.rank-badge__total {
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.product-card__rank-tags {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cell-rank {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cell-rank__number {
+  font-weight: 700;
+  color: #D97706;
+  font-size: var(--text-sm);
+}
+
+.cell-rank__total {
+  color: var(--color-text-tertiary);
+  font-size: var(--text-xs);
 }
 
 .products__table-wrapper {

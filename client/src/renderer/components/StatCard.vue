@@ -22,7 +22,7 @@ const props = defineProps<{
   label: string;
   value: string | number;
   icon: Component;
-  variant?: "primary" | "success" | "warning" | "info" | "danger";
+  variant?: "primary" | "success" | "warning" | "info" | "danger" | "amber";
   trend?: string;
   trendType?: "up" | "down" | "neutral";
 }>();
@@ -69,6 +69,7 @@ const trendIcon = computed(() => {
 .stat-card__icon--warning { background: linear-gradient(135deg, #F59E0B, #FBBF24); }
 .stat-card__icon--info { background: linear-gradient(135deg, #3B82F6, #60A5FA); }
 .stat-card__icon--danger { background: linear-gradient(135deg, #EF4444, #F87171); }
+.stat-card__icon--amber { background: linear-gradient(135deg, #F59E0B, #D97706); }
 
 .stat-card__content {
   flex: 1;

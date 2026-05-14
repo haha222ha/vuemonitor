@@ -1,11 +1,65 @@
 <template>
   <div class="ai fade-in">
-    <PageHeader title="AI 分析" subtitle="智能分析商品数据，生成洞察报告">
+    <PageHeader title="AI 决策" subtitle="智能分析商品数据，生成决策洞察报告">
       <el-button type="primary" @click="showReportDialog = true">
         <el-icon><Document /></el-icon>
         生成报告
       </el-button>
     </PageHeader>
+
+    <div v-if="products.length > 0" class="ai__quick-actions">
+      <div class="quick-actions__title">
+        <el-icon :size="16"><MagicStick /></el-icon>
+        <span>快捷分析</span>
+      </div>
+      <div class="quick-actions__grid">
+        <div
+          v-for="action in quickActions"
+          :key="action.type"
+          class="quick-action-card"
+          @click="startQuickAnalysis(action.type)"
+        >
+          <div :class="['quick-action-card__icon', `quick-action-card__icon--${action.color}`]">
+            <el-icon :size="20"><component :is="action.icon" /></el-icon>
+          </div>
+          <div class="quick-action-card__info">
+            <div class="quick-action-card__label">{{ action.label }}</div>
+            <div class="quick-action-card__desc">{{ action.desc }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="recommendations.length > 0" class="ai__recommendations">
+      <div class="recommendations__title">
+        <el-icon :size="16"><Opportunity /></el-icon>
+        <span>智能推荐</span>
+        <el-tag size="small" effect="light" type="warning" class="recommendations__badge">基于您的数据</el-tag>
+      </div>
+      <div class="recommendations__grid">
+        <div
+          v-for="rec in recommendations"
+          :key="rec.type + '-' + (rec.product_id || rec.event_id || rec.category)"
+          class="recommendation-card"
+          :class="[`recommendation-card--${rec.type}`]"
+          @click="handleRecommendationClick(rec)"
+        >
+          <div class="recommendation-card__header">
+            <div :class="['recommendation-card__icon', `recommendation-card__icon--${rec.type}`]">
+              <el-icon :size="16"><component :is="recIcon(rec.type)" /></el-icon>
+            </div>
+            <el-tag size="small" :type="recTagType(rec.type)" effect="dark">{{ recLabel(rec.type) }}</el-tag>
+          </div>
+          <div class="recommendation-card__body">
+            <div class="recommendation-card__name">{{ rec.product_name || rec.title || rec.category }}</div>
+            <div class="recommendation-card__reason">{{ rec.reason }}</div>
+          </div>
+          <div class="recommendation-card__action">
+            <el-icon :size="14"><ArrowRight /></el-icon>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <el-tabs v-model="activeTab" class="ai__tabs">
       <el-tab-pane name="analyses">
@@ -88,7 +142,7 @@
 
             <div class="analysis-card__footer">
               <span class="analysis-card__time">{{ formatDate(item.created_at) }}</span>
-              <el-button size="small" type="primary" link>查看详情</el-button>
+              <el-button size="small" type="primary" text @click="viewAnalysis(item)">查看详情</el-button>
             </div>
           </div>
         </div>
@@ -145,9 +199,9 @@
             </div>
 
             <div class="report-card__actions">
-              <el-button size="small" type="primary" link @click.stop="viewReport(report)">查看</el-button>
+              <el-button size="small" type="primary" text @click.stop="viewReport(report)">查看</el-button>
               <el-dropdown trigger="click" @command="(cmd: string) => exportReport(report, cmd)" @click.stop>
-                <el-button size="small" link type="success" @click.stop>导出</el-button>
+                <el-button size="small" text type="success" @click.stop>导出</el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item command="markdown">Markdown</el-dropdown-item>
@@ -167,7 +221,7 @@
       </el-tab-pane>
     </el-tabs>
 
-    <el-dialog v-model="showResult" title="分析结果" width="680px" class="ai-dialog">
+    <el-dialog v-model="showResult" title="分析结果" width="720px" class="ai-dialog">
       <div v-if="currentResult" class="analysis-result">
         <div class="analysis-result__tags">
           <el-tag size="small" :type="analysisTypeTag(currentResult.analysis_type)" effect="light">
@@ -179,6 +233,31 @@
           <el-tag size="small" effect="light">
             {{ currentResult.provider }} / {{ currentResult.model }}
           </el-tag>
+        </div>
+        <div v-if="currentResult.confidence" class="analysis-result__gauge-row">
+          <div class="gauge-card">
+            <div class="gauge-card__ring" :style="confidenceGaugeStyle(currentResult.confidence)">
+              <span class="gauge-card__value">{{ (currentResult.confidence * 100).toFixed(0) }}</span>
+            </div>
+            <div class="gauge-card__label">置信度</div>
+            <div :class="['gauge-card__badge', confidenceLevel(currentResult.confidence)]">
+              {{ confidenceLevel(currentResult.confidence) === 'high' ? '高可信' : confidenceLevel(currentResult.confidence) === 'medium' ? '中等' : '待验证' }}
+            </div>
+          </div>
+          <div class="analysis-result__tri-cards">
+            <div :class="['tri-card', currentResult.confidence >= 0.8 ? 'tri-card--success' : currentResult.confidence >= 0.5 ? 'tri-card--warning' : 'tri-card--danger']">
+              <div class="tri-card__value">{{ currentResult.confidence >= 0.8 ? '✓' : currentResult.confidence >= 0.5 ? '!' : '✗' }}</div>
+              <div class="tri-card__label">可信度</div>
+            </div>
+            <div class="tri-card tri-card--primary">
+              <div class="tri-card__value">{{ analysisTypeLabel(currentResult.analysis_type).substring(0, 2) }}</div>
+              <div class="tri-card__label">类型</div>
+            </div>
+            <div class="tri-card tri-card--info">
+              <div class="tri-card__value">{{ currentResult.provider?.substring(0, 3) || 'AI' }}</div>
+              <div class="tri-card__label">模型</div>
+            </div>
+          </div>
         </div>
         <div class="analysis-result__content">
           {{ formatResult(currentResult.result) }}
@@ -276,9 +355,9 @@
       </div>
       <template #footer>
         <div class="report-view__footer">
-          <el-button @click="exportReport(currentReport, 'markdown')">导出 Markdown</el-button>
-          <el-button type="primary" @click="exportReport(currentReport, 'html')">导出 HTML</el-button>
-          <el-button type="success" @click="exportReport(currentReport, 'pdf')">导出 PDF</el-button>
+          <el-button size="default" @click="exportReport(currentReport, 'markdown')">导出 Markdown</el-button>
+          <el-button size="default" type="primary" @click="exportReport(currentReport, 'html')">导出 HTML</el-button>
+          <el-button size="default" type="success" @click="exportReport(currentReport, 'pdf')">导出 PDF</el-button>
         </div>
       </template>
     </el-dialog>
@@ -317,7 +396,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from "vue";
-import api from "../utils/api";
+import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
 import { jsPDF } from "jspdf";
@@ -333,12 +412,19 @@ import {
   PriceTag,
   Star,
   Cpu,
+  MagicStick,
+  Opportunity,
+  ArrowRight,
+  ShoppingCart,
 } from "@element-plus/icons-vue";
+import api from "../utils/api";
 
+const router = useRouter();
 const activeTab = ref("analyses");
 const analyses = ref<any[]>([]);
 const reports = ref<any[]>([]);
 const products = ref<any[]>([]);
+const recommendations = ref<any[]>([]);
 const loading = ref(false);
 const reportsLoading = ref(false);
 const generating = ref(false);
@@ -363,6 +449,13 @@ const reportFormRules: FormRules = {
   report_type: [{ required: true, message: "请选择报告类型", trigger: "change" }],
   product_ids: [{ required: true, message: "请选择商品", trigger: "change", type: "array", min: 1 }],
 };
+
+const quickActions = [
+  { type: "trend_score", label: "趋势评分", desc: "评估商品趋势走向", icon: TrendCharts, color: "success" },
+  { type: "prediction", label: "爆品预测", desc: "预测爆款潜力", icon: Opportunity, color: "amber" },
+  { type: "risk_warning", label: "风险预警", desc: "识别潜在风险信号", icon: Warning, color: "danger" },
+  { type: "basic_analysis", label: "基础分析", desc: "全面商品数据分析", icon: DataAnalysis, color: "primary" },
+];
 
 const ANALYSIS_TYPE_MAP: Record<string, { label: string; tagType: string; icon: typeof DataAnalysis }> = {
   basic_analysis: { label: "基础分析", tagType: "", icon: DataAnalysis },
@@ -436,6 +529,38 @@ function formatResult(result: any): string {
   return JSON.stringify(result, null, 2);
 }
 
+function confidenceGaugeStyle(confidence: number) {
+  const deg = confidence * 360;
+  const color = confidence >= 0.8 ? '#10B981' : confidence >= 0.5 ? '#F59E0B' : '#EF4444';
+  return { background: `conic-gradient(${color} ${deg}deg, var(--color-border-light) ${deg}deg)` };
+}
+
+function confidenceLevel(confidence: number): string {
+  if (confidence >= 0.8) return 'high';
+  if (confidence >= 0.5) return 'medium';
+  return 'low';
+}
+
+async function startQuickAnalysis(type: string) {
+  if (products.value.length === 0) {
+    ElMessage.warning("请先添加商品");
+    return;
+  }
+  const productIds = products.value.slice(0, 5).map((p: any) => p.id);
+  try {
+    await window.electronAPI.invoke("ai:create-report", {
+      title: `${analysisTypeLabel(type)} - ${new Date().toLocaleDateString('zh-CN')}`,
+      report_type: type === "basic_analysis" ? "product" : type === "risk_warning" ? "risk" : "trend",
+      product_ids: productIds,
+    });
+    ElMessage.success("AI分析已提交，请稍后查看结果");
+    fetchAnalyses();
+    fetchReports();
+  } catch {
+    ElMessage.error("AI分析提交失败");
+  }
+}
+
 function isStructuredReport(content: any): boolean {
   return content && typeof content === "object" && !Array.isArray(content) && (content.executive_summary || content.product_analysis || content.recommendations || content.conclusion || content.trend_overview || content.overall_risk_level);
 }
@@ -470,8 +595,8 @@ function formatObjToMd(obj: any): string {
 async function fetchAnalyses() {
   loading.value = true;
   try {
-    const { data } = await api.get("/ai/analyses");
-    analyses.value = data?.data?.items || [];
+    const result = await window.electronAPI.invoke("ai:get-analyses");
+    analyses.value = result?.items || [];
   } finally {
     loading.value = false;
   }
@@ -480,8 +605,8 @@ async function fetchAnalyses() {
 async function fetchReports() {
   reportsLoading.value = true;
   try {
-    const { data } = await api.get("/ai/reports");
-    reports.value = data?.data || [];
+    const result = await window.electronAPI.invoke("ai:get-reports");
+    reports.value = result || [];
   } finally {
     reportsLoading.value = false;
   }
@@ -489,8 +614,8 @@ async function fetchReports() {
 
 async function fetchProducts() {
   try {
-    const { data } = await api.get("/products", { params: { page_size: 200 } });
-    products.value = data?.data?.items || [];
+    const result = await window.electronAPI.invoke("storage:get-products");
+    products.value = result || [];
   } catch {}
 }
 
@@ -500,13 +625,8 @@ function viewAnalysis(row: any) {
 }
 
 async function viewReport(row: any) {
-  try {
-    const { data } = await api.get(`/ai/reports/${row.id}`);
-    currentReport.value = data?.data || row;
-    showReportView.value = true;
-  } catch {
-    ElMessage.error("加载报告失败");
-  }
+  currentReport.value = row;
+  showReportView.value = true;
 }
 
 function exportReport(report: any, format: string) {
@@ -664,7 +784,7 @@ async function handleGenerateReport() {
 
   generating.value = true;
   try {
-    await api.post("/ai/report", {
+    await window.electronAPI.invoke("ai:create-report", {
       title: reportForm.title,
       report_type: reportForm.report_type,
       product_ids: reportForm.product_ids,
@@ -686,12 +806,344 @@ onMounted(() => {
   fetchAnalyses();
   fetchReports();
   fetchProducts();
+  fetchRecommendations();
 });
+
+async function fetchRecommendations() {
+  try {
+    const { data } = await api.get("/ai/recommendations", { params: { limit: 5 } });
+    if (data?.code === 0 && data.data?.items) {
+      recommendations.value = data.data.items;
+    }
+  } catch {}
+}
+
+function recIcon(type: string) {
+  const map: Record<string, typeof TrendCharts> = {
+    trending: TrendCharts, alert: Warning, category_insight: Opportunity, risk: PriceTag,
+  };
+  return map[type] || Opportunity;
+}
+
+function recTagType(type: string): string {
+  const map: Record<string, string> = {
+    trending: "success", alert: "danger", category_insight: "warning", risk: "danger",
+  };
+  return map[type] || "info";
+}
+
+function recLabel(type: string): string {
+  const map: Record<string, string> = {
+    trending: "趋势上升", alert: "异动告警", category_insight: "品类洞察", risk: "竞争风险",
+  };
+  return map[type] || "推荐";
+}
+
+function handleRecommendationClick(rec: any) {
+  if (rec.type === "alert" && rec.event_id) {
+    router.push("/notifications");
+  } else if (rec.product_id) {
+    router.push(`/products/${rec.product_id}`);
+  } else if (rec.type === "category_insight" && rec.category) {
+    router.push("/dashboard");
+  }
+}
 </script>
 
 <style scoped>
 .ai {
   padding: 0;
+}
+
+.ai__quick-actions {
+  padding: 20px 24px;
+  background: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.quick-actions__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 12px;
+}
+
+.quick-actions__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.quick-action-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-action-card:hover {
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.quick-action-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.quick-action-card__icon--primary { background: linear-gradient(135deg, #4F46E5, #7C3AED); }
+.quick-action-card__icon--success { background: linear-gradient(135deg, #10B981, #34D399); }
+.quick-action-card__icon--amber { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.quick-action-card__icon--danger { background: linear-gradient(135deg, #EF4444, #F87171); }
+
+.quick-action-card__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.quick-action-card__label {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.quick-action-card__desc {
+  font-size: var(--text-xs);
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+.ai__recommendations {
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border-bottom: 1px solid #FDE68A;
+}
+
+.recommendations__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: #92400E;
+  margin-bottom: 12px;
+}
+
+.recommendations__badge {
+  margin-left: 4px;
+}
+
+.recommendations__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.recommendation-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #FDE68A;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(4px);
+}
+
+.recommendation-card:hover {
+  border-color: #D97706;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
+  transform: translateY(-1px);
+}
+
+.recommendation-card--alert {
+  border-color: #FCA5A5;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.recommendation-card--alert:hover {
+  border-color: #EF4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+}
+
+.recommendation-card--risk {
+  border-color: #FED7AA;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.recommendation-card--risk:hover {
+  border-color: #F97316;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+}
+
+.recommendation-card--trending {
+  border-color: #BBF7D0;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.recommendation-card--trending:hover {
+  border-color: #22C55E;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15);
+}
+
+.recommendation-card__header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.recommendation-card__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+
+.recommendation-card__icon--trending { background: linear-gradient(135deg, #22C55E, #16A34A); }
+.recommendation-card__icon--alert { background: linear-gradient(135deg, #EF4444, #DC2626); }
+.recommendation-card__icon--category_insight { background: linear-gradient(135deg, #F59E0B, #D97706); }
+.recommendation-card__icon--risk { background: linear-gradient(135deg, #F97316, #EA580C); }
+
+.recommendation-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.recommendation-card__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recommendation-card__reason {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recommendation-card__action {
+  flex-shrink: 0;
+  color: var(--color-text-tertiary);
+  transition: color 0.2s;
+}
+
+.recommendation-card:hover .recommendation-card__action {
+  color: var(--color-primary);
+}
+
+.analysis-result__gauge-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.gauge-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.gauge-card__ring {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.gauge-card__ring::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: var(--color-bg-card);
+}
+
+.gauge-card__value {
+  position: relative;
+  z-index: 1;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.gauge-card__label {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+.gauge-card__badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.gauge-card__badge.high { background: #D1FAE5; color: #065F46; }
+.gauge-card__badge.medium { background: #FEF3C7; color: #92400E; }
+.gauge-card__badge.low { background: #FEE2E2; color: #991B1B; }
+
+.analysis-result__tri-cards {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+}
+
+.tri-card {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius-base);
+  text-align: center;
+}
+
+.tri-card--success { background: #D1FAE5; color: #065F46; }
+.tri-card--warning { background: #FEF3C7; color: #92400E; }
+.tri-card--danger { background: #FEE2E2; color: #991B1B; }
+.tri-card--primary { background: #EEF2FF; color: #3730A3; }
+.tri-card--info { background: #E0F2FE; color: #075985; }
+
+.tri-card__value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.tri-card__label {
+  font-size: 11px;
+  margin-top: 4px;
+  opacity: 0.8;
 }
 
 .ai__tabs {
@@ -979,6 +1431,19 @@ onMounted(() => {
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid var(--color-border-light);
+}
+
+.report-card__actions .el-button {
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.report-card__actions .el-button--primary {
+  color: var(--color-primary);
+}
+
+.report-card__actions .el-button--success {
+  color: var(--color-success);
 }
 
 .ai__loading {
