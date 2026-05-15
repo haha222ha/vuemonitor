@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import axios from "axios";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/v1";
-const BASE_PATH = import.meta.env.BASE_URL || "/admin/";
+const BASE_PATH = import.meta.env.BASE_URL || "/";
 
 const routes = [
   { path: "/", redirect: `${BASE_PATH}dashboard` },

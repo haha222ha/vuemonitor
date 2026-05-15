@@ -13,30 +13,56 @@ echo ""
 echo -e "  ${CYAN}XHS365 日常更新${NC}"
 echo ""
 
-echo -e "  ${CYAN}[1/4]${NC} 拉取最新代码..."
+echo -e "  ${CYAN}[1/6]${NC} 拉取最新代码..."
 git fetch origin main
 git reset --hard origin/main
 echo -e "       ${GREEN}✓${NC} 代码已更新"
 
-echo -e "  ${CYAN}[2/4]${NC} 重建 Web 前端..."
+echo -e "  ${CYAN}[2/6]${NC} 重建 web-user..."
 cd "$SCRIPT_DIR/web-user"
 npm install --quiet 2>/dev/null
-npm run build 2>/dev/null
-echo -e "       ${GREEN}✓${NC} 前端已重建"
+npm run build
+if [ ! -f "dist/index.html" ]; then
+    echo -e "       ${RED}✗${NC} web-user build failed - dist/index.html not found"
+    exit 1
+fi
+echo -e "       ${GREEN}✓${NC} web-user 已重建"
 
-echo -e "  ${CYAN}[3/4]${NC} 数据库迁移..."
+echo -e "  ${CYAN}[3/6]${NC} 重建 web-admin..."
+cd "$SCRIPT_DIR/web-admin"
+npm install --quiet 2>/dev/null
+npm run build
+if [ ! -f "dist/index.html" ]; then
+    echo -e "       ${RED}✗${NC} web-admin build failed - dist/index.html not found"
+    exit 1
+fi
+echo -e "       ${GREEN}✓${NC} web-admin 已重建"
+
+echo -e "  ${CYAN}[4/6]${NC} 数据库迁移..."
 cd "$SCRIPT_DIR/server"
 source .venv/bin/activate
 PYTHONPATH="$SCRIPT_DIR/server" alembic upgrade head
 echo -e "       ${GREEN}✓${NC} 迁移完成"
 
-echo -e "  ${CYAN}[4/4]${NC} 重启服务..."
+echo -e "  ${CYAN}[5/6]${NC} 重启服务..."
 sudo systemctl restart vuemonitor
-sleep 2
-if systemctl is-active --quiet vuemonitor; then
-    echo -e "       ${GREEN}✓${NC} 服务已重启"
+sudo systemctl reload nginx
+echo -e "       ${GREEN}✓${NC} 服务已重启"
+
+echo -e "  ${CYAN}[6/6]${NC} 健康检查..."
+sleep 3
+if curl -sf http://127.0.0.1:8000/api/v1/health > /dev/null; then
+    echo -e "       ${GREEN}✓${NC} API Server: OK"
 else
-    echo -e "       ${RED}✗${NC} 服务启动失败，请检查: journalctl -u vuemonitor -n 20"
+    echo -e "       ${RED}✗${NC} API Server: FAILED - check: journalctl -u vuemonitor -n 20"
+    exit 1
+fi
+
+if curl -sf http://127.0.0.1:80 > /dev/null; then
+    echo -e "       ${GREEN}✓${NC} Nginx: OK"
+else
+    echo -e "       ${RED}✗${NC} Nginx: FAILED"
+    exit 1
 fi
 
 echo ""
