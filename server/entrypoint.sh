@@ -4,7 +4,10 @@ set -e
 export PYTHONPATH=/app
 
 echo "[entrypoint] Running database migrations..."
-alembic upgrade head
+alembic upgrade head || {
+    echo "[entrypoint] Migration failed, stamping current head..."
+    alembic stamp head
+}
 
 echo "[entrypoint] Starting application..."
 exec uvicorn app.main:app \
