@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: server/Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
     restart: unless-stopped
     env_file:
       - .env
@@ -47,6 +49,8 @@ services:
 
   web-admin:
     build: ./web-admin
+    ports:
+      - "127.0.0.1:3000:80"
     restart: unless-stopped
     depends_on:
       server:
@@ -69,6 +73,8 @@ services:
 
   web-user:
     build: ./web-user
+    ports:
+      - "127.0.0.1:5174:80"
     restart: unless-stopped
     depends_on:
       server:
