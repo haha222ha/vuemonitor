@@ -83,7 +83,13 @@ async def get_db_context():
 
 async def init_db() -> None:
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        result = await conn.execute(text("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'"))
+        table_count = result.scalar()
+        if table_count == 0:
+            logger.info("No tables found, creating database schema...")
+            await conn.run_sync(Base.metadata.create_all)
+        else:
+            logger.info(f"Database already has {table_count} tables, skipping create_all")
 
 
 async def get_pool_stats() -> dict:
