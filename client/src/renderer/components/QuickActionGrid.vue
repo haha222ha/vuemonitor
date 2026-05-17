@@ -3,19 +3,23 @@
     <div class="quick-actions__title">
       <el-icon :size="16"><MagicStick /></el-icon>
       <span>快捷分析</span>
+      <span v-if="hasHighlight" class="quick-actions__hint">AI 推荐</span>
     </div>
     <div class="quick-actions__grid">
       <div
         v-for="action in actions"
         :key="action.type"
-        class="quick-action-card"
+        :class="['quick-action-card', { 'quick-action-card--highlight': action.highlight }]"
         @click="$emit('action', action.type)"
       >
         <div :class="['quick-action-card__icon', `quick-action-card__icon--${action.color}`]">
           <el-icon :size="20"><component :is="action.icon" /></el-icon>
         </div>
         <div class="quick-action-card__info">
-          <div class="quick-action-card__label">{{ action.label }}</div>
+          <div class="quick-action-card__label">
+            {{ action.label }}
+            <span v-if="action.highlight" class="quick-action-card__dot" />
+          </div>
           <div class="quick-action-card__desc">{{ action.desc }}</div>
         </div>
       </div>
@@ -24,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { MagicStick } from "@element-plus/icons-vue";
 import type { Component } from "vue";
 
@@ -33,10 +38,13 @@ export interface QuickAction {
   desc: string;
   icon: Component;
   color: string;
+  highlight?: boolean;
 }
 
-defineProps<{ actions: QuickAction[] }>();
+const props = defineProps<{ actions: QuickAction[] }>();
 defineEmits<{ action: [type: string] }>();
+
+const hasHighlight = computed(() => props.actions.some((a) => a.highlight));
 </script>
 
 <style scoped>
@@ -54,6 +62,15 @@ defineEmits<{ action: [type: string] }>();
   font-weight: 600;
   color: var(--color-text-secondary);
   margin-bottom: 12px;
+}
+
+.quick-actions__hint {
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  color: #fff;
+  font-weight: 500;
 }
 
 .quick-actions__grid {
@@ -78,6 +95,16 @@ defineEmits<{ action: [type: string] }>();
   border-color: var(--color-primary-light);
   box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
+}
+
+.quick-action-card--highlight {
+  border-color: #C7D2FE;
+  background: linear-gradient(135deg, #EEF2FF, #F5F3FF);
+}
+
+.quick-action-card--highlight:hover {
+  border-color: #6366F1;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
 }
 
 .quick-action-card__icon {
@@ -105,11 +132,31 @@ defineEmits<{ action: [type: string] }>();
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quick-action-card__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6366F1;
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
 }
 
 .quick-action-card__desc {
   font-size: var(--text-xs);
   color: var(--color-text-tertiary);
   margin-top: 2px;
+}
+
+.quick-action-card--highlight .quick-action-card__desc {
+  color: #6366F1;
 }
 </style>

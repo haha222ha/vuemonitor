@@ -1,4 +1,4 @@
-import { ref, reactive, onMounted, onUnmounted } from "vue";
+import { ref, reactive } from "vue";
 import { useProductStore } from "../stores/product";
 import { useCollectStore } from "../stores/collect";
 import { useSchedulerStore } from "../stores/scheduler";
@@ -23,6 +23,56 @@ export interface TrendSeriesItem {
   sparklinePoints: string;
   sparklineWidth: number;
   latestGrowth: number | null;
+}
+
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+const CACHE_TTL = 30_000;
+
+const cache = new Map<string, CacheEntry<any>>();
+
+function getCached<T>(key: string): T | null {
+  const entry = cache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL) {
+    cache.delete(key);
+    return null;
+  }
+  return entry.data as T;
+}
+
+function setCache<T>(key: string, data: T): void {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
+function invalidateCache(key?: string): void {
+  if (key) cache.delete(key);
+  else cache.clear();
+}
+
+const pendingRequests = new Map<string, Promise<any>>();
+
+async function dedupedFetch<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+  const pending = pendingRequests.get(key);
+  if (pending) return pending as Promise<T>;
+
+  const cached = getCached<T>(key);
+  if (cached !== null) return cached;
+
+  const promise = fetcher().then((data) => {
+    setCache(key, data);
+    pendingRequests.delete(key);
+    return data;
+  }).catch((err) => {
+    pendingRequests.delete(key);
+    throw err;
+  });
+
+  pendingRequests.set(key, promise);
+  return promise;
 }
 
 export function useDashboardData() {
@@ -101,31 +151,37 @@ export function useDashboardData() {
     bizStats.aiInsightCount = 0;
   }
 
+  function applyHomeData(d: any) {
+    const stats = d.biz_stats;
+    bizStats.cloudConnected = true;
+    bizStats.opportunityCount = stats.opportunity_count || 0;
+    bizStats.opportunityTrend = stats.opportunity_count > 0 ? `${stats.opportunity_count}个上榜` : "暂无排名";
+    bizStats.opportunityTrendType = stats.opportunity_count > 0 ? "up" : "neutral";
+    bizStats.todayTrend = stats.today_trend || "0%";
+    const pct = parseFloat(bizStats.todayTrend);
+    if (!isNaN(pct)) {
+      bizStats.todayTrendType = pct > 0 ? "up" : pct < 0 ? "down" : "neutral";
+      bizStats.todayTrendLabel = pct > 0 ? "较昨日上涨" : pct < 0 ? "较昨日下降" : "较昨日持平";
+    }
+    bizStats.alertCount = stats.alert_count || 0;
+    bizStats.alertTrend = bizStats.alertCount > 0 ? `${bizStats.alertCount}条未处理` : "暂无异动";
+    bizStats.aiInsightCount = stats.ai_insight_count || 0;
+
+    if (d.rankings && d.rankings.length > 0) opportunityRankings.value = d.rankings;
+    if (d.alert_events && d.alert_events.length > 0) alertEvents.value = d.alert_events;
+    if (d.category_heatmap && d.category_heatmap.length > 0) crowdHeatmap.value = d.category_heatmap;
+    if (d.behavior_patterns) crowdPatterns.value = d.behavior_patterns;
+    if (d.trend_timeseries && Object.keys(d.trend_timeseries).length > 0) processTrendSeries(d.trend_timeseries);
+  }
+
   async function fetchBizStats() {
     try {
-      const homeRes = await api.get("/dashboard/home");
-      if (homeRes.data?.code === 0 && homeRes.data.data) {
-        const d = homeRes.data.data;
-        const stats = d.biz_stats;
-        bizStats.cloudConnected = true;
-        bizStats.opportunityCount = stats.opportunity_count || 0;
-        bizStats.opportunityTrend = stats.opportunity_count > 0 ? `${stats.opportunity_count}个上榜` : "暂无排名";
-        bizStats.opportunityTrendType = stats.opportunity_count > 0 ? "up" : "neutral";
-        bizStats.todayTrend = stats.today_trend || "0%";
-        const pct = parseFloat(bizStats.todayTrend);
-        if (!isNaN(pct)) {
-          bizStats.todayTrendType = pct > 0 ? "up" : pct < 0 ? "down" : "neutral";
-          bizStats.todayTrendLabel = pct > 0 ? "较昨日上涨" : pct < 0 ? "较昨日下降" : "较昨日持平";
-        }
-        bizStats.alertCount = stats.alert_count || 0;
-        bizStats.alertTrend = bizStats.alertCount > 0 ? `${bizStats.alertCount}条未处理` : "暂无异动";
-        bizStats.aiInsightCount = stats.ai_insight_count || 0;
-
-        if (d.rankings && d.rankings.length > 0) opportunityRankings.value = d.rankings;
-        if (d.alert_events && d.alert_events.length > 0) alertEvents.value = d.alert_events;
-        if (d.category_heatmap && d.category_heatmap.length > 0) crowdHeatmap.value = d.category_heatmap;
-        if (d.behavior_patterns) crowdPatterns.value = d.behavior_patterns;
-        if (d.trend_timeseries && Object.keys(d.trend_timeseries).length > 0) processTrendSeries(d.trend_timeseries);
+      const homeData = await dedupedFetch("dashboard:home", async () => {
+        const res = await api.get("/dashboard/home");
+        return res.data?.code === 0 ? res.data.data : null;
+      });
+      if (homeData) {
+        applyHomeData(homeData);
       } else {
         applyLocalFallback();
       }
@@ -140,8 +196,11 @@ export function useDashboardData() {
   async function fetchOpportunityRankings() {
     opportunityLoading.value = true;
     try {
-      const res = await api.get("/feature/product-rankings");
-      if (res.data?.rankings) opportunityRankings.value = res.data.rankings;
+      const data = await dedupedFetch("feature:rankings", async () => {
+        const res = await api.get("/feature/product-rankings");
+        return res.data?.rankings || null;
+      });
+      if (data) opportunityRankings.value = data;
     } catch {} finally {
       opportunityLoading.value = false;
     }
@@ -150,8 +209,11 @@ export function useDashboardData() {
   async function fetchAlertEvents() {
     alertLoading.value = true;
     try {
-      const res = await api.get("/alert-rules/events/all", { params: { limit: 10 } });
-      if (res.data?.code === 0 && Array.isArray(res.data.data)) alertEvents.value = res.data.data;
+      const data = await dedupedFetch("alert:events", async () => {
+        const res = await api.get("/alert-rules/events/all", { params: { limit: 10 } });
+        return res.data?.code === 0 ? res.data.data : null;
+      });
+      if (data) alertEvents.value = data;
     } catch {} finally {
       alertLoading.value = false;
     }
@@ -160,6 +222,8 @@ export function useDashboardData() {
   async function acknowledgeAlert(eventId: string) {
     try {
       await api.post(`/alert-rules/events/${eventId}/acknowledge`);
+      invalidateCache("alert:events");
+      invalidateCache("dashboard:home");
       await fetchAlertEvents();
       await fetchBizStats();
     } catch {}
@@ -168,12 +232,14 @@ export function useDashboardData() {
   async function fetchCrowdInsights() {
     crowdLoading.value = true;
     try {
-      const homeRes = await api.get("/dashboard/home");
-      if (homeRes.data?.code === 0 && homeRes.data.data) {
-        const d = homeRes.data.data;
-        if (d.category_heatmap) crowdHeatmap.value = d.category_heatmap;
-        if (d.behavior_patterns) crowdPatterns.value = d.behavior_patterns;
-        if (d.trend_timeseries) processTrendSeries(d.trend_timeseries);
+      const homeData = await dedupedFetch("dashboard:home", async () => {
+        const res = await api.get("/dashboard/home");
+        return res.data?.code === 0 ? res.data.data : null;
+      });
+      if (homeData) {
+        if (homeData.category_heatmap) crowdHeatmap.value = homeData.category_heatmap;
+        if (homeData.behavior_patterns) crowdPatterns.value = homeData.behavior_patterns;
+        if (homeData.trend_timeseries) processTrendSeries(homeData.trend_timeseries);
       }
     } catch {} finally {
       crowdLoading.value = false;
@@ -183,8 +249,11 @@ export function useDashboardData() {
   async function fetchRecommendations() {
     recLoading.value = true;
     try {
-      const { data } = await api.get("/ai/recommendations", { params: { limit: 8 } });
-      recommendations.value = data?.data?.items || data?.items || [];
+      const data = await dedupedFetch("ai:recommendations", async () => {
+        const { data } = await api.get("/ai/recommendations", { params: { limit: 8 } });
+        return data?.data?.items || data?.items || [];
+      });
+      recommendations.value = data || [];
     } catch {
       recommendations.value = [];
     } finally {
@@ -203,6 +272,7 @@ export function useDashboardData() {
     fetchBizStats();
     fetchRecommendations();
     refreshTimer = setInterval(() => {
+      invalidateCache();
       collectStore.fetchStatus();
       schedulerStore.fetchState();
       fetchBizStats();

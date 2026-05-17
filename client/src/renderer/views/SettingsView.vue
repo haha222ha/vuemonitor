@@ -71,6 +71,35 @@
           </div>
         </div>
 
+        <div v-show="activeSection === 'appearance'" class="settings-section">
+          <h2 class="section-title">外观</h2>
+          <div class="settings-card">
+            <div class="setting-item">
+              <div class="setting-info">
+                <h3 class="setting-title">主题模式</h3>
+                <p class="setting-desc">选择界面配色方案</p>
+              </div>
+              <div class="theme-switcher">
+                <div
+                  v-for="opt in themeOptions"
+                  :key="opt.value"
+                  :class="['theme-option', { 'theme-option--active': themeMode === opt.value }]"
+                  @click="setThemeMode(opt.value)"
+                >
+                  <div :class="['theme-option__preview', `theme-option__preview--${opt.value}`]">
+                    <div class="theme-option__preview-sidebar" />
+                    <div class="theme-option__preview-body">
+                      <div class="theme-option__preview-line" />
+                      <div class="theme-option__preview-line theme-option__preview-line--short" />
+                    </div>
+                  </div>
+                  <span class="theme-option__label">{{ opt.label }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div v-show="activeSection === 'sync'">
           <SyncSection
             v-model:server-url="serverUrl"
@@ -349,6 +378,15 @@ import TeamSection from "../components/settings/TeamSection.vue";
 import AuditSection from "../components/settings/AuditSection.vue";
 import LogSection from "../components/settings/LogSection.vue";
 import { useSettingsData } from "../composables/useSettingsData";
+import { useTheme, type ThemeMode } from "../composables/useTheme";
+
+const { mode: themeMode, setMode: setThemeMode } = useTheme();
+
+const themeOptions: { value: ThemeMode; label: string }[] = [
+  { value: "light", label: "浅色" },
+  { value: "dark", label: "深色" },
+  { value: "system", label: "跟随系统" },
+];
 
 const {
   authStore, licenseStore,
@@ -432,6 +470,26 @@ onUnmounted(() => { cleanup(); });
 .shortcut-label { font-size: var(--text-sm); color: var(--color-text-primary); }
 .shortcut-actions { display: flex; gap: 4px; }
 .shortcuts-footer { padding-top: 16px; display: flex; justify-content: flex-end; }
+.theme-switcher { display: flex; gap: 12px; }
+.theme-option { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; padding: 12px; border: 2px solid var(--color-border-light); border-radius: var(--radius-lg); transition: all 0.2s; }
+.theme-option:hover { border-color: var(--color-primary-lighter); }
+.theme-option--active { border-color: var(--color-primary); background: var(--color-primary-lightest); }
+.theme-option__preview { width: 80px; height: 52px; border-radius: 6px; overflow: hidden; display: flex; }
+.theme-option__preview--light { background: #F8FAFC; border: 1px solid #E2E8F0; }
+.theme-option__preview--dark { background: #0F172A; border: 1px solid #334155; }
+.theme-option__preview--system { background: linear-gradient(135deg, #F8FAFC 50%, #0F172A 50%); border: 1px solid #94A3B8; }
+.theme-option__preview-sidebar { width: 20px; height: 100%; }
+.theme-option__preview--light .theme-option__preview-sidebar { background: #1E1B4B; }
+.theme-option__preview--dark .theme-option__preview-sidebar { background: #0F172A; border-right: 1px solid #334155; }
+.theme-option__preview--system .theme-option__preview-sidebar { background: linear-gradient(180deg, #1E1B4B 50%, #0F172A 50%); }
+.theme-option__preview-body { flex: 1; padding: 6px 4px; display: flex; flex-direction: column; gap: 4px; }
+.theme-option__preview-line { height: 4px; border-radius: 2px; }
+.theme-option__preview-line--short { width: 60%; }
+.theme-option__preview--light .theme-option__preview-line { background: #CBD5E1; }
+.theme-option__preview--dark .theme-option__preview-line { background: #475569; }
+.theme-option__preview--system .theme-option__preview-line { background: linear-gradient(90deg, #CBD5E1 50%, #475569 50%); }
+.theme-option__label { font-size: var(--text-xs); color: var(--color-text-secondary); font-weight: 500; }
+.theme-option--active .theme-option__label { color: var(--color-primary); }
 @media (max-width: 1024px) {
   .settings-container { flex-direction: column; }
   .settings-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--color-border-light); }

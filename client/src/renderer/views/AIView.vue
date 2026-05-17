@@ -85,6 +85,29 @@
               </el-tag>
             </div>
             <div class="analysis-card__body">
+              <div v-if="item.analysis_type === 'trend_score' && item.result?.score != null" class="analysis-card__visual-mini">
+                <div class="mini-gauge">
+                  <svg viewBox="0 0 36 36" class="mini-gauge__svg">
+                    <circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-border-light)" stroke-width="3" />
+                    <circle cx="18" cy="18" r="15" fill="none" :stroke="item.result.score >= 70 ? '#10B981' : item.result.score >= 40 ? '#F59E0B' : '#EF4444'" stroke-width="3" stroke-linecap="round" :stroke-dasharray="2 * Math.PI * 15" :stroke-dashoffset="2 * Math.PI * 15 * (1 - Math.min(item.result.score, 100) / 100)" class="mini-gauge__arc" />
+                  </svg>
+                  <span class="mini-gauge__value">{{ item.result.score }}</span>
+                </div>
+                <div class="mini-gauge__label">趋势评分</div>
+              </div>
+              <div v-else-if="item.analysis_type === 'prediction'" class="analysis-card__visual-mini">
+                <span :class="['mini-badge', `mini-badge--${predictionLevel(item)}`]">
+                  {{ predictionLevelLabel(item) }}
+                </span>
+                <span v-if="item.result?.growth_rate_7d != null" class="mini-growth" :class="item.result.growth_rate_7d >= 0 ? 'mini-growth--up' : 'mini-growth--down'">
+                  {{ item.result.growth_rate_7d >= 0 ? '+' : '' }}{{ item.result.growth_rate_7d.toFixed(1) }}%
+                </span>
+              </div>
+              <div v-else-if="item.analysis_type === 'risk_warning'" class="analysis-card__visual-mini">
+                <span :class="['mini-risk-tag', `mini-risk-tag--${riskLevel(item)}`]">
+                  {{ riskLevelLabel(item) }}
+                </span>
+              </div>
               <div v-if="item.confidence" class="analysis-card__confidence">
                 <span class="analysis-card__confidence-label">置信度</span>
                 <div class="analysis-card__confidence-bar">
@@ -187,7 +210,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import PageHeader from "../components/PageHeader.vue";
 import SearchInput from "../components/SearchInput.vue";
@@ -220,15 +243,118 @@ const {
   recIcon, recTagType, recLabel,
 } = useAIData();
 
-const quickActions = [
+const BASE_QUICK_ACTIONS = [
   { type: "trend_score", label: "趋势评分", desc: "评估商品趋势走向", icon: TrendCharts, color: "success" },
   { type: "prediction", label: "爆品预测", desc: "预测爆款潜力", icon: Opportunity, color: "amber" },
   { type: "risk_warning", label: "风险预警", desc: "识别潜在风险信号", icon: Warning, color: "danger" },
   { type: "basic_analysis", label: "基础分析", desc: "全面商品数据分析", icon: DataAnalysis, color: "primary" },
 ];
 
+const quickActions = computed(() => {
+  const recs = recommendations.value;
+  if (!recs || recs.length === 0) return BASE_QUICK_ACTIONS;
+
+  const dynamic: any[] = [];
+  const hasTrending = recs.some((r: any) => r.type === "trending");
+  const hasRisk = recs.some((r: any) => r.type === "risk");
+  const hasAlert = recs.some((r: any) => r.type === "alert");
+  const hasCategoryInsight = recs.some((r: any) => r.type === "category_insight");
+
+  if (hasTrending) {
+    const topTrend = recs.find((r: any) => r.type === "trending");
+    dynamic.push({
+      type: "trend_score",
+      label: "趋势评分",
+      desc: topTrend?.reason || "发现上升趋势商品",
+      icon: TrendCharts,
+      color: "success",
+      highlight: true,
+    });
+  } else {
+    dynamic.push(BASE_QUICK_ACTIONS[0]);
+  }
+
+  if (hasTrending || hasCategoryInsight) {
+    const topPred = recs.find((r: any) => r.type === "trending");
+    dynamic.push({
+      type: "prediction",
+      label: "爆品预测",
+      desc: topPred?.product_name ? `${topPred.product_name} 潜力评估` : "预测爆款潜力",
+      icon: Opportunity,
+      color: "amber",
+      highlight: !!topPred?.metric?.growth_rate_7d && topPred.metric.growth_rate_7d > 20,
+    });
+  } else {
+    dynamic.push(BASE_QUICK_ACTIONS[1]);
+  }
+
+  if (hasRisk || hasAlert) {
+    const riskRec = recs.find((r: any) => r.type === "risk");
+    const alertRec = recs.find((r: any) => r.type === "alert");
+    dynamic.push({
+      type: "risk_warning",
+      label: "风险预警",
+      desc: riskRec?.reason || alertRec?.reason || "检测到风险信号",
+      icon: Warning,
+      color: "danger",
+      highlight: hasAlert,
+    });
+  } else {
+    dynamic.push(BASE_QUICK_ACTIONS[2]);
+  }
+
+  if (hasCategoryInsight) {
+    const catRec = recs.find((r: any) => r.type === "category_insight");
+    dynamic.push({
+      type: "product_optimization",
+      label: "品类优化",
+      desc: catRec?.reason || "品类洞察可用",
+      icon: Cpu,
+      color: "primary",
+      highlight: true,
+    });
+  } else {
+    dynamic.push(BASE_QUICK_ACTIONS[3]);
+  }
+
+  return dynamic;
+});
+
 function viewAnalysis(row: any) { currentResult.value = row; showResult.value = true; }
 function viewReport(row: any) { currentReport.value = row; showReportView.value = true; }
+
+function predictionLevel(item: any): string {
+  if (item.result?.potential_level) {
+    const map: Record<string, string> = { low: 'low', medium: 'medium', high: 'high', star: 'star' };
+    return map[item.result.potential_level] || 'medium';
+  }
+  const s = item.result?.score ?? 0;
+  if (s >= 80) return 'star';
+  if (s >= 60) return 'high';
+  if (s >= 35) return 'medium';
+  return 'low';
+}
+
+function predictionLevelLabel(item: any): string {
+  const map: Record<string, string> = { low: '低潜力', medium: '中潜力', high: '高潜力', star: '★ 爆款' };
+  return map[predictionLevel(item)] || '评估中';
+}
+
+function riskLevel(item: any): string {
+  if (item.result?.overall_risk_level) {
+    const map: Record<string, string> = { high: 'danger', critical: 'danger', medium: 'warning', low: 'safe', safe: 'safe' };
+    return map[item.result.overall_risk_level.toLowerCase()] || 'warning';
+  }
+  const s = item.result?.score ?? 50;
+  if (s < 30) return 'danger';
+  if (s < 60) return 'warning';
+  return 'safe';
+}
+
+function riskLevelLabel(item: any): string {
+  const map: Record<string, string> = { danger: '⚠ 高风险', warning: '⚡ 中风险', safe: '✓ 低风险' };
+  return map[riskLevel(item)] || '评估中';
+}
 
 function handleRecommendationClick(rec: any) {
   if (rec.type === "alert" && rec.event_id) router.push("/notifications");
@@ -279,6 +405,24 @@ onMounted(() => { fetchAnalyses(); fetchReports(); fetchProducts(); fetchRecomme
 .analysis-card__model { font-size: var(--text-xs); color: var(--color-text-tertiary); }
 .analysis-card__status { flex-shrink: 0; }
 .analysis-card__body { margin-bottom: 12px; }
+.analysis-card__visual-mini { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.mini-gauge { position: relative; width: 36px; height: 36px; flex-shrink: 0; }
+.mini-gauge__svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.mini-gauge__arc { transition: stroke-dashoffset 0.5s ease-out; }
+.mini-gauge__value { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--color-text-primary); }
+.mini-gauge__label { font-size: 12px; color: var(--color-text-tertiary); }
+.mini-badge { display: inline-block; padding: 3px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.mini-badge--low { background: #F1F5F9; color: #475569; }
+.mini-badge--medium { background: #EEF2FF; color: #3730A3; }
+.mini-badge--high { background: #ECFDF5; color: #065F46; }
+.mini-badge--star { background: linear-gradient(135deg, #FFFBEB, #FEF3C7); color: #92400E; box-shadow: 0 0 8px rgba(245, 158, 11, 0.2); }
+.mini-growth { font-size: 12px; font-weight: 600; }
+.mini-growth--up { color: #10B981; }
+.mini-growth--down { color: #EF4444; }
+.mini-risk-tag { display: inline-block; padding: 3px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.mini-risk-tag--danger { background: #FEE2E2; color: #991B1B; }
+.mini-risk-tag--warning { background: #FEF3C7; color: #92400E; }
+.mini-risk-tag--safe { background: #D1FAE5; color: #065F46; }
 .analysis-card__confidence { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .analysis-card__confidence-label { font-size: var(--text-xs); color: var(--color-text-tertiary); min-width: 40px; }
 .analysis-card__confidence-bar { flex: 1; height: 6px; background: var(--color-bg-muted); border-radius: 3px; overflow: hidden; }

@@ -122,6 +122,11 @@
           <el-badge :value="notificationStore.unreadCount" :hidden="!notificationStore.hasUnread" :max="99">
             <el-button :icon="Bell" circle size="small" @click="$router.push('/notifications')" />
           </el-badge>
+          <el-tooltip :content="themeTooltip" placement="bottom">
+            <el-button circle size="small" @click="toggleTheme" class="topbar__theme-btn">
+              <el-icon :size="16"><component :is="themeIcon" /></el-icon>
+            </el-button>
+          </el-tooltip>
           <el-dropdown>
             <div class="topbar__user">
               <div class="topbar__avatar">
@@ -184,6 +189,7 @@ import SearchInput from "../components/SearchInput.vue";
 import GlobalSearchDialog from "../components/GlobalSearchDialog.vue";
 import StatusDot from "../components/StatusDot.vue";
 import PlanCard from "../components/PlanCard.vue";
+import { useTheme } from "../composables/useTheme";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -192,6 +198,14 @@ const notificationStore = useNotificationStore();
 const permissionStore = usePermissionStore();
 const licenseStore = useLicenseStore();
 const collectStore = useCollectStore();
+const { mode: themeMode, isDark, toggle: toggleTheme } = useTheme();
+
+import { Sunny, Moon } from "@element-plus/icons-vue";
+const themeIcon = computed(() => isDark.value ? Moon : Sunny);
+const themeTooltip = computed(() => {
+  const labels: Record<string, string> = { light: "浅色", dark: "深色", system: "跟随系统" };
+  return `主题：${labels[themeMode.value] || "跟随系统"}（点击切换）`;
+});
 
 const windowWidth = ref(window.innerWidth);
 const collapsed = ref(false);

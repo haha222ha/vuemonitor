@@ -45,6 +45,11 @@
         <div class="login__circle login__circle--1" />
         <div class="login__circle login__circle--2" />
         <div class="login__circle login__circle--3" />
+        <div class="login__particles">
+          <div v-for="i in 6" :key="i" :class="['login__particle', `login__particle--${i}`]" />
+        </div>
+        <div class="login__glow login__glow--1" />
+        <div class="login__glow login__glow--2" />
       </div>
     </div>
 
@@ -112,9 +117,42 @@ const {
 .login__feature-desc { font-size: 12px; opacity: 0.7; margin-top: 2px; }
 .login__brand-decoration { position: absolute; inset: 0; pointer-events: none; }
 .login__circle { position: absolute; border-radius: 50%; background: rgba(255, 255, 255, 0.05); }
-.login__circle--1 { width: 300px; height: 300px; top: -80px; right: -60px; }
-.login__circle--2 { width: 200px; height: 200px; bottom: -40px; left: -40px; }
-.login__circle--3 { width: 150px; height: 150px; top: 50%; left: 60%; }
+.login__circle--1 { width: 300px; height: 300px; top: -80px; right: -60px; animation: circleDrift1 12s ease-in-out infinite; }
+.login__circle--2 { width: 200px; height: 200px; bottom: -40px; left: -40px; animation: circleDrift2 15s ease-in-out infinite; }
+.login__circle--3 { width: 150px; height: 150px; top: 50%; left: 60%; animation: circleDrift3 10s ease-in-out infinite; }
+.login__particles { position: absolute; inset: 0; }
+.login__particle { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); animation: particleFloat 8s ease-in-out infinite; }
+.login__particle--1 { top: 15%; left: 20%; animation-delay: 0s; animation-duration: 7s; }
+.login__particle--2 { top: 60%; left: 75%; animation-delay: 1.2s; animation-duration: 9s; width: 4px; height: 4px; }
+.login__particle--3 { top: 80%; left: 30%; animation-delay: 2.5s; animation-duration: 6s; width: 8px; height: 8px; background: rgba(255, 255, 255, 0.2); }
+.login__particle--4 { top: 25%; left: 65%; animation-delay: 3.8s; animation-duration: 10s; width: 5px; height: 5px; }
+.login__particle--5 { top: 70%; left: 50%; animation-delay: 0.8s; animation-duration: 8s; width: 3px; height: 3px; background: rgba(129, 140, 248, 0.5); }
+.login__particle--6 { top: 40%; left: 85%; animation-delay: 4.5s; animation-duration: 7.5s; width: 7px; height: 7px; background: rgba(255, 255, 255, 0.15); }
+.login__glow { position: absolute; border-radius: 50%; filter: blur(60px); pointer-events: none; }
+.login__glow--1 { width: 200px; height: 200px; background: rgba(129, 140, 248, 0.15); top: 20%; right: 10%; animation: glowPulse 6s ease-in-out infinite; }
+.login__glow--2 { width: 160px; height: 160px; background: rgba(167, 139, 250, 0.12); bottom: 15%; left: 15%; animation: glowPulse 8s ease-in-out infinite 2s; }
+@keyframes particleFloat {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+  25% { transform: translateY(-20px) translateX(10px); opacity: 0.6; }
+  50% { transform: translateY(-10px) translateX(-8px); opacity: 0.4; }
+  75% { transform: translateY(-25px) translateX(5px); opacity: 0.7; }
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.15); }
+}
+@keyframes circleDrift1 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-15px, 20px); }
+}
+@keyframes circleDrift2 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20px, -15px); }
+}
+@keyframes circleDrift3 {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(-10px, -18px); }
+}
 .login__form-side { flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px; background: var(--color-bg-page); }
 .login__form-wrapper { width: 100%; max-width: 400px; }
 .login__form-header { margin-bottom: 32px; }

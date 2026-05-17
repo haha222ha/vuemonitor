@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" title="分析结果" width="720px" class="ai-dialog">
+  <el-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" title="分析结果" width="760px" class="ai-dialog">
     <div v-if="result" class="analysis-result">
       <div class="analysis-result__tags">
         <el-tag size="small" :type="analysisTypeTag(result.analysis_type)" effect="light">
@@ -12,7 +12,37 @@
           {{ result.provider }} / {{ result.model }}
         </el-tag>
       </div>
-      <div v-if="result.confidence" class="analysis-result__gauge-row">
+
+      <div v-if="result.analysis_type === 'trend_score'" class="analysis-result__visual">
+        <TrendScoreVisual
+          :score="result.result?.score"
+          :confidence="result.confidence"
+          :trend="result.result?.trend_short"
+          :growth-rate="result.result?.growth_rate_7d"
+          :lifecycle="result.result?.lifecycle_stage"
+        />
+      </div>
+
+      <div v-else-if="result.analysis_type === 'prediction'" class="analysis-result__visual">
+        <PredictionVisual
+          :score="result.result?.score"
+          :confidence="result.confidence"
+          :potential-level="result.result?.potential_level"
+          :growth-rate="result.result?.growth_rate_7d"
+          :competition-index="result.result?.competition_index"
+        />
+      </div>
+
+      <div v-else-if="result.analysis_type === 'risk_warning'" class="analysis-result__visual">
+        <RiskWarningVisual
+          :risks="result.result?.risks"
+          :overall-risk="result.result?.overall_risk_level"
+          :confidence="result.confidence"
+          :score="result.result?.score"
+        />
+      </div>
+
+      <div v-else class="analysis-result__gauge-row">
         <div class="gauge-card">
           <div class="gauge-card__ring" :style="confidenceGaugeStyle(result.confidence)">
             <span class="gauge-card__value">{{ (result.confidence * 100).toFixed(0) }}</span>
@@ -37,13 +67,14 @@
           </div>
         </div>
       </div>
+
       <div class="analysis-result__content">
         <template v-if="isStructuredResult(result.result)">
           <div v-if="result.result.summary" class="result-block result-block--highlight">
             <div class="result-block__label">摘要</div>
             <div class="result-block__text">{{ result.result.summary }}</div>
           </div>
-          <div v-if="result.result.score != null" class="result-block">
+          <div v-if="result.analysis_type !== 'trend_score' && result.result.score != null" class="result-block">
             <div class="result-block__label">评分</div>
             <div class="result-score-bar">
               <div class="result-score-fill" :style="{ width: `${Math.min(result.result.score, 100)}%` }" />
@@ -56,7 +87,7 @@
               <li v-for="(rec, idx) in result.result.recommendations" :key="idx">{{ rec }}</li>
             </ul>
           </div>
-          <div v-if="result.result.risks?.length" class="result-block">
+          <div v-if="result.analysis_type !== 'risk_warning' && result.result.risks?.length" class="result-block">
             <div class="result-block__label">风险</div>
             <ul class="result-list result-list--risk">
               <li v-for="(risk, idx) in result.result.risks" :key="idx">{{ risk }}</li>
@@ -68,14 +99,26 @@
               <li v-for="(finding, idx) in result.result.key_findings" :key="idx">{{ finding }}</li>
             </ul>
           </div>
+          <div v-if="result.result.next_steps?.length" class="result-block">
+            <div class="result-block__label">下一步行动</div>
+            <ul class="result-list result-list--action">
+              <li v-for="(step, idx) in result.result.next_steps" :key="idx">{{ step }}</li>
+            </ul>
+          </div>
         </template>
-        <template v-else>{{ formatResult(result.result) }}</template>
+        <template v-else>
+          <div class="result-plaintext">{{ formatResult(result.result) }}</div>
+        </template>
       </div>
     </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
+import TrendScoreVisual from "./TrendScoreVisual.vue";
+import PredictionVisual from "./PredictionVisual.vue";
+import RiskWarningVisual from "./RiskWarningVisual.vue";
+
 defineProps<{
   modelValue: boolean;
   result: any;
@@ -93,8 +136,9 @@ defineEmits<{ (e: "update:modelValue", value: boolean): void }>();
 <style scoped>
 .ai-dialog :deep(.el-dialog__header) { padding: 20px 24px; border-bottom: 1px solid var(--color-border-light); margin-right: 0; }
 .ai-dialog :deep(.el-dialog__title) { font-size: var(--text-lg); font-weight: 600; color: var(--color-text-primary); }
-.ai-dialog :deep(.el-dialog__body) { padding: 24px; }
+.ai-dialog :deep(.el-dialog__body) { padding: 24px; max-height: 70vh; overflow-y: auto; }
 .analysis-result__tags { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.analysis-result__visual { margin-bottom: 20px; }
 .analysis-result__gauge-row { display: flex; gap: 20px; margin-bottom: 20px; align-items: center; }
 .gauge-card { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .gauge-card__ring { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; }
@@ -125,4 +169,6 @@ defineEmits<{ (e: "update:modelValue", value: boolean): void }>();
 .result-list li { margin-bottom: 4px; }
 .result-list--recommend li { color: #065F46; }
 .result-list--risk li { color: #991B1B; }
+.result-list--action li { color: #3730A3; }
+.result-plaintext { white-space: pre-wrap; word-break: break-word; }
 </style>

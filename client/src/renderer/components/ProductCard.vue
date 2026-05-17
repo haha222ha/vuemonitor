@@ -50,6 +50,27 @@
           <div class="product-card__percentile-fill" :style="{ width: percentileWidth }" />
         </div>
       </div>
+      <div v-if="competitionIndex != null" class="product-card__competition">
+        <div class="product-card__competition-header">
+          <span class="product-card__competition-label">竞争力指数</span>
+          <span :class="['product-card__competition-value', `product-card__competition-value--${competitionLevel}`]">
+            {{ competitionIndex.toFixed(2) }}
+          </span>
+        </div>
+        <div class="product-card__competition-bar">
+          <div class="product-card__competition-track">
+            <div class="product-card__competition-seg product-card__competition-seg--low" style="width: 40%" />
+            <div class="product-card__competition-seg product-card__competition-seg--mid" style="width: 30%" />
+            <div class="product-card__competition-seg product-card__competition-seg--high" style="width: 30%" />
+          </div>
+          <div class="product-card__competition-marker" :style="{ left: `${Math.min(competitionIndex * 100, 100)}%` }" />
+        </div>
+        <div class="product-card__competition-labels">
+          <span>弱</span>
+          <span>中</span>
+          <span>强</span>
+        </div>
+      </div>
     </div>
     <div class="product-card__actions">
       <el-button size="small" @click="$emit('detail', product)">详情</el-button>
@@ -104,6 +125,18 @@ const percentileText = computed(() => {
 const percentileWidth = computed(() => {
   if (!props.ranking || props.ranking.total === 0) return "0%";
   return `${Math.round(((props.ranking.total - props.ranking.rank) / props.ranking.total) * 100)}%`;
+});
+
+const competitionIndex = computed(() => {
+  return props.product.latest_feature?.competition_index ?? props.product.competition_index ?? null;
+});
+
+const competitionLevel = computed(() => {
+  const idx = competitionIndex.value;
+  if (idx == null) return 'unknown';
+  if (idx >= 0.7) return 'high';
+  if (idx >= 0.4) return 'medium';
+  return 'low';
 });
 
 function formatDate(dateStr: string): string {
@@ -302,4 +335,18 @@ function lifecycleLabel(stage: string): string {
   border-radius: 3px;
   transition: width 0.6s ease;
 }
+.product-card__competition { margin-top: 10px; }
+.product-card__competition-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.product-card__competition-label { font-size: 12px; color: var(--color-text-secondary); }
+.product-card__competition-value { font-size: 14px; font-weight: 700; }
+.product-card__competition-value--low { color: #10B981; }
+.product-card__competition-value--medium { color: #F59E0B; }
+.product-card__competition-value--high { color: #EF4444; }
+.product-card__competition-bar { position: relative; height: 6px; margin-bottom: 2px; }
+.product-card__competition-track { display: flex; height: 100%; border-radius: 3px; overflow: hidden; }
+.product-card__competition-seg--low { background: #BBF7D0; }
+.product-card__competition-seg--mid { background: #FDE68A; }
+.product-card__competition-seg--high { background: #FCA5A5; }
+.product-card__competition-marker { position: absolute; top: -3px; width: 4px; height: 12px; background: var(--color-text-primary); border-radius: 2px; transform: translateX(-50%); transition: left 0.5s ease-out; }
+.product-card__competition-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--color-text-tertiary); }
 </style>

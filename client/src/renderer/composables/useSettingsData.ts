@@ -13,6 +13,7 @@ export function useSettingsData() {
   const sections = [
     { key: "account", label: "账户与授权", icon: "User" },
     { key: "notifications", label: "通知偏好", icon: "Bell" },
+    { key: "appearance", label: "外观", icon: "Sunny" },
     { key: "sync", label: "数据同步", icon: "Refresh" },
     { key: "collection", label: "采集配置", icon: "Cpu" },
     { key: "updates", label: "自动更新", icon: "Download" },
