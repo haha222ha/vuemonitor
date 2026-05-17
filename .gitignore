@@ -45,3 +45,5 @@ test-screenshots/
 progress.md
 findings.md
 task_plan.md
+deploy/downloads/*.exe
+deploy/downloads/*.blockmap
