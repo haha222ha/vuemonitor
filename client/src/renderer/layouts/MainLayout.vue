@@ -18,7 +18,7 @@
         <div class="sidebar__group">
           <div v-if="!collapsed" class="sidebar__group-label">洞察</div>
           <router-link
-            v-for="item in coreItems"
+            v-for="item in insightItems"
             :key="item.path"
             :to="item.path"
             :class="['sidebar__item', { 'sidebar__item--active': route.path === item.path }]"
@@ -27,21 +27,13 @@
             <transition name="fade">
               <span v-if="!collapsed" class="sidebar__item-label">{{ item.label }}</span>
             </transition>
-            <transition name="fade">
-              <el-badge
-                v-if="!collapsed && item.badge"
-                :value="item.badge"
-                :max="99"
-                class="sidebar__item-badge"
-              />
-            </transition>
           </router-link>
         </div>
 
         <div class="sidebar__group">
-          <div v-if="!collapsed" class="sidebar__group-label">管理</div>
+          <div v-if="!collapsed" class="sidebar__group-label">决策</div>
           <router-link
-            v-for="item in toolItems"
+            v-for="item in decisionItems"
             :key="item.path"
             :to="item.path"
             :class="['sidebar__item', { 'sidebar__item--active': route.path === item.path }]"
@@ -64,6 +56,14 @@
             <el-icon :size="20"><component :is="item.icon" /></el-icon>
             <transition name="fade">
               <span v-if="!collapsed" class="sidebar__item-label">{{ item.label }}</span>
+            </transition>
+            <transition name="fade">
+              <el-badge
+                v-if="!collapsed && item.badge"
+                :value="item.badge"
+                :max="99"
+                class="sidebar__item-badge"
+              />
             </transition>
           </router-link>
         </div>
@@ -200,21 +200,21 @@ const showGlobalSearch = ref(false);
 
 const isMobile = computed(() => windowWidth.value < 768);
 
-const coreItems = computed(() => [
+const insightItems = computed(() => [
   { path: "/dashboard", icon: Opportunity, label: "机会雷达" },
   { path: "/products", icon: Goods, label: "我的商品" },
   { path: "/category-insight", icon: DataAnalysis, label: "品类洞察" },
-  { path: "/ai", icon: MagicStick, label: "AI 决策" },
-]);
-
-const toolItems = computed(() => [
-  { path: "/scheduler", icon: Timer, label: "采集调度" },
-  { path: "/monitor", icon: Warning, label: "告警中心" },
-  { path: "/notifications", icon: ChatDotRound, label: t('nav.notifications'), badge: notificationStore.unreadCount || undefined },
   { path: "/compare", icon: DataAnalysis, label: "竞品对比" },
 ]);
 
+const decisionItems = computed(() => [
+  { path: "/ai", icon: MagicStick, label: "AI 决策" },
+  { path: "/monitor", icon: Warning, label: "告警中心" },
+]);
+
 const systemItems = computed(() => [
+  { path: "/scheduler", icon: Timer, label: "采集调度" },
+  { path: "/notifications", icon: ChatDotRound, label: t('nav.notifications'), badge: notificationStore.unreadCount || undefined },
   { path: "/settings", icon: Setting, label: t('nav.settings') },
   { path: "/license", icon: Key, label: t('nav.license') },
 ]);
@@ -222,7 +222,7 @@ const systemItems = computed(() => [
 const mobileNavItems = computed(() => [
   { path: "/dashboard", icon: Opportunity, label: "机会雷达" },
   { path: "/products", icon: Goods, label: "我的商品" },
-  { path: "/category-insight", icon: DataAnalysis, label: "品类洞察" },
+  { path: "/ai", icon: MagicStick, label: "AI 决策" },
   { path: "/monitor", icon: Warning, label: "告警中心" },
   { path: "/settings", icon: Setting, label: t('nav.settings') },
 ]);
