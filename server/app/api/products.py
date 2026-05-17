@@ -183,8 +183,7 @@ async def list_products(
                 ProductFeature.source,
                 ProductFeature.collected_at,
                 func.row_number()
-                .partition_by(ProductFeature.product_id)
-                .order_by(ProductFeature.collected_at.desc())
+                .over(partition_by=ProductFeature.product_id, order_by=ProductFeature.collected_at.desc())
                 .label("rn"),
             )
             .where(ProductFeature.product_id.in_(product_ids))

@@ -42,8 +42,7 @@ async def get_dashboard_stats(
             ProductFeature.product_id,
             ProductFeature.sales_count,
             func.row_number()
-            .partition_by(ProductFeature.product_id)
-            .order_by(ProductFeature.collected_at.desc())
+            .over(partition_by=ProductFeature.product_id, order_by=ProductFeature.collected_at.desc())
             .label("rn"),
         )
         .where(ProductFeature.product_id.in_(
@@ -57,8 +56,7 @@ async def get_dashboard_stats(
             ProductFeature.product_id,
             ProductFeature.sales_count,
             func.row_number()
-            .partition_by(ProductFeature.product_id)
-            .order_by(ProductFeature.collected_at.desc())
+            .over(partition_by=ProductFeature.product_id, order_by=ProductFeature.collected_at.desc())
             .label("rn"),
         )
         .where(ProductFeature.product_id.in_(
@@ -81,8 +79,8 @@ async def get_dashboard_stats(
                 & (prev_features_subq.c.rn == 2),
             )
             .where(latest_features_subq.c.rn == 1)
-            .where(latest_features_subq.c.latest_sales > prev_features_subq.c.prev_sales)
-            .where(prev_features_subq.c.prev_sales > 0)
+            .where(latest_features_subq.c.sales_count > prev_features_subq.c.sales_count)
+            .where(prev_features_subq.c.sales_count > 0)
             .subquery()
         )
     )
@@ -100,8 +98,8 @@ async def get_dashboard_stats(
                 & (prev_features_subq.c.rn == 2),
             )
             .where(latest_features_subq.c.rn == 1)
-            .where(latest_features_subq.c.latest_sales < prev_features_subq.c.prev_sales)
-            .where(prev_features_subq.c.prev_sales > 0)
+            .where(latest_features_subq.c.sales_count < prev_features_subq.c.sales_count)
+            .where(prev_features_subq.c.sales_count > 0)
             .subquery()
         )
     )
@@ -202,8 +200,7 @@ async def get_dashboard_stats(
                 ProductFeature.price,
                 ProductFeature.sales_count,
                 func.row_number()
-                .partition_by(ProductFeature.product_id)
-                .order_by(ProductFeature.collected_at.desc())
+                .over(partition_by=ProductFeature.product_id, order_by=ProductFeature.collected_at.desc())
                 .label("rn"),
             )
             .where(ProductFeature.product_id.in_(recent_product_ids))
@@ -290,40 +287,43 @@ async def get_dashboard_trend(
         return {"code": 0, "data": cached}
 
     now = datetime.now(timezone.utc)
-    start_date = now - timedelta(days=days)
+    start_date = datetime.utcnow() - timedelta(days=days)
 
     product_daily_result = await db.execute(
-        select(
-            func.date_trunc("day", Product.created_at).label("day"),
-            func.count().label("count"),
-        )
-        .where(Product.user_id == user.id, Product.created_at >= start_date)
-        .group_by(func.date_trunc("day", Product.created_at))
-        .order_by(text("day"))
+        text("""
+            SELECT date_trunc('day', created_at)::date AS day, count(*) AS count
+            FROM products
+            WHERE user_id = :uid AND created_at >= :start_date
+            GROUP BY date_trunc('day', created_at)::date
+            ORDER BY day
+        """),
+        {"uid": user.id, "start_date": start_date},
     )
-    product_map = {row[0].date(): row[1] for row in product_daily_result.all()}
+    product_map = {row[0]: row[1] for row in product_daily_result.all()}
 
     collect_daily_result = await db.execute(
-        select(
-            func.date_trunc("day", CollectTask.created_at).label("day"),
-            func.count().label("count"),
-        )
-        .where(CollectTask.user_id == user.id, CollectTask.created_at >= start_date)
-        .group_by(func.date_trunc("day", CollectTask.created_at))
-        .order_by(text("day"))
+        text("""
+            SELECT date_trunc('day', created_at)::date AS day, count(*) AS count
+            FROM collect_tasks
+            WHERE user_id = :uid AND created_at >= :start_date
+            GROUP BY date_trunc('day', created_at)::date
+            ORDER BY day
+        """),
+        {"uid": user.id, "start_date": start_date},
     )
-    collect_map = {row[0].date(): row[1] for row in collect_daily_result.all()}
+    collect_map = {row[0]: row[1] for row in collect_daily_result.all()}
 
     ai_daily_result = await db.execute(
-        select(
-            func.date_trunc("day", AIAnalysis.created_at).label("day"),
-            func.count().label("count"),
-        )
-        .where(AIAnalysis.user_id == user.id, AIAnalysis.created_at >= start_date)
-        .group_by(func.date_trunc("day", AIAnalysis.created_at))
-        .order_by(text("day"))
+        text("""
+            SELECT date_trunc('day', created_at)::date AS day, count(*) AS count
+            FROM ai_analyses
+            WHERE user_id = :uid AND created_at >= :start_date
+            GROUP BY date_trunc('day', created_at)::date
+            ORDER BY day
+        """),
+        {"uid": user.id, "start_date": start_date},
     )
-    ai_map = {row[0].date(): row[1] for row in ai_daily_result.all()}
+    ai_map = {row[0]: row[1] for row in ai_daily_result.all()}
 
     dates = []
     product_daily = []
@@ -454,8 +454,7 @@ async def get_home_data(
             ProductFeature.product_id,
             ProductFeature.sales_count,
             func.row_number()
-            .partition_by(ProductFeature.product_id)
-            .order_by(ProductFeature.collected_at.desc())
+            .over(partition_by=ProductFeature.product_id, order_by=ProductFeature.collected_at.desc())
             .label("rn"),
         )
         .where(ProductFeature.product_id.in_(
@@ -469,8 +468,7 @@ async def get_home_data(
             ProductFeature.product_id,
             ProductFeature.sales_count,
             func.row_number()
-            .partition_by(ProductFeature.product_id)
-            .order_by(ProductFeature.collected_at.desc())
+            .over(partition_by=ProductFeature.product_id, order_by=ProductFeature.collected_at.desc())
             .label("rn"),
         )
         .where(ProductFeature.product_id.in_(
@@ -530,7 +528,7 @@ async def get_home_data(
 
     rankings_result = await db.execute(
         text("""
-            SELECT pr.product_id, pr.overall_rank, pr.overall_score,
+            SELECT pr.product_id, pr.overall_rank,
                    pr.trend_short, pr.lifecycle_stage, p.product_name, p.category
             FROM product_rankings pr
             JOIN products p ON p.id = pr.product_id
@@ -546,7 +544,7 @@ async def get_home_data(
             "product_name": r.product_name,
             "category": r.category,
             "overall_rank": r.overall_rank,
-            "overall_score": float(r.overall_score) if r.overall_score else None,
+            "overall_score": None,
             "trend_short": r.trend_short,
             "lifecycle_stage": r.lifecycle_stage,
         }
@@ -582,6 +580,149 @@ async def get_home_data(
     )
     unack_alert_count = unack_alert_count_result.scalar() or 0
 
+    heatmap_result = await db.execute(
+        select(
+            Product.category,
+            func.count(Product.id).label("product_count"),
+            func.count(func.distinct(Product.user_id)).label("user_count"),
+            func.avg(ProductFeature.sales_count).label("avg_sales"),
+            func.avg(ProductFeature.favorite_count).label("avg_favorites"),
+            func.avg(ProductFeature.rating).label("avg_rating"),
+        )
+        .join(ProductFeature, ProductFeature.product_id == Product.id)
+        .where(Product.is_active == True, Product.category.isnot(None))
+        .group_by(Product.category)
+    )
+    heatmap_rows = heatmap_result.all()
+    heatmap = []
+    for row in heatmap_rows:
+        if not row.category:
+            continue
+        heat_score = 0.0
+        if row.user_count:
+            heat_score += min(row.user_count / 10, 3) * 10
+        if row.avg_sales:
+            heat_score += min(float(row.avg_sales) / 1000, 3) * 20
+        if row.avg_favorites:
+            heat_score += min(float(row.avg_favorites) / 500, 3) * 15
+        if row.avg_rating and float(row.avg_rating) > 4:
+            heat_score += 15
+        heatmap.append({
+            "category": row.category,
+            "product_count": row.product_count,
+            "user_count": row.user_count,
+            "avg_sales": float(row.avg_sales) if row.avg_sales else None,
+            "avg_favorites": float(row.avg_favorites) if row.avg_favorites else None,
+            "avg_rating": float(row.avg_rating) if row.avg_rating else None,
+            "heat_score": round(min(heat_score, 100), 1),
+            "heat_level": "hot" if heat_score >= 70 else "warm" if heat_score >= 40 else "cold",
+        })
+    heatmap.sort(key=lambda x: x["heat_score"], reverse=True)
+
+    lifecycle_result = await db.execute(
+        text("""
+            SELECT lifecycle_stage, COUNT(*) as cnt
+            FROM product_rankings pr
+            JOIN products p ON p.id = pr.product_id
+            WHERE p.is_active = true
+            GROUP BY lifecycle_stage
+            ORDER BY cnt DESC
+        """),
+    )
+    lifecycle_dist = [{"stage": r.lifecycle_stage, "count": r.cnt} for r in lifecycle_result.all()]
+
+    trend_result = await db.execute(
+        text("""
+            SELECT trend_short, COUNT(*) as cnt
+            FROM product_rankings pr
+            JOIN products p ON p.id = pr.product_id
+            WHERE p.is_active = true
+            GROUP BY trend_short
+            ORDER BY cnt DESC
+        """),
+    )
+    trend_dist = [{"trend": r.trend_short, "count": r.cnt} for r in trend_result.all()]
+
+    price_band_result = await db.execute(
+        text("""
+            SELECT
+                CASE
+                    WHEN pf.price < 50 THEN 'under_50'
+                    WHEN pf.price < 100 THEN '50_100'
+                    WHEN pf.price < 200 THEN '100_200'
+                    WHEN pf.price < 500 THEN '200_500'
+                    ELSE 'over_500'
+                END AS price_band,
+                COUNT(*) AS cnt,
+                AVG(pf.sales_count) AS avg_sales,
+                AVG(pf.rating) AS avg_rating
+            FROM product_features pf
+            JOIN products p ON p.id = pf.product_id
+            WHERE p.is_active = true AND pf.price IS NOT NULL
+            GROUP BY price_band
+            ORDER BY MIN(pf.price)
+        """),
+    )
+    price_bands = [
+        {
+            "band": r.price_band,
+            "count": r.cnt,
+            "avg_sales": float(r.avg_sales) if r.avg_sales else None,
+            "avg_rating": float(r.avg_rating) if r.avg_rating else None,
+        }
+        for r in price_band_result.all()
+    ]
+    best_seller_band = None
+    if price_bands:
+        bands_with_sales = [b for b in price_bands if b["avg_sales"] is not None]
+        if bands_with_sales:
+            best_seller_band = max(bands_with_sales, key=lambda b: b["avg_sales"])
+
+    trend_series_result = await db.execute(
+        text("""
+            SELECT
+                DATE_TRUNC('day', pf.collected_at) AS period,
+                p.category,
+                AVG(pf.sales_count) AS avg_sales,
+                AVG(pf.price) AS avg_price,
+                AVG(pf.rating) AS avg_rating,
+                COUNT(DISTINCT p.id) AS product_count,
+                COUNT(DISTINCT p.user_id) AS user_count
+            FROM product_features pf
+            JOIN products p ON p.id = pf.product_id
+            WHERE p.is_active = true
+              AND pf.collected_at >= NOW() - INTERVAL '30 days'
+            GROUP BY DATE_TRUNC('day', pf.collected_at), p.category
+            ORDER BY period ASC, p.category
+        """),
+    )
+    series_map: dict[str, list] = {}
+    for row in trend_series_result.mappings().all():
+        cat = row["category"] or "unknown"
+        if cat not in series_map:
+            series_map[cat] = []
+        series_map[cat].append({
+            "period": row["period"].isoformat() if row["period"] else None,
+            "avg_sales": float(row["avg_sales"]) if row["avg_sales"] else None,
+            "avg_price": float(row["avg_price"]) if row["avg_price"] else None,
+            "avg_rating": float(row["avg_rating"]) if row["avg_rating"] else None,
+            "product_count": row["product_count"],
+            "user_count": row["user_count"],
+        })
+    for cat in series_map:
+        points = series_map[cat]
+        for i in range(1, len(points)):
+            prev = points[i - 1]
+            curr = points[i]
+            if prev["avg_sales"] and curr["avg_sales"] and prev["avg_sales"] > 0:
+                curr["sales_growth_rate"] = round((curr["avg_sales"] - prev["avg_sales"]) / prev["avg_sales"], 4)
+            else:
+                curr["sales_growth_rate"] = None
+            if prev["avg_price"] and curr["avg_price"] and prev["avg_price"] > 0:
+                curr["price_change_rate"] = round((curr["avg_price"] - prev["avg_price"]) / prev["avg_price"], 4)
+            else:
+                curr["price_change_rate"] = None
+
     home_data = {
         "biz_stats": {
             "opportunity_count": len(rankings),
@@ -594,6 +735,16 @@ async def get_home_data(
         },
         "rankings": rankings,
         "alert_events": alert_events,
+        "category_heatmap": heatmap,
+        "behavior_patterns": {
+            "lifecycle_distribution": lifecycle_dist,
+            "trend_distribution": trend_dist,
+            "price_bands": price_bands,
+            "best_seller_price_band": best_seller_band,
+            "dominant_lifecycle": lifecycle_dist[0]["stage"] if lifecycle_dist else None,
+            "dominant_trend": trend_dist[0]["trend"] if trend_dist else None,
+        },
+        "trend_timeseries": series_map,
     }
 
     await cache_set(cache_key, home_data, ttl_seconds=60)

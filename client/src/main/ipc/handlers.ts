@@ -522,7 +522,7 @@ export function registerIpcHandlers(): void {
   ipcMain.handle("auth:login", async (_event, account: string, password: string, serverUrl: string) => {
     try {
       const axios = require("axios");
-      const { data } = await axios.post(`${serverUrl}/api/v1/auth/login`, { account, password });
+      const { data } = await axios.post(`${serverUrl}/api/v1/auth/login`, { account, password }, { timeout: 15000 });
       if (data.access_token) {
         const comm = getCommunication();
         comm.connect(serverUrl, data.access_token);
@@ -532,8 +532,9 @@ export function registerIpcHandlers(): void {
         cloudSync.startAutoSync();
       }
       return data;
-    } catch (err) {
-      return { error: true, message: (err as Error).message };
+    } catch (err: any) {
+      const message = err?.response?.data?.message || err?.message || "登录失败";
+      return { error: true, message };
     }
   });
 
@@ -544,7 +545,7 @@ export function registerIpcHandlers(): void {
       if (email && email.trim()) {
         payload.email = email.trim();
       }
-      const { data } = await axios.post(`${serverUrl}/api/v1/auth/register`, payload);
+      const { data } = await axios.post(`${serverUrl}/api/v1/auth/register`, payload, { timeout: 15000 });
       return data;
     } catch (err: any) {
       const message = err?.response?.data?.message || err?.message || "注册失败";

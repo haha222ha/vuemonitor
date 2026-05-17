@@ -16,7 +16,7 @@
 
       <nav class="sidebar__nav">
         <div class="sidebar__group">
-          <div v-if="!collapsed" class="sidebar__group-label">决策中心</div>
+          <div v-if="!collapsed" class="sidebar__group-label">洞察</div>
           <router-link
             v-for="item in coreItems"
             :key="item.path"
@@ -39,7 +39,7 @@
         </div>
 
         <div class="sidebar__group">
-          <div v-if="!collapsed" class="sidebar__group-label">运营工具</div>
+          <div v-if="!collapsed" class="sidebar__group-label">管理</div>
           <router-link
             v-for="item in toolItems"
             :key="item.path"
@@ -115,9 +115,9 @@
         </div>
 
         <div class="topbar__right">
-          <div class="topbar__collect-status" v-if="collectStore.isCollecting">
-            <StatusDot status="busy" />
-            <span class="topbar__collect-label">采集中</span>
+          <div class="topbar__collect-status">
+            <StatusDot :status="collectStore.isCollecting ? 'busy' : 'idle'" />
+            <span class="topbar__collect-label">{{ collectStore.isCollecting ? '采集中' : '空闲' }}</span>
           </div>
           <el-badge :value="notificationStore.unreadCount" :hidden="!notificationStore.hasUnread" :max="99">
             <el-button :icon="Bell" circle size="small" @click="$router.push('/notifications')" />
@@ -161,6 +161,8 @@
         </router-link>
       </div>
     </div>
+
+    <GlobalSearchDialog :visible="showGlobalSearch" @close="showGlobalSearch = false" />
   </div>
 </template>
 
@@ -179,6 +181,7 @@ import {
   Opportunity, Warning
 } from "@element-plus/icons-vue";
 import SearchInput from "../components/SearchInput.vue";
+import GlobalSearchDialog from "../components/GlobalSearchDialog.vue";
 import StatusDot from "../components/StatusDot.vue";
 import PlanCard from "../components/PlanCard.vue";
 
@@ -193,18 +196,20 @@ const collectStore = useCollectStore();
 const windowWidth = ref(window.innerWidth);
 const collapsed = ref(false);
 const searchRef = ref<InstanceType<typeof SearchInput>>();
+const showGlobalSearch = ref(false);
 
 const isMobile = computed(() => windowWidth.value < 768);
 
 const coreItems = computed(() => [
   { path: "/dashboard", icon: Opportunity, label: "机会雷达" },
-  { path: "/products", icon: Goods, label: "选品库" },
+  { path: "/products", icon: Goods, label: "我的商品" },
+  { path: "/category-insight", icon: DataAnalysis, label: "品类洞察" },
   { path: "/ai", icon: MagicStick, label: "AI 决策" },
 ]);
 
 const toolItems = computed(() => [
-  { path: "/scheduler", icon: Timer, label: "数据采集" },
-  { path: "/monitor", icon: Warning, label: "异动规则" },
+  { path: "/scheduler", icon: Timer, label: "采集调度" },
+  { path: "/monitor", icon: Warning, label: "告警中心" },
   { path: "/notifications", icon: ChatDotRound, label: t('nav.notifications'), badge: notificationStore.unreadCount || undefined },
   { path: "/compare", icon: DataAnalysis, label: "竞品对比" },
 ]);
@@ -216,25 +221,31 @@ const systemItems = computed(() => [
 
 const mobileNavItems = computed(() => [
   { path: "/dashboard", icon: Opportunity, label: "机会雷达" },
-  { path: "/products", icon: Goods, label: "选品库" },
-  { path: "/ai", icon: MagicStick, label: "AI 决策" },
-  { path: "/monitor", icon: Warning, label: "异动规则" },
+  { path: "/products", icon: Goods, label: "我的商品" },
+  { path: "/category-insight", icon: DataAnalysis, label: "品类洞察" },
+  { path: "/monitor", icon: Warning, label: "告警中心" },
   { path: "/settings", icon: Setting, label: t('nav.settings') },
 ]);
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "机会雷达",
-  "/products": "选品库",
+  "/products": "我的商品",
+  "/category-insight": "品类洞察",
   "/ai": "AI 决策",
-  "/scheduler": "数据采集",
-  "/monitor": "异动规则",
+  "/scheduler": "采集调度",
+  "/monitor": "告警中心",
   "/notifications": "通知中心",
   "/compare": "竞品对比",
   "/settings": "设置",
   "/license": "授权管理",
 };
 
-const currentPageTitle = computed(() => PAGE_TITLES[route.path] || "");
+const currentPageTitle = computed(() => {
+  const path = route.path;
+  if (PAGE_TITLES[path]) return PAGE_TITLES[path];
+  const base = "/" + path.split("/").filter(Boolean)[0];
+  return PAGE_TITLES[base] || "";
+});
 
 function onResize() {
   windowWidth.value = window.innerWidth;
@@ -245,7 +256,7 @@ function onResize() {
 
 function handleSearch(query: string) {
   if (query) {
-    console.log("Search:", query);
+    showGlobalSearch.value = true;
   }
 }
 
@@ -269,7 +280,7 @@ onMounted(() => {
   window.addEventListener("keydown", (e) => {
     if ((e.metaKey || e.ctrlKey) && e.key === "k") {
       e.preventDefault();
-      searchRef.value?.focus();
+      showGlobalSearch.value = !showGlobalSearch.value;
     }
   });
 
@@ -386,7 +397,7 @@ onUnmounted(() => {
   padding: 12px 24px 8px;
   font-size: 11px;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.35);
+  color: #818CF8;
   text-transform: uppercase;
   letter-spacing: 1px;
   white-space: nowrap;
@@ -403,7 +414,7 @@ onUnmounted(() => {
   padding: 10px 18px;
   margin: 2px 8px;
   border-radius: var(--radius-base);
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   transition: all 0.2s;
   white-space: nowrap;
@@ -417,13 +428,13 @@ onUnmounted(() => {
 }
 
 .sidebar__item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.06);
+  color: #FFFFFF;
 }
 
 .sidebar__item--active {
-  background: rgba(255, 255, 255, 0.12);
-  color: var(--color-text-inverse);
+  background: rgba(79, 70, 229, 0.2);
+  color: #FFFFFF;
 }
 
 .sidebar__item--active::before {
@@ -434,7 +445,7 @@ onUnmounted(() => {
   transform: translateY(-50%);
   width: 4px;
   height: 20px;
-  background: var(--color-primary-light);
+  background: #4F46E5;
   border-radius: 0 4px 4px 0;
 }
 
@@ -528,11 +539,17 @@ onUnmounted(() => {
   align-items: center;
   gap: 6px;
   padding: 4px 12px;
-  background: var(--color-warning-bg);
   border-radius: 20px;
   font-size: var(--text-xs);
-  color: var(--color-warning);
   font-weight: 500;
+  background: var(--color-bg-page);
+  color: var(--color-text-tertiary);
+  transition: all 0.3s;
+}
+
+.topbar__collect-status:has(.status-dot--busy) {
+  background: var(--color-success-bg);
+  color: var(--color-success);
 }
 
 .topbar__collect-label {

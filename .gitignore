@@ -40,3 +40,8 @@ browser_data/
 *.pma
 历史/
 baidu_auth.json
+backups/
+test-screenshots/
+progress.md
+findings.md
+task_plan.md

@@ -48,17 +48,17 @@ const isExpiringSoon = computed(() => {
 
 <style scoped>
 .plan-card {
-  margin: 16px;
+  margin: 12px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(79, 70, 229, 0.15);
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(79, 70, 229, 0.2);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .plan-card:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(79, 70, 229, 0.25);
 }
 
 .plan-card__header {
@@ -76,7 +76,7 @@ const isExpiringSoon = computed(() => {
 
 .plan-card__expires {
   font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.6);
+  color: #A5B4FC;
   margin-bottom: 12px;
 }
 
@@ -85,6 +85,6 @@ const isExpiringSoon = computed(() => {
   align-items: center;
   justify-content: space-between;
   font-size: var(--text-sm);
-  color: rgba(255, 255, 255, 0.7);
+  color: #C7D2FE;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div class="products fade-in">
-    <PageHeader title="选品库" subtitle="管理您的商品监控，发现选品机会">
+    <PageHeader title="我的商品" subtitle="管理您的商品监控，发现选品机会">
       <el-button v-permission="'gate:monitor:add'" type="primary" @click="showAdd = true">
         <el-icon><Plus /></el-icon>
         添加商品
@@ -43,55 +43,17 @@
     />
 
     <div v-else-if="viewMode === 'card'" class="products__grid">
-      <div v-for="product in filteredProducts" :key="product.id" class="product-card">
-        <div class="product-card__header">
-          <el-image v-if="product.image_url" :src="product.image_url" class="product-card__image" fit="cover" />
-          <div v-else class="product-card__image product-card__image--placeholder">
-            <el-icon :size="24"><Goods /></el-icon>
-          </div>
-          <div class="product-card__info">
-            <div class="product-card__name">{{ product.product_name }}</div>
-            <div class="product-card__shop">{{ product.shop_name || '未知店铺' }}</div>
-          </div>
-          <div v-if="getRankingInfo(product.id)" class="product-card__rank-badge">
-            <span class="rank-badge__number">#{{ getRankingInfo(product.id).rank }}</span>
-            <span class="rank-badge__total" v-if="getRankingInfo(product.id).total">/{{ getRankingInfo(product.id).total }}</span>
-          </div>
-        </div>
-        <div class="product-card__body">
-          <div class="product-card__meta">
-            <span class="product-card__id">{{ product.platform_product_id }}</span>
-            <span class="product-card__time">{{ product.last_collected_at ? formatDate(product.last_collected_at) : '未采集' }}</span>
-          </div>
-          <div v-if="getRankingInfo(product.id)" class="product-card__rank-tags">
-            <el-tag v-if="getRankingInfo(product.id).lifecycle" size="small" effect="light" type="warning">
-              {{ getRankingInfo(product.id).lifecycle }}
-            </el-tag>
-            <el-tag v-if="getRankingInfo(product.id).trend" size="small" effect="light"
-              :type="getRankingInfo(product.id).trend === '上升' ? 'success' : getRankingInfo(product.id).trend === '下降' ? 'danger' : 'info'">
-              {{ trendIcon(getRankingInfo(product.id).trend) }} {{ getRankingInfo(product.id).trend }}
-            </el-tag>
-          </div>
-        </div>
-        <div class="product-card__actions">
-          <el-button size="small" @click="$router.push(`/products/${product.id}`)">详情</el-button>
-          <el-button size="small" type="primary" @click="collectSingle(product)">采集</el-button>
-          <el-dropdown v-permission="'gate:ai:basic_analysis'" @command="(cmd: string) => quickAIAnalysis(product, cmd)" size="small">
-            <el-button size="small" type="warning">
-              <el-icon><MagicStick /></el-icon>AI
-            </el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="trend_score">趋势评分</el-dropdown-item>
-                <el-dropdown-item command="prediction">爆品预测</el-dropdown-item>
-                <el-dropdown-item command="risk_warning">风险预警</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
-          <el-button v-permission="'gate:monitor:auto_refresh'" size="small" @click="addSchedule(product)">定时</el-button>
-          <el-button size="small" type="danger" plain @click="confirmDelete(product.id)">删除</el-button>
-        </div>
-      </div>
+      <ProductCard
+        v-for="product in filteredProducts"
+        :key="product.id"
+        :product="product"
+        :ranking="getRankingInfo(product.id)"
+        @detail="$router.push(`/products/${product.id}`)"
+        @collect="collectSingle"
+        @ai-analysis="quickAIAnalysis"
+        @schedule="addSchedule"
+        @delete="confirmDelete"
+      />
     </div>
 
     <div v-else class="products__table-wrapper">
@@ -215,204 +177,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { useProductStore } from "../stores/product";
-import { useCollectStore } from "../stores/collect";
-import { useSchedulerStore } from "../stores/scheduler";
-import { usePermissionStore } from "../stores/permission";
-import { ElMessage, ElMessageBox } from "element-plus";
-import type { FormInstance, FormRules } from "element-plus";
-import { parseXHSUrl } from "@shared/constants/platforms";
-import { Plus, Download, Goods, Grid, List, Search, Opportunity, MagicStick, TrendCharts } from "@element-plus/icons-vue";
+import { onMounted } from "vue";
+import { Plus, Download, Goods, Grid, List, Search, MagicStick } from "@element-plus/icons-vue";
 import PageHeader from "../components/PageHeader.vue";
 import SearchInput from "../components/SearchInput.vue";
 import EmptyState from "../components/EmptyState.vue";
-import api from "../utils/api";
+import ProductCard from "../components/ProductCard.vue";
+import { useProductsData } from "../composables/useProductsData";
 
-const productStore = useProductStore();
-const collectStore = useCollectStore();
-const schedulerStore = useSchedulerStore();
-const permissionStore = usePermissionStore();
-
-const productRankings = ref<Record<string, { rank: number; total: number; trend: string; lifecycle: string }>>({});
-const rankingsLoading = ref(false);
-
-const showAdd = ref(false);
-const showCollect = ref(false);
-const showSchedule = ref(false);
-const addFormRef = ref<FormInstance>();
-const addForm = ref({ noteInput: "", product_name: "" });
-const concurrency = ref(3);
-const collectScope = ref("all");
-const scheduleFrequency = ref(60);
-const scheduleProduct = ref<Record<string, unknown> | null>(null);
-const viewMode = ref<"card" | "table">("card");
-const searchQuery = ref("");
-
-const addRules: FormRules = {
-  noteInput: [{ required: true, message: "请输入小红书商品链接或ID", trigger: "blur" }],
-};
-
-const filteredProducts = computed(() => {
-  if (!searchQuery.value) return productStore.products;
-  const q = searchQuery.value.toLowerCase();
-  return productStore.products.filter(
-    (p) =>
-      p.product_name?.toLowerCase().includes(q) ||
-      p.platform_product_id?.toLowerCase().includes(q) ||
-      p.shop_name?.toLowerCase().includes(q)
-  );
-});
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
-
-function resolveProductInput(input: string): { productId: string; targetType: string; targetUrl?: string } {
-  const trimmed = input.trim();
-  const parsed = parseXHSUrl(trimmed);
-  if (parsed.type === "goods" && parsed.id) return { productId: parsed.id, targetType: "goods" };
-  if (parsed.type === "note" && parsed.id && parsed.id !== "short_url") return { productId: parsed.id, targetType: "note" };
-  if (parsed.type === "note" && parsed.id === "short_url") return { productId: "short_url", targetType: "note", targetUrl: trimmed };
-  if (/^[a-f0-9]{8,}$/.test(trimmed)) return { productId: trimmed, targetType: "goods" };
-  return { productId: trimmed, targetType: "goods", targetUrl: trimmed };
-}
-
-async function addProduct() {
-  const valid = await addFormRef.value?.validate().catch(() => false);
-  if (!valid) return;
-  if (!permissionStore.canAddProduct) { ElMessage.warning("当前套餐商品数量已达上限，请升级"); return; }
-  const { productId, targetType, targetUrl } = resolveProductInput(addForm.value.noteInput);
-  try {
-    await window.electronAPI.invoke("storage:insert-product", {
-      platform: "xhs", platform_product_id: productId,
-      product_name: addForm.value.product_name || `XHS商品 ${productId}`, target_url: targetUrl,
-    });
-    ElMessage.success("添加成功");
-    showAdd.value = false;
-    addForm.value = { noteInput: "", product_name: "" };
-    await productStore.fetchProducts();
-    collectSingle({ platform: "xhs", platform_product_id: productId, target_url: targetUrl, targetType });
-  } catch { ElMessage.error("添加失败"); }
-}
-
-async function collectSingle(product: Record<string, unknown>) {
-  const targetType = (product.targetType as string) || "goods";
-  await collectStore.startCollect([{
-    targetId: product.platform_product_id as string,
-    targetType: targetType as "goods" | "note",
-    targetUrl: product.target_url as string | undefined,
-  }]);
-  ElMessage.success("采集任务已提交");
-}
-
-async function startBatchCollect() {
-  await collectStore.setConcurrency(concurrency.value);
-  const targets = productStore.products.map((p) => ({
-    targetId: p.platform_product_id,
-    targetType: ((p as Record<string, unknown>).targetType as "goods" | "note") || "goods",
-    targetUrl: (p as Record<string, unknown>).target_url as string | undefined,
-  }));
-  await collectStore.startCollect(targets);
-  showCollect.value = false;
-  ElMessage.success(`已提交 ${targets.length} 个采集任务`);
-}
-
-function addSchedule(product: Record<string, unknown>) {
-  if (!permissionStore.canAutoRefresh) { ElMessage.warning("定时采集需要Pro及以上版本"); return; }
-  scheduleProduct.value = product;
-  showSchedule.value = true;
-}
-
-async function confirmSchedule() {
-  if (!scheduleProduct.value) return;
-  try {
-    await schedulerStore.addTask({
-      product_id: scheduleProduct.value.id as string,
-      platform: "xhs",
-      platform_product_id: scheduleProduct.value.platform_product_id as string,
-      product_name: scheduleProduct.value.product_name as string,
-      frequency_minutes: scheduleFrequency.value,
-      is_active: true,
-    });
-    ElMessage.success("定时任务已创建");
-    showSchedule.value = false;
-  } catch { ElMessage.error("创建定时任务失败"); }
-}
-
-async function confirmDelete(id: string) {
-  try {
-    await ElMessageBox.confirm("确定要删除该商品监控吗？", "确认删除", {
-      confirmButtonText: "删除", cancelButtonText: "取消", type: "warning",
-    });
-    await window.electronAPI.invoke("storage:run", "UPDATE products SET is_active = 0 WHERE id = ?", [id]);
-    ElMessage.success("删除成功");
-    await productStore.fetchProducts();
-  } catch {}
-}
-
-async function fetchRankings() {
-  if (productStore.products.length === 0) return;
-  rankingsLoading.value = true;
-  try {
-    const { data } = await api.get("/feature/product-rankings", { params: { limit: 50 } });
-    if (data?.rankings) {
-      const map: Record<string, { rank: number; total: number; trend: string; lifecycle: string }> = {};
-      for (const r of data.rankings) {
-        if (r.product_id) {
-          map[r.product_id] = {
-            rank: r.overall_rank || r.category_rank || 0,
-            total: r.total_in_category || r.category_total || 0,
-            trend: r.trend_direction || "",
-            lifecycle: r.lifecycle_stage || "",
-          };
-        }
-      }
-      productRankings.value = map;
-    }
-  } catch {
-    productRankings.value = {};
-  } finally {
-    rankingsLoading.value = false;
-  }
-}
-
-function getRankingInfo(productId: string) {
-  return productRankings.value[productId] || null;
-}
-
-function trendIcon(trend: string) {
-  if (trend === "上升") return "📈";
-  if (trend === "下降") return "📉";
-  return "➡️";
-}
-
-async function quickAIAnalysis(product: Record<string, unknown>, type: string) {
-  const gateMap: Record<string, boolean> = {
-    trend_score: permissionStore.canAITrend,
-    prediction: permissionStore.canAIPrediction,
-    risk_warning: permissionStore.canAIRisk,
-  };
-  if (!gateMap[type]) {
-    ElMessage.warning("当前套餐不支持此AI分析，请升级");
-    return;
-  }
-  try {
-    const productId = product.id as string;
-    await api.post("/ai/analyze", { product_id: productId, analysis_type: type });
-    ElMessage.success("AI分析已提交，请稍后在AI决策页查看结果");
-  } catch {
-    ElMessage.error("AI分析提交失败");
-  }
-}
+const {
+  productStore,
+  showAdd, showCollect, showSchedule,
+  addFormRef, addForm, addRules,
+  concurrency, collectScope, scheduleFrequency,
+  viewMode, searchQuery, filteredProducts,
+  formatDate,
+  addProduct, collectSingle, startBatchCollect,
+  addSchedule, confirmSchedule, confirmDelete,
+  getRankingInfo,
+  quickAIAnalysis, init,
+} = useProductsData();
 
 onMounted(() => {
-  productStore.fetchProducts();
-  collectStore.setupListeners();
-  collectStore.fetchStatus();
-  permissionStore.fetchPermissions();
-  fetchRankings();
+  init();
 });
 </script>
 
@@ -438,134 +225,6 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 16px;
-}
-
-.product-card {
-  background: var(--color-bg-card);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-border-light);
-  padding: 20px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.product-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
-
-.product-card__header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.product-card__image {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-base);
-  flex-shrink: 0;
-  border: 1px solid var(--color-border-light);
-}
-
-.product-card__image--placeholder {
-  background: var(--color-bg-page);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-tertiary);
-}
-
-.product-card__info {
-  flex: 1;
-  min-width: 0;
-}
-
-.product-card__name {
-  font-weight: 500;
-  font-size: var(--text-base);
-  color: var(--color-text-primary);
-  margin-bottom: 4px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.product-card__shop {
-  color: var(--color-text-tertiary);
-  font-size: var(--text-sm);
-}
-
-.product-card__body {
-  margin-bottom: 16px;
-}
-
-.product-card__meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.product-card__id {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
-}
-
-.product-card__time {
-  font-size: var(--text-xs);
-  color: var(--color-text-tertiary);
-}
-
-.product-card__actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.product-card__rank-badge {
-  flex-shrink: 0;
-  background: linear-gradient(135deg, #F59E0B, #D97706);
-  color: #fff;
-  border-radius: 8px;
-  padding: 2px 8px;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.6;
-  white-space: nowrap;
-}
-
-.rank-badge__number {
-  font-size: 14px;
-}
-
-.rank-badge__total {
-  font-size: 10px;
-  opacity: 0.8;
-}
-
-.product-card__rank-tags {
-  display: flex;
-  gap: 6px;
-  margin-top: 8px;
-}
-
-.cell-rank {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.cell-rank__number {
-  font-weight: 700;
-  color: #D97706;
-  font-size: var(--text-sm);
-}
-
-.cell-rank__total {
-  color: var(--color-text-tertiary);
-  font-size: var(--text-xs);
 }
 
 .products__table-wrapper {
@@ -623,6 +282,23 @@ onMounted(() => {
   gap: 8px;
 }
 
+.cell-rank {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cell-rank__number {
+  font-weight: 700;
+  color: #D97706;
+  font-size: var(--text-sm);
+}
+
+.cell-rank__total {
+  color: var(--color-text-tertiary);
+  font-size: var(--text-xs);
+}
+
 .cell-mono {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
@@ -654,9 +330,6 @@ onMounted(() => {
   }
   .products__grid {
     grid-template-columns: 1fr;
-  }
-  .product-card__actions {
-    flex-direction: column;
   }
 }
 </style>

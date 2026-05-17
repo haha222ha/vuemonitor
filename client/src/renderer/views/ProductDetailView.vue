@@ -105,26 +105,7 @@
                 <h3 class="card__title">品类排名</h3>
               </div>
             </div>
-            <div class="ranking-gauges">
-              <div class="gauge-item">
-                <div class="gauge-ring" :style="gaugeStyle(ranking.price_percentile, 'var(--color-danger)')">
-                  <span class="gauge-value">{{ ranking.price_percentile || 0 }}</span>
-                </div>
-                <div class="gauge-label">价格百分位</div>
-              </div>
-              <div class="gauge-item">
-                <div class="gauge-ring" :style="gaugeStyle(ranking.sales_percentile, 'var(--color-primary)')">
-                  <span class="gauge-value">{{ ranking.sales_percentile || 0 }}</span>
-                </div>
-                <div class="gauge-label">销量百分位</div>
-              </div>
-              <div class="gauge-item">
-                <div class="gauge-ring" :style="gaugeStyle(ranking.rating_percentile, 'var(--color-warning)')">
-                  <span class="gauge-value">{{ ranking.rating_percentile || 0 }}</span>
-                </div>
-                <div class="gauge-label">评分百分位</div>
-              </div>
-            </div>
+            <RankingGauge :gauges="rankingGauges" />
             <div class="ranking-info">
               <div class="ranking-row">
                 <span class="ranking-info-label">综合排名</span>
@@ -139,7 +120,7 @@
             </div>
             <div class="ranking-tags">
               <el-tag v-if="ranking.lifecycle_stage" size="small" :type="lifecycleTagType(ranking.lifecycle_stage)">
-                {{ ranking.lifecycle_stage }}
+                {{ lifecycleLabel(ranking.lifecycle_stage) }}
               </el-tag>
               <el-tag v-if="ranking.trend_direction" size="small" :type="trendTagType(ranking.trend_direction)">
                 {{ trendLabel(ranking.trend_direction) }}
@@ -182,15 +163,13 @@
           </div>
         </div>
 
-        <div v-if="aiStore.currentAnalysis" class="card" style="margin-top: 20px">
-          <div class="card__header">
-            <div class="card__title-group">
-              <el-icon class="card__icon" :size="20"><MagicStick /></el-icon>
-              <h3 class="card__title">AI分析结果</h3>
-            </div>
-          </div>
-          <div class="ai-result">{{ formatAIResult(aiStore.currentAnalysis) }}</div>
-        </div>
+        <AIAnalysisResult
+          v-if="aiStore.currentAnalysis"
+          style="margin-top: 20px"
+          :analysis="aiStore.currentAnalysis"
+          :analysis-type-label="analysisTypeLabel"
+          :format-a-i-result="formatAIResult"
+        />
 
         <div class="card" style="margin-top: 20px">
           <div class="card__header">
@@ -260,522 +239,76 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, reactive, nextTick, watch } from "vue";
-import { useRoute } from "vue-router";
-import { useProductStore } from "../stores/product";
-import { useCollectStore } from "../stores/collect";
-import { useAIStore } from "../stores/ai";
-import { usePermissionStore } from "../stores/permission";
-import { ElMessage } from "element-plus";
+import { onMounted, onUnmounted } from "vue";
 import {
   ArrowLeft, Refresh, ArrowDown, Download, PriceTag, TrendCharts,
-  Star, ChatDotRound, Histogram, DataBoard, MagicStick, List, Link, Goods
+  Star, ChatDotRound, Histogram, DataBoard, List, Link, Goods
 } from "@element-plus/icons-vue";
-import * as echarts from "echarts";
 import PageHeader from "../components/PageHeader.vue";
 import StatCard from "../components/StatCard.vue";
 import EmptyState from "../components/EmptyState.vue";
+import RankingGauge from "../components/RankingGauge.vue";
 import MultiMetricChart from "../components/MultiMetricChart";
-import type { MultiMetricDataPoint } from "../components/MultiMetricChart";
-import api from "../utils/api";
+import AIAnalysisResult from "../components/AIAnalysisResult.vue";
+import { useProductDetailData } from "../composables/useProductDetailData";
 
-const route = useRoute();
-const productStore = useProductStore();
-const collectStore = useCollectStore();
-const aiStore = useAIStore();
-const permissionStore = usePermissionStore();
+const {
+  productStore, collectStore, aiStore,
+  ranking, benchmark, chartRange, radarChartRef, metricVisible,
+  selectedMetrics, latestFeature, priceChange, salesChange,
+  radarData, chartData, rankingGauges,
+  formatDate, formatNumber, formatAIResult,
+  analysisTypeLabel, getPriceChangeClass,
+  lifecycleTagType, trendTagType, trendLabel, lifecycleLabel,
+  collectNow, runAnalysis, exportData, updateChartRange,
+  init, cleanup,
+} = useProductDetailData();
 
-const ranking = ref<Record<string, any> | null>(null);
-const benchmark = ref<Record<string, any> | null>(null);
-const chartRange = ref(0);
-const radarChartRef = ref<HTMLDivElement>();
-let radarChart: echarts.ECharts | null = null;
-
-const metricVisible = reactive({
-  price: true,
-  sales: true,
-  rating: false,
-  review_count: false,
-  favorite_count: false,
-});
-
-const selectedMetrics = computed(() => {
-  return Object.entries(metricVisible)
-    .filter(([, visible]) => visible)
-    .map(([key]) => key);
-});
-
-function updateMetrics() {}
-
-const latestFeature = computed(() => {
-  return productStore.features.length > 0 ? productStore.features[0] : null;
-});
-
-const priceChange = computed(() => {
-  const features = productStore.features;
-  if (features.length < 2 || features[0].price == null || features[1].price == null) return null;
-  if (features[1].price === 0) return null;
-  return ((features[0].price! - features[1].price!) / features[1].price!) * 100;
-});
-
-const salesChange = computed(() => {
-  const features = productStore.features;
-  if (features.length < 2 || features[0].sales_count == null || features[1].sales_count == null) return null;
-  if (features[1].sales_count === 0) return null;
-  return ((features[0].sales_count! - features[1].sales_count!) / features[1].sales_count!) * 100;
-});
-
-const radarData = computed(() => {
-  if (!ranking.value) return null;
-  return {
-    indicators: [
-      { name: "价格百分位", max: 100 },
-      { name: "销量百分位", max: 100 },
-      { name: "评分百分位", max: 100 },
-    ],
-    values: [
-      ranking.value.price_percentile || 0,
-      ranking.value.sales_percentile || 0,
-      ranking.value.rating_percentile || 0,
-    ],
-  };
-});
-
-const chartData = computed<MultiMetricDataPoint[]>(() => {
-  let features = productStore.features.slice();
-  if (chartRange.value > 0) {
-    const cutoff = new Date(Date.now() - chartRange.value * 24 * 60 * 60 * 1000);
-    features = features.filter((f) => f.collected_at && new Date(f.collected_at) >= cutoff);
-  }
-  return features
-    .slice()
-    .reverse()
-    .map((f) => ({
-      date: f.collected_at ? formatDate(f.collected_at) : "",
-      price: f.price,
-      sales: f.sales_count,
-      rating: f.rating,
-      review_count: f.review_count,
-      favorite_count: f.favorite_count,
-    }));
-});
-
-function updateChartRange() {}
-
-function gaugeStyle(percentile: number | undefined, color: string) {
-  const pct = percentile || 0;
-  const deg = (pct / 100) * 360;
-  return {
-    background: `conic-gradient(${color} ${deg}deg, var(--color-border-light) ${deg}deg)`,
-  };
-}
-
-function renderRadarChart() {
-  if (!radarChartRef.value || !radarData.value) return;
-
-  if (!radarChart) {
-    radarChart = echarts.init(radarChartRef.value);
-  }
-
-  radarChart.setOption({
-    tooltip: {},
-    radar: {
-      indicator: radarData.value.indicators,
-      shape: "circle",
-      splitNumber: 4,
-      axisName: { color: "var(--color-text-secondary)", fontSize: 12 },
-      splitArea: { areaStyle: { color: ["var(--color-bg-page)", "#fff", "var(--color-bg-page)", "#fff"] } },
-    },
-    series: [
-      {
-        type: "radar",
-        data: [
-          {
-            value: radarData.value.values,
-            name: "当前商品",
-            areaStyle: { color: "rgba(79, 70, 229, 0.15)" },
-            lineStyle: { color: "var(--color-primary)", width: 2 },
-            itemStyle: { color: "var(--color-primary)" },
-          },
-        ],
-      },
-    ],
-  });
-}
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
-}
-
-function formatNumber(num: number): string {
-  if (num >= 10000) return `${(num / 10000).toFixed(1)}万`;
-  if (num >= 1000) return `${(num / 1000).toFixed(1)}k`;
-  return String(num);
-}
-
-function formatAIResult(result: Record<string, unknown>): string {
-  if (typeof result === "string") return result;
-  if (result.result) return String(result.result);
-  if (result.analysis) return String(result.analysis);
-  return JSON.stringify(result, null, 2);
-}
-
-function getPriceChangeClass(row: any): string {
-  const idx = productStore.features.indexOf(row);
-  if (idx < 0 || idx >= productStore.features.length - 1) return "";
-  const prev = productStore.features[idx + 1];
-  if (row.price == null || prev?.price == null) return "";
-  return row.price > prev.price ? "price-up" : row.price < prev.price ? "price-down" : "";
-}
-
-function lifecycleTagType(stage: string): string {
-  const map: Record<string, string> = { 新品期: "success", 成长期: "", 成熟期: "warning", 衰退期: "danger" };
-  return map[stage] || "info";
-}
-
-function trendTagType(direction: string): string {
-  const map: Record<string, string> = { 上升: "success", 下降: "danger", 平稳: "info" };
-  return map[direction] || "info";
-}
-
-function trendLabel(direction: string): string {
-  const map: Record<string, string> = { 上升: "📈 上升趋势", 下降: "📉 下降趋势", 平稳: "➡️ 平稳" };
-  return map[direction] || direction;
-}
-
-async function fetchRanking(productId: string) {
-  try {
-    const { data } = await api.get(`/feature/product-ranking/${productId}`);
-    ranking.value = data?.ranking || null;
-  } catch {
-    ranking.value = null;
-  }
-}
-
-async function fetchBenchmark(category: string, price?: number | null, salesCount?: number | null) {
-  try {
-    const params: Record<string, unknown> = { category };
-    const results: Record<string, any> = {};
-    if (price != null) {
-      const { data } = await api.get("/feature/anonymous/price-benchmark", { params: { ...params, price } });
-      if (data?.benchmark) Object.assign(results, data.benchmark);
-    }
-    if (salesCount != null) {
-      const { data } = await api.get("/feature/anonymous/sales-benchmark", { params: { ...params, sales_count: salesCount } });
-      if (data?.benchmark) Object.assign(results, data.benchmark);
-    }
-    benchmark.value = Object.keys(results).length > 0 ? results : null;
-  } catch {
-    benchmark.value = null;
-  }
-}
-
-async function collectNow() {
-  const p = productStore.currentProduct;
-  if (!p) return;
-  await collectStore.startCollect([
-    { targetId: p.platform_product_id, targetType: "goods" },
-  ]);
-  ElMessage.success("采集任务已提交");
-}
-
-async function runAnalysis(type: string) {
-  const productId = route.params.id as string;
-  const result = await aiStore.analyzeProduct(productId, type);
-  if (result) {
-    ElMessage.success("分析完成");
-  }
-}
-
-async function exportData() {
-  try {
-    const productId = route.params.id as string;
-    const features = productStore.features;
-    const csvHeader = "采集时间,价格,销量,评分,评论数,收藏数,来源\n";
-    const csvRows = features
-      .map((f) => `${f.collected_at},${f.price ?? ""},${f.sales_count ?? ""},${f.rating ?? ""},${f.review_count ?? ""},${f.favorite_count ?? ""},${f.source}`)
-      .join("\n");
-    const blob = new Blob([csvHeader + csvRows], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `product_${productId}_features.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    ElMessage.success("导出成功");
-  } catch {
-    ElMessage.error("导出失败");
-  }
-}
-
-watch(radarData, () => {
-  nextTick(() => renderRadarChart());
-});
-
-onMounted(async () => {
-  const productId = route.params.id as string;
-  await productStore.fetchProductDetail(productId);
-  await productStore.fetchFeatures(productId);
-  permissionStore.fetchPermissions();
-
-  await fetchRanking(productId);
-
-  const product = productStore.currentProduct;
-  if (product?.category) {
-    const latest = productStore.features[0];
-    await fetchBenchmark(product.category, latest?.price, latest?.sales_count);
-  }
-
-  nextTick(() => renderRadarChart());
-});
-
-onUnmounted(() => {
-  radarChart?.dispose();
-  radarChart = null;
-});
+onMounted(() => { init(); });
+onUnmounted(() => { cleanup(); });
 </script>
 
 <style scoped>
-.product-detail {
-  padding: 0;
-}
-
-.product-detail__info-card {
-  background: var(--color-bg-card);
-  border-radius: var(--radius-lg);
-  padding: 20px 24px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--color-border-light);
-  margin-bottom: 20px;
-}
-
-.info-card__header {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.info-card__platform {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.info-card__meta {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px 24px;
-}
-
-.info-card__meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.info-card__meta-label {
-  font-size: var(--text-xs);
-  color: var(--color-text-tertiary);
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.info-card__meta-value {
-  font-size: var(--text-base);
-  color: var(--color-text-primary);
-  font-weight: 500;
-}
-
-.product-detail__stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.product-detail__analysis-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-
-.product-detail__ranking-card,
-.product-detail__benchmark-card {
-  min-width: 0;
-}
-
-.ranking-gauges {
-  display: flex;
-  justify-content: space-around;
-  padding: 16px 0;
-}
-
-.gauge-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.gauge-ring {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-.gauge-ring::before {
-  content: "";
-  position: absolute;
-  inset: 6px;
-  border-radius: 50%;
-  background: var(--color-bg-card);
-}
-
-.gauge-value {
-  position: relative;
-  z-index: 1;
-  font-size: var(--text-lg);
-  font-weight: 700;
-  color: var(--color-text-primary);
-}
-
-.gauge-label {
-  font-size: var(--text-xs);
-  color: var(--color-text-secondary);
-}
-
-.ranking-info {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.ranking-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.ranking-info-label {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  min-width: 64px;
-}
-
-.rank-number {
-  font-size: var(--text-xl);
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.rank-total {
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-}
-
-.ranking-tags {
-  margin-top: 12px;
-  display: flex;
-  gap: 8px;
-}
-
-.product-detail__radar {
-  width: 100%;
-  height: 260px;
-}
-
-.benchmark-list {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.benchmark-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  background: var(--color-bg-page);
-  border-radius: var(--radius-base);
-}
-
-.benchmark-label {
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-  min-width: 60px;
-  font-weight: 500;
-}
-
-.benchmark-detail {
-  font-size: var(--text-sm);
-  color: var(--color-text-tertiary);
-  margin-left: auto;
-}
-
-.ai-result {
-  white-space: pre-wrap;
-  line-height: 1.8;
-  font-size: var(--text-base);
-  color: var(--color-text-primary);
-  padding: 4px 0;
-}
-
-.product-detail__chart {
-  padding: 8px 0;
-}
-
-.chart-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.chart-toolbar__metrics {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  font-size: var(--text-sm);
-  color: var(--color-text-secondary);
-}
-
-.price-cell {
-  font-weight: 600;
-}
-
-.price-cell.price-up {
-  color: var(--color-danger);
-}
-
-.price-cell.price-down {
-  color: var(--color-success);
-}
-
+.product-detail { padding: 0; }
+.product-detail__info-card { background: var(--color-bg-card); border-radius: var(--radius-lg); padding: 20px 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border-light); margin-bottom: 20px; }
+.info-card__header { display: flex; flex-direction: column; gap: 16px; }
+.info-card__platform { display: flex; align-items: center; gap: 8px; }
+.info-card__meta { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px 24px; }
+.info-card__meta-item { display: flex; flex-direction: column; gap: 4px; }
+.info-card__meta-label { font-size: var(--text-xs); color: var(--color-text-tertiary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+.info-card__meta-value { font-size: var(--text-base); color: var(--color-text-primary); font-weight: 500; }
+.product-detail__stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+.product-detail__analysis-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.product-detail__ranking-card, .product-detail__benchmark-card { min-width: 0; }
+.card { background: var(--color-bg-card); border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); padding: 20px; }
+.card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.card__title-group { display: flex; align-items: center; gap: 8px; }
+.card__icon { color: var(--color-primary); }
+.card__title { margin: 0; font-size: var(--text-base); font-weight: 600; color: var(--color-text-primary); }
+.card__actions { display: flex; gap: 8px; }
+.ranking-info { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+.ranking-row { display: flex; align-items: baseline; gap: 8px; }
+.ranking-info-label { font-size: var(--text-sm); color: var(--color-text-secondary); min-width: 64px; }
+.rank-number { font-size: var(--text-xl); font-weight: 700; color: var(--color-primary); }
+.rank-total { font-size: var(--text-sm); color: var(--color-text-tertiary); }
+.ranking-tags { margin-top: 12px; display: flex; gap: 8px; }
+.product-detail__radar { width: 100%; height: 260px; }
+.benchmark-list { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
+.benchmark-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: var(--color-bg-page); border-radius: var(--radius-base); }
+.benchmark-label { font-size: var(--text-sm); color: var(--color-text-secondary); min-width: 60px; font-weight: 500; }
+.benchmark-detail { font-size: var(--text-sm); color: var(--color-text-tertiary); margin-left: auto; }
+.product-detail__chart { padding: 8px 0; }
+.chart-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.chart-toolbar__label { font-size: var(--text-sm); color: var(--color-text-secondary); }
+.price-cell { font-weight: 600; }
+.price-cell.price-up { color: var(--color-danger); }
+.price-cell.price-down { color: var(--color-success); }
 @media (max-width: 1024px) {
-  .product-detail__stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .product-detail__analysis-row {
-    grid-template-columns: 1fr;
-  }
+  .product-detail__stats { grid-template-columns: repeat(2, 1fr); }
+  .product-detail__analysis-row { grid-template-columns: 1fr; }
 }
-
 @media (max-width: 640px) {
-  .product-detail__stats {
-    grid-template-columns: 1fr;
-  }
-
-  .info-card__meta {
-    grid-template-columns: 1fr;
-  }
+  .product-detail__stats { grid-template-columns: 1fr; }
+  .info-card__meta { grid-template-columns: 1fr; }
 }
 </style>

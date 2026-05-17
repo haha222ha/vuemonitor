@@ -60,6 +60,11 @@ const routes = [
         component: () => import("../views/CompareView.vue"),
       },
       {
+        path: "category-insight",
+        name: "CategoryInsight",
+        component: () => import("../views/CategoryInsightView.vue"),
+      },
+      {
         path: "scheduler",
         name: "Scheduler",
         component: () => import("../views/SchedulerView.vue"),

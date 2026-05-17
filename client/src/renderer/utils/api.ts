@@ -32,6 +32,11 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    if (!error.response && error.code === "ERR_NETWORK") {
+      console.warn("[API] 网络不可达，服务可能离线");
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -71,8 +76,16 @@ api.interceptors.response.use(
       }
     }
 
+    if (error.response?.status === 503) {
+      console.warn("[API] 服务暂时不可用 (503)");
+    }
+
     return Promise.reject(error);
   }
 );
+
+export function isNetworkError(error: any): boolean {
+  return !error.response && (error.code === "ERR_NETWORK" || error.code === "ECONNREFUSED" || error.code === "ECONNRESET" || error.message?.includes("Network Error"));
+}
 
 export default api;
