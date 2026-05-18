@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from sqlalchemy.orm import DeclarativeBase
 
 from app.config import get_settings
+import app.models  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
@@ -85,8 +86,6 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         await conn.execute(text('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'))
         await conn.execute(text('CREATE EXTENSION IF NOT EXISTS "pg_trgm"'))
-
-        from app.models import *  # noqa: F401,F403
 
         await conn.run_sync(Base.metadata.create_all)
 
