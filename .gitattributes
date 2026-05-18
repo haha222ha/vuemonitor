@@ -1,2 +1,0 @@
-deploy/downloads/*.exe filter=lfs diff=lfs merge=lfs -text
-deploy/downloads/*.blockmap filter=lfs diff=lfs merge=lfs -text
