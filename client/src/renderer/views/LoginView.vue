@@ -163,5 +163,14 @@ const {
 .login__register-link { text-align: center; margin-top: 24px; font-size: 14px; color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; gap: 4px; }
 .login__register-btn { color: var(--color-primary); font-weight: 600; cursor: pointer; text-decoration: none; font-size: 14px; transition: color 0.2s, text-decoration 0.2s; }
 .login__register-btn:hover { color: var(--color-primary-dark); text-decoration: underline; }
+
+[data-theme="dark"] .login__form-side { background: #0D1117; }
+[data-theme="dark"] .login__form-wrapper { background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-xl); padding: 40px; }
+[data-theme="dark"] .login__submit { background: linear-gradient(135deg, #6366F1, #8B5CF6) !important; border: none !important; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4) !important; }
+[data-theme="dark"] .login__submit:hover { background: linear-gradient(135deg, #818CF8, #A78BFA) !important; box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5) !important; }
+[data-theme="dark"] .login__register-btn { color: #A5B4FC; }
+[data-theme="dark"] .login__register-btn:hover { color: #C7D2FE; }
+[data-theme="dark"] .login__register-link { color: var(--color-text-tertiary); }
+
 @media (max-width: 768px) { .login { flex-direction: column; } .login__brand { padding: 32px; min-height: auto; } .login__form-side { padding: 32px; } }
 </style>

@@ -39,4 +39,10 @@ defineEmits<{
 .login__register-dialog :deep(.el-dialog__header) { padding: 20px 24px; border-bottom: 1px solid var(--color-border-light); margin-right: 0; }
 .login__register-dialog :deep(.el-dialog__title) { font-size: var(--text-lg); font-weight: 600; }
 .login__register-dialog :deep(.el-dialog__body) { padding: 24px; }
+
+[data-theme="dark"] .login__register-dialog :deep(.el-dialog) { background: var(--color-bg-card) !important; border: 1px solid var(--color-border) !important; }
+[data-theme="dark"] .login__register-dialog :deep(.el-dialog__header) { border-bottom-color: var(--color-border) !important; }
+[data-theme="dark"] .login__register-dialog :deep(.el-dialog__footer) { border-top-color: var(--color-border) !important; }
+[data-theme="dark"] .login__register-dialog :deep(.el-button--primary) { background: linear-gradient(135deg, #6366F1, #8B5CF6) !important; border: none !important; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4) !important; }
+[data-theme="dark"] .login__register-dialog :deep(.el-button--primary:hover) { background: linear-gradient(135deg, #818CF8, #A78BFA) !important; }
 </style>

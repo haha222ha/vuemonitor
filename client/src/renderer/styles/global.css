@@ -88,6 +88,21 @@ html, body, #app {
   border-color: var(--color-primary-light) !important;
 }
 
+[data-theme="dark"] .el-button--primary {
+  background: linear-gradient(135deg, #6366F1, #8B5CF6) !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
+}
+
+[data-theme="dark"] .el-button--primary:hover {
+  background: linear-gradient(135deg, #818CF8, #A78BFA) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4) !important;
+}
+
+[data-theme="dark"] .el-button--primary:active {
+  background: linear-gradient(135deg, #4F46E5, #7C3AED) !important;
+}
+
 .el-tag {
   border-radius: var(--radius-sm) !important;
 }
