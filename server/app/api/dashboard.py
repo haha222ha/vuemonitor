@@ -526,30 +526,34 @@ async def get_home_data(
     )
     today_ai_count = today_ai_result.scalar() or 0
 
-    rankings_result = await db.execute(
-        text("""
-            SELECT pr.product_id, pr.overall_rank,
-                   pr.trend_short, pr.lifecycle_stage, p.product_name, p.category
-            FROM product_rankings pr
-            JOIN products p ON p.id = pr.product_id
-            WHERE p.user_id = :uid
-            ORDER BY pr.overall_rank ASC NULLS LAST
-            LIMIT 5
-        """),
-        {"uid": user.id},
-    )
-    rankings = [
-        {
-            "product_id": str(r.product_id),
-            "product_name": r.product_name,
-            "category": r.category,
-            "overall_rank": r.overall_rank,
-            "overall_score": None,
-            "trend_short": r.trend_short,
-            "lifecycle_stage": r.lifecycle_stage,
-        }
-        for r in rankings_result.mappings().all()
-    ]
+    rankings = []
+    try:
+        rankings_result = await db.execute(
+            text("""
+                SELECT pr.product_id, pr.overall_rank,
+                       pr.trend_short, pr.lifecycle_stage, p.product_name, p.category
+                FROM product_rankings pr
+                JOIN products p ON p.id = pr.product_id
+                WHERE p.user_id = :uid
+                ORDER BY pr.overall_rank ASC NULLS LAST
+                LIMIT 5
+            """),
+            {"uid": user.id},
+        )
+        rankings = [
+            {
+                "product_id": str(r.product_id),
+                "product_name": r.product_name,
+                "category": r.category,
+                "overall_rank": r.overall_rank,
+                "overall_score": None,
+                "trend_short": r.trend_short,
+                "lifecycle_stage": r.lifecycle_stage,
+            }
+            for r in rankings_result.mappings().all()
+        ]
+    except Exception:
+        pass
 
     from app.models.alert_rule import AlertEvent
     alert_events_result = await db.execute(
@@ -619,29 +623,37 @@ async def get_home_data(
         })
     heatmap.sort(key=lambda x: x["heat_score"], reverse=True)
 
-    lifecycle_result = await db.execute(
-        text("""
-            SELECT lifecycle_stage, COUNT(*) as cnt
-            FROM product_rankings pr
-            JOIN products p ON p.id = pr.product_id
-            WHERE p.is_active = true
-            GROUP BY lifecycle_stage
-            ORDER BY cnt DESC
-        """),
-    )
-    lifecycle_dist = [{"stage": r.lifecycle_stage, "count": r.cnt} for r in lifecycle_result.all()]
+    lifecycle_dist = []
+    try:
+        lifecycle_result = await db.execute(
+            text("""
+                SELECT lifecycle_stage, COUNT(*) as cnt
+                FROM product_rankings pr
+                JOIN products p ON p.id = pr.product_id
+                WHERE p.is_active = true
+                GROUP BY lifecycle_stage
+                ORDER BY cnt DESC
+            """),
+        )
+        lifecycle_dist = [{"stage": r.lifecycle_stage, "count": r.cnt} for r in lifecycle_result.all()]
+    except Exception:
+        pass
 
-    trend_result = await db.execute(
-        text("""
-            SELECT trend_short, COUNT(*) as cnt
-            FROM product_rankings pr
-            JOIN products p ON p.id = pr.product_id
-            WHERE p.is_active = true
-            GROUP BY trend_short
-            ORDER BY cnt DESC
-        """),
-    )
-    trend_dist = [{"trend": r.trend_short, "count": r.cnt} for r in trend_result.all()]
+    trend_dist = []
+    try:
+        trend_result = await db.execute(
+            text("""
+                SELECT trend_short, COUNT(*) as cnt
+                FROM product_rankings pr
+                JOIN products p ON p.id = pr.product_id
+                WHERE p.is_active = true
+                GROUP BY trend_short
+                ORDER BY cnt DESC
+            """),
+        )
+        trend_dist = [{"trend": r.trend_short, "count": r.cnt} for r in trend_result.all()]
+    except Exception:
+        pass
 
     price_band_result = await db.execute(
         text("""

@@ -41,17 +41,20 @@ async def get_my_product_rankings(
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(
-        text("""
-            SELECT pr.* FROM product_rankings pr
-            JOIN products p ON p.id = pr.product_id
-            WHERE p.user_id = :uid
-            ORDER BY pr.overall_rank ASC NULLS LAST
-        """),
-        {"uid": user.id},
-    )
-    rows = result.mappings().all()
-    return {"rankings": [dict(r) for r in rows]}
+    try:
+        result = await db.execute(
+            text("""
+                SELECT pr.* FROM product_rankings pr
+                JOIN products p ON p.id = pr.product_id
+                WHERE p.user_id = :uid
+                ORDER BY pr.overall_rank ASC NULLS LAST
+            """),
+            {"uid": user.id},
+        )
+        rows = result.mappings().all()
+        return {"rankings": [dict(r) for r in rows]}
+    except Exception:
+        return {"rankings": []}
 
 
 @router.post("/compute-all")
@@ -226,31 +229,39 @@ async def get_behavior_patterns(
     category_filter = "AND p.category = :cat" if category else ""
     params = {"cat": category} if category else {}
 
-    lifecycle_result = await db.execute(
-        text(f"""
-            SELECT lifecycle_stage, COUNT(*) as cnt
-            FROM product_rankings pr
-            JOIN products p ON p.id = pr.product_id
-            WHERE p.is_active = true {category_filter}
-            GROUP BY lifecycle_stage
-            ORDER BY cnt DESC
-        """),
-        params,
-    )
-    lifecycle_dist = [{"stage": r.lifecycle_stage, "count": r.cnt} for r in lifecycle_result.all()]
+    lifecycle_dist = []
+    try:
+        lifecycle_result = await db.execute(
+            text(f"""
+                SELECT lifecycle_stage, COUNT(*) as cnt
+                FROM product_rankings pr
+                JOIN products p ON p.id = pr.product_id
+                WHERE p.is_active = true {category_filter}
+                GROUP BY lifecycle_stage
+                ORDER BY cnt DESC
+            """),
+            params,
+        )
+        lifecycle_dist = [{"stage": r.lifecycle_stage, "count": r.cnt} for r in lifecycle_result.all()]
+    except Exception:
+        pass
 
-    trend_result = await db.execute(
-        text(f"""
-            SELECT trend_short, COUNT(*) as cnt
-            FROM product_rankings pr
-            JOIN products p ON p.id = pr.product_id
-            WHERE p.is_active = true {category_filter}
-            GROUP BY trend_short
-            ORDER BY cnt DESC
-        """),
-        params,
-    )
-    trend_dist = [{"trend": r.trend_short, "count": r.cnt} for r in trend_result.all()]
+    trend_dist = []
+    try:
+        trend_result = await db.execute(
+            text(f"""
+                SELECT trend_short, COUNT(*) as cnt
+                FROM product_rankings pr
+                JOIN products p ON p.id = pr.product_id
+                WHERE p.is_active = true {category_filter}
+                GROUP BY trend_short
+                ORDER BY cnt DESC
+            """),
+            params,
+        )
+        trend_dist = [{"trend": r.trend_short, "count": r.cnt} for r in trend_result.all()]
+    except Exception:
+        pass
 
     price_band_result = await db.execute(
         text(f"""

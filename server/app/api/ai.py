@@ -243,31 +243,34 @@ async def get_recommendations(
 
     recommendations = []
 
-    trending_products = await db.execute(
-        text("""
-            SELECT p.id, p.product_name, p.category, p.image_url,
-                   pr.overall_rank, pr.category_rank, pr.lifecycle_stage,
-                   pr.trend_short, pr.growth_rate_7d, pr.sales_velocity
-            FROM product_rankings pr
-            JOIN products p ON p.id = pr.product_id
-            WHERE p.user_id = :uid
-              AND pr.trend_short = 'rising'
-            ORDER BY pr.growth_rate_7d DESC NULLS LAST
-            LIMIT :lim
-        """),
-        {"uid": user.id, "lim": limit},
-    )
-    for row in trending_products.mappings().all():
-        recommendations.append({
-            "type": "trending",
-            "priority": 1,
-            "product_id": str(row["id"]),
-            "product_name": row["product_name"],
-            "category": row["category"],
-            "image_url": row["image_url"],
-            "reason": f"7日增长率 {row['growth_rate_7d']:.1f}%，趋势上升" if row["growth_rate_7d"] else "趋势上升中",
-            "metric": {"growth_rate_7d": float(row["growth_rate_7d"]) if row["growth_rate_7d"] else None, "rank": row["overall_rank"]},
-        })
+    try:
+        trending_products = await db.execute(
+            text("""
+                SELECT p.id, p.product_name, p.category, p.image_url,
+                       pr.overall_rank, pr.category_rank, pr.lifecycle_stage,
+                       pr.trend_short, pr.growth_rate_7d, pr.sales_velocity
+                FROM product_rankings pr
+                JOIN products p ON p.id = pr.product_id
+                WHERE p.user_id = :uid
+                  AND pr.trend_short = 'rising'
+                ORDER BY pr.growth_rate_7d DESC NULLS LAST
+                LIMIT :lim
+            """),
+            {"uid": user.id, "lim": limit},
+        )
+        for row in trending_products.mappings().all():
+            recommendations.append({
+                "type": "trending",
+                "priority": 1,
+                "product_id": str(row["id"]),
+                "product_name": row["product_name"],
+                "category": row["category"],
+                "image_url": row["image_url"],
+                "reason": f"7日增长率 {row['growth_rate_7d']:.1f}%，趋势上升" if row["growth_rate_7d"] else "趋势上升中",
+                "metric": {"growth_rate_7d": float(row["growth_rate_7d"]) if row["growth_rate_7d"] else None, "rank": row["overall_rank"]},
+            })
+    except Exception:
+        pass
 
     unack_events = await db.execute(
         select(AlertEvent)
@@ -312,30 +315,33 @@ async def get_recommendations(
             "metric": {"avg_sales": int(row["avg_sales"] or 0), "avg_rating": float(row["avg_rating"] or 0), "product_count": row["cnt"]},
         })
 
-    low_rank_products = await db.execute(
-        text("""
-            SELECT p.id, p.product_name, p.category, p.image_url,
-                   pr.overall_rank, pr.competition_index, pr.volatility
-            FROM product_rankings pr
-            JOIN products p ON p.id = pr.product_id
-            WHERE p.user_id = :uid
-              AND pr.competition_index > 0.7
-            ORDER BY pr.competition_index DESC
-            LIMIT :lim
-        """),
-        {"uid": user.id, "lim": 3},
-    )
-    for row in low_rank_products.mappings().all():
-        recommendations.append({
-            "type": "risk",
-            "priority": 2,
-            "product_id": str(row["id"]),
-            "product_name": row["product_name"],
-            "category": row["category"],
-            "image_url": row["image_url"],
-            "reason": f"竞争指数 {float(row['competition_index'] or 0):.2f}，波动率 {float(row['volatility'] or 0):.2f}",
-            "metric": {"competition_index": float(row["competition_index"] or 0), "volatility": float(row["volatility"] or 0)},
-        })
+    try:
+        low_rank_products = await db.execute(
+            text("""
+                SELECT p.id, p.product_name, p.category, p.image_url,
+                       pr.overall_rank, pr.competition_index, pr.volatility
+                FROM product_rankings pr
+                JOIN products p ON p.id = pr.product_id
+                WHERE p.user_id = :uid
+                  AND pr.competition_index > 0.7
+                ORDER BY pr.competition_index DESC
+                LIMIT :lim
+            """),
+            {"uid": user.id, "lim": 3},
+        )
+        for row in low_rank_products.mappings().all():
+            recommendations.append({
+                "type": "risk",
+                "priority": 2,
+                "product_id": str(row["id"]),
+                "product_name": row["product_name"],
+                "category": row["category"],
+                "image_url": row["image_url"],
+                "reason": f"竞争指数 {float(row['competition_index'] or 0):.2f}，波动率 {float(row['volatility'] or 0):.2f}",
+                "metric": {"competition_index": float(row["competition_index"] or 0), "volatility": float(row["volatility"] or 0)},
+            })
+    except Exception:
+        pass
 
     recommendations.sort(key=lambda x: x["priority"])
 
