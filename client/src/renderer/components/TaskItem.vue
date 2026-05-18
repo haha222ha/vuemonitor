@@ -17,8 +17,8 @@
         <span v-if="task.error_message" class="task-item__error">{{ task.error_message }}</span>
       </div>
       <el-progress
-        v-if="task.status === 'running' && task.progress > 0"
-        :percentage="task.progress"
+        v-if="task.status === 'running' && (task.progress ?? 0) > 0"
+        :percentage="task.progress ?? 0"
         :stroke-width="4"
         :show-text="true"
         :color="progressColor(task.status)"

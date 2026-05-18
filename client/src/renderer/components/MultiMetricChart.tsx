@@ -37,8 +37,8 @@ export default defineComponent({
       }
 
       const dates = props.data.map((d) => d.date);
-      const series: echarts.EChartOption.Series[] = [];
-      const yAxes: Record<string, echarts.EChartOption.YAxis> = {};
+      const series: any[] = [];
+      const yAxes: Record<string, any> = {};
 
       let hasLeftAxis = false;
       let hasRightAxis = false;
@@ -47,7 +47,7 @@ export default defineComponent({
         const config = METRIC_CONFIG[metric];
         if (!config) continue;
 
-        const values = props.data.map((d) => (d as Record<string, unknown>)[metric] as number | null ?? null);
+        const values = props.data.map((d) => (d as unknown as Record<string, unknown>)[metric] as number | null ?? null);
 
         series.push({
           type: "line",
@@ -59,7 +59,7 @@ export default defineComponent({
           lineStyle: { width: 2, color: config.color },
           itemStyle: { color: config.color },
           yAxisIndex: config.yAxisIndex,
-        } as unknown as echarts.EChartOption.Series);
+        } as any);
 
         if (config.yAxisIndex === 0) hasLeftAxis = true;
         if (config.yAxisIndex === 1) hasRightAxis = true;

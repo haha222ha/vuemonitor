@@ -29,7 +29,7 @@
 import { ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
 
-defineProps<{
+const props = defineProps<{
   modelValue: boolean;
   reportForm: { title: string; report_type: string; product_ids: string[] };
   products: any[];

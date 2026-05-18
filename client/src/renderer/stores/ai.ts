@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import api from "../utils/api";
 
 export interface AIAnalysisRecord {
   id: string;
@@ -124,17 +125,29 @@ export const useAIStore = defineStore("ai", () => {
     }
 
     try {
-      const result = await window.electronAPI.invoke("sync:ai-analyze", productId, analysisType) as Record<string, unknown> | null;
-      if (result) {
-        currentAnalysis.value = result;
-        setCachedResult(productId, analysisType, result);
-        return result;
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("sync:ai-analyze", productId, analysisType) as Record<string, unknown> | null;
+        if (result) {
+          currentAnalysis.value = result;
+          setCachedResult(productId, analysisType, result);
+          return result;
+        }
+        const fallbackErr: AIError = { type: "provider", message: "AI分析请求失败，请检查网络连接或稍后重试", retryable: true };
+        aiError.value = fallbackErr;
+        error.value = fallbackErr.message;
+        return null;
+      } else {
+        const { data } = await api.post("/ai/analyze", { product_id: productId, analysis_type: analysisType });
+        if (data.code === 0 && data.data) {
+          const result = data.data.result || data.data;
+          currentAnalysis.value = result;
+          setCachedResult(productId, analysisType, result);
+          return result;
+        }
+        aiError.value = { type: "unknown", message: "分析请求失败", retryable: true };
+        error.value = "分析请求失败";
+        return null;
       }
-
-      const fallbackErr: AIError = { type: "provider", message: "AI分析请求失败，请检查网络连接或稍后重试", retryable: true };
-      aiError.value = fallbackErr;
-      error.value = fallbackErr.message;
-      return null;
     } catch (err) {
       const classified = classifyError(err);
       aiError.value = classified;
@@ -149,12 +162,19 @@ export const useAIStore = defineStore("ai", () => {
     loading.value = true;
     error.value = null;
     try {
-      const sql = productId
-        ? "SELECT * FROM ai_analysis WHERE product_id = ? ORDER BY analyzed_at DESC LIMIT 50"
-        : "SELECT * FROM ai_analysis ORDER BY analyzed_at DESC LIMIT 100";
-      const params = productId ? [productId] : [];
-      const rows = await window.electronAPI.invoke("storage:query", sql, params);
-      analyses.value = (rows as AIAnalysisRecord[]) || [];
+      if (window.electronAPI) {
+        const sql = productId
+          ? "SELECT * FROM ai_analysis WHERE product_id = ? ORDER BY analyzed_at DESC LIMIT 50"
+          : "SELECT * FROM ai_analysis ORDER BY analyzed_at DESC LIMIT 100";
+        const params = productId ? [productId] : [];
+        const rows = await window.electronAPI.invoke("storage:query", sql, params);
+        analyses.value = (rows as AIAnalysisRecord[]) || [];
+      } else {
+        const { data } = await api.get("/ai/analyses", { params: { product_id: productId } });
+        if (data.code === 0 && data.data) {
+          analyses.value = data.data.items || data.data || [];
+        }
+      }
     } catch (err) {
       error.value = String(err);
     } finally {

@@ -31,7 +31,7 @@
           <EmptyState :icon="Bell" title="暂无异动规则" description="创建异动规则，当商品价格、销量、评分等发生变化时自动预警" action-label="新建规则" :action-icon="Bell" @action="openCreateDialog" />
         </div>
         <div v-else class="monitor__grid">
-          <RuleCard v-for="rule in rules" :key="rule.id" :rule="rule" @toggle="toggleRule" @edit="openEditDialog" @delete="deleteRule" />
+          <RuleCard v-for="rule in rules" :key="rule.id" :rule="rule" @toggle="toggleRule as any" @edit="openEditDialog as any" @delete="deleteRule" />
         </div>
       </el-tab-pane>
 

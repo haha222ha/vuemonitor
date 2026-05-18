@@ -90,8 +90,10 @@ export function useCompareData() {
       if (isNetworkError(err)) cloudAvailable.value = false;
     }
     try {
-      const result = await window.electronAPI.invoke("products:list", { page: 1, pageSize: 200 });
-      allProducts.value = result?.data?.items || [];
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("products:list", { page: 1, pageSize: 200 }) as { data?: { items?: any[] } } | null;
+        allProducts.value = result?.data?.items || [];
+      }
     } catch { allProducts.value = []; }
   }
 
@@ -138,7 +140,7 @@ export function useCompareData() {
           if (data) result = { data };
         } catch { cloudAvailable.value = false; }
       }
-      if (!result) {
+      if (!result && window.electronAPI) {
         try {
           const localResult = await window.electronAPI.invoke("products:compare", { productIds: ids });
           result = localResult;
@@ -273,7 +275,7 @@ export function useCompareData() {
       tooltip: { trigger: "axis" },
       legend: { bottom: 0, textStyle: { fontSize: 12 } },
       grid: { left: 60, right: 30, top: 30, bottom: 50 },
-      xAxis: { type: "category", data: names, axisLabel: { fontSize: 11, rotate: names.some((n) => n.length > 6) ? 30 : 0 } },
+      xAxis: { type: "category", data: names, axisLabel: { fontSize: 11, rotate: names.some((n: string) => n.length > 6) ? 30 : 0 } },
       yAxis: { type: "value", axisLabel: { fontSize: 11 } },
       series: seriesData,
     }, true);

@@ -28,7 +28,7 @@ function loadShortcuts(): ShortcutBinding[] {
   try {
     const saved = localStorage.getItem(SHORTCUTS_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved);
+      const parsed: ShortcutBinding[] = JSON.parse(saved);
       const savedMap = new Map(parsed.map((s: ShortcutBinding) => [s.action, s]));
       return DEFAULT_SHORTCUTS.map((d) => savedMap.get(d.action) || d);
     }

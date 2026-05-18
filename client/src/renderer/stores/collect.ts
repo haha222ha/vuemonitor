@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import api from "../utils/api";
 
 export interface CollectStatus {
   isRunning: boolean;
@@ -36,8 +37,18 @@ export const useCollectStore = defineStore("collect", () => {
 
   async function fetchStatus() {
     try {
-      const result = await window.electronAPI.invoke("collect:status");
-      status.value = result as CollectStatus;
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("collect:status");
+        status.value = result as CollectStatus;
+      } else {
+        const { data } = await api.get("/collect/tasks");
+        if (data.code === 0 && data.data) {
+          const tasks = data.data.items || data.data || [];
+          status.value.activeCount = tasks.filter((t: any) => t.status === "running").length;
+          status.value.queueLength = tasks.filter((t: any) => t.status === "pending").length;
+          status.value.isRunning = status.value.activeCount > 0;
+        }
+      }
     } catch {}
   }
 
@@ -45,14 +56,25 @@ export const useCollectStore = defineStore("collect", () => {
     loading.value = true;
     error.value = null;
     try {
-      const tasksWithId = tasks.map((t) => ({
-        ...t,
-        id: crypto.randomUUID(),
-      }));
-      const result = await window.electronAPI.invoke("collect:start", tasksWithId);
-      status.value.activeCount = (result as { activeCount: number }).activeCount;
-      status.value.queueLength = (result as { queueLength: number }).queueLength;
-      status.value.isRunning = true;
+      if (window.electronAPI) {
+        const tasksWithId = tasks.map((t) => ({
+          ...t,
+          id: crypto.randomUUID(),
+        }));
+        const result = await window.electronAPI.invoke("collect:start", tasksWithId);
+        status.value.activeCount = (result as { activeCount: number }).activeCount;
+        status.value.queueLength = (result as { queueLength: number }).queueLength;
+        status.value.isRunning = true;
+      } else {
+        for (const task of tasks) {
+          await api.post("/collect/tasks", {
+            target_id: task.targetId,
+            target_type: task.targetType,
+            target_url: task.targetUrl,
+          });
+        }
+        await fetchStatus();
+      }
     } catch (err) {
       error.value = String(err);
     } finally {
@@ -62,29 +84,41 @@ export const useCollectStore = defineStore("collect", () => {
 
   async function cancelCollect(taskId: string) {
     try {
-      await window.electronAPI.invoke("collect:cancel", taskId);
+      if (window.electronAPI) {
+        await window.electronAPI.invoke("collect:cancel", taskId);
+      } else {
+        await api.post(`/collect/tasks/${taskId}/cancel`);
+      }
     } catch {}
   }
 
   async function clearQueue() {
     try {
-      await window.electronAPI.invoke("collect:clear-queue");
-      status.value.queueLength = 0;
+      if (window.electronAPI) {
+        await window.electronAPI.invoke("collect:clear-queue");
+        status.value.queueLength = 0;
+      }
     } catch {}
   }
 
   async function setConcurrency(value: number) {
     try {
-      const result = await window.electronAPI.invoke("concurrency:set", value);
-      status.value.concurrency = (result as { current: number }).current;
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("concurrency:set", value);
+        status.value.concurrency = (result as { current: number }).current;
+      } else {
+        status.value.concurrency = value;
+      }
     } catch {}
   }
 
   async function getConcurrency() {
     try {
-      const result = await window.electronAPI.invoke("concurrency:get");
-      status.value.concurrency = (result as { current: number }).current;
-      status.value.resourceUsage = (result as { resourceUsage: CollectStatus["resourceUsage"] }).resourceUsage;
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("concurrency:get");
+        status.value.concurrency = (result as { current: number }).current;
+        status.value.resourceUsage = (result as { resourceUsage: CollectStatus["resourceUsage"] }).resourceUsage;
+      }
     } catch {}
   }
 
@@ -104,6 +138,7 @@ export const useCollectStore = defineStore("collect", () => {
   }
 
   function setupListeners() {
+    if (!window.electronAPI) return;
     window.electronAPI.on("collect:result", (result: unknown) => {
       addResult(result as CollectResult);
     });

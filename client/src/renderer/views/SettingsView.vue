@@ -414,7 +414,7 @@ const {
   saveNotifySettings,
   refreshSyncStatus, loadConflicts,
   handleResolveConflict, handleResolveAllConflicts,
-  handleSyncNow, loadSyncHistory,
+  handleSyncNow, loadSyncHistory, syncHistory,
   handleConnect, handleAutoSyncToggle, handleSyncIntervalChange,
   handleConcurrencyChange, handleCollectIntervalChange, handleAutoUpdateToggle,
   handleCheckUpdate, handleDownloadUpdate,

@@ -88,8 +88,15 @@ export function useAlertData() {
   async function fetchRules() {
     loading.value = true;
     try {
-      const productsRes = await window.electronAPI.invoke("storage:get-products");
-      products.value = productsRes || [];
+      if (window.electronAPI) {
+        const productsRes = await window.electronAPI.invoke("storage:get-products") as any[] | null;
+        products.value = productsRes || [];
+      } else {
+        const { data } = await api.get("/products", { params: { page: 1, page_size: 200 } });
+        if (data?.code === 0 && data.data) {
+          products.value = data.data.items || data.data || [];
+        }
+      }
     } catch {}
 
     try {
@@ -103,8 +110,10 @@ export function useAlertData() {
     } catch {
       cloudAvailable.value = false;
       try {
-        const localRules = await window.electronAPI.invoke("monitor:get-rules");
-        rules.value = localRules || [];
+        if (window.electronAPI) {
+          const localRules = await window.electronAPI.invoke("monitor:get-rules") as AlertRule[] | null;
+          rules.value = localRules || [];
+        }
       } catch {
         rules.value = [];
       }
@@ -145,7 +154,7 @@ export function useAlertData() {
     try {
       if (cloudAvailable.value) {
         await api.put(`/alert-rules/${rule.id}`, { is_active: !rule.is_active });
-      } else {
+      } else if (window.electronAPI) {
         await window.electronAPI.invoke("monitor:toggle-rule", rule.id, !rule.is_active);
       }
       rule.is_active = !rule.is_active;
@@ -158,7 +167,7 @@ export function useAlertData() {
       await ElMessageBox.confirm("确定要删除该规则吗？", "确认删除", { confirmButtonText: "删除", cancelButtonText: "取消", type: "warning" });
       if (cloudAvailable.value) {
         await api.delete(`/alert-rules/${id}`);
-      } else {
+      } else if (window.electronAPI) {
         await window.electronAPI.invoke("monitor:delete-rule", id);
       }
       ElMessage.success("删除成功");
@@ -230,7 +239,7 @@ export function useAlertData() {
         await api.post("/alert-rules", serverPayload);
         ElMessage.success("规则已创建");
       }
-    } else {
+    } else if (window.electronAPI) {
       if (editingRule) {
         await window.electronAPI.invoke("monitor:update-rule", editingRule.id, { rule_name: form.rule_name, conditions: form.conditions, notify_channels: form.notify_channels, is_active: form.is_active });
         ElMessage.success("规则已更新");

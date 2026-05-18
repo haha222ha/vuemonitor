@@ -78,10 +78,17 @@ export function useProductsData() {
     if (!permissionStore.canAddProduct) { ElMessage.warning("当前套餐商品数量已达上限，请升级"); return; }
     const { productId, targetType, targetUrl } = resolveProductInput(addForm.value.noteInput);
     try {
-      await window.electronAPI.invoke("storage:insert-product", {
-        platform: "xhs", platform_product_id: productId,
-        product_name: addForm.value.product_name || `XHS商品 ${productId}`, target_url: targetUrl,
-      });
+      if (window.electronAPI) {
+        await window.electronAPI.invoke("storage:insert-product", {
+          platform: "xhs", platform_product_id: productId,
+          product_name: addForm.value.product_name || `XHS商品 ${productId}`, target_url: targetUrl,
+        });
+      } else {
+        await api.post("/products", {
+          platform: "xhs", platform_product_id: productId,
+          product_name: addForm.value.product_name || `XHS商品 ${productId}`, target_url: targetUrl,
+        });
+      }
       ElMessage.success("添加成功");
       showAdd.value = false;
       addForm.value = { noteInput: "", product_name: "" };
@@ -139,7 +146,11 @@ export function useProductsData() {
       await ElMessageBox.confirm("确定要删除该商品监控吗？", "确认删除", {
         confirmButtonText: "删除", cancelButtonText: "取消", type: "warning",
       });
-      await window.electronAPI.invoke("storage:run", "UPDATE products SET is_active = 0 WHERE id = ?", [id]);
+      if (window.electronAPI) {
+        await window.electronAPI.invoke("storage:run", "UPDATE products SET is_active = 0 WHERE id = ?", [id]);
+      } else {
+        await api.delete(`/products/${id}`);
+      }
       ElMessage.success("删除成功");
       await productStore.fetchProducts();
     } catch {}

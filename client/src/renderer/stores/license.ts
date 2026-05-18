@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import api from "../utils/api";
 
 export interface LicenseInfo {
   licenseKey: string;
@@ -47,23 +48,52 @@ export const useLicenseStore = defineStore("license", () => {
 
   async function fetchLicense() {
     try {
-      const result = await window.electronAPI.invoke("license:get-current");
-      license.value = result as LicenseInfo | null;
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("license:get-current");
+        license.value = result as LicenseInfo | null;
+      } else {
+        const { data } = await api.get("/license/status");
+        if (data.code === 0 && data.data) {
+          license.value = data.data as LicenseInfo;
+        }
+      }
     } catch {}
   }
 
   async function fetchPlan() {
     try {
-      const result = await window.electronAPI.invoke("license:get-plan") as {
-        plan: string;
-        features: string[];
-        quotas: Record<string, number>;
-      };
-      if (license.value) {
-        license.value.plan = result.plan as LicenseInfo["plan"];
-        license.value.features = result.features;
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("license:get-plan") as {
+          plan: string;
+          features: string[];
+          quotas: Record<string, number>;
+        };
+        if (license.value) {
+          license.value.plan = result.plan as LicenseInfo["plan"];
+          license.value.features = result.features;
+        }
+        quotas.value = result.quotas || {};
+      } else {
+        const { data } = await api.get("/auth/me");
+        if (data.code === 0 && data.data) {
+          const userPlan = data.data.plan || "free";
+          if (license.value) {
+            license.value.plan = userPlan;
+          } else {
+            license.value = {
+              licenseKey: "",
+              deviceId: "",
+              plan: userPlan,
+              expiresAt: null,
+              activatedAt: new Date().toISOString(),
+              features: [],
+              machineFingerprint: "",
+              isValid: true,
+              lastVerified: new Date().toISOString(),
+            };
+          }
+        }
       }
-      quotas.value = result.quotas || {};
     } catch {}
   }
 
@@ -71,16 +101,26 @@ export const useLicenseStore = defineStore("license", () => {
     loading.value = true;
     error.value = null;
     try {
-      const result = await window.electronAPI.invoke("license:activate", licenseKey, serverUrl) as {
-        success: boolean;
-        license?: LicenseInfo;
-        error?: string;
-      };
-      if (result.success && result.license) {
-        license.value = result.license;
-        return true;
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("license:activate", licenseKey, serverUrl) as {
+          success: boolean;
+          license?: LicenseInfo;
+          error?: string;
+        };
+        if (result.success && result.license) {
+          license.value = result.license;
+          return true;
+        } else {
+          error.value = result.error || "激活失败";
+          return false;
+        }
       } else {
-        error.value = result.error || "激活失败";
+        const { data } = await api.post("/auth/license/activate", { license_key: licenseKey });
+        if (data.code === 0 && data.data) {
+          license.value = data.data as LicenseInfo;
+          return true;
+        }
+        error.value = data.message || "激活失败";
         return false;
       }
     } catch (err) {
@@ -93,7 +133,9 @@ export const useLicenseStore = defineStore("license", () => {
 
   async function deactivate() {
     try {
-      await window.electronAPI.invoke("license:deactivate");
+      if (window.electronAPI) {
+        await window.electronAPI.invoke("license:deactivate");
+      }
       license.value = null;
       return true;
     } catch {
@@ -103,10 +145,13 @@ export const useLicenseStore = defineStore("license", () => {
 
   async function getDeviceInfo() {
     try {
-      return await window.electronAPI.invoke("license:get-device-id") as {
-        deviceId: string;
-        fingerprint: string;
-      };
+      if (window.electronAPI) {
+        return await window.electronAPI.invoke("license:get-device-id") as {
+          deviceId: string;
+          fingerprint: string;
+        };
+      }
+      return null;
     } catch {
       return null;
     }
@@ -114,7 +159,10 @@ export const useLicenseStore = defineStore("license", () => {
 
   async function checkFeature(gateKey: string): Promise<boolean> {
     try {
-      return await window.electronAPI.invoke("license:check-feature", gateKey) as boolean;
+      if (window.electronAPI) {
+        return await window.electronAPI.invoke("license:check-feature", gateKey) as boolean;
+      }
+      return true;
     } catch {
       return false;
     }
@@ -122,7 +170,10 @@ export const useLicenseStore = defineStore("license", () => {
 
   async function checkQuota(quotaKey: string, currentUsage: number): Promise<QuotaCheckResult> {
     try {
-      return await window.electronAPI.invoke("license:check-quota", quotaKey, currentUsage) as QuotaCheckResult;
+      if (window.electronAPI) {
+        return await window.electronAPI.invoke("license:check-quota", quotaKey, currentUsage) as QuotaCheckResult;
+      }
+      return { allowed: true, limit: -1, remaining: -1 };
     } catch {
       return { allowed: true, limit: -1, remaining: -1 };
     }
@@ -130,7 +181,10 @@ export const useLicenseStore = defineStore("license", () => {
 
   async function checkExpired(): Promise<boolean> {
     try {
-      return await window.electronAPI.invoke("license:is-expired") as boolean;
+      if (window.electronAPI) {
+        return await window.electronAPI.invoke("license:is-expired") as boolean;
+      }
+      return false;
     } catch {
       return false;
     }

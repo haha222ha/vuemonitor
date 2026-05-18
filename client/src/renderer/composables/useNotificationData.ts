@@ -87,7 +87,7 @@ export function useNotificationData() {
     }
   }
 
-  async function markRead(id: string, source: "cloud" | "local") {
+  async function markRead(id: string, source: string) {
     await notificationStore.markAsRead(id, source);
   }
 
@@ -96,7 +96,7 @@ export function useNotificationData() {
     ElMessage.success("已全部标为已读");
   }
 
-  async function deleteNotification(id: string, source: "cloud" | "local") {
+  async function deleteNotification(id: string, source: string) {
     await notificationStore.deleteNotification(id, source);
     ElMessage.success("已删除");
   }
@@ -134,19 +134,23 @@ export function useNotificationData() {
     }, 30000);
 
     try {
-      unsubscribeLocal = window.electronAPI.on("notification:local", (data: unknown) => {
-        const notif = data as NotificationItem;
-        notificationStore.handleNewNotification(notif);
-      });
+      if (window.electronAPI) {
+        unsubscribeLocal = window.electronAPI.on("notification:local", (data: unknown) => {
+          const notif = data as NotificationItem;
+          notificationStore.handleNewNotification(notif);
+        });
+      }
     } catch {}
 
     try {
-      unsubscribeWs = window.electronAPI.on("notification", (data: unknown) => {
-        const msg = data as { type: string; data: NotificationItem };
-        if (msg.type === "notification:new" && msg.data) {
-          notificationStore.handleNewNotification({ ...msg.data, source: "cloud" });
-        }
-      });
+      if (window.electronAPI) {
+        unsubscribeWs = window.electronAPI.on("notification", (data: unknown) => {
+          const msg = data as { type: string; data: NotificationItem };
+          if (msg.type === "notification:new" && msg.data) {
+            notificationStore.handleNewNotification({ ...msg.data, source: "cloud" });
+          }
+        });
+      }
     } catch {}
   }
 

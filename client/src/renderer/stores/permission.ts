@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import api from "../utils/api";
 import type { PlanTier } from "@shared/constants/feature-gates";
 import { FEATURE_GATES, PLAN_LIMITS, isPlanSufficient } from "@shared/constants/feature-gates";
 
@@ -41,8 +42,17 @@ export const usePermissionStore = defineStore("permission", () => {
   async function fetchPermissions() {
     loading.value = true;
     try {
-      const result = await window.electronAPI.invoke("permission:get-all");
-      gates.value = result as Record<string, boolean>;
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("permission:get-all");
+        gates.value = result as Record<string, boolean>;
+      } else {
+        const { data } = await api.get("/auth/me");
+        if (data.code === 0 && data.data) {
+          const userPlan = (data.data.plan || "free") as PlanTier;
+          plan.value = userPlan;
+          rebuildGatesFromPlan();
+        }
+      }
     } catch {
       rebuildGatesFromPlan();
     } finally {
@@ -52,9 +62,19 @@ export const usePermissionStore = defineStore("permission", () => {
 
   async function checkGate(gateKey: string): Promise<boolean> {
     try {
-      const result = await window.electronAPI.invoke("permission:check", gateKey);
-      gates.value[gateKey] = result as boolean;
-      return result as boolean;
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("permission:check", gateKey);
+        gates.value[gateKey] = result as boolean;
+        return result as boolean;
+      } else {
+        const gate = FEATURE_GATES.find((g) => g.key === gateKey);
+        if (gate) {
+          const allowed = isPlanSufficient(plan.value, gate.requiredPlan);
+          gates.value[gateKey] = allowed;
+          return allowed;
+        }
+        return false;
+      }
     } catch {
       return false;
     }
@@ -62,8 +82,12 @@ export const usePermissionStore = defineStore("permission", () => {
 
   async function refreshFromServer() {
     try {
-      await window.electronAPI.invoke("permission:refresh");
-      await fetchPermissions();
+      if (window.electronAPI) {
+        await window.electronAPI.invoke("permission:refresh");
+        await fetchPermissions();
+      } else {
+        await fetchPermissions();
+      }
     } catch {}
   }
 

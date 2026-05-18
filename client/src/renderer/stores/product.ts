@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+import api from "../utils/api";
 
 export interface Product {
   id: string;
@@ -45,8 +46,15 @@ export const useProductStore = defineStore("product", () => {
     loading.value = true;
     error.value = null;
     try {
-      const result = await window.electronAPI.invoke("datamart:list-products", filter.value.platform, 100);
-      products.value = result as Product[];
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("datamart:list-products", filter.value.platform, 100);
+        products.value = result as Product[];
+      } else {
+        const { data } = await api.get("/products", { params: { platform: filter.value.platform || undefined } });
+        if (data.code === 0 && data.data) {
+          products.value = data.data.items || data.data || [];
+        }
+      }
     } catch (err) {
       error.value = String(err);
     } finally {
@@ -58,9 +66,17 @@ export const useProductStore = defineStore("product", () => {
     loading.value = true;
     error.value = null;
     try {
-      const result = await window.electronAPI.invoke("datamart:get-product", productId);
-      currentProduct.value = result as Product;
-      await fetchFeatures(productId);
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("datamart:get-product", productId);
+        currentProduct.value = result as Product;
+        await fetchFeatures(productId);
+      } else {
+        const { data } = await api.get(`/products/${productId}`);
+        if (data.code === 0 && data.data) {
+          currentProduct.value = data.data;
+        }
+        await fetchFeatures(productId);
+      }
     } catch (err) {
       error.value = String(err);
     } finally {
@@ -70,13 +86,20 @@ export const useProductStore = defineStore("product", () => {
 
   async function fetchFeatures(productId: string) {
     try {
-      const result = await window.electronAPI.invoke("storage:query", "SELECT * FROM product_features WHERE product_id = ? ORDER BY collected_at DESC LIMIT 30", [productId]);
-      features.value = (result as ProductFeature[]).map((f: ProductFeature) => ({
-        ...f,
-        extra_features: typeof (f as Record<string, unknown>).extra_features === "string"
-          ? JSON.parse((f as Record<string, unknown>).extra_features as string)
-          : (f as Record<string, unknown>).extra_features,
-      }));
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("storage:query", "SELECT * FROM product_features WHERE product_id = ? ORDER BY collected_at DESC LIMIT 30", [productId]);
+        features.value = (result as ProductFeature[]).map((f: ProductFeature) => ({
+          ...f,
+          extra_features: typeof (f as unknown as Record<string, unknown>).extra_features === "string"
+            ? JSON.parse((f as unknown as Record<string, unknown>).extra_features as string)
+            : (f as unknown as Record<string, unknown>).extra_features,
+        }));
+      } else {
+        const { data } = await api.get(`/products/${productId}/features`);
+        if (data.code === 0 && data.data) {
+          features.value = data.data.items || data.data || [];
+        }
+      }
     } catch (err) {
       error.value = String(err);
     }

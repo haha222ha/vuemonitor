@@ -42,7 +42,7 @@
             size="small"
             text
             type="primary"
-            @click="$emit('acknowledge', evt.id)"
+            @click="$emit('acknowledge', String(evt.id))"
           >
             确认
           </el-button>
@@ -78,7 +78,7 @@ defineProps<{
 
 defineEmits<{
   refresh: [];
-  acknowledge: [id: string | number];
+  acknowledge: [id: string];
 }>();
 
 function formatAlertTime(timestamp?: string): string {

@@ -11,7 +11,9 @@ export interface NotificationItem {
   related_id: string | null;
   related_type: string | null;
   created_at: string | null;
-  source: "cloud" | "local";
+  source: "cloud" | "local" | "alert_event";
+  severity?: string;
+  is_acknowledged?: boolean;
 }
 
 export const useNotificationStore = defineStore("notification", () => {
@@ -47,6 +49,7 @@ export const useNotificationStore = defineStore("notification", () => {
 
   async function fetchLocalNotifications(): Promise<NotificationItem[]> {
     try {
+      if (!window.electronAPI) return [];
       const localNotifs = await window.electronAPI.invoke("notifications:get", 100) as Array<{
         id: string;
         type: string;
@@ -124,8 +127,10 @@ export const useNotificationStore = defineStore("notification", () => {
 
       let localCount = 0;
       try {
-        const result = await window.electronAPI.invoke("notifications:unread-count") as { count: number };
-        localCount = result?.count || 0;
+        if (window.electronAPI) {
+          const result = await window.electronAPI.invoke("notifications:unread-count") as { count: number };
+          localCount = result?.count || 0;
+        }
       } catch {}
 
       unreadCount.value = cloudCount + localCount;
@@ -134,13 +139,13 @@ export const useNotificationStore = defineStore("notification", () => {
     }
   }
 
-  async function markAsRead(notificationId: string, source?: "cloud" | "local") {
+  async function markAsRead(notificationId: string, source?: string) {
     const n = notifications.value.find((item) => item.id === notificationId);
     const itemSource = source || n?.source;
 
     if (itemSource === "local") {
       try {
-        await window.electronAPI.invoke("notifications:mark-read", notificationId);
+        if (window.electronAPI) await window.electronAPI.invoke("notifications:mark-read", notificationId);
       } catch {}
     } else {
       try {
@@ -160,7 +165,7 @@ export const useNotificationStore = defineStore("notification", () => {
 
     if (localUnread.length > 0) {
       try {
-        await window.electronAPI.invoke("notifications:mark-all-read");
+        if (window.electronAPI) await window.electronAPI.invoke("notifications:mark-all-read");
       } catch {}
     }
 
@@ -176,13 +181,13 @@ export const useNotificationStore = defineStore("notification", () => {
     unreadCount.value = 0;
   }
 
-  async function deleteNotification(notificationId: string, source?: "cloud" | "local") {
+  async function deleteNotification(notificationId: string, source?: string) {
     const n = notifications.value.find((item) => item.id === notificationId);
     const itemSource = source || n?.source;
 
     if (itemSource === "local") {
       try {
-        await window.electronAPI.invoke("notifications:delete", notificationId);
+        if (window.electronAPI) await window.electronAPI.invoke("notifications:delete", notificationId);
       } catch {}
     } else {
       try {
@@ -207,7 +212,7 @@ export const useNotificationStore = defineStore("notification", () => {
 
     for (const item of localRead) {
       try {
-        await window.electronAPI.invoke("notifications:delete", item.id);
+        if (window.electronAPI) await window.electronAPI.invoke("notifications:delete", item.id);
       } catch {}
     }
 

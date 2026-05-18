@@ -37,13 +37,13 @@
             link
             size="small"
             type="primary"
-            @click.stop="$emit('mark-read', item.id, item.source === 'alert_event' ? 'cloud' : item.source)"
+            @click.stop="$emit('mark-read', item.id, (item.source as string))"
           >标为已读</el-button>
           <el-button
             link
             size="small"
             type="danger"
-            @click.stop="$emit('delete', item.id, item.source === 'alert_event' ? 'cloud' : item.source)"
+            @click.stop="$emit('delete', item.id, (item.source as string))"
           >删除</el-button>
         </div>
       </div>

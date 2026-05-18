@@ -46,7 +46,8 @@ export function useSchedulerData() {
 
   async function fetchLocalTasks() {
     try {
-      const result = await window.electronAPI.invoke("scheduler:timeline");
+      if (!window.electronAPI) return;
+      const result = await window.electronAPI.invoke("scheduler:timeline") as { tasks?: any[]; state?: { isRunning?: boolean } } | null;
       cloudTasks.value = (result?.tasks || []).map((t: any) => ({
         id: t.id,
         task_type: "product",
@@ -56,7 +57,7 @@ export function useSchedulerData() {
         progress: t.progress || 0,
         created_at: t.last_run_at || new Date().toISOString(),
       }));
-      schedulerRunning.value = result?.state?.isRunning || false;
+      schedulerRunning.value = result?.state?.isRunning ?? false;
     } catch {}
   }
 
@@ -209,12 +210,14 @@ export function useSchedulerData() {
     refreshTimer = setInterval(fetchCloudTasks, 15000);
 
     try {
-      unsubscribeWs = window.electronAPI.on("ws:message", (data: unknown) => {
-        const msg = data as { type: string; data: any };
-        if (msg.type === "collect:progress" || msg.type === "collect:completed") {
-          fetchCloudTasks();
-        }
-      });
+      if (window.electronAPI) {
+        unsubscribeWs = window.electronAPI.on("ws:message", (data: unknown) => {
+          const msg = data as { type: string; data: any };
+          if (msg.type === "collect:progress" || msg.type === "collect:completed") {
+            fetchCloudTasks();
+          }
+        });
+      }
     } catch {}
   }
 

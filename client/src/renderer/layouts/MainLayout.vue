@@ -130,7 +130,7 @@
           <el-dropdown>
             <div class="topbar__user">
               <div class="topbar__avatar">
-                {{ (authStore.user?.nickname || 'U')[0].toUpperCase() }}
+                {{ ((authStore.user?.nickname || 'U') as string)[0].toUpperCase() }}
               </div>
               <span v-if="!isMobile" class="topbar__username">{{ authStore.user?.nickname || '用户' }}</span>
             </div>
@@ -299,42 +299,46 @@ onMounted(() => {
   });
 
   try {
-    unsubscribeLocal = window.electronAPI.on("notification:local", (data: unknown) => {
-      notificationStore.handleNewNotification(data as import("../stores/notification").NotificationItem);
-    });
+    if (window.electronAPI) {
+      unsubscribeLocal = window.electronAPI.on("notification:local", (data: unknown) => {
+        notificationStore.handleNewNotification(data as import("../stores/notification").NotificationItem);
+      });
+    }
   } catch {}
 
   try {
-    unsubscribeWs = window.electronAPI.on("notification", (data: unknown) => {
+    if (window.electronAPI) {
+      unsubscribeWs = window.electronAPI.on("notification", (data: unknown) => {
       const msg = data as { type: string; data: import("../stores/notification").NotificationItem };
       if (msg.type === "notification:new" && msg.data) {
         notificationStore.handleNewNotification({ ...msg.data, source: "cloud" });
       } else if (msg.type === "monitor:triggered" && msg.data) {
         notificationStore.handleNewNotification({
-          id: (msg.data as Record<string, unknown>).id as string || crypto.randomUUID(),
+          id: (msg.data as unknown as Record<string, unknown>).id as string || crypto.randomUUID(),
           type: "monitor",
           title: "监控规则触发",
-          content: String((msg.data as Record<string, unknown>).message || "商品数据触发监控规则"),
+          content: String((msg.data as unknown as Record<string, unknown>).message || "商品数据触发监控规则"),
           is_read: false,
-          related_id: (msg.data as Record<string, unknown>).product_id as string || null,
+          related_id: (msg.data as unknown as Record<string, unknown>).product_id as string || null,
           related_type: "product",
           created_at: new Date().toISOString(),
           source: "cloud",
         });
       } else if (msg.type === "ai:analysis_completed" && msg.data) {
         notificationStore.handleNewNotification({
-          id: (msg.data as Record<string, unknown>).analysis_id as string || crypto.randomUUID(),
+          id: (msg.data as unknown as Record<string, unknown>).analysis_id as string || crypto.randomUUID(),
           type: "ai",
           title: "AI分析完成",
           content: "AI分析已完成，点击查看结果",
           is_read: false,
-          related_id: (msg.data as Record<string, unknown>).product_id as string || null,
+          related_id: (msg.data as unknown as Record<string, unknown>).product_id as string || null,
           related_type: "product",
           created_at: new Date().toISOString(),
           source: "cloud",
         });
       }
     });
+    }
   } catch {}
 });
 

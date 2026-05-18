@@ -85,11 +85,11 @@
         <el-table-column label="排名" width="120">
           <template #default="{ row }">
             <div v-if="getRankingInfo(row.id)" class="cell-rank">
-              <span class="cell-rank__number">#{{ getRankingInfo(row.id).rank }}</span>
-              <span class="cell-rank__total" v-if="getRankingInfo(row.id).total">/{{ getRankingInfo(row.id).total }}</span>
-              <el-tag v-if="getRankingInfo(row.id).trend" size="small" effect="light"
-                :type="getRankingInfo(row.id).trend === '上升' ? 'success' : getRankingInfo(row.id).trend === '下降' ? 'danger' : 'info'">
-                {{ getRankingInfo(row.id).trend }}
+              <span class="cell-rank__number">#{{ getRankingInfo(row.id)!.rank }}</span>
+              <span class="cell-rank__total" v-if="getRankingInfo(row.id)!.total">/{{ getRankingInfo(row.id)!.total }}</span>
+              <el-tag v-if="getRankingInfo(row.id)!.trend" size="small" effect="light"
+                :type="getRankingInfo(row.id)!.trend === '上升' ? 'success' : getRankingInfo(row.id)!.trend === '下降' ? 'danger' : 'info'">
+                {{ getRankingInfo(row.id)!.trend }}
               </el-tag>
             </div>
             <span v-else class="cell-secondary">-</span>

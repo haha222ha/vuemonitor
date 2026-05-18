@@ -26,7 +26,7 @@
       "@logger/*": ["./src/logger/*"],
       "@shared/*": ["../shared/*"]
     },
-    "types": ["node", "better-sqlite3"]
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "../shared/**/*.ts"],
   "exclude": ["node_modules", "dist"]

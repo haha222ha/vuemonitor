@@ -53,7 +53,7 @@
       <div v-if="cloudDataSummary" class="cloud-data-summary">
         <div class="cloud-data-grid">
           <div v-for="(count, table) in cloudDataSummary.tables" :key="table" class="cloud-data-item">
-            <span class="cloud-data-label">{{ cloudTableLabel(table as string) }}</span>
+            <span class="cloud-data-label">{{ cloudTableLabel(table as unknown as string) }}</span>
             <span class="cloud-data-value">{{ count < 0 ? '?' : count }}</span>
           </div>
         </div>

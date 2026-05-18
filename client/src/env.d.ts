@@ -12,8 +12,14 @@ declare module "*.tsx" {
   export default component;
 }
 
+declare namespace JSX {
+  interface IntrinsicElements {
+    [elemName: string]: any;
+  }
+}
+
 interface Window {
-  electronAPI: {
+  electronAPI?: {
     invoke: (channel: string, ...args: unknown[]) => Promise<unknown>;
     on: (channel: string, callback: (...args: unknown[]) => void) => () => void;
     getAppVersion: () => Promise<string>;

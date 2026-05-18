@@ -124,8 +124,15 @@ export function useAIData() {
   async function fetchAnalyses() {
     loading.value = true;
     try {
-      const result = await window.electronAPI.invoke("ai:get-analyses");
-      analyses.value = result?.items || [];
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("ai:get-analyses") as { items?: any[] } | null;
+        analyses.value = result?.items || [];
+      } else {
+        const { data } = await api.get("/ai/analyses");
+        if (data?.code === 0 && data.data) {
+          analyses.value = data.data.items || data.data || [];
+        }
+      }
     } finally {
       loading.value = false;
     }
@@ -134,8 +141,15 @@ export function useAIData() {
   async function fetchReports() {
     reportsLoading.value = true;
     try {
-      const result = await window.electronAPI.invoke("ai:get-reports");
-      reports.value = result || [];
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("ai:get-reports") as any[] | null;
+        reports.value = result || [];
+      } else {
+        const { data } = await api.get("/ai/reports");
+        if (data?.code === 0 && data.data) {
+          reports.value = data.data.items || data.data || [];
+        }
+      }
     } finally {
       reportsLoading.value = false;
     }
@@ -143,8 +157,15 @@ export function useAIData() {
 
   async function fetchProducts() {
     try {
-      const result = await window.electronAPI.invoke("storage:get-products");
-      products.value = result || [];
+      if (window.electronAPI) {
+        const result = await window.electronAPI.invoke("storage:get-products") as any[] | null;
+        products.value = result || [];
+      } else {
+        const { data } = await api.get("/products");
+        if (data?.code === 0 && data.data) {
+          products.value = data.data.items || data.data || [];
+        }
+      }
     } catch {}
   }
 
@@ -164,11 +185,19 @@ export function useAIData() {
     }
     const productIds = products.value.slice(0, 5).map((p: any) => p.id);
     try {
-      await window.electronAPI.invoke("ai:create-report", {
-        title: `${analysisTypeLabel(type)} - ${new Date().toLocaleDateString('zh-CN')}`,
-        report_type: type === "basic_analysis" ? "product" : type === "risk_warning" ? "risk" : "trend",
-        product_ids: productIds,
-      });
+      if (window.electronAPI) {
+        await window.electronAPI.invoke("ai:create-report", {
+          title: `${analysisTypeLabel(type)} - ${new Date().toLocaleDateString('zh-CN')}`,
+          report_type: type === "basic_analysis" ? "product" : type === "risk_warning" ? "risk" : "trend",
+          product_ids: productIds,
+        });
+      } else {
+        await api.post("/ai/report", {
+          title: `${analysisTypeLabel(type)} - ${new Date().toLocaleDateString('zh-CN')}`,
+          report_type: type === "basic_analysis" ? "product" : type === "risk_warning" ? "risk" : "trend",
+          product_ids: productIds,
+        });
+      }
       ElMessage.success("AI分析已提交，请稍后查看结果");
       fetchAnalyses();
       fetchReports();
@@ -180,11 +209,19 @@ export function useAIData() {
   async function handleGenerateReport() {
     generating.value = true;
     try {
-      await window.electronAPI.invoke("ai:create-report", {
-        title: reportForm.title,
-        report_type: reportForm.report_type,
-        product_ids: reportForm.product_ids,
-      });
+      if (window.electronAPI) {
+        await window.electronAPI.invoke("ai:create-report", {
+          title: reportForm.title,
+          report_type: reportForm.report_type,
+          product_ids: reportForm.product_ids,
+        });
+      } else {
+        await api.post("/ai/report", {
+          title: reportForm.title,
+          report_type: reportForm.report_type,
+          product_ids: reportForm.product_ids,
+        });
+      }
       ElMessage.success("报告生成请求已提交");
       reportForm.title = "";
       reportForm.report_type = "product";

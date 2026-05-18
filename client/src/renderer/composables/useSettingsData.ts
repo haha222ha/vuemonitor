@@ -4,6 +4,16 @@ import { useAuthStore } from "../stores/auth";
 import { useLicenseStore } from "../stores/license";
 import { shortcutManager, type ShortcutBinding } from "../utils/shortcuts";
 
+async function safeInvoke(channel: string, ...args: unknown[]): Promise<any> {
+  if (!window.electronAPI) return undefined;
+  return window.electronAPI.invoke(channel, ...args);
+}
+
+function safeOn(channel: string, callback: (...args: unknown[]) => void): (() => void) | null {
+  if (!window.electronAPI) return null;
+  return window.electronAPI.on(channel, callback);
+}
+
 export function useSettingsData() {
   const authStore = useAuthStore();
   const licenseStore = useLicenseStore();
@@ -246,23 +256,23 @@ export function useSettingsData() {
 
   async function refreshSyncStatus() {
     try {
-      const status = await window.electronAPI.invoke("sync:status") as typeof syncStatus;
+      const status = await safeInvoke("sync:status") as typeof syncStatus;
       Object.assign(syncStatus, status);
     } catch {}
   }
 
   async function loadConflicts() {
     try {
-      const result = await window.electronAPI.invoke("sync:get-conflicts") as typeof conflicts.value;
+      const result = await safeInvoke("sync:get-conflicts") as typeof conflicts.value;
       conflicts.value = result || [];
     } catch {
       conflicts.value = [];
     }
   }
 
-  async function handleResolveConflict(conflictId: string, resolution: "local_wins" | "server_wins" | "merged") {
+  async function handleResolveConflict(conflictId: string, resolution: string) {
     try {
-      const success = await window.electronAPI.invoke("sync:resolve-conflict", conflictId, resolution) as boolean;
+      const success = await safeInvoke("sync:resolve-conflict", conflictId, resolution) as boolean;
       if (success) {
         const labels: Record<string, string> = { local_wins: "保留本地", server_wins: "采用服务器", merged: "合并" };
         ElMessage.success(`冲突已解决（${labels[resolution]}）`);
@@ -276,17 +286,17 @@ export function useSettingsData() {
     }
   }
 
-  async function handleResolveAllConflicts(resolution: "local_wins" | "server_wins" | "merged") {
+  async function handleResolveAllConflicts(resolution: string) {
     try {
       await ElMessageBox.confirm(
         `确定要将所有冲突全部采用"${resolution === 'server_wins' ? '服务器' : resolution === 'local_wins' ? '本地' : '合并'}"方式解决吗？`,
         "批量解决冲突",
         { confirmButtonText: "确定", cancelButtonText: "取消", type: "warning" }
       );
-      const allConflicts = await window.electronAPI.invoke("sync:get-conflicts") as Array<{ id: string }>;
+      const allConflicts = await safeInvoke("sync:get-conflicts") as Array<{ id: string }>;
       let resolved = 0;
       for (const c of allConflicts) {
-        const success = await window.electronAPI.invoke("sync:resolve-conflict", c.id, resolution) as boolean;
+        const success = await safeInvoke("sync:resolve-conflict", c.id, resolution) as boolean;
         if (success) resolved++;
       }
       ElMessage.success(`已解决 ${resolved} 条冲突`);
@@ -298,7 +308,7 @@ export function useSettingsData() {
   async function handleSyncNow() {
     syncing.value = true;
     try {
-      const result = await window.electronAPI.invoke("sync:now") as { pushed: number; pulled: number; errors: number };
+      const result = await safeInvoke("sync:now") as { pushed: number; pulled: number; errors: number };
       ElMessage.success(`同步完成：推送${result.pushed}条，拉取${result.pulled}条`);
       await refreshSyncStatus();
       loadSyncHistory();
@@ -313,7 +323,7 @@ export function useSettingsData() {
 
   async function loadSyncHistory() {
     try {
-      const result = await window.electronAPI.invoke("sync:get-history") as typeof syncHistory.value;
+      const result = await safeInvoke("sync:get-history") as typeof syncHistory.value;
       syncHistory.value = result || [];
     } catch {
       syncHistory.value = [];
@@ -341,7 +351,7 @@ export function useSettingsData() {
     if (!serverUrl.value) { ElMessage.warning("请输入服务器地址"); return; }
     try {
       const token = localStorage.getItem("access_token") || "";
-      await window.electronAPI.invoke("sync:configure", serverUrl.value, token);
+      await safeInvoke("sync:configure", serverUrl.value, token);
       ElMessage.success("服务器连接配置成功");
       await refreshSyncStatus();
     } catch { ElMessage.error("连接配置失败"); }
@@ -351,10 +361,10 @@ export function useSettingsData() {
     saveSettings();
     try {
       if (autoSyncEnabled.value) {
-        await window.electronAPI.invoke("sync:start", syncInterval.value);
+        await safeInvoke("sync:start", syncInterval.value);
         ElMessage.success(`已开启自动同步（每${syncInterval.value}分钟）`);
       } else {
-        await window.electronAPI.invoke("sync:stop");
+        await safeInvoke("sync:stop");
         ElMessage.info("已停止自动同步");
       }
     } catch { ElMessage.error("操作失败"); }
@@ -364,8 +374,8 @@ export function useSettingsData() {
     saveSettings();
     if (autoSyncEnabled.value) {
       try {
-        await window.electronAPI.invoke("sync:stop");
-        await window.electronAPI.invoke("sync:start", syncInterval.value);
+        await safeInvoke("sync:stop");
+        await safeInvoke("sync:start", syncInterval.value);
         ElMessage.success(`同步频率已调整为每${syncInterval.value}分钟`);
       } catch {}
     }
@@ -373,7 +383,7 @@ export function useSettingsData() {
 
   async function handleConcurrencyChange(val: number) {
     saveSettings();
-    try { await window.electronAPI.invoke("concurrency:set", val); } catch {}
+    try { await safeInvoke("concurrency:set", val); } catch {}
   }
 
   async function handleCollectIntervalChange() { saveSettings(); }
@@ -384,7 +394,7 @@ export function useSettingsData() {
     checkingUpdate.value = true;
     updateStatus.error = null;
     try {
-      const result = await window.electronAPI.invoke("update:check") as { updateAvailable: boolean; version: string };
+      const result = await safeInvoke("update:check") as { updateAvailable: boolean; version: string };
       updateStatus.updateAvailable = result.updateAvailable;
       updateStatus.version = result.version;
       if (!result.updateAvailable) ElMessage.success("当前已是最新版本");
@@ -397,17 +407,17 @@ export function useSettingsData() {
 
   async function handleDownloadUpdate() {
     try {
-      await window.electronAPI.invoke("update:download");
+      await safeInvoke("update:download");
       updateStatus.downloading = true;
-      window.electronAPI.on("update:download-progress", (data: unknown) => {
+      safeOn("update:download-progress", (data: unknown) => {
         const d = data as { progress: number };
         updateStatus.downloadProgress = Math.round(d.progress);
       });
-      window.electronAPI.on("update:downloaded", () => {
+      safeOn("update:downloaded", () => {
         updateStatus.downloading = false;
         ElMessageBox.confirm("更新已下载完成，是否立即重启安装？", "安装更新", {
           confirmButtonText: "重启安装", cancelButtonText: "稍后", type: "success",
-        }).then(() => { window.electronAPI.invoke("update:install"); }).catch(() => {});
+        }).then(() => { safeInvoke("update:install"); }).catch(() => {});
       });
     } catch {
       updateStatus.downloading = false;
@@ -417,7 +427,7 @@ export function useSettingsData() {
 
   async function handleExportLocalData() {
     try {
-      const result = await window.electronAPI.invoke("storage:export-all") as Record<string, unknown[]>;
+      const result = await safeInvoke("storage:export-all") as Record<string, unknown[]>;
       const json = JSON.stringify(result, null, 2);
       const blob = new Blob([json], { type: "application/json;charset=utf-8" });
       const url = URL.createObjectURL(blob);
@@ -437,7 +447,7 @@ export function useSettingsData() {
         "确认清理",
         { confirmButtonText: "清理", cancelButtonText: "取消", type: "warning" }
       );
-      const result = await window.electronAPI.invoke("storage:cleanup", cleanupDays.value) as { deleted: number };
+      const result = await safeInvoke("storage:cleanup", cleanupDays.value) as { deleted: number };
       ElMessage.success(`已清理 ${result.deleted} 条旧数据`);
       refreshStorage();
     } catch {}
@@ -445,7 +455,7 @@ export function useSettingsData() {
 
   async function refreshStorage() {
     try {
-      const result = await window.electronAPI.invoke("storage:size") as { sizeBytes: number };
+      const result = await safeInvoke("storage:size") as { sizeBytes: number };
       const sizeMB = (result.sizeBytes / (1024 * 1024)).toFixed(2);
       storageInfo.sizeText = `${sizeMB} MB`;
     } catch { storageInfo.sizeText = "未知"; }
@@ -453,7 +463,7 @@ export function useSettingsData() {
 
   async function loadLogStats() {
     try {
-      const stats = await window.electronAPI.invoke("log:get-stats") as typeof logStats;
+      const stats = await safeInvoke("log:get-stats") as typeof logStats & { config?: { level?: string } };
       Object.assign(logStats, stats);
       if (stats.config?.level) logLevel.value = stats.config.level;
     } catch {}
@@ -461,7 +471,7 @@ export function useSettingsData() {
 
   async function handleLogLevelChange() {
     try {
-      await window.electronAPI.invoke("log:set-level", logLevel.value);
+      await safeInvoke("log:set-level", logLevel.value);
       ElMessage.success(`日志级别已设为 ${logLevel.value.toUpperCase()}`);
     } catch { ElMessage.error("设置日志级别失败"); }
   }
@@ -473,7 +483,7 @@ export function useSettingsData() {
 
   async function loadRecentLogs() {
     try {
-      const result = await window.electronAPI.invoke("log:get-recent", 200, logFilterLevel.value || undefined, logFilterModule.value || undefined) as Array<Record<string, unknown>>;
+      const result = await safeInvoke("log:get-recent", 200, logFilterLevel.value || undefined, logFilterModule.value || undefined) as Array<Record<string, unknown>>;
       logEntries.value = (result || []).reverse();
       logLevelCounts.debug = 0;
       logLevelCounts.info = 0;
@@ -492,7 +502,7 @@ export function useSettingsData() {
 
   async function handleExportLogs(format: string) {
     try {
-      const content = await window.electronAPI.invoke("log:export", format) as string;
+      const content = await safeInvoke("log:export", format) as string;
       const ext = format === "json" ? "json" : "txt";
       const mimeType = format === "json" ? "application/json" : "text/plain";
       const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
@@ -511,7 +521,7 @@ export function useSettingsData() {
       await ElMessageBox.confirm("确定要清除所有日志文件吗？此操作不可恢复。", "确认清除日志", {
         confirmButtonText: "清除", cancelButtonText: "取消", type: "warning",
       });
-      const result = await window.electronAPI.invoke("log:clear") as { deleted: number };
+      const result = await safeInvoke("log:clear") as { deleted: number };
       ElMessage.success(`已清除 ${result.deleted} 个日志文件`);
       await loadLogStats();
     } catch {}
@@ -527,7 +537,7 @@ export function useSettingsData() {
   async function handleUploadLogs() {
     logUploading.value = true;
     try {
-      const result = await window.electronAPI.invoke("log:upload") as { success: boolean; uploaded: number };
+      const result = await safeInvoke("log:upload") as { success: boolean; uploaded: number };
       if (result.success) { ElMessage.success(`已上传 ${result.uploaded} 条日志`); }
       else { ElMessage.warning("日志上传失败，请检查上传端点配置"); }
     } catch { ElMessage.error("日志上传失败"); }
@@ -721,7 +731,7 @@ export function useSettingsData() {
       if (!email) { ElMessage.error("无法获取邮箱信息"); return; }
       await ElMessageBox.prompt("请输入您的邮箱地址以确认删除操作", "邮箱确认", {
         confirmButtonText: "确认", cancelButtonText: "取消",
-        inputPattern: new RegExp(`^${email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),
+        inputPattern: new RegExp(`^${(email as string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`),
         inputErrorMessage: "邮箱地址不匹配",
       });
       cloudDeleteLoading.value = true;
@@ -750,8 +760,8 @@ export function useSettingsData() {
     fetchSecuritySummary();
     fetchSecurityLogs();
     statusTimer = setInterval(refreshSyncStatus, 10000);
-    window.electronAPI.on("sync:conflict:detected", () => { loadConflicts(); });
-    window.electronAPI.on("sync:conflict:resolved", () => { loadConflicts(); });
+    safeOn("sync:conflict:detected", () => { loadConflicts(); });
+    safeOn("sync:conflict:resolved", () => { loadConflicts(); });
   }
 
   function cleanup() {
@@ -785,7 +795,7 @@ export function useSettingsData() {
     saveNotifySettings, saveSettings,
     refreshSyncStatus, loadConflicts,
     handleResolveConflict, handleResolveAllConflicts,
-    handleSyncNow, loadSyncHistory, formatSyncTime,
+    handleSyncNow, loadSyncHistory, syncHistory, formatSyncTime,
     handleConnect, handleAutoSyncToggle, handleSyncIntervalChange,
     handleConcurrencyChange, handleCollectIntervalChange, handleAutoUpdateToggle,
     handleCheckUpdate, handleDownloadUpdate,
