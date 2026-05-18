@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, UploadFile, File
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -213,3 +213,22 @@ async def get_client_download_link(platform: str):
             return {"code": 0, "data": platform_data}
 
     return {"code": 404, "message": f"未找到 {platform} 平台的安装包"}
+
+
+@router.post("/upload-download")
+async def upload_download_file(
+    admin: AdminUser,
+    file: UploadFile = File(...),
+):
+    import os
+    downloads_dir = os.environ.get("DOWNLOADS_DIR", "/opt/vuemonitor/deploy/downloads")
+    os.makedirs(downloads_dir, exist_ok=True)
+    dest = os.path.join(downloads_dir, file.filename)
+    with open(dest, "wb") as f:
+        while True:
+            chunk = await file.read(1024 * 1024)
+            if not chunk:
+                break
+            f.write(chunk)
+    size = os.path.getsize(dest)
+    return {"code": 0, "data": {"filename": file.filename, "size": size, "path": dest}}
