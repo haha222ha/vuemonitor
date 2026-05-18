@@ -13,12 +13,12 @@ echo ""
 echo -e "  ${CYAN}XHS365 日常更新${NC}"
 echo ""
 
-echo -e "  ${CYAN}[1/6]${NC} 拉取最新代码..."
+echo -e "  ${CYAN}[1/7]${NC} 拉取最新代码..."
 git fetch origin main
 git reset --hard origin/main
 echo -e "       ${GREEN}✓${NC} 代码已更新"
 
-echo -e "  ${CYAN}[2/6]${NC} 重建 web-user..."
+echo -e "  ${CYAN}[2/7]${NC} 重建 web-user..."
 cd "$SCRIPT_DIR/web-user"
 npm install --quiet 2>/dev/null
 npm run build
@@ -28,7 +28,7 @@ if [ ! -f "dist/index.html" ]; then
 fi
 echo -e "       ${GREEN}✓${NC} web-user 已重建"
 
-echo -e "  ${CYAN}[3/6]${NC} 重建 web-admin..."
+echo -e "  ${CYAN}[3/7]${NC} 重建 web-admin..."
 cd "$SCRIPT_DIR/web-admin"
 npm install --quiet 2>/dev/null
 npm run build
@@ -38,18 +38,27 @@ if [ ! -f "dist/index.html" ]; then
 fi
 echo -e "       ${GREEN}✓${NC} web-admin 已重建"
 
-echo -e "  ${CYAN}[4/6]${NC} 数据库迁移..."
+echo -e "  ${CYAN}[4/7]${NC} 数据库迁移..."
 cd "$SCRIPT_DIR/server"
 source .venv/bin/activate
 PYTHONPATH="$SCRIPT_DIR/server" alembic upgrade head
 echo -e "       ${GREEN}✓${NC} 迁移完成"
 
-echo -e "  ${CYAN}[5/6]${NC} 重启服务..."
+echo -e "  ${CYAN}[5/7]${NC} 确保下载目录..."
+mkdir -p "$SCRIPT_DIR/deploy/downloads"
+if [ ! -f "$SCRIPT_DIR/deploy/downloads/XHS365-Setup-0.1.0.exe" ]; then
+    echo -e "       ${RED}⚠${NC} 安装包不存在: deploy/downloads/XHS365-Setup-0.1.0.exe"
+    echo -e "       ${CYAN}→${NC} 请从本地上传: scp client/release/XHS365-Setup-0.1.0.exe server:/opt/vuemonitor/deploy/downloads/"
+else
+    echo -e "       ${GREEN}✓${NC} 安装包就绪"
+fi
+
+echo -e "  ${CYAN}[6/7]${NC} 重启服务..."
 sudo systemctl restart vuemonitor
 sudo systemctl reload nginx
 echo -e "       ${GREEN}✓${NC} 服务已重启"
 
-echo -e "  ${CYAN}[6/6]${NC} 健康检查..."
+echo -e "  ${CYAN}[7/7]${NC} 健康检查..."
 sleep 3
 if curl -sf http://127.0.0.1:8000/api/v1/health > /dev/null; then
     echo -e "       ${GREEN}✓${NC} API Server: OK"
