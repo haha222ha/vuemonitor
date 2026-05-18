@@ -47,4 +47,73 @@ api_router.include_router(system_router)
 
 @api_router.get("/health", tags=["health"])
 async def health_check():
-    return {"status": "ok", "version": "0.1.0"}
+    from app.core.database import health_check as db_health
+    from app.core.redis import get_redis
+
+    db = await db_health()
+    redis_status = "ok"
+    try:
+        redis = await get_redis()
+        await redis.ping()
+    except Exception as e:
+        redis_status = f"error: {e}"
+
+    return {
+        "status": "ok" if db["status"] == "healthy" and redis_status == "ok" else "degraded",
+        "version": "0.1.0",
+        "database": db,
+        "redis": redis_status,
+    }
+
+
+@api_router.get("/diagnose", tags=["health"])
+async def diagnose():
+    from sqlalchemy import text
+    from app.core.database import engine, async_session_factory
+    from app.core.redis import get_redis
+    import traceback
+
+    results = {"database": {}, "redis": {}, "tables": {}, "auth_test": {}}
+
+    try:
+        async with engine.begin() as conn:
+            result = await conn.execute(text("SELECT 1"))
+            results["database"]["connection"] = "ok"
+    except Exception as e:
+        results["database"]["connection"] = f"error: {e}"
+        results["database"]["traceback"] = traceback.format_exc()
+
+    try:
+        async with engine.begin() as conn:
+            result = await conn.execute(
+                text("SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY table_name")
+            )
+            tables = [row[0] for row in result]
+            results["tables"]["list"] = tables
+            results["tables"]["count"] = len(tables)
+    except Exception as e:
+        results["tables"]["error"] = str(e)
+
+    required_tables = ["users", "refresh_tokens", "products", "monitor_tasks", "alert_rules", "alert_events", "security_audit_log"]
+    if "list" in results["tables"]:
+        results["tables"]["missing"] = [t for t in required_tables if t not in results["tables"]["list"]]
+
+    try:
+        async with async_session_factory() as session:
+            result = await session.execute(text("SELECT count(*) FROM users"))
+            count = result.scalar()
+            results["auth_test"]["user_count"] = count
+    except Exception as e:
+        results["auth_test"]["query_error"] = str(e)
+        results["auth_test"]["traceback"] = traceback.format_exc()
+
+    try:
+        redis = await get_redis()
+        await redis.ping()
+        results["redis"]["connection"] = "ok"
+        info = await redis.info()
+        results["redis"]["version"] = info.get("redis_version", "unknown")
+    except Exception as e:
+        results["redis"]["connection"] = f"error: {e}"
+
+    return results

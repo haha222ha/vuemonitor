@@ -1,6 +1,9 @@
 from contextlib import asynccontextmanager
+import logging
+import traceback
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
@@ -28,6 +31,8 @@ from app.core.seed import seed_feature_gates
 settings = get_settings()
 
 configure_structlog()
+
+logger = logging.getLogger(__name__)
 
 scheduler = setup_scheduler()
 
@@ -84,6 +89,21 @@ app.add_middleware(
 )
 
 register_exception_handlers(app)
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger = logging.getLogger("uvicorn.error")
+    logger.error(f"Unhandled exception on {request.method} {request.url.path}: {exc}\n{traceback.format_exc()}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "code": 500,
+            "message": "服务器内部错误",
+            "detail": str(exc) if settings.DEBUG else "Internal Server Error",
+        },
+    )
+
 
 @app.get("/health")
 async def root_health():

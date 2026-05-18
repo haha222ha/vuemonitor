@@ -55,9 +55,14 @@ class SecurityAuditMiddleware(BaseHTTPMiddleware):
                 audit_record["risk_score"] += 20
 
         if request.method in AUDITED_METHODS:
-            body_risk = await self._analyze_body(request)
-            audit_record["risk_score"] += body_risk["score"]
-            audit_record["risk_flags"].extend(body_risk["flags"])
+            try:
+                body = await request.body()
+                if body:
+                    body_risk = self._analyze_body_sync(body)
+                    audit_record["risk_score"] += body_risk["score"]
+                    audit_record["risk_flags"].extend(body_risk["flags"])
+            except Exception:
+                pass
 
         query_risk = self._analyze_query(request)
         audit_record["risk_score"] += query_risk["score"]
@@ -112,10 +117,9 @@ class SecurityAuditMiddleware(BaseHTTPMiddleware):
             return forwarded.split(",")[0].strip()
         return request.client.host if request.client else "unknown"
 
-    async def _analyze_body(self, request: Request) -> dict:
+    def _analyze_body_sync(self, body: bytes) -> dict:
         result = {"score": 0, "flags": []}
         try:
-            body = await request.body()
             if not body:
                 return result
             body_str = body.decode("utf-8", errors="replace")

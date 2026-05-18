@@ -1,3 +1,4 @@
+import logging
 import time
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -8,12 +9,14 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
+from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException, UnauthorizedException
 from app.middleware.auth import CurrentUser
 from app.models.license import LicenseCode, LicenseActivation
 from app.models.user import User
 from app.schemas.auth import LoginRequest, RefreshTokenRequest, RegisterRequest, TokenResponse, UserInfoResponse
 from app.services.auth_service import AuthService
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -24,8 +27,14 @@ _LOCKOUT_SECONDS = 300
 
 @router.post("/register", response_model=UserInfoResponse)
 async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
-    svc = AuthService(db)
-    return await svc.register(req)
+    try:
+        svc = AuthService(db)
+        return await svc.register(req)
+    except (BadRequestException, UnauthorizedException, ForbiddenException):
+        raise
+    except Exception as e:
+        logger.error(f"Register error: {e}", exc_info=True)
+        raise BadRequestException(message=f"注册失败: {str(e)[:100]}")
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -38,10 +47,16 @@ async def login(req: LoginRequest, request: Request, db: AsyncSession = Depends(
         raise ForbiddenException(message=f"登录尝试过多，请{_LOCKOUT_SECONDS}秒后重试")
     _login_attempts[client_ip] = attempts
 
-    svc = AuthService(db)
-    result = await svc.login(req)
-    _login_attempts.pop(client_ip, None)
-    return result
+    try:
+        svc = AuthService(db)
+        result = await svc.login(req)
+        _login_attempts.pop(client_ip, None)
+        return result
+    except (UnauthorizedException, ForbiddenException):
+        raise
+    except Exception as e:
+        logger.error(f"Login error for account={req.account}: {e}", exc_info=True)
+        raise UnauthorizedException(message=f"登录失败: {str(e)[:100]}")
 
 
 @router.post("/refresh", response_model=TokenResponse)

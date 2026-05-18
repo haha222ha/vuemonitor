@@ -83,6 +83,9 @@ async def get_db_context():
 
 async def init_db() -> None:
     async with engine.begin() as conn:
+        await conn.execute(text('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"'))
+        await conn.execute(text('CREATE EXTENSION IF NOT EXISTS "pg_trgm"'))
+
         result = await conn.execute(text("SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'"))
         table_count = result.scalar()
         if table_count == 0:

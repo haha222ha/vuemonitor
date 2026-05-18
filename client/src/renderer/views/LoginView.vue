@@ -74,7 +74,7 @@
 
         <div class="login__register-link">
           <span>没有账号？</span>
-          <el-button type="primary" plain @click="showRegister = true" class="login__register-btn">立即注册</el-button>
+          <a class="login__register-btn" @click="showRegister = true">立即注册</a>
         </div>
       </div>
     </div>
@@ -160,7 +160,8 @@ const {
 .login__form-subtitle { font-size: 14px; color: var(--color-text-secondary); margin: 0; }
 .login__form .el-form-item { margin-bottom: 20px; }
 .login__submit { width: 100%; }
-.login__register-link { text-align: center; margin-top: 24px; font-size: 14px; color: var(--color-text-secondary); }
-.login__register-btn { margin-left: 8px; }
+.login__register-link { text-align: center; margin-top: 24px; font-size: 14px; color: var(--color-text-secondary); display: flex; align-items: center; justify-content: center; gap: 4px; }
+.login__register-btn { color: var(--color-primary); font-weight: 600; cursor: pointer; text-decoration: none; font-size: 14px; transition: color 0.2s, text-decoration 0.2s; }
+.login__register-btn:hover { color: var(--color-primary-dark); text-decoration: underline; }
 @media (max-width: 768px) { .login { flex-direction: column; } .login__brand { padding: 32px; min-height: auto; } .login__form-side { padding: 32px; } }
 </style>
