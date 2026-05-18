@@ -344,9 +344,9 @@ function lifecycleLabel(stage: string): string {
 .product-card__competition-value--high { color: #EF4444; }
 .product-card__competition-bar { position: relative; height: 6px; margin-bottom: 2px; }
 .product-card__competition-track { display: flex; height: 100%; border-radius: 3px; overflow: hidden; }
-.product-card__competition-seg--low { background: #BBF7D0; }
-.product-card__competition-seg--mid { background: #FDE68A; }
-.product-card__competition-seg--high { background: #FCA5A5; }
+.product-card__competition-seg--low { background: var(--color-success-light); }
+.product-card__competition-seg--mid { background: var(--color-warning-light); }
+.product-card__competition-seg--high { background: var(--color-danger-light); }
 .product-card__competition-marker { position: absolute; top: -3px; width: 4px; height: 12px; background: var(--color-text-primary); border-radius: 2px; transform: translateX(-50%); transition: left 0.5s ease-out; }
 .product-card__competition-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--color-text-tertiary); }
 </style>

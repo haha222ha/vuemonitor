@@ -272,7 +272,7 @@ function handleClose() {
 .condition-label { font-size: var(--text-xs); color: var(--color-text-secondary); min-width: 70px; }
 .condition-unit { font-size: var(--text-xs); color: var(--color-text-tertiary); }
 .condition-desc { font-size: var(--text-xs); color: var(--color-text-tertiary); margin-left: 4px; }
-.condition-preview { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: #FDF6EC; border-radius: var(--radius-base); font-size: var(--text-xs); color: #E6A23C; }
+.condition-preview { display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--color-warning-bg); border-radius: var(--radius-base); font-size: var(--text-xs); color: var(--color-warning); }
 .modern-dialog :deep(.el-dialog__header) { padding: 20px 24px; border-bottom: 1px solid var(--color-border-light); margin-right: 0; }
 .modern-dialog :deep(.el-dialog__title) { font-size: var(--text-lg); font-weight: 600; color: var(--color-text-primary); }
 .modern-dialog :deep(.el-dialog__body) { padding: 24px; }

@@ -290,7 +290,7 @@ onMounted(() => {
 
 .cell-rank__number {
   font-weight: 700;
-  color: #D97706;
+  color: var(--color-warning);
   font-size: var(--text-sm);
 }
 

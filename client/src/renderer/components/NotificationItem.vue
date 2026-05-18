@@ -150,8 +150,8 @@ function formatTime(dateStr: string | null): string {
 }
 
 .notification-item.unread {
-  background: #f0f4ff;
-  border-color: #d0dfff;
+  background: var(--color-primary-lightest);
+  border-color: var(--color-primary-lighter);
 }
 
 .notification-dot {

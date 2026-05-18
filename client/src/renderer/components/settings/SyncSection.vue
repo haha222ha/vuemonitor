@@ -187,9 +187,9 @@ function formatSyncTime(ts: string): string {
 .setting-desc { margin: 0; font-size: var(--text-xs); color: var(--color-text-secondary); }
 .sync-frequency { display: flex; align-items: center; gap: 12px; padding-top: 12px; }
 .frequency-label { font-size: var(--text-sm); color: var(--color-text-secondary); }
-.conflict-card { margin-top: 20px; border-color: #fecaca; }
+.conflict-card { margin-top: 20px; border-color: var(--color-danger-light); }
 .conflict-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
-.conflict-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: #fef2f2; border-radius: var(--radius-base); }
+.conflict-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--color-danger-bg); border-radius: var(--radius-base); }
 .conflict-actions { display: flex; gap: 8px; }
 .conflict-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--color-border-light); }
 .sync-history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
