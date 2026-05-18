@@ -145,21 +145,21 @@ defineEmits<{ (e: "update:modelValue", value: boolean): void }>();
 .gauge-card__value { color: var(--color-text-primary); }
 .gauge-card__label { font-size: var(--text-xs); color: var(--color-text-tertiary); }
 .gauge-card__badge { font-size: var(--text-xs); padding: 2px 8px; border-radius: 10px; }
-.gauge-card__badge.high { background: #D1FAE5; color: #065F46; }
-.gauge-card__badge.medium { background: #FEF3C7; color: #92400E; }
-.gauge-card__badge.low { background: #FEE2E2; color: #991B1B; }
+.gauge-card__badge.high { background: var(--color-success-bg); color: var(--color-success); }
+.gauge-card__badge.medium { background: var(--color-warning-bg); color: var(--color-warning); }
+.gauge-card__badge.low { background: var(--color-danger-bg); color: var(--color-danger); }
 .analysis-result__tri-cards { display: flex; gap: 12px; flex: 1; }
 .tri-card { flex: 1; padding: 12px; border-radius: var(--radius-lg); text-align: center; }
-.tri-card--success { background: #D1FAE5; }
-.tri-card--warning { background: #FEF3C7; }
-.tri-card--danger { background: #FEE2E2; }
-.tri-card--primary { background: #DBEAFE; }
-.tri-card--info { background: #E0E7FF; }
+.tri-card--success { background: var(--color-success-bg); }
+.tri-card--warning { background: var(--color-warning-bg); }
+.tri-card--danger { background: var(--color-danger-bg); }
+.tri-card--primary { background: var(--color-primary-lightest); }
+.tri-card--info { background: var(--color-primary-lightest); }
 .tri-card__value { font-size: 20px; font-weight: 700; }
 .tri-card__label { font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: 4px; }
 .analysis-result__content { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; }
 .result-block { margin-bottom: 16px; }
-.result-block--highlight { background: #F0F9FF; border-radius: var(--radius-base); padding: 12px 16px; border-left: 3px solid var(--color-primary); }
+.result-block--highlight { background: var(--color-primary-lightest); border-radius: var(--radius-base); padding: 12px 16px; border-left: 3px solid var(--color-primary); }
 .result-block__label { font-size: var(--text-xs); font-weight: 600; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
 .result-block__text { color: var(--color-text-primary); }
 .result-score-bar { display: flex; align-items: center; gap: 12px; }
@@ -167,8 +167,8 @@ defineEmits<{ (e: "update:modelValue", value: boolean): void }>();
 .result-score-value { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
 .result-list { padding-left: 20px; margin: 0; }
 .result-list li { margin-bottom: 4px; }
-.result-list--recommend li { color: #065F46; }
-.result-list--risk li { color: #991B1B; }
-.result-list--action li { color: #3730A3; }
+.result-list--recommend li { color: var(--color-success); }
+.result-list--risk li { color: var(--color-danger); }
+.result-list--action li { color: var(--color-primary-light); }
 .result-plaintext { white-space: pre-wrap; word-break: break-word; }
 </style>

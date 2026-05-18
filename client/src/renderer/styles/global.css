@@ -43,6 +43,7 @@ html, body, #app {
 
 .el-dialog {
   border-radius: var(--radius-xl) !important;
+  background: var(--color-bg-card) !important;
 }
 
 .el-dialog__header {

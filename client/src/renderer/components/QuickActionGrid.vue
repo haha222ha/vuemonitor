@@ -84,7 +84,7 @@ const hasHighlight = computed(() => props.actions.some((a) => a.highlight));
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: var(--color-bg-page);
+  background: var(--color-bg-card);
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-lg);
   cursor: pointer;
@@ -98,12 +98,12 @@ const hasHighlight = computed(() => props.actions.some((a) => a.highlight));
 }
 
 .quick-action-card--highlight {
-  border-color: #C7D2FE;
-  background: linear-gradient(135deg, #EEF2FF, #F5F3FF);
+  border-color: var(--color-primary-lighter);
+  background: linear-gradient(135deg, var(--color-primary-lightest), var(--color-bg-card));
 }
 
 .quick-action-card--highlight:hover {
-  border-color: #6366F1;
+  border-color: var(--color-primary-light);
   box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
 }
 
@@ -141,7 +141,7 @@ const hasHighlight = computed(() => props.actions.some((a) => a.highlight));
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #6366F1;
+  background: var(--color-primary-light);
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
@@ -157,6 +157,6 @@ const hasHighlight = computed(() => props.actions.some((a) => a.highlight));
 }
 
 .quick-action-card--highlight .quick-action-card__desc {
-  color: #6366F1;
+  color: var(--color-primary-light);
 }
 </style>

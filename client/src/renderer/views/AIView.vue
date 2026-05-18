@@ -367,18 +367,18 @@ onMounted(() => { fetchAnalyses(); fetchReports(); fetchProducts(); fetchRecomme
 
 <style scoped>
 .ai { padding: 0; }
-.ai__recommendations { padding: 20px 24px; background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); border-bottom: 1px solid #FDE68A; }
-.recommendations__title { display: flex; align-items: center; gap: 8px; font-size: var(--text-sm); font-weight: 600; color: #92400E; margin-bottom: 12px; }
+.ai__recommendations { padding: 20px 24px; background: linear-gradient(135deg, var(--color-bg-card) 0%, var(--color-bg-hover) 100%); border-bottom: 1px solid var(--color-border-light); }
+.recommendations__title { display: flex; align-items: center; gap: 8px; font-size: var(--text-sm); font-weight: 600; color: var(--color-primary-light); margin-bottom: 12px; }
 .recommendations__badge { margin-left: 4px; }
 .recommendations__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
-.recommendation-card { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(255, 255, 255, 0.85); border: 1px solid #FDE68A; border-radius: var(--radius-lg); cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px); }
-.recommendation-card:hover { border-color: #D97706; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15); transform: translateY(-1px); }
-.recommendation-card--alert { border-color: #FCA5A5; background: rgba(255, 255, 255, 0.9); }
-.recommendation-card--alert:hover { border-color: #EF4444; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15); }
-.recommendation-card--risk { border-color: #FED7AA; background: rgba(255, 255, 255, 0.9); }
-.recommendation-card--risk:hover { border-color: #F97316; box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15); }
-.recommendation-card--trending { border-color: #BBF7D0; background: rgba(255, 255, 255, 0.9); }
-.recommendation-card--trending:hover { border-color: #22C55E; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15); }
+.recommendation-card { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--color-bg-card); border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px); }
+.recommendation-card:hover { border-color: var(--color-primary-light); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15); transform: translateY(-1px); }
+.recommendation-card--alert { border-color: var(--color-danger-light); background: var(--color-bg-card); }
+.recommendation-card--alert:hover { border-color: var(--color-danger); box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15); }
+.recommendation-card--risk { border-color: var(--color-warning-light); background: var(--color-bg-card); }
+.recommendation-card--risk:hover { border-color: var(--color-warning); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15); }
+.recommendation-card--trending { border-color: var(--color-success-light); background: var(--color-bg-card); }
+.recommendation-card--trending:hover { border-color: var(--color-success); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.15); }
 .recommendation-card__header { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
 .recommendation-card__icon { width: 36px; height: 36px; border-radius: var(--radius-base); display: flex; align-items: center; justify-content: center; color: #fff; }
 .recommendation-card__icon--trending { background: linear-gradient(135deg, #22C55E, #16A34A); }

@@ -104,21 +104,21 @@ const barColor = computed(() => {
 .prediction-visual { background: var(--color-bg-card); border: 1px solid var(--color-border-light); border-radius: var(--radius-xl); padding: 24px; }
 .prediction-visual__hero { display: flex; gap: 24px; align-items: center; margin-bottom: 20px; }
 .potential-ring { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 3px solid; }
-.potential-ring--low { border-color: #94A3B8; background: #F1F5F9; }
-.potential-ring--medium { border-color: #6366F1; background: #EEF2FF; }
-.potential-ring--high { border-color: #10B981; background: #ECFDF5; }
-.potential-ring--star { border-color: #F59E0B; background: linear-gradient(135deg, #FFFBEB, #FEF3C7); box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
+.potential-ring--low { border-color: var(--color-text-tertiary); background: var(--color-bg-hover); }
+.potential-ring--medium { border-color: var(--color-primary-light); background: var(--color-primary-lightest); }
+.potential-ring--high { border-color: var(--color-success); background: var(--color-success-bg); }
+.potential-ring--star { border-color: var(--color-warning); background: linear-gradient(135deg, var(--color-warning-bg), var(--color-bg-card)); box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); }
 .potential-ring__inner { text-align: center; }
 .potential-ring__icon { font-size: 28px; line-height: 1; }
-.potential-ring--star .potential-ring__icon { color: #F59E0B; }
-.potential-ring--high .potential-ring__icon { color: #10B981; }
-.potential-ring--medium .potential-ring__icon { color: #6366F1; }
-.potential-ring--low .potential-ring__icon { color: #94A3B8; }
+.potential-ring--star .potential-ring__icon { color: var(--color-warning); }
+.potential-ring--high .potential-ring__icon { color: var(--color-success); }
+.potential-ring--medium .potential-ring__icon { color: var(--color-primary-light); }
+.potential-ring--low .potential-ring__icon { color: var(--color-text-tertiary); }
 .potential-ring__level { font-size: 12px; font-weight: 600; margin-top: 4px; }
-.potential-ring--star .potential-ring__level { color: #92400E; }
-.potential-ring--high .potential-ring__level { color: #065F46; }
-.potential-ring--medium .potential-ring__level { color: #3730A3; }
-.potential-ring--low .potential-ring__level { color: #475569; }
+.potential-ring--star .potential-ring__level { color: var(--color-warning-light); }
+.potential-ring--high .potential-ring__level { color: var(--color-success-light); }
+.potential-ring--medium .potential-ring__level { color: var(--color-primary-light); }
+.potential-ring--low .potential-ring__level { color: var(--color-text-secondary); }
 .prediction-visual__stats { flex: 1; display: flex; flex-direction: column; gap: 12px; }
 .prediction-stat { display: flex; flex-direction: column; gap: 4px; }
 .prediction-stat__label { font-size: 12px; color: var(--color-text-tertiary); }
@@ -127,17 +127,17 @@ const barColor = computed(() => {
 .prediction-stat__fill { height: 100%; border-radius: 3px; transition: width 0.6s ease-out; }
 .prediction-stat__value { font-size: 13px; font-weight: 600; color: var(--color-text-primary); min-width: 48px; text-align: right; }
 .prediction-stat__metric { font-size: 14px; font-weight: 600; }
-.prediction-stat__metric--up { color: #10B981; }
-.prediction-stat__metric--down { color: #EF4444; }
-.prediction-stat__metric--safe { color: #10B981; }
-.prediction-stat__metric--warning { color: #F59E0B; }
-.prediction-stat__metric--danger { color: #EF4444; }
+.prediction-stat__metric--up { color: var(--color-success); }
+.prediction-stat__metric--down { color: var(--color-danger); }
+.prediction-stat__metric--safe { color: var(--color-success); }
+.prediction-stat__metric--warning { color: var(--color-warning); }
+.prediction-stat__metric--danger { color: var(--color-danger); }
 .prediction-visual__scale { border-top: 1px solid var(--color-border-light); padding-top: 16px; }
 .potential-scale { display: flex; justify-content: space-between; }
 .potential-scale__item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-tertiary); }
 .potential-scale__dot { width: 8px; height: 8px; border-radius: 50%; }
-.potential-scale__item--low .potential-scale__dot { background: #94A3B8; }
-.potential-scale__item--medium .potential-scale__dot { background: #6366F1; }
-.potential-scale__item--high .potential-scale__dot { background: #10B981; }
-.potential-scale__item--star .potential-scale__dot { background: #F59E0B; }
+.potential-scale__item--low .potential-scale__dot { background: var(--color-text-tertiary); }
+.potential-scale__item--medium .potential-scale__dot { background: var(--color-primary-light); }
+.potential-scale__item--high .potential-scale__dot { background: var(--color-success); }
+.potential-scale__item--star .potential-scale__dot { background: var(--color-warning); }
 </style>

@@ -107,20 +107,20 @@
   --color-danger-bg: #7F1D1D;
   --color-info: #9CA3AF;
 
-  --color-bg-page: #0F172A;
-  --color-bg-card: #1E293B;
+  --color-bg-page: #111827;
+  --color-bg-card: #1F2937;
   --color-bg-sidebar: #0F172A;
-  --color-bg-sidebar-hover: #1E293B;
+  --color-bg-sidebar-hover: #1F2937;
   --color-bg-sidebar-active: #312E81;
-  --color-bg-hover: #334155;
+  --color-bg-hover: #374151;
 
-  --color-border: #334155;
-  --color-border-light: #1E293B;
-  --color-border-lighter: #0F172A;
+  --color-border: #374151;
+  --color-border-light: #1F2937;
+  --color-border-lighter: #111827;
 
-  --color-text-primary: #F1F5F9;
-  --color-text-secondary: #94A3B8;
-  --color-text-tertiary: #64748B;
+  --color-text-primary: #F9FAFB;
+  --color-text-secondary: #D1D5DB;
+  --color-text-tertiary: #9CA3AF;
   --color-text-inverse: #0F172A;
 
   --gradient-hero: linear-gradient(135deg, #6366F1, #8B5CF6);

@@ -232,7 +232,7 @@ function numericClass(val: number, key: string): string {
 .report-view__structured { display: flex; flex-direction: column; gap: 16px; }
 .report-section { padding: 12px 0; border-bottom: 1px solid var(--color-border-lighter); }
 .report-section:last-child { border-bottom: none; }
-.report-section--highlight { background: #F0F9FF; border-radius: var(--radius-base); padding: 12px 16px; border-left: 3px solid var(--color-primary); }
+.report-section--highlight { background: var(--color-primary-lightest); border-radius: var(--radius-base); padding: 12px 16px; border-left: 3px solid var(--color-primary); }
 .report-section--visual { background: var(--color-bg-page); border-radius: var(--radius-base); padding: 16px; }
 .report-section h4 { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px; }
 .report-section p { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin: 0; white-space: pre-wrap; }
@@ -245,41 +245,41 @@ function numericClass(val: number, key: string): string {
 .report-trend-gauge__unit { font-size: 11px; color: var(--color-text-tertiary); }
 .report-trend-info { display: flex; flex-direction: column; gap: 4px; }
 .report-trend-badge { display: inline-block; padding: 3px 12px; border-radius: 10px; font-size: 13px; font-weight: 600; width: fit-content; }
-.report-trend-badge--excellent { background: #D1FAE5; color: #065F46; }
-.report-trend-badge--good { background: #DBEAFE; color: #1E40AF; }
-.report-trend-badge--fair { background: #FEF3C7; color: #92400E; }
-.report-trend-badge--poor { background: #FEE2E2; color: #991B1B; }
+.report-trend-badge--excellent { background: var(--color-success-bg); color: var(--color-success); }
+.report-trend-badge--good { background: var(--color-primary-lightest); color: var(--color-primary-light); }
+.report-trend-badge--fair { background: var(--color-warning-bg); color: var(--color-warning); }
+.report-trend-badge--poor { background: var(--color-danger-bg); color: var(--color-danger); }
 .report-trend-desc { font-size: 13px; color: var(--color-text-tertiary); }
 .report-risk-banner { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: var(--radius-lg); }
-.report-risk-banner--danger { background: linear-gradient(135deg, #FEE2E2, #FECACA); border: 1px solid #FCA5A5; }
-.report-risk-banner--warning { background: linear-gradient(135deg, #FEF3C7, #FDE68A); border: 1px solid #FCD34D; }
-.report-risk-banner--safe { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); border: 1px solid #6EE7B7; }
+.report-risk-banner--danger { background: linear-gradient(135deg, var(--color-danger-bg), var(--color-bg-card)); border: 1px solid var(--color-danger-light); }
+.report-risk-banner--warning { background: linear-gradient(135deg, var(--color-warning-bg), var(--color-bg-card)); border: 1px solid var(--color-warning-light); }
+.report-risk-banner--safe { background: linear-gradient(135deg, var(--color-success-bg), var(--color-bg-card)); border: 1px solid var(--color-success-light); }
 .report-risk-banner__icon { font-size: 28px; }
 .report-risk-banner__info { display: flex; flex-direction: column; gap: 2px; }
 .report-risk-banner__level { font-size: 16px; font-weight: 700; }
-.report-risk-banner--danger .report-risk-banner__level { color: #991B1B; }
-.report-risk-banner--warning .report-risk-banner__level { color: #92400E; }
-.report-risk-banner--safe .report-risk-banner__level { color: #065F46; }
+.report-risk-banner--danger .report-risk-banner__level { color: var(--color-danger-light); }
+.report-risk-banner--warning .report-risk-banner__level { color: var(--color-warning-light); }
+.report-risk-banner--safe .report-risk-banner__level { color: var(--color-success-light); }
 .report-risk-banner__desc { font-size: 13px; }
-.report-risk-banner--danger .report-risk-banner__desc { color: #B91C1C; }
-.report-risk-banner--warning .report-risk-banner__desc { color: #B45309; }
-.report-risk-banner--safe .report-risk-banner__desc { color: #047857; }
+.report-risk-banner--danger .report-risk-banner__desc { color: var(--color-danger-light); }
+.report-risk-banner--warning .report-risk-banner__desc { color: var(--color-warning-light); }
+.report-risk-banner--safe .report-risk-banner__desc { color: var(--color-success-light); }
 .report-kv-grid { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; }
 .report-kv-key { font-size: var(--text-xs); color: var(--color-text-tertiary); font-weight: 500; }
 .report-kv-val { font-size: var(--text-sm); color: var(--color-text-primary); }
 .report-metric { font-weight: 600; }
-.report-metric--up { color: #10B981; }
-.report-metric--down { color: #EF4444; }
-.report-metric--safe { color: #10B981; }
-.report-metric--warning { color: #F59E0B; }
-.report-metric--danger { color: #EF4444; }
+.report-metric--up { color: var(--color-success); }
+.report-metric--down { color: var(--color-danger); }
+.report-metric--safe { color: var(--color-success); }
+.report-metric--warning { color: var(--color-warning); }
+.report-metric--danger { color: var(--color-danger); }
 .report-text-block { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; white-space: pre-wrap; }
 .report-list { display: flex; flex-direction: column; gap: 8px; }
 .report-list-item { display: flex; align-items: flex-start; gap: 10px; }
 .report-list-index { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #fff; }
-.report-list-index--recommend { background: #10B981; }
-.report-list-index--action { background: #6366F1; }
-.report-list-index--mitigate { background: #F59E0B; }
+.report-list-index--recommend { background: var(--color-success); }
+.report-list-index--action { background: var(--color-primary-light); }
+.report-list-index--mitigate { background: var(--color-warning); }
 .report-list-content { flex: 1; }
 .report-list-reason { display: block; font-size: var(--text-xs); color: var(--color-text-tertiary); margin-top: 2px; }
 .report-plaintext { white-space: pre-wrap; word-break: break-word; font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; }

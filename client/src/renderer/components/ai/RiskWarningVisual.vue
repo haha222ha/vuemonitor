@@ -126,47 +126,47 @@ function severityLabel(severity: string): string {
 .risk-warning-visual { background: var(--color-bg-card); border: 1px solid var(--color-border-light); border-radius: var(--radius-xl); padding: 24px; }
 .risk-warning-visual__overall { margin-bottom: 20px; }
 .risk-overall-card { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-radius: var(--radius-lg); }
-.risk-overall-card--danger { background: linear-gradient(135deg, #FEE2E2, #FECACA); border: 1px solid #FCA5A5; }
-.risk-overall-card--warning { background: linear-gradient(135deg, #FEF3C7, #FDE68A); border: 1px solid #FCD34D; }
-.risk-overall-card--success { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); border: 1px solid #6EE7B7; }
+.risk-overall-card--danger { background: linear-gradient(135deg, var(--color-danger-bg), var(--color-bg-card)); border: 1px solid var(--color-danger-light); }
+.risk-overall-card--warning { background: linear-gradient(135deg, var(--color-warning-bg), var(--color-bg-card)); border: 1px solid var(--color-warning-light); }
+.risk-overall-card--success { background: linear-gradient(135deg, var(--color-success-bg), var(--color-bg-card)); border: 1px solid var(--color-success-light); }
 .risk-overall-card__icon { font-size: 32px; line-height: 1; }
 .risk-overall-card__info { flex: 1; }
 .risk-overall-card__level { font-size: 18px; font-weight: 700; }
-.risk-overall-card--danger .risk-overall-card__level { color: #991B1B; }
-.risk-overall-card--warning .risk-overall-card__level { color: #92400E; }
-.risk-overall-card--success .risk-overall-card__level { color: #065F46; }
+.risk-overall-card--danger .risk-overall-card__level { color: var(--color-danger-light); }
+.risk-overall-card--warning .risk-overall-card__level { color: var(--color-warning-light); }
+.risk-overall-card--success .risk-overall-card__level { color: var(--color-success-light); }
 .risk-overall-card__desc { font-size: 13px; margin-top: 2px; }
-.risk-overall-card--danger .risk-overall-card__desc { color: #B91C1C; }
-.risk-overall-card--warning .risk-overall-card__desc { color: #B45309; }
-.risk-overall-card--success .risk-overall-card__desc { color: #047857; }
+.risk-overall-card--danger .risk-overall-card__desc { color: var(--color-danger-light); }
+.risk-overall-card--warning .risk-overall-card__desc { color: var(--color-warning-light); }
+.risk-overall-card--success .risk-overall-card__desc { color: var(--color-success-light); }
 .risk-overall-card__score { text-align: right; }
 .risk-overall-card__score-value { font-size: 28px; font-weight: 700; }
-.risk-overall-card--danger .risk-overall-card__score-value { color: #991B1B; }
-.risk-overall-card--warning .risk-overall-card__score-value { color: #92400E; }
-.risk-overall-card--success .risk-overall-card__score-value { color: #065F46; }
+.risk-overall-card--danger .risk-overall-card__score-value { color: var(--color-danger-light); }
+.risk-overall-card--warning .risk-overall-card__score-value { color: var(--color-warning-light); }
+.risk-overall-card--success .risk-overall-card__score-value { color: var(--color-success-light); }
 .risk-overall-card__score-unit { font-size: 13px; color: var(--color-text-tertiary); }
 .risk-warning-visual__cards { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
 .risk-card { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--radius-base); border: 1px solid var(--color-border-light); background: var(--color-bg-page); }
-.risk-card--danger { border-left: 4px solid #EF4444; background: #FEF2F2; }
-.risk-card--warning { border-left: 4px solid #F59E0B; background: #FFFBEB; }
-.risk-card--success { border-left: 4px solid #10B981; background: #ECFDF5; }
+.risk-card--danger { border-left: 4px solid var(--color-danger); background: var(--color-danger-bg); }
+.risk-card--warning { border-left: 4px solid var(--color-warning); background: var(--color-warning-bg); }
+.risk-card--success { border-left: 4px solid var(--color-success); background: var(--color-success-bg); }
 .risk-card__indicator { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.risk-card--danger .risk-card__indicator { background: #EF4444; }
-.risk-card--warning .risk-card__indicator { background: #F59E0B; }
-.risk-card--success .risk-card__indicator { background: #10B981; }
+.risk-card--danger .risk-card__indicator { background: var(--color-danger); }
+.risk-card--warning .risk-card__indicator { background: var(--color-warning); }
+.risk-card--success .risk-card__indicator { background: var(--color-success); }
 .risk-card__body { flex: 1; min-width: 0; }
 .risk-card__title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
 .risk-card__detail { font-size: 12px; color: var(--color-text-tertiary); margin-top: 2px; }
 .risk-card__badge { padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 600; flex-shrink: 0; }
-.risk-card__badge--danger { background: #FEE2E2; color: #991B1B; }
-.risk-card__badge--warning { background: #FEF3C7; color: #92400E; }
-.risk-card__badge--success { background: #D1FAE5; color: #065F46; }
+.risk-card__badge--danger { background: var(--color-danger-bg); color: var(--color-danger-light); }
+.risk-card__badge--warning { background: var(--color-warning-bg); color: var(--color-warning-light); }
+.risk-card__badge--success { background: var(--color-success-bg); color: var(--color-success-light); }
 .risk-warning-visual__empty { text-align: center; padding: 20px; color: var(--color-text-tertiary); font-size: 13px; }
 .risk-warning-visual__legend { border-top: 1px solid var(--color-border-light); padding-top: 12px; }
 .risk-legend { display: flex; justify-content: center; gap: 20px; }
 .risk-legend__item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-tertiary); }
 .risk-legend__dot { width: 8px; height: 8px; border-radius: 50%; }
-.risk-legend__dot--danger { background: #EF4444; }
-.risk-legend__dot--warning { background: #F59E0B; }
-.risk-legend__dot--success { background: #10B981; }
+.risk-legend__dot--danger { background: var(--color-danger); }
+.risk-legend__dot--warning { background: var(--color-warning); }
+.risk-legend__dot--success { background: var(--color-success); }
 </style>

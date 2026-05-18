@@ -118,10 +118,10 @@ const lifecycleLabel = computed(() => props.lifecycle || '-');
 .trend-score-visual__info { flex: 1; display: flex; flex-direction: column; gap: 10px; }
 .trend-score-visual__level { margin-bottom: 4px; }
 .level-badge { display: inline-block; padding: 4px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; }
-.level-badge--excellent { background: #D1FAE5; color: #065F46; }
-.level-badge--good { background: #DBEAFE; color: #1E40AF; }
-.level-badge--fair { background: #FEF3C7; color: #92400E; }
-.level-badge--poor { background: #FEE2E2; color: #991B1B; }
+.level-badge--excellent { background: var(--color-success-bg); color: var(--color-success); }
+.level-badge--good { background: var(--color-primary-lightest); color: var(--color-primary-light); }
+.level-badge--fair { background: var(--color-warning-bg); color: var(--color-warning); }
+.level-badge--poor { background: var(--color-danger-bg); color: var(--color-danger); }
 .trend-score-visual__trend,
 .trend-score-visual__growth,
 .trend-score-visual__lifecycle { display: flex; align-items: center; justify-content: space-between; }
@@ -131,10 +131,10 @@ const lifecycleLabel = computed(() => props.lifecycle || '-');
 .trend-value--down { color: #EF4444; }
 .trend-value--neutral { color: #94A3B8; }
 .lifecycle-badge { padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: 500; }
-.lifecycle-badge--new { background: #E0E7FF; color: #3730A3; }
-.lifecycle-badge--growth { background: #D1FAE5; color: #065F46; }
-.lifecycle-badge--stable { background: #F1F5F9; color: #475569; }
-.lifecycle-badge--decline { background: #FEE2E2; color: #991B1B; }
+.lifecycle-badge--new { background: var(--color-primary-lightest); color: var(--color-primary-light); }
+.lifecycle-badge--growth { background: var(--color-success-bg); color: var(--color-success); }
+.lifecycle-badge--stable { background: var(--color-bg-hover); color: var(--color-text-secondary); }
+.lifecycle-badge--decline { background: var(--color-danger-bg); color: var(--color-danger); }
 .trend-score-visual__scale { display: flex; align-items: center; gap: 8px; }
 .scale-label { font-size: 11px; color: var(--color-text-tertiary); min-width: 20px; }
 .scale-bar { flex: 1; height: 6px; border-radius: 3px; display: flex; overflow: hidden; position: relative; }
