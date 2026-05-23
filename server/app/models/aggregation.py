@@ -1,9 +1,9 @@
-import uuid
 from datetime import date, datetime
+
 from sqlalchemy import Boolean, Date, DateTime, Index, Integer, String
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
-from app.models.base import UUIDPrimaryKeyMixin, Base
+
+from app.models.base import Base, UUIDPrimaryKeyMixin
 
 
 class AggregationAudit(UUIDPrimaryKeyMixin, Base):

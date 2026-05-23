@@ -1,8 +1,8 @@
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -35,7 +35,7 @@ async def get_current_user(
     if not user.is_active:
         raise UnauthorizedException(message="账户已禁用")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if user.plan != "free" and user.plan_expires_at and user.plan_expires_at < now:
         user.plan = "free"
         user.plan_expires_at = None

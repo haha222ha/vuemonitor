@@ -1,13 +1,14 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import api from "../utils/api";
+import type { PlanTier } from "../../../shared/constants/feature-gates";
 
 export const useAuthStore = defineStore("auth", () => {
   const token = ref(localStorage.getItem("access_token") || "");
   const user = ref<any>(null);
 
   const isLoggedIn = computed(() => !!token.value);
-  const userPlan = computed(() => user.value?.plan || "free");
+  const userPlan = computed<PlanTier>(() => (user.value?.plan || "free") as PlanTier);
 
   async function login(account: string, password: string) {
     const { data } = await api.post("/auth/login", { account, password });

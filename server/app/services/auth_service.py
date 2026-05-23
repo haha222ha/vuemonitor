@@ -1,8 +1,7 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import or_
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BadRequestException, NotFoundException, UnauthorizedException
@@ -68,7 +67,7 @@ class AuthService:
         if not user.is_active:
             raise UnauthorizedException(message="账户已禁用")
 
-        user.last_login_at = datetime.now(timezone.utc)
+        user.last_login_at = datetime.now(UTC)
 
         access_token = create_access_token(subject=str(user.id), extra={"plan": user.plan, "role": user.role})
         refresh_token = create_refresh_token(subject=str(user.id))
@@ -76,7 +75,7 @@ class AuthService:
         from hashlib import sha256
 
         token_hash = sha256(refresh_token.encode()).hexdigest()
-        rt = RefreshToken(user_id=user.id, token_hash=token_hash, expires_at=datetime.now(timezone.utc) + timedelta(days=7))
+        rt = RefreshToken(user_id=user.id, token_hash=token_hash, expires_at=datetime.now(UTC) + timedelta(days=7))
         self.db.add(rt)
 
         return TokenResponse(
@@ -113,7 +112,7 @@ class AuthService:
         await self.db.delete(rt)
 
         new_hash = sha256(new_refresh.encode()).hexdigest()
-        new_rt = RefreshToken(user_id=user.id, token_hash=new_hash, expires_at=datetime.now(timezone.utc) + timedelta(days=7))
+        new_rt = RefreshToken(user_id=user.id, token_hash=new_hash, expires_at=datetime.now(UTC) + timedelta(days=7))
         self.db.add(new_rt)
 
         return TokenResponse(access_token=new_access, refresh_token=new_refresh, expires_in=1800)

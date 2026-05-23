@@ -1,16 +1,14 @@
 import uuid
-import asyncio
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from sqlalchemy import select, and_
+import structlog
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.alert_rule import AlertRule, AlertEvent
-from app.services.alert_service import alert_service
 from app.core.cache import cache_get, cache_set
-
-import structlog
+from app.models.alert_rule import AlertEvent, AlertRule
+from app.services.alert_service import alert_service
 
 logger = structlog.get_logger()
 
@@ -56,7 +54,7 @@ class AlertRuleEngine:
 
         if rule.last_triggered_at:
             cooldown = timedelta(minutes=rule.cooldown_minutes)
-            if datetime.now(timezone.utc) - rule.last_triggered_at < cooldown:
+            if datetime.now(UTC) - rule.last_triggered_at < cooldown:
                 return None
 
         metric_value = await self._get_metric_value(rule, db)
@@ -90,7 +88,7 @@ class AlertRuleEngine:
         )
         db.add(event)
 
-        rule.last_triggered_at = datetime.now(timezone.utc)
+        rule.last_triggered_at = datetime.now(UTC)
         rule.trigger_count += 1
         await db.commit()
         await db.refresh(event)
@@ -103,7 +101,7 @@ class AlertRuleEngine:
         result = await db.execute(
             select(AlertRule).where(
                 AlertRule.user_id == user_id,
-                AlertRule.is_active == True,
+                AlertRule.is_active,
             )
         )
         rules = result.scalars().all()
@@ -139,7 +137,7 @@ class AlertRuleEngine:
         return await self._default_metric_query(rule, db)
 
     async def _default_metric_query(self, rule: AlertRule, db: AsyncSession) -> float | None:
-        from app.models.product import Product, ProductFeature
+        from app.models.product import ProductFeature
 
         if rule.metric in ("price", "sales_count", "monthly_sales", "rating", "review_count", "favorite_count"):
             product_id = rule.filters.get("product_id") if rule.filters else None
@@ -237,7 +235,7 @@ class AlertRuleEngine:
                         event.detail,
                     )
                 except Exception:
-                    pass
+                    logger.warning("Silent exception")
 
     async def get_events(
         self,
@@ -264,7 +262,7 @@ class AlertRuleEngine:
         if not event:
             return False
         event.is_acknowledged = True
-        event.acknowledged_at = datetime.now(timezone.utc)
+        event.acknowledged_at = datetime.now(UTC)
         await db.commit()
         return True
 

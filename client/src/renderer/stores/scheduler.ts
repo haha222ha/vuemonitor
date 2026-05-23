@@ -46,11 +46,13 @@ export const useSchedulerStore = defineStore("scheduler", () => {
         if (data.code === 0 && data.data) {
           const items = data.data.items || data.data || [];
           state.value.totalTasks = items.length;
-          state.value.activeTasks = items.filter((t: any) => t.status === "running" || t.is_active).length;
+          state.value.activeTasks = items.filter((t: Record<string, unknown>) => t.status === "running" || t.is_active).length;
           state.value.isRunning = state.value.activeTasks > 0;
         }
       }
-    } catch {}
+    } catch (err) {
+      console.warn("[Scheduler] fetchState failed:", err);
+    }
   }
 
   async function fetchTasks() {

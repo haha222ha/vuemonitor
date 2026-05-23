@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+﻿import { EventEmitter } from "events";
 import { getStorage } from "../storage/sqlite";
 import { normalizer, NormalizedXHSData, NormalizationResult } from "../collect/normalizer";
 import { featureEngine } from "../feature/feature-engine";
@@ -51,7 +51,7 @@ export class DataMart extends EventEmitter {
 
     if (existing) {
       logger.debug("DataMart", "更新已有商品数据", { key, productId: existing.id });
-      return this.updateExisting(existing.id, normalized, anomalies, key);
+      return this.updateExisting(existing, normalized, anomalies, key);
     } else {
       logger.debug("DataMart", "创建新商品数据", { key });
       return this.createNew(normalized, userId, anomalies, key);
@@ -72,7 +72,7 @@ export class DataMart extends EventEmitter {
         this.dedupCache.set(key, { id: row.id, lastCollected: row.last_collected_at || "" });
       }
       this.cacheLoaded = true;
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
   }
 
   private findExistingProduct(key: string): { id: string; lastCollected: string } | null {
@@ -143,7 +143,7 @@ export class DataMart extends EventEmitter {
             this.emit("monitor:triggered", { productId: existing.id, count: triggered });
           }
         }
-      } catch {}
+      } catch (err) { logger.warn("[Main] operation failed:", err); }
     });
     return result;
   }
@@ -223,7 +223,7 @@ export class DataMart extends EventEmitter {
       if (rows.length > 0 && rows[0].sales_count !== null) {
         return Math.max(0, normalized.sales_count - rows[0].sales_count);
       }
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
 
     return null;
   }

@@ -1,7 +1,6 @@
 import json
 import logging
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 import structlog
 
@@ -26,7 +25,7 @@ class AlertService:
             "title": title,
             "detail": detail,
             "extra": extra or {},
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
         self._alert_history.append(alert)
@@ -87,7 +86,7 @@ class AlertService:
             try:
                 await email_service.send_email(recipient, subject, body)
             except Exception:
-                pass
+                logger.warning("Silent exception")
 
     def _send_log(self, alert: dict):
         settings = get_settings()

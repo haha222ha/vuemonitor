@@ -7,6 +7,7 @@ import { useCollectStore } from "../stores/collect";
 import { useSchedulerStore } from "../stores/scheduler";
 import { usePermissionStore } from "../stores/permission";
 import api from "../utils/api";
+import type { Product } from "@shared/types";
 
 export interface ProductRanking {
   rank: number;
@@ -25,30 +26,99 @@ export function useProductsData() {
   const rankingsLoading = ref(false);
 
   const showAdd = ref(false);
+  const addTab = ref<"link" | "search">("link");
+  const discoveryKeyword = ref("");
+  const discoveryResults = ref<Product[]>([]);
+  const discoveryLoading = ref(false);
+  const discoveryHasSearched = ref(false);
   const showCollect = ref(false);
   const showSchedule = ref(false);
   const addFormRef = ref<FormInstance>();
   const addForm = ref({ noteInput: "", product_name: "" });
   const concurrency = ref(3);
   const collectScope = ref("all");
+  const collectCategory = ref("");
   const scheduleFrequency = ref(60);
   const scheduleProduct = ref<Record<string, unknown> | null>(null);
-  const viewMode = ref<"card" | "table">("card");
+  const viewMode = ref<"card" | "table" | "waterfall">("card");
   const searchQuery = ref("");
+  const categoryFilter = ref<string | null>(null);
 
   const addRules: FormRules = {
     noteInput: [{ required: true, message: "请输入小红书商品链接或ID", trigger: "blur" }],
   };
 
   const filteredProducts = computed(() => {
-    if (!searchQuery.value) return productStore.products;
-    const q = searchQuery.value.toLowerCase();
-    return productStore.products.filter(
-      (p) =>
-        p.product_name?.toLowerCase().includes(q) ||
-        p.platform_product_id?.toLowerCase().includes(q) ||
-        p.shop_name?.toLowerCase().includes(q)
-    );
+    let result = productStore.products;
+    if (categoryFilter.value) {
+      result = result.filter((p) => p.category === categoryFilter.value);
+    }
+    if (searchQuery.value) {
+      const q = searchQuery.value.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.product_name?.toLowerCase().includes(q) ||
+          p.platform_product_id?.toLowerCase().includes(q) ||
+          p.shop_name?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  });
+
+  const categoryList = computed(() => {
+    const cats = new Set<string>();
+    for (const p of productStore.products) {
+      if (p.category) cats.add(p.category);
+    }
+    return Array.from(cats).sort();
+  });
+
+  const uncollectedCount = computed(() => {
+    return productStore.products.filter((p) => !p.last_collected_at).length;
+  });
+
+  const staleCount = computed(() => {
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+    return productStore.products.filter((p) => {
+      if (!p.last_collected_at) return false;
+      return new Date(p.last_collected_at).getTime() < oneDayAgo;
+    }).length;
+  });
+
+  const failedCount = computed(() => {
+    return productStore.products.filter((p) => p.last_collect_status === "failed").length;
+  });
+
+  const batchCollectTargets = computed(() => {
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
+    if (collectScope.value === "uncollected") {
+      return productStore.products.filter((p) => !p.last_collected_at);
+    }
+    if (collectScope.value === "stale") {
+      return productStore.products.filter((p) => {
+        if (!p.last_collected_at) return false;
+        return new Date(p.last_collected_at).getTime() < oneDayAgo;
+      });
+    }
+    if (collectScope.value === "failed") {
+      return productStore.products.filter((p) => p.last_collect_status === "failed");
+    }
+    if (collectScope.value === "category" && collectCategory.value) {
+      return productStore.products.filter((p) => p.category === collectCategory.value);
+    }
+    return productStore.products;
+  });
+
+  const batchCollectCount = computed(() => batchCollectTargets.value.length);
+
+  const estimatedTime = computed(() => {
+    const count = batchCollectCount.value;
+    if (count === 0) return "0分钟";
+    const avgSeconds = 15;
+    const totalSeconds = Math.ceil(count / concurrency.value) * avgSeconds;
+    if (totalSeconds < 60) return `${totalSeconds}秒`;
+    const minutes = Math.ceil(totalSeconds / 60);
+    return `${minutes}分钟`;
   });
 
   function formatDate(dateStr: string): string {
@@ -97,6 +167,67 @@ export function useProductsData() {
     } catch { ElMessage.error("添加失败"); }
   }
 
+  async function searchDiscovery() {
+    if (!discoveryKeyword.value.trim()) return;
+    discoveryLoading.value = true;
+    discoveryHasSearched.value = true;
+    try {
+      const { data } = await api.post("/discovery/search", {
+        keyword: discoveryKeyword.value,
+        page: 1,
+        page_size: 20,
+      });
+      if (data.code === 0) {
+        discoveryResults.value = data.data.items;
+      }
+    } catch {
+      discoveryResults.value = [];
+    } finally {
+      discoveryLoading.value = false;
+    }
+  }
+
+  let discoveryDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  const DISCOVERY_DEBOUNCE_MS = 400;
+
+  function debouncedSearchDiscovery() {
+    if (discoveryDebounceTimer) clearTimeout(discoveryDebounceTimer);
+    discoveryDebounceTimer = setTimeout(() => {
+      searchDiscovery();
+    }, DISCOVERY_DEBOUNCE_MS);
+  }
+
+  function cancelDebouncedSearchDiscovery() {
+    if (discoveryDebounceTimer) {
+      clearTimeout(discoveryDebounceTimer);
+      discoveryDebounceTimer = null;
+    }
+  }
+
+  async function addFromDiscovery(item: { ref?: string; title?: string; store_name?: string }) {
+    if (!permissionStore.canAddProduct) {
+      ElMessage.warning("当前套餐商品数量已达上限，请升级");
+      return;
+    }
+    try {
+      await api.post("/discovery/add-to-monitor", {
+        ref_id: item.ref,
+        product_name: item.title,
+        mode: "goods",
+      });
+      ElMessage.success("已加入监控");
+      await productStore.fetchProducts();
+    } catch { ElMessage.error("添加失败"); }
+  }
+
+  function resetAddDialog() {
+    addTab.value = "link";
+    discoveryKeyword.value = "";
+    discoveryResults.value = [];
+    discoveryHasSearched.value = false;
+    addForm.value = { noteInput: "", product_name: "" };
+  }
+
   async function collectSingle(product: Record<string, unknown>) {
     const targetType = (product.targetType as string) || "goods";
     await collectStore.startCollect([{
@@ -109,11 +240,15 @@ export function useProductsData() {
 
   async function startBatchCollect() {
     await collectStore.setConcurrency(concurrency.value);
-    const targets = productStore.products.map((p) => ({
+    const targets = batchCollectTargets.value.map((p) => ({
       targetId: p.platform_product_id,
       targetType: ((p as Record<string, unknown>).targetType as "goods" | "note") || "goods",
       targetUrl: (p as Record<string, unknown>).target_url as string | undefined,
     }));
+    if (targets.length === 0) {
+      ElMessage.warning("没有可采集的商品");
+      return;
+    }
     await collectStore.startCollect(targets);
     showCollect.value = false;
     ElMessage.success(`已提交 ${targets.length} 个采集任务`);
@@ -147,13 +282,13 @@ export function useProductsData() {
         confirmButtonText: "删除", cancelButtonText: "取消", type: "warning",
       });
       if (window.electronAPI) {
-        await window.electronAPI.invoke("storage:run", "UPDATE products SET is_active = 0 WHERE id = ?", [id]);
+        await window.electronAPI.invoke("storage:deactivate-product", id);
       } else {
         await api.delete(`/products/${id}`);
       }
       ElMessage.success("删除成功");
       await productStore.fetchProducts();
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function fetchRankings() {
@@ -247,12 +382,15 @@ export function useProductsData() {
   return {
     productStore, collectStore, schedulerStore, permissionStore,
     productRankings, rankingsLoading,
-    showAdd, showCollect, showSchedule,
+    showAdd, addTab, discoveryKeyword, discoveryResults, discoveryLoading, discoveryHasSearched,
+    showCollect, showSchedule,
     addFormRef, addForm, addRules,
-    concurrency, collectScope, scheduleFrequency, scheduleProduct,
-    viewMode, searchQuery, filteredProducts,
+    concurrency, collectScope, collectCategory, scheduleFrequency, scheduleProduct,
+    viewMode, searchQuery, categoryFilter, filteredProducts,
+    categoryList, uncollectedCount, staleCount, failedCount, batchCollectTargets, batchCollectCount, estimatedTime,
     formatDate, formatNumber, resolveProductInput,
-    addProduct, collectSingle, startBatchCollect,
+    addProduct, searchDiscovery, debouncedSearchDiscovery, cancelDebouncedSearchDiscovery, addFromDiscovery, resetAddDialog,
+    collectSingle, startBatchCollect,
     addSchedule, confirmSchedule, confirmDelete,
     fetchRankings, getRankingInfo,
     trendIcon, lifecycleTagType, lifecycleLabel,

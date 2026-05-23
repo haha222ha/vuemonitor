@@ -1,10 +1,11 @@
 import time
-from typing import Callable
 
-from fastapi import Request, Response
+from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from app.core.redis import get_redis
+import logging
+logger = logging.getLogger(__name__)
 
 _metrics: dict[str, dict] = {}
 
@@ -102,7 +103,6 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
 
 
 async def collect_system_metrics():
-    import asyncio
     import psutil
 
     try:
@@ -119,7 +119,7 @@ async def collect_system_metrics():
             gauge_set("db_pool_checked_out", pool_stats["checked_out"])
             gauge_set("db_pool_overflow", pool_stats["overflow"])
         except Exception:
-            pass
+            logger.warning("Silent exception")
 
         try:
             redis = await get_redis()
@@ -128,9 +128,9 @@ async def collect_system_metrics():
             gauge_set("redis_used_memory_bytes", info.get("used_memory", 0))
             gauge_set("redis_keys_count", info.get("db0", {}).get("keys", 0) if isinstance(info.get("db0"), dict) else 0)
         except Exception:
-            pass
+            logger.warning("Silent exception")
 
     except ImportError:
-        pass
+        logger.warning("Silent exception")
     except Exception:
-        pass
+        logger.warning("Silent exception")

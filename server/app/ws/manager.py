@@ -1,17 +1,15 @@
-import json
-import uuid
 import asyncio
-import zlib
+import json
 import time
-from datetime import datetime, timezone
+import zlib
 from collections import deque
+from datetime import UTC, datetime
 
-from fastapi import APIRouter, Depends, Query, WebSocket, WebSocketDisconnect
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
 
-from app.core.database import get_db
 from app.core.security import decode_access_token
+import logging
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -32,7 +30,7 @@ class ConnectionManager:
             try:
                 await self.active_connections[user_id].close(code=4002)
             except Exception:
-                pass
+                logger.warning("Silent exception")
         self.active_connections[user_id] = websocket
         self.last_seen[user_id] = time.time()
 
@@ -124,7 +122,7 @@ async def _ws_heartbeat(websocket: WebSocket, user_id: str):
         if user_id not in manager.active_connections:
             break
         try:
-            await websocket.send_json({"type": "ping", "ts": datetime.now(timezone.utc).isoformat()})
+            await websocket.send_json({"type": "ping", "ts": datetime.now(UTC).isoformat()})
             missed_pings += 1
             if missed_pings > max_missed:
                 manager.disconnect(user_id)
@@ -142,6 +140,20 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
         if not user_id:
             await websocket.close(code=4001)
             return
+
+        from app.core.database import async_session_factory
+        from app.models.user import User
+        from sqlalchemy import select
+        import uuid as uuid_mod
+
+        async with async_session_factory() as session:
+            result = await session.execute(
+                select(User).where(User.id == uuid_mod.UUID(user_id))
+            )
+            user = result.scalar_one_or_none()
+            if not user or not user.is_active:
+                await websocket.close(code=4003)
+                return
     except Exception:
         await websocket.close(code=4001)
         return
@@ -157,12 +169,12 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
                 if msg_type == "pong":
                     manager.last_seen[user_id] = time.time()
                 elif msg_type == "ping":
-                    await websocket.send_json({"type": "pong", "ts": datetime.now(timezone.utc).isoformat()})
+                    await websocket.send_json({"type": "pong", "ts": datetime.now(UTC).isoformat()})
                 elif msg_type == "sync:pull":
                     await websocket.send_json({
                         "type": "sync:pull_response",
                         "data": msg.get("data", {}),
-                        "ts": datetime.now(timezone.utc).isoformat(),
+                        "ts": datetime.now(UTC).isoformat(),
                     })
             except json.JSONDecodeError:
                 await websocket.send_json({"type": "error", "message": "Invalid JSON"})

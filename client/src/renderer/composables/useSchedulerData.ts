@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
+﻿﻿﻿﻿﻿﻿import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
 import * as echarts from "echarts";
 import { ElMessage } from "element-plus";
 import api, { isNetworkError } from "../utils/api";
@@ -26,7 +26,7 @@ export function useSchedulerData() {
   async function fetchCloudTasks() {
     tasksLoading.value = true;
     try {
-      const params: Record<string, any> = { page: 1, page_size: 50 };
+      const params: Record<string, unknown> = { page: 1, page_size: 50 };
       if (taskFilter.value !== "all") params.status = taskFilter.value;
       const { data } = await api.get("/collect/tasks", { params });
       if (data?.code === 0 && data.data?.items) {
@@ -47,18 +47,18 @@ export function useSchedulerData() {
   async function fetchLocalTasks() {
     try {
       if (!window.electronAPI) return;
-      const result = await window.electronAPI.invoke("scheduler:timeline") as { tasks?: any[]; state?: { isRunning?: boolean } } | null;
-      cloudTasks.value = (result?.tasks || []).map((t: any) => ({
-        id: t.id,
+      const result = await window.electronAPI.invoke("scheduler:timeline") as { tasks?: Record<string, unknown>[]; state?: { isRunning?: boolean } } | null;
+      cloudTasks.value = (result?.tasks || []).map((t: Record<string, unknown>) => ({
+        id: String(t.id || ""),
         task_type: "product",
-        platform: t.platform || "local",
-        target_ids: [t.product_name],
+        platform: String(t.platform || "local"),
+        target_ids: [String(t.product_name || "")],
         status: t.is_active ? "running" : "paused",
-        progress: t.progress || 0,
-        created_at: t.last_run_at || new Date().toISOString(),
+        progress: Number(t.progress || 0),
+        created_at: String(t.last_run_at || new Date().toISOString()),
       }));
       schedulerRunning.value = result?.state?.isRunning ?? false;
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function toggleScheduler() {
@@ -126,8 +126,8 @@ export function useSchedulerData() {
       ElMessage.success("采集任务已创建");
       await fetchCloudTasks();
       return true;
-    } catch (err: any) {
-      ElMessage.error(err?.response?.data?.message || "创建失败");
+    } catch (err: unknown) {
+      ElMessage.error((err as { response?: { data?: { message?: string } } })?.response?.data?.message || "创建失败");
       return false;
     }
   }
@@ -212,13 +212,13 @@ export function useSchedulerData() {
     try {
       if (window.electronAPI) {
         unsubscribeWs = window.electronAPI.on("ws:message", (data: unknown) => {
-          const msg = data as { type: string; data: any };
+          const msg = data as { type: string; data: Record<string, unknown> };
           if (msg.type === "collect:progress" || msg.type === "collect:completed") {
             fetchCloudTasks();
           }
         });
       }
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   function stopAutoRefresh() {

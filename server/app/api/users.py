@@ -1,19 +1,18 @@
 import secrets
-import uuid
-from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.cache import cache_get, cache_set, cache_delete
+from app.core.cache import cache_delete, cache_get, cache_set
 from app.core.database import get_db
 from app.core.exceptions import BadRequestException, NotFoundException, UnauthorizedException
-from app.core.security import hash_password, verify_password, create_access_token
+from app.core.security import hash_password, verify_password
 from app.middleware.auth import CurrentUser
 from app.models.user import User
 from app.schemas.auth import UserInfoResponse
+from app.services.operation_audit import record_operation
 
 router = APIRouter(prefix="/user", tags=["user"])
 
@@ -104,6 +103,13 @@ async def change_password(
     user.password_hash = hash_password(req.new_password)
     await db.flush()
 
+    await record_operation(
+        user_id=str(user.id),
+        action="auth:password_change",
+        resource_type="user",
+        resource_id=str(user.id),
+    )
+
     return {"code": 0, "message": "密码修改成功"}
 
 
@@ -190,6 +196,14 @@ async def delete_account(
 ):
     user.is_active = False
     await db.flush()
+
+    await record_operation(
+        user_id=str(user.id),
+        action="data:delete",
+        resource_type="user",
+        resource_id=str(user.id),
+        detail="account_deactivation",
+    )
 
     return {"code": 0, "message": "账户已停用，数据将在30天后删除"}
 

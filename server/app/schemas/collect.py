@@ -1,6 +1,7 @@
 from datetime import datetime
-from typing import Optional
+
 from pydantic import BaseModel, Field
+
 
 class CollectTaskCreateRequest(BaseModel):
     task_type: str = Field(..., pattern="^(product|shop|category|author)$")
@@ -16,16 +17,16 @@ class CollectTaskResponse(BaseModel):
     target_ids: list[str]
     status: str = "pending"
     progress: float = 0.0
-    result_summary: Optional[str] = None
-    error_message: Optional[str] = None
+    result_summary: str | None = None
+    error_message: str | None = None
     created_at: datetime
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
     model_config = {"from_attributes": True}
 
 class CollectTaskListQuery(BaseModel):
     page: int = Field(1, ge=1)
     page_size: int = Field(20, ge=1, le=100)
-    status: Optional[str] = None
-    platform: Optional[str] = None
-    task_type: Optional[str] = None
+    status: str | None = None
+    platform: str | None = None
+    task_type: str | None = None

@@ -1,14 +1,14 @@
+import logging
 import uuid
-from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select, text, func
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.middleware.auth import CurrentUser
-from app.feature.cloud_engine import CloudFeatureEngine
 from app.feature.anonymized_aggregator import AnonymizedAggregator
+from app.feature.cloud_engine import CloudFeatureEngine
+from app.middleware.auth import CurrentUser
 from app.models.product import Product, ProductFeature
 
 router = APIRouter(prefix="/feature", tags=["feature"])
@@ -16,7 +16,7 @@ router = APIRouter(prefix="/feature", tags=["feature"])
 
 @router.get("/category-stats")
 async def get_category_stats(
-    category: Optional[str] = Query(None),
+    category: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     engine = CloudFeatureEngine(db)
@@ -54,6 +54,7 @@ async def get_my_product_rankings(
         rows = result.mappings().all()
         return {"rankings": [dict(r) for r in rows]}
     except Exception:
+        logging.getLogger("feature").warning(f"Failed to get product rankings for user {user.id}", exc_info=True)
         return {"rankings": []}
 
 
@@ -117,7 +118,7 @@ async def get_category_heatmap(
             func.avg(ProductFeature.rating).label("avg_rating"),
         )
         .join(ProductFeature, ProductFeature.product_id == Product.id)
-        .where(Product.is_active == True, Product.category.isnot(None))
+        .where(Product.is_active, Product.category.isnot(None))
         .group_by(Product.category)
     )
     rows = result.all()
@@ -154,7 +155,7 @@ async def get_category_heatmap(
 
 @router.get("/crowd/trend-timeseries")
 async def get_trend_timeseries(
-    category: Optional[str] = Query(None),
+    category: str | None = Query(None),
     days: int = Query(30, ge=7, le=90),
     db: AsyncSession = Depends(get_db),
 ):
@@ -223,7 +224,7 @@ async def get_trend_timeseries(
 
 @router.get("/crowd/behavior-patterns")
 async def get_behavior_patterns(
-    category: Optional[str] = Query(None),
+    category: str | None = Query(None),
     db: AsyncSession = Depends(get_db),
 ):
     category_filter = "AND p.category = :cat" if category else ""
@@ -244,7 +245,7 @@ async def get_behavior_patterns(
         )
         lifecycle_dist = [{"stage": r.lifecycle_stage, "count": r.cnt} for r in lifecycle_result.all()]
     except Exception:
-        pass
+        logging.getLogger("feature").warning("Failed to query lifecycle distribution", exc_info=True)
 
     trend_dist = []
     try:
@@ -261,7 +262,7 @@ async def get_behavior_patterns(
         )
         trend_dist = [{"trend": r.trend_short, "count": r.cnt} for r in trend_result.all()]
     except Exception:
-        pass
+        logging.getLogger("feature").warning("Failed to query trend distribution", exc_info=True)
 
     price_band_result = await db.execute(
         text(f"""

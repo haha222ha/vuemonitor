@@ -1,19 +1,20 @@
 import secrets
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
-from sqlalchemy import select, func, and_
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from app.middleware.auth import CurrentUser
-from app.models.user import User
-from app.models.team import Team, TeamMember, TeamSharedRule, TeamSharedProduct, TeamInvitation
 from app.models.monitor import MonitorRule
 from app.models.product import Product
+from app.models.team import Team, TeamInvitation, TeamMember, TeamSharedProduct, TeamSharedRule
+from app.models.user import User
+from app.services.operation_audit import record_operation
 
 router = APIRouter(prefix="/teams", tags=["teams"])
 
@@ -65,6 +66,14 @@ async def create_team(
     )
     db.add(member)
     await db.flush()
+
+    await record_operation(
+        user_id=str(user.id),
+        action="team:create",
+        resource_type="team",
+        resource_id=str(team.id),
+        detail=f"name={req.name[:30]}",
+    )
 
     return {"code": 0, "data": {"id": str(team.id), "name": team.name}}
 
@@ -164,6 +173,15 @@ async def delete_team(
 ):
     team = await _get_team_with_access(team_id, user.id, db, min_role="owner")
     await db.delete(team)
+
+    await record_operation(
+        user_id=str(user.id),
+        action="team:member_remove",
+        resource_type="team",
+        resource_id=team_id,
+        detail="team_deleted",
+    )
+
     return {"code": 0, "message": "团队已删除"}
 
 
@@ -194,10 +212,18 @@ async def invite_member(
         role=req.role,
         token=token,
         status="pending",
-        expires_at=datetime.now(timezone.utc) + timedelta(days=7),
+        expires_at=datetime.now(UTC) + timedelta(days=7),
     )
     db.add(invitation)
     await db.flush()
+
+    await record_operation(
+        user_id=str(user.id),
+        action="team:member_add",
+        resource_type="team",
+        resource_id=str(team.id),
+        detail=f"email={req.email}, role={req.role}",
+    )
 
     return {"code": 0, "data": {"invitation_id": str(invitation.id), "token": token}}
 
@@ -214,7 +240,7 @@ async def accept_invitation(
 
     if not invitation:
         raise NotFoundException(message="邀请不存在或已过期")
-    if invitation.expires_at < datetime.now(timezone.utc):
+    if invitation.expires_at < datetime.now(UTC):
         invitation.status = "expired"
         raise BadRequestException(message="邀请已过期")
 

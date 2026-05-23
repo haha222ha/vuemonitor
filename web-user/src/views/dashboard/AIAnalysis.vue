@@ -281,7 +281,7 @@
                     <div class="result-card">
                       <h4>市场规模</h4>
                       <el-tag :type="extractField('market_size') === 'large' ? 'success' : extractField('market_size') === 'medium' ? 'warning' : 'info'" size="large">
-                        {{ { large: '大', medium: '中', small: '小' }[extractField('market_size')] || extractField('market_size') || 'N/A' }}
+                        {{ ({ large: '大', medium: '中', small: '小' } as Record<string, string>)[extractField('market_size')] || extractField('market_size') || 'N/A' }}
                       </el-tag>
                     </div>
                   </el-col>
@@ -289,7 +289,7 @@
                     <div class="result-card">
                       <h4>竞争程度</h4>
                       <el-tag :type="extractField('competition_level') === 'low' ? 'success' : extractField('competition_level') === 'medium' ? 'warning' : 'danger'" size="large">
-                        {{ { high: '激烈', medium: '中等', low: '温和' }[extractField('competition_level')] || extractField('competition_level') || 'N/A' }}
+                        {{ ({ high: '激烈', medium: '中等', low: '温和' } as Record<string, string>)[extractField('competition_level')] || extractField('competition_level') || 'N/A' }}
                       </el-tag>
                     </div>
                   </el-col>
@@ -297,7 +297,7 @@
                     <div class="result-card">
                       <h4>增长潜力</h4>
                       <el-tag :type="extractField('growth_potential') === 'high' ? 'success' : extractField('growth_potential') === 'medium' ? 'warning' : 'info'" size="large">
-                        {{ { high: '高', medium: '中', low: '低' }[extractField('growth_potential')] || extractField('growth_potential') || 'N/A' }}
+                        {{ ({ high: '高', medium: '中', low: '低' } as Record<string, string>)[extractField('growth_potential')] || extractField('growth_potential') || 'N/A' }}
                       </el-tag>
                     </div>
                   </el-col>
@@ -466,9 +466,11 @@ const trendDirectionLabel = computed(() => {
   return "平稳";
 });
 
-function riskTagType(level: string) {
-  const map: Record<string, string> = { high: "danger", medium: "warning", low: "success", 高: "danger", 中: "warning", 低: "success" };
-  return (map[level] || "info") as any;
+type TagType = 'primary' | 'success' | 'info' | 'warning' | 'danger';
+
+function riskTagType(level: string): TagType {
+  const map: Record<string, TagType> = { high: "danger", medium: "warning", low: "success", 高: "danger", 中: "warning", 低: "success" };
+  return map[level] || "info";
 }
 
 function riskLevelLabel(level: string) {
@@ -476,9 +478,9 @@ function riskLevelLabel(level: string) {
   return map[level] || level || "未知";
 }
 
-function potentialTagType(level: string) {
-  const map: Record<string, string> = { high: "danger", medium: "warning", low: "info" };
-  return (map[level] || "info") as any;
+function potentialTagType(level: string): TagType {
+  const map: Record<string, TagType> = { high: "danger", medium: "warning", low: "info" };
+  return map[level] || "info";
 }
 
 function potentialLabel(level: string) {
@@ -486,9 +488,9 @@ function potentialLabel(level: string) {
   return map[level] || level || "未知";
 }
 
-function analysisTypeTag(type: string) {
-  const map: Record<string, string> = { basic_analysis: "", trend_score: "primary", prediction: "warning", risk_warning: "danger", report: "success", competitor_analysis: "primary", product_selection: "warning" };
-  return (map[type] || "info") as any;
+function analysisTypeTag(type: string): TagType {
+  const map: Record<string, TagType> = { basic_analysis: "info", trend_score: "primary", prediction: "warning", risk_warning: "danger", report: "success", competitor_analysis: "primary", product_selection: "warning" };
+  return map[type] || "info";
 }
 
 function analysisTypeLabel(type: string) {

@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import Any
 
 from app.core.redis import get_redis
 

@@ -1,12 +1,9 @@
 import json
 import logging
-from datetime import datetime, timezone
 
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 
 from app.core.database import engine
-from app.models.operation_audit import OperationAuditLog
-from sqlalchemy import text
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +38,7 @@ async def record_operation(
                      old_value, new_value, ip_address, user_agent)
                     VALUES
                     (:user_id, :action, :resource_type, :resource_id, :detail,
-                     :old_value::jsonb, :new_value::jsonb, :ip_address, :user_agent)
+                     CAST(:old_value AS jsonb), CAST(:new_value AS jsonb), :ip_address, :user_agent)
                 """),
                 {
                     "user_id": str(user_id),

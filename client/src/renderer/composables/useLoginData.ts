@@ -21,7 +21,7 @@ export function useLoginData() {
     password: [{ required: true, message: "请输入密码", trigger: "blur" }],
   };
 
-  const emailPattern = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   const regRules: FormRules = {
     nickname: [
@@ -30,7 +30,7 @@ export function useLoginData() {
     ],
     email: [
       {
-        validator: (_rule: any, value: string, callback: any) => {
+        validator: (_rule: unknown, value: string, callback: (err?: Error) => void) => {
           if (!value || value.trim() === "") {
             callback();
           } else if (!emailPattern.test(value.trim())) {
@@ -46,7 +46,7 @@ export function useLoginData() {
       { required: true, message: "请输入密码", trigger: "blur" },
       { min: 8, message: "密码至少8位", trigger: "blur" },
       {
-        validator: (_rule: any, value: string, callback: any) => {
+        validator: (_rule: unknown, value: string, callback: (err?: Error) => void) => {
           if (value && !/[A-Z]/.test(value)) {
             callback(new Error("密码需包含大写字母"));
           } else if (value && !/[a-z]/.test(value)) {
@@ -90,8 +90,8 @@ export function useLoginData() {
       regForm.email = "";
       regForm.nickname = "";
       regForm.password = "";
-    } catch (e: any) {
-      const msg = e?.response?.data?.message || e?.message || "注册失败，请稍后重试";
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { message?: string } }; message?: string })?.response?.data?.message || (e as Error)?.message || "注册失败，请稍后重试";
       ElMessage.error(msg);
     } finally {
       regLoading.value = false;

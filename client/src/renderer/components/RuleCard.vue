@@ -28,7 +28,7 @@
     <div class="rule-card__footer">
       <div class="rule-card__meta">
         <el-badge :value="rule.trigger_count" :type="rule.trigger_count > 0 ? 'danger' : 'info'" :hidden="rule.trigger_count === 0" />
-        <span class="rule-card__time" v-if="rule.last_triggered_at">
+        <span v-if="rule.last_triggered_at" class="rule-card__time">
           最近触发: {{ formatTime(rule.last_triggered_at) }}
         </span>
       </div>
@@ -44,18 +44,7 @@
 import {
   PriceTag, TrendCharts, ShoppingCart, Star, Setting,
 } from "@element-plus/icons-vue";
-
-interface AlertRule {
-  id: string;
-  rule_name: string;
-  rule_type: string;
-  conditions: Record<string, any>;
-  is_active: boolean;
-  trigger_count: number;
-  last_triggered_at?: string;
-  severity?: string;
-  [key: string]: any;
-}
+import type { AlertRule } from "../composables/useAlertData";
 
 defineProps<{
   rule: AlertRule;

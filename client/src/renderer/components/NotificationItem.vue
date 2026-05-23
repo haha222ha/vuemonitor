@@ -4,7 +4,7 @@
     :class="{ unread: !item.is_read, [`severity-${item.severity}`]: item.severity }"
     @click="$emit('click', item)"
   >
-    <div class="notification-dot" v-if="!item.is_read" />
+    <div v-if="!item.is_read" class="notification-dot" />
     <div class="notification-icon" :style="{ background: iconBg(item.type) }">
       <el-icon :size="20" :color="typeIconColor(item.type)">
         <component :is="typeIcon(item.type)" />
@@ -26,25 +26,31 @@
         <span class="notification-time">{{ formatTime(item.created_at) }}</span>
         <div class="notification-actions">
           <el-button
-            v-if="item.source === 'alert_event' && !(item as any).is_acknowledged"
+            v-if="item.source === 'alert_event' && !item.is_acknowledged"
             link
             size="small"
             type="warning"
             @click.stop="$emit('acknowledge-alert', item)"
-          >确认告警</el-button>
+          >
+            确认告警
+          </el-button>
           <el-button
             v-if="!item.is_read && item.source !== 'alert_event'"
             link
             size="small"
             type="primary"
-            @click.stop="$emit('mark-read', item.id, (item.source as string))"
-          >标为已读</el-button>
+            @click.stop="$emit('mark-read', item.id, item.source)"
+          >
+            标为已读
+          </el-button>
           <el-button
             link
             size="small"
             type="danger"
-            @click.stop="$emit('delete', item.id, (item.source as string))"
-          >删除</el-button>
+            @click.stop="$emit('delete', item.id, item.source)"
+          >
+            删除
+          </el-button>
         </div>
       </div>
     </div>

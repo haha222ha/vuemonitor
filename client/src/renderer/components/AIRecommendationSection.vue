@@ -5,7 +5,7 @@
         <el-icon><MagicStick /></el-icon>
         AI智能推荐
       </h3>
-      <el-button text size="small" @click="$emit('refresh')" :loading="loading">刷新</el-button>
+      <el-button text size="small" :loading="loading" @click="$emit('refresh')">刷新</el-button>
     </div>
     <div v-if="loading" style="padding: 24px"><el-skeleton :rows="3" animated /></div>
     <div v-else-if="recommendations.length > 0" class="ai-rec-grid">
@@ -20,7 +20,7 @@
         </div>
         <div class="ai-rec-card__body">
           <div v-if="rec.image_url" class="ai-rec-card__img">
-            <img :src="rec.image_url" :alt="rec.product_name" />
+            <img :src="rec.image_url" :alt="rec.product_name">
           </div>
           <div class="ai-rec-card__info">
             <div class="ai-rec-card__name">{{ rec.product_name || rec.category || '未知' }}</div>
@@ -71,7 +71,7 @@ interface RecommendationItem {
   category?: string;
   image_url?: string;
   type: string;
-  reason: string;
+  reason?: string;
   metric?: RecMetric | null;
   event_id?: string;
 }

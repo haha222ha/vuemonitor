@@ -1,12 +1,11 @@
 import uuid
 from datetime import datetime
-from decimal import Decimal
 
 from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, Text, func, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import UUIDPrimaryKeyMixin, Base
+from app.models.base import Base, UUIDPrimaryKeyMixin
 
 
 class AIPrediction(UUIDPrimaryKeyMixin, Base):

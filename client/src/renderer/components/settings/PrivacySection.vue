@@ -38,7 +38,7 @@
           <el-switch v-model="clientPrivacy.autoErrorReport" />
         </div>
       </div>
-      <div class="setting-divider"></div>
+      <div class="setting-divider" />
       <div class="setting-item">
         <div class="setting-info">
           <h3 class="setting-title">云端数据管理 (GDPR)</h3>
@@ -46,8 +46,8 @@
         </div>
       </div>
       <div class="privacy-cloud-actions">
-        <el-button size="small" @click="$emit('cloud-data-summary')" :loading="cloudDataLoading">查看数据摘要</el-button>
-        <el-button size="small" @click="$emit('cloud-data-export')" :loading="cloudExportLoading">导出云端数据</el-button>
+        <el-button size="small" :loading="cloudDataLoading" @click="$emit('cloud-data-summary')">查看数据摘要</el-button>
+        <el-button size="small" :loading="cloudExportLoading" @click="$emit('cloud-data-export')">导出云端数据</el-button>
         <el-button size="small" @click="$emit('show-privacy-policy')">隐私政策</el-button>
       </div>
       <div v-if="cloudDataSummary" class="cloud-data-summary">
@@ -59,11 +59,11 @@
         </div>
         <div class="cloud-data-total">总记录数: <strong>{{ cloudDataSummary.total_records }}</strong></div>
       </div>
-      <div class="setting-divider"></div>
+      <div class="setting-divider" />
       <div class="privacy-danger-zone">
         <h4 class="danger-zone-title">危险区域</h4>
         <p class="danger-zone-desc">删除数据操作不可逆。根据 GDPR 被遗忘权，您可以请求删除所有云端个人数据。删除后账户将被匿名化且无法恢复。</p>
-        <el-button type="danger" size="small" @click="$emit('cloud-data-deletion')" :loading="cloudDeleteLoading">
+        <el-button type="danger" size="small" :loading="cloudDeleteLoading" @click="$emit('cloud-data-deletion')">
           请求删除所有云端数据
         </el-button>
       </div>

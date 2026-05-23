@@ -1,6 +1,8 @@
 from datetime import datetime
-from typing import Optional, Any
+from typing import Any
+
 from pydantic import BaseModel, Field
+
 
 class AIAnalysisRequest(BaseModel):
     product_id: str
@@ -12,8 +14,8 @@ class AIAnalysisResponse(BaseModel):
     product_id: str
     analysis_type: str
     result: dict[str, Any]
-    score: Optional[float] = None
-    summary: Optional[str] = None
+    score: float | None = None
+    summary: str | None = None
     created_at: datetime
     model_config = {"from_attributes": True}
 

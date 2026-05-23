@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" title="分析结果" width="760px" class="ai-dialog">
+  <el-dialog :model-value="modelValue" title="分析结果" width="760px" class="ai-dialog" @update:model-value="$emit('update:modelValue', $event)">
     <div v-if="result" class="analysis-result">
       <div class="analysis-result__tags">
         <el-tag size="small" :type="analysisTypeTag(result.analysis_type)" effect="light">

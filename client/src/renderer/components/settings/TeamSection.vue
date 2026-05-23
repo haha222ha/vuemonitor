@@ -49,7 +49,7 @@
           <el-option value="viewer" label="查看者" />
           <el-option value="admin" label="管理员" />
         </el-select>
-        <el-button type="primary" @click="$emit('invite-member')" :loading="inviting">邀请</el-button>
+        <el-button type="primary" :loading="inviting" @click="$emit('invite-member')">邀请</el-button>
       </div>
     </div>
 

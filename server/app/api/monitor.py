@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
@@ -10,6 +10,8 @@ from app.core.database import get_db
 from app.core.exceptions import NotFoundException
 from app.middleware.auth import CurrentUser
 from app.models.monitor import MonitorRule, Notification
+from app.models.product import Product, ProductFeature
+from app.services.operation_audit import record_operation
 
 router = APIRouter(prefix="/monitor", tags=["monitor"])
 
@@ -42,6 +44,15 @@ async def create_rule(
     )
     db.add(rule)
     await db.flush()
+
+    await record_operation(
+        user_id=str(user.id),
+        action="monitor:rule_create",
+        resource_type="monitor_rule",
+        resource_id=str(rule.id),
+        detail=f"type={req.rule_type}, name={req.rule_name[:30]}",
+    )
+
     return {"code": 0, "data": {"id": str(rule.id)}}
 
 
@@ -101,6 +112,13 @@ async def update_rule(
     if req.is_active is not None:
         rule.is_active = req.is_active
 
+    await record_operation(
+        user_id=str(user.id),
+        action="monitor:rule_update",
+        resource_type="monitor_rule",
+        resource_id=rule_id,
+    )
+
     return {"code": 0, "data": {"updated": True}}
 
 
@@ -118,6 +136,13 @@ async def delete_rule(
         raise NotFoundException(message="规则不存在")
 
     await db.delete(rule)
+
+    await record_operation(
+        user_id=str(user.id),
+        action="monitor:rule_delete",
+        resource_type="monitor_rule",
+        resource_id=rule_id,
+    )
     return {"code": 0, "data": {"deleted": True}}
 
 
@@ -185,8 +210,90 @@ async def mark_all_notifications_read(
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(
-        select(Notification).where(Notification.user_id == user.id, Notification.is_read == False)
+        select(Notification).where(Notification.user_id == user.id, not Notification.is_read)
     )
     for n in result.scalars().all():
         n.is_read = True
     return {"code": 0, "data": {"read_all": True}}
+
+
+@router.get("/auto-detect")
+async def auto_detect_anomalies(
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+    days: int = Query(7, ge=1, le=30),
+    threshold: float = Query(2.0, ge=1.0, le=5.0, description="标准差倍数阈值"),
+):
+    since = datetime.utcnow() - timedelta(days=days)
+
+    result = await db.execute(
+        select(Product).where(Product.user_id == user.id, Product.is_active)
+    )
+    products = result.scalars().all()
+
+    anomalies = []
+    for p in products:
+        feat_result = await db.execute(
+            select(ProductFeature)
+            .where(ProductFeature.product_id == p.id, ProductFeature.collected_at >= since)
+            .order_by(ProductFeature.collected_at.asc())
+        )
+        features = feat_result.scalars().all()
+        if len(features) < 3:
+            continue
+
+        prices = [float(f.price) for f in features if f.price is not None]
+        sales = [f.sales_count for f in features if f.sales_count is not None]
+
+        latest = features[-1]
+
+        if len(prices) >= 3:
+            avg_p = sum(prices[:-1]) / len(prices[:-1])
+            std_p = (sum((x - avg_p) ** 2 for x in prices[:-1]) / len(prices[:-1])) ** 0.5
+            if std_p > 0 and prices[-1] is not None:
+                z_score = abs(prices[-1] - avg_p) / std_p
+                if z_score > threshold:
+                    direction = "spike" if prices[-1] > avg_p else "drop"
+                    anomalies.append({
+                        "product_id": str(p.id),
+                        "product_name": p.product_name,
+                        "platform": p.platform,
+                        "anomaly_type": f"price_{direction}",
+                        "metric": "price",
+                        "current_value": prices[-1],
+                        "average_value": round(avg_p, 2),
+                        "z_score": round(z_score, 2),
+                        "detected_at": latest.collected_at.isoformat() if latest.collected_at else None,
+                    })
+
+        if len(sales) >= 3:
+            avg_s = sum(sales[:-1]) / len(sales[:-1])
+            std_s = (sum((x - avg_s) ** 2 for x in sales[:-1]) / len(sales[:-1])) ** 0.5
+            if std_s > 0 and sales[-1] is not None:
+                z_score = abs(sales[-1] - avg_s) / std_s
+                if z_score > threshold:
+                    direction = "surge" if sales[-1] > avg_s else "drop"
+                    anomalies.append({
+                        "product_id": str(p.id),
+                        "product_name": p.product_name,
+                        "platform": p.platform,
+                        "anomaly_type": f"sales_{direction}",
+                        "metric": "sales_count",
+                        "current_value": sales[-1],
+                        "average_value": round(avg_s, 1),
+                        "z_score": round(z_score, 2),
+                        "detected_at": latest.collected_at.isoformat() if latest.collected_at else None,
+                    })
+
+    anomalies.sort(key=lambda a: a["z_score"], reverse=True)
+
+    summary = {
+        "total_anomalies": len(anomalies),
+        "price_anomalies": sum(1 for a in anomalies if a["metric"] == "price"),
+        "sales_anomalies": sum(1 for a in anomalies if a["metric"] == "sales_count"),
+        "products_affected": len(set(a["product_id"] for a in anomalies)),
+        "threshold": threshold,
+        "days": days,
+    }
+
+    return {"code": 0, "data": {"anomalies": anomalies, "summary": summary}}

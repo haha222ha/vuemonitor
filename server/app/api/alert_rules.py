@@ -1,15 +1,17 @@
+import statistics
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.exceptions import BadRequestException, NotFoundException
 from app.middleware.auth import CurrentUser
-from app.models.alert_rule import AlertRule, AlertEvent
-from app.services.alert_rule_engine import alert_rule_engine, SUPPORTED_METRICS, SUPPORTED_OPERATORS, SEVERITY_LEVELS
+from app.models.alert_rule import AlertEvent, AlertRule
+from app.models.product import Product, ProductFeature
+from app.services.alert_rule_engine import SEVERITY_LEVELS, SUPPORTED_METRICS, SUPPORTED_OPERATORS, alert_rule_engine
 
 router = APIRouter(prefix="/alert-rules", tags=["告警规则"])
 
@@ -298,7 +300,7 @@ async def get_alert_stats(
     )
     active_rules = await db.execute(
         select(func.count()).select_from(AlertRule).where(
-            AlertRule.user_id == user.id, AlertRule.is_active == True
+            AlertRule.user_id == user.id, AlertRule.is_active
         )
     )
     recent_events = await db.execute(
@@ -306,7 +308,7 @@ async def get_alert_stats(
     )
     unack_events = await db.execute(
         select(func.count()).select_from(AlertEvent).where(
-            AlertEvent.user_id == user.id, AlertEvent.is_acknowledged == False
+            AlertEvent.user_id == user.id, not AlertEvent.is_acknowledged
         )
     )
 
@@ -317,5 +319,135 @@ async def get_alert_stats(
             "active_rules": active_rules.scalar() or 0,
             "total_events": recent_events.scalar() or 0,
             "unacknowledged_events": unack_events.scalar() or 0,
+        },
+    }
+
+
+@router.post("/auto-detect")
+async def auto_detect_anomalies(
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+    metric: str = Query("sales_count", description="检测指标: price/sales_count/rating"),
+    z_threshold: float = Query(2.0, ge=1.0, le=4.0, description="Z-score阈值"),
+    days: int = Query(7, ge=1, le=30, description="回溯天数"),
+    min_samples: int = Query(5, ge=3, le=20, description="最少样本数"),
+):
+    valid_metrics = {"price", "sales_count", "rating", "review_count", "favorite_count"}
+    if metric not in valid_metrics:
+        raise BadRequestException(message=f"不支持的指标: {metric}，可选: {', '.join(valid_metrics)}")
+
+    since = datetime.now(UTC) - timedelta(days=days)
+
+    result = await db.execute(
+        select(Product).where(Product.user_id == user.id, Product.is_active == 1)
+    )
+    products = result.scalars().all()
+
+    anomalies = []
+
+    for p in products:
+        feat_result = await db.execute(
+            select(ProductFeature)
+            .where(
+                ProductFeature.product_id == p.id,
+                ProductFeature.collected_at >= since,
+            )
+            .order_by(ProductFeature.collected_at.desc())
+            .limit(30)
+        )
+        features = feat_result.scalars().all()
+
+        if len(features) < min_samples:
+            continue
+
+        values = []
+        for f in features:
+            v = getattr(f, metric, None)
+            if v is not None:
+                values.append(float(v))
+
+        if len(values) < min_samples:
+            continue
+
+        latest_val = values[0]
+        historical = values[1:]
+
+        if len(historical) < 2:
+            continue
+
+        mean_val = statistics.mean(historical)
+        stdev_val = statistics.stdev(historical)
+
+        if stdev_val == 0:
+            continue
+
+        z_score = (latest_val - mean_val) / stdev_val
+
+        if abs(z_score) >= z_threshold:
+            direction = "up" if z_score > 0 else "down"
+            severity = "critical" if abs(z_score) >= 3.0 else "warning"
+
+            metric_labels = {
+                "price": "价格", "sales_count": "销量",
+                "rating": "评分", "review_count": "评论数", "favorite_count": "收藏数",
+            }
+            direction_labels = {"up": "异常升高", "down": "异常下降"}
+
+            event = AlertEvent(
+                rule_id=uuid.UUID("00000000-0000-0000-0000-000000000000"),
+                user_id=user.id,
+                severity=severity,
+                title=f"{p.product_name or p.platform_product_id} {metric_labels.get(metric, metric)}{direction_labels[direction]}",
+                detail=f"商品「{p.product_name or p.platform_product_id}」的{metric_labels.get(metric, metric)}出现异常{direction_labels[direction]}，当前值 {latest_val:.2f}，历史均值 {mean_val:.2f}，Z-score {z_score:.2f}",
+                metric_value=latest_val,
+                threshold_value=z_threshold,
+                context={
+                    "auto_detect": True,
+                    "product_id": str(p.id),
+                    "product_name": p.product_name,
+                    "platform": p.platform,
+                    "metric": metric,
+                    "direction": direction,
+                    "z_score": round(z_score, 2),
+                    "mean": round(mean_val, 2),
+                    "stdev": round(stdev_val, 2),
+                    "latest_value": latest_val,
+                    "sample_count": len(values),
+                },
+            )
+            db.add(event)
+            anomalies.append(event)
+
+    if anomalies:
+        await db.commit()
+        for a in anomalies:
+            await db.refresh(a)
+
+    return {
+        "code": 0,
+        "data": {
+            "total_scanned": len(products),
+            "anomaly_count": len(anomalies),
+            "metric": metric,
+            "z_threshold": z_threshold,
+            "days": days,
+            "anomalies": [
+                {
+                    "id": str(a.id),
+                    "product_id": a.context.get("product_id", ""),
+                    "product_name": a.context.get("product_name", ""),
+                    "platform": a.context.get("platform", ""),
+                    "metric": a.context.get("metric", metric),
+                    "direction": a.context.get("direction", ""),
+                    "z_score": a.context.get("z_score", 0),
+                    "latest_value": a.context.get("latest_value", 0),
+                    "mean": a.context.get("mean", 0),
+                    "severity": a.severity,
+                    "title": a.title,
+                    "detail": a.detail,
+                    "created_at": a.created_at.isoformat() if a.created_at else None,
+                }
+                for a in anomalies
+            ],
         },
     }

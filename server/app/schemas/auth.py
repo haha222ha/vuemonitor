@@ -1,18 +1,17 @@
 import re
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
 
 
 class RegisterRequest(BaseModel):
-    email: Optional[str] = Field(default=None, max_length=255)
+    email: str | None = Field(default=None, max_length=255)
     nickname: str = Field(min_length=2, max_length=50)
     password: str = Field(min_length=8, max_length=128)
 
     @field_validator("email")
     @classmethod
-    def validate_email_format(cls, v: Optional[str]) -> Optional[str]:
+    def validate_email_format(cls, v: str | None) -> str | None:
         if v is None or v.strip() == "":
             return None
         v = v.strip()
@@ -51,11 +50,11 @@ class RefreshTokenRequest(BaseModel):
 
 class UserInfoResponse(BaseModel):
     id: str
-    email: Optional[str] = None
+    email: str | None = None
     nickname: str
-    avatar_url: Optional[str] = None
+    avatar_url: str | None = None
     plan: str
-    plan_expires_at: Optional[datetime] = None
+    plan_expires_at: datetime | None = None
     role: str
     is_active: bool
     email_notify_enabled: bool = True

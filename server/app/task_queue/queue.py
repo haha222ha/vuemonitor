@@ -3,9 +3,10 @@ import json
 import logging
 import time
 import uuid
-from datetime import datetime, timezone
+from collections.abc import Callable, Coroutine
+from datetime import UTC, datetime
 from enum import IntEnum
-from typing import Any, Callable, Coroutine
+from typing import Any
 
 from app.core.redis import get_redis
 
@@ -59,7 +60,7 @@ async def enqueue(
         "max_retries": max_retries,
         "retry_count": 0,
         "status": TaskStatus.PENDING,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(UTC).isoformat(),
         "started_at": None,
         "completed_at": None,
         "error": None,
@@ -102,7 +103,7 @@ async def cancel_task(task_id: str) -> bool:
         return False
 
     task["status"] = "cancelled"
-    task["completed_at"] = datetime.now(timezone.utc).isoformat()
+    task["completed_at"] = datetime.now(UTC).isoformat()
 
     pipe = redis.pipeline()
     pipe.hset(TASK_RUNNING_KEY, task_id, json.dumps(task))
@@ -192,7 +193,7 @@ class TaskWorker:
         redis = await get_redis()
 
         task["status"] = TaskStatus.RUNNING
-        task["started_at"] = datetime.now(timezone.utc).isoformat()
+        task["started_at"] = datetime.now(UTC).isoformat()
         await redis.hset(TASK_RUNNING_KEY, task_id, json.dumps(task))
 
         try:
@@ -203,7 +204,7 @@ class TaskWorker:
 
             task["status"] = TaskStatus.COMPLETED
             task["result"] = result
-            task["completed_at"] = datetime.now(timezone.utc).isoformat()
+            task["completed_at"] = datetime.now(UTC).isoformat()
 
             pipe = redis.pipeline()
             pipe.hset(TASK_RUNNING_KEY, task_id, json.dumps(task))
@@ -217,7 +218,7 @@ class TaskWorker:
 
             logger.info(f"Task completed: {task_id} type={task['type']}")
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             await self._handle_failure(task, "Task timed out (600s)")
         except Exception as e:
             await self._handle_failure(task, str(e))
@@ -242,7 +243,7 @@ class TaskWorker:
             logger.warning(f"Task retrying: {task_id} attempt={task['retry_count']}/{task['max_retries']}")
         else:
             task["status"] = TaskStatus.FAILED
-            task["completed_at"] = datetime.now(timezone.utc).isoformat()
+            task["completed_at"] = datetime.now(UTC).isoformat()
 
             pipe = redis.pipeline()
             pipe.hset(TASK_RUNNING_KEY, task_id, json.dumps(task))

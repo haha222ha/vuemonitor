@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+﻿import { EventEmitter } from "events";
 import { getStorage } from "../storage/sqlite";
 import { logger } from "../logger/logger";
 
@@ -157,7 +157,7 @@ export class LocalScheduler extends EventEmitter {
     try {
       const storage = getStorage();
       storage.run("DELETE FROM scheduled_tasks WHERE id = ?", [taskId]);
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
 
     this.emit("task:removed", { taskId });
     logger.info("LocalScheduler", "移除定时任务", { taskId });
@@ -461,16 +461,16 @@ export class LocalScheduler extends EventEmitter {
 
     try {
       storage.run(`ALTER TABLE scheduled_tasks ADD COLUMN last_run_status TEXT`);
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
     try {
       storage.run(`ALTER TABLE scheduled_tasks ADD COLUMN retry_count INTEGER NOT NULL DEFAULT 0`);
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
     try {
       storage.run(`ALTER TABLE scheduled_tasks ADD COLUMN max_retries INTEGER NOT NULL DEFAULT 3`);
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
     try {
       storage.run(`ALTER TABLE scheduled_tasks ADD COLUMN consecutive_failures INTEGER NOT NULL DEFAULT 0`);
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
   }
 
   private async persistTask(task: ScheduledTask): Promise<void> {

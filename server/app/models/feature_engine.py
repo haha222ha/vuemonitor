@@ -1,9 +1,11 @@
 import uuid
 from datetime import date, datetime
+
 from sqlalchemy import Boolean, Date, DateTime, Float, Index, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
-from app.models.base import UUIDPrimaryKeyMixin, Base
+
+from app.models.base import Base, UUIDPrimaryKeyMixin
 
 
 class Feature(UUIDPrimaryKeyMixin, Base):

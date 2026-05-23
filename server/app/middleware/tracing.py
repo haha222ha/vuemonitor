@@ -1,8 +1,7 @@
 import logging
 import uuid
 from contextvars import ContextVar
-from datetime import datetime, timezone
-from typing import Any
+from datetime import UTC, datetime
 
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
@@ -46,7 +45,7 @@ class TracingMiddleware(BaseHTTPMiddleware):
 
         trace = _traces.setdefault(trace_id, {
             "trace_id": trace_id,
-            "start_time": datetime.now(timezone.utc).isoformat(),
+            "start_time": datetime.now(UTC).isoformat(),
             "spans": [],
         })
 
@@ -54,7 +53,7 @@ class TracingMiddleware(BaseHTTPMiddleware):
             "span_id": span_id,
             "parent_span_id": parent_span_id,
             "operation": f"{request.method} {request.url.path}",
-            "start_time": datetime.now(timezone.utc).isoformat(),
+            "start_time": datetime.now(UTC).isoformat(),
             "tags": {
                 "http.method": request.method,
                 "http.url": str(request.url),
@@ -75,7 +74,7 @@ class TracingMiddleware(BaseHTTPMiddleware):
             raise
         finally:
             span["duration_ms"] = round((time.time() - start) * 1000, 2)
-            span["end_time"] = datetime.now(timezone.utc).isoformat()
+            span["end_time"] = datetime.now(UTC).isoformat()
             trace["spans"].append(span)
 
             if len(_traces) > MAX_TRACES:
@@ -99,8 +98,8 @@ def add_custom_span(operation: str, tags: dict[str, str] | None = None, duration
         "span_id": span_id,
         "parent_span_id": parent_span_id,
         "operation": operation,
-        "start_time": datetime.now(timezone.utc).isoformat(),
-        "end_time": datetime.now(timezone.utc).isoformat(),
+        "start_time": datetime.now(UTC).isoformat(),
+        "end_time": datetime.now(UTC).isoformat(),
         "duration_ms": duration_ms,
         "status": "ok",
         "tags": tags or {},
@@ -108,7 +107,7 @@ def add_custom_span(operation: str, tags: dict[str, str] | None = None, duration
 
     trace = _traces.setdefault(trace_id, {
         "trace_id": trace_id,
-        "start_time": datetime.now(timezone.utc).isoformat(),
+        "start_time": datetime.now(UTC).isoformat(),
         "spans": [],
     })
     trace["spans"].append(span)

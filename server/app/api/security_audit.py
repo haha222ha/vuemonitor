@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import desc, func, select
@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.middleware.auth import AdminUser
 from app.models.security_audit import SecurityAuditLog
-from app.models.user import User
 
 router = APIRouter(prefix="/admin/security", tags=["安全审计"])
 
@@ -25,24 +24,29 @@ async def list_audit_logs(
     start_date: str | None = None,
     end_date: str | None = None,
 ):
-    query = select(SecurityAuditLog)
+    conditions = []
 
     if min_risk is not None:
-        query = query.where(SecurityAuditLog.risk_score >= min_risk)
+        conditions.append(SecurityAuditLog.risk_score >= min_risk)
     if method:
-        query = query.where(SecurityAuditLog.method == method)
+        conditions.append(SecurityAuditLog.method == method)
     if path:
-        query = query.where(SecurityAuditLog.path.ilike(f"%{path}%"))
+        conditions.append(SecurityAuditLog.path.ilike(f"%{path}%"))
     if client_ip:
-        query = query.where(SecurityAuditLog.client_ip == client_ip)
+        conditions.append(SecurityAuditLog.client_ip == client_ip)
     if start_date:
-        query = query.where(SecurityAuditLog.timestamp >= start_date)
+        conditions.append(SecurityAuditLog.timestamp >= start_date)
     if end_date:
-        query = query.where(SecurityAuditLog.timestamp <= end_date)
+        conditions.append(SecurityAuditLog.timestamp <= end_date)
 
-    total_result = await db.execute(select(func.count()).select_from(query.subquery()))
-    total = total_result.scalar() or 0
+    count_query = select(func.count(SecurityAuditLog.id))
+    for cond in conditions:
+        count_query = count_query.where(cond)
+    total = (await db.execute(count_query)).scalar() or 0
 
+    query = select(SecurityAuditLog)
+    for cond in conditions:
+        query = query.where(cond)
     query = query.order_by(desc(SecurityAuditLog.id)).offset((page - 1) * page_size).limit(page_size)
     result = await db.execute(query)
     logs = result.scalars().all()
@@ -81,7 +85,7 @@ async def audit_summary(
     db: AsyncSession = Depends(get_db),
     hours: int = Query(24, ge=1, le=720),
 ):
-    since = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+    since = (datetime.now(UTC) - timedelta(hours=hours)).isoformat()
 
     total_requests = await db.execute(
         select(func.count()).select_from(SecurityAuditLog).where(SecurityAuditLog.timestamp >= since)

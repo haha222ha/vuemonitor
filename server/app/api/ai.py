@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 from fastapi import APIRouter, Depends, Query
@@ -5,11 +6,11 @@ from pydantic import BaseModel, Field
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.ai.providers import ANALYSIS_PROMPTS, get_available_providers
+from app.ai.service import AIService
 from app.core.database import get_db
 from app.core.exceptions import NotFoundException
 from app.middleware.auth import CurrentUser
-from app.ai.service import AIService
-from app.ai.providers import ANALYSIS_PROMPTS, get_available_providers
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
@@ -238,7 +239,6 @@ async def get_recommendations(
     db: AsyncSession = Depends(get_db),
     limit: int = Query(5, ge=1, le=20),
 ):
-    from app.models.product import Product, ProductFeature
     from app.models.alert_rule import AlertEvent
 
     recommendations = []
@@ -270,11 +270,11 @@ async def get_recommendations(
                 "metric": {"growth_rate_7d": float(row["growth_rate_7d"]) if row["growth_rate_7d"] else None, "rank": row["overall_rank"]},
             })
     except Exception:
-        pass
+        logging.getLogger("ai").warning("Failed to query rising products", exc_info=True)
 
     unack_events = await db.execute(
         select(AlertEvent)
-        .where(AlertEvent.user_id == user.id, AlertEvent.is_acknowledged == False)
+        .where(AlertEvent.user_id == user.id, not AlertEvent.is_acknowledged)
         .order_by(AlertEvent.severity.desc(), AlertEvent.created_at.desc())
         .limit(limit),
     )
@@ -341,7 +341,7 @@ async def get_recommendations(
                 "metric": {"competition_index": float(row["competition_index"] or 0), "volatility": float(row["volatility"] or 0)},
             })
     except Exception:
-        pass
+        logging.getLogger("ai").warning("Failed to query competitive products", exc_info=True)
 
     recommendations.sort(key=lambda x: x["priority"])
 

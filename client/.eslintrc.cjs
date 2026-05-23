@@ -1,0 +1,66 @@
+module.exports = {
+  root: true,
+  env: {
+    browser: true,
+    node: true,
+    es2022: true,
+  },
+  parser: "vue-eslint-parser",
+  parserOptions: {
+    parser: "@typescript-eslint/parser",
+    ecmaVersion: 2022,
+    sourceType: "module",
+    extraFileExtensions: [".vue"],
+    project: "./tsconfig.json",
+  },
+  plugins: ["@typescript-eslint"],
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:vue/vue3-recommended",
+  ],
+  rules: {
+    "vue/multi-word-component-names": "off",
+    "vue/no-v-html": "off",
+    "vue/require-default-prop": "off",
+    "vue/max-attributes-per-line": "off",
+    "vue/singleline-html-element-content-newline": "off",
+    "vue/no-mutating-props": "warn",
+    "vue/no-unused-vars": "warn",
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "no-console": ["warn", { allow: ["warn", "error"] }],
+    "no-irregular-whitespace": "warn",
+    "no-empty": ["error", { allowEmptyCatch: true }],
+    "prefer-const": "warn",
+  },
+  overrides: [
+    {
+      files: ["*.mts", "*.ts"],
+      rules: {
+        "@typescript-eslint/no-explicit-any": "off",
+      },
+    },
+    {
+      files: ["src/main/**/*.ts"],
+      env: { node: true, browser: false },
+    },
+    {
+      files: ["src/renderer/**/*.ts", "src/renderer/**/*.vue"],
+      env: { browser: true, node: false },
+    },
+  ],
+  ignorePatterns: [
+    "dist",
+    "release",
+    "node_modules",
+    "*.d.ts",
+    "vite.config.*.mts",
+    "vite.config.*.timestamp-*",
+    "e2e",
+    "playwright.config.ts",
+    "scripts",
+  ],
+};

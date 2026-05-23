@@ -19,8 +19,35 @@ function onTokenRefreshed(newToken: string) {
   refreshSubscribers = [];
 }
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("access_token");
+async function getAccessToken(): Promise<string | null> {
+  if (window.electronAPI) {
+    return await window.electronAPI.invoke("secure-storage:get", "access_token");
+  }
+  return localStorage.getItem("access_token");
+}
+
+async function setTokens(access: string, refresh?: string): Promise<void> {
+  if (window.electronAPI) {
+    await window.electronAPI.invoke("secure-storage:set", "access_token", access);
+    if (refresh) await window.electronAPI.invoke("secure-storage:set", "refresh_token", refresh);
+  } else {
+    localStorage.setItem("access_token", access);
+    if (refresh) localStorage.setItem("refresh_token", refresh);
+  }
+}
+
+async function clearTokens(): Promise<void> {
+  if (window.electronAPI) {
+    await window.electronAPI.invoke("secure-storage:delete", "access_token");
+    await window.electronAPI.invoke("secure-storage:delete", "refresh_token");
+  } else {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+  }
+}
+
+api.interceptors.request.use(async (config) => {
+  const token = await getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -33,7 +60,6 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (!error.response && error.code === "ERR_NETWORK") {
-      console.warn("[API] 网络不可达，服务可能离线");
       return Promise.reject(error);
     }
 
@@ -50,42 +76,42 @@ api.interceptors.response.use(
       }
 
       isRefreshing = true;
-      const refreshToken = localStorage.getItem("refresh_token");
+      let refreshToken: string | null = null;
+      if (window.electronAPI) {
+        refreshToken = await window.electronAPI.invoke("secure-storage:get", "refresh_token");
+      } else {
+        refreshToken = localStorage.getItem("refresh_token");
+      }
 
       if (refreshToken) {
         try {
           const { data } = await axios.post(`${API_BASE_URL}/auth/refresh`, {
             refresh_token: refreshToken,
           });
-          localStorage.setItem("access_token", data.access_token);
-          localStorage.setItem("refresh_token", data.refresh_token);
+          await setTokens(data.access_token, data.refresh_token);
           onTokenRefreshed(data.access_token);
           originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
           return api.request(originalRequest);
         } catch {
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
+          await clearTokens();
           window.location.hash = "#/login";
           return Promise.reject(error);
         } finally {
           isRefreshing = false;
         }
       } else {
-        localStorage.removeItem("access_token");
+        await clearTokens();
         window.location.hash = "#/login";
       }
-    }
-
-    if (error.response?.status === 503) {
-      console.warn("[API] 服务暂时不可用 (503)");
     }
 
     return Promise.reject(error);
   }
 );
 
-export function isNetworkError(error: any): boolean {
-  return !error.response && (error.code === "ERR_NETWORK" || error.code === "ECONNREFUSED" || error.code === "ECONNRESET" || error.message?.includes("Network Error"));
+export function isNetworkError(error: unknown): boolean {
+  const e = error as { response?: unknown; code?: string; message?: string };
+  return !e.response && (e.code === "ERR_NETWORK" || e.code === "ECONNREFUSED" || e.code === "ECONNRESET" || !!e.message?.includes("Network Error"));
 }
 
 export default api;

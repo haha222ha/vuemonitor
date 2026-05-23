@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" title="从模板创建规则" width="520px" class="modern-dialog">
+  <el-dialog :model-value="modelValue" title="从模板创建规则" width="520px" class="modern-dialog" @update:model-value="$emit('update:modelValue', $event)">
     <div class="template-grid">
       <div v-for="tpl in ruleTemplates" :key="tpl.id" class="template-card" @click="$emit('select', tpl)">
         <div class="template-icon" :style="{ background: tpl.bg }">

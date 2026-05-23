@@ -51,7 +51,7 @@ export class WindowManager {
       this.mainWindow = null;
     });
 
-    this.mainWindow.on("minimize", (event) => {
+    this.mainWindow.on("minimize", (event: Electron.Event) => {
       event.preventDefault();
       this.mainWindow?.hide();
     });

@@ -1,10 +1,11 @@
-import { ref, reactive, computed } from "vue";
+﻿﻿﻿﻿﻿﻿import { ref, reactive, computed } from "vue";
 import { ElMessage } from "element-plus";
 import { jsPDF } from "jspdf";
 import {
   DataAnalysis, Document, TrendCharts, Warning, PriceTag, Star, Cpu,
 } from "@element-plus/icons-vue";
 import api from "../utils/api";
+import type { Product, AIAnalysis, AIReport, AIRecommendation } from "@shared/types";
 
 export const ANALYSIS_TYPE_MAP: Record<string, { label: string; tagType: string; icon: typeof DataAnalysis }> = {
   basic_analysis: { label: "基础分析", tagType: "", icon: DataAnalysis },
@@ -20,10 +21,10 @@ export const REPORT_TYPE_MAP: Record<string, string> = {
 };
 
 export function useAIData() {
-  const analyses = ref<any[]>([]);
-  const reports = ref<any[]>([]);
-  const products = ref<any[]>([]);
-  const recommendations = ref<any[]>([]);
+  const analyses = ref<AIAnalysis[]>([]);
+  const reports = ref<AIReport[]>([]);
+  const products = ref<Product[]>([]);
+  const recommendations = ref<AIRecommendation[]>([]);
   const loading = ref(false);
   const reportsLoading = ref(false);
   const generating = ref(false);
@@ -73,22 +74,31 @@ export function useAIData() {
     return `${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
   }
 
-  function formatResult(result: any): string {
+  function formatResult(result: unknown): string {
     if (!result) return "";
     if (typeof result === "string") return result;
-    if (result.result) return String(result.result);
-    if (result.analysis) return String(result.analysis);
-    if (result.content) return String(result.content);
+    if (typeof result === "object" && result !== null) {
+      const r = result as Record<string, unknown>;
+      if (r.result) return String(r.result);
+      if (r.analysis) return String(r.analysis);
+      if (r.content) return String(r.content);
+    }
     return JSON.stringify(result, null, 2);
   }
 
-  function isStructuredResult(result: any): boolean {
+  function isStructuredResult(result: unknown): boolean {
     if (!result || typeof result === "string") return false;
-    return !!(result.summary || result.recommendations?.length || result.risks?.length || result.key_findings?.length || result.score != null);
+    if (typeof result === "object" && result !== null) {
+      const r = result as Record<string, unknown>;
+      return !!(r.summary || (r.recommendations as unknown[])?.length || (r.risks as unknown[])?.length || (r.key_findings as unknown[])?.length || r.score != null);
+    }
+    return false;
   }
 
-  function isStructuredReport(content: any): boolean {
-    return content && typeof content === "object" && !Array.isArray(content) && (content.executive_summary || content.product_analysis || content.recommendations || content.conclusion || content.trend_overview || content.overall_risk_level);
+  function isStructuredReport(content: unknown): boolean {
+    if (!content || typeof content !== "object" || Array.isArray(content)) return false;
+    const c = content as Record<string, unknown>;
+    return !!(c.executive_summary || c.product_analysis || c.recommendations || c.conclusion || c.trend_overview || c.overall_risk_level);
   }
 
   function confidenceGaugeStyle(confidence: number) {
@@ -114,9 +124,9 @@ export function useAIData() {
     return map[key] || key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   }
 
-  function formatObjToMd(obj: any): string {
+  function formatObjToMd(obj: unknown): string {
     if (typeof obj === "string") return obj;
-    if (Array.isArray(obj)) return obj.map((item: any) => `- ${typeof item === "string" ? item : JSON.stringify(item)}`).join("\n");
+    if (Array.isArray(obj)) return (obj as unknown[]).map((item) => `- ${typeof item === "string" ? item : JSON.stringify(item)}`).join("\n");
     if (typeof obj === "object" && obj !== null) return Object.entries(obj).map(([k, v]) => `- **${formatKey(k)}**: ${typeof v === "object" ? JSON.stringify(v) : v}`).join("\n");
     return String(obj);
   }
@@ -125,7 +135,7 @@ export function useAIData() {
     loading.value = true;
     try {
       if (window.electronAPI) {
-        const result = await window.electronAPI.invoke("ai:get-analyses") as { items?: any[] } | null;
+        const result = await window.electronAPI.invoke("ai:get-analyses") as { items?: AIAnalysis[] } | null;
         analyses.value = result?.items || [];
       } else {
         const { data } = await api.get("/ai/analyses");
@@ -142,7 +152,7 @@ export function useAIData() {
     reportsLoading.value = true;
     try {
       if (window.electronAPI) {
-        const result = await window.electronAPI.invoke("ai:get-reports") as any[] | null;
+        const result = await window.electronAPI.invoke("ai:get-reports") as AIReport[] | null;
         reports.value = result || [];
       } else {
         const { data } = await api.get("/ai/reports");
@@ -158,7 +168,7 @@ export function useAIData() {
   async function fetchProducts() {
     try {
       if (window.electronAPI) {
-        const result = await window.electronAPI.invoke("storage:get-products") as any[] | null;
+        const result = await window.electronAPI.invoke("storage:get-products") as Product[] | null;
         products.value = result || [];
       } else {
         const { data } = await api.get("/products");
@@ -166,7 +176,7 @@ export function useAIData() {
           products.value = data.data.items || data.data || [];
         }
       }
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function fetchRecommendations() {
@@ -175,7 +185,7 @@ export function useAIData() {
       if (data?.code === 0 && data.data?.items) {
         recommendations.value = data.data.items;
       }
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function startQuickAnalysis(type: string) {
@@ -183,7 +193,7 @@ export function useAIData() {
       ElMessage.warning("请先添加商品");
       return;
     }
-    const productIds = products.value.slice(0, 5).map((p: any) => p.id);
+    const productIds = products.value.slice(0, 5).map((p: Product) => p.id);
     try {
       if (window.electronAPI) {
         await window.electronAPI.invoke("ai:create-report", {
@@ -236,13 +246,13 @@ export function useAIData() {
     }
   }
 
-  function exportReport(report: any, format: string) {
+  function exportReport(report: AIReport, format: string) {
     if (!report?.content) {
       ElMessage.warning("报告内容为空");
       return;
     }
 
-    const contentObj = typeof report.content === "string" ? null : report.content;
+    const contentObj = typeof report.content === "string" ? null : report.content as Record<string, any>;
     const contentStr = contentObj ? JSON.stringify(contentObj, null, 2) : report.content;
 
     if (format === "pdf") {
@@ -316,17 +326,17 @@ export function useAIData() {
       if (contentObj?.overall_risk_level) md += `## 风险等级\n\n**${contentObj.overall_risk_level}**\n\n`;
       if (contentObj?.recommendations?.length) {
         md += `## 选品建议\n\n`;
-        contentObj.recommendations.forEach((r: any, i: number) => { md += `${i + 1}. ${typeof r === 'string' ? r : r.action || ''}${r.reason ? ` - ${r.reason}` : ''}\n`; });
+        contentObj.recommendations.forEach((r: Record<string, unknown>, i: number) => { md += `${i + 1}. ${typeof r === 'string' ? r : r.action || ''}${r.reason ? ` - ${r.reason}` : ''}\n`; });
         md += `\n`;
       }
       if (contentObj?.next_steps?.length) {
         md += `## 下一步行动\n\n`;
-        contentObj.next_steps.forEach((s: any, i: number) => { md += `${i + 1}. ${typeof s === 'string' ? s : s.action || JSON.stringify(s)}\n`; });
+        contentObj.next_steps.forEach((s: Record<string, unknown>, i: number) => { md += `${i + 1}. ${typeof s === 'string' ? s : s.action || JSON.stringify(s)}\n`; });
         md += `\n`;
       }
       if (contentObj?.mitigation_strategies?.length) {
         md += `## 风险缓解策略\n\n`;
-        contentObj.mitigation_strategies.forEach((s: any, i: number) => { md += `${i + 1}. ${typeof s === 'string' ? s : s.action || JSON.stringify(s)}\n`; });
+        contentObj.mitigation_strategies.forEach((s: Record<string, unknown>, i: number) => { md += `${i + 1}. ${typeof s === 'string' ? s : s.action || JSON.stringify(s)}\n`; });
         md += `\n`;
       }
       if (contentObj?.conclusion) md += `## 结论\n\n${contentObj.conclusion}\n\n`;

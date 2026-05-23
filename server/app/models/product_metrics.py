@@ -1,11 +1,11 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, Index, Integer, Float, func
+from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import UUIDPrimaryKeyMixin, Base
+from app.models.base import Base, UUIDPrimaryKeyMixin
 
 
 class ProductMetrics(UUIDPrimaryKeyMixin, Base):

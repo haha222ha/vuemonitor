@@ -1,23 +1,22 @@
-import secrets
+import logging
 import time
 import uuid
-import psutil
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
 
+import psutil
 from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db, engine, async_session_factory
-from app.core.exceptions import NotFoundException, ForbiddenException
-from app.core.security import verify_password, create_access_token
+from app.core.database import async_session_factory, engine, get_db
+from app.core.exceptions import ForbiddenException, NotFoundException
 from app.core.redis import get_redis
-from app.middleware.auth import CurrentUser, AdminUser
-from app.models.user import User
-from app.models.admin import ProxyPool, AdminAuditLog, RiskEvent
+from app.core.security import create_access_token, verify_password
+from app.middleware.auth import AdminUser
+from app.models.admin import AdminAuditLog, ProxyPool, RiskEvent
 from app.models.collect import CollectTask
-from app.models.license import LicenseCode
+from app.models.user import User
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -76,8 +75,8 @@ async def admin_stats(
     db: AsyncSession = Depends(get_db),
 ):
     total_users = (await db.execute(select(func.count()).select_from(User))).scalar() or 0
-    active_users = (await db.execute(select(func.count()).where(User.is_active == True))).scalar() or 0
-    today = datetime.now(timezone.utc).date()
+    active_users = (await db.execute(select(func.count()).where(User.is_active))).scalar() or 0
+    today = datetime.now(UTC).date()
     today_tasks = (await db.execute(
         select(func.count()).select_from(CollectTask).where(CollectTask.created_at >= today)
     )).scalar() or 0
@@ -465,12 +464,13 @@ async def list_audit_logs(
     }
 
 
-async def _log_action(db: AsyncSession, operator_id: str, action: str, resource_type: str, detail: str):
+async def _log_action(db: AsyncSession, operator_id: str, action: str, resource_type: str, detail: str | dict):
+    log_detail = detail if isinstance(detail, dict) else {"info": detail}
     log = AdminAuditLog(
         user_id=uuid.UUID(operator_id) if operator_id else None,
         action=action,
         resource_type=resource_type,
-        detail={"info": detail},
+        detail=log_detail,
     )
     db.add(log)
     await db.flush()
@@ -481,7 +481,7 @@ async def system_health(admin: AdminUser):
     cpu_percent = psutil.cpu_percent(interval=1)
     memory = psutil.virtual_memory()
     disk = psutil.disk_usage("/")
-    boot_time = datetime.fromtimestamp(psutil.boot_time(), tz=timezone.utc)
+    boot_time = datetime.fromtimestamp(psutil.boot_time(), tz=UTC)
 
     return {
         "code": 0,
@@ -503,7 +503,7 @@ async def system_health(admin: AdminUser):
                 "free_gb": round(disk.free / (1024**3), 2),
                 "percent": round(disk.used / disk.total * 100, 1),
             },
-            "uptime_seconds": (datetime.now(timezone.utc) - boot_time).total_seconds(),
+            "uptime_seconds": (datetime.now(UTC) - boot_time).total_seconds(),
             "processes": len(psutil.pids()),
         },
     }
@@ -514,7 +514,7 @@ async def performance_metrics(
     admin: AdminUser,
     db: AsyncSession = Depends(get_db),
 ):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     one_hour_ago = now - timedelta(hours=1)
     twenty_four_hours_ago = now - timedelta(hours=24)
 
@@ -587,6 +587,7 @@ async def infrastructure_status(admin: AdminUser, db: AsyncSession = Depends(get
     try:
         await db.execute(text("SELECT 1"))
     except Exception:
+        logging.getLogger("admin").error("Database health check failed", exc_info=True)
         db_status = "unhealthy"
 
     redis_status = "healthy"
@@ -602,6 +603,7 @@ async def infrastructure_status(admin: AdminUser, db: AsyncSession = Depends(get
         }
         await redis.ping()
     except Exception:
+        logging.getLogger("admin").error("Redis health check failed", exc_info=True)
         redis_status = "unhealthy"
 
     return {
@@ -626,7 +628,7 @@ async def risk_statistics(
     admin: AdminUser,
     db: AsyncSession = Depends(get_db),
 ):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     twenty_four_hours_ago = now - timedelta(hours=24)
     seven_days_ago = now - timedelta(days=7)
 
@@ -653,7 +655,7 @@ async def risk_statistics(
         )
         risk_by_platform = {row[0]: row[1] for row in risk_platform_result.all()}
     except Exception:
-        pass
+        logging.getLogger("admin").warning("Failed to query risk events by platform", exc_info=True)
 
     total_24h = sum(risk_by_type.values())
     total_7d = sum(risk_by_level.values())
@@ -697,12 +699,13 @@ async def run_benchmark(
 
     _benchmark_running = True
     try:
+        from dataclasses import asdict
+
         from tests.benchmark_collect import (
             run_concurrency_benchmark,
             run_proxy_benchmark,
             run_risk_threshold_test,
         )
-        from dataclasses import asdict
 
         results = {}
 
@@ -720,7 +723,7 @@ async def run_benchmark(
             results["risk_threshold"] = risk_result
 
         _benchmark_results = {
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
             "benchmarks": results,
             "triggered_by": str(admin.id),
         }

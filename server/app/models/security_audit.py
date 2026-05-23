@@ -1,8 +1,6 @@
-import uuid
-from datetime import datetime
 
-from sqlalchemy import DateTime, Float, Index, Integer, String, Text, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import Float, Index, Integer, String, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base
@@ -21,7 +19,7 @@ class SecurityAuditLog(Base):
     user_agent: Mapped[str] = mapped_column(String(500), nullable=False, default="")
     user_id: Mapped[str | None] = mapped_column(String(36))
     risk_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    risk_flags: Mapped[dict] = mapped_column(JSONB, nullable=False, default=list)
+    risk_flags: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
     status_code: Mapped[int | None] = mapped_column(Integer)
     response_time_ms: Mapped[float | None] = mapped_column(Float)
 

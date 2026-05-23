@@ -1,13 +1,11 @@
-from fastapi import APIRouter, Depends, Query, UploadFile, File
+from fastapi import APIRouter, File, Query, UploadFile
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db
 from app.middleware.auth import AdminUser, CurrentUser
-from app.services.feature_flag import feature_flag_service
+from app.middleware.tracing import clear_traces, get_all_traces, get_trace
 from app.services.backup_service import backup_service
-from app.middleware.tracing import get_trace, get_all_traces, clear_traces
 from app.services.error_capture import error_capture
+from app.services.feature_flag import feature_flag_service
 from app.services.sla_monitor import sla_monitor
 
 router = APIRouter(tags=["system"])
@@ -178,7 +176,7 @@ async def get_latest_client_version():
     manifest_path = os.path.join(downloads_dir, "latest.json")
 
     if os.path.exists(manifest_path):
-        with open(manifest_path, "r", encoding="utf-8") as f:
+        with open(manifest_path, encoding="utf-8") as f:
             data = json.load(f)
         return {"code": 0, "data": data}
 
@@ -206,7 +204,7 @@ async def get_client_download_link(platform: str):
     manifest_path = os.path.join(downloads_dir, "latest.json")
 
     if os.path.exists(manifest_path):
-        with open(manifest_path, "r", encoding="utf-8") as f:
+        with open(manifest_path, encoding="utf-8") as f:
             data = json.load(f)
         platform_data = data.get("platforms", {}).get(platform, {})
         if platform_data:

@@ -15,7 +15,7 @@ export function useFeatureGate() {
   }
 
   // Check quota — returns { allowed: boolean, current: number, limit: number }
-  function checkQuota(quotaType: "maxProducts" | "maxConcurrency" | "dailyCollectLimit" | "maxScheduleTasks" | "aiCallsPerDay", current: number): { allowed: boolean; current: number; limit: number } {
+  function checkQuota(quotaType: "maxProducts" | "maxConcurrency" | "dailyCollectLimit" | "maxScheduleTasks" | "aiCallsPerDay" | "discoverySearchPerDay" | "discoveryBurstPerDay" | "aipicDailyLimit", current: number): { allowed: boolean; current: number; limit: number } {
     const limits = PLAN_LIMITS[userPlan.value];
     const limit = limits[quotaType];
     if (limit === -1) return { allowed: true, current, limit: -1 }; // -1 = unlimited

@@ -10,7 +10,7 @@
       @blur="focused = false"
       @keydown.enter="$emit('search', query)"
       @keydown.esc="query = ''; $emit('search', '')"
-    />
+    >
     <kbd v-if="shortcut" class="search-input__shortcut">{{ shortcut }}</kbd>
   </div>
 </template>

@@ -109,7 +109,7 @@ class SessionManager:
                 if isinstance(data, list):
                     return data
             except Exception:
-                pass
+                logger.warning("Silent exception")
         return []
 
     async def _save_cookies(self, platform: str, cookie_jar: aiohttp.CookieJar):
@@ -152,7 +152,7 @@ class SessionManager:
                     response_url=None,
                 )
             except Exception:
-                pass
+                logger.warning("Silent exception")
 
         connector = aiohttp.TCPConnector(
             limit=20,
@@ -184,11 +184,11 @@ class SessionManager:
             try:
                 await self._save_cookies(platform, old_session.cookie_jar)
             except Exception:
-                pass
+                logger.warning("Silent exception")
             try:
                 await old_session.close()
             except Exception:
-                pass
+                logger.warning("Silent exception")
         self._session_fingerprints[session_key] = self.generate_fingerprint()
 
     async def _warmup(self, session: aiohttp.ClientSession, platform: str, fingerprint: dict):
@@ -206,11 +206,11 @@ class SessionManager:
                     timeout=aiohttp.ClientTimeout(total=15),
                     allow_redirects=True,
                     ssl=False,
-                ) as resp:
+                ) as _resp:
                     pass
                 await asyncio.sleep(random.uniform(0.5, 1.5))
             except Exception:
-                pass
+                logger.warning("Silent exception")
 
     async def close_all(self):
         for key, session in self._sessions.items():
@@ -219,11 +219,11 @@ class SessionManager:
                 try:
                     await self._save_cookies(platform, session.cookie_jar)
                 except Exception:
-                    pass
+                    logger.warning("Silent exception")
                 try:
                     await session.close()
                 except Exception:
-                    pass
+                    logger.warning("Silent exception")
         self._sessions.clear()
         self._session_fingerprints.clear()
         self._request_counts.clear()

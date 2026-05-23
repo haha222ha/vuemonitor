@@ -1,6 +1,7 @@
-import { ref, reactive } from "vue";
+﻿﻿﻿﻿﻿﻿import { ref, reactive } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import api from "../utils/api";
+import type { Product, AlertEvent } from "@shared/types";
 
 export interface AlertStats {
   total_rules: number;
@@ -14,7 +15,7 @@ export interface AlertRule {
   rule_name: string;
   rule_type: string;
   product_id: string | null;
-  conditions: Record<string, any>;
+  conditions: Record<string, unknown>;
   notify_channels: string[];
   is_active: boolean;
   trigger_count: number;
@@ -22,18 +23,47 @@ export interface AlertRule {
   severity?: string;
   window_minutes?: number;
   cooldown_minutes?: number;
-  [key: string]: any;
+  [key: string]: unknown;
+}
+
+export interface AnomalyItem {
+  id: string;
+  product_id: string;
+  product_name: string;
+  platform: string;
+  metric: string;
+  direction: "up" | "down";
+  z_score: number;
+  latest_value: number;
+  mean: number;
+  severity: "info" | "warning" | "critical";
+  title: string;
+  detail: string;
+  created_at: string | null;
+}
+
+export interface AutoDetectResult {
+  total_scanned: number;
+  anomaly_count: number;
+  metric: string;
+  z_threshold: number;
+  days: number;
+  anomalies: AnomalyItem[];
 }
 
 export function useAlertData() {
   const rules = ref<AlertRule[]>([]);
-  const products = ref<any[]>([]);
+  const products = ref<Product[]>([]);
   const loading = ref(false);
   const cloudAvailable = ref(true);
 
-  const events = ref<any[]>([]);
+  const events = ref<AlertEvent[]>([]);
   const eventsLoading = ref(false);
   const eventSeverityFilter = ref("");
+
+  const anomalies = ref<AnomalyItem[]>([]);
+  const anomaliesLoading = ref(false);
+  const autoDetectResult = ref<AutoDetectResult | null>(null);
 
   const alertStats = reactive<AlertStats>({
     total_rules: 0,
@@ -51,10 +81,10 @@ export function useAlertData() {
     return map[metric] || "custom";
   }
 
-  function buildConditionsFromServer(r: any): Record<string, any> {
-    const c: Record<string, any> = {};
-    const metric = r.metric || "";
-    const op = r.operator || "";
+  function buildConditionsFromServer(r: Record<string, unknown>): Record<string, unknown> {
+    const c: Record<string, unknown> = {};
+    const metric = String(r.metric || "");
+    const op = String(r.operator || "");
     const threshold = r.threshold;
     if (metric === "price" && op === "decrease_by_percent" && threshold) c.threshold = threshold;
     else if (metric === "price" && op === "less_than" && threshold) c.below_price = threshold;
@@ -63,25 +93,25 @@ export function useAlertData() {
     else if (metric === "stock" && op === "equals" && threshold === 0) c.stock_events = ["out_of_stock"];
     else if (metric === "rating" && op === "less_than" && threshold) c.below_rating = threshold;
     else if (metric === "rating" && op === "decrease_by" && threshold) c.rating_decrease = threshold;
-    if (r.window_minutes) c.window_hours = Math.round(r.window_minutes / 60) || 1;
+    if (r.window_minutes) c.window_hours = Math.round(Number(r.window_minutes) / 60) || 1;
     return c;
   }
 
-  function adaptServerRule(r: any): AlertRule {
-    const ruleType = metricToRuleType(r.metric, r.rule_type);
+  function adaptServerRule(r: Record<string, unknown>): AlertRule {
+    const ruleType = metricToRuleType(String(r.metric || ""), String(r.rule_type || ""));
     return {
-      id: r.id,
-      rule_name: r.name,
+      id: String(r.id || ""),
+      rule_name: String(r.name || ""),
       rule_type: ruleType,
-      product_id: r.filters?.product_id || null,
+      product_id: (r.filters as Record<string, unknown> | undefined)?.product_id as string || null,
       conditions: buildConditionsFromServer(r),
-      notify_channels: r.channels?.notify || ["app"],
-      is_active: r.is_active,
-      trigger_count: r.trigger_count || 0,
-      last_triggered_at: r.last_triggered_at,
-      severity: r.severity,
-      window_minutes: r.window_minutes,
-      cooldown_minutes: r.cooldown_minutes,
+      notify_channels: ((r.channels as Record<string, unknown> | undefined)?.notify as string[]) || ["app"],
+      is_active: !!r.is_active,
+      trigger_count: Number(r.trigger_count || 0),
+      last_triggered_at: r.last_triggered_at as string | undefined,
+      severity: r.severity as string | undefined,
+      window_minutes: r.window_minutes as number | undefined,
+      cooldown_minutes: r.cooldown_minutes as number | undefined,
     };
   }
 
@@ -89,7 +119,7 @@ export function useAlertData() {
     loading.value = true;
     try {
       if (window.electronAPI) {
-        const productsRes = await window.electronAPI.invoke("storage:get-products") as any[] | null;
+        const productsRes = await window.electronAPI.invoke("storage:get-products") as Product[] | null;
         products.value = productsRes || [];
       } else {
         const { data } = await api.get("/products", { params: { page: 1, page_size: 200 } });
@@ -97,12 +127,12 @@ export function useAlertData() {
           products.value = data.data.items || data.data || [];
         }
       }
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
 
     try {
       const { data: rulesRes } = await api.get("/alert-rules");
       if (rulesRes?.code === 0 && Array.isArray(rulesRes.data)) {
-        rules.value = rulesRes.data.map((r: any) => adaptServerRule(r));
+        rules.value = rulesRes.data.map((r: Record<string, unknown>) => adaptServerRule(r));
         cloudAvailable.value = true;
       } else {
         throw new Error("invalid response");
@@ -172,7 +202,7 @@ export function useAlertData() {
       }
       ElMessage.success("删除成功");
       fetchRules();
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function acknowledgeEvent(eventId: string) {
@@ -193,7 +223,7 @@ export function useAlertData() {
       ElMessage.success(`已确认 ${ids.length} 条事件`);
       await fetchEvents();
       await fetchAlertStats();
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   function buildServerPayload(name: string, ruleType: string, conditions: Record<string, any>, channels: string[], isActive: boolean, productId?: string) {
@@ -251,6 +281,30 @@ export function useAlertData() {
     fetchRules();
   }
 
+  async function runAutoDetect(metric: string = "sales_count", zThreshold: number = 2.0, days: number = 7) {
+    anomaliesLoading.value = true;
+    try {
+      const { data } = await api.post("/alert-rules/auto-detect", null, {
+        params: { metric, z_threshold: zThreshold, days },
+      });
+      if (data?.code === 0 && data.data) {
+        anomalies.value = data.data.anomalies || [];
+        autoDetectResult.value = data.data;
+        if (anomalies.value.length > 0) {
+          ElMessage.warning(`检测到 ${anomalies.value.length} 个异常商品`);
+        } else {
+          ElMessage.success("未检测到异常商品");
+        }
+      }
+    } catch {
+      anomalies.value = [];
+      autoDetectResult.value = null;
+      ElMessage.error("异常检测失败");
+    } finally {
+      anomaliesLoading.value = false;
+    }
+  }
+
   return {
     rules,
     products,
@@ -269,5 +323,9 @@ export function useAlertData() {
     batchAcknowledge,
     buildServerPayload,
     submitRule,
+    anomalies,
+    anomaliesLoading,
+    autoDetectResult,
+    runAutoDetect,
   };
 }

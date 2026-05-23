@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import desc, func, select
@@ -7,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.middleware.auth import AdminUser, CurrentUser
 from app.models.operation_audit import OperationAuditLog
-from app.models.user import User
 
 router = APIRouter(prefix="/audit/operations", tags=["操作审计"])
 
@@ -24,23 +23,28 @@ async def list_operation_logs(
     end_date: str | None = None,
 ):
     is_admin = user.role in ("super_admin", "admin")
-    query = select(OperationAuditLog)
+    conditions = []
 
     if not is_admin:
-        query = query.where(OperationAuditLog.user_id == str(user.id))
+        conditions.append(OperationAuditLog.user_id == str(user.id))
 
     if action:
-        query = query.where(OperationAuditLog.action == action)
+        conditions.append(OperationAuditLog.action == action)
     if resource_type:
-        query = query.where(OperationAuditLog.resource_type == resource_type)
+        conditions.append(OperationAuditLog.resource_type == resource_type)
     if start_date:
-        query = query.where(OperationAuditLog.created_at >= start_date)
+        conditions.append(OperationAuditLog.created_at >= start_date)
     if end_date:
-        query = query.where(OperationAuditLog.created_at <= end_date)
+        conditions.append(OperationAuditLog.created_at <= end_date)
 
-    total_result = await db.execute(select(func.count()).select_from(query.subquery()))
-    total = total_result.scalar() or 0
+    count_query = select(func.count(OperationAuditLog.id))
+    for cond in conditions:
+        count_query = count_query.where(cond)
+    total = (await db.execute(count_query)).scalar() or 0
 
+    query = select(OperationAuditLog)
+    for cond in conditions:
+        query = query.where(cond)
     query = query.order_by(desc(OperationAuditLog.id)).offset((page - 1) * page_size).limit(page_size)
     result = await db.execute(query)
     logs = result.scalars().all()
@@ -76,7 +80,7 @@ async def operation_summary(
     db: AsyncSession = Depends(get_db),
     hours: int = Query(24, ge=1, le=720),
 ):
-    since = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()
+    since = (datetime.now(UTC) - timedelta(hours=hours)).isoformat()
 
     total_ops = await db.execute(
         select(func.count()).select_from(OperationAuditLog).where(OperationAuditLog.created_at >= since)

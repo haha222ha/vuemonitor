@@ -1,4 +1,4 @@
-import { ipcRenderer } from "electron";
+﻿import { ipcRenderer } from "electron";
 
 const SHORTCUTS_KEY = "keyboard-shortcuts";
 
@@ -32,7 +32,7 @@ function loadShortcuts(): ShortcutBinding[] {
       const savedMap = new Map(parsed.map((s: ShortcutBinding) => [s.action, s]));
       return DEFAULT_SHORTCUTS.map((d) => savedMap.get(d.action) || d);
     }
-  } catch {}
+  } catch (err) { console.warn("[Composable] operation failed:", err); }
   return [...DEFAULT_SHORTCUTS];
 }
 

@@ -76,6 +76,20 @@
             <div ref="radarChartRef" class="chart-container-sm"></div>
           </el-card>
 
+          <el-card shadow="never" class="growth-card" style="margin-top: 16px">
+            <template #header><span>24小时增长</span></template>
+            <div v-if="growth24h" class="growth-items">
+              <div v-for="(val, key) in growth24h" :key="key" class="growth-item">
+                <span class="growth-label">{{ growthLabel(key as string) }}</span>
+                <span :class="['growth-value', val.change > 0 ? 'growth-up' : val.change < 0 ? 'growth-down' : 'growth-flat']">
+                  {{ val.change > 0 ? '+' : '' }}{{ val.change }}
+                  <small v-if="val.change_pct != null">({{ val.change_pct > 0 ? '+' : '' }}{{ val.change_pct }}%)</small>
+                </span>
+              </div>
+            </div>
+            <div v-else class="empty-hint">暂无24小时增长数据</div>
+          </el-card>
+
           <el-card shadow="never" class="ai-card" style="margin-top: 16px">
             <template #header>
               <div class="card-header">
@@ -114,6 +128,7 @@ const loading = ref(true);
 const trendRange = ref("30d");
 const aiResult = ref("");
 const aiLoading = ref(false);
+const growth24h = ref<Record<string, { old_value: number; new_value: number; change: number; change_pct: number | null }> | null>(null);
 
 const priceChartRef = ref<HTMLElement>();
 const salesChartRef = ref<HTMLElement>();
@@ -143,17 +158,26 @@ function formatAIResult(text: string) {
   return text.replace(/\n/g, "<br/>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 }
 
+function growthLabel(key: string) {
+  const map: Record<string, string> = { price: "价格", sales_count: "销量", monthly_sales: "月销", review_count: "评论", favorite_count: "收藏" };
+  return map[key] || key;
+}
+
 async function fetchProduct() {
   loading.value = true;
   try {
-    const [prodRes, featRes] = await Promise.all([
+    const [prodRes, featRes, growthRes] = await Promise.all([
       api.get(`/products/${productId.value}`),
       api.get(`/products/${productId.value}/features`, { params: { limit: 90 } }),
+      api.get(`/products/${productId.value}/growth-24h`).catch(() => null),
     ]);
     product.value = prodRes.data?.data;
     features.value = featRes.data?.data?.items || featRes.data?.data || [];
     if (features.value.length > 0) {
       latestFeature.value = features.value[features.value.length - 1];
+    }
+    if (growthRes?.data?.data?.growth) {
+      growth24h.value = growthRes.data.data.growth;
     }
   } catch {
     product.value = null;
@@ -162,16 +186,47 @@ async function fetchProduct() {
   }
 }
 
+function detectAnomalies(values: (number | null)[]): { coord: [number, number]; value: number }[] {
+  const valid = values.filter((v): v is number => v != null);
+  if (valid.length < 3) return [];
+  const mean = valid.reduce((a, b) => a + b, 0) / valid.length;
+  const std = Math.sqrt(valid.reduce((a, b) => a + (b - mean) ** 2, 0) / valid.length);
+  const threshold = mean + 2 * std;
+  const lowerThreshold = mean - 2 * std;
+  return values
+    .map((v, i) => (v != null && (v > threshold || v < lowerThreshold) ? { coord: [i, v], value: v } : null))
+    .filter((x): x is { coord: [number, number]; value: number } => x != null);
+}
+
 function renderPriceChart() {
   if (!priceChartRef.value || features.value.length === 0) return;
   if (!priceChart) priceChart = echarts.init(priceChartRef.value);
   const data = features.value.map((f) => [new Date(f.collected_at).getTime(), f.price]);
+  const priceValues = features.value.map((f) => f.price);
+  const anomalies = detectAnomalies(priceValues);
+  const anomalyData = anomalies.map((a) => {
+    const f = features.value[a.coord[0]];
+    return f ? { coord: [new Date(f.collected_at).getTime(), a.value], value: a.value } : null;
+  }).filter(Boolean);
+
   priceChart.setOption({
     backgroundColor: "transparent",
     grid: { top: 20, right: 20, bottom: 30, left: 60 },
     xAxis: { type: "time", axisLabel: { color: "#8a8a9a", fontSize: 11 }, axisLine: { lineStyle: { color: "rgba(255,255,255,0.06)" } } },
     yAxis: { type: "value", axisLabel: { color: "#8a8a9a", fontSize: 11, formatter: "¥{value}" }, splitLine: { lineStyle: { color: "rgba(255,255,255,0.04)" } } },
-    series: [{ type: "line", data, smooth: true, lineStyle: { color: "#6366f1", width: 2 }, areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: "rgba(99,102,241,0.3)" }, { offset: 1, color: "rgba(99,102,241,0)" }]) }, itemStyle: { color: "#6366f1" }, symbol: "none" }],
+    series: [{
+      type: "line",
+      data,
+      smooth: true,
+      lineStyle: { color: "#6366f1", width: 2 },
+      areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: "rgba(99,102,241,0.3)" }, { offset: 1, color: "rgba(99,102,241,0)" }]) },
+      itemStyle: { color: "#6366f1" },
+      symbol: "none",
+      markPoint: anomalyData.length > 0 ? {
+        data: anomalyData.map((d: any) => ({ coord: d.coord, value: d.value, symbol: "circle", symbolSize: 10, itemStyle: { color: "#ef4444" } })),
+        label: { show: false },
+      } : undefined,
+    }],
     tooltip: { trigger: "axis", backgroundColor: "#1a1a24", borderColor: "rgba(255,255,255,0.1)", textStyle: { color: "#e0e0e6" } },
   });
 }
@@ -356,6 +411,44 @@ onMounted(async () => {
   text-align: center;
   padding: 20px 0;
 }
+
+.growth-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.growth-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.growth-item:last-child {
+  border-bottom: none;
+}
+
+.growth-label {
+  color: #8a8a9a;
+  font-size: 13px;
+}
+
+.growth-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.growth-value small {
+  font-weight: 400;
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+.growth-up { color: #ef4444; }
+.growth-down { color: #22c55e; }
+.growth-flat { color: #8a8a9a; }
 
 .ai-result {
   color: #c0c0cc;

@@ -5,7 +5,7 @@ from sqlalchemy import DateTime, ForeignKey, Index, SmallInteger, String, Text, 
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin, Base
+from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 
 class CollectTask(UUIDPrimaryKeyMixin, TimestampMixin, Base):

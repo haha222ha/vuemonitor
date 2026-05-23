@@ -27,7 +27,7 @@ export const useMonitorStore = defineStore("monitor", () => {
     error.value = null;
     try {
       if (window.electronAPI) {
-        const result = await window.electronAPI.invoke("storage:query", "SELECT * FROM monitor_rules ORDER BY created_at DESC");
+        const result = await window.electronAPI.invoke("monitor:get-rules");
         rules.value = (result as MonitorRule[]).map((r) => ({
           ...r,
           conditions: typeof r.conditions === "string" ? JSON.parse(r.conditions as unknown as string) : r.conditions,
@@ -50,7 +50,13 @@ export const useMonitorStore = defineStore("monitor", () => {
     try {
       if (window.electronAPI) {
         const id = crypto.randomUUID();
-        await window.electronAPI.invoke("storage:run", "INSERT INTO monitor_rules (id, product_id, rule_name, rule_type, conditions, is_active) VALUES (?, ?, ?, ?, ?, ?)", [id, rule.product_id, rule.rule_name, rule.rule_type, JSON.stringify(rule.conditions), rule.is_active ? 1 : 0]);
+        await window.electronAPI.invoke("monitor:create-rule", {
+          product_id: rule.product_id,
+          rule_name: rule.rule_name,
+          rule_type: rule.rule_type,
+          conditions: rule.conditions,
+          is_active: rule.is_active,
+        });
         rules.value.push({ ...rule, id, last_triggered_at: null, trigger_count: 0, created_at: new Date().toISOString() });
       } else {
         const { data } = await api.post("/alert-rules", {
@@ -74,7 +80,7 @@ export const useMonitorStore = defineStore("monitor", () => {
   async function removeRule(ruleId: string) {
     try {
       if (window.electronAPI) {
-        await window.electronAPI.invoke("storage:run", "DELETE FROM monitor_rules WHERE id = ?", [ruleId]);
+        await window.electronAPI.invoke("monitor:delete-rule", ruleId);
       } else {
         await api.delete(`/alert-rules/${ruleId}`);
       }
@@ -87,7 +93,7 @@ export const useMonitorStore = defineStore("monitor", () => {
   async function toggleRule(ruleId: string, active: boolean) {
     try {
       if (window.electronAPI) {
-        await window.electronAPI.invoke("storage:run", "UPDATE monitor_rules SET is_active = ? WHERE id = ?", [active ? 1 : 0, ruleId]);
+        await window.electronAPI.invoke("monitor:toggle-rule", ruleId, active);
       } else {
         await api.patch(`/alert-rules/${ruleId}`, { is_active: active });
       }

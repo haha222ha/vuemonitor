@@ -1,11 +1,9 @@
 import asyncio
 import logging
 import time
-from datetime import datetime, timezone
-from typing import Any
 
 from app.core.redis import get_redis
-from app.middleware.prometheus import counter_inc, gauge_set
+from app.middleware.prometheus import gauge_set
 from app.services.alert_service import alert_service
 
 logger = logging.getLogger(__name__)
@@ -69,7 +67,7 @@ class SLAMonitor:
         window_start = now - SLO_WINDOW
 
         redis = await get_redis()
-        metrics = await redis.hgetall(SLO_KEY)
+        await redis.hgetall(SLO_KEY)
 
         for slo_name, slo in self._slos.items():
             try:

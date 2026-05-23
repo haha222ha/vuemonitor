@@ -4,6 +4,13 @@ import { useCollectStore } from "../stores/collect";
 import { useSchedulerStore } from "../stores/scheduler";
 import { usePermissionStore } from "../stores/permission";
 import api, { isNetworkError } from "../utils/api";
+import type { OpportunityItem, AlertEvent, HeatmapItem, AIRecommendation, WeekOverWeek } from "@shared/types";
+
+export interface WeekOverWeekMetric {
+  this_week: number;
+  last_week: number;
+  change_pct: number | null;
+}
 
 export interface BizStats {
   opportunityCount: number;
@@ -16,6 +23,13 @@ export interface BizStats {
   alertTrend: string;
   aiInsightCount: number;
   cloudConnected: boolean;
+  productCount: number;
+  productCountTrend: string;
+  productCountTrendType: "up" | "down" | "neutral";
+  todayCollect: number;
+  collectTrend: string;
+  collectTrendType: "up" | "down" | "neutral";
+  weekOverWeek: WeekOverWeek | null;
 }
 
 export interface TrendSeriesItem {
@@ -92,24 +106,31 @@ export function useDashboardData() {
     alertTrend: "暂无异动",
     aiInsightCount: 0,
     cloudConnected: false,
+    productCount: 0,
+    productCountTrend: "-",
+    productCountTrendType: "neutral",
+    todayCollect: 0,
+    collectTrend: "-",
+    collectTrendType: "neutral",
+    weekOverWeek: null,
   });
 
-  const opportunityRankings = ref<any[]>([]);
+  const opportunityRankings = ref<OpportunityItem[]>([]);
   const opportunityLoading = ref(false);
-  const alertEvents = ref<any[]>([]);
+  const alertEvents = ref<AlertEvent[]>([]);
   const alertLoading = ref(false);
-  const crowdHeatmap = ref<any[]>([]);
-  const crowdPatterns = ref<any>(null);
+  const crowdHeatmap = ref<HeatmapItem[]>([]);
+  const crowdPatterns = ref<Record<string, unknown> | null>(null);
   const crowdLoading = ref(false);
   const crowdTrendSeries = ref<TrendSeriesItem[]>([]);
-  const recommendations = ref<any[]>([]);
+  const recommendations = ref<AIRecommendation[]>([]);
   const recLoading = ref(false);
 
   function processTrendSeries(seriesMap: Record<string, any[]>) {
     const processed: TrendSeriesItem[] = [];
     for (const [category, points] of Object.entries(seriesMap)) {
       if (points.length < 2) continue;
-      const salesValues = points.map((p: any) => p.avg_sales || 0);
+      const salesValues = points.map((p: Record<string, unknown>) => Number(p.avg_sales || 0));
       const minVal = Math.min(...salesValues);
       const maxVal = Math.max(...salesValues);
       const range = maxVal - minVal || 1;
@@ -122,12 +143,12 @@ export function useDashboardData() {
           return `${x.toFixed(1)},${y.toFixed(1)}`;
         })
         .join(" ");
-      const lastPoint = points[points.length - 1];
+      const lastPoint = points[points.length - 1] as Record<string, unknown>;
       processed.push({
         category,
         sparklinePoints,
         sparklineWidth: w,
-        latestGrowth: lastPoint?.sales_growth_rate ?? null,
+        latestGrowth: (lastPoint?.sales_growth_rate as number) ?? null,
       });
     }
     processed.sort((a, b) => {
@@ -149,10 +170,16 @@ export function useDashboardData() {
     bizStats.alertCount = collectStore.riskAlerts.length;
     bizStats.alertTrend = bizStats.alertCount > 0 ? `${bizStats.alertCount}条本地告警` : "暂无异动";
     bizStats.aiInsightCount = 0;
+    bizStats.productCount = productStore.productCount;
+    bizStats.productCountTrend = "本地模式";
+    bizStats.productCountTrendType = "neutral";
+    bizStats.todayCollect = 0;
+    bizStats.collectTrend = "本地模式";
+    bizStats.collectTrendType = "neutral";
   }
 
-  function applyHomeData(d: any) {
-    const stats = d.biz_stats;
+  function applyHomeData(d: Record<string, unknown>) {
+    const stats = d.biz_stats as Record<string, any>;
     bizStats.cloudConnected = true;
     bizStats.opportunityCount = stats.opportunity_count || 0;
     bizStats.opportunityTrend = stats.opportunity_count > 0 ? `${stats.opportunity_count}个上榜` : "暂无排名";
@@ -166,12 +193,42 @@ export function useDashboardData() {
     bizStats.alertCount = stats.alert_count || 0;
     bizStats.alertTrend = bizStats.alertCount > 0 ? `${bizStats.alertCount}条未处理` : "暂无异动";
     bizStats.aiInsightCount = stats.ai_insight_count || 0;
+    bizStats.productCount = stats.product_count || 0;
+    const pcc = stats.product_count_change;
+    if (pcc != null) {
+      const pv = Number(pcc);
+      bizStats.productCountTrend = pv >= 0 ? `+${pv}%` : `${pv}%`;
+      bizStats.productCountTrendType = pv > 0 ? "up" : pv < 0 ? "down" : "neutral";
+    } else {
+      bizStats.productCountTrend = `今日+${stats.today_new_products || 0}`;
+      bizStats.productCountTrendType = "neutral";
+    }
+    bizStats.todayCollect = stats.today_collect || 0;
+    const ccc = stats.collect_count_change;
+    if (ccc != null) {
+      const cv = Number(ccc);
+      bizStats.collectTrend = cv >= 0 ? `+${cv}%` : `${cv}%`;
+      bizStats.collectTrendType = cv > 0 ? "up" : cv < 0 ? "down" : "neutral";
+    } else {
+      bizStats.collectTrend = `今日${stats.today_collect || 0}次`;
+      bizStats.collectTrendType = "neutral";
+    }
 
-    if (d.rankings && d.rankings.length > 0) opportunityRankings.value = d.rankings;
-    if (d.alert_events && d.alert_events.length > 0) alertEvents.value = d.alert_events;
-    if (d.category_heatmap && d.category_heatmap.length > 0) crowdHeatmap.value = d.category_heatmap;
-    if (d.behavior_patterns) crowdPatterns.value = d.behavior_patterns;
-    if (d.trend_timeseries && Object.keys(d.trend_timeseries).length > 0) processTrendSeries(d.trend_timeseries);
+    if (stats.week_over_week) {
+      bizStats.weekOverWeek = {
+        products: stats.week_over_week.products,
+        collects: stats.week_over_week.collects,
+        ai_analyses: stats.week_over_week.ai_analyses,
+      } as WeekOverWeek;
+    } else {
+      bizStats.weekOverWeek = null;
+    }
+
+    if (d.rankings && Array.isArray(d.rankings)) opportunityRankings.value = d.rankings as OpportunityItem[];
+    if (d.alert_events && Array.isArray(d.alert_events)) alertEvents.value = d.alert_events as AlertEvent[];
+    if (d.category_heatmap && Array.isArray(d.category_heatmap)) crowdHeatmap.value = d.category_heatmap as HeatmapItem[];
+    if (d.behavior_patterns) crowdPatterns.value = d.behavior_patterns as Record<string, unknown>;
+    if (d.trend_timeseries && typeof d.trend_timeseries === "object" && Object.keys(d.trend_timeseries).length > 0) processTrendSeries(d.trend_timeseries as Record<string, TrendSeriesItem[]>);
   }
 
   async function fetchBizStats() {
@@ -201,7 +258,7 @@ export function useDashboardData() {
         return res.data?.rankings || null;
       });
       if (data) opportunityRankings.value = data;
-    } catch {} finally {
+    } catch (err) { console.warn("[Composable] operation failed:", err); } finally {
       opportunityLoading.value = false;
     }
   }
@@ -214,7 +271,7 @@ export function useDashboardData() {
         return res.data?.code === 0 ? res.data.data : null;
       });
       if (data) alertEvents.value = data;
-    } catch {} finally {
+    } catch (err) { console.warn("[Composable] operation failed:", err); } finally {
       alertLoading.value = false;
     }
   }
@@ -226,7 +283,7 @@ export function useDashboardData() {
       invalidateCache("dashboard:home");
       await fetchAlertEvents();
       await fetchBizStats();
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function fetchCrowdInsights() {
@@ -241,7 +298,7 @@ export function useDashboardData() {
         if (homeData.behavior_patterns) crowdPatterns.value = homeData.behavior_patterns;
         if (homeData.trend_timeseries) processTrendSeries(homeData.trend_timeseries);
       }
-    } catch {} finally {
+    } catch (err) { console.warn("[Composable] operation failed:", err); } finally {
       crowdLoading.value = false;
     }
   }

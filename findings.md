@@ -1,243 +1,224 @@
-# XHS365 审计发现记录
+# XHS365 深度审计发现
 
-> 创建日期：2026-05-13 | 最近更新：2026-05-15 | 版本：V2.0 深度审计
+> 审计日期：2026-05-22 | 基于代码全量审查 + 需求文档对照
 
 ---
 
-## 一、系统架构发现
+## 一、子系统审计发现
 
-### 1.1 整体架构评级：⭐⭐⭐⭐⭐ (95/100)
+### 1.1 服务端（FastAPI）— 代码完成度 90%
 
-- 五层混合架构设计完整，模块职责清晰
-- 双链路架构（本地采集 vs 云端采集）完全解耦，架构合理
-- M06 Proxy Manager已正确废弃并迁入M21-B，本地Electron合规直连
-- 数据流单向清晰：采集→标准化→中台→AI→展示
+| 文件 | 行数 | 发现 |
+|------|------|------|
+| [server/app/main.py](file:///d:/vuemonitor/server/app/main.py) | ~150 | ✅ 完善的lifespan管理，含安全检查、恢复、种子数据 |
+| [server/app/api/router.py](file:///d:/vuemonitor/server/app/api/router.py) | ~100 | ✅ 26个路由模块注册，含health/diagnose端点 |
+| [server/app/ai/service.py](file:///d:/vuemonitor/server/app/ai/service.py) | — | ✅ 9种分析类型 + 规则引擎fallback + 缓存 + WebSocket推送 |
+| [server/app/ai/providers.py](file:///d:/vuemonitor/server/app/ai/providers.py) | — | ✅ OpenAI + DeepSeek双Provider，自动切换 |
+| [server/app/middleware/](file:///d:/vuemonitor/server/app/middleware/) | 9个文件 | ✅ 认证/特性门控/日志/Prometheus/配额/限流/安全审计/安全头/链路追踪 |
+| [server/app/models/__init__.py](file:///d:/vuemonitor/server/app/models/__init__.py) | — | ✅ 37+ ORM模型，含完整关联关系 |
+| 关键缺失 | — | ⚠️ AI API Key未配置（OpenAI/DeepSeek） |
+| 关键缺失 | — | ⚠️ 数据库密码已更换但需验证线上状态 |
 
-### 1.2 技术栈一致性
+### 1.2 Electron客户端 — 代码完成度 85%
 
-| 组件 | 技术栈 | 状态 |
-|------|--------|------|
-| Electron客户端 | Vue3 + TypeScript + Pinia + Element Plus + ECharts | ✅ 统一 |
-| FastAPI服务端 | Python 3.11 + SQLAlchemy 2.0 + asyncpg + Redis | ✅ 统一 |
-| Web-user | Vue3 + TypeScript + Vite | ✅ 统一 |
-| Web-admin | Vue3 + TypeScript + Vite | ✅ 统一 |
-| 共享常量 | shared/constants (TS + PY双版本) | ✅ 统一 |
+| 文件 | 行数 | 发现 |
+|------|------|------|
+| [client/src/main/index.ts](file:///d:/vuemonitor/client/src/main/index.ts) | ~250 | ✅ 完善的bootstrap流程，含崩溃恢复/离线模式/性能监控 |
+| [client/src/main/ipc/handlers.ts](file:///d:/vuemonitor/client/src/main/ipc/handlers.ts) | 19 | ✅ 路由分发到5个子handler模块（Collect/Storage/Sync/Service） |
+| [client/src/main/collect/chromium-worker.ts](file:///d:/vuemonitor/client/src/main/collect/chromium-worker.ts) | — | ✅ 分片队列 + 并发门控 + 视图池 |
+| [client/src/main/collect/playwright-collector.ts](file:///d:/vuemonitor/client/src/main/collect/playwright-collector.ts) | — | ✅ 无头浏览器 + 截图 + 数据提取 |
+| [client/src/main/collect/data-mart.ts](file:///d:/vuemonitor/client/src/main/collect/data-mart.ts) | — | ✅ 去重 + 融合 + 质量评分 + 缓存失效 |
+| [client/src/main/sync/cloud-sync.ts](file:///d:/vuemonitor/client/src/main/sync/cloud-sync.ts) | — | ✅ 755行，push/pull/conflict resolution |
+| [client/src/main/license/license-manager.ts](file:///d:/vuemonitor/client/src/main/license/license-manager.ts) | — | ✅ 设备指纹 + 激活/停用 |
+| [client/src/renderer/router/index.ts](file:///d:/vuemonitor/client/src/renderer/router/index.ts) | ~100 | ✅ 14个路由（含登录）+ 路由守卫 + Token持久化 |
+| [client/src/renderer/views/SettingsView.vue](file:///d:/vuemonitor/client/src/renderer/views/SettingsView.vue) | 1465 | ⚠️ 过长，需拆分 |
+| [client/src/renderer/views/DashboardView.vue](file:///d:/vuemonitor/client/src/renderer/views/DashboardView.vue) | 771 | ⚠️ 过长，需拆分 |
+| UI重设计 | [2026-05-13-electron-ui-redesign.md](file:///d:/vuemonitor/docs/superpowers/specs/2026-05-13-electron-ui-redesign.md) | ⚠️ 设计完成但未实施到代码 |
+| 关键缺失 | — | ⚠️ 未打包测试 |
+| 关键缺失 | — | ⚠️ 崩溃恢复逻辑不完整（快照/检查点待完善） |
 
-### 1.3 🆕 深度审计架构发现
+### 1.3 Web-user前端 — 代码完成度 80%
+
+| 文件 | 发现 |
+|------|------|
+| [web-user/src/views/dashboard/](file:///d:/vuemonitor/web-user/src/views/dashboard/) | ✅ 12个子页面：DashboardHome/AIAnalysis/AIReport/CollectCenter/CompareView/DiscoveryView/MonitorList/NotificationsView/ProductDetailView/SettingsView/TeamView/AdminMonitorView |
+| [web-user/src/stores/](file:///d:/vuemonitor/web-user/src/stores/) | ✅ 5个Store：auth/monitor/notifications/products/teams |
+| [web-user/src/views/LandingView.vue](file:///d:/vuemonitor/web-user/src/views/LandingView.vue) | ✅ 营销落地页 |
+| [web-user/src/views/PricingView.vue](file:///d:/vuemonitor/web-user/src/views/PricingView.vue) | ✅ 定价对比页 |
+| 关键缺失 | ⚠️ 前后端联调未开始 |
+| 关键缺失 | ⚠️ AI分析页→后端API链路未测试 |
+
+### 1.4 Web-admin后台 — 代码完成度 75%
+
+| 文件 | 发现 |
+|------|------|
+| [web-admin/src/views/](file:///d:/vuemonitor/web-admin/src/views/) | ✅ 12个管理页面：Dashboard/Users/Licenses/Collect/Proxies/RiskEvents/AuditLogs/SystemMonitor/AlertConfig/SecurityAudit/GDPR/Benchmark |
+| [web-admin/src/stores/](file:///d:/vuemonitor/web-admin/src/stores/) | ✅ 12个Store：admin/users/dashboard/collect/proxies/riskEvents/alertConfig/systemMonitor/securityAudit/gdpr/licenses/benchmark/auditLogs |
+| 关键缺失 | ⚠️ Admin登录联调未验证 |
+| 关键缺失 | ⚠️ 部分页面为占位实现 |
+
+---
+
+## 二、代码质量发现
+
+### 2.1 优点
 
 | 发现 | 详情 |
 |------|------|
-| API路由完整度极高 | 20个路由模块覆盖全部业务：auth/products/ai/monitor/collect/admin/dashboard/license/teams/alert_rules/ai_templates/gdpr/security_audit/operation_audit/task_queue/system |
-| 数据模型完整度极高 | 30+模型覆盖全部业务实体，5个Alembic迁移脚本完整 |
-| AI引擎设计优秀 | 双Provider(OpenAI+DeepSeek)+9种分析类型+规则引擎fallback+结果缓存+WebSocket推送+Feature Gate集成 |
-| IPC通道完整度极高 | 60+ IPC handler覆盖：采集/存储/同步/权限/许可证/日志/更新/性能监控/窗口管理 |
-| 云同步实现完整 | CloudSyncManager 755行，push/pull/conflict resolution/自动同步/离线队列 |
-| 安全中间件完整 | SecurityHeaders/CORS/RateLimit/Auth/FeatureGate五层防护 |
+| 架构分层清晰 | API → Service → Model → Core 严格分层 |
+| 异常处理完善 | 统一异常处理器 + 自定义异常类体系 |
+| 缓存策略成熟 | Redis装饰器 + 批量操作 + 失效策略 |
+| 安全多层防护 | 认证/限流/安全审计/安全头/CORS 五层 |
+| 数据库迁移规范 | Alembic版本化管理，8个迁移脚本 |
+| 双Provider AI | OpenAI/DeepSeek自动切换 + 规则引擎fallback |
+| 完整的IPC白名单 | 120+ IPC通道白名单，防止任意调用 |
+
+### 2.2 问题发现
+
+| # | 问题 | 严重度 | 位置 | 建议 |
+|---|------|--------|------|------|
+| CQ-1 | View文件过大 | 🟡 | [SettingsView.vue (1465行)](file:///d:/vuemonitor/client/src/renderer/views/SettingsView.vue)，[DashboardView.vue (771行)](file:///d:/vuemonitor/client/src/renderer/views/DashboardView.vue) | 拆分为子组件 |
+| CQ-2 | AI分析结果纯文本渲染 | 🟡 | [AIView.vue](file:///d:/vuemonitor/client/src/renderer/views/AIView.vue) | 使用结构化组件渲染 |
+| CQ-3 | 组件复用度低 | 🟡 | [client/src/renderer/components/](file:///d:/vuemonitor/client/src/renderer/components/) | 已有34个组件但views仍过大 |
+| CQ-4 | UI风格不统一 | 🟡 | 多处inline style | 统一为设计Token CSS变量 |
+| CQ-5 | Admin暴力破解防护仅内存级 | 🟡 | [auth.py](file:///d:/vuemonitor/server/app/api/auth.py) `_MAX_ATTEMPTS=5` | 迁移到Redis持久化 |
+| CQ-6 | DeepSeek API使用第三方代理 | 🟡 | `base_url="https://www.packyapi.com/v1"` | 评估代理可靠性，考虑直连 |
+| CQ-7 | 测试覆盖不完整 | 🟡 | [server/tests/](file:///d:/vuemonitor/server/tests/) | 10个测试文件但以集成测试为主 |
 
 ---
 
-## 二、安全发现
+## 三、安全审计发现（更新）
 
-### 2.1 🔴 高危问题
+### 3.1 已修复项
 
-| # | 问题 | 位置 | 影响 | 状态 |
-|---|------|------|------|------|
-| SEC-1 | JWT_SECRET/JWT_REFRESH_SECRET 使用默认值 | server/.env.example | 攻击者可伪造Token | ✅ 本地已更换 |
-| SEC-2 | ENCRYPTION_KEY 使用默认值 | server/.env.example | 数据加密形同虚设 | ✅ 本地已更换 |
-| SEC-3 | PostgreSQL 默认密码 saas_pass | docker-compose.yml | 数据库可被未授权访问 | ⚠️ 待服务器操作 |
-| SEC-4 | ~~服务端未强制HTTPS~~ | ~~Nginx配置~~ | ✅ 已解决：Cloudflare Flexible SSL + 始终HTTPS重定向 | completed |
-| SEC-5 | Redis 无密码 | docker-compose.yml | Redis可被未授权访问 | ⚠️ 待服务器操作 |
+| # | 问题 | 修复状态 |
+|---|------|----------|
+| SEC-1 | JWT_SECRET默认值 | ✅ 本地已更换为强随机值 |
+| SEC-2 | ENCRYPTION_KEY默认值 | ✅ 本地已更换 |
+| SEC-3 | PostgreSQL默认密码 | ✅ 服务器已更换为Xhs365Secure2026 |
+| SEC-4 | Redis无密码 | ✅ 服务器已配置Xhs365Redis2026 |
+| SEC-5 | 端口暴露 | ✅ PostgreSQL/Redis仅监听localhost |
+| SEC-6 | HTTPS缺失 | ✅ Cloudflare Flexible SSL |
+| SEC-7 | CORS开发环境 | ✅ 生产环境已移除localhost |
 
-### 2.2 🟡 中危问题
+### 3.2 待处理项
 
-| # | 问题 | 位置 | 影响 | 状态 |
-|---|------|------|------|------|
-| SEC-6 | CORS开发环境允许localhost | server配置 | 可能被恶意网站利用 | ✅ 生产环境已自动移除 |
-| SEC-7 | PostgreSQL/Redis端口映射到宿主机 | docker-compose.yml | 外部可直接访问 | ⚠️ 待服务器操作 |
-| SEC-8 | 备份文件未加密 | scripts/backup.ps1 | 备份数据泄露风险 | pending |
-| SEC-9 | AI API Key未配置 | 服务器.env | AI功能不可用 | pending |
-
-### 2.3 🟢 低危问题
-
-| # | 问题 | 位置 | 影响 |
+| # | 问题 | 风险 | 建议 |
 |---|------|------|------|
-| SEC-10 | 日志可能包含敏感信息 | 全局 | 信息泄露风险 |
-| SEC-11 | 依赖版本范围宽松 | requirements.txt/package.json | 兼容性风险 |
-
-### 2.4 🆕 深度审计安全发现
-
-| # | 问题 | 详情 | 影响 |
-|---|------|------|------|
-| SEC-12 | SecurityHeadersMiddleware CSP配置 | 生产环境CSP允许unsafe-inline/unsafe-eval | XSS风险，但Electron环境可接受 |
-| SEC-13 | Admin登录暴力破解防护 | 有_MAX_ATTEMPTS=5限制，但仅内存级，重启后失效 | 建议迁移到Redis |
-| SEC-14 | 用户登录暴力破解防护 | 有_MAX_ATTEMPTS=10限制，但仅内存级 | 建议迁移到Redis |
-| SEC-15 | DeepSeek API使用代理URL | base_url="https://www.packyapi.com/v1" | 第三方代理风险，需确认可靠性 |
+| SEC-8 | 备份文件未加密 | 🟡 中 | AES-256加密备份文件 |
+| SEC-9 | 日志可能含敏感信息 | 🟡 中 | 添加日志脱敏过滤器 |
+| SEC-10 | Admin暴力破解可绕过 | 🟡 中 | Redis持久化失败计数 |
+| SEC-11 | CSP允许unsafe-inline | 🟢 低 | Electron环境可接受 |
 
 ---
 
-## 三、功能完整性发现
+## 四、部署基础设施发现
 
-### 3.1 已完成模块（18个）
+### 4.1 服务器状态（2026-05-16最后记录）
 
-所有核心模块代码已完成，包括：
-- 客户端：M01主进程/M02 UI/M03-A Chromium采集/M03-B Playwright/M03-C标准化/M04数据中台/M05特征引擎/M07存储/M08权限/M09通信
-- 服务端：M10 API网关/M11用户/M12授权/M13 Feature Gate/M15 AI引擎/M18数据库
-- 前端：M22管理后台/Web-user用户前端
+| 项目 | 状态 |
+|------|------|
+| 服务器IP | 47.239.181.111（阿里云ECS） |
+| 配置 | 2C / 1.6GB RAM / 40GB磁盘 |
+| Nginx | ✅ 运行中 (0.0.0.0:80) |
+| uvicorn | ✅ 运行中 (0.0.0.0:8000) |
+| PostgreSQL | ✅ 运行中 (127.0.0.1:5432) |
+| Redis | ✅ 运行中 (127.0.0.1:6379) |
+| www.xhs365.cn | ✅ 可访问 |
+| admin.xhs365.cn | ✅ 可访问 |
 
-### 3.2 框架就绪但未完善（4个）
+### 4.2 已解决的基础设施问题
 
-| 模块 | 现状 | 缺失 |
+| 问题 | 解决方案 |
+|------|----------|
+| 服务器曾宕机 | 已恢复，所有service正常运行 |
+| 网站未更新 | update.sh已升级为6步流程（含web-admin构建+重启nginx） |
+| web-admin blank page | vite base从/admin/改为/（子域名部署场景） |
+| npm build OOM | 服务器RAM不足，确认无法在服务器执行npm build |
+| Swap不足 | 2GB Swap已添加 |
+
+### 4.3 待解决的基础设施问题
+
+| 问题 | 影响 | 建议 |
 |------|------|------|
-| M20 崩溃恢复 | 基础结构已有 | 完整的快照/检查点/恢复逻辑 |
-| M21 定时任务 | tasks.py基础结构 | 实际调度逻辑、任务队列 |
-| M21-B API采集引擎 | engine.py+parsers.py | 实际API调用测试、代理池管理 |
-| M23 通知系统 | API端点已有 | WebSocket推送、邮件通知接入 |
+| 服务器只1.6GB RAM | npm build会OOM | 升级到4GB或在本地构建后scp上传 |
+| CI/CD未连接部署 | git push不触发自动部署 | GitHub Actions添加SSH deploy步骤 |
+| 监控体系未激活 | 无法及时发现故障 | 配置Prometheus+Grafana |
+| 备份无加密 | 数据泄露风险 | AES-256加密备份 |
 
-### 3.3 待开发模块（3个）
+---
 
-| 模块 | 优先级 | 说明 |
-|------|--------|------|
-| M14 云端Feature Engine | P2 | 与M05逻辑复用，需增加群体聚合 |
-| M16 AI报告生成器 | P2 | 依赖AI分析可用 |
-| M17 匿名聚合 | P3 | MVP不需要，数据量足够后再开发 |
+## 五、模块完成度对照
 
-### 3.4 🆕 深度审计功能发现
+### 5.1 代码完整模块（18个）
 
-| 发现 | 详情 | 影响 |
+| 编号 | 模块 | 位置 | 评估 |
+|------|------|------|------|
+| M01 | Electron主进程调度 | [client/src/main/](file:///d:/vuemonitor/client/src/main/) | ✅ 完整 |
+| M02 | Vue UI展示层 | [client/src/renderer/](file:///d:/vuemonitor/client/src/renderer/) | ✅ 完整（14个视图+34个组件） |
+| M03-A | Chromium实时采集 | [client/src/main/collect/chromium-worker.ts](file:///d:/vuemonitor/client/src/main/collect/chromium-worker.ts) | ✅ 完整 |
+| M03-B | Playwright补采 | [client/src/main/collect/playwright-collector.ts](file:///d:/vuemonitor/client/src/main/collect/playwright-collector.ts) | ✅ 完整 |
+| M03-C | Node标准化 | [client/src/main/collect/normalizer.ts](file:///d:/vuemonitor/client/src/main/collect/normalizer.ts) | ✅ 完整 |
+| M04 | 统一数据中台 | [client/src/main/collect/data-mart.ts](file:///d:/vuemonitor/client/src/main/collect/data-mart.ts) | ✅ 完整 |
+| M05 | Feature Engine(本地) | [client/src/main/feature/feature-engine.ts](file:///d:/vuemonitor/client/src/main/feature/feature-engine.ts) | ✅ 完整 |
+| M07 | 本地存储 | [client/src/main/storage/sqlite.ts](file:///d:/vuemonitor/client/src/main/storage/sqlite.ts) | ✅ 完整 |
+| M08 | 本地权限缓存 | [client/src/main/permission/permission-cache.ts](file:///d:/vuemonitor/client/src/main/permission/permission-cache.ts) | ✅ 完整 |
+| M09 | 通信层 | [client/src/main/communication/ws-client.ts](file:///d:/vuemonitor/client/src/main/communication/ws-client.ts) | ✅ 完整 |
+| M10 | API Gateway | [server/app/api/router.py](file:///d:/vuemonitor/server/app/api/router.py) | ✅ 完整（26个路由模块） |
+| M11 | 用户系统 | [server/app/api/auth.py](file:///d:/vuemonitor/server/app/api/auth.py)，[server/app/api/users.py](file:///d:/vuemonitor/server/app/api/users.py) | ✅ 完整 |
+| M12 | 授权码系统 | [server/app/api/license.py](file:///d:/vuemonitor/server/app/api/license.py)，[client/src/main/license/license-manager.ts](file:///d:/vuemonitor/client/src/main/license/license-manager.ts) | ✅ 完整 |
+| M13 | Feature Gate | [server/app/middleware/feature_gate.py](file:///d:/vuemonitor/server/app/middleware/feature_gate.py)，[shared/constants/feature_gates.py](file:///d:/vuemonitor/shared/constants/feature_gates.py) | ✅ 完整 |
+| M15 | AI分析引擎 | [server/app/ai/](file:///d:/vuemonitor/server/app/ai/) | ✅ 代码完整（API Key未配置） |
+| M18 | PostgreSQL | [database/schema.sql](file:///d:/vuemonitor/database/schema.sql) | ✅ 完整（42张表） |
+| M22 | Web-admin | [web-admin/src/](file:///d:/vuemonitor/web-admin/src/) | ✅ 完整（12个页面） |
+| - | Web-user | [web-user/src/](file:///d:/vuemonitor/web-user/src/) | ✅ 完整 |
+
+### 5.2 框架就绪模块（4个）
+
+| 编号 | 模块 | 缺口 |
 |------|------|------|
-| AI分析类型完整 | 9种分析类型：basic_analysis/trend_score/prediction/risk_warning/competitor_analysis/product_selection/report/product_optimization/batch_analysis | 超出需求文档预期 |
-| AI报告模板系统 | AIReportTemplate模型+默认模板(商品分析/竞品对比/趋势预测/风险评估) | M16部分已实现 |
-| 告警规则引擎 | AlertRule+AlertEvent+AlertRuleEngine，支持多指标/多操作符/多严重级别 | 超出需求文档预期 |
-| 团队协作 | Team+TeamMember+TeamSharedRule+TeamSharedProduct+TeamInvitation | 完整实现 |
-| GDPR合规 | 数据导出/删除请求API，覆盖11张用户数据表 | M24已实现 |
-| 安全审计 | SecurityAuditLog+OperationAuditLog双审计体系 | 超出需求文档预期 |
-| 任务队列 | TaskQueue+TaskPriority，支持异步任务管理 | M21部分已实现 |
-| 会员体系 | MembershipPlan+UserMembership，支持订阅管理 | Phase 2准备就绪 |
-| AI预测 | AIPrediction模型，支持评分+标签+分解+原因 | Phase 2准备就绪 |
-| 特征引擎云端 | Feature+CategoryStat+EnhancedFeature，M14部分已实现 | 框架就绪 |
+| M20 | 崩溃恢复 | 任务快照/检查点/自动重启逻辑待完善 |
+| M21 | 定时任务调度器 | 周期性调度/失败重试/Cron待完善 |
+| M21-B | API高并发采集引擎 | 真实API采集/代理池/风控待完善 |
+| M23 | 通知系统 | 邮件通知接入(SMTP)未配置 |
 
----
+### 5.3 待开发模块（3个）
 
-## 四、部署发现
-
-### 4.1 当前部署状态
-
-- 服务器：阿里云ECS 2C/1.6GB RAM（配置偏低）
-- 域名：xhs365.cn（Cloudflare托管，Flexible SSL）
-- 部署方式：GitHub同步部署（非Docker）
-- 关联系统：pic.xhs365.cn（AIPic图片处理，独立部署）
-- 数据备份：已完成，关键数据备份至本地 d:\vuemonitor\backups\
-
-### 4.2 部署风险
-
-| # | 风险 | 说明 | 状态 |
-|---|------|------|------|
-| DEP-1 | 服务器内存仅1.6GB | 已添加2GB Swap，但高并发可能不足 | ⚠️ 建议升级 |
-| DEP-2 | ~~Cloudflare Flexible SSL~~ | ✅ 已解决：CF Flexible SSL + 始终HTTPS重定向 | completed |
-| DEP-3 | 单实例部署 | 无高可用，服务中断无法自动恢复 | pending |
-| DEP-4 | Electron客户端未打包 | 代码完成但未实际打包测试 | pending |
-| DEP-5 | 🆕 远程主机曾崩溃 | 服务器不稳定，可能需要重装 | ⚠️ 数据已备份 |
-| DEP-6 | 🆕 AIPic独立部署 | pic.xhs365.cn独立部署，与主系统解耦 | ✅ 正常 |
-
-### 4.3 🆕 备份清单（2026-05-15）
-
-| 文件 | 大小 | 说明 |
+| 编号 | 模块 | 备注 |
 |------|------|------|
-| vuemonitor.sql | 98 KB | PostgreSQL完整dump（42张表+数据） |
-| aipic_global_config.db | 132 KB | AIPic SQLite主数据库 |
-| user_data_401377a7_8aea.db | 28 KB | AIPic用户数据 |
-| aipic_data.tar.gz | 3.8 MB | AIPic图片+用户数据打包 |
-| vuemonitor_root.env | 1.2 KB | VueMonitor根目录.env |
-| vuemonitor_server.env | 747 B | VueMonitor服务端.env |
-| aipic_root.env | 86 B | AIPic根目录.env |
-| aipic_backend.env | 369 B | AIPic后端.env |
-| nginx_vuemonitor.conf | 3.1 KB | Nginx www.xhs365.cn配置 |
-| nginx_aipic.conf | 1.8 KB | Nginx pic.xhs365.cn配置 |
-| vuemonitor.service | 402 B | systemd服务文件 |
-| aipic.service | 425 B | systemd服务文件 |
+| M14 | Feature Engine(云端) | 与M05逻辑复用，增加群体行为聚合 |
+| M16 | AI报告生成器 | 标准商业决策输出 + PDF + 多模板 |
+| M17 | 匿名聚合模块 | MVP阶段可暂缓 |
 
 ---
 
-## 五、代码质量发现
+## 六、超出需求文档的实现
 
-### 5.1 服务端
-
-- 代码结构分层清晰：API → Service → Model → Core
-- 异常处理统一：自定义异常类 + 全局异常处理器
-- 数据库会话管理良好：异步 + 自动提交/回滚
-- 缓存策略完善：Redis + 装饰器 + 批量操作
-
-### 5.2 客户端
-
-- 进程隔离严格：主进程/渲染进程IPC通信
-- 安全预加载：contextBridge + 白名单通道
-- 状态管理模块化：Pinia Store
-- 错误恢复：崩溃恢复 + 检查点 + 重试
-
-### 5.3 潜在问题
-
-| # | 问题 | 说明 | 状态 |
-|---|------|------|------|
-| CODE-1 | SQLite JSONB→TEXT修复 | 需确认所有SQLite相关代码已修复 | pending |
-| CODE-2 | gate:proxy:* 废弃清理 | 需确认前端/后端所有proxy相关Gate已标记废弃 | pending |
-| CODE-3 | M05↔M14字段映射 | 本地features表与云端features表字段映射需验证 | pending |
-| CODE-4 | 产品化语言审查 | 需全面检查异常提示是否使用产品化语言 | pending |
-| CODE-5 | 🆕 AI Store错误分类 | 已增强：network/permission/quota/no_data/provider/unknown | ✅ 已完成 |
-| CODE-6 | 🆕 CloudSync错误反馈 | 已增强：服务端业务错误分类传递 | ✅ 已完成 |
-| CODE-7 | 🆕 AI权限前置检查 | 已增强：IPC handler分析前先检查Feature Gate | ✅ 已完成 |
-| CODE-8 | 🆕 Auth Store登录后初始化 | 已增强：postLoginInit并行获取权限/许可证 | ✅ 已完成 |
+| 实现 | 说明 | 影响 |
+|------|------|------|
+| 9种AI分析类型 | basic/trend/prediction/risk/competitor/selection/report/optimization/batch | 超出需求预期 |
+| AI报告模板系统 | AIReportTemplate模型+默认模板(商品/竞品/趋势/风险) | M16部分已实现 |
+| 告警规则引擎 | AlertRule+AlertEvent+多指标/操作符/严重级别 | 超出预期 |
+| 团队协作 | Team+Member+SharedRule+SharedProduct+Invitation | 完整实现 |
+| GDPR合规 | 数据导出/删除请求API，11张表覆盖 | M24已实现 |
+| 安全审计双体系 | SecurityAuditLog+OperationAuditLog | 超出预期 |
+| 任务队列 | TaskQueue+TaskPriority | M21部分实现 |
+| 会员体系 | MembershipPlan+UserMembership | Phase 2就绪 |
+| AI预测 | AIPrediction模型+评分+标签+分解 | Phase 2就绪 |
+| 特征引擎云端 | Feature+CategoryStat+EnhancedFeature | M14框架就绪 |
+| AIPic作图系统 | 完整的AI作图模块(生成/风格/队列/积分) | 独立子系统 |
 
 ---
 
-## 六、业务逻辑发现
+## 七、系统薄弱点
 
-### 6.1 会员体系
-
-| 等级 | 监控上限 | AI能力 | 定价策略 |
-|------|---------|--------|---------|
-| Free | 3个 | 3次/日，基础描述 | 免费（引流） |
-| Pro | 50个 | 无限，趋势评分+历史对比 | 授权码 |
-| Premium | 无限 | 爆品预测+风险预警+多维评分 | 授权码 |
-| Enterprise | 无限 | API+私有部署+自定义AI | 授权码/合同 |
-
-### 6.2 核心转化策略
-
-**数据深度差异**（非功能锁）：
-- Free：当前状态数据 → "销量正在上升"
-- Pro：历史趋势+基础分析 → "7天增长12%，评分★★★★☆"
-- Premium：AI预测+多维模型 → "爆品概率85%，未来3天预测↑"
-
-### 6.3 SaaS演进路线
-
-- Phase 1 (1-3月)：MVP验证 — Free+Pro，小红书，1000用户
-- Phase 2 (3-6月)：增长期 — +Premium，+淘宝，10000用户
-- Phase 3 (6-12月)：规模期 — +Enterprise，全平台，50000+用户
-
-### 6.4 🆕 AI能力分层映射
-
-| 分析类型 | Free | Pro | Premium |
-|----------|------|-----|---------|
-| basic_analysis（基础分析） | ✅ 3次/日 | ✅ 无限 | ✅ 无限 |
-| trend_score（趋势评分） | ❌ | ✅ 无限 | ✅ 无限 |
-| prediction（爆品预测） | ❌ | ❌ | ✅ 无限 |
-| risk_warning（风险预警） | ❌ | ❌ | ✅ 无限 |
-| competitor_analysis（竞品分析） | ❌ | ✅ 无限 | ✅ 无限 |
-| product_selection（选品建议） | ❌ | ❌ | ✅ 无限 |
-| report（分析报告） | ❌ | ✅ 无限 | ✅ 无限 |
-| product_optimization（商品优化） | ❌ | ✅ 无限 | ✅ 无限 |
-| batch_analysis（批量分析） | ❌ | ❌ | ✅ 无限 |
-
----
-
-## 七、关键待确认项
-
-| # | 问题 | 影响 | 需要确认方 | 状态 |
-|---|------|------|-----------|------|
-| Q-1 | AI API Key何时配置？ | AI功能无法使用 | 用户/运营 | ⚠️ 待确认 |
-| Q-2 | Electron客户端是否需要Mac/Linux版？ | 打包策略 | 用户 | ⚠️ 待确认 |
-| Q-3 | 服务器是否需要升级配置？ | 并发承载能力 | 运维 | ⚠️ 建议升级 |
-| Q-4 | 是否需要对接支付系统？ | 商业化路径 | 产品 | ⚠️ Phase 2 |
-| Q-5 | 小红书采集合规性确认？ | 法律风险 | 法务 | ⚠️ 待确认 |
-| Q-6 | 🆕 远程主机是否需要重装？ | 服务恢复 | 用户 | ⚠️ 待确认 |
-| Q-7 | 🆕 DeepSeek代理URL(packyapi.com)是否可靠？ | AI服务稳定性 | 用户 | ⚠️ 待确认 |
-| Q-8 | 🆕 AIPic系统是否需要同步维护？ | 系统一致性 | 用户 | ⚠️ 待确认 |
+| 薄弱点 | 描述 | 风险等级 |
+|--------|------|----------|
+| 端到端未验证 | 核心业务流程未完整跑通 | 🔴 高 |
+| AI不可用 | API Key未配置，核心卖点不工作 | 🔴 高 |
+| Electron未打包 | 桌面客户端无法分发 | 🔴 高 |
+| 服务器资源低 | 1.6GB RAM不足以编译前端 | 🟡 中 |
+| 监控缺失 | 无生产监控告警 | 🟡 中 |
+| 测试不足 | 以集成测试为主，缺少单元测试覆盖 | 🟡 中 |
+| CI/CD断裂 | GitHub Actions不触发部署 | 🟡 中 |
+| 文档滞后 | UI重设计等新文档未同步到代码 | 🟢 低 |

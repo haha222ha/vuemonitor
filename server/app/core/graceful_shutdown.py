@@ -4,7 +4,7 @@ import logging
 import os
 import signal
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class GracefulShutdown:
     def register_task(self, task_id: str, task_info: dict):
         self._active_tasks[task_id] = {
             **task_info,
-            "registered_at": datetime.now(timezone.utc).isoformat(),
+            "registered_at": datetime.now(UTC).isoformat(),
         }
 
     def unregister_task(self, task_id: str):
@@ -71,11 +71,11 @@ class GracefulShutdown:
         checkpoint_dir = Path(_CHECKPOINT_DIR)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         checkpoint_file = checkpoint_dir / f"shutdown_{timestamp}.json"
 
         checkpoint_data = {
-            "shutdown_time": datetime.now(timezone.utc).isoformat(),
+            "shutdown_time": datetime.now(UTC).isoformat(),
             "active_tasks": self._active_tasks,
         }
 
@@ -92,7 +92,7 @@ class GracefulShutdown:
         recovered = []
         for cp_file in sorted(checkpoint_dir.glob("shutdown_*.json")):
             try:
-                with open(cp_file, "r", encoding="utf-8") as f:
+                with open(cp_file, encoding="utf-8") as f:
                     data = json.load(f)
 
                 for task_id, task_info in data.get("active_tasks", {}).items():
@@ -121,4 +121,4 @@ def setup_signal_handlers():
         try:
             loop.add_signal_handler(sig, _signal_handler)
         except NotImplementedError:
-            pass
+            logger.warning("Silent exception")

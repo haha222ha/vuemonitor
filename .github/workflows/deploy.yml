@@ -1,0 +1,164 @@
+name: Deploy to Production
+
+on:
+  workflow_run:
+    workflows: ["Server CI/CD", "Web CI/CD"]
+    types:
+      - completed
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      server_replicas:
+        description: "Server replicas count"
+        required: false
+        default: "2"
+      force_deploy:
+        description: "Force deploy even if no changes"
+        required: false
+        type: boolean
+        default: false
+
+env:
+  DEPLOY_PATH: /opt/vuemonitor
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success')
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Sync project files
+        run: |
+          rsync -avz --delete \
+            --exclude='node_modules' \
+            --exclude='.git' \
+            --exclude='client/node_modules' \
+            --exclude='server/__pycache__' \
+            --exclude='*.pyc' \
+            --exclude='.env' \
+            --exclude='coverage' \
+            --exclude='dist' \
+            -e "ssh -i ~/.ssh/deploy_key" \
+            ./ ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd ${{ env.DEPLOY_PATH }}
+
+            echo "=== Checking .env file ==="
+            if [ ! -f .env ]; then
+              echo "ERROR: .env file not found at ${{ env.DEPLOY_PATH }}/.env"
+              echo "Create it with required variables: DB_PASSWORD, REDIS_PASSWORD, JWT_SECRET, etc."
+              exit 1
+            fi
+
+            echo "=== Pulling latest Docker images ==="
+            docker compose -f docker-compose.prod.yml pull 2>/dev/null || true
+
+            echo "=== Building images ==="
+            docker compose -f docker-compose.prod.yml build --parallel
+
+            echo "=== Running database migrations ==="
+            docker compose -f docker-compose.prod.yml run --rm server alembic upgrade head
+
+            echo "=== Rolling update ==="
+            SERVER_REPLICAS=${{ github.event.inputs.server_replicas || '2' }} \
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans --no-deps server
+
+            echo "=== Waiting for server health check ==="
+            for i in $(seq 1 30); do
+              if docker compose -f docker-compose.prod.yml exec -T server curl -sf http://localhost:8000/health > /dev/null 2>&1; then
+                echo "Server is healthy after ${i} attempts"
+                break
+              fi
+              if [ $i -eq 30 ]; then
+                echo "ERROR: Server failed health check after 30 attempts"
+                docker compose -f docker-compose.prod.yml logs --tail=50 server
+                exit 1
+              fi
+              sleep 5
+            done
+
+            echo "=== Updating remaining services ==="
+            docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+            echo "=== Cleaning up old images ==="
+            docker image prune -f --filter "until=168h"
+
+            echo "=== Deployment complete ==="
+            docker compose -f docker-compose.prod.yml ps
+
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd ${{ env.DEPLOY_PATH }}
+
+            echo "=== Health check ==="
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/health || echo "000")
+            if [ "$HTTP_CODE" != "200" ]; then
+              echo "ERROR: Health check failed with HTTP $HTTP_CODE"
+              docker compose -f docker-compose.prod.yml logs --tail=100
+              exit 1
+            fi
+            echo "Health check passed (HTTP $HTTP_CODE)"
+
+            echo "=== Service status ==="
+            docker compose -f docker-compose.prod.yml ps --format "table {{.Name}}\t{{.Status}}\t{{.Ports}}"
+
+  notify:
+    name: Notify Deployment
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: always()
+    steps:
+      - name: Send notification
+        run: |
+          STATUS="${{ needs.deploy.result }}"
+          if [ "$STATUS" = "success" ]; then
+            EMOJI="✅"
+            COLOR="good"
+          else
+            EMOJI="❌"
+            COLOR="danger"
+          fi
+
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            curl -s -X POST "${{ secrets.SLACK_WEBHOOK_URL }}" \
+              -H 'Content-type: application/json' \
+              -d "{
+                \"text\": \"${EMOJI} Deployment to production ${STATUS}\",
+                \"attachments\": [{
+                  \"color\": \"${COLOR}\",
+                  \"fields\": [
+                    {\"title\": \"Repository\", \"value\": \"${{ github.repository }}\", \"short\": true},
+                    {\"title\": \"Branch\", \"value\": \"${{ github.ref_name }}\", \"short\": true},
+                    {\"title\": \"Commit\", \"value\": \"${{ github.sha }}\", \"short\": true},
+                    {\"title\": \"Triggered by\", \"value\": \"${{ github.actor }}\", \"short\": true}
+                  ]
+                }]
+              }"
+          fi
+
+          echo "Deployment ${STATUS} notification sent"

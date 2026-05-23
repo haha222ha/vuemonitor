@@ -3,6 +3,7 @@ import { useAuthStore } from "../stores/auth";
 
 interface WSMessage {
   type: string;
+  channel?: string;
   data?: any;
   ts?: string;
 }

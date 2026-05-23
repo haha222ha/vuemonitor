@@ -20,7 +20,12 @@
           <div class="stat-info">
             <div class="stat-value">{{ animatedStats.productCount }}</div>
             <div class="stat-label">监控商品</div>
-            <div class="stat-sub" v-if="stats.activeProductCount > 0">{{ stats.activeProductCount }} 活跃</div>
+            <div class="stat-sub">
+              <span v-if="stats.activeProductCount > 0">{{ stats.activeProductCount }} 活跃</span>
+              <span v-if="stats.productCountChange != null" :class="['stat-change', stats.productCountChange >= 0 ? 'stat-change--up' : 'stat-change--down']">
+                {{ stats.productCountChange >= 0 ? '↑' : '↓' }}{{ Math.abs(stats.productCountChange) }}% 环比
+              </span>
+            </div>
           </div>
         </div>
       </el-col>
@@ -48,6 +53,11 @@
             <div class="stat-value">{{ animatedStats.aiRecommendations }}</div>
             <div class="stat-label">AI推荐</div>
             <div class="stat-sub" v-if="stats.todayAiCount > 0">今日 {{ stats.todayAiCount }} 次</div>
+            <div class="stat-sub" v-else-if="stats.aiCountChange != null">
+              <span :class="['stat-change', stats.aiCountChange >= 0 ? 'stat-change--up' : 'stat-change--down']">
+                {{ stats.aiCountChange >= 0 ? '↑' : '↓' }}{{ Math.abs(stats.aiCountChange) }}% 环比
+              </span>
+            </div>
           </div>
         </div>
       </el-col>
@@ -60,6 +70,14 @@
             <div class="stat-value">{{ animatedStats.riskAlerts }}</div>
             <div class="stat-label">风险提示</div>
             <div class="stat-sub" v-if="stats.riskAlerts > 0">需关注</div>
+            <div class="stat-sub" v-else-if="stats.riskCountChange != null">
+              <span :class="['stat-change', stats.riskCountChange >= 0 ? 'stat-change--up' : 'stat-change--down']">
+                {{ stats.riskCountChange >= 0 ? '↑' : '↓' }}{{ Math.abs(stats.riskCountChange) }}% 环比
+              </span>
+            </div>
+            <el-button size="small" text type="danger" @click="runAnomalyDetect" :loading="detecting" style="margin-top: 4px; padding: 0;">
+              一键检测
+            </el-button>
           </div>
         </div>
       </el-col>
@@ -81,6 +99,28 @@
           </div>
           <div v-else class="chart-empty">
             <p>暂无趋势数据</p>
+          </div>
+        </div>
+
+        <div v-if="anomalyResults.length > 0" class="panel" style="margin-top: 20px;">
+          <div class="panel-header">
+            <h3>异常检测结果</h3>
+            <el-tag type="danger" effect="plain" size="small">{{ anomalyResults.length }} 项异常</el-tag>
+          </div>
+          <div class="anomaly-list">
+            <div v-for="a in anomalyResults" :key="a.id" class="anomaly-item" @click="goToProduct(a.product_id)">
+              <div :class="['anomaly-severity', `anomaly-severity--${a.severity}`]"></div>
+              <div class="anomaly-body">
+                <div class="anomaly-title">{{ a.product_name }}</div>
+                <div class="anomaly-detail">{{ a.detail }}</div>
+              </div>
+              <div class="anomaly-meta">
+                <el-tag :type="a.direction === 'up' ? 'danger' : 'success'" size="small" effect="plain">
+                  {{ a.direction === 'up' ? '↑ 异常升高' : '↓ 异常下降' }}
+                </el-tag>
+                <span class="anomaly-zscore">Z={{ a.z_score }}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -153,7 +193,12 @@
           <div class="collect-status">
             <div class="collect-item">
               <span class="collect-label">今日采集</span>
-              <span class="collect-value">{{ stats.todayCollect }}</span>
+              <div class="collect-value-wrap">
+                <span class="collect-value">{{ stats.todayCollect }}</span>
+                <span v-if="stats.collectCountChange != null" :class="['stat-change', stats.collectCountChange >= 0 ? 'stat-change--up' : 'stat-change--down']" style="font-size: 11px;">
+                  {{ stats.collectCountChange >= 0 ? '↑' : '↓' }}{{ Math.abs(stats.collectCountChange) }}%
+                </span>
+              </div>
             </div>
             <div class="collect-item">
               <span class="collect-label">活跃任务</span>
@@ -243,9 +288,11 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed, onMounted, onUnmounted } from "vue";
+import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import api from "../../utils/api";
 import { Refresh } from "@element-plus/icons-vue";
+import { ElMessage } from "element-plus";
 import VChart from "vue-echarts";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
@@ -255,6 +302,7 @@ import { GridComponent, TooltipComponent, LegendComponent } from "echarts/compon
 use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent]);
 
 const auth = useAuthStore();
+const router = useRouter();
 
 const stats = reactive({
   productCount: 0,
@@ -268,6 +316,14 @@ const stats = reactive({
   activeTasks: 0,
   successRate: 0,
   todayAiCount: 0,
+  productCountChange: null as number | null,
+  collectCountChange: null as number | null,
+  aiCountChange: null as number | null,
+  riskCountChange: null as number | null,
+  todayNewProducts: 0,
+  yesterdayNewProducts: 0,
+  todayCollectCount: 0,
+  yesterdayCollect: 0,
 });
 
 const animatedStats = reactive({
@@ -281,6 +337,8 @@ const platformDist = ref<Record<string, number>>({});
 const collectRunning = ref(false);
 const activities = ref<any[]>([]);
 const refreshing = ref(false);
+const detecting = ref(false);
+const anomalyResults = ref<any[]>([]);
 
 const trendData = reactive({
   dates: [] as string[],
@@ -306,8 +364,8 @@ const planLabel = computed(() => {
 });
 
 const planTagType = computed(() => {
-  const map: Record<string, string> = { pro: "primary", premium: "warning", enterprise: "danger" };
-  return (map[auth.userPlan] || "info") as any;
+  const map: Record<string, 'primary' | 'success' | 'info' | 'warning' | 'danger'> = { pro: "primary", premium: "warning", enterprise: "danger" };
+  return map[auth.userPlan] || "info";
 });
 
 const trendClass = computed(() => {
@@ -404,9 +462,9 @@ function timeAgo(dateStr: string | null) {
   return Math.floor(diff / 86400) + "天前";
 }
 
-function activityStatusType(status: string) {
-  const map: Record<string, string> = { completed: "success", running: "primary", pending: "warning", failed: "danger", cancelled: "info" };
-  return (map[status] || "info") as any;
+function activityStatusType(status: string): 'primary' | 'success' | 'info' | 'warning' | 'danger' {
+  const map: Record<string, 'primary' | 'success' | 'info' | 'warning' | 'danger'> = { completed: "success", running: "primary", pending: "warning", failed: "danger", cancelled: "info" };
+  return map[status] || "info";
 }
 
 function activityStatusLabel(status: string) {
@@ -446,6 +504,15 @@ async function fetchStats() {
     stats.todayAiCount = d.today_ai_count || 0;
     collectRunning.value = d.collect_running || false;
 
+    stats.productCountChange = d.product_count_change ?? null;
+    stats.collectCountChange = d.collect_count_change ?? null;
+    stats.aiCountChange = d.ai_count_change ?? null;
+    stats.riskCountChange = d.risk_count_change ?? null;
+    stats.todayNewProducts = d.today_new_products || 0;
+    stats.yesterdayNewProducts = d.yesterday_new_products || 0;
+    stats.todayCollectCount = d.today_collect || 0;
+    stats.yesterdayCollect = d.yesterday_collect || 0;
+
     recentProducts.value = d.recent_products || [];
     platformDist.value = d.platform_distribution || {};
 
@@ -477,6 +544,31 @@ async function refreshAll() {
   refreshing.value = true;
   await Promise.all([fetchStats(), fetchTrend(), fetchActivities()]);
   refreshing.value = false;
+}
+
+async function runAnomalyDetect() {
+  detecting.value = true;
+  try {
+    const { data } = await api.post("/alert-rules/auto-detect", null, {
+      params: { metric: "sales_count", z_threshold: 2.0, days: 7 },
+    });
+    if (data?.code === 0) {
+      anomalyResults.value = data.data.anomalies || [];
+      if (anomalyResults.value.length === 0) {
+        ElMessage.success("未检测到异常，所有商品数据正常");
+      } else {
+        ElMessage.warning(`检测到 ${anomalyResults.value.length} 项异常`);
+      }
+    }
+  } catch {
+    ElMessage.error("异常检测失败，请稍后重试");
+  } finally {
+    detecting.value = false;
+  }
+}
+
+function goToProduct(productId: string) {
+  router.push(`/dashboard/monitor/${productId}`);
 }
 
 onMounted(() => {
@@ -603,6 +695,21 @@ onUnmounted(() => {
   font-size: 11px;
   color: #5a5a6a;
   margin-top: 2px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.stat-change {
+  font-weight: 600;
+}
+
+.stat-change--up {
+  color: #22c55e;
+}
+
+.stat-change--down {
+  color: #ef4444;
 }
 
 .panel {
@@ -624,6 +731,80 @@ onUnmounted(() => {
   font-weight: 600;
   color: #fff;
   margin: 0;
+}
+
+.anomaly-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.anomaly-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.anomaly-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.anomaly-severity {
+  width: 4px;
+  height: 36px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.anomaly-severity--warning {
+  background: #f59e0b;
+}
+
+.anomaly-severity--critical {
+  background: #ef4444;
+}
+
+.anomaly-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.anomaly-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e0e0e6;
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.anomaly-detail {
+  font-size: 12px;
+  color: #8a8a9a;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.anomaly-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.anomaly-zscore {
+  font-size: 11px;
+  color: #6a6a7a;
+  font-family: monospace;
 }
 
 .trend-legend {
@@ -799,6 +980,12 @@ onUnmounted(() => {
   color: #fff;
   font-size: 18px;
   font-weight: 700;
+}
+
+.collect-value-wrap {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
 }
 
 .value-accent {

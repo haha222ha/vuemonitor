@@ -5,7 +5,7 @@ from sqlalchemy import DateTime, ForeignKey, Index, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import UUIDPrimaryKeyMixin, Base
+from app.models.base import Base, UUIDPrimaryKeyMixin
 
 
 class ProductIdMapping(UUIDPrimaryKeyMixin, Base):

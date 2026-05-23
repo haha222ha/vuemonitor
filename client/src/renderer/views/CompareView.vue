@@ -1,7 +1,7 @@
 <template>
   <div class="compare fade-in">
     <PageHeader title="商品对比" subtitle="多维度对比分析，结合品类基准与排名数据">
-      <el-button type="primary" @click="showSelector = true" :disabled="selectedProducts.length >= 10">
+      <el-button type="primary" :disabled="selectedProducts.length >= 10" @click="showSelector = true">
         添加商品 ({{ selectedProducts.length }}/10)
       </el-button>
       <el-button v-if="compareData" @click="resetCompare">重置对比</el-button>
@@ -35,7 +35,7 @@
       </div>
       <template #footer>
         <el-button @click="showSelector = false">取消</el-button>
-        <el-button type="primary" @click="runCompare" :disabled="selectedProducts.length < 2" :loading="loading">开始对比</el-button>
+        <el-button type="primary" :disabled="selectedProducts.length < 2" :loading="loading" @click="runCompare">开始对比</el-button>
       </template>
     </el-dialog>
 
@@ -86,7 +86,7 @@
           <el-table-column prop="sales_count" label="销量" width="130" sortable>
             <template #default="{ row }">
               <div :class="getMetricClass('sales_count', row.sales_count)">{{ row.sales_count != null ? formatNumber(row.sales_count) : '-' }}</div>
-              <div v-if="row._benchmark?.sales" class="table-benchmark">均值{{ formatNumber(row._benchmark.sales.avg) }}</div>
+              <div v-if="row._benchmark?.sales" class="table-benchmark">均值{{ formatNumber(row._benchmark.sales.avg ?? null) }}</div>
             </template>
           </el-table-column>
           <el-table-column prop="rating" label="评分" width="110" sortable>
@@ -101,7 +101,7 @@
           <el-table-column prop="favorite_count" label="收藏" width="100" sortable>
             <template #default="{ row }"><span :class="getMetricClass('favorite_count', row.favorite_count)">{{ row.favorite_count != null ? formatNumber(row.favorite_count) : '-' }}</span></template>
           </el-table-column>
-          <el-table-column label="排名" width="100" v-if="hasRankings">
+          <el-table-column v-if="hasRankings" label="排名" width="100">
             <template #default="{ row }">
               <el-tag v-if="row._ranking" :type="row._ranking.percentile >= 70 ? 'success' : row._ranking.percentile >= 40 ? 'warning' : 'danger'" size="small" effect="dark">
                 Top {{ row._ranking.percentile }}%
@@ -118,8 +118,8 @@
               <el-tag size="small">{{ item.platform }}</el-tag>
             </div>
             <div v-if="item._ranking" class="compare-product-card__rank">
-              <div class="rank-badge" :class="item._ranking.percentile >= 70 ? 'rank-badge--high' : item._ranking.percentile >= 40 ? 'rank-badge--mid' : 'rank-badge--low'">
-                Top {{ item._ranking.percentile }}%
+              <div class="rank-badge" :class="(item._ranking.percentile ?? 0) >= 70 ? 'rank-badge--high' : (item._ranking.percentile ?? 0) >= 40 ? 'rank-badge--mid' : 'rank-badge--low'">
+                Top {{ item._ranking.percentile ?? '-' }}%
               </div>
             </div>
             <div class="compare-product-card__metrics">
@@ -131,7 +131,7 @@
               <div class="compare-product-card__metric">
                 <span class="compare-product-card__metric-label">销量</span>
                 <span class="compare-product-card__metric-value" :class="getMetricClass('sales_count', item.sales_count)">{{ item.sales_count != null ? formatNumber(item.sales_count) : '-' }}</span>
-                <span v-if="item._benchmark?.sales" class="compare-product-card__metric-benchmark">均值{{ formatNumber(item._benchmark.sales.avg) }}</span>
+                <span v-if="item._benchmark?.sales" class="compare-product-card__metric-benchmark">均值{{ formatNumber(item._benchmark.sales.avg ?? null) }}</span>
               </div>
               <div class="compare-product-card__metric">
                 <span class="compare-product-card__metric-label">评分</span>
@@ -158,10 +158,32 @@
             <h3 class="card__title">雷达分析</h3>
           </div>
           <div class="card__actions">
-            <el-checkbox v-model="showBenchmarkLine" label="显示品类均值" v-if="hasBenchmark" />
+            <el-checkbox v-if="hasBenchmark" v-model="showBenchmarkLine" label="显示品类均值" />
           </div>
         </div>
-        <div ref="radarChartRef" class="compare__chart"></div>
+        <div ref="radarChartRef" class="compare__chart" />
+      </div>
+
+      <div class="card" style="margin-top: 20px">
+        <div class="card__header">
+          <div class="card__title-group">
+            <el-icon class="card__icon" :size="20"><TrendCharts /></el-icon>
+            <h3 class="card__title">趋势叠加</h3>
+          </div>
+          <div class="card__actions">
+            <el-radio-group v-model="trendMetric" size="small">
+              <el-radio-button value="sales_count">销量</el-radio-button>
+              <el-radio-button value="price">价格</el-radio-button>
+              <el-radio-button value="favorite_count">收藏</el-radio-button>
+            </el-radio-group>
+            <el-radio-group v-model="trendDays" size="small" style="margin-left: 8px">
+              <el-radio-button :value="7">7天</el-radio-button>
+              <el-radio-button :value="14">14天</el-radio-button>
+              <el-radio-button :value="30">30天</el-radio-button>
+            </el-radio-group>
+          </div>
+        </div>
+        <div ref="trendChartRef" class="compare__chart compare__chart--trend" />
       </div>
 
       <div class="card" style="margin-top: 20px">
@@ -176,7 +198,7 @@
             </el-radio-group>
           </div>
         </div>
-        <div ref="barChartRef" class="compare__chart compare__chart--bar"></div>
+        <div ref="barChartRef" class="compare__chart compare__chart--bar" />
       </div>
 
       <div class="card" style="margin-top: 20px">
@@ -190,11 +212,11 @@
           <div v-for="metric in metricLabels" :key="metric.key" class="metric-card">
             <div class="metric-card__label">{{ metric.label }}</div>
             <div v-if="compareData.comparison?.[metric.key]" class="metric-card__detail">
-              <el-tag type="success" v-if="compareData.comparison[metric.key].best">
-                最优: {{ compareData.comparison[metric.key].best[0] }} ({{ compareData.comparison[metric.key].best[1] }})
+              <el-tag v-if="compareData.comparison?.[metric.key]?.best" type="success">
+                最优: {{ compareData.comparison[metric.key].best![0] }} ({{ compareData.comparison[metric.key].best![1] }})
               </el-tag>
-              <el-tag type="danger" v-if="compareData.comparison[metric.key].worst">
-                最差: {{ compareData.comparison[metric.key].worst[0] }} ({{ compareData.comparison[metric.key].worst[1] }})
+              <el-tag v-if="compareData.comparison?.[metric.key]?.worst" type="danger">
+                最差: {{ compareData.comparison[metric.key].worst![0] }} ({{ compareData.comparison[metric.key].worst![1] }})
               </el-tag>
             </div>
             <div v-else class="metric-card__detail"><el-text type="info">数据不足</el-text></div>
@@ -220,7 +242,8 @@ const router = useRouter();
 const {
   showSelector, searchQuery, selectedProducts, compareData,
   loading, cloudAvailable, viewMode, showBenchmarkLine, barMetric,
-  radarChartRef, barChartRef,
+  trendMetric, trendDays,
+  radarChartRef, barChartRef, trendChartRef,
   metricLabels, barMetrics, hasRankings, hasBenchmark, filteredProducts,
   isSelected, toggleSelect, removeProduct, resetCompare, formatNumber,
   runCompare, getMetricClass,
@@ -249,6 +272,7 @@ onUnmounted(() => { cleanup(); });
 .compare__chips { display: flex; gap: 6px; flex-wrap: wrap; flex: 1; }
 .compare__chart { height: 400px; }
 .compare__chart--bar { height: 320px; }
+.compare__chart--trend { height: 380px; }
 .compare__cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; padding: 4px; }
 .compare-product-card { padding: 16px; border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); background: var(--color-bg-card); transition: border-color 0.2s; }
 .compare-product-card:hover { border-color: var(--color-primary); }

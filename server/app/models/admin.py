@@ -5,7 +5,7 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, SmallInteger, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.base import UUIDPrimaryKeyMixin, Base
+from app.models.base import Base, UUIDPrimaryKeyMixin
 
 
 class RBACRole(UUIDPrimaryKeyMixin, Base):

@@ -1,7 +1,7 @@
 import json
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -22,7 +22,7 @@ class StructuredLoggingMiddleware(BaseHTTPMiddleware):
         duration_ms = round((time.monotonic() - start_time) * 1000, 2)
 
         log_entry = {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "request_id": request_id,
             "method": request.method,
             "path": request.url.path,

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import api from "../utils/api";
+import type { Product } from "./product";
 
 export interface CollectStatus {
   isRunning: boolean;
@@ -44,12 +45,14 @@ export const useCollectStore = defineStore("collect", () => {
         const { data } = await api.get("/collect/tasks");
         if (data.code === 0 && data.data) {
           const tasks = data.data.items || data.data || [];
-          status.value.activeCount = tasks.filter((t: any) => t.status === "running").length;
-          status.value.queueLength = tasks.filter((t: any) => t.status === "pending").length;
+          status.value.activeCount = tasks.filter((t: Record<string, unknown>) => t.status === "running").length;
+          status.value.queueLength = tasks.filter((t: Record<string, unknown>) => t.status === "pending").length;
           status.value.isRunning = status.value.activeCount > 0;
         }
       }
-    } catch {}
+    } catch (err) {
+      console.warn("[Collect] fetchStatus failed:", err);
+    }
   }
 
   async function startCollect(tasks: Array<{ targetId: string; targetType: string; targetUrl?: string }>) {
@@ -89,7 +92,9 @@ export const useCollectStore = defineStore("collect", () => {
       } else {
         await api.post(`/collect/tasks/${taskId}/cancel`);
       }
-    } catch {}
+    } catch (err) {
+      console.warn("[Collect] cancelCollect failed:", err);
+    }
   }
 
   async function clearQueue() {
@@ -98,7 +103,9 @@ export const useCollectStore = defineStore("collect", () => {
         await window.electronAPI.invoke("collect:clear-queue");
         status.value.queueLength = 0;
       }
-    } catch {}
+    } catch (err) {
+      console.warn("[Collect] clearQueue failed:", err);
+    }
   }
 
   async function setConcurrency(value: number) {
@@ -109,7 +116,9 @@ export const useCollectStore = defineStore("collect", () => {
       } else {
         status.value.concurrency = value;
       }
-    } catch {}
+    } catch (err) {
+      console.warn("[Collect] setConcurrency failed:", err);
+    }
   }
 
   async function getConcurrency() {
@@ -119,10 +128,12 @@ export const useCollectStore = defineStore("collect", () => {
         status.value.concurrency = (result as { current: number }).current;
         status.value.resourceUsage = (result as { resourceUsage: CollectStatus["resourceUsage"] }).resourceUsage;
       }
-    } catch {}
+    } catch (err) {
+      console.warn("[Collect] getConcurrency failed:", err);
+    }
   }
 
-  function addResult(result: CollectResult) {
+  async function addResult(result: CollectResult) {
     results.value.unshift(result);
     if (results.value.length > 200) {
       results.value = results.value.slice(0, 200);
@@ -130,6 +141,20 @@ export const useCollectStore = defineStore("collect", () => {
     if (result.status === "risk_detected") {
       riskAlerts.value.unshift(result);
     }
+
+    try {
+      const { useProductStore } = await import("./product");
+      const productStore = useProductStore();
+      const product = productStore.products.find(
+        (p: Product) => p.platform_product_id === result.targetId
+      );
+      if (product) {
+        product.last_collect_status = result.status === "success" ? "success" : "failed";
+        if (result.status === "success") {
+          product.last_collected_at = new Date().toISOString();
+        }
+      }
+    } catch { /* ignore */ }
   }
 
   function clearResults() {

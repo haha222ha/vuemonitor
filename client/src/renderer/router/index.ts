@@ -65,6 +65,16 @@ const routes = [
         component: () => import("../views/CategoryInsightView.vue"),
       },
       {
+        path: "discovery",
+        name: "Discovery",
+        component: () => import("../views/DiscoveryView.vue"),
+      },
+      {
+        path: "hot-insight",
+        name: "HotInsight",
+        component: () => import("../views/HotInsightView.vue"),
+      },
+      {
         path: "scheduler",
         name: "Scheduler",
         component: () => import("../views/SchedulerView.vue"),
@@ -78,8 +88,13 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, _from, next) => {
-  const token = localStorage.getItem("access_token");
+router.beforeEach(async (to, _from, next) => {
+  let token: string | null = null;
+  if (window.electronAPI) {
+    token = await window.electronAPI.invoke("secure-storage:get", "access_token");
+  } else {
+    token = localStorage.getItem("access_token");
+  }
   if (to.name !== "Login" && !token) {
     next({ name: "Login" });
   } else {

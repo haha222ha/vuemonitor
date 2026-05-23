@@ -6,7 +6,7 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, Numeric, S
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin, Base
+from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 
 class Product(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -18,6 +18,7 @@ class Product(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     product_name: Mapped[str] = mapped_column(String(500), nullable=False)
     shop_name: Mapped[str | None] = mapped_column(String(255))
     category: Mapped[str | None] = mapped_column(String(100))
+    category_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("product_categories.id", ondelete="SET NULL"))
     image_url: Mapped[str | None] = mapped_column(String(500))
     product_url: Mapped[str | None] = mapped_column(String(500))
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
@@ -30,6 +31,10 @@ class Product(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         UniqueConstraint("user_id", "platform", "platform_product_id", name="uq_user_platform_product"),
         Index("idx_products_user_id", "user_id"),
         Index("idx_products_platform", "platform"),
+        Index("idx_products_category_id", "category_id"),
+        Index("idx_products_is_active", "is_active"),
+        Index("idx_products_last_collected", "last_collected_at"),
+        Index("idx_products_user_active", "user_id", "is_active"),
     )
 
 
@@ -55,4 +60,5 @@ class ProductFeature(UUIDPrimaryKeyMixin, Base):
     __table_args__ = (
         Index("idx_product_features_product_id", "product_id"),
         Index("idx_product_features_collected_at", "collected_at"),
+        Index("idx_product_features_product_collected", "product_id", "collected_at"),
     )

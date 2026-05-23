@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+﻿import { EventEmitter } from "events";
 import { BrowserWindow, app } from "electron";
 import * as os from "os";
 import { logger } from "../logger/logger";
@@ -156,10 +156,10 @@ class PerformanceMonitor extends EventEmitter {
     let diskInfo = { readCount: 0, writeCount: 0, readBytes: 0, writeBytes: 0 };
     try {
       const currentDisk = {
-        readCount: process.ioCounters?.readOperationCount || 0,
-        writeCount: process.ioCounters?.writeOperationCount || 0,
-        readBytes: process.ioCounters?.readTransferCount || 0,
-        writeBytes: process.ioCounters?.writeTransferCount || 0,
+        readCount: 0,
+        writeCount: 0,
+        readBytes: 0,
+        writeBytes: 0,
       };
 
       if (this.lastDiskInfo) {
@@ -172,7 +172,7 @@ class PerformanceMonitor extends EventEmitter {
       }
 
       this.lastDiskInfo = currentDisk;
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
 
     return {
       timestamp: new Date().toISOString(),

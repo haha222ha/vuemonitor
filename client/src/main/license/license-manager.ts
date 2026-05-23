@@ -2,6 +2,8 @@ import * as crypto from "crypto";
 import * as os from "os";
 import * as fs from "fs";
 import * as path from "path";
+import axios from "axios";
+import { logger } from "../logger/logger";
 
 export interface LicenseInfo {
   licenseKey: string;
@@ -199,7 +201,6 @@ export class LicenseManager {
     serverUrl: string
   ): Promise<VerificationResult> {
     try {
-      const axios = require("axios");
       const { data } = await axios.post(`${serverUrl}/api/v1/license/verify`, {
         license_key: key,
         device_id: deviceId,
@@ -273,7 +274,7 @@ export class LicenseManager {
       license.lastVerified = new Date().toISOString();
       this.saveLicense(license);
       this.cachedLicense = license;
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
   }
 
   getCurrentLicense(): LicenseInfo | null {

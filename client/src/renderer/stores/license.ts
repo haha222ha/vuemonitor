@@ -57,7 +57,9 @@ export const useLicenseStore = defineStore("license", () => {
           license.value = data.data as LicenseInfo;
         }
       }
-    } catch {}
+    } catch (err) {
+      console.warn("[License] fetchLicense failed:", err);
+    }
   }
 
   async function fetchPlan() {
@@ -94,7 +96,9 @@ export const useLicenseStore = defineStore("license", () => {
           }
         }
       }
-    } catch {}
+    } catch (err) {
+      console.warn("[License] fetchPlan failed:", err);
+    }
   }
 
   async function activate(licenseKey: string, serverUrl?: string) {
@@ -138,7 +142,8 @@ export const useLicenseStore = defineStore("license", () => {
       }
       license.value = null;
       return true;
-    } catch {
+    } catch (err) {
+      console.warn("[License] deactivate failed:", err);
       return false;
     }
   }
@@ -152,7 +157,8 @@ export const useLicenseStore = defineStore("license", () => {
         };
       }
       return null;
-    } catch {
+    } catch (err) {
+      console.warn("[License] getDeviceInfo failed:", err);
       return null;
     }
   }
@@ -163,7 +169,8 @@ export const useLicenseStore = defineStore("license", () => {
         return await window.electronAPI.invoke("license:check-feature", gateKey) as boolean;
       }
       return true;
-    } catch {
+    } catch (err) {
+      console.warn("[License] checkFeature failed:", err);
       return false;
     }
   }
@@ -174,7 +181,8 @@ export const useLicenseStore = defineStore("license", () => {
         return await window.electronAPI.invoke("license:check-quota", quotaKey, currentUsage) as QuotaCheckResult;
       }
       return { allowed: true, limit: -1, remaining: -1 };
-    } catch {
+    } catch (err) {
+      console.warn("[License] checkQuota failed:", err);
       return { allowed: true, limit: -1, remaining: -1 };
     }
   }
@@ -185,7 +193,8 @@ export const useLicenseStore = defineStore("license", () => {
         return await window.electronAPI.invoke("license:is-expired") as boolean;
       }
       return false;
-    } catch {
+    } catch (err) {
+      console.warn("[License] checkExpired failed:", err);
       return false;
     }
   }

@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
+import axios from "axios";
 import { FEATURE_GATES, PLAN_LIMITS, isPlanSufficient, PlanTier, FeatureGateDefinition } from "@shared/constants/feature-gates";
+import { logger } from "../logger/logger";
 
 export interface PermissionState {
   plan: PlanTier;
@@ -32,7 +34,6 @@ export class LocalPermissionCache {
 
   async refreshFromServer(serverUrl: string, token: string): Promise<void> {
     try {
-      const axios = require("axios");
       const { data } = await axios.get(`${serverUrl}/api/v1/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -43,7 +44,7 @@ export class LocalPermissionCache {
       this.rebuildGates();
       this.rebuildQuotas(data.usage || {});
       this.saveToDisk();
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
   }
 
   checkGate(gateKey: string): boolean {
@@ -91,7 +92,7 @@ export class LocalPermissionCache {
       if (fs.existsSync(this.cachePath)) {
         fs.unlinkSync(this.cachePath);
       }
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
   }
 
   updateFromLicense(license: { plan: string; features: string[]; isValid: boolean }): void {
@@ -146,6 +147,6 @@ export class LocalPermissionCache {
   private saveToDisk(): void {
     try {
       fs.writeFileSync(this.cachePath, JSON.stringify(this.state, null, 2), "utf-8");
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
   }
 }

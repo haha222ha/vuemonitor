@@ -12,6 +12,7 @@ export interface Product {
   image_url: string | null;
   product_url: string | null;
   last_collected_at: string | null;
+  last_collect_status: "pending" | "success" | "failed" | null;
   created_at: string;
   updated_at: string;
 }
@@ -87,7 +88,7 @@ export const useProductStore = defineStore("product", () => {
   async function fetchFeatures(productId: string) {
     try {
       if (window.electronAPI) {
-        const result = await window.electronAPI.invoke("storage:query", "SELECT * FROM product_features WHERE product_id = ? ORDER BY collected_at DESC LIMIT 30", [productId]);
+        const result = await window.electronAPI.invoke("storage:get-features", productId);
         features.value = (result as ProductFeature[]).map((f: ProductFeature) => ({
           ...f,
           extra_features: typeof (f as unknown as Record<string, unknown>).extra_features === "string"

@@ -130,7 +130,7 @@ class RedisRateLimitMiddleware(BaseHTTPMiddleware):
                 payload = decode_access_token(auth_header[7:])
                 return payload.get("plan", _DEFAULT_PLAN)
             except Exception:
-                pass
+                logger.warning("Silent exception")
         return _DEFAULT_PLAN
 
     def _get_client_id(self, request: Request) -> str:

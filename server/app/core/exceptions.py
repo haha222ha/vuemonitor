@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-
 from shared.constants.error_codes import ERROR_CODES
 
 

@@ -27,6 +27,21 @@ export const FEATURE_GATES: FeatureGateDefinition[] = [
   { key: "gate:collect:playwright", name: "Playwright深度采集", type: "feature", requiredPlan: "pro", description: "Pro及以上支持SPA/搜索页采集" },
   { key: "gate:collect:author_full", name: "博主全量采集", type: "feature", requiredPlan: "pro", description: "Pro及以上支持" },
   { key: "gate:sync:cloud", name: "云端数据同步", type: "feature", requiredPlan: "pro", description: "Pro及以上支持" },
+  { key: "gate:discovery:search", name: "商品发现搜索", type: "quota", requiredPlan: "free", description: "搜索商品数据库（免费5次/Pro50次/Premium200次）", quotaDaily: 5 },
+  { key: "gate:discovery:burst", name: "爆品洞察", type: "quota", requiredPlan: "premium", description: "爆品榜单和飙升榜（Premium及以上，50次/天）", quotaDaily: 50 },
+  { key: "gate:aipic:generate", name: "AI作图", type: "feature", requiredPlan: "free", description: "基础文生图/图生图" },
+  { key: "gate:aipic:hd", name: "高清画质", type: "feature", requiredPlan: "pro", description: "HD画质生成" },
+  { key: "gate:aipic:ultra", name: "超清画质", type: "feature", requiredPlan: "premium", description: "Ultra画质生成" },
+  { key: "gate:aipic:style", name: "风格库", type: "feature", requiredPlan: "pro", description: "自定义风格" },
+  { key: "gate:aipic:batch", name: "批量生成", type: "feature", requiredPlan: "premium", description: "批量生图" },
+  { key: "gate:aipic:api", name: "API访问", type: "feature", requiredPlan: "premium", description: "API密钥调用" },
+  { key: "gate:monitor:waterfall", name: "瀑布流视图", type: "feature", requiredPlan: "free", description: "瀑布流商品展示" },
+  { key: "gate:monitor:category", name: "分类管理", type: "feature", requiredPlan: "pro", description: "商品分类筛选管理" },
+  { key: "gate:monitor:growth_24h", name: "24h增长", type: "feature", requiredPlan: "pro", description: "24小时增长指标" },
+  { key: "gate:monitor:anomaly", name: "异常检测", type: "feature", requiredPlan: "premium", description: "自动异常检测与告警" },
+  { key: "gate:monitor:compare", name: "商品对比", type: "feature", requiredPlan: "pro", description: "多商品趋势对比分析" },
+  { key: "gate:import:excel", name: "Excel导入", type: "feature", requiredPlan: "pro", description: "批量Excel导入商品" },
+  { key: "gate:collect:create", name: "创建采集任务", type: "feature", requiredPlan: "free", description: "创建数据采集任务" },
 ];
 
 export const PLAN_HIERARCHY: Record<PlanTier, number> = {
@@ -40,9 +55,9 @@ export function isPlanSufficient(userPlan: PlanTier, requiredPlan: PlanTier): bo
   return PLAN_HIERARCHY[userPlan] >= PLAN_HIERARCHY[requiredPlan];
 }
 
-export const PLAN_LIMITS: Record<PlanTier, { maxProducts: number; maxConcurrency: number; dailyCollectLimit: number; maxScheduleTasks: number; aiCallsPerDay: number }> = {
-  free: { maxProducts: 10, maxConcurrency: 2, dailyCollectLimit: 50, maxScheduleTasks: 0, aiCallsPerDay: 5 },
-  pro: { maxProducts: 100, maxConcurrency: 5, dailyCollectLimit: 500, maxScheduleTasks: 20, aiCallsPerDay: 50 },
-  premium: { maxProducts: 500, maxConcurrency: 8, dailyCollectLimit: 2000, maxScheduleTasks: 100, aiCallsPerDay: 200 },
-  enterprise: { maxProducts: -1, maxConcurrency: 10, dailyCollectLimit: -1, maxScheduleTasks: -1, aiCallsPerDay: -1 },
+export const PLAN_LIMITS: Record<PlanTier, { maxProducts: number; maxConcurrency: number; dailyCollectLimit: number; maxScheduleTasks: number; aiCallsPerDay: number; discoverySearchPerDay: number; discoveryBurstPerDay: number; aipicDailyLimit: number; aipicMaxQuality: string; excelImportPerDay: number; historyDays: number; anomalyDetection: boolean }> = {
+  free: { maxProducts: 3, maxConcurrency: 1, dailyCollectLimit: 20, maxScheduleTasks: 0, aiCallsPerDay: 3, discoverySearchPerDay: 5, discoveryBurstPerDay: 0, aipicDailyLimit: 3, aipicMaxQuality: "standard", excelImportPerDay: 0, historyDays: 7, anomalyDetection: false },
+  pro: { maxProducts: 50, maxConcurrency: 5, dailyCollectLimit: 500, maxScheduleTasks: 20, aiCallsPerDay: 50, discoverySearchPerDay: 50, discoveryBurstPerDay: 0, aipicDailyLimit: 50, aipicMaxQuality: "hd", excelImportPerDay: 10, historyDays: 30, anomalyDetection: false },
+  premium: { maxProducts: 500, maxConcurrency: 8, dailyCollectLimit: 2000, maxScheduleTasks: 100, aiCallsPerDay: 200, discoverySearchPerDay: 200, discoveryBurstPerDay: 50, aipicDailyLimit: 200, aipicMaxQuality: "ultra", excelImportPerDay: 50, historyDays: 90, anomalyDetection: true },
+  enterprise: { maxProducts: -1, maxConcurrency: 10, dailyCollectLimit: -1, maxScheduleTasks: -1, aiCallsPerDay: -1, discoverySearchPerDay: -1, discoveryBurstPerDay: -1, aipicDailyLimit: -1, aipicMaxQuality: "ultra", excelImportPerDay: -1, historyDays: -1, anomalyDetection: true },
 };

@@ -1,6 +1,8 @@
 from datetime import datetime
-from typing import Optional, Any
+from typing import Any
+
 from pydantic import BaseModel, Field
+
 
 class AdminStatsResponse(BaseModel):
     total_users: int = 0
@@ -35,15 +37,15 @@ class AlertRuleCreateRequest(BaseModel):
     condition_type: str
     condition_config: dict[str, Any] = {}
     severity: str = "medium"
-    channel_id: Optional[str] = None
+    channel_id: str | None = None
 
 class AlertRuleUpdateRequest(BaseModel):
-    name: Optional[str] = None
-    condition_type: Optional[str] = None
-    condition_config: Optional[dict[str, Any]] = None
-    severity: Optional[str] = None
-    channel_id: Optional[str] = None
-    is_active: Optional[bool] = None
+    name: str | None = None
+    condition_type: str | None = None
+    condition_config: dict[str, Any] | None = None
+    severity: str | None = None
+    channel_id: str | None = None
+    is_active: bool | None = None
 
 class AlertRuleResponse(BaseModel):
     id: str
@@ -51,7 +53,7 @@ class AlertRuleResponse(BaseModel):
     condition_type: str
     condition_config: dict[str, Any]
     severity: str
-    channel: Optional[str] = None
+    channel: str | None = None
     is_active: bool = True
     created_at: datetime
     model_config = {"from_attributes": True}
@@ -62,15 +64,15 @@ class AlertChannelCreateRequest(BaseModel):
     is_enabled: bool = True
 
 class AlertChannelUpdateRequest(BaseModel):
-    config: Optional[dict[str, Any]] = None
-    is_enabled: Optional[bool] = None
+    config: dict[str, Any] | None = None
+    is_enabled: bool | None = None
 
 class AlertChannelResponse(BaseModel):
     id: str
     type: str
     config: dict[str, Any]
     is_enabled: bool = True
-    last_test_at: Optional[datetime] = None
+    last_test_at: datetime | None = None
     created_at: datetime
     model_config = {"from_attributes": True}
 
@@ -78,8 +80,8 @@ class SecurityAuditEventResponse(BaseModel):
     id: str
     event_type: str
     severity: str
-    user_id: Optional[str] = None
-    ip: Optional[str] = None
+    user_id: str | None = None
+    ip: str | None = None
     detail: str
     created_at: datetime
     model_config = {"from_attributes": True}
@@ -87,17 +89,17 @@ class SecurityAuditEventResponse(BaseModel):
 class SecurityAuditQuery(BaseModel):
     page: int = Field(1, ge=1)
     page_size: int = Field(20, ge=1, le=100)
-    event_type: Optional[str] = None
-    severity: Optional[str] = None
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
+    event_type: str | None = None
+    severity: str | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
 
 class GdprExportRequestResponse(BaseModel):
     id: str
     user_email: str
     status: str = "pending"
     requested_at: datetime
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
     model_config = {"from_attributes": True}
 
 class GdprDeletionRequestResponse(BaseModel):
@@ -106,7 +108,7 @@ class GdprDeletionRequestResponse(BaseModel):
     status: str = "pending"
     retention_days: int = 30
     requested_at: datetime
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
     model_config = {"from_attributes": True}
 
 class GdprStatsResponse(BaseModel):
@@ -138,8 +140,8 @@ class LicenseResponse(BaseModel):
     duration_days: int
     status: str
     created_at: datetime
-    activated_at: Optional[datetime] = None
-    activated_by: Optional[str] = None
+    activated_at: datetime | None = None
+    activated_by: str | None = None
     model_config = {"from_attributes": True}
 
 class WeeklyRegistrationItem(BaseModel):

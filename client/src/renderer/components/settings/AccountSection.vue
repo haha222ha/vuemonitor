@@ -2,7 +2,7 @@
   <div class="settings-section">
     <h2 class="section-title">账户信息</h2>
     <div class="settings-card">
-      <div class="account-info" v-if="authStore.user">
+      <div v-if="authStore.user" class="account-info">
         <div class="account-avatar">
           <div class="avatar-circle">{{ (authStore.user.nickname || authStore.user.email || 'U')[0].toUpperCase() }}</div>
         </div>

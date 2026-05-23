@@ -1,12 +1,12 @@
 import json
 import logging
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.providers import ANALYSIS_PROMPTS, get_provider, get_available_providers
+from app.ai.providers import ANALYSIS_PROMPTS, get_available_providers, get_provider
 from app.core.cache import cache_get, cache_set
 from app.core.exceptions import BadRequestException, NotFoundException
 from app.middleware.feature_gate import FeatureGateMiddleware
@@ -156,7 +156,7 @@ class AIService:
         await manager.send_to_user(str(user_id), {
             "type": "ai:analysis_completed",
             "data": {"analysis_id": str(analysis.id), "product_id": str(product_id), "analysis_type": analysis_type},
-            "ts": datetime.now(timezone.utc).isoformat(),
+            "ts": datetime.now(UTC).isoformat(),
         })
 
         return result
@@ -324,7 +324,7 @@ class AIService:
                 await manager.send_to_user(str(user_id), {
                     "type": "ai:report_completed",
                     "data": {"report_id": str(report.id), "title": title, "status": "completed"},
-                    "ts": datetime.now(timezone.utc).isoformat(),
+                    "ts": datetime.now(UTC).isoformat(),
                 })
 
             return {
@@ -346,7 +346,7 @@ class AIService:
             await manager.send_to_user(str(user_id), {
                 "type": "ai:report_completed",
                 "data": {"report_id": str(report.id), "title": title, "status": "completed"},
-                "ts": datetime.now(timezone.utc).isoformat(),
+                "ts": datetime.now(UTC).isoformat(),
             })
 
         return {

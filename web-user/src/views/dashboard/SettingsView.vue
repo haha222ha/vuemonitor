@@ -168,7 +168,7 @@
             <div class="data-summary" v-if="dataSummary">
               <div class="data-summary-grid">
                 <div v-for="(count, table) in dataSummary.tables" :key="table" class="data-summary-item">
-                  <span class="data-summary-label">{{ tableLabel(table as string) }}</span>
+                  <span class="data-summary-label">{{ tableLabel(String(table)) }}</span>
                   <span class="data-summary-value" :class="{ 'data-summary-error': count < 0 }">{{ count < 0 ? '?' : count }}</span>
                 </div>
               </div>
@@ -388,8 +388,8 @@ const planBenefits = computed(() => PLAN_LIMITS_MAP[auth.userPlan] || PLAN_LIMIT
 const planLabel = computed(() => planLabelMap[auth.userPlan] || "免费版");
 
 const planTagType = computed(() => {
-  const map: Record<string, string> = { pro: "primary", premium: "warning", enterprise: "danger" };
-  return (map[auth.userPlan] || "info") as any;
+  const map: Record<string, 'primary' | 'success' | 'info' | 'warning' | 'danger'> = { pro: "primary", premium: "warning", enterprise: "danger" };
+  return map[auth.userPlan] || "info";
 });
 
 const aiBenefitLabel = computed(() => {
@@ -419,9 +419,9 @@ function maskCode(code: string) {
   return code.slice(0, 4) + "****" + code.slice(-4);
 }
 
-function licenseStatusType(status: string) {
-  const map: Record<string, string> = { active: "success", expired: "danger", unused: "info", revoked: "warning" };
-  return (map[status] || "info") as any;
+function licenseStatusType(status: string): 'primary' | 'success' | 'info' | 'warning' | 'danger' {
+  const map: Record<string, 'primary' | 'success' | 'info' | 'warning' | 'danger'> = { active: "success", expired: "danger", unused: "info", revoked: "warning" };
+  return map[status] || "info";
 }
 
 function licenseStatusLabel(status: string) {

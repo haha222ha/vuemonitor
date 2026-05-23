@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, onUnmounted } from "vue";
+﻿﻿﻿﻿﻿﻿import { ref, computed, onMounted, onUnmounted } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useNotificationStore, type NotificationItem } from "../stores/notification";
 import api from "../utils/api";
@@ -52,7 +52,7 @@ export function useNotificationData() {
     try {
       const { data } = await api.get("/alert-rules/events/all", { params: { limit: 50 } });
       if (data?.code === 0 && Array.isArray(data.data)) {
-        alertEvents.value = data.data.map((e: any) => ({
+        alertEvents.value = data.data.map((e: Record<string, unknown>) => ({
           id: e.id,
           type: "alert_event",
           title: e.title || "异动告警",
@@ -108,7 +108,7 @@ export function useNotificationData() {
       });
       await notificationStore.deleteReadNotifications();
       ElMessage.success("已清除所有已读通知");
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   function handleFilterChange() {
@@ -140,7 +140,7 @@ export function useNotificationData() {
           notificationStore.handleNewNotification(notif);
         });
       }
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
 
     try {
       if (window.electronAPI) {
@@ -151,7 +151,7 @@ export function useNotificationData() {
           }
         });
       }
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   function stopListeners() {

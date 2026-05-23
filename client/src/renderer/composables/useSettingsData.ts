@@ -4,6 +4,15 @@ import { useAuthStore } from "../stores/auth";
 import { useLicenseStore } from "../stores/license";
 import { shortcutManager, type ShortcutBinding } from "../utils/shortcuts";
 
+interface LogEntry {
+  level: string;
+  timestamp: string;
+  module: string;
+  message: string;
+  error?: string;
+}
+import type { Team, TeamMember, AuditLog, SecurityLog } from "@shared/types";
+
 async function safeInvoke(channel: string, ...args: unknown[]): Promise<any> {
   if (!window.electronAPI) return undefined;
   return window.electronAPI.invoke(channel, ...args);
@@ -101,7 +110,7 @@ export function useSettingsData() {
     uploadQueueSize: 0,
   });
   const logDialogVisible = ref(false);
-  const logEntries = ref<Array<Record<string, unknown>>>([]);
+  const logEntries = ref<LogEntry[]>([]);
   const logFilterLevel = ref("");
   const logFilterModule = ref("");
   const logSearchQuery = ref("");
@@ -127,28 +136,28 @@ export function useSettingsData() {
   const showCreateTeamDialog = ref(false);
   const creatingTeam = ref(false);
   const createTeamForm = ref({ name: "", description: "" });
-  const teams = ref<any[]>([]);
+  const teams = ref<Team[]>([]);
   const teamsLoading = ref(false);
-  const currentTeam = ref<any>(null);
-  const teamMembers = ref<any[]>([]);
+  const currentTeam = ref<Team | null>(null);
+  const teamMembers = ref<TeamMember[]>([]);
   const inviteEmail = ref("");
   const inviteRole = ref("member");
   const inviting = ref(false);
 
-  const auditLogs = ref<any[]>([]);
+  const auditLogs = ref<AuditLog[]>([]);
   const auditLoading = ref(false);
   const auditPage = ref(1);
   const auditPageSize = ref(20);
   const auditTotal = ref(0);
   const auditFilter = ref({ action: "", resource_type: "" });
 
-  const securityLogs = ref<any[]>([]);
+  const securityLogs = ref<SecurityLog[]>([]);
   const securityLoading = ref(false);
   const securityPage = ref(1);
   const securityPageSize = ref(20);
   const securityTotal = ref(0);
   const securityFilter = ref<{ path: string; client_ip: string; method: string; min_risk: number | null }>({ path: "", client_ip: "", method: "", min_risk: null });
-  const securitySummary = ref<any>(null);
+  const securitySummary = ref<Record<string, unknown> | null>(null);
 
   const CLOUD_TABLE_LABELS: Record<string, string> = {
     products: "商品数据", product_features: "商品特征", monitor_rules: "监控规则",
@@ -168,9 +177,9 @@ export function useSettingsData() {
   const filteredLogEntries = computed(() => {
     if (!logSearchQuery.value) return logEntries.value;
     const q = logSearchQuery.value.toLowerCase();
-    return logEntries.value.filter((e: any) => {
-      const msg = (e.message || "").toLowerCase();
-      const mod = (e.module || "").toLowerCase();
+    return logEntries.value.filter((e) => {
+      const msg = e.message.toLowerCase();
+      const mod = e.module.toLowerCase();
       const err = (e.error || "").toLowerCase();
       return msg.includes(q) || mod.includes(q) || err.includes(q);
     });
@@ -224,7 +233,7 @@ export function useSettingsData() {
         if (s.autoUpdateEnabled !== undefined) autoUpdateEnabled.value = s.autoUpdateEnabled;
         if (s.cleanupDays) cleanupDays.value = s.cleanupDays;
       }
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   function saveSettings() {
@@ -251,14 +260,14 @@ export function useSettingsData() {
     try {
       const api = (await import("../utils/api")).default;
       await api.put("/users/me", { email_notify_enabled: enabled });
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function refreshSyncStatus() {
     try {
       const status = await safeInvoke("sync:status") as typeof syncStatus;
       Object.assign(syncStatus, status);
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function loadConflicts() {
@@ -302,7 +311,7 @@ export function useSettingsData() {
       ElMessage.success(`已解决 ${resolved} 条冲突`);
       await loadConflicts();
       await refreshSyncStatus();
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function handleSyncNow() {
@@ -316,6 +325,31 @@ export function useSettingsData() {
       ElMessage.error("同步失败");
     } finally {
       syncing.value = false;
+    }
+  }
+
+  async function handleFullSync() {
+    syncing.value = true;
+    try {
+      const result = await safeInvoke("sync:full-sync") as { pushed: number; pulled: number; errors: number };
+      ElMessage.success(`全量同步完成：推送${result.pushed}条，拉取${result.pulled}条${result.errors > 0 ? `，${result.errors}个错误` : ""}`);
+      await refreshSyncStatus();
+      loadSyncHistory();
+    } catch {
+      ElMessage.error("全量同步失败");
+    } finally {
+      syncing.value = false;
+    }
+  }
+
+  const serverSyncInfo = ref<Record<string, unknown> | null>(null);
+
+  async function loadServerSyncStatus() {
+    try {
+      const result = await safeInvoke("sync:server-status") as Record<string, unknown>;
+      serverSyncInfo.value = result;
+    } catch {
+      serverSyncInfo.value = null;
     }
   }
 
@@ -377,13 +411,13 @@ export function useSettingsData() {
         await safeInvoke("sync:stop");
         await safeInvoke("sync:start", syncInterval.value);
         ElMessage.success(`同步频率已调整为每${syncInterval.value}分钟`);
-      } catch {}
+      } catch (err) { console.warn("[Composable] operation failed:", err); }
     }
   }
 
   async function handleConcurrencyChange(val: number) {
     saveSettings();
-    try { await safeInvoke("concurrency:set", val); } catch {}
+    try { await safeInvoke("concurrency:set", val); } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function handleCollectIntervalChange() { saveSettings(); }
@@ -450,7 +484,7 @@ export function useSettingsData() {
       const result = await safeInvoke("storage:cleanup", cleanupDays.value) as { deleted: number };
       ElMessage.success(`已清理 ${result.deleted} 条旧数据`);
       refreshStorage();
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function refreshStorage() {
@@ -466,7 +500,7 @@ export function useSettingsData() {
       const stats = await safeInvoke("log:get-stats") as typeof logStats & { config?: { level?: string } };
       Object.assign(logStats, stats);
       if (stats.config?.level) logLevel.value = stats.config.level;
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function handleLogLevelChange() {
@@ -483,7 +517,7 @@ export function useSettingsData() {
 
   async function loadRecentLogs() {
     try {
-      const result = await safeInvoke("log:get-recent", 200, logFilterLevel.value || undefined, logFilterModule.value || undefined) as Array<Record<string, unknown>>;
+      const result = await safeInvoke("log:get-recent", 200, logFilterLevel.value || undefined, logFilterModule.value || undefined) as LogEntry[];
       logEntries.value = (result || []).reverse();
       logLevelCounts.debug = 0;
       logLevelCounts.info = 0;
@@ -491,7 +525,7 @@ export function useSettingsData() {
       logLevelCounts.error = 0;
       logLevelCounts.total = logEntries.value.length;
       for (const e of logEntries.value) {
-        const lvl = (e as any).level as string;
+        const lvl = e.level || "";
         if (lvl === "debug") logLevelCounts.debug++;
         else if (lvl === "info") logLevelCounts.info++;
         else if (lvl === "warn") logLevelCounts.warn++;
@@ -524,7 +558,7 @@ export function useSettingsData() {
       const result = await safeInvoke("log:clear") as { deleted: number };
       ElMessage.success(`已清除 ${result.deleted} 个日志文件`);
       await loadLogStats();
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   function filterLogEntries() {}
@@ -569,7 +603,7 @@ export function useSettingsData() {
   }
 
   async function selectTeam(teamId: string) {
-    currentTeam.value = teams.value.find((t: any) => t.id === teamId);
+    currentTeam.value = teams.value.find((t: Team) => t.id === teamId) || null;
     if (currentTeam.value) {
       try {
         const api = (await import("../utils/api")).default;
@@ -589,7 +623,7 @@ export function useSettingsData() {
       ElMessage.success("团队已删除");
       if (currentTeam.value?.id === teamId) { currentTeam.value = null; teamMembers.value = []; }
       fetchTeams();
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function handleInviteMember() {
@@ -601,8 +635,8 @@ export function useSettingsData() {
       ElMessage.success("邀请已发送");
       inviteEmail.value = "";
       selectTeam(currentTeam.value.id);
-    } catch (err: any) {
-      ElMessage.error(err?.response?.data?.message || "邀请失败");
+    } catch (err: unknown) {
+      ElMessage.error((err as { response?: { data?: { message?: string } } })?.response?.data?.message || "邀请失败");
     } finally { inviting.value = false; }
   }
 
@@ -615,7 +649,7 @@ export function useSettingsData() {
       await api.delete(`/teams/${teamId}/members/${memberId}`);
       ElMessage.success("成员已移除");
       selectTeam(teamId);
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   function teamRoleLabel(role: string): string {
@@ -624,6 +658,11 @@ export function useSettingsData() {
   }
 
   async function fetchAuditLogs() {
+    if (!authStore.isAuthenticated) {
+      auditLogs.value = [];
+      auditTotal.value = 0;
+      return;
+    }
     auditLoading.value = true;
     try {
       const api = (await import("../utils/api")).default;
@@ -645,6 +684,11 @@ export function useSettingsData() {
   }
 
   async function fetchSecuritySummary() {
+    const userRole = (authStore.user as Record<string, unknown>)?.role || ((authStore.user as Record<string, unknown>)?.data as Record<string, unknown> | undefined)?.role;
+    if (!authStore.isAuthenticated || (userRole !== "admin" && userRole !== "super_admin")) {
+      securitySummary.value = null;
+      return;
+    }
     try {
       const api = (await import("../utils/api")).default;
       const { data } = await api.get("/admin/security/audit-summary");
@@ -653,6 +697,12 @@ export function useSettingsData() {
   }
 
   async function fetchSecurityLogs() {
+    const userRole = (authStore.user as Record<string, unknown>)?.role || ((authStore.user as Record<string, unknown>)?.data as Record<string, unknown> | undefined)?.role;
+    if (!authStore.isAuthenticated || (userRole !== "admin" && userRole !== "super_admin")) {
+      securityLogs.value = [];
+      securityTotal.value = 0;
+      return;
+    }
     securityLoading.value = true;
     try {
       const api = (await import("../utils/api")).default;
@@ -740,8 +790,8 @@ export function useSettingsData() {
       const result = data?.data || data;
       ElMessage.success(`数据删除成功，共删除 ${result.total_deleted} 条记录`);
       authStore.logout();
-    } catch (e: any) {
-      if (e !== "cancel" && e?.message !== "cancel") { ElMessage.error("数据删除失败"); }
+    } catch (e: unknown) {
+      if (e !== "cancel" && (e as Error)?.message !== "cancel") { ElMessage.error("数据删除失败"); }
     } finally { cloudDeleteLoading.value = false; }
   }
 
@@ -762,6 +812,8 @@ export function useSettingsData() {
     statusTimer = setInterval(refreshSyncStatus, 10000);
     safeOn("sync:conflict:detected", () => { loadConflicts(); });
     safeOn("sync:conflict:resolved", () => { loadConflicts(); });
+    safeOn("sync:complete", () => { loadServerSyncStatus(); });
+    loadServerSyncStatus();
   }
 
   function cleanup() {
@@ -795,7 +847,7 @@ export function useSettingsData() {
     saveNotifySettings, saveSettings,
     refreshSyncStatus, loadConflicts,
     handleResolveConflict, handleResolveAllConflicts,
-    handleSyncNow, loadSyncHistory, syncHistory, formatSyncTime,
+    handleSyncNow, handleFullSync, loadServerSyncStatus, serverSyncInfo, loadSyncHistory, syncHistory, formatSyncTime,
     handleConnect, handleAutoSyncToggle, handleSyncIntervalChange,
     handleConcurrencyChange, handleCollectIntervalChange, handleAutoUpdateToggle,
     handleCheckUpdate, handleDownloadUpdate,

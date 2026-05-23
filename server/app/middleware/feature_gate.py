@@ -1,18 +1,17 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy import select, func
+from shared.constants.feature_gates import PLAN_LIMITS, is_plan_sufficient
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.exceptions import ForbiddenException
 from app.middleware.auth import CurrentUser
-from app.models.user import User
 from app.models.feature_gate import FeatureGate, FeatureGateUsage
-
-from shared.constants.feature_gates import PLAN_HIERARCHY, PLAN_LIMITS, is_plan_sufficient
+from app.models.user import User
 
 
 class FeatureGateMiddleware:
@@ -23,10 +22,9 @@ class FeatureGateMiddleware:
         if user.plan == "free":
             return False
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         if user.plan_expires_at and user.plan_expires_at < now:
-            old_plan = user.plan
             user.plan = "free"
             user.plan_expires_at = None
             await self.db.flush()
@@ -38,7 +36,7 @@ class FeatureGateMiddleware:
         await self.check_and_downgrade_expired_plan(user)
 
         result = await self.db.execute(
-            select(FeatureGate).where(FeatureGate.gate_key == gate_key, FeatureGate.is_active == True)
+            select(FeatureGate).where(FeatureGate.gate_key == gate_key, FeatureGate.is_active)
         )
         gate = result.scalar_one_or_none()
 
@@ -55,7 +53,7 @@ class FeatureGateMiddleware:
             config = gate.config or {}
             quota_limit = config.get(user.plan, config.get("default", 0))
             if quota_limit > 0:
-                today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+                today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
                 count_result = await self.db.execute(
                     select(func.count()).where(
                         FeatureGateUsage.user_id == user.id,
@@ -84,6 +82,15 @@ class FeatureGateMiddleware:
                 "gate:ai:batch_analysis": "aiCallsPerDay",
                 "gate:ai:report": "aiCallsPerDay",
                 "gate:ai:note_optimization": "aiCallsPerDay",
+                "gate:discovery:search": "discoverySearchPerDay",
+                "gate:discovery:burst": "discoveryBurstPerDay",
+                "gate:import:excel": "excelImportPerDay",
+                "gate:aipic:generate": "aipicDailyLimit",
+                "gate:aipic:hd": "aipicDailyLimit",
+                "gate:aipic:ultra": "aipicDailyLimit",
+                "gate:aipic:style": "aipicDailyLimit",
+                "gate:aipic:batch": "aipicDailyLimit",
+                "gate:aipic:api": "aipicDailyLimit",
             }
 
             limit_key = gate_key_mapping.get(gate_key)
@@ -99,7 +106,7 @@ class FeatureGateMiddleware:
                     count_result = await self.db.execute(
                         select(func.count()).select_from(Product).where(
                             Product.user_id == user.id,
-                            Product.is_active == True,
+                            Product.is_active,
                         )
                     )
                     current_count = count_result.scalar() or 0
@@ -109,7 +116,7 @@ class FeatureGateMiddleware:
                             message=f"商品数量已达上限（{current_count}/{limit_value}），请升级套餐",
                         )
                 elif limit_key == "aiCallsPerDay" and limit_value > 0:
-                    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+                    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
                     ai_gates = [k for k, v in gate_key_mapping.items() if v == "aiCallsPerDay"]
                     count_result = await self.db.execute(
                         select(func.count()).where(
@@ -123,6 +130,70 @@ class FeatureGateMiddleware:
                         raise ForbiddenException(
                             code=42014,
                             message=f"今日AI分析次数已达上限（{used_count}/{limit_value}），请升级套餐",
+                        )
+                elif limit_key == "discoverySearchPerDay" and limit_value > 0:
+                    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+                    search_gates = [k for k, v in gate_key_mapping.items() if v == "discoverySearchPerDay"]
+                    count_result = await self.db.execute(
+                        select(func.count()).where(
+                            FeatureGateUsage.user_id == user.id,
+                            FeatureGateUsage.gate_key.in_(search_gates),
+                            FeatureGateUsage.used_at >= today_start,
+                        )
+                    )
+                    used_count = count_result.scalar() or 0
+                    if used_count >= limit_value:
+                        raise ForbiddenException(
+                            code=42021,
+                            message=f"今日搜索次数已达上限（{used_count}/{limit_value}），请升级套餐或明日再试",
+                        )
+                elif limit_key == "discoveryBurstPerDay" and limit_value > 0:
+                    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+                    burst_gates = [k for k, v in gate_key_mapping.items() if v == "discoveryBurstPerDay"]
+                    count_result = await self.db.execute(
+                        select(func.count()).where(
+                            FeatureGateUsage.user_id == user.id,
+                            FeatureGateUsage.gate_key.in_(burst_gates),
+                            FeatureGateUsage.used_at >= today_start,
+                        )
+                    )
+                    used_count = count_result.scalar() or 0
+                    if used_count >= limit_value:
+                        raise ForbiddenException(
+                            code=42022,
+                            message=f"今日爆品洞察次数已达上限（{used_count}/{limit_value}），请升级套餐或明日再试",
+                        )
+                elif limit_key == "excelImportPerDay" and limit_value > 0:
+                    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+                    import_gates = [k for k, v in gate_key_mapping.items() if v == "excelImportPerDay"]
+                    count_result = await self.db.execute(
+                        select(func.count()).where(
+                            FeatureGateUsage.user_id == user.id,
+                            FeatureGateUsage.gate_key.in_(import_gates),
+                            FeatureGateUsage.used_at >= today_start,
+                        )
+                    )
+                    used_count = count_result.scalar() or 0
+                    if used_count >= limit_value:
+                        raise ForbiddenException(
+                            code=42023,
+                            message=f"今日Excel导入次数已达上限（{used_count}/{limit_value}），请升级套餐",
+                        )
+                elif limit_key == "aipicDailyLimit" and limit_value > 0:
+                    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+                    aipic_gates = [k for k, v in gate_key_mapping.items() if v == "aipicDailyLimit"]
+                    count_result = await self.db.execute(
+                        select(func.count()).where(
+                            FeatureGateUsage.user_id == user.id,
+                            FeatureGateUsage.gate_key.in_(aipic_gates),
+                            FeatureGateUsage.used_at >= today_start,
+                        )
+                    )
+                    used_count = count_result.scalar() or 0
+                    if used_count >= limit_value:
+                        raise ForbiddenException(
+                            code=42024,
+                            message=f"今日AI作图次数已达上限（{used_count}/{limit_value}），请升级套餐",
                         )
 
     async def record_usage(self, user_id: uuid.UUID, gate_key: str, detail: dict | None = None) -> None:

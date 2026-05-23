@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select, update
@@ -66,7 +65,7 @@ async def get_unread_count(
     result = await db.execute(
         select(func.count()).where(
             Notification.user_id == user.id,
-            Notification.is_read == False,
+            not Notification.is_read,
         )
     )
     count = result.scalar() or 0
@@ -101,7 +100,7 @@ async def mark_all_as_read(
 ):
     await db.execute(
         update(Notification)
-        .where(Notification.user_id == user.id, Notification.is_read == False)
+        .where(Notification.user_id == user.id, not Notification.is_read)
         .values(is_read=True)
     )
     return {"code": 0, "message": "全部已标记为已读"}

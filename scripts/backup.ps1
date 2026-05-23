@@ -16,7 +16,11 @@ $BACKUP_FILE = Join-Path $BACKUP_DIR "vuemonitor_${TIMESTAMP}.dump"
 
 Write-Host "[$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')] Starting backup: $BACKUP_FILE"
 
-$env:PGPASSWORD = if ($env:DB_PASSWORD) { $env:DB_PASSWORD } else { "saas_pass" }
+if (-not $env:DB_PASSWORD) {
+    Write-Error "DB_PASSWORD environment variable is required. Set it before running backup."
+    exit 1
+}
+$env:PGPASSWORD = $env:DB_PASSWORD
 
 pg_dump -h $DB_HOST -p $DB_PORT -U $DB_USER -Fc $DB_NAME -f $BACKUP_FILE
 

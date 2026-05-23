@@ -81,17 +81,17 @@
                 <div class="analysis-card__model">{{ item.provider }} / {{ item.model }}</div>
               </div>
               <el-tag :type="item.status === 'completed' ? 'success' : item.status === 'failed' ? 'danger' : 'warning'" size="small" effect="light" class="analysis-card__status">
-                {{ statusLabel(item.status) }}
+                {{ statusLabel(item.status || '') }}
               </el-tag>
             </div>
             <div class="analysis-card__body">
-              <div v-if="item.analysis_type === 'trend_score' && item.result?.score != null" class="analysis-card__visual-mini">
+              <div v-if="item.analysis_type === 'trend_score' && getResultNum(item.result, 'score') != null" class="analysis-card__visual-mini">
                 <div class="mini-gauge">
                   <svg viewBox="0 0 36 36" class="mini-gauge__svg">
                     <circle cx="18" cy="18" r="15" fill="none" stroke="var(--color-border-light)" stroke-width="3" />
-                    <circle cx="18" cy="18" r="15" fill="none" :stroke="item.result.score >= 70 ? '#10B981' : item.result.score >= 40 ? '#F59E0B' : '#EF4444'" stroke-width="3" stroke-linecap="round" :stroke-dasharray="2 * Math.PI * 15" :stroke-dashoffset="2 * Math.PI * 15 * (1 - Math.min(item.result.score, 100) / 100)" class="mini-gauge__arc" />
+                    <circle cx="18" cy="18" r="15" fill="none" :stroke="scoreColor(getResultNum(item.result, 'score')!)" stroke-width="3" stroke-linecap="round" :stroke-dasharray="2 * Math.PI * 15" :stroke-dashoffset="scoreOffset(getResultNum(item.result, 'score')!)" class="mini-gauge__arc" />
                   </svg>
-                  <span class="mini-gauge__value">{{ item.result.score }}</span>
+                  <span class="mini-gauge__value">{{ getResultNum(item.result, 'score') }}</span>
                 </div>
                 <div class="mini-gauge__label">趋势评分</div>
               </div>
@@ -99,8 +99,8 @@
                 <span :class="['mini-badge', `mini-badge--${predictionLevel(item)}`]">
                   {{ predictionLevelLabel(item) }}
                 </span>
-                <span v-if="item.result?.growth_rate_7d != null" class="mini-growth" :class="item.result.growth_rate_7d >= 0 ? 'mini-growth--up' : 'mini-growth--down'">
-                  {{ item.result.growth_rate_7d >= 0 ? '+' : '' }}{{ item.result.growth_rate_7d.toFixed(1) }}%
+                <span v-if="getResultNum(item.result, 'growth_rate_7d') != null" class="mini-growth" :class="getResultNum(item.result, 'growth_rate_7d')! >= 0 ? 'mini-growth--up' : 'mini-growth--down'">
+                  {{ growthDisplay(getResultNum(item.result, 'growth_rate_7d')) }}
                 </span>
               </div>
               <div v-else-if="item.analysis_type === 'risk_warning'" class="analysis-card__visual-mini">
@@ -120,7 +120,7 @@
               </div>
             </div>
             <div class="analysis-card__footer">
-              <span class="analysis-card__time">{{ formatDate(item.created_at) }}</span>
+              <span class="analysis-card__time">{{ formatDate(item.created_at || item.analyzed_at) }}</span>
               <el-button size="small" type="primary" text @click="viewAnalysis(item)">查看详情</el-button>
             </div>
           </div>
@@ -155,7 +155,7 @@
               </el-tag>
             </div>
             <div v-if="report.content" class="report-card__preview">
-              {{ typeof report.content === 'string' ? report.content.substring(0, 160) : report.content.executive_summary || JSON.stringify(report.content).substring(0, 160) }}{{ (typeof report.content === 'string' ? report.content : JSON.stringify(report.content)).length > 160 ? '...' : '' }}
+              {{ getReportSummary(report.content).substring(0, 160) }}{{ getReportSummary(report.content).length > 160 ? '...' : '' }}
             </div>
             <div class="report-card__actions">
               <el-button size="small" type="primary" text @click.stop="viewReport(report)">查看</el-button>
@@ -221,14 +221,47 @@ import ReportViewDialog from "../components/ai/ReportViewDialog.vue";
 import ReportGenerateDialog from "../components/ai/ReportGenerateDialog.vue";
 import { useAIData, ANALYSIS_TYPE_MAP } from "../composables/useAIData";
 import { DataAnalysis, Document, Search, TrendCharts, Warning, PriceTag, Star, Cpu, Opportunity, ArrowRight } from "@element-plus/icons-vue";
+import type { AIAnalysis, AIReport, AIRecommendation } from "@shared/types";
+
+function getResultNum(result: Record<string, unknown>, key: string): number | null {
+  const val = result[key];
+  return typeof val === "number" ? val : null;
+}
+
+function getResultStr(result: Record<string, unknown>, key: string): string | null {
+  const val = result[key];
+  return typeof val === "string" ? val : null;
+}
+
+function getReportSummary(content: Record<string, unknown>): string {
+  if (!content) return "";
+  const summary = content.executive_summary;
+  if (typeof summary === "string") return summary;
+  return JSON.stringify(content);
+}
+
+function scoreColor(score: number): string {
+  if (score >= 70) return "#10B981";
+  if (score >= 40) return "#F59E0B";
+  return "#EF4444";
+}
+
+function scoreOffset(score: number): number {
+  return 2 * Math.PI * 15 * (1 - Math.min(score, 100) / 100);
+}
+
+function growthDisplay(rate: number | null): string {
+  if (rate == null) return "";
+  return `${rate >= 0 ? "+" : ""}${rate.toFixed(1)}%`;
+}
 
 const router = useRouter();
 const activeTab = ref("analyses");
 const showResult = ref(false);
 const showReportView = ref(false);
 const showReportDialog = ref(false);
-const currentResult = ref<any>(null);
-const currentReport = ref<any>(null);
+const currentResult = ref<AIAnalysis | null>(null);
+const currentReport = ref<AIReport | null>(null);
 
 const {
   analyses, reports, products, recommendations,
@@ -255,13 +288,13 @@ const quickActions = computed(() => {
   if (!recs || recs.length === 0) return BASE_QUICK_ACTIONS;
 
   const dynamic: any[] = [];
-  const hasTrending = recs.some((r: any) => r.type === "trending");
-  const hasRisk = recs.some((r: any) => r.type === "risk");
-  const hasAlert = recs.some((r: any) => r.type === "alert");
-  const hasCategoryInsight = recs.some((r: any) => r.type === "category_insight");
+  const hasTrending = recs.some((r) => r.type === "trending");
+  const hasRisk = recs.some((r) => r.type === "risk");
+  const hasAlert = recs.some((r) => r.type === "alert");
+  const hasCategoryInsight = recs.some((r) => r.type === "category_insight");
 
   if (hasTrending) {
-    const topTrend = recs.find((r: any) => r.type === "trending");
+    const topTrend = recs.find((r) => r.type === "trending");
     dynamic.push({
       type: "trend_score",
       label: "趋势评分",
@@ -275,22 +308,23 @@ const quickActions = computed(() => {
   }
 
   if (hasTrending || hasCategoryInsight) {
-    const topPred = recs.find((r: any) => r.type === "trending");
+    const topPred = recs.find((r) => r.type === "trending");
+    const growthRate = topPred?.metric?.growth_rate_7d;
     dynamic.push({
       type: "prediction",
       label: "爆品预测",
       desc: topPred?.product_name ? `${topPred.product_name} 潜力评估` : "预测爆款潜力",
       icon: Opportunity,
       color: "amber",
-      highlight: !!topPred?.metric?.growth_rate_7d && topPred.metric.growth_rate_7d > 20,
+      highlight: typeof growthRate === "number" && growthRate > 20,
     });
   } else {
     dynamic.push(BASE_QUICK_ACTIONS[1]);
   }
 
   if (hasRisk || hasAlert) {
-    const riskRec = recs.find((r: any) => r.type === "risk");
-    const alertRec = recs.find((r: any) => r.type === "alert");
+    const riskRec = recs.find((r) => r.type === "risk");
+    const alertRec = recs.find((r) => r.type === "alert");
     dynamic.push({
       type: "risk_warning",
       label: "风险预警",
@@ -304,7 +338,7 @@ const quickActions = computed(() => {
   }
 
   if (hasCategoryInsight) {
-    const catRec = recs.find((r: any) => r.type === "category_insight");
+    const catRec = recs.find((r) => r.type === "category_insight");
     dynamic.push({
       type: "product_optimization",
       label: "品类优化",
@@ -320,43 +354,45 @@ const quickActions = computed(() => {
   return dynamic;
 });
 
-function viewAnalysis(row: any) { currentResult.value = row; showResult.value = true; }
-function viewReport(row: any) { currentReport.value = row; showReportView.value = true; }
+function viewAnalysis(row: AIAnalysis) { currentResult.value = row; showResult.value = true; }
+function viewReport(row: AIReport) { currentReport.value = row; showReportView.value = true; }
 
-function predictionLevel(item: any): string {
-  if (item.result?.potential_level) {
+function predictionLevel(item: AIAnalysis): string {
+  const level = getResultStr(item.result, 'potential_level');
+  if (level) {
     const map: Record<string, string> = { low: 'low', medium: 'medium', high: 'high', star: 'star' };
-    return map[item.result.potential_level] || 'medium';
+    return map[level] || 'medium';
   }
-  const s = item.result?.score ?? 0;
+  const s = getResultNum(item.result, 'score') ?? 0;
   if (s >= 80) return 'star';
   if (s >= 60) return 'high';
   if (s >= 35) return 'medium';
   return 'low';
 }
 
-function predictionLevelLabel(item: any): string {
+function predictionLevelLabel(item: AIAnalysis): string {
   const map: Record<string, string> = { low: '低潜力', medium: '中潜力', high: '高潜力', star: '★ 爆款' };
   return map[predictionLevel(item)] || '评估中';
 }
 
-function riskLevel(item: any): string {
-  if (item.result?.overall_risk_level) {
+function riskLevel(item: AIAnalysis): string {
+  const overallLevel = getResultStr(item.result, 'overall_risk_level');
+  if (overallLevel) {
     const map: Record<string, string> = { high: 'danger', critical: 'danger', medium: 'warning', low: 'safe', safe: 'safe' };
-    return map[item.result.overall_risk_level.toLowerCase()] || 'warning';
+    return map[overallLevel.toLowerCase()] || 'warning';
   }
-  const s = item.result?.score ?? 50;
+  const s = getResultNum(item.result, 'score') ?? 50;
   if (s < 30) return 'danger';
   if (s < 60) return 'warning';
   return 'safe';
 }
 
-function riskLevelLabel(item: any): string {
+function riskLevelLabel(item: AIAnalysis): string {
   const map: Record<string, string> = { danger: '⚠ 高风险', warning: '⚡ 中风险', safe: '✓ 低风险' };
   return map[riskLevel(item)] || '评估中';
 }
 
-function handleRecommendationClick(rec: any) {
+function handleRecommendationClick(rec: AIRecommendation) {
   if (rec.type === "alert" && rec.event_id) router.push("/notifications");
   else if (rec.product_id) router.push(`/products/${rec.product_id}`);
   else if (rec.type === "category_insight" && rec.category) router.push("/dashboard");

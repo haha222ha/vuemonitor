@@ -1,6 +1,6 @@
 <template>
-  <el-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" title="生成分析报告" width="540px" class="ai-dialog">
-    <el-form :model="reportForm" label-width="100px" :rules="reportFormRules" ref="formRef">
+  <el-dialog :model-value="modelValue" title="生成分析报告" width="540px" class="ai-dialog" @update:model-value="$emit('update:modelValue', $event)">
+    <el-form ref="formRef" :model="reportForm" label-width="100px" :rules="reportFormRules">
       <el-form-item label="报告标题" prop="title">
         <el-input v-model="reportForm.title" placeholder="如：本周商品分析报告" />
       </el-form-item>

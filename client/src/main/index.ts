@@ -160,7 +160,20 @@ async function bootstrap(): Promise<void> {
   }
 }
 
-app.whenReady().then(bootstrap);
+const gotTheLock = app.requestSingleInstanceLock();
+if (!gotTheLock) {
+  app.quit();
+} else {
+  app.on("second-instance", () => {
+    const win = windowManager?.getMainWindow();
+    if (win) {
+      if (win.isMinimized()) win.restore();
+      win.show();
+      win.focus();
+    }
+  });
+  app.whenReady().then(bootstrap);
+}
 
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {

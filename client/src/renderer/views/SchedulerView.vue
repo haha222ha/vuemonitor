@@ -54,11 +54,11 @@
           <h3 class="card__title">调度时间线</h3>
         </div>
       </div>
-      <div ref="ganttChartRef" class="scheduler__chart"></div>
+      <div ref="ganttChartRef" class="scheduler__chart" />
     </div>
 
     <el-dialog v-model="showCreateDialog" title="新建采集任务" width="520px" class="modern-dialog">
-      <el-form :model="createForm" label-width="80px" :rules="createRules" ref="createFormRef">
+      <el-form ref="createFormRef" :model="createForm" label-width="80px" :rules="createRules">
         <el-form-item label="平台" prop="platform">
           <el-select v-model="createForm.platform" style="width: 100%">
             <el-option label="小红书" value="xhs" />
@@ -103,15 +103,15 @@
           <span class="task-detail__label">类型</span>
           <span>{{ taskTypeLabel(currentDetail.task_type) }}</span>
         </div>
-        <div class="task-detail__row" v-if="currentDetail.progress != null">
+        <div v-if="currentDetail.progress != null" class="task-detail__row">
           <span class="task-detail__label">进度</span>
           <el-progress :percentage="currentDetail.progress" :stroke-width="8" style="flex: 1" />
         </div>
-        <div class="task-detail__row" v-if="currentDetail.result_summary">
+        <div v-if="currentDetail.result_summary" class="task-detail__row">
           <span class="task-detail__label">结果</span>
           <span>{{ currentDetail.result_summary }}</span>
         </div>
-        <div class="task-detail__row" v-if="currentDetail.error_message">
+        <div v-if="currentDetail.error_message" class="task-detail__row">
           <span class="task-detail__label">错误</span>
           <span class="task-detail__error">{{ currentDetail.error_message }}</span>
         </div>

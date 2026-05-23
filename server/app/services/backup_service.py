@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 import shutil
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from app.config import get_settings
@@ -20,7 +20,7 @@ class BackupService:
 
     async def create_backup(self, label: str | None = None) -> dict:
         settings = get_settings()
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         backup_name = f"{label or 'auto'}_{timestamp}"
         backup_path = self._backup_dir / backup_name
         backup_path.mkdir(parents=True, exist_ok=True)
@@ -51,7 +51,6 @@ class BackupService:
 
     async def _backup_postgresql(self, backup_path: Path) -> dict:
         settings = get_settings()
-        db_url = settings.DATABASE_URL
         dump_file = backup_path / "database.dump"
 
         env = os.environ.copy()
@@ -151,7 +150,7 @@ class BackupService:
         import json
         from datetime import timedelta
 
-        cutoff = datetime.now(timezone.utc) - timedelta(days=retention_days)
+        cutoff = datetime.now(UTC) - timedelta(days=retention_days)
         removed = 0
 
         for d in self._backup_dir.iterdir():
@@ -165,12 +164,12 @@ class BackupService:
                 ts_str = meta.get("timestamp", "")
                 if ts_str:
                     try:
-                        ts = datetime.strptime(ts_str, "%Y%m%d_%H%M%S").replace(tzinfo=timezone.utc)
+                        ts = datetime.strptime(ts_str, "%Y%m%d_%H%M%S").replace(tzinfo=UTC)
                         if ts < cutoff:
                             shutil.rmtree(str(d))
                             removed += 1
                     except ValueError:
-                        pass
+                        logger.warning("Silent exception")
 
         logger.info(f"Cleaned up {removed} old backups (retention={retention_days}d)")
         return removed

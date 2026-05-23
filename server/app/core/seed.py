@@ -1,6 +1,6 @@
 import logging
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import async_session_factory
 from app.models.feature_gate import FeatureGate
@@ -19,6 +19,21 @@ FEATURE_GATES_SEED = [
     {"gate_key": "gate:ai:report", "gate_name": "AI分析报告", "gate_type": "limit", "required_plan": "pro", "description": "生成AI分析报告"},
     {"gate_key": "gate:ai:note_optimization", "gate_name": "AI笔记优化", "gate_type": "limit", "required_plan": "pro", "description": "小红书笔记内容优化"},
     {"gate_key": "gate:monitor:add", "gate_name": "添加监控商品", "gate_type": "limit", "required_plan": "free", "description": "添加商品到监控列表"},
+    {"gate_key": "gate:collect:create", "gate_name": "创建采集任务", "gate_type": "feature", "required_plan": "free", "description": "创建商品采集任务"},
+    {"gate_key": "gate:monitor:waterfall", "gate_name": "瀑布流视图", "gate_type": "feature", "required_plan": "free", "description": "瀑布流商品展示视图"},
+    {"gate_key": "gate:monitor:category", "gate_name": "分类管理", "gate_type": "feature", "required_plan": "pro", "description": "商品分类管理功能"},
+    {"gate_key": "gate:monitor:growth_24h", "gate_name": "24h增长数据", "gate_type": "feature", "required_plan": "pro", "description": "商品24小时增长数据展示"},
+    {"gate_key": "gate:monitor:anomaly", "gate_name": "异常检测", "gate_type": "feature", "required_plan": "premium", "description": "自动异常检测和告警"},
+    {"gate_key": "gate:monitor:compare", "gate_name": "商品对比", "gate_type": "feature", "required_plan": "pro", "description": "多商品对比趋势图"},
+    {"gate_key": "gate:import:excel", "gate_name": "Excel批量导入", "gate_type": "limit", "required_plan": "pro", "description": "通过Excel批量导入商品"},
+    {"gate_key": "gate:discovery:search", "gate_name": "商品发现搜索", "gate_type": "limit", "required_plan": "free", "description": "搜索商品数据库，免费5次/Pro50次/Premium200次"},
+    {"gate_key": "gate:discovery:burst", "gate_name": "爆品洞察", "gate_type": "limit", "required_plan": "premium", "description": "爆品榜单和飙升榜，Premium及以上可用"},
+    {"gate_key": "gate:aipic:generate", "gate_name": "AI作图", "gate_type": "feature", "required_plan": "free", "description": "基础文生图/图生图"},
+    {"gate_key": "gate:aipic:hd", "gate_name": "高清画质", "gate_type": "feature", "required_plan": "pro", "description": "HD画质生成"},
+    {"gate_key": "gate:aipic:ultra", "gate_name": "超清画质", "gate_type": "feature", "required_plan": "premium", "description": "Ultra画质生成"},
+    {"gate_key": "gate:aipic:style", "gate_name": "风格库", "gate_type": "feature", "required_plan": "pro", "description": "自定义风格"},
+    {"gate_key": "gate:aipic:batch", "gate_name": "批量生成", "gate_type": "feature", "required_plan": "premium", "description": "批量生图"},
+    {"gate_key": "gate:aipic:api", "gate_name": "API访问", "gate_type": "feature", "required_plan": "premium", "description": "API密钥调用"},
 ]
 
 

@@ -4,17 +4,17 @@
       <div class="login__brand-content">
         <div class="login__logo">
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-            <rect width="48" height="48" rx="14" fill="rgba(255,255,255,0.15)"/>
-            <path d="M14 17h20M14 24h14M14 31h16" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+            <rect width="48" height="48" rx="14" fill="rgba(255,255,255,0.15)" />
+            <path d="M14 17h20M14 24h14M14 31h16" stroke="#fff" stroke-width="3" stroke-linecap="round" />
           </svg>
           <span class="login__logo-text">XHS365</span>
         </div>
-        <h1 class="login__headline">AI 驱动的<br/>选品决策系统</h1>
+        <h1 class="login__headline">AI 驱动的<br>选品决策系统</h1>
         <p class="login__tagline">实时监控 · 智能分析 · 趋势预警</p>
         <div class="login__features">
           <div class="login__feature">
             <div class="login__feature-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#818CF8" stroke-width="2"/><path d="M12 8v4l3 3" stroke="#818CF8" stroke-width="2" stroke-linecap="round"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#818CF8" stroke-width="2" /><path d="M12 8v4l3 3" stroke="#818CF8" stroke-width="2" stroke-linecap="round" /></svg>
             </div>
             <div>
               <div class="login__feature-title">实时监控</div>
@@ -23,7 +23,7 @@
           </div>
           <div class="login__feature">
             <div class="login__feature-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#818CF8" stroke-width="2" stroke-linejoin="round"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#818CF8" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#818CF8" stroke-width="2" stroke-linejoin="round" /><path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="#818CF8" stroke-width="2" stroke-linejoin="round" /></svg>
             </div>
             <div>
               <div class="login__feature-title">AI 智能分析</div>
@@ -32,7 +32,7 @@
           </div>
           <div class="login__feature">
             <div class="login__feature-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#818CF8" stroke-width="2" stroke-linejoin="round"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="#818CF8" stroke-width="2" stroke-linejoin="round" /></svg>
             </div>
             <div>
               <div class="login__feature-title">趋势预警</div>
@@ -60,7 +60,7 @@
           <p class="login__form-subtitle">登录您的 XHS365 账户</p>
         </div>
 
-        <el-form :model="form" :rules="loginRules" ref="loginFormRef" @submit.prevent="handleLogin" class="login__form">
+        <el-form ref="loginFormRef" :model="form" :rules="loginRules" class="login__form" @submit.prevent="handleLogin">
           <el-form-item prop="account">
             <el-input v-model="form.account" placeholder="昵称或邮箱" size="large" />
           </el-form-item>
@@ -68,7 +68,7 @@
             <el-input v-model="form.password" placeholder="密码" type="password" show-password size="large" />
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" :loading="loading" @click="handleLogin" size="large" class="login__submit">登录</el-button>
+            <el-button type="primary" :loading="loading" size="large" class="login__submit" @click="handleLogin">登录</el-button>
           </el-form-item>
         </el-form>
 

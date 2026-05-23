@@ -37,17 +37,17 @@
         </div>
 
         <div v-if="patterns" class="insight-section crowd-patterns">
-          <div class="crowd-patterns__row" v-if="patterns.dominant_lifecycle">
+          <div v-if="patterns.dominant_lifecycle" class="crowd-patterns__row">
             <span class="crowd-patterns__label">主流生命周期</span>
             <el-tag size="small" effect="light">{{ lifecycleLabel(patterns.dominant_lifecycle) }}</el-tag>
           </div>
-          <div class="crowd-patterns__row" v-if="patterns.dominant_trend">
+          <div v-if="patterns.dominant_trend" class="crowd-patterns__row">
             <span class="crowd-patterns__label">主流趋势</span>
             <el-tag :type="trendTagType(patterns.dominant_trend)" size="small" effect="light">
               {{ trendLabel(patterns.dominant_trend) }}
             </el-tag>
           </div>
-          <div class="crowd-patterns__row" v-if="patterns.best_seller_price_band">
+          <div v-if="patterns.best_seller_price_band" class="crowd-patterns__row">
             <span class="crowd-patterns__label">最佳价格带</span>
             <el-tag size="small" type="success" effect="light">{{ priceBandLabel(patterns.best_seller_price_band.band) }}</el-tag>
           </div>

@@ -1,25 +1,34 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.api.auth import router as auth_router
-from app.api.sync import router as sync_router
-from app.api.products import router as products_router
-from app.api.monitor import router as monitor_router
-from app.api.collect import router as collect_router
-from app.api.ai import router as ai_router
 from app.api.admin import router as admin_router
-from app.api.dashboard import router as dashboard_router
-from app.api.notifications import router as notifications_router
-from app.api.license import router as license_router
-from app.api.users import router as users_router
-from app.api.feature import router as feature_router
-from app.api.teams import router as teams_router
-from app.api.alert_rules import router as alert_rules_router
+from app.api.ai import router as ai_router
 from app.api.ai_templates import router as ai_templates_router
-from app.api.security_audit import router as security_audit_router
+from app.api.aipic.admin_routes import router as aipic_admin_router
+from app.api.aipic.generate_routes import router as aipic_generate_router
+from app.api.aipic.user_routes import router as aipic_user_router
+from app.api.alert_rules import router as alert_rules_router
+from app.api.auth import router as auth_router
+from app.api.categories import router as categories_router
+from app.api.collect import router as collect_router
+from app.api.dashboard import router as dashboard_router
+from app.api.discovery import router as discovery_router
+from app.api.feature import router as feature_router
 from app.api.gdpr import router as gdpr_router
+from app.api.license import router as license_router
+from app.api.monitor import router as monitor_router
+from app.api.notifications import router as notifications_router
 from app.api.operation_audit import router as operation_audit_router
-from app.api.task_queue import router as task_queue_router
+from app.api.products import router as products_router
+from app.api.security_audit import router as security_audit_router
+from app.api.sync import router as sync_router
 from app.api.system import router as system_router
+from app.api.task_queue import router as task_queue_router
+from app.api.teams import router as teams_router
+from app.api.users import router as users_router
+from app.middleware.auth import AdminUser, require_role
+
+async def require_admin(user: AdminUser):
+    return user
 
 api_router = APIRouter()
 
@@ -43,6 +52,11 @@ api_router.include_router(gdpr_router)
 api_router.include_router(operation_audit_router)
 api_router.include_router(task_queue_router)
 api_router.include_router(system_router)
+api_router.include_router(discovery_router)
+api_router.include_router(categories_router)
+api_router.include_router(aipic_generate_router)
+api_router.include_router(aipic_user_router)
+api_router.include_router(aipic_admin_router)
 
 
 @api_router.get("/health", tags=["health"])
@@ -67,11 +81,13 @@ async def health_check():
 
 
 @api_router.get("/diagnose", tags=["health"])
-async def diagnose():
-    from sqlalchemy import text
-    from app.core.database import engine, async_session_factory
-    from app.core.redis import get_redis
+async def diagnose(user=Depends(require_admin)):
     import traceback
+
+    from sqlalchemy import text
+
+    from app.core.database import async_session_factory, engine
+    from app.core.redis import get_redis
 
     results = {"database": {}, "redis": {}, "tables": {}, "auth_test": {}}
 

@@ -348,3 +348,116 @@ class TestConstants:
         assert "USER_CREDENTIALS_INVALID" in ERROR_CODES
         assert "NOT_FOUND" in ERROR_CODES
         assert "INTERNAL_ERROR" in ERROR_CODES
+
+
+class TestFeatureGateMiddleware:
+    def _make_middleware(self):
+        from app.middleware.feature_gate import FeatureGateMiddleware
+        db = AsyncMock()
+        db.flush = AsyncMock()
+        db.execute = AsyncMock()
+        return FeatureGateMiddleware(db), db
+
+    def _make_user(self, plan="pro", plan_expires_at=None):
+        user = MagicMock()
+        user.id = uuid.uuid4()
+        user.plan = plan
+        user.plan_expires_at = plan_expires_at
+        return user
+
+    def _mock_gate_result(self, db, gate=None):
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none = MagicMock(return_value=gate)
+        db.execute = AsyncMock(return_value=mock_result)
+
+    @pytest.mark.asyncio
+    async def test_check_gate_no_gate_passes(self):
+        mw, db = self._make_middleware()
+        user = self._make_user()
+        self._mock_gate_result(db, gate=None)
+        await mw.check_gate(user, "gate:nonexistent")
+        assert True
+
+    @pytest.mark.asyncio
+    async def test_check_gate_insufficient_plan_raises(self):
+        from app.core.exceptions import ForbiddenException
+        mw, db = self._make_middleware()
+        user = self._make_user(plan="free")
+
+        gate = MagicMock()
+        gate.gate_key = "gate:monitor:compare"
+        gate.gate_name = "商品对比"
+        gate.required_plan = "pro"
+        gate.gate_type = "feature"
+        gate.is_active = True
+        self._mock_gate_result(db, gate=gate)
+
+        with pytest.raises(ForbiddenException) as exc_info:
+            await mw.check_gate(user, "gate:monitor:compare")
+        assert exc_info.value.code == 42010
+
+    @pytest.mark.asyncio
+    async def test_check_gate_sufficient_plan_passes(self):
+        mw, db = self._make_middleware()
+        user = self._make_user(plan="premium")
+
+        gate = MagicMock()
+        gate.gate_key = "gate:monitor:compare"
+        gate.gate_name = "商品对比"
+        gate.required_plan = "pro"
+        gate.gate_type = "feature"
+        gate.is_active = True
+        self._mock_gate_result(db, gate=gate)
+
+        await mw.check_gate(user, "gate:monitor:compare")
+        assert True
+
+    @pytest.mark.asyncio
+    async def test_expired_plan_downgraded(self):
+        from datetime import UTC
+        mw, db = self._make_middleware()
+        expired = datetime.now(UTC) - timedelta(days=1)
+        user = self._make_user(plan="pro", plan_expires_at=expired)
+
+        result = await mw.check_and_downgrade_expired_plan(user)
+        assert result is True
+        assert user.plan == "free"
+
+    @pytest.mark.asyncio
+    async def test_active_plan_not_downgraded(self):
+        from datetime import UTC
+        mw, db = self._make_middleware()
+        future = datetime.now(UTC) + timedelta(days=30)
+        user = self._make_user(plan="pro", plan_expires_at=future)
+
+        result = await mw.check_and_downgrade_expired_plan(user)
+        assert result is False
+        assert user.plan == "pro"
+
+    @pytest.mark.asyncio
+    async def test_free_plan_not_downgraded(self):
+        mw, db = self._make_middleware()
+        user = self._make_user(plan="free")
+
+        result = await mw.check_and_downgrade_expired_plan(user)
+        assert result is False
+
+    @pytest.mark.asyncio
+    async def test_record_usage(self):
+        mw, db = self._make_middleware()
+        user_id = uuid.uuid4()
+        await mw.record_usage(user_id, "gate:ai:basic_analysis", {"detail": "test"})
+        db.add.assert_called_once()
+
+    def test_aipic_gate_keys_in_mapping(self):
+        from app.middleware.feature_gate import FeatureGateMiddleware
+        import inspect
+        source = inspect.getsource(FeatureGateMiddleware.check_gate)
+        aipic_keys = ["gate:aipic:generate", "gate:aipic:hd", "gate:aipic:ultra", "gate:aipic:style", "gate:aipic:batch", "gate:aipic:api"]
+        for key in aipic_keys:
+            assert key in source, f"{key} not found in gate_key_mapping"
+
+    def test_plan_limits_aipic_daily(self):
+        from shared.constants.feature_gates import PLAN_LIMITS
+        for plan in ["free", "pro", "premium", "enterprise"]:
+            assert "aipicDailyLimit" in PLAN_LIMITS[plan], f"aipicDailyLimit missing for {plan}"

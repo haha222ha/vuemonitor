@@ -1,4 +1,5 @@
 import * as crypto from "crypto";
+import * as os from "os";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
@@ -80,7 +81,6 @@ export function decryptRow(row: Record<string, any>): Record<string, any> {
 
 function getMachineFingerprint(): string {
   try {
-    const os = require("os");
     const cpus = os.cpus();
     const totalMem = os.totalmem();
     const hostname = os.hostname();

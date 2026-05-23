@@ -9,48 +9,109 @@
               ref="inputRef"
               v-model="query"
               class="global-search__input"
-              placeholder="搜索商品、规则、页面、设置..."
+              placeholder="搜索商品、页面、命令..."
               @keydown.esc="$emit('close')"
               @keydown.up.prevent="moveSelection(-1)"
               @keydown.down.prevent="moveSelection(1)"
               @keydown.enter="selectCurrent"
-            />
+            >
             <kbd class="global-search__kbd">ESC</kbd>
           </div>
 
-          <div v-if="query && filteredResults.length > 0" class="global-search__results">
-            <div
-              v-for="(group, gi) in groupedResults"
-              :key="group.label"
-              class="global-search__group"
+          <div class="global-search__mode-tabs">
+            <button
+              :class="['global-search__mode-tab', { 'global-search__mode-tab--active': mode === 'search' }]"
+              @click="mode = 'search'"
             >
-              <div class="global-search__group-label">{{ group.label }}</div>
+              🔍 搜索
+            </button>
+            <button
+              :class="['global-search__mode-tab', { 'global-search__mode-tab--active': mode === 'command' }]"
+              @click="mode = 'command'"
+            >
+              ⚡ 命令
+            </button>
+            <button
+              :class="['global-search__mode-tab', { 'global-search__mode-tab--active': mode === 'recent' }]"
+              @click="mode = 'recent'"
+            >
+              📋 最近访问
+            </button>
+          </div>
+
+          <div v-if="mode === 'search'" class="global-search__content">
+            <div v-if="query && filteredResults.length > 0" class="global-search__results">
               <div
-                v-for="(item, ii) in group.items"
-                :key="item.key"
-                :class="['global-search__item', { 'global-search__item--active': selectedIndex === flatIndex(gi, ii) }]"
-                @click="selectItem(item)"
-                @mouseenter="selectedIndex = flatIndex(gi, ii)"
+                v-for="(group, gi) in groupedResults"
+                :key="group.label"
+                class="global-search__group"
               >
-                <el-icon class="global-search__item-icon"><component :is="item.icon" /></el-icon>
-                <div class="global-search__item-info">
-                  <span class="global-search__item-label">{{ item.label }}</span>
-                  <span v-if="item.desc" class="global-search__item-desc">{{ item.desc }}</span>
+                <div class="global-search__group-label">{{ group.label }}</div>
+                <div
+                  v-for="(item, ii) in group.items"
+                  :key="item.key"
+                  :class="['global-search__item', { 'global-search__item--active': selectedIndex === flatIndex(gi, ii) }]"
+                  @click="selectItem(item)"
+                  @mouseenter="selectedIndex = flatIndex(gi, ii)"
+                >
+                  <el-icon class="global-search__item-icon"><component :is="item.icon" /></el-icon>
+                  <div class="global-search__item-info">
+                    <span class="global-search__item-label">{{ item.label }}</span>
+                    <span v-if="item.desc" class="global-search__item-desc">{{ item.desc }}</span>
+                  </div>
+                  <span v-if="item.shortcut" class="global-search__item-shortcut">{{ item.shortcut }}</span>
                 </div>
-                <span v-if="item.shortcut" class="global-search__item-shortcut">{{ item.shortcut }}</span>
+              </div>
+            </div>
+
+            <div v-else-if="query && filteredResults.length === 0" class="global-search__empty">
+              <p>未找到「{{ query }}」相关结果</p>
+            </div>
+
+            <div v-else class="global-search__hints">
+              <div class="global-search__group">
+                <div class="global-search__group-label">快速导航</div>
+                <div
+                  v-for="(item, i) in quickNavItems"
+                  :key="item.key"
+                  :class="['global-search__item', { 'global-search__item--active': selectedIndex === i }]"
+                  @click="selectItem(item)"
+                  @mouseenter="selectedIndex = i"
+                >
+                  <el-icon class="global-search__item-icon"><component :is="item.icon" /></el-icon>
+                  <div class="global-search__item-info">
+                    <span class="global-search__item-label">{{ item.label }}</span>
+                    <span v-if="item.desc" class="global-search__item-desc">{{ item.desc }}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div v-else-if="query && filteredResults.length === 0" class="global-search__empty">
-            <p>未找到「{{ query }}」相关结果</p>
+          <div v-if="mode === 'command'" class="global-search__content">
+            <div class="global-search__group">
+              <div class="global-search__group-label">常用命令</div>
+              <div
+                v-for="(cmd, i) in commandItems"
+                :key="cmd.key"
+                :class="['global-search__item', { 'global-search__item--active': selectedIndex === i }]"
+                @click="executeCommand(cmd)"
+                @mouseenter="selectedIndex = i"
+              >
+                <el-icon class="global-search__item-icon"><component :is="cmd.icon" /></el-icon>
+                <div class="global-search__item-info">
+                  <span class="global-search__item-label">{{ cmd.label }}</span>
+                  <span class="global-search__item-desc">{{ cmd.desc }}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div v-else class="global-search__hints">
-            <div class="global-search__group">
-              <div class="global-search__group-label">快速导航</div>
+          <div v-if="mode === 'recent'" class="global-search__content">
+            <div v-if="recentItems.length > 0" class="global-search__group">
+              <div class="global-search__group-label">最近访问</div>
               <div
-                v-for="(item, i) in quickNavItems"
+                v-for="(item, i) in recentItems"
                 :key="item.key"
                 :class="['global-search__item', { 'global-search__item--active': selectedIndex === i }]"
                 @click="selectItem(item)"
@@ -59,10 +120,12 @@
                 <el-icon class="global-search__item-icon"><component :is="item.icon" /></el-icon>
                 <div class="global-search__item-info">
                   <span class="global-search__item-label">{{ item.label }}</span>
-                  <span v-if="item.desc" class="global-search__item-desc">{{ item.desc }}</span>
+                  <span class="global-search__item-desc">{{ item.time }}</span>
                 </div>
-                <span v-if="item.shortcut" class="global-search__item-shortcut">{{ item.shortcut }}</span>
               </div>
+            </div>
+            <div v-else class="global-search__empty">
+              <p>暂无最近访问记录</p>
             </div>
           </div>
         </div>
@@ -72,12 +135,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from "vue";
+import { ref, computed, watch, nextTick, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import {
   Search, Opportunity, Goods, MagicStick, Timer, Warning,
-  Setting, Key, ChatDotRound, DataAnalysis, Document, Cpu, Bell
+  Setting, Key, ChatDotRound, DataAnalysis, Document, Cpu, Bell,
+  Plus, VideoPlay, Moon, Sunny
 } from "@element-plus/icons-vue";
+import { useTheme } from "../composables/useTheme";
 
 interface SearchItem {
   key: string;
@@ -86,19 +151,32 @@ interface SearchItem {
   icon: any;
   action: string;
   shortcut?: string;
+  time?: string;
+}
+
+interface CommandItem {
+  key: string;
+  label: string;
+  desc: string;
+  icon: any;
+  execute: () => void;
 }
 
 const props = defineProps<{ visible: boolean }>();
-const emit = defineEmits<{ close: []; navigate: [path: string] }>();
+const emit = defineEmits<{ close: [] }>();
 
 const router = useRouter();
+const { isDark, toggle: toggleTheme } = useTheme();
 const query = ref("");
 const inputRef = ref<HTMLInputElement>();
 const selectedIndex = ref(0);
+const mode = ref<"search" | "command" | "recent">("search");
+const recentItems = ref<SearchItem[]>([]);
 
 const allItems: SearchItem[] = [
-  { key: "nav-dashboard", label: "机会雷达", desc: "发现商机，洞察异动", icon: Opportunity, action: "/dashboard" },
+  { key: "nav-dashboard", label: "工作台", desc: "数据概览与快速操作", icon: Opportunity, action: "/dashboard" },
   { key: "nav-products", label: "我的商品", desc: "商品列表与详情", icon: Goods, action: "/products" },
+  { key: "nav-discovery", label: "商品发现", desc: "搜索商品和店铺", icon: DataAnalysis, action: "/discovery" },
   { key: "nav-category", label: "品类洞察", desc: "品类热力图与趋势", icon: DataAnalysis, action: "/category-insight" },
   { key: "nav-ai", label: "AI决策", desc: "智能分析与推荐", icon: MagicStick, action: "/ai" },
   { key: "nav-scheduler", label: "采集调度", desc: "任务队列与进度", icon: Timer, action: "/scheduler" },
@@ -107,17 +185,17 @@ const allItems: SearchItem[] = [
   { key: "nav-compare", label: "竞品对比", desc: "多商品横向对比", icon: DataAnalysis, action: "/compare" },
   { key: "nav-settings", label: "设置", desc: "账户、同步、隐私", icon: Setting, action: "/settings" },
   { key: "nav-license", label: "授权管理", desc: "套餐与激活", icon: Key, action: "/license" },
-  { key: "action-sync", label: "立即同步", desc: "同步数据到云端", icon: Cpu, action: "action:sync" },
-  { key: "action-collect", label: "开始采集", desc: "启动数据采集任务", icon: Timer, action: "action:collect" },
-  { key: "action-ai-analyze", label: "AI快捷分析", desc: "对商品执行AI分析", icon: MagicStick, action: "/ai" },
-  { key: "action-alert-rules", label: "告警规则管理", desc: "创建和编辑告警规则", icon: Warning, action: "/monitor" },
-  { key: "action-export", label: "导出数据", desc: "导出本地数据为JSON", icon: Document, action: "action:export" },
-  { key: "action-settings-team", label: "团队管理", desc: "创建团队、邀请成员", icon: Setting, action: "/settings" },
-  { key: "action-settings-audit", label: "操作审计", desc: "查看操作日志", icon: Document, action: "/settings" },
-  { key: "action-settings-security", label: "安全审计", desc: "查看安全日志", icon: Bell, action: "/settings" },
 ];
 
-const quickNavItems = computed(() => allItems.slice(0, 10));
+const quickNavItems = computed(() => allItems.slice(0, 8));
+
+const commandItems = computed<CommandItem[]>(() => [
+  { key: "cmd-add-product", label: "添加商品", desc: "打开添加商品对话框", icon: Plus, execute: () => { router.push({ path: "/products", query: { add: "1" } }); emit("close"); } },
+  { key: "cmd-collect", label: "开始采集", desc: "启动数据采集任务", icon: VideoPlay, execute: () => { window.electronAPI?.invoke("collect:start").catch(() => {}); emit("close"); } },
+  { key: "cmd-ai", label: "AI分析", desc: "打开AI决策面板", icon: MagicStick, execute: () => { router.push("/ai"); emit("close"); } },
+  { key: "cmd-reports", label: "查看报告", desc: "打开通知和报告列表", icon: Document, execute: () => { router.push("/notifications"); emit("close"); } },
+  { key: "cmd-theme", label: "切换主题", desc: isDark.value ? "切换到浅色模式" : "切换到深色模式", icon: isDark.value ? Sunny : Moon, execute: () => { toggleTheme(); emit("close"); } },
+]);
 
 const filteredResults = computed(() => {
   if (!query.value.trim()) return [];
@@ -131,11 +209,8 @@ const filteredResults = computed(() => {
 });
 
 const groupedResults = computed(() => {
-  const navItems = filteredResults.value.filter((i) => !i.action.startsWith("action:"));
-  const actionItems = filteredResults.value.filter((i) => i.action.startsWith("action:"));
   const groups: { label: string; items: SearchItem[] }[] = [];
-  if (navItems.length > 0) groups.push({ label: "页面导航", items: navItems });
-  if (actionItems.length > 0) groups.push({ label: "快捷操作", items: actionItems });
+  if (filteredResults.value.length > 0) groups.push({ label: "页面导航", items: filteredResults.value });
   return groups;
 });
 
@@ -147,32 +222,57 @@ function flatIndex(gi: number, ii: number): number {
 }
 
 function moveSelection(delta: number) {
-  const total = query.value ? filteredResults.value.length : quickNavItems.value.length;
+  let total = 0;
+  if (mode.value === "search") {
+    total = query.value ? filteredResults.value.length : quickNavItems.value.length;
+  } else if (mode.value === "command") {
+    total = commandItems.value.length;
+  } else {
+    total = recentItems.value.length;
+  }
   if (total === 0) return;
   selectedIndex.value = (selectedIndex.value + delta + total) % total;
 }
 
 function selectCurrent() {
-  const items = query.value ? filteredResults.value : quickNavItems.value;
+  let items: SearchItem[] = [];
+  if (mode.value === "search") {
+    items = query.value ? filteredResults.value : quickNavItems.value;
+  } else if (mode.value === "recent") {
+    items = recentItems.value;
+  }
   if (items[selectedIndex.value]) {
     selectItem(items[selectedIndex.value]);
   }
 }
 
 function selectItem(item: SearchItem) {
-  if (item.action.startsWith("action:")) {
-    const action = item.action.replace("action:", "");
-    if (action === "sync") {
-      window.electronAPI?.invoke("sync:now").catch(() => {});
-    } else if (action === "collect") {
-      window.electronAPI?.invoke("collect:start").catch(() => {});
-    } else if (action === "export") {
-      window.electronAPI?.invoke("storage:export-all").catch(() => {});
-    }
-  } else {
+  if (item.action && !item.action.startsWith("action:")) {
     router.push(item.action);
+    addRecent(item);
   }
   emit("close");
+}
+
+function executeCommand(cmd: CommandItem) {
+  cmd.execute();
+}
+
+function addRecent(item: SearchItem) {
+  const now = new Date();
+  const timeStr = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
+  const recent = { ...item, time: timeStr };
+  recentItems.value = [recent, ...recentItems.value.filter((r) => r.key !== item.key)].slice(0, 10);
+  try {
+    localStorage.setItem("recent-visits", JSON.stringify(recentItems.value));
+  } catch {}
+}
+
+function loadRecent() {
+  try {
+    const saved = localStorage.getItem("recent-visits");
+    if (saved) recentItems.value = JSON.parse(saved);
+  } catch {}
 }
 
 watch(
@@ -181,6 +281,8 @@ watch(
     if (v) {
       query.value = "";
       selectedIndex.value = 0;
+      mode.value = "search";
+      loadRecent();
       nextTick(() => inputRef.value?.focus());
     }
   }
@@ -188,6 +290,10 @@ watch(
 
 watch(query, () => {
   selectedIndex.value = 0;
+});
+
+onMounted(() => {
+  loadRecent();
 });
 </script>
 
@@ -199,16 +305,16 @@ watch(query, () => {
   z-index: 9999;
   display: flex;
   justify-content: center;
-  padding-top: 15vh;
+  padding-top: 10vh;
   backdrop-filter: blur(4px);
 }
 
 .global-search {
-  width: 560px;
-  max-height: 480px;
+  width: 600px;
+  max-height: 520px;
   background: var(--color-bg-card);
   border-radius: var(--radius-xl);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-xl);
   border: 1px solid var(--color-border-light);
   overflow: hidden;
   display: flex;
@@ -218,8 +324,8 @@ watch(query, () => {
 .global-search__header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
+  gap: var(--space-base);
+  padding: var(--space-base) var(--space-lg);
   border-bottom: 1px solid var(--color-border-light);
 }
 
@@ -246,27 +352,62 @@ watch(query, () => {
 .global-search__kbd {
   font-family: var(--font-sans);
   font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 4px;
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-xs);
   background: var(--color-bg-page);
   border: 1px solid var(--color-border);
   color: var(--color-text-tertiary);
   flex-shrink: 0;
 }
 
-.global-search__results,
-.global-search__hints {
+.global-search__mode-tabs {
+  display: flex;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-lg) 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.global-search__mode-tab {
+  padding: var(--space-sm) var(--space-base);
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-base) var(--radius-base) 0 0;
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.global-search__mode-tab:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.global-search__mode-tab--active {
+  background: var(--color-bg-page);
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.global-search__content {
   overflow-y: auto;
-  padding: 8px 0;
+  padding: var(--space-sm) 0;
+  flex: 1;
+}
+
+.global-search__results {
+  overflow-y: auto;
+  padding: var(--space-sm) 0;
   flex: 1;
 }
 
 .global-search__group {
-  margin-bottom: 4px;
+  margin-bottom: var(--space-xs);
 }
 
 .global-search__group-label {
-  padding: 8px 20px 4px;
+  padding: var(--space-sm) var(--space-lg) var(--space-xs);
   font-size: 11px;
   font-weight: 600;
   color: var(--color-text-tertiary);
@@ -277,10 +418,10 @@ watch(query, () => {
 .global-search__item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 20px;
+  gap: var(--space-base);
+  padding: var(--space-sm) var(--space-lg);
   cursor: pointer;
-  transition: background 0.15s;
+  transition: background var(--duration-fast) var(--ease-out);
 }
 
 .global-search__item:hover,
@@ -308,14 +449,14 @@ watch(query, () => {
 .global-search__item-desc {
   font-size: var(--text-xs);
   color: var(--color-text-tertiary);
-  margin-left: 8px;
+  margin-left: var(--space-sm);
 }
 
 .global-search__item-shortcut {
   font-family: var(--font-sans);
   font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 4px;
+  padding: var(--space-2xs) var(--space-xs);
+  border-radius: var(--radius-xs);
   background: var(--color-bg-page);
   border: 1px solid var(--color-border-light);
   color: var(--color-text-tertiary);
@@ -323,7 +464,7 @@ watch(query, () => {
 }
 
 .global-search__empty {
-  padding: 32px 20px;
+  padding: var(--space-2xl) var(--space-lg);
   text-align: center;
   color: var(--color-text-secondary);
   font-size: var(--text-sm);
@@ -359,8 +500,8 @@ watch(query, () => {
 
 @media (max-width: 768px) {
   .global-search {
-    width: calc(100vw - 32px);
-    margin: 0 16px;
+    width: calc(100vw - var(--space-xl));
+    margin: 0 var(--space-base);
   }
 }
 </style>

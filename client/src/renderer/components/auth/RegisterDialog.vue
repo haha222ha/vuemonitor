@@ -1,6 +1,6 @@
 <template>
-  <el-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" title="创建账户" width="420px" class="login__register-dialog">
-    <el-form :model="regForm" :rules="regRules" ref="regFormRef" class="login__form">
+  <el-dialog :model-value="modelValue" title="创建账户" width="420px" class="login__register-dialog" @update:model-value="$emit('update:modelValue', $event)">
+    <el-form ref="regFormRef" :model="regForm" :rules="regRules" class="login__form">
       <el-form-item prop="nickname">
         <el-input v-model="regForm.nickname" placeholder="昵称（必填）" size="large" />
       </el-form-item>

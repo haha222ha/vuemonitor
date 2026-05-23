@@ -3,7 +3,7 @@ import time
 from contextlib import asynccontextmanager
 
 from sqlalchemy import event, text
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from app.config import get_settings
@@ -126,12 +126,16 @@ async def init_db() -> None:
 
 async def get_pool_stats() -> dict:
     pool = engine.pool
+    try:
+        invalidated = pool.invalidated() if callable(getattr(pool, 'invalidated', None)) else getattr(pool, 'invalidated', 0)
+    except Exception:
+        invalidated = 0
     return {
         "pool_size": pool.size(),
         "checked_in": pool.checkedin(),
         "checked_out": pool.checkedout(),
         "overflow": pool.overflow(),
-        "invalidated": pool.invalidated,
+        "invalidated": invalidated,
     }
 
 

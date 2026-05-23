@@ -1,14 +1,12 @@
 import logging
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
-from typing import Optional
 
-from sqlalchemy import select, func, and_, text
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.product import Product, ProductFeature
-from app.models.monitor import MonitorRule
 
 logger = logging.getLogger(__name__)
 
@@ -18,14 +16,14 @@ class CategoryStats:
         self,
         category: str,
         product_count: int,
-        avg_price: Optional[float],
-        median_price: Optional[float],
-        avg_sales: Optional[float],
-        avg_rating: Optional[float],
-        price_p25: Optional[float],
-        price_p75: Optional[float],
-        sales_p25: Optional[float],
-        sales_p75: Optional[float],
+        avg_price: float | None,
+        median_price: float | None,
+        avg_sales: float | None,
+        avg_rating: float | None,
+        price_p25: float | None,
+        price_p75: float | None,
+        sales_p25: float | None,
+        sales_p75: float | None,
     ):
         self.category = category
         self.product_count = product_count
@@ -57,21 +55,21 @@ class ProductRanking:
     def __init__(
         self,
         product_id: uuid.UUID,
-        category: Optional[str],
-        price_percentile: Optional[float],
-        sales_percentile: Optional[float],
-        rating_percentile: Optional[float],
-        overall_rank: Optional[int],
-        category_rank: Optional[int],
-        category_total: Optional[int],
-        lifecycle_stage: Optional[str],
-        trend_short: Optional[str],
-        trend_long: Optional[str],
-        sales_velocity: Optional[float],
-        growth_rate_7d: Optional[float],
-        growth_rate_30d: Optional[float],
-        volatility: Optional[float],
-        competition_index: Optional[float],
+        category: str | None,
+        price_percentile: float | None,
+        sales_percentile: float | None,
+        rating_percentile: float | None,
+        overall_rank: int | None,
+        category_rank: int | None,
+        category_total: int | None,
+        lifecycle_stage: str | None,
+        trend_short: str | None,
+        trend_long: str | None,
+        sales_velocity: float | None,
+        growth_rate_7d: float | None,
+        growth_rate_30d: float | None,
+        volatility: float | None,
+        competition_index: float | None,
     ):
         self.product_id = product_id
         self.category = category
@@ -115,7 +113,7 @@ class CloudFeatureEngine:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def compute_category_stats(self, category: Optional[str] = None) -> list[CategoryStats]:
+    async def compute_category_stats(self, category: str | None = None) -> list[CategoryStats]:
         base_query = (
             select(
                 Product.category,
@@ -125,7 +123,7 @@ class CloudFeatureEngine:
                 func.avg(ProductFeature.rating).label("avg_rating"),
             )
             .join(ProductFeature, ProductFeature.product_id == Product.id)
-            .where(Product.is_active == True, Product.category.isnot(None))
+            .where(Product.is_active, Product.category.isnot(None))
             .group_by(Product.category)
         )
 
@@ -148,7 +146,7 @@ class CloudFeatureEngine:
                     func.percentile_cont(0.75).within_group(ProductFeature.price).label("p75"),
                 )
                 .join(Product, Product.id == ProductFeature.product_id)
-                .where(Product.category == cat, Product.is_active == True)
+                .where(Product.category == cat, Product.is_active)
             )
             price_pct = percentile_result.one_or_none()
 
@@ -158,7 +156,7 @@ class CloudFeatureEngine:
                     func.percentile_cont(0.75).within_group(ProductFeature.sales_count).label("p75"),
                 )
                 .join(Product, Product.id == ProductFeature.product_id)
-                .where(Product.category == cat, Product.is_active == True)
+                .where(Product.category == cat, Product.is_active)
             )
             sales_pct = sales_pct_result.one_or_none()
 
@@ -177,7 +175,7 @@ class CloudFeatureEngine:
 
         return stats_list
 
-    async def compute_product_ranking(self, product_id: uuid.UUID) -> Optional[ProductRanking]:
+    async def compute_product_ranking(self, product_id: uuid.UUID) -> ProductRanking | None:
         product_result = await self.db.execute(
             select(Product).where(Product.id == product_id)
         )
@@ -240,7 +238,7 @@ class CloudFeatureEngine:
 
     async def compute_all_rankings(self) -> int:
         result = await self.db.execute(
-            select(Product.id).where(Product.is_active == True)
+            select(Product.id).where(Product.is_active)
         )
         product_ids = result.scalars().all()
 
@@ -257,8 +255,8 @@ class CloudFeatureEngine:
         return computed
 
     async def _compute_percentile(
-        self, product_id: uuid.UUID, field: str, category: Optional[str]
-    ) -> Optional[float]:
+        self, product_id: uuid.UUID, field: str, category: str | None
+    ) -> float | None:
         if not category:
             return None
 
@@ -281,7 +279,7 @@ class CloudFeatureEngine:
             .join(Product, Product.id == ProductFeature.product_id)
             .where(
                 Product.category == category,
-                Product.is_active == True,
+                Product.is_active,
                 getattr(ProductFeature, field).isnot(None),
             )
         )
@@ -293,7 +291,7 @@ class CloudFeatureEngine:
             .join(Product, Product.id == ProductFeature.product_id)
             .where(
                 Product.category == category,
-                Product.is_active == True,
+                Product.is_active,
                 getattr(ProductFeature, field) < product_value,
             )
         )
@@ -301,7 +299,7 @@ class CloudFeatureEngine:
 
         return round((below / total) * 100, 1) if total > 0 else None
 
-    async def _compute_overall_rank(self, product_id: uuid.UUID) -> Optional[int]:
+    async def _compute_overall_rank(self, product_id: uuid.UUID) -> int | None:
         result = await self.db.execute(
             text("""
                 WITH ranked AS (
@@ -323,8 +321,8 @@ class CloudFeatureEngine:
         return row.rnk if row else None
 
     async def _compute_category_rank(
-        self, product_id: uuid.UUID, category: Optional[str]
-    ) -> Optional[int]:
+        self, product_id: uuid.UUID, category: str | None
+    ) -> int | None:
         if not category:
             return None
 
@@ -348,19 +346,19 @@ class CloudFeatureEngine:
         row = result.one_or_none()
         return row.rnk if row else None
 
-    async def _compute_category_total(self, category: Optional[str]) -> Optional[int]:
+    async def _compute_category_total(self, category: str | None) -> int | None:
         if not category:
             return None
         result = await self.db.execute(
             select(func.count(Product.id)).where(
-                Product.category == category, Product.is_active == True
+                Product.category == category, Product.is_active
             )
         )
         return result.scalar()
 
     def _compute_sales_velocity(
-        self, latest: Optional[ProductFeature], prev: Optional[ProductFeature]
-    ) -> Optional[float]:
+        self, latest: ProductFeature | None, prev: ProductFeature | None
+    ) -> float | None:
         if not latest or not prev or not latest.sales_count or not prev.sales_count:
             return None
 
@@ -371,10 +369,10 @@ class CloudFeatureEngine:
         delta = max(0, latest.sales_count - prev.sales_count)
         return round(delta / days_diff, 2)
 
-    async def _compute_growth_rate(self, product_id: uuid.UUID, days: int) -> Optional[float]:
+    async def _compute_growth_rate(self, product_id: uuid.UUID, days: int) -> float | None:
         from datetime import timedelta
 
-        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+        cutoff = datetime.now(UTC) - timedelta(days=days)
 
         result = await self.db.execute(
             select(ProductFeature)
@@ -401,7 +399,7 @@ class CloudFeatureEngine:
 
         return round((last.sales_count - first.sales_count) / first.sales_count, 4)
 
-    async def _compute_volatility(self, product_id: uuid.UUID) -> Optional[float]:
+    async def _compute_volatility(self, product_id: uuid.UUID) -> float | None:
         result = await self.db.execute(
             select(ProductFeature.price)
             .where(ProductFeature.product_id == product_id, ProductFeature.price.isnot(None))
@@ -420,7 +418,7 @@ class CloudFeatureEngine:
         variance = sum((p - mean) ** 2 for p in prices) / len(prices)
         return round((variance ** 0.5) / mean, 4)
 
-    def _compute_competition_index(self, latest: Optional[ProductFeature]) -> Optional[float]:
+    def _compute_competition_index(self, latest: ProductFeature | None) -> float | None:
         if not latest:
             return None
 
@@ -455,9 +453,9 @@ class CloudFeatureEngine:
 
     def _compute_lifecycle_stage(
         self,
-        growth_rate: Optional[float],
-        latest: Optional[ProductFeature],
-        prev: Optional[ProductFeature],
+        growth_rate: float | None,
+        latest: ProductFeature | None,
+        prev: ProductFeature | None,
     ) -> str:
         if not latest or not prev:
             return "new"
@@ -475,7 +473,7 @@ class CloudFeatureEngine:
             return "declining"
         return "decline"
 
-    def _compute_trend(self, growth_rate: Optional[float]) -> str:
+    def _compute_trend(self, growth_rate: float | None) -> str:
         if growth_rate is None:
             return "unknown"
         if growth_rate > 0.1:
@@ -485,9 +483,6 @@ class CloudFeatureEngine:
         return "stable"
 
     async def _save_ranking(self, ranking: ProductRanking) -> None:
-        from app.models.base import Base
-        from sqlalchemy import Table, Column, String, Integer, Float, DateTime
-        from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
         result = await self.db.execute(
             text("""

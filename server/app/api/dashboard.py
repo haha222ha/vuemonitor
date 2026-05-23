@@ -1,14 +1,15 @@
-from datetime import datetime, timedelta, timezone
+import logging
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import case, func, select, text
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import cache_get, cache_set
 from app.core.database import get_db
 from app.middleware.auth import CurrentUser
-from app.models.collect import CollectTask, CollectTaskItem
 from app.models.ai import AIAnalysis
+from app.models.collect import CollectTask, CollectTaskItem
 from app.models.product import Product, ProductFeature
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
@@ -23,7 +24,7 @@ async def get_dashboard_stats(
     cached = await cache_get(cache_key)
     if cached is not None:
         return {"code": 0, "data": cached}
-    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
 
     product_count_result = await db.execute(
         select(func.count()).select_from(Product).where(Product.user_id == user.id)
@@ -32,7 +33,7 @@ async def get_dashboard_stats(
 
     active_product_count_result = await db.execute(
         select(func.count()).select_from(Product).where(
-            Product.user_id == user.id, Product.is_active == True
+            Product.user_id == user.id, Product.is_active
         )
     )
     active_product_count = active_product_count_result.scalar() or 0
@@ -286,7 +287,7 @@ async def get_dashboard_trend(
     if cached is not None:
         return {"code": 0, "data": cached}
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     start_date = datetime.utcnow() - timedelta(days=days)
 
     product_daily_result = await db.execute(
@@ -442,7 +443,7 @@ async def get_home_data(
     if cached is not None:
         return {"code": 0, "data": cached}
 
-    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
 
     product_count_result = await db.execute(
         select(func.count()).select_from(Product).where(Product.user_id == user.id)
@@ -526,6 +527,154 @@ async def get_home_data(
     )
     today_ai_count = today_ai_result.scalar() or 0
 
+    yesterday_start = today_start - timedelta(days=1)
+    yesterday_product_count_result = await db.execute(
+        select(func.count()).select_from(Product).where(
+            Product.user_id == user.id, Product.created_at >= yesterday_start, Product.created_at < today_start
+        )
+    )
+    yesterday_new_products = yesterday_product_count_result.scalar() or 0
+
+    today_new_products_result = await db.execute(
+        select(func.count()).select_from(Product).where(
+            Product.user_id == user.id, Product.created_at >= today_start
+        )
+    )
+    today_new_products = today_new_products_result.scalar() or 0
+
+    yesterday_collect_result = await db.execute(
+        select(func.count()).select_from(CollectTask).where(
+            CollectTask.user_id == user.id, CollectTask.created_at >= yesterday_start, CollectTask.created_at < today_start
+        )
+    )
+    yesterday_collect = yesterday_collect_result.scalar() or 0
+
+    today_collect_result = await db.execute(
+        select(func.count()).select_from(CollectTask).where(
+            CollectTask.user_id == user.id, CollectTask.created_at >= today_start
+        )
+    )
+    today_collect = today_collect_result.scalar() or 0
+
+    product_count_change = None
+    if yesterday_new_products > 0:
+        product_count_change = round((today_new_products - yesterday_new_products) / yesterday_new_products * 100, 1)
+
+    collect_count_change = None
+    if yesterday_collect > 0:
+        collect_count_change = round((today_collect - yesterday_collect) / yesterday_collect * 100, 1)
+
+    yesterday_ai_result = await db.execute(
+        text("""
+            SELECT COUNT(*) FROM feature_gate_usage
+            WHERE user_id = :uid AND gate_key LIKE 'gate:ai:%'
+            AND used_at >= :yesterday_start AND used_at < :today_start
+        """),
+        {"uid": user.id, "yesterday_start": yesterday_start, "today_start": today_start},
+    )
+    yesterday_ai_count = yesterday_ai_result.scalar() or 0
+
+    today_ai_result = await db.execute(
+        text("""
+            SELECT COUNT(*) FROM feature_gate_usage
+            WHERE user_id = :uid AND gate_key LIKE 'gate:ai:%'
+            AND used_at >= :today_start
+        """),
+        {"uid": user.id, "today_start": today_start},
+    )
+    today_ai_count = today_ai_result.scalar() or 0
+
+    ai_count_change = None
+    if yesterday_ai_count > 0:
+        ai_count_change = round((today_ai_count - yesterday_ai_count) / yesterday_ai_count * 100, 1)
+
+    yesterday_risk_result = await db.execute(
+        text("""
+            SELECT COUNT(*) FROM alerts
+            WHERE user_id = :uid AND alert_type = 'risk'
+            AND created_at >= :yesterday_start AND created_at < :today_start
+        """),
+        {"uid": user.id, "yesterday_start": yesterday_start, "today_start": today_start},
+    )
+    yesterday_risk_count = yesterday_risk_result.scalar() or 0
+
+    today_risk_result = await db.execute(
+        text("""
+            SELECT COUNT(*) FROM alerts
+            WHERE user_id = :uid AND alert_type = 'risk'
+            AND created_at >= :today_start
+        """),
+        {"uid": user.id, "today_start": today_start},
+    )
+    today_risk_count = today_risk_result.scalar() or 0
+
+    risk_count_change = None
+    if yesterday_risk_count > 0:
+        risk_count_change = round((today_risk_count - yesterday_risk_count) / yesterday_risk_count * 100, 1)
+
+    week_start = today_start - timedelta(days=today_start.weekday())
+    last_week_start = week_start - timedelta(days=7)
+    last_week_end = week_start
+
+    this_week_products_result = await db.execute(
+        select(func.count()).select_from(Product).where(
+            Product.user_id == user.id, Product.created_at >= week_start
+        )
+    )
+    this_week_products = this_week_products_result.scalar() or 0
+
+    last_week_products_result = await db.execute(
+        select(func.count()).select_from(Product).where(
+            Product.user_id == user.id, Product.created_at >= last_week_start, Product.created_at < last_week_end
+        )
+    )
+    last_week_products = last_week_products_result.scalar() or 0
+
+    this_week_collects_result = await db.execute(
+        select(func.count()).select_from(CollectTask).where(
+            CollectTask.user_id == user.id, CollectTask.created_at >= week_start
+        )
+    )
+    this_week_collects = this_week_collects_result.scalar() or 0
+
+    last_week_collects_result = await db.execute(
+        select(func.count()).select_from(CollectTask).where(
+            CollectTask.user_id == user.id, CollectTask.created_at >= last_week_start, CollectTask.created_at < last_week_end
+        )
+    )
+    last_week_collects = last_week_collects_result.scalar() or 0
+
+    this_week_ai_result = await db.execute(
+        text("""
+            SELECT COUNT(*) FROM feature_gate_usage
+            WHERE user_id = :uid AND gate_key LIKE 'gate:ai:%'
+            AND used_at >= :week_start
+        """),
+        {"uid": user.id, "week_start": week_start},
+    )
+    this_week_ai = this_week_ai_result.scalar() or 0
+
+    last_week_ai_result = await db.execute(
+        text("""
+            SELECT COUNT(*) FROM feature_gate_usage
+            WHERE user_id = :uid AND gate_key LIKE 'gate:ai:%'
+            AND used_at >= :last_week_start AND used_at < :last_week_end
+        """),
+        {"uid": user.id, "last_week_start": last_week_start, "last_week_end": last_week_end},
+    )
+    last_week_ai = last_week_ai_result.scalar() or 0
+
+    def _wow_pct(this_val: int, last_val: int) -> float | None:
+        if last_val > 0:
+            return round((this_val - last_val) / last_val * 100, 1)
+        return None
+
+    week_over_week = {
+        "products": {"this_week": this_week_products, "last_week": last_week_products, "change_pct": _wow_pct(this_week_products, last_week_products)},
+        "collects": {"this_week": this_week_collects, "last_week": last_week_collects, "change_pct": _wow_pct(this_week_collects, last_week_collects)},
+        "ai_analyses": {"this_week": this_week_ai, "last_week": last_week_ai, "change_pct": _wow_pct(this_week_ai, last_week_ai)},
+    }
+
     rankings = []
     try:
         rankings_result = await db.execute(
@@ -553,12 +702,12 @@ async def get_home_data(
             for r in rankings_result.mappings().all()
         ]
     except Exception:
-        pass
+        logging.getLogger("dashboard").warning("Failed to query product rankings", exc_info=True)
 
     from app.models.alert_rule import AlertEvent
     alert_events_result = await db.execute(
         select(AlertEvent)
-        .where(AlertEvent.user_id == user.id, AlertEvent.is_acknowledged == False)
+        .where(AlertEvent.user_id == user.id, not AlertEvent.is_acknowledged)
         .order_by(AlertEvent.created_at.desc())
         .limit(5)
     )
@@ -579,7 +728,7 @@ async def get_home_data(
 
     unack_alert_count_result = await db.execute(
         select(func.count()).select_from(AlertEvent).where(
-            AlertEvent.user_id == user.id, AlertEvent.is_acknowledged == False
+            AlertEvent.user_id == user.id, not AlertEvent.is_acknowledged
         )
     )
     unack_alert_count = unack_alert_count_result.scalar() or 0
@@ -594,7 +743,7 @@ async def get_home_data(
             func.avg(ProductFeature.rating).label("avg_rating"),
         )
         .join(ProductFeature, ProductFeature.product_id == Product.id)
-        .where(Product.is_active == True, Product.category.isnot(None))
+        .where(Product.is_active, Product.category.isnot(None))
         .group_by(Product.category)
     )
     heatmap_rows = heatmap_result.all()
@@ -637,7 +786,7 @@ async def get_home_data(
         )
         lifecycle_dist = [{"stage": r.lifecycle_stage, "count": r.cnt} for r in lifecycle_result.all()]
     except Exception:
-        pass
+        logging.getLogger("dashboard").warning("Failed to query lifecycle distribution", exc_info=True)
 
     trend_dist = []
     try:
@@ -653,7 +802,7 @@ async def get_home_data(
         )
         trend_dist = [{"trend": r.trend_short, "count": r.cnt} for r in trend_result.all()]
     except Exception:
-        pass
+        logging.getLogger("dashboard").warning("Failed to query trend distribution", exc_info=True)
 
     price_band_result = await db.execute(
         text("""
@@ -744,6 +893,15 @@ async def get_home_data(
             "alert_count": unack_alert_count,
             "ai_insight_count": today_ai_count,
             "product_count": product_count,
+            "today_new_products": today_new_products,
+            "yesterday_new_products": yesterday_new_products,
+            "product_count_change": product_count_change,
+            "today_collect": today_collect,
+            "yesterday_collect": yesterday_collect,
+            "collect_count_change": collect_count_change,
+            "ai_count_change": ai_count_change,
+            "risk_count_change": risk_count_change,
+            "week_over_week": week_over_week,
         },
         "rankings": rankings,
         "alert_events": alert_events,

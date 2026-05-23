@@ -11,30 +11,30 @@
         </el-tag>
       </div>
     </div>
-    <div class="ai-result-section" v-if="analysis.summary">
+    <div v-if="analysis.summary" class="ai-result-section">
       <div class="ai-result-section__label">摘要</div>
       <div class="ai-result-section__content ai-result-section__content--highlight">{{ analysis.summary }}</div>
     </div>
-    <div class="ai-result-section" v-if="analysis.score != null">
+    <div v-if="analysis.score != null" class="ai-result-section">
       <div class="ai-result-section__label">评分</div>
       <div class="ai-score-bar">
         <div class="ai-score-bar__fill" :style="{ width: `${Math.min(analysis.score, 100)}%` }" />
         <span class="ai-score-bar__value">{{ analysis.score }}/100</span>
       </div>
     </div>
-    <div class="ai-result-section" v-if="analysis.recommendations?.length">
+    <div v-if="analysis.recommendations?.length" class="ai-result-section">
       <div class="ai-result-section__label">建议</div>
       <ul class="ai-recommendations">
         <li v-for="(rec, idx) in analysis.recommendations" :key="idx">{{ rec }}</li>
       </ul>
     </div>
-    <div class="ai-result-section" v-if="analysis.risks?.length">
+    <div v-if="analysis.risks?.length" class="ai-result-section">
       <div class="ai-result-section__label">风险</div>
       <ul class="ai-risks">
         <li v-for="(risk, idx) in analysis.risks" :key="idx">{{ risk }}</li>
       </ul>
     </div>
-    <div class="ai-result" v-if="!analysis.summary && !analysis.recommendations?.length">
+    <div v-if="!analysis.summary && !analysis.recommendations?.length" class="ai-result">
       {{ formatAIResult(analysis) }}
     </div>
   </div>

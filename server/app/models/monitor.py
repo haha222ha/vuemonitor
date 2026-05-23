@@ -5,7 +5,7 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, String, Te
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin, Base
+from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 
 class MonitorRule(UUIDPrimaryKeyMixin, TimestampMixin, Base):

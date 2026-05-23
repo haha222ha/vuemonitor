@@ -1,6 +1,6 @@
 import logging
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 
 from sqlalchemy import select
@@ -9,8 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.monitor import MonitorRule, Notification
 from app.models.product import Product, ProductFeature
 from app.models.user import User
-from app.ws.manager import manager
 from app.services.email_service import email_service
+from app.ws.manager import manager
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ class RuleEvaluator:
 
     async def evaluate_all_active_rules(self) -> int:
         result = await self.db.execute(
-            select(MonitorRule).where(MonitorRule.is_active == True)
+            select(MonitorRule).where(MonitorRule.is_active)
         )
         rules = result.scalars().all()
         triggered_count = 0
@@ -71,7 +71,7 @@ class RuleEvaluator:
             prev=prev_feature,
         )
 
-        rule.last_triggered_at = datetime.now(timezone.utc)
+        rule.last_triggered_at = datetime.now(UTC)
         rule.trigger_count = (rule.trigger_count or 0) + 1
 
         return True
@@ -239,7 +239,7 @@ class RuleEvaluator:
                 "title": notification.title,
                 "content": content,
             },
-            "ts": datetime.now(timezone.utc).isoformat(),
+            "ts": datetime.now(UTC).isoformat(),
         })
 
         try:
@@ -255,7 +255,7 @@ class RuleEvaluator:
         except Exception as e:
             logger.error(f"Failed to send email notification for rule {rule.id}: {e}")
 
-        return notification;
+        return notification
 
     def _build_notification_content(
         self,

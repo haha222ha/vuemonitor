@@ -1,8 +1,9 @@
-import { app, BrowserWindow, dialog } from "electron";
+﻿import { app, BrowserWindow, dialog } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import { EventEmitter } from "events";
 import * as fs from "fs";
 import * as path from "path";
+import { logger } from "../logger/logger";
 
 export interface AutoUpdateStatus {
   checking: boolean;
@@ -72,7 +73,7 @@ class AutoUpdateManager extends EventEmitter {
     try {
       const historyPath = path.join(app.getPath("userData"), HISTORY_FILE);
       fs.writeFileSync(historyPath, JSON.stringify(this.status.updateHistory, null, 2));
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
   }
 
   private setupAutoUpdater(): void {

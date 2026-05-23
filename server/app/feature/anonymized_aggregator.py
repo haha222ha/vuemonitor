@@ -1,10 +1,7 @@
-import hashlib
 import logging
 import math
-from datetime import datetime, timedelta
-from typing import Optional
 
-from sqlalchemy import select, func, and_, text
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.product import Product, ProductFeature
@@ -22,14 +19,14 @@ class AnonymizedAggregate:
         category: str,
         user_count: int,
         product_count: int,
-        avg_price: Optional[float],
-        median_price: Optional[float],
-        avg_sales: Optional[float],
-        avg_rating: Optional[float],
-        price_range: Optional[str],
-        sales_range: Optional[str],
-        top_lifecycle: Optional[str],
-        dominant_trend: Optional[str],
+        avg_price: float | None,
+        median_price: float | None,
+        avg_sales: float | None,
+        avg_rating: float | None,
+        price_range: str | None,
+        sales_range: str | None,
+        top_lifecycle: str | None,
+        dominant_trend: str | None,
         is_k_anonymous: bool,
     ):
         self.category = category
@@ -62,7 +59,7 @@ class AnonymizedAggregate:
         }
 
     @staticmethod
-    def _add_noise(value: Optional[float]) -> Optional[float]:
+    def _add_noise(value: float | None) -> float | None:
         if value is None:
             return None
         import random
@@ -70,7 +67,7 @@ class AnonymizedAggregate:
         return round(max(0, value + noise), 2)
 
     @staticmethod
-    def _laplace_noise(value: Optional[float], epsilon: float = 1.0) -> Optional[float]:
+    def _laplace_noise(value: float | None, epsilon: float = 1.0) -> float | None:
         if value is None:
             return None
         import random
@@ -86,9 +83,9 @@ class CategoryHeatPoint:
         category: str,
         product_count: int,
         user_count: int,
-        avg_sales: Optional[float],
-        avg_favorites: Optional[float],
-        avg_rating: Optional[float],
+        avg_sales: float | None,
+        avg_favorites: float | None,
+        avg_rating: float | None,
         heat_score: float,
         heat_level: str,
     ):
@@ -119,13 +116,13 @@ class TrendTimePoint:
         self,
         period: str,
         category: str,
-        avg_sales: Optional[float],
-        avg_price: Optional[float],
-        avg_rating: Optional[float],
+        avg_sales: float | None,
+        avg_price: float | None,
+        avg_rating: float | None,
         product_count: int,
         user_count: int,
-        sales_growth_rate: Optional[float] = None,
-        price_change_rate: Optional[float] = None,
+        sales_growth_rate: float | None = None,
+        price_change_rate: float | None = None,
     ):
         self.period = period
         self.category = category
@@ -167,7 +164,7 @@ class AnonymizedAggregator:
                 func.avg(ProductFeature.rating).label("avg_rating"),
             )
             .join(ProductFeature, ProductFeature.product_id == Product.id)
-            .where(Product.is_active == True, Product.category.isnot(None))
+            .where(Product.is_active, Product.category.isnot(None))
             .group_by(Product.category)
             .having(func.count(func.distinct(Product.user_id)) >= self.k)
         )
@@ -187,7 +184,7 @@ class AnonymizedAggregator:
                     func.max(ProductFeature.price).label("max_price"),
                 )
                 .join(Product, Product.id == ProductFeature.product_id)
-                .where(Product.category == row.category, Product.is_active == True)
+                .where(Product.category == row.category, Product.is_active)
             )
             price_stats = percentile_result.one_or_none()
 
@@ -197,7 +194,7 @@ class AnonymizedAggregator:
                     func.max(ProductFeature.sales_count).label("max_sales"),
                 )
                 .join(Product, Product.id == ProductFeature.product_id)
-                .where(Product.category == row.category, Product.is_active == True)
+                .where(Product.category == row.category, Product.is_active)
             )
             sales_stats = sales_range_result.one_or_none()
 
@@ -250,10 +247,10 @@ class AnonymizedAggregator:
 
     async def get_price_benchmark(
         self, category: str, price: float
-    ) -> Optional[dict]:
+    ) -> dict | None:
         user_count_result = await self.db.execute(
             select(func.count(func.distinct(Product.user_id)))
-            .where(Product.category == category, Product.is_active == True)
+            .where(Product.category == category, Product.is_active)
         )
         user_count = user_count_result.scalar() or 0
 
@@ -267,7 +264,7 @@ class AnonymizedAggregator:
                 func.percentile_cont(0.75).within_group(ProductFeature.price).label("p75"),
             )
             .join(Product, Product.id == ProductFeature.product_id)
-            .where(Product.category == category, Product.is_active == True)
+            .where(Product.category == category, Product.is_active)
         )
         pct = percentile_result.one_or_none()
 
@@ -280,7 +277,7 @@ class AnonymizedAggregator:
             .join(Product, Product.id == ProductFeature.product_id)
             .where(
                 Product.category == category,
-                Product.is_active == True,
+                Product.is_active,
                 ProductFeature.price < price,
             )
         )
@@ -292,7 +289,7 @@ class AnonymizedAggregator:
             .join(Product, Product.id == ProductFeature.product_id)
             .where(
                 Product.category == category,
-                Product.is_active == True,
+                Product.is_active,
                 ProductFeature.price.isnot(None),
             )
         )
@@ -330,7 +327,7 @@ class AnonymizedAggregator:
                 func.avg(ProductFeature.rating).label("avg_rating"),
             )
             .join(ProductFeature, ProductFeature.product_id == Product.id)
-            .where(Product.is_active == True, Product.category.isnot(None))
+            .where(Product.is_active, Product.category.isnot(None))
             .group_by(Product.category)
             .having(func.count(func.distinct(Product.user_id)) >= self.k)
         )
@@ -370,7 +367,7 @@ class AnonymizedAggregator:
 
     async def get_trend_timeseries(
         self,
-        category: Optional[str] = None,
+        category: str | None = None,
         days: int = 30,
     ) -> dict[str, list[TrendTimePoint]]:
         interval = "day" if days <= 30 else "week"
@@ -435,7 +432,7 @@ class AnonymizedAggregator:
         return series_map
 
     async def get_behavior_patterns(
-        self, category: Optional[str] = None
+        self, category: str | None = None
     ) -> dict:
         category_filter = "AND p.category = :cat" if category else ""
         params = {"cat": category} if category else {}
@@ -518,10 +515,10 @@ class AnonymizedAggregator:
 
     async def get_sales_benchmark(
         self, category: str, sales_count: int
-    ) -> Optional[dict]:
+    ) -> dict | None:
         user_count_result = await self.db.execute(
             select(func.count(func.distinct(Product.user_id)))
-            .where(Product.category == category, Product.is_active == True)
+            .where(Product.category == category, Product.is_active)
         )
         user_count = user_count_result.scalar() or 0
 
@@ -535,7 +532,7 @@ class AnonymizedAggregator:
                 func.percentile_cont(0.75).within_group(ProductFeature.sales_count).label("p75"),
             )
             .join(Product, Product.id == ProductFeature.product_id)
-            .where(Product.category == category, Product.is_active == True)
+            .where(Product.category == category, Product.is_active)
         )
         pct = percentile_result.one_or_none()
 
@@ -548,7 +545,7 @@ class AnonymizedAggregator:
             .join(Product, Product.id == ProductFeature.product_id)
             .where(
                 Product.category == category,
-                Product.is_active == True,
+                Product.is_active,
                 ProductFeature.sales_count < sales_count,
             )
         )
@@ -560,7 +557,7 @@ class AnonymizedAggregator:
             .join(Product, Product.id == ProductFeature.product_id)
             .where(
                 Product.category == category,
-                Product.is_active == True,
+                Product.is_active,
                 ProductFeature.sales_count.isnot(None),
             )
         )

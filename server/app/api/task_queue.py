@@ -1,9 +1,7 @@
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Query
 
-from app.core.database import get_db
 from app.middleware.auth import AdminUser
-from app.task_queue.queue import enqueue, get_task_status, cancel_task, list_tasks, TaskPriority
+from app.task_queue.queue import TaskPriority, cancel_task, enqueue, get_task_status, list_tasks
 
 router = APIRouter(prefix="/tasks", tags=["task-queue"])
 

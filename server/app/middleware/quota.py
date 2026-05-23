@@ -1,12 +1,11 @@
-import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import Request
+from shared.constants.feature_gates import PLAN_LIMITS
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.responses import JSONResponse
 
 from app.core.redis import get_redis
-from shared.constants.feature_gates import PLAN_LIMITS
 
 _QUOTA_PATH_MAP = {
     "/api/v1/collect": ("dailyCollectLimit", "collect"),
@@ -52,7 +51,7 @@ class QuotaEnforcementMiddleware(BaseHTTPMiddleware):
                 if limit == -1:
                     return await call_next(request)
 
-                today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                today = datetime.now(UTC).strftime("%Y-%m-%d")
                 redis_key = f"quota:{counter_name}:{user.id}:{today}"
 
                 try:

@@ -1,10 +1,11 @@
 import uuid
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.exceptions import BadRequestException, NotFoundException
+from app.core.exceptions import NotFoundException
 from app.middleware.auth import CurrentUser
 from app.models.ai import AIReportTemplate
 
@@ -75,7 +76,7 @@ async def list_templates(
     report_type: str | None = None,
 ):
     query = select(AIReportTemplate).where(
-        (AIReportTemplate.user_id == user.id) | (AIReportTemplate.is_default == True)
+        (AIReportTemplate.user_id == user.id) | (AIReportTemplate.is_default)
     )
     if report_type:
         query = query.where(AIReportTemplate.report_type == report_type)
@@ -189,14 +190,22 @@ async def update_template(
     template = result.scalar_one_or_none()
     if not template:
         raise NotFoundException(message="模板不存在")
-    if name is not None: template.name = name
-    if description is not None: template.description = description
-    if metrics is not None: template.metrics = metrics
-    if chart_types is not None: template.chart_types = chart_types
-    if output_format is not None: template.output_format = output_format
-    if prompt_template is not None: template.prompt_template = prompt_template
-    if sections is not None: template.sections = sections
-    if is_active is not None: template.is_active = is_active
+    if name is not None:
+        template.name = name
+    if description is not None:
+        template.description = description
+    if metrics is not None:
+        template.metrics = metrics
+    if chart_types is not None:
+        template.chart_types = chart_types
+    if output_format is not None:
+        template.output_format = output_format
+    if prompt_template is not None:
+        template.prompt_template = prompt_template
+    if sections is not None:
+        template.sections = sections
+    if is_active is not None:
+        template.is_active = is_active
     await db.commit()
     return {"code": 0, "data": {"id": str(template.id), "updated": True}}
 
@@ -226,7 +235,7 @@ async def init_default_templates(
     db: AsyncSession = Depends(get_db),
 ):
     existing = await db.execute(
-        select(AIReportTemplate).where(AIReportTemplate.is_default == True)
+        select(AIReportTemplate).where(AIReportTemplate.is_default)
     )
     if existing.scalars().first():
         return {"code": 0, "data": {"message": "默认模板已存在"}}

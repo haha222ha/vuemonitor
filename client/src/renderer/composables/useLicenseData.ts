@@ -18,7 +18,7 @@ export function useLicenseData() {
     licenseKey: [{ required: true, message: "请输入授权码", trigger: "blur" }],
     serverUrl: [
       {
-        validator: (_rule: any, value: string, callback: any) => {
+        validator: (_rule: unknown, value: string, callback: (err?: Error) => void) => {
           if (form.verifyMode === "online" && !value) {
             callback(new Error("在线验证需要填写服务器地址"));
           } else {
@@ -82,7 +82,7 @@ export function useLicenseData() {
       });
       await licenseStore.deactivate();
       ElMessage.success("已解除绑定");
-    } catch {}
+    } catch (err) { console.warn("[Composable] operation failed:", err); }
   }
 
   async function handleRefresh() {

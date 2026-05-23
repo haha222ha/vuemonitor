@@ -1,15 +1,13 @@
-import json
-import uuid
-from datetime import datetime, timezone
+import logging
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.exceptions import BadRequestException, NotFoundException
+from app.core.exceptions import BadRequestException
 from app.middleware.auth import CurrentUser
-from app.models.user import User
+from app.services.operation_audit import record_operation
 
 router = APIRouter(prefix="/gdpr", tags=["GDPR合规"])
 
@@ -44,6 +42,7 @@ async def get_data_summary(
             count = result.scalar() or 0
             summary[table_name] = count
         except Exception:
+            logging.getLogger("gdpr").warning(f"Failed to count table {table_name} for user {user.id}", exc_info=True)
             summary[table_name] = -1
 
     return {
@@ -76,14 +75,23 @@ async def export_user_data(
             rows = result.mappings().all()
             exported[table_name] = [dict(row) for row in rows]
         except Exception:
+            logging.getLogger("gdpr").warning(f"Failed to export table {table_name} for user {user.id}", exc_info=True)
             exported[table_name] = []
 
     user_data = {
-        "export_timestamp": datetime.now(timezone.utc).isoformat(),
+        "export_timestamp": datetime.now(UTC).isoformat(),
         "user_id": str(user.id),
         "email": user.email,
         "data": exported,
     }
+
+    await record_operation(
+        user_id=str(user.id),
+        action="gdpr:data_export",
+        resource_type="user_data",
+        resource_id=str(user.id),
+        detail=f"format={format}, tables={len(exported)}",
+    )
 
     return {
         "code": 0,
@@ -112,6 +120,7 @@ async def request_data_deletion(
             )
             deleted_tables[table_name] = result.rowcount
         except Exception:
+            logging.getLogger("gdpr").error(f"Failed to delete from table {table_name} for user {user.id}", exc_info=True)
             deleted_tables[table_name] = -1
 
     user.is_active = False
@@ -122,6 +131,14 @@ async def request_data_deletion(
         user.display_name = "Deleted User"
 
     await db.commit()
+
+    await record_operation(
+        user_id=str(user.id),
+        action="gdpr:deletion_request",
+        resource_type="user_data",
+        resource_id=str(user.id),
+        detail=f"tables_deleted={sum(v for v in deleted_tables.values() if v >= 0)}",
+    )
 
     return {
         "code": 0,
@@ -148,7 +165,7 @@ async def update_consent(
         "analytics": analytics,
         "marketing": marketing,
         "third_party_sharing": third_party_sharing,
-        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(UTC).isoformat(),
         "version": "1.0",
     }
 

@@ -15,6 +15,14 @@
           <el-icon><View /></el-icon>
           <span>{{ t('nav.products') }}</span>
         </el-menu-item>
+        <el-menu-item index="/dashboard/discovery">
+          <el-icon><Search /></el-icon>
+          <span>商品发现</span>
+        </el-menu-item>
+        <el-menu-item index="/dashboard/compare">
+          <el-icon><ScaleToOriginal /></el-icon>
+          <span>商品对比</span>
+        </el-menu-item>
         <el-menu-item index="/dashboard/collect">
           <el-icon><Upload /></el-icon>
           <span>{{ t('nav.monitor') }}</span>
@@ -27,6 +35,10 @@
           <el-menu-item index="/dashboard/ai">AI分析</el-menu-item>
           <el-menu-item index="/dashboard/ai/reports">分析报告</el-menu-item>
         </el-sub-menu>
+        <el-menu-item index="/dashboard/aipic">
+          <el-icon><Picture /></el-icon>
+          <span>AI作图</span>
+        </el-menu-item>
         <el-menu-item index="/dashboard/team">
           <el-icon><User /></el-icon>
           <span>{{ t('nav.team') }}</span>
@@ -110,7 +122,7 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { useWebSocket } from "../composables/useWebSocket";
-import { Monitor, View, Upload, MagicStick, Setting, Bell, User, DataAnalysis } from "@element-plus/icons-vue";
+import { Monitor, View, Upload, MagicStick, Setting, Bell, User, DataAnalysis, Picture, Search, ScaleToOriginal } from "@element-plus/icons-vue";
 import api from "../utils/api";
 import { useI18n } from "../i18n";
 
@@ -133,19 +145,22 @@ const pageTitle = computed(() => {
   const map: Record<string, string> = {
     "/dashboard": "数据总览",
     "/dashboard/monitor": "商品监控",
+    "/dashboard/discovery": "商品发现",
+    "/dashboard/compare": "商品对比",
     "/dashboard/collect": "采集中心",
     "/dashboard/ai": "AI分析",
     "/dashboard/team": "团队协作",
     "/dashboard/notifications": "通知中心",
     "/dashboard/settings": "设置",
     "/dashboard/admin/monitor": "系统监控",
+    "/dashboard/aipic": "AI作图",
   };
   return map[route.path] || "Dashboard";
 });
 
 const planTagType = computed(() => {
-  const map: Record<string, string> = { pro: "primary", premium: "warning", enterprise: "danger" };
-  return (map[auth.userPlan] || "info") as any;
+  const map: Record<string, 'primary' | 'success' | 'info' | 'warning' | 'danger'> = { pro: "primary", premium: "warning", enterprise: "danger" };
+  return map[auth.userPlan] || "info";
 });
 
 const isAdmin = computed(() => auth.user?.role === "admin");

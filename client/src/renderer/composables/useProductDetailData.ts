@@ -159,7 +159,7 @@ export function useProductDetailData() {
     if (idx < 0 || idx >= productStore.features.length - 1) return "";
     const prev = productStore.features[idx + 1];
     if (row.price == null || prev?.price == null) return "";
-    return row.price > prev.price ? "price-up" : row.price < prev.price ? "price-down" : "";
+    return Number(row.price) > Number(prev.price) ? "price-up" : Number(row.price) < Number(prev.price) ? "price-down" : "";
   }
 
   function lifecycleTagType(stage: string): string {

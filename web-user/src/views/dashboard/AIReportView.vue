@@ -114,9 +114,11 @@ const createForm = reactive({
   product_ids: [] as string[],
 });
 
-function reportTypeTag(type: string) {
-  const map: Record<string, string> = { product: "primary", category: "success", trend: "warning", risk: "danger" };
-  return (map[type] || "info") as any;
+type TagType = 'primary' | 'success' | 'info' | 'warning' | 'danger';
+
+function reportTypeTag(type: string): TagType {
+  const map: Record<string, TagType> = { product: "primary", category: "success", trend: "warning", risk: "danger" };
+  return map[type] || "info";
 }
 
 function reportTypeLabel(type: string) {
@@ -124,9 +126,9 @@ function reportTypeLabel(type: string) {
   return map[type] || type;
 }
 
-function statusTag(status: string) {
-  const map: Record<string, string> = { completed: "success", processing: "warning", failed: "danger", pending: "info" };
-  return (map[status] || "info") as any;
+function statusTag(status: string): TagType {
+  const map: Record<string, TagType> = { completed: "success", processing: "warning", failed: "danger", pending: "info" };
+  return map[status] || "info";
 }
 
 function statusLabel(status: string) {

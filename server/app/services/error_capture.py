@@ -1,7 +1,7 @@
 import logging
 import sys
 import traceback
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from app.config import get_settings
@@ -41,7 +41,7 @@ class ErrorCapture:
 
         event = {
             "event_id": _generate_event_id(),
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": "error",
             "type": type(error).__name__,
             "message": str(error),
@@ -66,7 +66,7 @@ class ErrorCapture:
 
         event = {
             "event_id": _generate_event_id(),
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "level": level,
             "type": "message",
             "message": message,
@@ -113,7 +113,7 @@ class ErrorCapture:
                 data=data,
                 headers={
                     "Content-Type": "application/json",
-                    "X-Sentry-Auth": f"Sentry sentry_version=7, sentry_client=vuemonitor/1.0",
+                    "X-Sentry-Auth": "Sentry sentry_version=7, sentry_client=vuemonitor/1.0",
                 },
             )
             urllib.request.urlopen(req, timeout=5)

@@ -1,9 +1,11 @@
 import uuid
 from datetime import datetime
+
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.models.base import UUIDPrimaryKeyMixin, Base
+
+from app.models.base import Base, UUIDPrimaryKeyMixin
 
 
 class AnalysisResult(UUIDPrimaryKeyMixin, Base):

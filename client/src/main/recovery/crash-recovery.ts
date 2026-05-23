@@ -1,4 +1,4 @@
-import { getStorage } from "../storage/sqlite";
+﻿import { getStorage } from "../storage/sqlite";
 import { EventEmitter } from "events";
 import * as fs from "fs";
 import * as path from "path";
@@ -167,7 +167,7 @@ class CrashRecoveryManager extends EventEmitter {
           }
         } catch {
           const filePath = path.join(this.checkpointDir, file);
-          try { fs.unlinkSync(filePath); cleaned++; } catch {}
+          try { fs.unlinkSync(filePath); cleaned++; } catch (err) { logger.warn("[Main] operation failed:", err); }
         }
       }
 
@@ -284,7 +284,7 @@ class CrashRecoveryManager extends EventEmitter {
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
   }
 
   startPeriodicCheckpoint(taskId: string, getProgress: () => { phase: TaskCheckpoint["phase"]; progress: number; partialData?: string | null }): void {
@@ -300,7 +300,7 @@ class CrashRecoveryManager extends EventEmitter {
           partialData: state.partialData ?? null,
           timestamp: new Date().toISOString(),
         });
-      } catch {}
+      } catch (err) { logger.warn("[Main] operation failed:", err); }
     }, CHECKPOINT_INTERVAL_MS);
 
     this.checkpointTimers.set(taskId, timer);
@@ -401,7 +401,7 @@ class CrashRecoveryManager extends EventEmitter {
         logger.info("CrashRecovery", "检测到有效部分数据，选择使用部分数据", { taskId: task.id, progress: checkpoint.progress });
         return "use_partial";
       }
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
 
     return "re_collect";
   }

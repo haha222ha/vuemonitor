@@ -28,8 +28,8 @@
         <el-checkbox
           v-if="!evt.is_acknowledged"
           :model-value="selectedIds.includes(evt.id)"
-          @change="(val: boolean) => toggleSelect(evt.id, val)"
           class="event-item__check"
+          @change="(val: boolean) => toggleSelect(evt.id, val)"
         />
         <div class="event-item__severity" :class="`event-item__severity--${evt.severity}`" />
         <div class="event-item__body">
@@ -37,7 +37,7 @@
             <span class="event-item__title">{{ evt.title }}</span>
             <el-tag size="small" :type="severityTagType(evt.severity)" effect="dark">{{ severityLabel(evt.severity) }}</el-tag>
           </div>
-          <div class="event-item__detail" v-if="evt.detail">{{ evt.detail }}</div>
+          <div v-if="evt.detail" class="event-item__detail">{{ evt.detail }}</div>
           <div class="event-item__meta">
             <span v-if="evt.metric_value != null">指标值: {{ evt.metric_value }}</span>
             <span v-if="evt.threshold_value != null">阈值: {{ evt.threshold_value }}</span>

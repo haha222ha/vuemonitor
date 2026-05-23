@@ -4,9 +4,9 @@
       <div class="sidebar__logo" @click="collapsed = !collapsed">
         <div class="sidebar__logo-icon">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <rect width="28" height="28" rx="8" fill="url(#logo-gradient)"/>
-            <path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
-            <defs><linearGradient id="logo-gradient" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#818CF8"/><stop offset="1" stop-color="#4F46E5"/></linearGradient></defs>
+            <rect width="28" height="28" rx="8" fill="url(#logo-gradient)" />
+            <path d="M8 10h12M8 14h8M8 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+            <defs><linearGradient id="logo-gradient" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#818CF8" /><stop offset="1" stop-color="#4F46E5" /></linearGradient></defs>
           </svg>
         </div>
         <transition name="fade">
@@ -16,9 +16,9 @@
 
       <nav class="sidebar__nav">
         <div class="sidebar__group">
-          <div v-if="!collapsed" class="sidebar__group-label">洞察</div>
+          <div v-if="!collapsed" class="sidebar__group-label">核心工作流</div>
           <router-link
-            v-for="item in insightItems"
+            v-for="item in coreItems"
             :key="item.path"
             :to="item.path"
             :class="['sidebar__item', { 'sidebar__item--active': route.path === item.path }]"
@@ -31,9 +31,9 @@
         </div>
 
         <div class="sidebar__group">
-          <div v-if="!collapsed" class="sidebar__group-label">决策</div>
+          <div v-if="!collapsed" class="sidebar__group-label">AI 能力</div>
           <router-link
-            v-for="item in decisionItems"
+            v-for="item in aiItems"
             :key="item.path"
             :to="item.path"
             :class="['sidebar__item', { 'sidebar__item--active': route.path === item.path }]"
@@ -46,9 +46,9 @@
         </div>
 
         <div class="sidebar__group">
-          <div v-if="!collapsed" class="sidebar__group-label">系统</div>
+          <div v-if="!collapsed" class="sidebar__group-label">运营管理</div>
           <router-link
-            v-for="item in systemItems"
+            v-for="item in opsItems"
             :key="item.path"
             :to="item.path"
             :class="['sidebar__item', { 'sidebar__item--active': route.path === item.path }]"
@@ -64,6 +64,21 @@
                 :max="99"
                 class="sidebar__item-badge"
               />
+            </transition>
+          </router-link>
+        </div>
+
+        <div class="sidebar__group">
+          <div v-if="!collapsed" class="sidebar__group-label">系统</div>
+          <router-link
+            v-for="item in systemItems"
+            :key="item.path"
+            :to="item.path"
+            :class="['sidebar__item', { 'sidebar__item--active': route.path === item.path }]"
+          >
+            <el-icon :size="20"><component :is="item.icon" /></el-icon>
+            <transition name="fade">
+              <span v-if="!collapsed" class="sidebar__item-label">{{ item.label }}</span>
             </transition>
           </router-link>
         </div>
@@ -88,16 +103,16 @@
             :icon="Fold"
             circle
             size="small"
-            @click="collapsed = !collapsed"
             class="topbar__menu-btn"
+            @click="collapsed = !collapsed"
           />
           <el-button
             v-else
             :icon="collapsed ? Expand : Fold"
             circle
             size="small"
-            @click="collapsed = !collapsed"
             class="topbar__menu-btn"
+            @click="collapsed = !collapsed"
           />
           <div class="topbar__breadcrumb">
             <span class="topbar__page-name">{{ currentPageTitle }}</span>
@@ -123,7 +138,7 @@
             <el-button :icon="Bell" circle size="small" @click="$router.push('/notifications')" />
           </el-badge>
           <el-tooltip :content="themeTooltip" placement="bottom">
-            <el-button circle size="small" @click="toggleTheme" class="topbar__theme-btn">
+            <el-button circle size="small" class="topbar__theme-btn" @click="toggleTheme">
               <el-icon :size="16"><component :is="themeIcon" /></el-icon>
             </el-button>
           </el-tooltip>
@@ -183,7 +198,7 @@ import { useI18n } from "../i18n";
 import {
   Monitor, Goods, MagicStick, Timer, Bell, Setting, Key,
   Fold, Expand, SwitchButton, DataAnalysis, ChatDotRound,
-  Opportunity, Warning
+  Opportunity, Warning, Compass, TrendCharts
 } from "@element-plus/icons-vue";
 import SearchInput from "../components/SearchInput.vue";
 import GlobalSearchDialog from "../components/GlobalSearchDialog.vue";
@@ -214,21 +229,26 @@ const showGlobalSearch = ref(false);
 
 const isMobile = computed(() => windowWidth.value < 768);
 
-const insightItems = computed(() => [
-  { path: "/dashboard", icon: Opportunity, label: "机会雷达" },
+const coreItems = computed(() => [
+  { path: "/dashboard", icon: Opportunity, label: "工作台" },
   { path: "/products", icon: Goods, label: "我的商品" },
+  { path: "/discovery", icon: Compass, label: "商品发现" },
+]);
+
+const aiItems = computed(() => [
+  { path: "/ai", icon: MagicStick, label: "AI 决策" },
   { path: "/category-insight", icon: DataAnalysis, label: "品类洞察" },
+  { path: "/hot-insight", icon: TrendCharts, label: "爆品洞察" },
   { path: "/compare", icon: DataAnalysis, label: "竞品对比" },
 ]);
 
-const decisionItems = computed(() => [
-  { path: "/ai", icon: MagicStick, label: "AI 决策" },
-  { path: "/monitor", icon: Warning, label: "告警中心" },
+const opsItems = computed(() => [
+  { path: "/monitor", icon: Warning, label: "告警中心", badge: undefined },
+  { path: "/scheduler", icon: Timer, label: "采集调度" },
+  { path: "/notifications", icon: ChatDotRound, label: t('nav.notifications'), badge: notificationStore.unreadCount || undefined },
 ]);
 
 const systemItems = computed(() => [
-  { path: "/scheduler", icon: Timer, label: "采集调度" },
-  { path: "/notifications", icon: ChatDotRound, label: t('nav.notifications'), badge: notificationStore.unreadCount || undefined },
   { path: "/settings", icon: Setting, label: t('nav.settings') },
   { path: "/license", icon: Key, label: t('nav.license') },
 ]);
@@ -242,9 +262,11 @@ const mobileNavItems = computed(() => [
 ]);
 
 const PAGE_TITLES: Record<string, string> = {
-  "/dashboard": "机会雷达",
+  "/dashboard": "工作台",
+  "/discovery": "商品发现",
   "/products": "我的商品",
   "/category-insight": "品类洞察",
+  "/hot-insight": "爆品洞察",
   "/ai": "AI 决策",
   "/scheduler": "采集调度",
   "/monitor": "告警中心",

@@ -269,7 +269,7 @@
                 <h3 class="section-subtitle">按类型分布 (24h)</h3>
                 <div class="risk-bars">
                   <div v-for="(count, type) in riskData.last_24h.by_type" :key="type" class="risk-bar-item">
-                    <span class="risk-bar-label">{{ riskTypeLabel(type as string) }}</span>
+                    <span class="risk-bar-label">{{ riskTypeLabel(String(type)) }}</span>
                     <div class="risk-bar-track">
                       <div class="risk-bar-fill" :style="{ width: riskBarWidth(count as number) }" />
                     </div>
@@ -284,7 +284,7 @@
                 <h3 class="section-subtitle">按级别分布 (7天)</h3>
                 <div class="risk-bars">
                   <div v-for="(count, level) in riskData.last_7d.by_level" :key="level" class="risk-bar-item">
-                    <span class="risk-bar-label">{{ riskLevelLabel(level as string) }}</span>
+                    <span class="risk-bar-label">{{ riskLevelLabel(String(level)) }}</span>
                     <div class="risk-bar-track">
                       <div class="risk-bar-fill" :class="'risk-bar-fill--' + level" :style="{ width: riskBarWidth(count as number) }" />
                     </div>
@@ -299,8 +299,8 @@
           <div class="risk-detail-card" style="margin-top: 16px" v-if="Object.keys(riskData.last_24h.by_platform).length > 0">
             <h3 class="section-subtitle">按平台分布 (24h)</h3>
             <div class="risk-platforms">
-              <el-tag v-for="(count, platform) in riskData.last_24h.by_platform" :key="platform" :type="platformTagType(platform as string)" effect="light" size="large" class="risk-platform-tag">
-                {{ platformLabel(platform as string) }}: {{ count }}
+              <el-tag v-for="(count, platform) in riskData.last_24h.by_platform" :key="platform" :type="platformTagType(String(platform))" effect="light" size="large" class="risk-platform-tag">
+                {{ platformLabel(String(platform)) }}: {{ count }}
               </el-tag>
             </div>
           </div>

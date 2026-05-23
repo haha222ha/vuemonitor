@@ -1,18 +1,16 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime
 
-from fastapi import APIRouter, Body, Depends, Query, Request
+from fastapi import APIRouter, Body, Depends, Request
 from pydantic import BaseModel, Field
+from shared.constants.feature_gates import PLAN_FEATURES_MAP, PLAN_LIMITS
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.exceptions import BadRequestException, NotFoundException
-from app.middleware.auth import CurrentUser, AdminUser
-from app.models.license import LicenseCode, LicenseActivation
-from app.models.user import User
+from app.middleware.auth import AdminUser, CurrentUser
+from app.models.license import LicenseActivation, LicenseCode
 from app.services.license_service import LicenseService
-from shared.constants.feature_gates import PLAN_FEATURES_MAP, PLAN_LIMITS
 
 router = APIRouter(prefix="/license", tags=["license"])
 
@@ -119,7 +117,7 @@ async def get_license_status(
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     if user.plan_expires_at and user.plan_expires_at < now and user.plan != "free":
         user.plan = "free"

@@ -4,10 +4,10 @@
       <el-button @click="$router.back()">
         <el-icon><ArrowLeft /></el-icon>返回
       </el-button>
-      <el-button type="primary" @click="collectNow" :loading="collectStore.loading">
+      <el-button type="primary" :loading="collectStore.loading" @click="collectNow">
         <el-icon><Refresh /></el-icon>立即采集
       </el-button>
-      <el-dropdown v-permission="'gate:ai:basic_analysis'" @command="runAnalysis" :loading="aiStore.isAnalyzing">
+      <el-dropdown v-permission="'gate:ai:basic_analysis'" :loading="aiStore.isAnalyzing" @command="runAnalysis">
         <el-button :loading="aiStore.isAnalyzing">
           AI分析<el-icon class="el-icon--right"><ArrowDown /></el-icon>
         </el-button>
@@ -56,7 +56,7 @@
                 <span class="info-card__meta-label">最新采集</span>
                 <span class="info-card__meta-value">{{ productStore.currentProduct.last_collected_at ? formatDate(productStore.currentProduct.last_collected_at) : '未采集' }}</span>
               </div>
-              <div class="info-card__meta-item" v-if="productStore.currentProduct.product_url">
+              <div v-if="productStore.currentProduct.product_url" class="info-card__meta-item">
                 <span class="info-card__meta-label">链接</span>
                 <el-link :href="productStore.currentProduct.product_url" target="_blank" type="primary" :underline="false">
                   查看原商品 <el-icon><Link /></el-icon>
@@ -73,7 +73,7 @@
             label="当前价格"
             :value="latestFeature.price != null ? `¥${latestFeature.price}` : '-'"
             :trend="priceChange !== null ? `${Math.abs(priceChange).toFixed(1)}%` : undefined"
-            :trendType="priceChange !== null ? (priceChange > 0 ? 'up' : 'down') : undefined"
+            :trend-type="priceChange !== null ? (priceChange > 0 ? 'up' : 'down') : undefined"
           />
           <StatCard
             :icon="TrendCharts"
@@ -81,7 +81,7 @@
             label="总销量"
             :value="latestFeature.sales_count != null ? formatNumber(latestFeature.sales_count) : '-'"
             :trend="salesChange !== null ? `${Math.abs(salesChange).toFixed(1)}%` : undefined"
-            :trendType="salesChange !== null ? (salesChange > 0 ? 'up' : 'down') : undefined"
+            :trend-type="salesChange !== null ? (salesChange > 0 ? 'up' : 'down') : undefined"
           />
           <StatCard
             :icon="Star"
@@ -110,12 +110,12 @@
               <div class="ranking-row">
                 <span class="ranking-info-label">综合排名</span>
                 <span class="rank-number">#{{ ranking.overall_rank || '-' }}</span>
-                <span class="rank-total" v-if="ranking.total_in_category">/ {{ ranking.total_in_category }}</span>
+                <span v-if="ranking.total_in_category" class="rank-total">/ {{ ranking.total_in_category }}</span>
               </div>
               <div class="ranking-row">
                 <span class="ranking-info-label">品类排名</span>
                 <span class="rank-number">#{{ ranking.category_rank || '-' }}</span>
-                <span class="rank-total" v-if="ranking.category_total">/ {{ ranking.category_total }}</span>
+                <span v-if="ranking.category_total" class="rank-total">/ {{ ranking.category_total }}</span>
               </div>
             </div>
             <div class="ranking-tags">
@@ -135,27 +135,27 @@
                 <h3 class="card__title">品类基准对比</h3>
               </div>
             </div>
-            <div ref="radarChartRef" class="product-detail__radar" v-if="radarData"></div>
+            <div v-if="radarData" ref="radarChartRef" class="product-detail__radar" />
             <div class="benchmark-list">
-              <div class="benchmark-item" v-if="benchmark.price_level">
+              <div v-if="benchmark.price_level" class="benchmark-item">
                 <span class="benchmark-label">价格水平</span>
                 <el-tag :type="benchmark.price_level === '偏高' ? 'danger' : benchmark.price_level === '偏低' ? 'success' : 'warning'" size="small">
                   {{ benchmark.price_level }}
                 </el-tag>
                 <span class="benchmark-detail">品类均价 ¥{{ benchmark.category_avg_price || '-' }}</span>
               </div>
-              <div class="benchmark-item" v-if="benchmark.sales_level">
+              <div v-if="benchmark.sales_level" class="benchmark-item">
                 <span class="benchmark-label">销量水平</span>
                 <el-tag :type="benchmark.sales_level === '领先' ? 'success' : benchmark.sales_level === '落后' ? 'danger' : 'warning'" size="small">
                   {{ benchmark.sales_level }}
                 </el-tag>
                 <span class="benchmark-detail">品类均销 {{ benchmark.category_avg_sales || '-' }}</span>
               </div>
-              <div class="benchmark-item" v-if="benchmark.price_percentile != null">
+              <div v-if="benchmark.price_percentile != null" class="benchmark-item">
                 <span class="benchmark-label">价格分位</span>
                 <span class="benchmark-detail">超过 {{ benchmark.price_percentile }}% 的同类商品</span>
               </div>
-              <div class="benchmark-item" v-if="benchmark.sales_percentile != null">
+              <div v-if="benchmark.sales_percentile != null" class="benchmark-item">
                 <span class="benchmark-label">销量分位</span>
                 <span class="benchmark-detail">超过 {{ benchmark.sales_percentile }}% 的同类商品</span>
               </div>
@@ -211,7 +211,7 @@
               <h3 class="card__title">历史特征</h3>
             </div>
           </div>
-          <el-table :data="productStore.features" stripe v-loading="productStore.loading" max-height="400">
+          <el-table v-loading="productStore.loading" :data="productStore.features" stripe max-height="400">
             <el-table-column prop="collected_at" label="采集时间" width="180">
               <template #default="{ row }">{{ formatDate(row.collected_at) }}</template>
             </el-table-column>

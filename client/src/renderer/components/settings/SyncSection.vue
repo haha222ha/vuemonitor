@@ -9,7 +9,10 @@
             {{ syncStatus.isSyncing ? "同步中..." : "空闲" }}
           </el-tag>
         </div>
-        <el-button type="primary" :loading="syncing" @click="$emit('sync-now')">立即同步</el-button>
+        <div class="sync-actions">
+          <el-button type="primary" :loading="syncing" @click="$emit('sync-now')">增量同步</el-button>
+          <el-button :loading="syncing" @click="$emit('full-sync')">全量同步</el-button>
+        </div>
       </div>
 
       <div class="sync-stats">
@@ -28,6 +31,28 @@
         <div class="stat-item">
           <span class="stat-label">已同步</span>
           <span class="stat-value">{{ syncStatus.syncedCount }}</span>
+        </div>
+      </div>
+
+      <div v-if="serverSyncInfo" class="server-info-card">
+        <div class="server-info-title">服务端数据概览</div>
+        <div class="server-info-grid">
+          <div class="server-info-item">
+            <span class="server-info-label">商品数</span>
+            <span class="server-info-value">{{ serverSyncInfo.product_count ?? "-" }}</span>
+          </div>
+          <div class="server-info-item">
+            <span class="server-info-label">特征记录</span>
+            <span class="server-info-value">{{ serverSyncInfo.feature_count ?? "-" }}</span>
+          </div>
+          <div class="server-info-item">
+            <span class="server-info-label">分类数</span>
+            <span class="server-info-value">{{ serverSyncInfo.category_count ?? "-" }}</span>
+          </div>
+          <div class="server-info-item">
+            <span class="server-info-label">最后更新</span>
+            <span class="server-info-value">{{ serverSyncInfo.last_product_update ? formatSyncTime(serverSyncInfo.last_product_update) : "-" }}</span>
+          </div>
         </div>
       </div>
 
@@ -84,7 +109,7 @@
       </div>
       <div v-if="syncHistory.length > 0" class="sync-timeline">
         <div v-for="record in syncHistory" :key="record.id" class="sync-timeline__item">
-          <div class="sync-timeline__dot" :class="`sync-timeline__dot--${record.status}`"></div>
+          <div class="sync-timeline__dot" :class="`sync-timeline__dot--${record.status}`" />
           <div class="sync-timeline__content">
             <div class="sync-timeline__row">
               <span class="sync-timeline__action">{{ record.action === 'push' ? '推送' : record.action === 'pull' ? '拉取' : '同步' }}</span>
@@ -118,10 +143,12 @@ const props = defineProps<{
   conflicts: any[];
   conflictCount: number;
   syncHistory: any[];
+  serverSyncInfo: Record<string, unknown> | null;
 }>();
 
 const emit = defineEmits<{
   'sync-now': [];
+  'full-sync': [];
   'connect': [];
   'auto-sync-toggle': [];
   'sync-interval-change': [];
@@ -171,6 +198,7 @@ function formatSyncTime(ts: string): string {
 .section-subtitle { margin: 0 0 16px; font-size: var(--text-base); font-weight: 600; color: var(--color-text-primary); }
 .settings-card { background: var(--color-bg-card); border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); padding: 20px; }
 .sync-status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.sync-actions { display: flex; gap: 8px; }
 .sync-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 .sync-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; padding: 16px; background: var(--color-bg-page); border-radius: var(--radius-lg); }
@@ -207,4 +235,10 @@ function formatSyncTime(ts: string): string {
 .sync-timeline__error { color: var(--color-danger); }
 .sync-timeline__time { font-size: var(--text-xs); color: var(--color-text-tertiary); }
 .sync-history-empty { text-align: center; padding: 24px 0; color: var(--color-text-secondary); font-size: var(--text-sm); }
+.server-info-card { margin-top: 16px; padding: 16px; background: var(--color-bg-page); border-radius: var(--radius-lg); border: 1px solid var(--color-border-light); }
+.server-info-title { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); margin-bottom: 12px; }
+.server-info-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.server-info-item { display: flex; flex-direction: column; gap: 4px; }
+.server-info-label { font-size: var(--text-xs); color: var(--color-text-secondary); }
+.server-info-value { font-size: var(--text-sm); font-weight: 600; color: var(--color-text-primary); }
 </style>

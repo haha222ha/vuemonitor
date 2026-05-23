@@ -1,13 +1,16 @@
-import WebSocket from "ws";
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import WebSocket from "ws";
 import { BrowserWindow } from "electron";
 import axios from "axios";
+import { logger } from "../logger/logger";
 
-let wsClient: WebSocket | null = null;
+const wsClient: WebSocket | null = null;
 let communication: WSCommunication | null = null;
 let reconnectTimer: NodeJS.Timeout | null = null;
 
 const HEARTBEAT_INTERVAL = 30000;
 const HEARTBEAT_TIMEOUT = 60000;
+const MAX_RECONNECT_DELAY = 60000;
+const BASE_RECONNECT_DELAY = 1000;
 
 export class WSCommunication {
   private ws: WebSocket | null = null;
@@ -18,11 +21,17 @@ export class WSCommunication {
   private heartbeatTimer: NodeJS.Timeout | null = null;
   private heartbeatTimeoutTimer: NodeJS.Timeout | null = null;
   private lastPongTime: number = 0;
+  private reconnectAttempts: number = 0;
 
   constructor() {}
 
   setMainWindow(window: BrowserWindow): void {
     this.mainWindow = window;
+    window.on("closed", () => {
+      if (this.mainWindow === window) {
+        this.mainWindow = null;
+      }
+    });
   }
 
   connect(serverUrl: string, token: string): boolean {
@@ -40,6 +49,7 @@ export class WSCommunication {
       });
 
       this.ws.on("open", () => {
+        this.reconnectAttempts = 0;
         this.sendToRenderer("ws:connected", {});
         this.startHeartbeat();
       });
@@ -59,7 +69,7 @@ export class WSCommunication {
           if (msg.type === "monitor:triggered" || msg.type === "notification:new") {
             this.sendToRenderer("notification", msg);
           }
-        } catch {}
+        } catch (err) { logger.warn("[Main] operation failed:", err); }
       });
 
       this.ws.on("close", () => {
@@ -97,6 +107,25 @@ export class WSCommunication {
     }
     this.ws.send(JSON.stringify({ type, data }));
     return true;
+  }
+
+  isConnected(): boolean {
+    return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
+  }
+
+  async request(method: string, url: string, data?: unknown): Promise<unknown> {
+    try {
+      const config: { method: string; url: string; headers: Record<string, string>; data?: unknown } = {
+        method,
+        url: `${this.apiBase}${url}`,
+        headers: { Authorization: `Bearer ${this.token}` },
+      };
+      if (data) config.data = data;
+      const response = await axios(config);
+      return response.data;
+    } catch (error) {
+      return { error: true, message: (error as Error).message };
+    }
   }
 
   async pushToCloud(data: unknown): Promise<unknown> {
@@ -141,12 +170,15 @@ export class WSCommunication {
 
   private scheduleReconnect(): void {
     if (reconnectTimer) return;
+    this.reconnectAttempts++;
+    const delay = Math.min(BASE_RECONNECT_DELAY * Math.pow(2, this.reconnectAttempts - 1), MAX_RECONNECT_DELAY);
+    const jitter = Math.random() * delay * 0.3;
     reconnectTimer = setTimeout(() => {
       reconnectTimer = null;
       if (this.serverUrl && this.token) {
         this.connect(this.serverUrl, this.token);
       }
-    }, 5000);
+    }, delay + jitter);
   }
 
   private sendToRenderer(channel: string, data: unknown): void {

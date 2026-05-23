@@ -3,9 +3,8 @@ import json
 import logging
 import time
 from abc import ABC, abstractmethod
-from datetime import datetime, timezone
 
-from openai import AsyncOpenAI, APIConnectionError, APIStatusError, APITimeoutError
+from openai import APIConnectionError, APIStatusError, APITimeoutError, AsyncOpenAI
 
 from app.config import get_settings
 

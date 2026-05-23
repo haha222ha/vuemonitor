@@ -1,6 +1,6 @@
 <template>
   <div class="ranking-gauge">
-    <div class="gauge-item" v-for="gauge in gauges" :key="gauge.label">
+    <div v-for="gauge in gauges" :key="gauge.label" class="gauge-item">
       <div class="gauge-ring" :style="ringStyle(gauge.value, gauge.color)">
         <span class="gauge-value">{{ gauge.value || 0 }}</span>
       </div>

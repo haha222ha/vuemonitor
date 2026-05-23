@@ -38,6 +38,14 @@ export const usePermissionStore = defineStore("permission", () => {
   const canAIPrediction = computed(() => gates.value["gate:ai:prediction"] ?? false);
   const canAIRisk = computed(() => gates.value["gate:ai:risk_warning"] ?? false);
   const canCloudCollect = computed(() => gates.value["gate:collect:cloud"] ?? false);
+  const canDiscoverySearch = computed(() => gates.value["gate:discovery:search"] ?? false);
+  const canDiscoveryBurst = computed(() => gates.value["gate:discovery:burst"] ?? false);
+  const canExcelImport = computed(() => gates.value["gate:import:excel"] ?? false);
+  const canCategoryManage = computed(() => gates.value["gate:monitor:category"] ?? false);
+  const canGrowth24h = computed(() => gates.value["gate:monitor:growth_24h"] ?? false);
+  const canAnomalyDetect = computed(() => gates.value["gate:monitor:anomaly"] ?? false);
+  const canCompareTrend = computed(() => gates.value["gate:monitor:compare"] ?? false);
+  const canWaterfall = computed(() => gates.value["gate:monitor:waterfall"] ?? false);
 
   async function fetchPermissions() {
     loading.value = true;
@@ -88,7 +96,9 @@ export const usePermissionStore = defineStore("permission", () => {
       } else {
         await fetchPermissions();
       }
-    } catch {}
+    } catch (err) {
+      console.warn("[Permission] refresh failed:", err);
+    }
   }
 
   function setPlan(newPlan: PlanTier) {
@@ -117,6 +127,14 @@ export const usePermissionStore = defineStore("permission", () => {
     canAIPrediction,
     canAIRisk,
     canCloudCollect,
+    canDiscoverySearch,
+    canDiscoveryBurst,
+    canExcelImport,
+    canCategoryManage,
+    canGrowth24h,
+    canAnomalyDetect,
+    canCompareTrend,
+    canWaterfall,
     fetchPermissions,
     checkGate,
     refreshFromServer,

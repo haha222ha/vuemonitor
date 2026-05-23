@@ -32,7 +32,7 @@
               </div>
               <el-switch v-model="notifySettings.desktop" @change="saveNotifySettings" />
             </div>
-            <div class="setting-divider"></div>
+            <div class="setting-divider" />
             <div class="setting-item">
               <div class="setting-info">
                 <h3 class="setting-title">邮件通知</h3>
@@ -40,7 +40,7 @@
               </div>
               <el-switch v-model="notifySettings.email" @change="saveNotifySettings" />
             </div>
-            <div class="setting-divider"></div>
+            <div class="setting-divider" />
             <div class="setting-item">
               <div class="setting-info">
                 <h3 class="setting-title">声音提醒</h3>
@@ -48,7 +48,7 @@
               </div>
               <el-switch v-model="notifySettings.sound" @change="saveNotifySettings" />
             </div>
-            <div class="setting-divider"></div>
+            <div class="setting-divider" />
             <div class="setting-item">
               <div class="setting-info">
                 <h3 class="setting-title">免打扰时段</h3>
@@ -64,8 +64,8 @@
                 start-placeholder="开始" 
                 end-placeholder="结束" 
                 format="HH:mm" 
-                @change="saveNotifySettings"
                 class="modern-time-picker"
+                @change="saveNotifySettings"
               />
             </div>
           </div>
@@ -110,7 +110,9 @@
             :conflicts="conflicts"
             :conflict-count="conflictCount"
             :sync-history="syncHistory"
+            :server-sync-info="serverSyncInfo"
             @sync-now="handleSyncNow"
+            @full-sync="handleFullSync"
             @connect="handleConnect"
             @auto-sync-toggle="handleAutoSyncToggle"
             @sync-interval-change="handleSyncIntervalChange"
@@ -129,9 +131,9 @@
                 <h3 class="setting-title">最大并发数</h3>
                 <p class="setting-desc">同时采集的任务数量</p>
               </div>
-              <el-input-number v-model="concurrency" :min="1" :max="10" @change="handleConcurrencyChange" class="modern-input-number" />
+              <el-input-number v-model="concurrency" :min="1" :max="10" class="modern-input-number" @change="handleConcurrencyChange" />
             </div>
-            <div class="setting-divider"></div>
+            <div class="setting-divider" />
             <div class="setting-item">
               <div class="setting-info">
                 <h3 class="setting-title">自动最小化</h3>
@@ -139,13 +141,13 @@
               </div>
               <el-switch v-model="autoMinimize" />
             </div>
-            <div class="setting-divider"></div>
+            <div class="setting-divider" />
             <div class="setting-item">
               <div class="setting-info">
                 <h3 class="setting-title">采集间隔</h3>
                 <p class="setting-desc">每次采集之间的等待时间（秒）</p>
               </div>
-              <el-input-number v-model="collectInterval" :min="10" :max="300" :step="10" @change="handleCollectIntervalChange" class="modern-input-number" />
+              <el-input-number v-model="collectInterval" :min="10" :max="300" :step="10" class="modern-input-number" @change="handleCollectIntervalChange" />
             </div>
           </div>
         </div>
@@ -161,11 +163,11 @@
               <el-switch v-model="autoUpdateEnabled" @change="handleAutoUpdateToggle" />
             </div>
             <div class="update-actions">
-              <el-button @click="handleCheckUpdate" :loading="checkingUpdate">检查更新</el-button>
+              <el-button :loading="checkingUpdate" @click="handleCheckUpdate">检查更新</el-button>
               <span v-if="updateStatus.version" class="update-status">
                 <template v-if="updateStatus.updateAvailable">
                   新版本 <el-tag size="small" type="success">v{{ updateStatus.version }}</el-tag> 可用
-                  <el-button type="primary" @click="handleDownloadUpdate" :loading="updateStatus.downloading">
+                  <el-button type="primary" :loading="updateStatus.downloading" @click="handleDownloadUpdate">
                     {{ updateStatus.downloading ? `下载中 ${updateStatus.downloadProgress}%` : '下载并安装' }}
                   </el-button>
                 </template>
@@ -188,7 +190,7 @@
               </div>
               <el-button @click="handleExportLocalData">导出</el-button>
             </div>
-            <div class="setting-divider"></div>
+            <div class="setting-divider" />
             <div class="setting-item">
               <div class="setting-info">
                 <h3 class="setting-title">清理旧数据</h3>
@@ -204,7 +206,7 @@
                 <el-button type="danger" @click="handleCleanup">清理</el-button>
               </div>
             </div>
-            <div class="setting-divider"></div>
+            <div class="setting-divider" />
             <div class="setting-item">
               <div class="setting-info">
                 <h3 class="setting-title">存储占用</h3>
@@ -341,9 +343,9 @@
                     v-model="row.key"
                     size="small"
                     placeholder="按下新快捷键..."
-                    @keydown="captureKey($event, row)"
                     class="shortcut-input"
                     readonly
+                    @keydown="captureKey($event, row)"
                   />
                 </div>
                 <span class="shortcut-label">{{ row.label }}</span>
@@ -366,10 +368,6 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from "vue";
-import { 
-  User, Bell, Refresh, Cpu, Download, Folder, Document, Connection, 
-  Lock, UserFilled, List, WarningFilled
-} from "@element-plus/icons-vue";
 import PageHeader from "../components/PageHeader.vue";
 import AccountSection from "../components/settings/AccountSection.vue";
 import SyncSection from "../components/settings/SyncSection.vue";
@@ -412,9 +410,9 @@ const {
   cloudTableLabel, logLevelBarWidth, captureKey,
   saveShortcutKey, handleShortcutToggle, resetShortcuts,
   saveNotifySettings,
-  refreshSyncStatus, loadConflicts,
+  loadConflicts,
   handleResolveConflict, handleResolveAllConflicts,
-  handleSyncNow, loadSyncHistory, syncHistory,
+  handleSyncNow, handleFullSync, serverSyncInfo, loadSyncHistory, syncHistory,
   handleConnect, handleAutoSyncToggle, handleSyncIntervalChange,
   handleConcurrencyChange, handleCollectIntervalChange, handleAutoUpdateToggle,
   handleCheckUpdate, handleDownloadUpdate,

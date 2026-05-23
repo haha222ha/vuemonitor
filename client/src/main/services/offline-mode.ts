@@ -236,11 +236,11 @@ class OfflineModeManager extends EventEmitter {
     try {
       const storage = getStorage();
       storage.run("DELETE FROM offline_operations");
-      const stmt = storage.prepare(
-        "INSERT INTO offline_operations (id, type, payload, created_at, retry_count, max_retries) VALUES (?, ?, ?, ?, ?, ?)"
-      );
       for (const op of this.pendingOperations) {
-        stmt.run(op.id, op.type, op.payload, op.createdAt, op.retryCount, op.maxRetries);
+        storage.run(
+          "INSERT INTO offline_operations (id, type, payload, created_at, retry_count, max_retries) VALUES (?, ?, ?, ?, ?, ?)",
+          [op.id, op.type, op.payload, op.createdAt, op.retryCount, op.maxRetries]
+        );
       }
     } catch (err) {
       logger.error("OfflineModeManager", `保存离线操作失败: ${err}`);
@@ -250,7 +250,7 @@ class OfflineModeManager extends EventEmitter {
   private loadPendingOperations(): void {
     try {
       const storage = getStorage();
-      const rows = storage.all(
+      const rows = storage.query(
         "SELECT id, type, payload, created_at, retry_count, max_retries FROM offline_operations ORDER BY created_at"
       );
       this.pendingOperations = (rows || []).map((row: any) => ({

@@ -7,16 +7,17 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
+from shared.constants.feature_gates import PLAN_LIMITS
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.cache import cache_get, cache_set, invalidate_user_cache
 from app.core.database import get_db
-from app.core.cache import cache_get, cache_set, cache_delete_pattern, invalidate_user_cache
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from app.middleware.auth import CurrentUser
 from app.middleware.feature_gate import FeatureGateMiddleware
-from shared.constants.feature_gates import PLAN_LIMITS
 from app.models.product import Product, ProductFeature
+from app.services.operation_audit import record_operation
 
 router = APIRouter(prefix="/products", tags=["products"])
 
@@ -87,7 +88,7 @@ async def create_product(
     await gate.check_gate(user, "gate:monitor:add")
 
     count_result = await db.execute(
-        select(func.count()).where(Product.user_id == user.id, Product.is_active == True)
+        select(func.count()).where(Product.user_id == user.id, Product.is_active)
     )
     limits = PLAN_LIMITS.get(user.plan, PLAN_LIMITS["free"])
     if limits["maxProducts"] > 0 and (count_result.scalar() or 0) >= limits["maxProducts"]:
@@ -136,9 +137,105 @@ async def create_product(
 
     await gate.record_usage(user.id, "gate:monitor:add")
 
+    await record_operation(
+        user_id=str(user.id),
+        action="create",
+        resource_type="product",
+        resource_id=str(product.id),
+        detail=f"platform={platform}, name={product_name[:30]}",
+    )
+
     await invalidate_user_cache(str(user.id))
 
     return {"code": 0, "data": {"id": str(product.id), "platform": platform, "platform_product_id": platform_product_id}}
+
+
+class BatchImportItem(BaseModel):
+    platform: str = Field(..., pattern="^(xhs|douyin|taobao|jd|pdd)$")
+    platform_product_id: str = Field(..., min_length=1, max_length=255)
+    product_name: str | None = Field(None, min_length=1, max_length=500)
+    url: str | None = None
+    shop_name: str | None = None
+    category: str | None = None
+    image_url: str | None = None
+
+
+class BatchImportRequest(BaseModel):
+    items: list[BatchImportItem] = Field(..., min_length=1, max_length=100)
+
+
+@router.post("/batch-import")
+async def batch_import_products(
+    req: BatchImportRequest,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+):
+    gate = FeatureGateMiddleware(db)
+    await gate.check_gate(user, "gate:import:excel")
+
+    limits = PLAN_LIMITS.get(user.plan, PLAN_LIMITS["free"])
+    count_result = await db.execute(
+        select(func.count()).where(Product.user_id == user.id, Product.is_active)
+    )
+    current_count = count_result.scalar() or 0
+    remaining = limits["maxProducts"] - current_count if limits["maxProducts"] > 0 else len(req.items)
+
+    added = []
+    skipped = []
+    for item in req.items:
+        if limits["maxProducts"] > 0 and len(added) >= remaining:
+            skipped.append({"platform_product_id": item.platform_product_id, "reason": "商品数量已达上限"})
+            continue
+
+        existing = await db.execute(
+            select(Product).where(
+                Product.user_id == user.id,
+                Product.platform == item.platform,
+                Product.platform_product_id == item.platform_product_id,
+            )
+        )
+        if existing.scalar_one_or_none():
+            skipped.append({"platform_product_id": item.platform_product_id, "reason": "商品已存在"})
+            continue
+
+        product_url = item.url
+        if item.url and not product_url:
+            product_url = item.url
+
+        product = Product(
+            user_id=user.id,
+            platform=item.platform,
+            platform_product_id=item.platform_product_id,
+            product_name=item.product_name or f"{item.platform}商品{item.platform_product_id[:8]}",
+            shop_name=item.shop_name,
+            category=item.category,
+            image_url=item.image_url,
+            product_url=product_url,
+        )
+        db.add(product)
+        added.append(item.platform_product_id)
+
+    await db.flush()
+    await gate.record_usage(user.id, "gate:import:excel")
+
+    await record_operation(
+        user_id=str(user.id),
+        action="batch_import",
+        resource_type="product",
+        resource_id="batch",
+        detail=f"added={len(added)}, skipped={len(skipped)}",
+    )
+
+    await invalidate_user_cache(str(user.id))
+
+    return {
+        "code": 0,
+        "data": {
+            "added_count": len(added),
+            "skipped_count": len(skipped),
+            "skipped": skipped[:10],
+        },
+    }
 
 
 @router.get("")
@@ -225,6 +322,21 @@ async def list_products(
             if latest and prev and latest[5] and prev[5] and prev[5] > 0 and latest[5]:
                 trend = round((latest[5] - prev[5]) / prev[5] * 100, 1)
 
+            growth_24h = None
+            if latest and prev and latest[11] and prev[11]:
+                time_diff = (latest[11] - prev[11]).total_seconds()
+                if time_diff <= 86400 and prev[5] is not None and latest[5] is not None:
+                    sales_delta = latest[5] - prev[5]
+                    sales_pct = round(sales_delta / prev[5] * 100, 1) if prev[5] > 0 else None
+                    revenue_delta = None
+                    if latest[3] is not None and sales_delta > 0:
+                        revenue_delta = round(float(latest[3]) * sales_delta, 2)
+                    growth_24h = {
+                        "sales_delta": sales_delta,
+                        "sales_pct": sales_pct,
+                        "revenue_delta": revenue_delta,
+                    }
+
             items.append({
                 "id": str(p.id),
                 "platform": p.platform,
@@ -237,6 +349,7 @@ async def list_products(
                 "is_active": p.is_active,
                 "last_collected_at": p.last_collected_at.isoformat() if p.last_collected_at else None,
                 "trend": trend,
+                "growth_24h": growth_24h,
                 "latest_feature": {
                     "id": str(latest[1]),
                     "price": float(latest[3]) if latest and latest[3] else None,
@@ -264,6 +377,7 @@ async def list_products(
                 "is_active": p.is_active,
                 "last_collected_at": p.last_collected_at.isoformat() if p.last_collected_at else None,
                 "trend": 0.0,
+                "growth_24h": None,
                 "latest_feature": None,
             })
 
@@ -339,6 +453,15 @@ async def delete_product(
         raise NotFoundException(message="商品不存在")
 
     await db.delete(product)
+
+    await record_operation(
+        user_id=str(user.id),
+        action="delete",
+        resource_type="product",
+        resource_id=product_id,
+        detail=f"name={product.product_name[:30] if product.product_name else ''}",
+    )
+
     return {"code": 0, "data": {"deleted": True}}
 
 
@@ -576,3 +699,233 @@ async def compare_products(
             }
 
     return {"code": 0, "data": {"items": compare_items, "comparison": comparison}}
+
+
+@router.get("/{product_id}/growth-24h")
+async def get_product_growth_24h(
+    product_id: str,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+):
+    gate = FeatureGateMiddleware(db)
+    await gate.check_gate(user, "gate:monitor:growth_24h")
+
+    try:
+        pid = uuid.UUID(product_id)
+    except ValueError:
+        raise BadRequestException(message="无效的商品ID")
+
+    result = await db.execute(
+        select(Product).where(Product.id == pid, Product.user_id == user.id)
+    )
+    product = result.scalar_one_or_none()
+    if not product:
+        raise NotFoundException(message="商品不存在")
+
+    from datetime import timedelta
+
+
+    now_24h_ago = datetime.utcnow() - timedelta(hours=24)
+
+    feat_result = await db.execute(
+        select(ProductFeature)
+        .where(ProductFeature.product_id == pid, ProductFeature.collected_at >= now_24h_ago)
+        .order_by(ProductFeature.collected_at.asc())
+    )
+    features_24h = feat_result.scalars().all()
+
+    latest_result = await db.execute(
+        select(ProductFeature)
+        .where(ProductFeature.product_id == pid)
+        .order_by(ProductFeature.collected_at.desc())
+        .limit(1)
+    )
+    latest = latest_result.scalar_one_or_none()
+
+    if not latest or not features_24h:
+        return {
+            "code": 0,
+            "data": {
+                "product_id": product_id,
+                "growth": None,
+                "snapshots": [],
+            },
+        }
+
+    oldest = features_24h[0]
+    growth = {}
+    metric_fields = [
+        ("price", "price"),
+        ("sales_count", "sales_count"),
+        ("monthly_sales", "monthly_sales"),
+        ("review_count", "review_count"),
+        ("favorite_count", "favorite_count"),
+    ]
+
+    for field_name, label in metric_fields:
+        old_val = getattr(oldest, field_name, None)
+        new_val = getattr(latest, field_name, None)
+        if old_val is not None and new_val is not None and float(old_val) != 0:
+            change = float(new_val) - float(old_val)
+            pct = (change / float(old_val)) * 100
+            growth[label] = {
+                "old_value": float(old_val),
+                "new_value": float(new_val),
+                "change": round(change, 2),
+                "change_pct": round(pct, 2),
+            }
+        elif old_val is not None and new_val is not None:
+            growth[label] = {
+                "old_value": float(old_val),
+                "new_value": float(new_val),
+                "change": float(new_val) - float(old_val),
+                "change_pct": None,
+            }
+
+    snapshots = []
+    for f in features_24h:
+        snapshots.append({
+            "collected_at": f.collected_at.isoformat() if f.collected_at else None,
+            "price": float(f.price) if f.price else None,
+            "sales_count": f.sales_count,
+            "monthly_sales": f.monthly_sales,
+            "review_count": f.review_count,
+            "favorite_count": f.favorite_count,
+        })
+
+    return {
+        "code": 0,
+        "data": {
+            "product_id": product_id,
+            "growth": growth,
+            "snapshots": snapshots,
+        },
+    }
+
+
+@router.post("/compare-trends")
+async def compare_products_trends(
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+    product_ids: list[str] = Query(..., description="商品ID列表"),
+    days: int = Query(7, ge=1, le=30, description="趋势天数"),
+):
+    gate = FeatureGateMiddleware(db)
+    await gate.check_gate(user, "gate:monitor:compare")
+
+    if len(product_ids) < 2 or len(product_ids) > 10:
+        raise BadRequestException(message="对比商品数量需在2-10之间")
+
+    from datetime import timedelta
+
+    uuid_ids = [uuid.UUID(pid) for pid in product_ids]
+    result = await db.execute(
+        select(Product).where(Product.id.in_(uuid_ids), Product.user_id == user.id)
+    )
+    products = result.scalars().all()
+
+    if len(products) < 2:
+        raise BadRequestException(message="有效商品不足2个")
+
+    since = datetime.utcnow() - timedelta(days=days)
+    product_id_list = [p.id for p in products]
+
+    feat_result = await db.execute(
+        select(ProductFeature)
+        .where(
+            ProductFeature.product_id.in_(product_id_list),
+            ProductFeature.collected_at >= since,
+        )
+        .order_by(ProductFeature.product_id, ProductFeature.collected_at.asc())
+    )
+    all_features = feat_result.scalars().all()
+
+    product_map = {str(p.id): p for p in products}
+    trends: dict[str, list] = {str(p.id): [] for p in products}
+
+    for feat in all_features:
+        pid = str(feat.product_id)
+        trends[pid].append({
+            "collected_at": feat.collected_at.isoformat() if feat.collected_at else None,
+            "price": float(feat.price) if feat.price else None,
+            "sales_count": feat.sales_count,
+            "monthly_sales": feat.monthly_sales,
+            "review_count": feat.review_count,
+            "favorite_count": feat.favorite_count,
+        })
+
+    series = []
+    for pid, data_points in trends.items():
+        p = product_map.get(pid)
+        if not p:
+            continue
+        series.append({
+            "product_id": pid,
+            "product_name": p.product_name,
+            "platform": p.platform,
+            "data": data_points,
+        })
+
+    return {
+        "code": 0,
+        "data": {
+            "days": days,
+            "series": series,
+            "metrics": ["price", "sales_count", "monthly_sales", "review_count", "favorite_count"],
+        },
+    }
+
+
+@router.get("/{product_id}/sparkline")
+async def get_product_sparkline(
+    product_id: str,
+    user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+    metric: str = Query("sales_count", pattern="^(price|sales_count|monthly_sales|review_count|favorite_count)$"),
+    days: int = Query(7, ge=1, le=30),
+):
+    try:
+        pid = uuid.UUID(product_id)
+    except ValueError:
+        raise BadRequestException(message="无效的商品ID")
+
+    result = await db.execute(
+        select(Product).where(Product.id == pid, Product.user_id == user.id)
+    )
+    product = result.scalar_one_or_none()
+    if not product:
+        raise NotFoundException(message="商品不存在")
+
+    from datetime import timedelta
+
+    since = datetime.utcnow() - timedelta(days=days)
+    feat_result = await db.execute(
+        select(
+            ProductFeature.collected_at,
+            getattr(ProductFeature, metric),
+        )
+        .where(ProductFeature.product_id == pid, ProductFeature.collected_at >= since)
+        .order_by(ProductFeature.collected_at.asc())
+    )
+    rows = feat_result.all()
+
+    values = []
+    for row in rows:
+        val = row[1]
+        values.append(float(val) if val is not None else None)
+
+    min_val = min(v for v in values if v is not None) if any(v is not None for v in values) else 0
+    max_val = max(v for v in values if v is not None) if any(v is not None for v in values) else 0
+
+    return {
+        "code": 0,
+        "data": {
+            "product_id": product_id,
+            "metric": metric,
+            "days": days,
+            "values": values,
+            "min": min_val,
+            "max": max_val,
+            "count": len(values),
+        },
+    }

@@ -1,9 +1,8 @@
 import asyncio
 import json
 import logging
-import random
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import aiohttp
@@ -17,6 +16,7 @@ from app.models.admin import ProxyPool, RiskEvent
 from app.models.collect import CollectTask, CollectTaskItem
 from app.models.product import Product, ProductFeature
 from app.ws.manager import manager
+logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ class ProxyManager:
         if not proxy:
             return None
 
-        proxy.last_used_at = datetime.now(timezone.utc)
+        proxy.last_used_at = datetime.now(UTC)
         return {"ip": proxy.ip, "port": proxy.port, "protocol": proxy.protocol, "id": str(proxy.id)}
 
     async def mark_proxy_fail(self, proxy_id: str):
@@ -190,7 +190,7 @@ class RiskDetector:
                             "detail": {"keyword": keyword, "api_msg": data.get("msg", "")},
                         }
         except (json.JSONDecodeError, AttributeError):
-            pass
+            logger.warning("Silent exception")
 
         return None
 
@@ -243,7 +243,7 @@ class DataPersister:
                 product.image_url = parsed["image_url"]
             if parsed.get("product_url"):
                 product.product_url = parsed["product_url"]
-            product.last_collected_at = datetime.now(timezone.utc)
+            product.last_collected_at = datetime.now(UTC)
         else:
             product = Product(
                 user_id=user_id,
@@ -255,7 +255,7 @@ class DataPersister:
                 image_url=parsed.get("image_url"),
                 product_url=parsed.get("product_url"),
                 is_active=True,
-                last_collected_at=datetime.now(timezone.utc),
+                last_collected_at=datetime.now(UTC),
             )
             self.db.add(product)
             await self.db.flush()
@@ -284,7 +284,7 @@ class DataPersister:
             review_count=parsed.get("review_count"),
             favorite_count=parsed.get("favorite_count"),
             source="collect",
-            collected_at=datetime.now(timezone.utc),
+            collected_at=datetime.now(UTC),
         )
         self.db.add(feature)
 
@@ -315,7 +315,7 @@ class CollectEngine:
             return {"status": "error", "message": "任务不存在"}
 
         task.status = "running"
-        task.started_at = datetime.now(timezone.utc)
+        task.started_at = datetime.now(UTC)
         await self.db.flush()
 
         items_result = await self.db.execute(
@@ -325,7 +325,7 @@ class CollectEngine:
 
         if not items:
             task.status = "completed"
-            task.completed_at = datetime.now(timezone.utc)
+            task.completed_at = datetime.now(UTC)
             task.progress = 100
             await self.db.flush()
             return {"status": "completed", "collected": 0}
@@ -341,7 +341,6 @@ class CollectEngine:
             nonlocal success_count, fail_count, risk_count, product_count
             async with self._semaphore:
                 await self.rate_controller.acquire()
-                last_risk = None
                 for attempt in range(self.MAX_RETRIES + 1):
                     try:
                         fetch_result = await self._fetch_item(task.platform, item.target_id)
@@ -372,7 +371,7 @@ class CollectEngine:
                                     await self.proxy_manager.mark_proxy_banned(fetch_proxy_id)
 
                             if risk["risk_type"] in ("rate_limit", "server_error") and attempt < self.MAX_RETRIES:
-                                last_risk = risk
+                                _last_risk = risk
                                 await asyncio.sleep(self.RETRY_DELAYS[min(attempt, len(self.RETRY_DELAYS) - 1)])
                                 continue
 
@@ -387,10 +386,10 @@ class CollectEngine:
                                         "detail": risk["detail"],
                                         "target_id": item.target_id,
                                     },
-                                    "ts": datetime.now(timezone.utc).isoformat(),
+                                    "ts": datetime.now(UTC).isoformat(),
                                 })
                             except Exception:
-                                pass
+                                logger.warning("Silent exception")
                             break
                         else:
                             parser = get_parser(task.platform)
@@ -400,10 +399,10 @@ class CollectEngine:
                                 self.rate_controller.on_success()
                                 item.status = "completed"
                                 item.result = parsed
-                                item.completed_at = datetime.now(timezone.utc)
+                                item.completed_at = datetime.now(UTC)
 
                                 try:
-                                    product = await self.persister.save_parsed_data(task.user_id, parsed)
+                                    await self.persister.save_parsed_data(task.user_id, parsed)
                                     async with _lock:
                                         product_count += 1
                                 except Exception as e:
@@ -415,7 +414,7 @@ class CollectEngine:
                                 self.rate_controller.on_success()
                                 item.status = "completed"
                                 item.result = {"raw_captured": True, "target_id": item.target_id}
-                                item.completed_at = datetime.now(timezone.utc)
+                                item.completed_at = datetime.now(UTC)
                                 async with _lock:
                                     success_count += 1
                             break
@@ -448,16 +447,16 @@ class CollectEngine:
                             "done": done,
                             "total": total,
                         },
-                        "ts": datetime.now(timezone.utc).isoformat(),
+                        "ts": datetime.now(UTC).isoformat(),
                     })
                 except Exception:
-                    pass
+                    logger.warning("Silent exception")
 
         await asyncio.gather(*[process_item(item) for item in items])
 
         task.progress = 100
         task.status = "completed"
-        task.completed_at = datetime.now(timezone.utc)
+        task.completed_at = datetime.now(UTC)
         task.result_summary = {
             "success": success_count,
             "failed": fail_count,
@@ -500,7 +499,7 @@ class CollectEngine:
             result = await fetcher(session, fingerprint, target_id, proxy_url)
             result["proxy_id"] = proxy_id
             return result
-        except aiohttp.ClientError as e:
+        except aiohttp.ClientError:
             if proxy_id:
                 await self.proxy_manager.mark_proxy_fail(proxy_id)
             raise
@@ -535,7 +534,7 @@ class CollectEngine:
                 if resp.status == 200:
                     return {"raw_text": text, "status_code": resp.status}
         except Exception:
-            pass
+            logger.warning("Silent exception")
 
         headers2 = dict(fingerprint)
         headers2["Referer"] = f"https://www.xiaohongshu.com/goods/{target_id}"

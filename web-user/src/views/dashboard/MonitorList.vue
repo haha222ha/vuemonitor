@@ -11,17 +11,27 @@
           <el-option label="抖音" value="douyin" />
         </el-select>
       </div>
-      <el-button type="primary" @click="showAddDialog = true">+ 添加监控</el-button>
-      <el-dropdown style="margin-left: 8px" @command="handleExport">
-        <el-button>导出数据<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item command="csv">导出 CSV</el-dropdown-item>
-            <el-dropdown-item command="json">导出 JSON</el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+      <div class="toolbar-right">
+        <el-button-group>
+          <el-button :type="viewMode === 'grid' ? 'primary' : 'default'" @click="viewMode = 'grid'">
+            <el-icon><Grid /></el-icon>
+          </el-button>
+          <el-button :type="viewMode === 'waterfall' ? 'primary' : 'default'" @click="viewMode = 'waterfall'">
+            <el-icon><Menu /></el-icon>
+          </el-button>
+        </el-button-group>
+        <el-button type="primary" @click="showAddDialog = true">+ 添加监控</el-button>
+        <el-button @click="showExcelImport = true">批量导入</el-button>
+        <el-button @click="showExport = true" style="margin-left: 8px">导出数据</el-button>
+      </div>
     </div>
+
+    <div class="monitor-list__body">
+      <CategorySidebar
+        :active-category="categoryFilter || null"
+        :total-count="products.length"
+        @select="onCategorySelect"
+      />
 
     <div v-if="loading" style="text-align: center; padding: 40px;">
       <el-icon class="is-loading" :size="24"><Loading /></el-icon>
@@ -34,7 +44,7 @@
       <el-button type="primary" @click="showAddDialog = true">添加第一个商品</el-button>
     </div>
 
-    <div v-else class="product-grid">
+    <div v-else-if="viewMode === 'grid'" class="product-grid">
       <div v-for="p in filteredProducts" :key="p.id" class="product-card" @click="viewDetail(p)">
         <div class="card-image">
           <img v-if="p.image_url" :src="p.image_url" :alt="p.product_name" />
@@ -57,6 +67,12 @@
               <span class="stat-label">评分</span>
               <span class="stat-value">{{ p.latest_feature.rating }}</span>
             </div>
+            <div v-if="p.growth_24h && p.growth_24h.sales_pct != null" class="stat-item">
+              <span class="stat-label">24h增长</span>
+              <span :class="['stat-value', p.growth_24h.sales_pct > 0 ? 'growth-up' : p.growth_24h.sales_pct < 0 ? 'growth-down' : '']">
+                {{ p.growth_24h.sales_pct > 0 ? '+' : '' }}{{ p.growth_24h.sales_pct }}%
+              </span>
+            </div>
           </div>
           <div class="card-footer">
             <span :class="['trend-badge', p.trend > 0 ? 'trend-up' : p.trend < 0 ? 'trend-down' : 'trend-flat']">
@@ -66,8 +82,19 @@
               {{ p.last_collected_at ? timeAgo(p.last_collected_at) : '未采集' }}
             </span>
           </div>
+          <div v-if="p.sparkline_data && p.sparkline_data.length >= 2" class="card-sparkline">
+            <SparklineChart :data="p.sparkline_data" :color="p.trend > 0 ? '#22c55e' : p.trend < 0 ? '#ef4444' : '#6366f1'" width="100%" height="28px" />
+          </div>
         </div>
       </div>
+    </div>
+
+    <div v-else class="product-waterfall">
+      <WaterfallLayout :items="filteredProducts" :item-key="(p: any) => p.id" :column-count="3" :gap="16">
+        <template #default="{ item }">
+          <ProductWaterfallCard :product="item" @detail="viewDetail" @delete="confirmDelete" />
+        </template>
+      </WaterfallLayout>
     </div>
 
     <el-dialog v-model="showAddDialog" title="添加商品监控" width="520px" :close-on-click-modal="false">
@@ -104,6 +131,10 @@
         <el-button type="primary" :loading="adding" @click="addProduct">添加监控</el-button>
       </template>
     </el-dialog>
+
+    <ExcelImportDialog v-model="showExcelImport" @close="fetchProducts" />
+    <ExportDialog v-model="showExport" :products="filteredProducts" :total-count="products.length" :filtered-count="filteredProducts.length" @close="showExport = false" />
+    </div>
   </div>
 </template>
 
@@ -113,7 +144,13 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import api from "../../utils/api";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Loading, ArrowDown } from "@element-plus/icons-vue";
+import { Loading, Grid, Menu } from "@element-plus/icons-vue";
+import WaterfallLayout from "../../components/WaterfallLayout.vue";
+import ProductWaterfallCard from "../../components/ProductWaterfallCard.vue";
+import ExcelImportDialog from "../../components/ExcelImportDialog.vue";
+import ExportDialog from "../../components/ExportDialog.vue";
+import CategorySidebar from "../../components/CategorySidebar.vue";
+import SparklineChart from "../../components/SparklineChart.vue";
 
 const router = useRouter();
 const auth = useAuthStore();
@@ -122,7 +159,11 @@ const adding = ref(false);
 const products = ref<any[]>([]);
 const search = ref("");
 const platformFilter = ref("");
+const categoryFilter = ref("");
+const viewMode = ref<"grid" | "waterfall">("grid");
 const showAddDialog = ref(false);
+const showExcelImport = ref(false);
+const showExport = ref(false);
 
 const addForm = reactive({
   url: "",
@@ -136,9 +177,14 @@ const filteredProducts = computed(() => {
   return products.value.filter((p) => {
     const matchSearch = !search.value || p.product_name?.includes(search.value) || p.shop_name?.includes(search.value);
     const matchPlatform = !platformFilter.value || p.platform === platformFilter.value;
-    return matchSearch && matchPlatform;
+    const matchCategory = !categoryFilter.value || p.category_id === categoryFilter.value;
+    return matchSearch && matchPlatform && matchCategory;
   });
 });
+
+function onCategorySelect(categoryId: string | null, _categoryName: string | null) {
+  categoryFilter.value = categoryId || "";
+}
 
 function platformLabel(p: string) {
   const map: Record<string, string> = { xhs: "小红书", taobao: "淘宝", jd: "京东", pdd: "拼多多", douyin: "抖音" };
@@ -271,41 +317,20 @@ async function confirmDelete(row: any) {
   } catch {}
 }
 
-async function handleExport(format: string) {
-  try {
-    const resp = await api.get(`/products/export/${format}`, {
-      params: { platform: platformFilter.value || undefined },
-      responseType: format === "csv" ? "blob" : "json",
-    });
-    if (format === "csv") {
-      const blob = new Blob([resp.data], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `products_export_${new Date().toISOString().slice(0, 10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } else {
-      const blob = new Blob([JSON.stringify(resp.data, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `products_export_${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-    ElMessage.success("导出成功");
-  } catch (e: any) {
-    ElMessage.error(e?.response?.data?.message || "导出失败");
-  }
-}
-
-onMounted(fetchProducts);
+onMounted(() => {
+  fetchProducts();
+});
 </script>
 
 <style scoped>
 .monitor-list {
   padding: 4px;
+}
+
+.monitor-list__body {
+  display: flex;
+  min-height: 0;
+  flex: 1;
 }
 
 .page-toolbar {
@@ -318,6 +343,12 @@ onMounted(fetchProducts);
 .toolbar-left {
   display: flex;
   gap: 12px;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .empty-state {
@@ -454,6 +485,22 @@ onMounted(fetchProducts);
 .trend-down {
   color: #ef4444;
   background: rgba(239, 68, 68, 0.1);
+}
+
+.growth-up {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.growth-down {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.card-sparkline {
+  margin-top: 6px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .trend-flat {

@@ -9,7 +9,7 @@
         <el-radio-button :value="30">30天</el-radio-button>
         <el-radio-button :value="90">90天</el-radio-button>
       </el-radio-group>
-      <el-button @click="refreshAll" :loading="refreshing">刷新</el-button>
+      <el-button :loading="refreshing" @click="refreshAll">刷新</el-button>
     </PageHeader>
 
     <div class="category-insight__stats">
@@ -36,7 +36,7 @@
         <div v-if="heatmapLoading" class="category-insight__chart-loading">
           <el-skeleton :rows="6" animated />
         </div>
-        <div v-else-if="heatmapData.length > 0" ref="heatmapChartRef" class="category-insight__chart category-insight__chart--heatmap"></div>
+        <div v-else-if="heatmapData.length > 0" ref="heatmapChartRef" class="category-insight__chart category-insight__chart--heatmap" />
         <EmptyState v-else :icon="Grid" title="暂无品类热力数据" description="连接云端服务获取品类热度分析" compact />
       </div>
 
@@ -57,29 +57,29 @@
         <template v-else-if="patterns">
           <div class="behavior-section">
             <h4 class="behavior-section__title">生命周期分布</h4>
-            <div v-if="patterns.lifecycle_distribution?.length" ref="lifecycleChartRef" class="category-insight__chart category-insight__chart--small"></div>
+            <div v-if="patterns.lifecycle_distribution?.length" ref="lifecycleChartRef" class="category-insight__chart category-insight__chart--small" />
             <div v-else class="behavior-section__empty">暂无数据</div>
           </div>
           <div class="behavior-section">
             <h4 class="behavior-section__title">趋势方向分布</h4>
-            <div v-if="patterns.trend_distribution?.length" ref="trendDistChartRef" class="category-insight__chart category-insight__chart--small"></div>
+            <div v-if="patterns.trend_distribution?.length" ref="trendDistChartRef" class="category-insight__chart category-insight__chart--small" />
             <div v-else class="behavior-section__empty">暂无数据</div>
           </div>
           <div class="behavior-section">
             <h4 class="behavior-section__title">价格带分析</h4>
-            <div v-if="patterns.price_bands?.length" ref="priceBandChartRef" class="category-insight__chart category-insight__chart--small"></div>
+            <div v-if="patterns.price_bands?.length" ref="priceBandChartRef" class="category-insight__chart category-insight__chart--small" />
             <div v-else class="behavior-section__empty">暂无数据</div>
           </div>
-          <div class="behavior-summary" v-if="patterns.dominant_lifecycle || patterns.dominant_trend || patterns.best_seller_price_band">
-            <div class="behavior-summary__item" v-if="patterns.dominant_lifecycle">
+          <div v-if="patterns.dominant_lifecycle || patterns.dominant_trend || patterns.best_seller_price_band" class="behavior-summary">
+            <div v-if="patterns.dominant_lifecycle" class="behavior-summary__item">
               <span class="behavior-summary__label">主流生命周期</span>
               <el-tag size="small" effect="light">{{ lifecycleLabel(patterns.dominant_lifecycle) }}</el-tag>
             </div>
-            <div class="behavior-summary__item" v-if="patterns.dominant_trend">
+            <div v-if="patterns.dominant_trend" class="behavior-summary__item">
               <span class="behavior-summary__label">主流趋势</span>
               <el-tag :type="trendTagType(patterns.dominant_trend)" size="small" effect="light">{{ trendLabel(patterns.dominant_trend) }}</el-tag>
             </div>
-            <div class="behavior-summary__item" v-if="patterns.best_seller_price_band">
+            <div v-if="patterns.best_seller_price_band" class="behavior-summary__item">
               <span class="behavior-summary__label">最佳价格带</span>
               <el-tag size="small" type="success" effect="light">{{ priceBandLabel(patterns.best_seller_price_band.band) }}</el-tag>
             </div>
@@ -107,7 +107,7 @@
       <div v-if="trendLoading" class="category-insight__chart-loading">
         <el-skeleton :rows="5" animated />
       </div>
-      <div v-else-if="trendSeries && Object.keys(trendSeries).length > 0" ref="trendChartRef" class="category-insight__chart category-insight__chart--trend"></div>
+      <div v-else-if="trendSeries && Object.keys(trendSeries).length > 0" ref="trendChartRef" class="category-insight__chart category-insight__chart--trend" />
       <EmptyState v-else :icon="DataLine" title="暂无趋势数据" description="选择品类和时间范围查看趋势变化" compact />
     </div>
 

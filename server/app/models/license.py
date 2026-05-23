@@ -5,7 +5,7 @@ from sqlalchemy import DateTime, ForeignKey, Integer, SmallInteger, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import UUIDPrimaryKeyMixin, Base
+from app.models.base import Base, UUIDPrimaryKeyMixin
 
 
 class LicenseCode(UUIDPrimaryKeyMixin, Base):

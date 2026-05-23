@@ -38,7 +38,7 @@
         <el-button @click="$emit('view-logs')">查看日志</el-button>
         <el-button @click="$emit('export-logs', 'json')">导出 JSON</el-button>
         <el-button @click="$emit('export-logs', 'text')">导出文本</el-button>
-        <el-button @click="$emit('upload-logs')" :loading="logUploading">上传日志</el-button>
+        <el-button :loading="logUploading" @click="$emit('upload-logs')">上传日志</el-button>
         <el-button type="danger" @click="$emit('clear-logs')">清除日志</el-button>
       </div>
     </div>
@@ -62,33 +62,33 @@
       <div class="log-level-bars">
         <div class="log-level-bar">
           <span class="bar-label">Debug</span>
-          <div class="bar-track"><div class="bar-fill bar-fill--debug" :style="{ width: logLevelBarWidth(logLevelCounts.debug) }"></div></div>
+          <div class="bar-track"><div class="bar-fill bar-fill--debug" :style="{ width: logLevelBarWidth(logLevelCounts.debug) }" /></div>
           <span class="bar-count">{{ logLevelCounts.debug }}</span>
         </div>
         <div class="log-level-bar">
           <span class="bar-label">Info</span>
-          <div class="bar-track"><div class="bar-fill bar-fill--info" :style="{ width: logLevelBarWidth(logLevelCounts.info) }"></div></div>
+          <div class="bar-track"><div class="bar-fill bar-fill--info" :style="{ width: logLevelBarWidth(logLevelCounts.info) }" /></div>
           <span class="bar-count">{{ logLevelCounts.info }}</span>
         </div>
         <div class="log-level-bar">
           <span class="bar-label">Warn</span>
-          <div class="bar-track"><div class="bar-fill bar-fill--warn" :style="{ width: logLevelBarWidth(logLevelCounts.warn) }"></div></div>
+          <div class="bar-track"><div class="bar-fill bar-fill--warn" :style="{ width: logLevelBarWidth(logLevelCounts.warn) }" /></div>
           <span class="bar-count">{{ logLevelCounts.warn }}</span>
         </div>
         <div class="log-level-bar">
           <span class="bar-label">Error</span>
-          <div class="bar-track"><div class="bar-fill bar-fill--error" :style="{ width: logLevelBarWidth(logLevelCounts.error) }"></div></div>
+          <div class="bar-track"><div class="bar-fill bar-fill--error" :style="{ width: logLevelBarWidth(logLevelCounts.error) }" /></div>
           <span class="bar-count">{{ logLevelCounts.error }}</span>
         </div>
       </div>
 
       <div class="log-entries-container">
-        <div v-for="(entry, idx) in filteredLogEntries" :key="idx" class="log-entry" :class="`log-entry--${(entry as any).level}`">
-          <span class="log-entry__time">{{ (entry as any).timestamp }}</span>
-          <el-tag size="small" :type="logEntryTagType((entry as any).level)">{{ (entry as any).level }}</el-tag>
-          <span class="log-entry__module">{{ (entry as any).module }}</span>
-          <span class="log-entry__message">{{ (entry as any).message }}</span>
-          <span v-if="(entry as any).error" class="log-entry__error">{{ (entry as any).error }}</span>
+        <div v-for="(entry, idx) in filteredLogEntries" :key="idx" class="log-entry" :class="`log-entry--${entry.level}`">
+          <span class="log-entry__time">{{ entry.timestamp }}</span>
+          <el-tag size="small" :type="logEntryTagType(entry.level)">{{ entry.level }}</el-tag>
+          <span class="log-entry__module">{{ entry.module }}</span>
+          <span class="log-entry__message">{{ entry.message }}</span>
+          <span v-if="entry.error" class="log-entry__error">{{ entry.error }}</span>
         </div>
         <div v-if="filteredLogEntries.length === 0" class="log-empty">暂无日志记录</div>
       </div>
@@ -99,11 +99,26 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+interface LogEntry {
+  level: string;
+  timestamp: string;
+  module: string;
+  message: string;
+  error?: string;
+}
+
+interface LogStats {
+  sessionId: string;
+  logFiles: number;
+  bufferSize: number;
+  uploadQueueSize: number;
+}
+
 const props = defineProps<{
   logLevel: string;
-  logStats: any;
+  logStats: LogStats;
   logDialogVisible: boolean;
-  logEntries: any[];
+  logEntries: LogEntry[];
   logFilterLevel: string;
   logFilterModule: string;
   logSearchQuery: string;
@@ -111,7 +126,7 @@ const props = defineProps<{
   logUploading: boolean;
   logModules: string[];
   logLevelCounts: { debug: number; info: number; warn: number; error: number; total: number };
-  filteredLogEntries: any[];
+  filteredLogEntries: LogEntry[];
   logLevelBarWidth: (count: number) => string;
 }>();
 

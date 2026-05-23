@@ -2,12 +2,11 @@ import { EventEmitter } from "events";
 import { getStorage } from "../storage/sqlite";
 import { licenseManager } from "../license/license-manager";
 import { logger } from "../logger/logger";
-
-const axios = require("axios");
+import axios from "axios";
 
 export interface SyncRecord {
   id: string;
-  type: "product" | "feature" | "ai_result";
+  type: "product" | "feature" | "ai_result" | "category";
   localId: string;
   action: "create" | "update" | "delete";
   data: Record<string, unknown>;
@@ -31,7 +30,7 @@ export interface SyncStatus {
 
 export interface SyncConflict {
   id: string;
-  type: "product" | "feature";
+  type: "product" | "feature" | "category";
   localId: string;
   localData: Record<string, unknown>;
   localVersion: number;
@@ -150,6 +149,11 @@ export class CloudSyncManager extends EventEmitter {
         `UPDATE product_features SET price = ?, sales_count = ?, rating = ?, review_count = ?, favorite_count = ? WHERE id = ?`,
         [conflict.localData.price, conflict.localData.sales_count, conflict.localData.rating, conflict.localData.review_count, conflict.localData.favorite_count, conflict.localId]
       );
+    } else if (conflict.type === "category") {
+      storage.run(
+        `UPDATE categories SET name = ?, icon = ?, color = ?, sort_order = ?, updated_at = datetime('now') WHERE id = ?`,
+        [conflict.localData.name, conflict.localData.icon, conflict.localData.color, conflict.localData.sort_order, conflict.localId]
+      );
     }
   }
 
@@ -163,6 +167,11 @@ export class CloudSyncManager extends EventEmitter {
       storage.run(
         `UPDATE product_features SET price = ?, sales_count = ?, rating = ?, review_count = ?, favorite_count = ? WHERE id = ?`,
         [conflict.serverData.price, conflict.serverData.sales_count, conflict.serverData.rating, conflict.serverData.review_count, conflict.serverData.favorite_count, conflict.localId]
+      );
+    } else if (conflict.type === "category") {
+      storage.run(
+        `UPDATE categories SET name = ?, icon = ?, color = ?, sort_order = ?, updated_at = datetime('now') WHERE id = ?`,
+        [conflict.serverData.name, conflict.serverData.icon, conflict.serverData.color, conflict.serverData.sort_order, conflict.localId]
       );
     }
   }
@@ -178,6 +187,11 @@ export class CloudSyncManager extends EventEmitter {
       storage.run(
         `UPDATE product_features SET price = ?, sales_count = ?, rating = ?, review_count = ?, favorite_count = ? WHERE id = ?`,
         [merged.price, merged.sales_count, merged.rating, merged.review_count, merged.favorite_count, conflict.localId]
+      );
+    } else if (conflict.type === "category") {
+      storage.run(
+        `UPDATE categories SET name = ?, icon = ?, color = ?, sort_order = ?, updated_at = datetime('now') WHERE id = ?`,
+        [merged.name, merged.icon, merged.color, merged.sort_order, conflict.localId]
       );
     }
   }
@@ -277,6 +291,28 @@ export class CloudSyncManager extends EventEmitter {
     this.emit("sync:queued", record);
   }
 
+  enqueueCategory(category: Record<string, unknown>, action: "create" | "update" | "delete"): void {
+    const localId = category.id as string;
+    const version = action === "create" ? 1 : this.getLocalVersion("category", localId) + 1;
+    this.incrementLocalVersion("category", localId);
+
+    const record: SyncRecord = {
+      id: crypto.randomUUID(),
+      type: "category",
+      localId,
+      action,
+      data: category,
+      syncedAt: null,
+      syncStatus: "pending",
+      retryCount: 0,
+      createdAt: new Date().toISOString(),
+      version,
+      updatedAt: new Date().toISOString(),
+    };
+    this.pendingQueue.push(record);
+    this.emit("sync:queued", record);
+  }
+
   async syncAll(): Promise<{ pushed: number; pulled: number; errors: number }> {
     if (this.isSyncing || !this.serverUrl || !this.token) {
       return { pushed: 0, pulled: 0, errors: 0 };
@@ -291,8 +327,9 @@ export class CloudSyncManager extends EventEmitter {
 
     try {
       pushed = await this.pushToServer();
-      const pulled = await this.pullFromServer();
+      const pulled = await this.pullChangesFromServer();
       this.stats.lastSyncAt = new Date().toISOString();
+      this.persistLastSyncAt();
       logger.info("CloudSync", "同步完成", { pushed, pulled, errors });
       this.emit("sync:complete", { pushed, pulled, errors });
       return { pushed, pulled, errors };
@@ -306,6 +343,330 @@ export class CloudSyncManager extends EventEmitter {
     }
   }
 
+  async fullSync(): Promise<{ pushed: number; pulled: number; errors: number }> {
+    if (this.isSyncing || !this.serverUrl || !this.token) {
+      return { pushed: 0, pulled: 0, errors: 0 };
+    }
+
+    this.isSyncing = true;
+    this.emit("sync:start");
+    logger.info("CloudSync", "开始全量同步");
+
+    let pushed = 0;
+    let errors = 0;
+
+    try {
+      pushed = await this.batchPushToServer();
+      const pulled = await this.pullChangesFromServer(true);
+      this.stats.lastSyncAt = new Date().toISOString();
+      this.persistLastSyncAt();
+      logger.info("CloudSync", "全量同步完成", { pushed, pulled, errors });
+      this.emit("sync:complete", { pushed, pulled, errors, fullSync: true });
+      return { pushed, pulled, errors };
+    } catch (err) {
+      errors++;
+      logger.error("CloudSync", "全量同步失败", err);
+      this.emit("sync:error", { error: (err as Error).message });
+      return { pushed, errors, pulled: 0 };
+    } finally {
+      this.isSyncing = false;
+    }
+  }
+
+  private async batchPushToServer(): Promise<number> {
+    if (this.pendingQueue.length === 0) return 0;
+    if (!this.serverUrl || !this.token) return 0;
+
+    const storage = getStorage();
+    const products: Record<string, unknown>[] = [];
+    const features: Record<string, unknown>[] = [];
+    const categories: Record<string, unknown>[] = [];
+    const deletions: Record<string, unknown>[] = [];
+
+    const batch = this.pendingQueue.splice(0, SYNC_BATCH_SIZE);
+
+    for (const record of batch) {
+      if (record.action === "delete") {
+        deletions.push({ type: record.type, id: record.localId });
+        continue;
+      }
+      if (record.type === "product") {
+        products.push(record.data);
+      } else if (record.type === "feature") {
+        features.push(record.data);
+      } else if (record.type === "category") {
+        categories.push(record.data);
+      }
+    }
+
+    try {
+      const { data } = await axios.post(
+        `${this.serverUrl}/api/v1/sync/batch-push`,
+        { products, features, categories, deletions },
+        { headers: { Authorization: `Bearer ${this.token}` }, timeout: 60000 }
+      );
+
+      if (data && data.code === 0) {
+        const result = data.data || {};
+        const pushed = (result.products || 0) + (result.features || 0) + (result.categories || 0) + (result.deletions || 0);
+        this.stats.syncedCount += pushed;
+
+        for (const record of batch) {
+          record.syncedAt = new Date().toISOString();
+          record.syncStatus = "synced";
+        }
+
+        if (result.errors > 0) {
+          logger.warn("CloudSync", "批量推送部分失败", { errors: result.errors });
+        }
+
+        return pushed;
+      } else {
+        for (const record of batch) {
+          this.handleSinglePushFailure(record);
+        }
+        return 0;
+      }
+    } catch (err) {
+      logger.error("CloudSync", "批量推送失败", err);
+      for (const record of batch) {
+        this.handleSinglePushFailure(record);
+      }
+      return 0;
+    }
+  }
+
+  private async pullChangesFromServer(full: boolean = false): Promise<number> {
+    if (!this.serverUrl || !this.token) return 0;
+
+    const storage = getStorage();
+    this.ensureSyncTables();
+
+    try {
+      const endpoint = full
+        ? `${this.serverUrl}/api/v1/sync/full-pull`
+        : `${this.serverUrl}/api/v1/sync/changes`;
+
+      const requestBody: Record<string, unknown> = {
+        include_products: true,
+        include_features: true,
+        include_categories: true,
+        include_deletions: true,
+      };
+
+      if (!full && this.stats.lastSyncAt) {
+        requestBody.since = this.stats.lastSyncAt;
+      }
+
+      const { data } = await axios.post(endpoint, requestBody, {
+        headers: { Authorization: `Bearer ${this.token}` },
+        timeout: 60000,
+      });
+
+      if (!data || data.code !== 0 || !data.data) return 0;
+
+      const serverData = data.data;
+      let pulled = 0;
+
+      if (serverData.products && Array.isArray(serverData.products)) {
+        for (const prod of serverData.products as Array<Record<string, unknown>>) {
+          try {
+            const existingRows = storage.query(
+              "SELECT id FROM products WHERE id = ?",
+              [prod.id]
+            ) as Array<{ id: string }>;
+
+            if (existingRows.length === 0) {
+              storage.run(
+                `INSERT INTO products (id, platform, platform_product_id, product_name, shop_name, image_url, category, category_id, product_url, is_active, last_collected_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                  prod.id,
+                  prod.platform || "xhs",
+                  prod.platform_product_id || "",
+                  prod.product_name || "",
+                  prod.shop_name || null,
+                  prod.image_url || null,
+                  prod.category || null,
+                  prod.category_id || null,
+                  prod.product_url || null,
+                  prod.is_active !== false ? 1 : 0,
+                  prod.last_collected_at || null,
+                ]
+              );
+              pulled++;
+            } else {
+              const conflictDetected = this.detectConflictOnPull(storage, "product", prod.id as string, prod);
+              if (conflictDetected) continue;
+
+              storage.run(
+                `UPDATE products SET product_name = ?, shop_name = ?, image_url = ?, category = ?, category_id = ?, product_url = ?, is_active = ?, last_collected_at = ?, updated_at = datetime('now')
+                 WHERE id = ?`,
+                [
+                  prod.product_name,
+                  prod.shop_name || null,
+                  prod.image_url || null,
+                  prod.category || null,
+                  prod.category_id || null,
+                  prod.product_url || null,
+                  prod.is_active !== false ? 1 : 0,
+                  prod.last_collected_at || null,
+                  prod.id,
+                ]
+              );
+              pulled++;
+            }
+          } catch (err) {
+            logger.warn("CloudSync", "拉取产品失败", { id: prod.id, err });
+          }
+        }
+      }
+
+      if (serverData.features && Array.isArray(serverData.features)) {
+        for (const feat of serverData.features as Array<Record<string, unknown>>) {
+          try {
+            if (!feat.product_id) continue;
+
+            const existingFeatures = storage.query(
+              "SELECT id FROM product_features WHERE id = ?",
+              [feat.id]
+            ) as Array<{ id: string }>;
+
+            if (existingFeatures.length === 0) {
+              const productRows = storage.query(
+                "SELECT id FROM products WHERE id = ?",
+                [feat.product_id]
+              ) as Array<{ id: string }>;
+
+              if (productRows.length === 0) continue;
+
+              storage.run(
+                `INSERT INTO product_features (id, product_id, price, original_price, sales_count, monthly_sales, rating, review_count, favorite_count, stock_status, extra_features, source, collected_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                  feat.id || crypto.randomUUID(),
+                  feat.product_id,
+                  feat.price ?? null,
+                  feat.original_price ?? null,
+                  feat.sales_count ?? null,
+                  feat.monthly_sales ?? null,
+                  feat.rating ?? null,
+                  feat.review_count ?? null,
+                  feat.favorite_count ?? null,
+                  feat.stock_status ?? null,
+                  JSON.stringify(feat.extra_features || {}),
+                  feat.source || "cloud",
+                  feat.collected_at || new Date().toISOString(),
+                ]
+              );
+              pulled++;
+            }
+          } catch (err) {
+            logger.warn("CloudSync", "拉取特征失败", { id: feat.id, err });
+          }
+        }
+      }
+
+      if (serverData.categories && Array.isArray(serverData.categories)) {
+        for (const cat of serverData.categories as Array<Record<string, unknown>>) {
+          try {
+            const existingCats = storage.query(
+              "SELECT id FROM categories WHERE id = ?",
+              [cat.id]
+            ) as Array<{ id: string }>;
+
+            if (existingCats.length === 0) {
+              storage.run(
+                `INSERT INTO categories (id, name, icon, color, sort_order, parent_id, is_active, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))`,
+                [cat.id, cat.name, cat.icon || null, cat.color || null, cat.sort_order || 0, cat.parent_id || null]
+              );
+              pulled++;
+            } else {
+              storage.run(
+                `UPDATE categories SET name = ?, icon = ?, color = ?, sort_order = ?, parent_id = ?, updated_at = datetime('now') WHERE id = ?`,
+                [cat.name, cat.icon || null, cat.color || null, cat.sort_order || 0, cat.parent_id || null, cat.id]
+              );
+              pulled++;
+            }
+          } catch (err) {
+            logger.warn("CloudSync", "拉取分类失败", { id: cat.id, err });
+          }
+        }
+      }
+
+      if (serverData.deletions && Array.isArray(serverData.deletions)) {
+        for (const del of serverData.deletions as Array<Record<string, unknown>>) {
+          try {
+            if (del.type === "product" && del.id) {
+              storage.run(
+                "UPDATE products SET is_active = 0, updated_at = datetime('now') WHERE id = ?",
+                [del.id]
+              );
+              pulled++;
+            } else if (del.type === "category" && del.id) {
+              storage.run("DELETE FROM categories WHERE id = ?", [del.id]);
+              pulled++;
+            }
+          } catch (err) {
+            logger.warn("CloudSync", "应用删除失败", { type: del.type, id: del.id, err });
+          }
+        }
+      }
+
+      this.emit("sync:pulled", { count: pulled });
+      const pendingConflicts = this.conflicts.filter(c => c.resolution === "pending");
+      if (pendingConflicts.length > 0) {
+        this.emit("sync:conflict:detected", { count: pendingConflicts.length });
+      }
+      return pulled;
+    } catch (err) {
+      logger.error("CloudSync", "增量拉取失败", err);
+      return 0;
+    }
+  }
+
+  async getServerSyncStatus(): Promise<Record<string, unknown> | null> {
+    if (!this.serverUrl || !this.token) return null;
+
+    try {
+      const { data } = await axios.get(
+        `${this.serverUrl}/api/v1/sync/status`,
+        { headers: { Authorization: `Bearer ${this.token}` }, timeout: 10000 }
+      );
+      if (data && data.code === 0) {
+        return data.data;
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  private persistLastSyncAt(): void {
+    const storage = getStorage();
+    this.ensureSyncTables();
+    storage.run(
+      `INSERT OR REPLACE INTO sync_versions (record_type, record_id, version, updated_at) VALUES ('__last_sync', '__global', 1, ?)`,
+      [this.stats.lastSyncAt || new Date().toISOString()]
+    );
+  }
+
+  loadLastSyncAt(): void {
+    const storage = getStorage();
+    this.ensureSyncTables();
+    try {
+      const rows = storage.query(
+        "SELECT updated_at FROM sync_versions WHERE record_type = '__last_sync' AND record_id = '__global'"
+      ) as Array<{ updated_at: string }>;
+      if (rows.length > 0) {
+        this.stats.lastSyncAt = rows[0].updated_at;
+      }
+    } catch {
+      this.stats.lastSyncAt = null;
+    }
+  }
+
   private async pushToServer(): Promise<number> {
     if (this.pendingQueue.length === 0) return 0;
     if (!this.serverUrl || !this.token) return 0;
@@ -313,9 +674,61 @@ export class CloudSyncManager extends EventEmitter {
     let pushed = 0;
     const batch = this.pendingQueue.splice(0, SYNC_BATCH_SIZE);
 
+    const categoryRecords = batch.filter(r => r.type === "category");
+    const productFeatureRecords = batch.filter(r => r.type !== "category");
+
+    for (const record of categoryRecords) {
+      try {
+        const catData = record.data;
+        let response: { data: { code: number } };
+
+        if (record.action === "create") {
+          response = await axios.post(
+            `${this.serverUrl}/api/v1/categories`,
+            {
+              name: catData.name,
+              icon: catData.icon || null,
+              color: catData.color || null,
+              sort_order: catData.sort_order || 0,
+              parent_id: catData.parent_id || null,
+            },
+            { headers: { Authorization: `Bearer ${this.token}` }, timeout: 15000 }
+          );
+        } else if (record.action === "update") {
+          response = await axios.put(
+            `${this.serverUrl}/api/v1/categories/${record.localId}`,
+            {
+              name: catData.name,
+              icon: catData.icon,
+              color: catData.color,
+              sort_order: catData.sort_order,
+              parent_id: catData.parent_id,
+            },
+            { headers: { Authorization: `Bearer ${this.token}` }, timeout: 15000 }
+          );
+        } else {
+          response = await axios.delete(
+            `${this.serverUrl}/api/v1/categories/${record.localId}`,
+            { headers: { Authorization: `Bearer ${this.token}` }, timeout: 15000 }
+          );
+        }
+
+        if (response.data && response.data.code === 0) {
+          pushed++;
+          this.stats.syncedCount++;
+          record.syncedAt = new Date().toISOString();
+          record.syncStatus = "synced";
+        } else {
+          this.handleSinglePushFailure(record);
+        }
+      } catch {
+        this.handleSinglePushFailure(record);
+      }
+    }
+
     const grouped = new Map<string, { product: SyncRecord | null; features: SyncRecord[] }>();
 
-    for (const record of batch) {
+    for (const record of productFeatureRecords) {
       const ppid = (record.data.platform_product_id as string) || record.localId;
       if (!grouped.has(ppid)) {
         grouped.set(ppid, { product: null, features: [] });
@@ -390,6 +803,16 @@ export class CloudSyncManager extends EventEmitter {
         r.syncStatus = "failed";
         this.stats.failedCount++;
       }
+    }
+  }
+
+  private handleSinglePushFailure(record: SyncRecord): void {
+    record.retryCount++;
+    if (record.retryCount < MAX_RETRY) {
+      this.pendingQueue.push(record);
+    } else {
+      record.syncStatus = "failed";
+      this.stats.failedCount++;
     }
   }
 
@@ -482,8 +905,37 @@ export class CloudSyncManager extends EventEmitter {
               pulled++;
             }
           }
-        } catch {}
+        } catch (err) { logger.warn("[Main] operation failed:", err); }
       }
+
+      try {
+        const catResponse = await axios.get(
+          `${this.serverUrl}/api/v1/categories`,
+          { headers: { Authorization: `Bearer ${this.token}` }, timeout: 15000 }
+        );
+        if (catResponse.data?.code === 0 && catResponse.data?.data?.categories) {
+          const serverCategories = catResponse.data.data.categories as Array<Record<string, unknown>>;
+          for (const cat of serverCategories) {
+            const localRows = storage.query(
+              "SELECT id FROM categories WHERE id = ?",
+              [cat.id]
+            ) as Array<{ id: string }>;
+            if (localRows.length === 0) {
+              storage.run(
+                `INSERT INTO categories (id, name, icon, color, sort_order, parent_id, is_active, created_at, updated_at)
+                 VALUES (?, ?, ?, ?, ?, ?, 1, datetime('now'), datetime('now'))`,
+                [cat.id, cat.name, cat.icon || null, cat.color || null, cat.sort_order || 0, cat.parent_id || null]
+              );
+              pulled++;
+            } else {
+              storage.run(
+                `UPDATE categories SET name = ?, icon = ?, color = ?, sort_order = ?, parent_id = ?, updated_at = datetime('now') WHERE id = ?`,
+                [cat.name, cat.icon || null, cat.color || null, cat.sort_order || 0, cat.parent_id || null, cat.id]
+              );
+            }
+          }
+        }
+      } catch (err) { logger.warn("[CloudSync] category pull failed:", err); }
 
       this.emit("sync:pulled", { count: pulled });
       if (this.conflicts.filter(c => c.resolution === "pending").length > 0) {
@@ -497,7 +949,7 @@ export class CloudSyncManager extends EventEmitter {
 
   private detectConflictOnPull(
     storage: ReturnType<typeof getStorage>,
-    type: "product" | "feature",
+    type: "product" | "feature" | "category",
     localId: string,
     serverData: Record<string, unknown>
   ): boolean {
@@ -547,7 +999,7 @@ export class CloudSyncManager extends EventEmitter {
 
   private getLocalData(
     storage: ReturnType<typeof getStorage>,
-    type: "product" | "feature",
+    type: "product" | "feature" | "category",
     localId: string
   ): Record<string, unknown> | null {
     try {
@@ -557,13 +1009,16 @@ export class CloudSyncManager extends EventEmitter {
       } else if (type === "feature") {
         const rows = storage.query("SELECT * FROM product_features WHERE id = ?", [localId]) as Record<string, unknown>[];
         return rows.length > 0 ? rows[0] : null;
+      } else if (type === "category") {
+        const rows = storage.query("SELECT * FROM categories WHERE id = ?", [localId]) as Record<string, unknown>[];
+        return rows.length > 0 ? rows[0] : null;
       }
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
     return null;
   }
 
   private hasLocalModifications(
-    type: "product" | "feature",
+    type: "product" | "feature" | "category",
     localData: Record<string, unknown>,
     serverData: Record<string, unknown>
   ): boolean {
@@ -572,6 +1027,9 @@ export class CloudSyncManager extends EventEmitter {
       return fields.some(f => localData[f] !== serverData[f]);
     } else if (type === "feature") {
       const fields = ["price", "sales_count", "rating", "review_count", "favorite_count"] as const;
+      return fields.some(f => localData[f] !== serverData[f]);
+    } else if (type === "category") {
+      const fields = ["name", "icon", "color", "sort_order"] as const;
       return fields.some(f => localData[f] !== serverData[f]);
     }
     return false;

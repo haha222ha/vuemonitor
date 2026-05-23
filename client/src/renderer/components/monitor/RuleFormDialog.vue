@@ -1,6 +1,6 @@
 <template>
-  <el-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :title="editingRule ? '编辑规则' : '新建规则'" width="600px" @close="handleClose" class="modern-dialog">
-    <el-form :model="ruleForm" label-width="100px" :rules="formRules" ref="formRef">
+  <el-dialog :model-value="modelValue" :title="editingRule ? '编辑规则' : '新建规则'" width="600px" class="modern-dialog" @update:model-value="$emit('update:modelValue', $event)" @close="handleClose">
+    <el-form ref="formRef" :model="ruleForm" label-width="100px" :rules="formRules">
       <el-form-item label="规则名称" prop="rule_name">
         <el-input v-model="ruleForm.rule_name" placeholder="如：价格跌破50元" />
       </el-form-item>
@@ -31,7 +31,7 @@
               <el-input-number v-model="ruleForm.conditions.below_price" :min="0" :precision="2" :disabled="!conditionToggles.price_below" size="small" />
               <span class="condition-unit">元</span>
             </div>
-            <div class="condition-preview" v-if="pricePreview">
+            <div v-if="pricePreview" class="condition-preview">
               <el-icon color="#E6A23C"><InfoFilled /></el-icon>
               <span>{{ pricePreview }}</span>
             </div>
@@ -188,7 +188,7 @@ watch(() => props.editingRule, (rule) => {
     ruleForm.conditions = { ...rule.conditions };
     ruleForm.notify_channels = rule.notify_channels || ["app", "desktop"];
     ruleForm.is_active = rule.is_active;
-    const c = rule.conditions || {};
+    const c = (rule.conditions || {}) as Record<string, any>;
     conditionToggles.price_threshold = !!c.threshold;
     conditionToggles.price_below = !!c.below_price;
     conditionToggles.sales_threshold = !!c.threshold;
@@ -208,18 +208,19 @@ watch(() => props.template, (tpl) => {
   if (tpl) {
     ruleForm.rule_name = tpl.name;
     ruleForm.rule_type = tpl.rule_type;
-    ruleForm.conditions = { ...tpl.conditions };
+    const tc = tpl.conditions as Record<string, any>;
+    ruleForm.conditions = { ...tc };
     if (tpl.rule_type === "price_drop") {
-      conditionToggles.price_threshold = !!tpl.conditions.threshold;
-      conditionToggles.price_below = !!tpl.conditions.below_price;
+      conditionToggles.price_threshold = !!tc.threshold;
+      conditionToggles.price_below = !!tc.below_price;
     } else if (tpl.rule_type === "sales_surge") {
-      conditionToggles.sales_threshold = !!tpl.conditions.threshold;
+      conditionToggles.sales_threshold = !!tc.threshold;
     } else if (tpl.rule_type === "stock_change") {
-      conditionToggles.stock_out = tpl.conditions.stock_events?.includes("out_of_stock") ?? false;
-      conditionToggles.stock_restock = tpl.conditions.stock_events?.includes("restocked") ?? false;
+      conditionToggles.stock_out = tc.stock_events?.includes("out_of_stock") ?? false;
+      conditionToggles.stock_restock = tc.stock_events?.includes("restocked") ?? false;
     } else if (tpl.rule_type === "rating_drop") {
-      conditionToggles.rating_below = !!tpl.conditions.below_rating;
-      conditionToggles.rating_decrease = !!tpl.conditions.rating_decrease;
+      conditionToggles.rating_below = !!tc.below_rating;
+      conditionToggles.rating_decrease = !!tc.rating_decrease;
     }
   }
 });

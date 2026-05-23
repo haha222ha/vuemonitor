@@ -1,15 +1,15 @@
 import hashlib
 import secrets
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-from sqlalchemy import select, func
+from shared.constants.feature_gates import PLAN_FEATURES_MAP, PLAN_LIMITS
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import BadRequestException, NotFoundException, ForbiddenException
-from app.models.license import LicenseCode, LicenseActivation, LicenseChangeLog
+from app.core.exceptions import BadRequestException, NotFoundException
+from app.models.license import LicenseActivation, LicenseChangeLog, LicenseCode
 from app.models.user import User
-from shared.constants.feature_gates import PLAN_FEATURES_MAP, PLAN_LIMITS
 
 _PLAN_CODES = {"F": "free", "P": "pro", "M": "premium", "E": "enterprise"}
 _PLAN_REVERSE = {v: k for k, v in _PLAN_CODES.items()}
@@ -86,7 +86,7 @@ class LicenseService:
         if lic.status == "revoked":
             return {"valid": False, "message": "授权码已被吊销"}
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         if lic.expires_at and lic.expires_at < now:
             if lic.status != "expired":
@@ -151,7 +151,7 @@ class LicenseService:
         if lic.status == "revoked":
             raise BadRequestException(message="授权码已被吊销")
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         if lic.expires_at and lic.expires_at < now:
             raise BadRequestException(message="授权码已过期")
 
@@ -234,7 +234,7 @@ class LicenseService:
 
         old_status = lic.status
         lic.status = "revoked"
-        lic.revoked_at = datetime.now(timezone.utc)
+        lic.revoked_at = datetime.now(UTC)
         lic.revoked_by = revoked_by
         lic.revoke_reason = reason
 
@@ -271,7 +271,7 @@ class LicenseService:
         if lic.status == "revoked":
             raise BadRequestException(message="已吊销的授权码无法续期")
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         old_expires = lic.expires_at.isoformat() if lic.expires_at else None
         base = lic.expires_at if lic.expires_at and lic.expires_at > now else now
         lic.expires_at = base + timedelta(days=extra_days)

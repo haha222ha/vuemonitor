@@ -1,4 +1,4 @@
-import { BrowserView, BrowserWindow, session, app } from "electron";
+﻿import { BrowserView, BrowserWindow, session, app } from "electron";
 import * as path from "path";
 import * as fs from "fs";
 import { EventEmitter } from "events";
@@ -417,7 +417,7 @@ export class ChromiumCollectWorker extends EventEmitter {
       if (fs.existsSync(this.checkpointPath)) {
         fs.unlinkSync(this.checkpointPath);
       }
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
   }
 
   setMainWindow(window: BrowserWindow): void {
@@ -533,7 +533,7 @@ export class ChromiumCollectWorker extends EventEmitter {
     if (!this.collectSession) return;
     const cookies = await this.collectSession.cookies.get({});
     for (const c of cookies) {
-      if (c.domain.includes("xiaohongshu")) {
+      if (c.domain?.includes("xiaohongshu")) {
         await this.collectSession.cookies.remove("https://www.xiaohongshu.com", c.name);
       }
     }
@@ -967,7 +967,7 @@ export class ChromiumCollectWorker extends EventEmitter {
             resolve();
             return;
           }
-        } catch {}
+        } catch (err) { logger.warn("[Main] operation failed:", err); }
 
         if (Date.now() - start > timeoutMs) {
           resolve();
@@ -984,7 +984,7 @@ export class ChromiumCollectWorker extends EventEmitter {
     if (view) {
       try {
         view.webContents.close();
-      } catch {}
+      } catch (err) { logger.warn("[Main] operation failed:", err); }
       this.views.delete(taskId);
     }
   }

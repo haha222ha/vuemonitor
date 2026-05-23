@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :model-value="modelValue" @update:model-value="$emit('update:modelValue', $event)" :title="report?.title || '报告'" width="760px" class="ai-dialog">
+  <el-dialog :model-value="modelValue" :title="report?.title || '报告'" width="760px" class="ai-dialog" @update:model-value="$emit('update:modelValue', $event)">
     <div v-if="report" class="report-view">
       <div class="report-view__header">
         <div class="report-view__tags">

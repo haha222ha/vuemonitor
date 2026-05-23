@@ -91,6 +91,7 @@ def check_env(filepath: str) -> list[str]:
         "JWT_REFRESH_SECRET": ["change-me-refresh-in-production", ""],
         "ENCRYPTION_KEY": ["0123456789abcdef0123456789abcdef", ""],
         "DB_PASSWORD": ["saas_pass", ""],
+        "REDIS_PASSWORD": [""],
     }
 
     for key, bad_values in insecure_values.items():
@@ -116,12 +117,41 @@ def check_env(filepath: str) -> list[str]:
     return issues
 
 
+def check_docker_compose(filepath: str = "docker-compose.yml") -> list[str]:
+    issues = []
+    if not os.path.exists(filepath):
+        return [f"文件不存在: {filepath}"]
+
+    with open(filepath, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    if '"5432:5432"' in content or "'5432:5432'" in content:
+        issues.append("[WARN] PostgreSQL 端口 5432 映射到宿主机，生产环境建议移除")
+    if '"6379:6379"' in content or "'6379:6379'" in content:
+        issues.append("[WARN] Redis 端口 6379 映射到宿主机，生产环境建议移除")
+    if "saas_pass" in content:
+        issues.append("[FAIL] docker-compose 中包含硬编码默认密码 saas_pass")
+    if "${REDIS_PASSWORD:-}" in content or 'REDIS_PASSWORD:-""' in content:
+        issues.append("[WARN] Redis 密码使用空默认值，应使用 ? 语法强制要求设置")
+    if "GF_SECURITY_ADMIN_PASSWORD:-admin" in content:
+        issues.append("[FAIL] Grafana 使用默认管理员密码 admin")
+
+    if not issues:
+        issues.append("[OK] Docker Compose 安全检查通过")
+
+    return issues
+
+
 def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == "--check":
             filepath = sys.argv[2] if len(sys.argv) > 2 else ".env"
             issues = check_env(filepath)
             for issue in issues:
+                print(issue)
+            print()
+            docker_issues = check_docker_compose()
+            for issue in docker_issues:
                 print(issue)
         else:
             print(f"未知参数: {sys.argv[1]}")

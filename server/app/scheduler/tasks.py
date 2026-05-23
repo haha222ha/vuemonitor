@@ -1,18 +1,19 @@
-import asyncio
 import logging
+import statistics
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timedelta
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 from sqlalchemy import select
 
-from app.core.database import async_session_factory
 from app.collect.engine import CollectEngine
-from app.models.collect import CollectTask
+from app.core.database import async_session_factory
 from app.models.admin import ProxyPool
+from app.models.collect import CollectTask
 from app.ws.manager import manager
+logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ async def process_pending_tasks():
                 await manager.send_to_user(str(task.user_id), {
                     "type": "collect:completed",
                     "data": {"task_id": str(task.id), "summary": summary},
-                    "ts": datetime.now(timezone.utc).isoformat(),
+                    "ts": datetime.now(UTC).isoformat(),
                 })
             except Exception as e:
                 logger.error(f"Task {task.id} failed: {e}")
@@ -74,7 +75,7 @@ async def check_proxy_health():
             if proxy.health_score <= 0 or proxy.fail_count >= 5:
                 proxy.status = "banned"
 
-            proxy.last_checked_at = datetime.now(timezone.utc)
+            proxy.last_checked_at = datetime.now(UTC)
 
         await db.commit()
 
@@ -83,7 +84,7 @@ async def cleanup_expired_tokens():
     async with async_session_factory() as db:
         from app.models.user import RefreshToken
         result = await db.execute(
-            select(RefreshToken).where(RefreshToken.expires_at < datetime.now(timezone.utc))
+            select(RefreshToken).where(RefreshToken.expires_at < datetime.now(UTC))
         )
         expired = result.scalars().all()
         for token in expired:
@@ -108,14 +109,14 @@ async def evaluate_monitor_rules():
 
 async def downgrade_expired_plans():
     async with async_session_factory() as db:
+        from app.models.license import LicenseCode
         from app.models.user import User
-        from app.models.license import LicenseCode, LicenseActivation
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         result = await db.execute(
             select(User).where(
                 User.plan != "free",
-                User.plan_expires_at != None,
+                User.plan_expires_at is not None,
                 User.plan_expires_at < now,
             )
         )
@@ -142,7 +143,7 @@ async def downgrade_expired_plans():
         result = await db.execute(
             select(LicenseCode).where(
                 LicenseCode.status == "active",
-                LicenseCode.expires_at != None,
+                LicenseCode.expires_at is not None,
                 LicenseCode.expires_at < now,
             )
         )
@@ -168,6 +169,131 @@ async def compute_feature_rankings():
                 logger.info(f"Feature rankings computed for {count} products")
         except Exception as e:
             logger.error(f"Feature ranking computation failed: {e}")
+
+
+async def auto_detect_anomalies():
+    from app.models.product import Product
+    from app.models.product import ProductFeature
+    from app.models.alert_rule import AlertEvent
+
+    METRICS = ["price", "sales_count"]
+    Z_THRESHOLD = 2.5
+    DAYS = 7
+    MIN_SAMPLES = 5
+
+    since = datetime.now(UTC) - timedelta(days=DAYS)
+
+    async with async_session_factory() as db:
+        result = await db.execute(
+            select(Product).where(Product.is_active == 1)
+        )
+        products = result.scalars().all()
+
+        total_anomalies = 0
+
+        for p in products:
+            feat_result = await db.execute(
+                select(ProductFeature)
+                .where(
+                    ProductFeature.product_id == p.id,
+                    ProductFeature.collected_at >= since,
+                )
+                .order_by(ProductFeature.collected_at.desc())
+                .limit(30)
+            )
+            features = feat_result.scalars().all()
+
+            if len(features) < MIN_SAMPLES:
+                continue
+
+            for metric in METRICS:
+                values = []
+                for f in features:
+                    v = getattr(f, metric, None)
+                    if v is not None:
+                        values.append(float(v))
+
+                if len(values) < MIN_SAMPLES:
+                    continue
+
+                latest_val = values[0]
+                historical = values[1:]
+
+                if len(historical) < 2:
+                    continue
+
+                mean_val = statistics.mean(historical)
+                stdev_val = statistics.stdev(historical)
+
+                if stdev_val == 0:
+                    continue
+
+                z_score = (latest_val - mean_val) / stdev_val
+
+                if abs(z_score) < Z_THRESHOLD:
+                    continue
+
+                direction = "up" if z_score > 0 else "down"
+                severity = "critical" if abs(z_score) >= 3.0 else "warning"
+
+                metric_labels = {"price": "价格", "sales_count": "销量"}
+                direction_labels = {"up": "异常升高", "down": "异常下降"}
+
+                recent_event = await db.execute(
+                    select(AlertEvent).where(
+                        AlertEvent.user_id == p.user_id,
+                        AlertEvent.is_acknowledged == False,
+                        AlertEvent.created_at >= datetime.now(UTC) - timedelta(hours=24),
+                    )
+                )
+                recent = recent_event.scalars().first()
+                if recent and recent.context:
+                    ctx = recent.context if isinstance(recent.context, dict) else {}
+                    if ctx.get("product_id") == str(p.id) and ctx.get("metric") == metric:
+                        continue
+
+                event = AlertEvent(
+                    rule_id=uuid.UUID("00000000-0000-0000-0000-000000000000"),
+                    user_id=p.user_id,
+                    severity=severity,
+                    title=f"{p.product_name or p.platform_product_id} {metric_labels.get(metric, metric)}{direction_labels[direction]}",
+                    detail=f"商品「{p.product_name or p.platform_product_id}」的{metric_labels.get(metric, metric)}出现异常{direction_labels[direction]}，当前值 {latest_val:.2f}，历史均值 {mean_val:.2f}，Z-score {z_score:.2f}",
+                    metric_value=latest_val,
+                    threshold_value=Z_THRESHOLD,
+                    context={
+                        "auto_detect": True,
+                        "product_id": str(p.id),
+                        "product_name": p.product_name,
+                        "platform": p.platform,
+                        "metric": metric,
+                        "direction": direction,
+                        "z_score": round(z_score, 2),
+                        "mean": round(mean_val, 2),
+                        "stdev": round(stdev_val, 2),
+                        "latest_value": latest_val,
+                    },
+                )
+                db.add(event)
+                total_anomalies += 1
+
+                try:
+                    await manager.send_to_user(str(p.user_id), {
+                        "type": "alert:anomaly",
+                        "data": {
+                            "product_name": p.product_name,
+                            "metric": metric,
+                            "direction": direction,
+                            "z_score": round(z_score, 2),
+                            "severity": severity,
+                        },
+                        "ts": datetime.now(UTC).isoformat(),
+                    })
+                except Exception:
+                    logger.warning("Silent exception")
+
+        if total_anomalies > 0:
+            await db.commit()
+            logger.info(f"Auto-detect found {total_anomalies} anomalies across {len(products)} products")
 
 
 def setup_scheduler():
@@ -216,6 +342,14 @@ def setup_scheduler():
         CronTrigger(hour="*/2", minute=30),
         id="compute_feature_rankings",
         name="计算商品群体排名",
+        replace_existing=True,
+    )
+
+    scheduler.add_job(
+        auto_detect_anomalies,
+        IntervalTrigger(hours=1),
+        id="auto_detect_anomalies",
+        name="自动异常检测",
         replace_existing=True,
     )
 

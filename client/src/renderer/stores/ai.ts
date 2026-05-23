@@ -163,11 +163,7 @@ export const useAIStore = defineStore("ai", () => {
     error.value = null;
     try {
       if (window.electronAPI) {
-        const sql = productId
-          ? "SELECT * FROM ai_analysis WHERE product_id = ? ORDER BY analyzed_at DESC LIMIT 50"
-          : "SELECT * FROM ai_analysis ORDER BY analyzed_at DESC LIMIT 100";
-        const params = productId ? [productId] : [];
-        const rows = await window.electronAPI.invoke("storage:query", sql, params);
+        const rows = await window.electronAPI.invoke("storage:get-ai-analyses", productId);
         analyses.value = (rows as AIAnalysisRecord[]) || [];
       } else {
         const { data } = await api.get("/ai/analyses", { params: { product_id: productId } });

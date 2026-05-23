@@ -1,7 +1,6 @@
 import logging
 import time
-import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel, Field
@@ -11,10 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException, UnauthorizedException
 from app.middleware.auth import CurrentUser
-from app.models.license import LicenseCode, LicenseActivation
-from app.models.user import User
+from app.models.license import LicenseActivation, LicenseCode
 from app.schemas.auth import LoginRequest, RefreshTokenRequest, RegisterRequest, TokenResponse, UserInfoResponse
 from app.services.auth_service import AuthService
+from app.services.operation_audit import record_operation
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +28,16 @@ _LOCKOUT_SECONDS = 300
 async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
     try:
         svc = AuthService(db)
-        return await svc.register(req)
+        result = await svc.register(req)
+        user_id = result.data.id if hasattr(result, "data") and result.data else None
+        await record_operation(
+            user_id=str(user_id) if user_id else "unknown",
+            action="auth:register",
+            resource_type="user",
+            resource_id=user_id,
+            ip_address="unknown",
+        )
+        return result
     except (BadRequestException, UnauthorizedException, ForbiddenException):
         raise
     except Exception as e:
@@ -51,6 +59,13 @@ async def login(req: LoginRequest, request: Request, db: AsyncSession = Depends(
         svc = AuthService(db)
         result = await svc.login(req)
         _login_attempts.pop(client_ip, None)
+        user_id = result.data.user_id if hasattr(result, "data") and result.data else None
+        await record_operation(
+            user_id=str(user_id) if user_id else "unknown",
+            action="auth:login",
+            resource_type="session",
+            ip_address=client_ip,
+        )
         return result
     except (UnauthorizedException, ForbiddenException):
         raise
@@ -93,7 +108,7 @@ async def activate_license(
     if license_obj.status == "revoked":
         raise BadRequestException(message="授权码已被吊销")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     if license_obj.expires_at and license_obj.expires_at < now:
         raise BadRequestException(message="授权码已过期")
@@ -138,6 +153,15 @@ async def activate_license(
             user.plan_expires_at = license_obj.expires_at
 
     await db.flush()
+
+    await record_operation(
+        user_id=str(user.id),
+        action="settings:license_update",
+        resource_type="license",
+        resource_id=str(license_obj.id),
+        detail=f"code={clean_code[:4]}***, plan={license_obj.plan}",
+        ip_address="unknown",
+    )
 
     return {
         "code": 0,

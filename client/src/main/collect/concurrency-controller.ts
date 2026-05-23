@@ -1,4 +1,5 @@
-import { EventEmitter } from "events";
+﻿import { EventEmitter } from "events";
+import { logger } from "../logger/logger";
 
 export interface ConcurrencyConfig {
   min: number;
@@ -120,7 +121,7 @@ export class ConcurrencyController extends EventEmitter {
           });
         }
       }
-    } catch {}
+    } catch (err) { logger.warn("[Main] operation failed:", err); }
   }
 
   destroy(): void {

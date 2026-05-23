@@ -1,8 +1,7 @@
-import smtplib
 import logging
-from email.mime.text import MIMEText
+import smtplib
 from email.mime.multipart import MIMEMultipart
-from typing import Optional
+from email.mime.text import MIMEText
 
 from app.config import get_settings
 
@@ -22,7 +21,7 @@ class EmailService:
         to_email: str,
         subject: str,
         content: str,
-        html_content: Optional[str] = None,
+        html_content: str | None = None,
     ) -> bool:
         if not self.is_configured:
             logger.warning("SMTP not configured, skipping email notification")

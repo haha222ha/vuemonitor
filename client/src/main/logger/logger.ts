@@ -1,6 +1,7 @@
 import { app } from "electron";
 import * as fs from "fs";
 import * as path from "path";
+import axios from "axios";
 
 export type LogLevel = "debug" | "info" | "warn" | "error" | "fatal";
 
@@ -97,7 +98,7 @@ export class StructuredLogger {
           fs.unlinkSync(path.join(this.logDir, toDelete));
         }
       }
-    } catch {}
+    } catch (err) { console.warn("[Main] operation failed:", err); }
   }
 
   private checkRotation(): void {
@@ -115,7 +116,7 @@ export class StructuredLogger {
         this.openStream();
         this.cleanOldLogs();
       }
-    } catch {}
+    } catch (err) { console.warn("[Main] operation failed:", err); }
   }
 
   debug(module: string, message: string, data?: Record<string, unknown>): void {
@@ -218,7 +219,7 @@ export class StructuredLogger {
     try {
       this.writeStream.write(lines);
       this.checkRotation();
-    } catch {}
+    } catch (err) { console.warn("[Main] operation failed:", err); }
   }
 
   getRecentLogs(count: number = 100, level?: LogLevel, module?: string): LogEntry[] {
@@ -233,9 +234,9 @@ export class StructuredLogger {
           if (level && LOG_LEVEL_PRIORITY[entry.level] < LOG_LEVEL_PRIORITY[level]) continue;
           if (module && entry.module !== module) continue;
           entries.push(entry);
-        } catch {}
+        } catch (err) { console.warn("[Main] operation failed:", err); }
       }
-    } catch {}
+    } catch (err) { console.warn("[Main] operation failed:", err); }
 
     return entries.slice(-count);
   }
@@ -255,7 +256,7 @@ export class StructuredLogger {
         });
       }
       files.sort((a, b) => b.modified.localeCompare(a.modified));
-    } catch {}
+    } catch (err) { console.warn("[Main] operation failed:", err); }
     return files;
   }
 
@@ -272,9 +273,9 @@ export class StructuredLogger {
         for (const line of lines) {
           try {
             allEntries.push(JSON.parse(line) as LogEntry);
-          } catch {}
+          } catch (err) { console.warn("[Main] operation failed:", err); }
         }
-      } catch {}
+      } catch (err) { console.warn("[Main] operation failed:", err); }
     }
 
     allEntries.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
@@ -306,7 +307,6 @@ export class StructuredLogger {
     const batch = this.uploadQueue.splice(0, 50);
 
     try {
-      const axios = require("axios");
       await axios.post(this.config.uploadEndpoint!, {
         logs: batch,
         sessionId: this.sessionId,
@@ -366,7 +366,7 @@ export class StructuredLogger {
       const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
       this.currentLogFile = path.join(this.logDir, `xhs365_${dateStr}.log`);
       this.openStream();
-    } catch {}
+    } catch (err) { console.warn("[Main] operation failed:", err); }
     return deleted;
   }
 

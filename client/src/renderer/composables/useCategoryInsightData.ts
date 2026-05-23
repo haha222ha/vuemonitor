@@ -1,8 +1,19 @@
 import { ref, computed, nextTick, watch } from "vue";
 import * as echarts from "echarts";
 import api, { isNetworkError } from "../utils/api";
+import type { HeatmapItem } from "@shared/types";
 
 const TREND_COLORS = ["#6366F1", "#EF4444", "#10B981", "#F59E0B", "#8B5CF6", "#06B6D4", "#EC4899", "#14B8A6", "#A855F7", "#F97316"];
+
+interface CategoryStatItem {
+  category: string;
+  count: number;
+  avg_price: number;
+  avg_sales: number;
+  product_count?: number;
+  heat_score?: number;
+  heat_level?: "hot" | "warm" | "cold";
+}
 
 export function useCategoryInsightData() {
   const selectedCategory = ref("");
@@ -11,13 +22,13 @@ export function useCategoryInsightData() {
   const heatmapMode = ref("treemap");
   const refreshing = ref(false);
 
-  const heatmapData = ref<any[]>([]);
+  const heatmapData = ref<HeatmapItem[]>([]);
   const heatmapLoading = ref(false);
-  const patterns = ref<any>(null);
+  const patterns = ref<Record<string, any> | null>(null);
   const patternsLoading = ref(false);
   const trendSeries = ref<Record<string, any[]>>({});
   const trendLoading = ref(false);
-  const categoryStatsList = ref<any[]>([]);
+  const categoryStatsList = ref<CategoryStatItem[]>([]);
 
   const heatmapChartRef = ref<HTMLElement>();
   const lifecycleChartRef = ref<HTMLElement>();
@@ -89,7 +100,7 @@ export function useCategoryInsightData() {
       const params: Record<string, any> = {};
       if (selectedCategory.value) params.category = selectedCategory.value;
       const { data } = await api.get("/feature/category-stats", { params });
-      if (data?.categories) categoryStatsList.value = data.categories;
+      if (data?.categories) categoryStatsList.value = data.categories as CategoryStatItem[];
     } catch (err) { if (isNetworkError(err)) categoryStatsList.value = []; }
   }
 
@@ -98,7 +109,7 @@ export function useCategoryInsightData() {
     try {
       const { data } = await api.get("/feature/crowd/category-heatmap");
       if (data?.heatmap) {
-        heatmapData.value = data.heatmap;
+        heatmapData.value = data.heatmap as HeatmapItem[];
         await nextTick();
         renderHeatmapChart();
       }
@@ -130,7 +141,7 @@ export function useCategoryInsightData() {
       if (selectedCategory.value) params.category = selectedCategory.value;
       const { data } = await api.get("/feature/crowd/trend-timeseries", { params });
       if (data?.series) {
-        trendSeries.value = data.series;
+        trendSeries.value = data.series as Record<string, any[]>;
         await nextTick();
         renderTrendChart();
       }
@@ -162,9 +173,15 @@ export function useCategoryInsightData() {
       heatmapChart.setOption({
         backgroundColor: "transparent",
         tooltip: {
-          formatter(params: any) {
-            const d = params.data; const meta = d._meta || {};
-            return `<strong>${d.name}</strong><br/>热度: ${d.value}<br/>商品数: ${meta.product_count || '-'}<br/>均价: ${meta.avg_price != null ? '¥' + meta.avg_price.toFixed(0) : '-'}<br/>均销量: ${meta.avg_sales != null ? formatNumber(meta.avg_sales) : '-'}<br/>均评分: ${meta.avg_rating != null ? meta.avg_rating.toFixed(1) : '-'}`;
+          formatter(params: { data?: { name?: string; value?: number; _meta?: Record<string, unknown> } }) {
+            const d = params.data;
+            if (!d) return "";
+            const meta = d._meta || {};
+            const pc = meta.product_count as number | undefined;
+            const ap = meta.avg_price as number | null | undefined;
+            const as_ = meta.avg_sales as number | null | undefined;
+            const ar = meta.avg_rating as number | null | undefined;
+            return `<strong>${d.name}</strong><br/>热度: ${d.value}<br/>商品数: ${pc ?? '-'}<br/>均价: ${ap != null ? '¥' + ap.toFixed(0) : '-'}<br/>均销量: ${as_ != null ? formatNumber(as_) : '-'}<br/>均评分: ${ar != null ? ar.toFixed(1) : '-'}`;
           },
         },
         series: [{
@@ -193,7 +210,7 @@ export function useCategoryInsightData() {
     if (!lifecycleChartRef.value || !patterns.value?.lifecycle_distribution?.length) return;
     if (!lifecycleChart) lifecycleChart = echarts.init(lifecycleChartRef.value);
     const dist = patterns.value.lifecycle_distribution;
-    const data = dist.map((d: any) => ({ name: lifecycleLabel(d.stage) || d.stage, value: d.count }));
+    const data = dist.map((d: any) => ({ name: lifecycleLabel(String(d.stage || "")) || d.stage, value: d.count }));
     lifecycleChart.setOption({
       backgroundColor: "transparent", tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
       series: [{ type: "pie", radius: ["40%", "70%"], center: ["50%", "50%"], data, label: { fontSize: 11, color: "#94A3B8" }, itemStyle: { borderRadius: 4, borderColor: "var(--color-bg-card)", borderWidth: 2 }, emphasis: { label: { fontSize: 13, fontWeight: "bold" } }, color: ["#6366F1", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#06B6D4"] }],
@@ -204,7 +221,7 @@ export function useCategoryInsightData() {
     if (!trendDistChartRef.value || !patterns.value?.trend_distribution?.length) return;
     if (!trendDistChart) trendDistChart = echarts.init(trendDistChartRef.value);
     const dist = patterns.value.trend_distribution;
-    const data = dist.map((d: any) => ({ name: trendLabel(d.trend) || d.trend, value: d.count, itemStyle: { color: d.trend === "up" ? "#10B981" : d.trend === "down" ? "#EF4444" : "#6366F1" } }));
+    const data = dist.map((d: any) => ({ name: trendLabel(String(d.trend || "")) || d.trend, value: d.count, itemStyle: { color: d.trend === "up" ? "#10B981" : d.trend === "down" ? "#EF4444" : "#6366F1" } }));
     trendDistChart.setOption({
       backgroundColor: "transparent", tooltip: { trigger: "item", formatter: "{b}: {c} ({d}%)" },
       series: [{ type: "pie", radius: ["40%", "70%"], center: ["50%", "50%"], data, label: { fontSize: 11, color: "#94A3B8" }, itemStyle: { borderRadius: 4, borderColor: "var(--color-bg-card)", borderWidth: 2 }, emphasis: { label: { fontSize: 13, fontWeight: "bold" } } }],
@@ -215,7 +232,7 @@ export function useCategoryInsightData() {
     if (!priceBandChartRef.value || !patterns.value?.price_bands?.length) return;
     if (!priceBandChart) priceBandChart = echarts.init(priceBandChartRef.value);
     const bands = patterns.value.price_bands;
-    const names = bands.map((b: any) => priceBandLabel(b.band));
+    const names = bands.map((b: any) => priceBandLabel(String(b.band || "")));
     const counts = bands.map((b: any) => b.count);
     const avgSales = bands.map((b: any) => b.avg_sales || 0);
     priceBandChart.setOption({
@@ -236,17 +253,17 @@ export function useCategoryInsightData() {
     const metric = trendMetric.value;
     const metricLabels: Record<string, string> = { avg_sales: "平均销量", avg_price: "平均价格", avg_rating: "平均评分", product_count: "商品数" };
     const categories = Object.keys(trendSeries.value);
-    const series: any[] = [];
+    const series: Record<string, unknown>[] = [];
     let allDates: string[] = [];
     for (const cat of categories) {
       const points = trendSeries.value[cat];
-      if (points.length === 0) continue;
-      const dates = points.map((p: any) => p.period?.substring(0, 10) || "");
+      if (!points || points.length === 0) continue;
+      const dates = points.map((p: any) => String(p.period || "").substring(0, 10) || "");
       if (dates.length > allDates.length) allDates = dates;
     }
     for (let i = 0; i < categories.length; i++) {
       const cat = categories[i];
-      const points = trendSeries.value[cat];
+      const points = trendSeries.value[cat] || [];
       const values = points.map((p: any) => p[metric] ?? null);
       series.push({
         name: cat, type: "line", data: values, smooth: true,

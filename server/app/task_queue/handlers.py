@@ -1,16 +1,20 @@
 import logging
+from datetime import UTC
+
 from app.task_queue.queue import register_handler
 
 logger = logging.getLogger(__name__)
 
 
 async def handle_collect_task(payload: dict) -> dict:
-    from app.core.database import async_session_factory
+    from datetime import datetime
+
+    from sqlalchemy import select
+
     from app.collect.engine import CollectEngine
+    from app.core.database import async_session_factory
     from app.models.collect import CollectTask
     from app.ws.manager import manager
-    from datetime import datetime, timezone
-    from sqlalchemy import select
 
     task_id = payload.get("task_id")
     if not task_id:
@@ -29,17 +33,18 @@ async def handle_collect_task(payload: dict) -> dict:
         await manager.send_to_user(str(task.user_id), {
             "type": "collect:completed",
             "data": {"task_id": str(task.id), "summary": summary},
-            "ts": datetime.now(timezone.utc).isoformat(),
+            "ts": datetime.now(UTC).isoformat(),
         })
 
     return {"status": "completed", "summary": summary}
 
 
 async def handle_ai_analysis(payload: dict) -> dict:
-    from app.core.database import async_session_factory
-    from app.services.ai_service import AIService
     from sqlalchemy import select
+
+    from app.core.database import async_session_factory
     from app.models.product import Product
+    from app.services.ai_service import AIService
 
     product_id = payload.get("product_id")
     analysis_type = payload.get("analysis_type", "basic")

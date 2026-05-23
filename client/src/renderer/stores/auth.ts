@@ -70,7 +70,7 @@ export const useAuthStore = defineStore("auth", () => {
 
     if (window.electronAPI) {
       const result = await window.electronAPI.invoke("auth:register", nickname, password, email, baseUrl) as Record<string, unknown>;
-      if ((result as any).error) {
+      if (result.error) {
         throw new Error((result.message as string) || "注册失败");
       }
     } else {
@@ -86,8 +86,8 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       const { data } = await api.get("/auth/me");
       user.value = data;
-    } catch (err: any) {
-      if (err?.response?.status === 401) {
+    } catch (err: unknown) {
+      if ((err as { response?: { status?: number } })?.response?.status === 401) {
         logout();
       }
     }

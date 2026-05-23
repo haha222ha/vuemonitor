@@ -1,9 +1,11 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, String, UniqueConstraint
+
+from sqlalchemy import DateTime, ForeignKey, Index, Integer, String, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin, Base
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 
 class UserQuota(UUIDPrimaryKeyMixin, TimestampMixin, Base):

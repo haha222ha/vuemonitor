@@ -1,9 +1,9 @@
 <template>
   <div class="license__activate">
     <div class="license__activate-card">
-      <el-form :model="form" :rules="rules" ref="formRef" label-width="80px">
+      <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="授权码" prop="licenseKey">
-          <el-input v-model="form.licenseKey" placeholder="VM-XXXX-XXXX-XXXX-XXXX" maxlength="27" @input="formatLicenseKey" style="font-family: monospace; letter-spacing: 2px" />
+          <el-input v-model="form.licenseKey" placeholder="VM-XXXX-XXXX-XXXX-XXXX" maxlength="27" style="font-family: monospace; letter-spacing: 2px" @input="formatLicenseKey" />
         </el-form-item>
         <el-form-item label="验证方式">
           <el-radio-group v-model="form.verifyMode">
@@ -20,7 +20,7 @@
         <el-alert :title="licenseStore.error" type="error" show-icon :closable="false" />
       </div>
 
-      <el-button type="primary" size="large" :loading="licenseStore.loading" @click="$emit('activate')" class="license__activate-btn">激活</el-button>
+      <el-button type="primary" size="large" :loading="licenseStore.loading" class="license__activate-btn" @click="$emit('activate')">激活</el-button>
 
       <div class="license__device-info">
         <span>设备ID: {{ deviceInfo?.deviceId || '获取中...' }}</span>

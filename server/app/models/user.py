@@ -5,7 +5,7 @@ from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.models.base import TimestampMixin, UUIDPrimaryKeyMixin, Base
+from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 
 class User(UUIDPrimaryKeyMixin, TimestampMixin, Base):
