@@ -1,14 +1,13 @@
-import sys
 import os
-import json
+import sys
 import uuid
-from datetime import datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 client = TestClient(app)
@@ -104,9 +103,7 @@ class TestProductsContract:
 
     def test_list_products_platform_filter(self):
         resp = client.get("/api/v1/products?platform=xhs", headers=get_auth_headers())
-        if resp.status_code == 200:
-            data = resp.json()
-            assert resp.status_code == 200
+        assert resp.status_code == 200
 
     def test_product_detail_404(self):
         resp = client.get(f"/api/v1/products/{uuid.uuid4()}", headers=get_auth_headers())

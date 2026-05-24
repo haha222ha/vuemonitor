@@ -1,17 +1,17 @@
-import sys
 import os
+import sys
 import uuid
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 
-from app.main import app
-from app.core.security import create_access_token
 from app.core.database import get_db
+from app.core.security import create_access_token
+from app.main import app
 from app.models.user import User
 
 

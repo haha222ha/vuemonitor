@@ -1,5 +1,7 @@
 import logging
+import time
 import uuid
+from collections import OrderedDict
 from contextvars import ContextVar
 from datetime import UTC, datetime
 
@@ -11,7 +13,7 @@ logger = logging.getLogger(__name__)
 _trace_id_var: ContextVar[str] = ContextVar("trace_id", default="")
 _span_id_var: ContextVar[str] = ContextVar("span_id", default="")
 
-_traces: dict[str, dict] = {}
+_traces: OrderedDict[str, dict] = OrderedDict()
 MAX_TRACES = 1000
 
 
@@ -49,6 +51,9 @@ class TracingMiddleware(BaseHTTPMiddleware):
             "spans": [],
         })
 
+        if len(_traces) > MAX_TRACES:
+            _traces.popitem(last=False)
+
         span = {
             "span_id": span_id,
             "parent_span_id": parent_span_id,
@@ -61,7 +66,6 @@ class TracingMiddleware(BaseHTTPMiddleware):
             },
         }
 
-        import time
         start = time.time()
 
         try:
@@ -76,10 +80,6 @@ class TracingMiddleware(BaseHTTPMiddleware):
             span["duration_ms"] = round((time.time() - start) * 1000, 2)
             span["end_time"] = datetime.now(UTC).isoformat()
             trace["spans"].append(span)
-
-            if len(_traces) > MAX_TRACES:
-                oldest = min(_traces.keys(), key=lambda k: _traces[k].get("start_time", ""))
-                _traces.pop(oldest, None)
 
         response.headers["X-Trace-ID"] = trace_id
         response.headers["X-Span-ID"] = span_id

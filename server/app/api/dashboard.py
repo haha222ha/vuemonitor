@@ -288,7 +288,7 @@ async def get_dashboard_trend(
         return {"code": 0, "data": cached}
 
     now = datetime.now(UTC)
-    start_date = datetime.utcnow() - timedelta(days=days)
+    start_date = datetime.now(UTC) - timedelta(days=days)
 
     product_daily_result = await db.execute(
         text("""

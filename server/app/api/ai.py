@@ -274,7 +274,7 @@ async def get_recommendations(
 
     unack_events = await db.execute(
         select(AlertEvent)
-        .where(AlertEvent.user_id == user.id, not AlertEvent.is_acknowledged)
+        .where(AlertEvent.user_id == user.id, AlertEvent.is_acknowledged.is_(False))
         .order_by(AlertEvent.severity.desc(), AlertEvent.created_at.desc())
         .limit(limit),
     )

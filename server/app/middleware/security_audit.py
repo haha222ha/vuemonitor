@@ -11,6 +11,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 
 from app.core.database import engine
+
 logger = logging.getLogger(__name__)
 
 SENSITIVE_HEADERS = {"authorization", "cookie", "x-api-key", "x-csrf-token"}
@@ -63,14 +64,19 @@ class SecurityAuditMiddleware(BaseHTTPMiddleware):
 
         auth_header = request.headers.get("authorization", "")
         if auth_header.startswith("Bearer "):
-            try:
-                from app.core.security import decode_access_token
-                payload = decode_access_token(auth_header[7:])
-                audit_record["user_id"] = payload.get("sub")
-            except Exception:
-                _audit_logger = logging.getLogger("security.audit")
-                _audit_logger.debug("Failed to decode access token in audit middleware", exc_info=True)
-                audit_record["risk_flags"].append("invalid_token")
+            cached_payload = getattr(request.state, "jwt_payload", None)
+            if cached_payload and isinstance(cached_payload, dict):
+                audit_record["user_id"] = cached_payload.get("sub")
+            else:
+                try:
+                    from app.core.security import decode_access_token
+                    payload = decode_access_token(auth_header[7:])
+                    request.state.jwt_payload = payload
+                    audit_record["user_id"] = payload.get("sub")
+                except Exception:
+                    _audit_logger = logging.getLogger("security.audit")
+                    _audit_logger.debug("Failed to decode access token in audit middleware", exc_info=True)
+                    audit_record["risk_flags"].append("invalid_token")
 
         body_risk = {"score": 0, "flags": []}
         if request.method in AUDITED_METHODS:
@@ -180,7 +186,7 @@ class SecurityAuditMiddleware(BaseHTTPMiddleware):
                         result["score"] += OVERSIZED_SCORE
                         result["flags"].append("oversized_body")
             except json.JSONDecodeError:
-                logger.warning("Silent exception")
+                logger.debug("Request body JSON decode failed in security audit")
 
         except Exception:
             logging.getLogger("security.audit").debug("Body analysis failed in audit", exc_info=True)

@@ -35,7 +35,7 @@ class AipicWorker:
             try:
                 await self._task
             except asyncio.CancelledError:
-                logger.warning("Silent exception")
+                logger.debug("AIPIC worker %s task cancelled", self.worker_id)
 
     def get_status(self) -> dict:
         return {

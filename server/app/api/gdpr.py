@@ -25,6 +25,9 @@ GDPR_TABLES = [
     ("scheduled_tasks", "user_id"),
 ]
 
+_ALLOWED_TABLES = {t[0] for t in GDPR_TABLES}
+_ALLOWED_COLUMNS = {t[1] for t in GDPR_TABLES}
+
 
 @router.get("/data-summary")
 async def get_data_summary(
@@ -33,6 +36,8 @@ async def get_data_summary(
 ):
     summary = {}
     for table_name, user_col in GDPR_TABLES:
+        if table_name not in _ALLOWED_TABLES or user_col not in _ALLOWED_COLUMNS:
+            continue
         try:
             from sqlalchemy import text
             result = await db.execute(

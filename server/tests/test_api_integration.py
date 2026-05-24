@@ -1,8 +1,8 @@
 import os
 import sys
 import uuid
-from datetime import datetime, timedelta, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -24,8 +24,8 @@ os.environ.setdefault("DEBUG", "true")
 os.environ.setdefault("OPENAI_API_KEY", "sk-test-key")
 os.environ.setdefault("DEEPSEEK_API_KEY", "sk-test-deepseek-key")
 
-from app.core.security import create_access_token, hash_password
 from app.core.database import get_db
+from app.core.security import create_access_token, hash_password
 from app.main import app
 
 
@@ -395,7 +395,7 @@ class TestSyncAPI:
             r = await client.post("/api/v1/sync/push", json={
                 "platform": "xhs",
                 "platform_product_id": "test123",
-                "features": [{"price": 99.9, "collected_at": datetime.now(timezone.utc).isoformat()}],
+                "features": [{"price": 99.9, "collected_at": datetime.now(UTC).isoformat()}],
             }, headers=_auth_headers(user))
             assert r.status_code in (200, 201, 401, 403, 422)
 

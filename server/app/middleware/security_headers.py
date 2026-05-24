@@ -1,3 +1,5 @@
+import secrets
+
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
@@ -20,15 +22,19 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
         if settings.is_production:
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+
+            nonce = secrets.token_urlsafe(16)
             response.headers["Content-Security-Policy"] = (
-                "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
-                "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
-                "font-src 'self' https://fonts.gstatic.com; "
-                "img-src 'self' data: https:; "
-                "connect-src 'self' https://api.deepseek.com https://api.openai.com; "
-                "frame-ancestors 'none'"
+                f"default-src 'self'; "
+                f"script-src 'self' 'nonce-{nonce}'; "
+                f"style-src 'self' 'nonce-{nonce}' https://fonts.googleapis.com; "
+                f"font-src 'self' https://fonts.gstatic.com; "
+                f"img-src 'self' data: https:; "
+                f"connect-src 'self' https://api.deepseek.com https://api.openai.com wss:; "
+                f"frame-ancestors 'none'"
             )
+            response.headers["X-CSP-Nonce"] = nonce
+
             for header_name in SENSITIVE_RESPONSE_HEADERS:
                 if header_name in response.headers:
                     value = response.headers[header_name]

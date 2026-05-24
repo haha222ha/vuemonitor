@@ -26,8 +26,8 @@ class ForbiddenException(AppException):
 
 
 class BadRequestException(AppException):
-    def __init__(self, message: str = "请求参数错误", detail: dict | None = None):
-        super().__init__(code=ERROR_CODES["BAD_REQUEST"], message=message, detail=detail)
+    def __init__(self, message: str = "请求参数错误", detail: dict | None = None, code: int | None = None):
+        super().__init__(code=code or ERROR_CODES["BAD_REQUEST"], message=message, detail=detail)
 
 
 def register_exception_handlers(app: FastAPI) -> None:

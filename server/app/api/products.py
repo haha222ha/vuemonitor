@@ -2,7 +2,7 @@ import csv
 import io
 import re
 import uuid
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, Query
 from fastapi.responses import StreamingResponse
@@ -527,6 +527,18 @@ async def export_products_csv(
     result = await db.execute(query.order_by(Product.updated_at.desc()))
     products = result.scalars().all()
 
+    product_ids = [p.id for p in products]
+    latest_features: dict[uuid.UUID, ProductFeature] = {}
+    if product_ids:
+        feat_result = await db.execute(
+            select(ProductFeature)
+            .where(ProductFeature.product_id.in_(product_ids))
+            .order_by(ProductFeature.product_id, ProductFeature.collected_at.desc())
+        )
+        for feat in feat_result.scalars().all():
+            if feat.product_id not in latest_features:
+                latest_features[feat.product_id] = feat
+
     output = io.StringIO()
     writer = csv.writer(output)
     writer.writerow([
@@ -536,13 +548,7 @@ async def export_products_csv(
     ])
 
     for p in products:
-        feat_result = await db.execute(
-            select(ProductFeature)
-            .where(ProductFeature.product_id == p.id)
-            .order_by(ProductFeature.collected_at.desc())
-            .limit(1)
-        )
-        feat = feat_result.scalar_one_or_none()
+        feat = latest_features.get(p.id)
 
         writer.writerow([
             str(p.id),
@@ -584,15 +590,21 @@ async def export_products_json(
     result = await db.execute(query.order_by(Product.updated_at.desc()))
     products = result.scalars().all()
 
-    export_data = []
-    for p in products:
+    product_ids = [p.id for p in products]
+    latest_features: dict[uuid.UUID, ProductFeature] = {}
+    if product_ids:
         feat_result = await db.execute(
             select(ProductFeature)
-            .where(ProductFeature.product_id == p.id)
-            .order_by(ProductFeature.collected_at.desc())
-            .limit(1)
+            .where(ProductFeature.product_id.in_(product_ids))
+            .order_by(ProductFeature.product_id, ProductFeature.collected_at.desc())
         )
-        feat = feat_result.scalar_one_or_none()
+        for feat in feat_result.scalars().all():
+            if feat.product_id not in latest_features:
+                latest_features[feat.product_id] = feat
+
+    export_data = []
+    for p in products:
+        feat = latest_features.get(p.id)
 
         product_data = {
             "id": str(p.id),
@@ -619,7 +631,7 @@ async def export_products_json(
 
         export_data.append(product_data)
 
-    return {"code": 0, "data": export_data, "total": len(export_data)}
+    return {"code": 0, "data": {"items": export_data, "total": len(export_data)}}
 
 
 @router.post("/compare")
@@ -648,14 +660,14 @@ async def compare_products(
     )
     all_features = feat_result.scalars().all()
 
-    latest_features: dict = {}
+    latest_features: dict[uuid.UUID, ProductFeature] = {}
     for feat in all_features:
         if feat.product_id not in latest_features:
             latest_features[feat.product_id] = feat
 
     compare_items = []
     for p in products:
-        feat = latest_features.get(p.id)
+        feat: ProductFeature | None = latest_features.get(p.id)
         compare_items.append({
             "id": str(p.id),
             "product_name": p.product_name,
@@ -674,15 +686,15 @@ async def compare_products(
         })
 
     metrics = ["price", "original_price", "sales_count", "monthly_sales", "rating", "review_count", "favorite_count"]
-    comparison = {}
+    comparison: dict[str, dict] = {}
     for metric in metrics:
         values = [(item["product_name"], item[metric]) for item in compare_items if item[metric] is not None]
         if not values:
-            comparison[metric] = {"best": None, "worst": None, "values": values}
+            comparison[metric] = {"best": None, "worst": None, "values": [], "direction": ""}
             continue
 
         if metric in ("price", "original_price"):
-            sorted_vals = sorted(values, key=lambda x: x[1])
+            sorted_vals = sorted(values, key=lambda x: x[1] if x[1] is not None else 0)
             comparison[metric] = {
                 "best": sorted_vals[0],
                 "worst": sorted_vals[-1],
@@ -690,7 +702,7 @@ async def compare_products(
                 "direction": "lower_better",
             }
         else:
-            sorted_vals = sorted(values, key=lambda x: x[1], reverse=True)
+            sorted_vals = sorted(values, key=lambda x: x[1] if x[1] is not None else 0, reverse=True)
             comparison[metric] = {
                 "best": sorted_vals[0],
                 "worst": sorted_vals[-1],
@@ -725,7 +737,7 @@ async def get_product_growth_24h(
     from datetime import timedelta
 
 
-    now_24h_ago = datetime.utcnow() - timedelta(hours=24)
+    now_24h_ago = datetime.now(UTC) - timedelta(hours=24)
 
     feat_result = await db.execute(
         select(ProductFeature)
@@ -827,7 +839,7 @@ async def compare_products_trends(
     if len(products) < 2:
         raise BadRequestException(message="有效商品不足2个")
 
-    since = datetime.utcnow() - timedelta(days=days)
+    since = datetime.now(UTC) - timedelta(days=days)
     product_id_list = [p.id for p in products]
 
     feat_result = await db.execute(
@@ -898,7 +910,7 @@ async def get_product_sparkline(
 
     from datetime import timedelta
 
-    since = datetime.utcnow() - timedelta(days=days)
+    since = datetime.now(UTC) - timedelta(days=days)
     feat_result = await db.execute(
         select(
             ProductFeature.collected_at,

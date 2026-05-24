@@ -123,14 +123,19 @@ class RedisRateLimitMiddleware(BaseHTTPMiddleware):
         return default_limits.get(method, (60, 60))
 
     def _get_user_plan(self, request: Request) -> str:
+        cached_payload = getattr(request.state, "jwt_payload", None)
+        if cached_payload and isinstance(cached_payload, dict):
+            return cached_payload.get("plan", _DEFAULT_PLAN)
+
         auth_header = request.headers.get("Authorization", "")
         if auth_header.startswith("Bearer "):
             try:
                 from app.core.security import decode_access_token
                 payload = decode_access_token(auth_header[7:])
+                request.state.jwt_payload = payload
                 return payload.get("plan", _DEFAULT_PLAN)
             except Exception:
-                logger.warning("Silent exception")
+                logger.debug("JWT decode failed in rate limit middleware")
         return _DEFAULT_PLAN
 
     def _get_client_id(self, request: Request) -> str:

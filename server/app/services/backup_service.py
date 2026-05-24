@@ -169,7 +169,7 @@ class BackupService:
                             shutil.rmtree(str(d))
                             removed += 1
                     except ValueError:
-                        logger.warning("Silent exception")
+                        logger.warning("Invalid timestamp in backup metadata for %s: %s", d.name, ts_str)
 
         logger.info(f"Cleaned up {removed} old backups (retention={retention_days}d)")
         return removed

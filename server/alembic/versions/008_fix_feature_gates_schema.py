@@ -16,7 +16,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.drop_index("idx_fg_usage_user_feature", table_name="feature_gate_usage")
+    op.execute("DROP INDEX IF EXISTS idx_fg_usage_user_feature")
 
     op.alter_column("feature_gates", "feature_key", new_column_name="gate_key")
     op.alter_column("feature_gates", "feature_name", new_column_name="gate_name")

@@ -113,8 +113,8 @@ class DiscoveryDatabase:
         for conn in self._pool:
             try:
                 await conn.close()
-            except Exception:
-                logger.warning("Silent exception")
+            except Exception as e:
+                logger.warning("Failed to close discovery DB connection: %s", e)
         self._pool.clear()
         self._initialized = False
 

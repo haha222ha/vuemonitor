@@ -1,21 +1,19 @@
 import asyncio
 import json
+import statistics
 import time
 import uuid
-import statistics
-from datetime import datetime, timezone
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
+from datetime import UTC, datetime
 
 import aiohttp
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import async_session_factory
-from app.collect.engine import CollectEngine, RiskDetector
-from app.collect.session_manager import SessionManager
+from app.collect.engine import RiskDetector
 from app.collect.rate_controller import AdaptiveRateController
-from app.models.collect import CollectTask, CollectTaskItem
-from app.models.admin import RiskEvent
+from app.collect.session_manager import SessionManager
+from app.core.database import async_session_factory
 
 
 @dataclass
@@ -40,7 +38,7 @@ class BenchmarkResult:
     timestamp: str = ""
 
     def __post_init__(self):
-        self.timestamp = datetime.now(timezone.utc).isoformat()
+        self.timestamp = datetime.now(UTC).isoformat()
 
 
 @dataclass
@@ -102,7 +100,7 @@ async def run_concurrency_benchmark(
                         else:
                             results["success"] += 1
                             rate_controller.on_success()
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     elapsed = (time.monotonic() - start) * 1000
                     response_times.append(elapsed)
                     results["failed"] += 1
@@ -300,7 +298,7 @@ async def run_full_benchmark() -> dict:
     print(f"  Total Risks: {risk_result['total_risks']}")
 
     report = {
-        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "generated_at": datetime.now(UTC).isoformat(),
         "benchmarks": results,
         "summary": {
             "max_safe_concurrency": _determine_safe_concurrency(results),

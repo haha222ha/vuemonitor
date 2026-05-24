@@ -1,5 +1,6 @@
 import statistics
 import uuid
+from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
@@ -339,23 +340,27 @@ async def auto_detect_anomalies(
     since = datetime.now(UTC) - timedelta(days=days)
 
     result = await db.execute(
-        select(Product).where(Product.user_id == user.id, Product.is_active == 1)
+        select(Product).where(Product.user_id == user.id, Product.is_active)
     )
     products = result.scalars().all()
 
     anomalies = []
 
-    for p in products:
-        feat_result = await db.execute(
+    features_by_product: dict[uuid.UUID, list[ProductFeature]] = defaultdict(list)
+    if products:
+        product_ids = [p.id for p in products]
+        all_features_result = await db.execute(
             select(ProductFeature)
-            .where(
-                ProductFeature.product_id == p.id,
-                ProductFeature.collected_at >= since,
-            )
-            .order_by(ProductFeature.collected_at.desc())
-            .limit(30)
+            .where(ProductFeature.product_id.in_(product_ids), ProductFeature.collected_at >= since)
+            .order_by(ProductFeature.product_id, ProductFeature.collected_at.desc())
         )
-        features = feat_result.scalars().all()
+        for f in all_features_result.scalars():
+            pid = f.product_id
+            if len(features_by_product[pid]) < 30:
+                features_by_product[pid].append(f)
+
+    for p in products:
+        features = features_by_product.get(p.id, [])
 
         if len(features) < min_samples:
             continue

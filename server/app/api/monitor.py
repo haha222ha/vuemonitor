@@ -1,5 +1,6 @@
 import uuid
-from datetime import datetime, timedelta
+from collections import defaultdict
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, Field
@@ -224,7 +225,7 @@ async def auto_detect_anomalies(
     days: int = Query(7, ge=1, le=30),
     threshold: float = Query(2.0, ge=1.0, le=5.0, description="标准差倍数阈值"),
 ):
-    since = datetime.utcnow() - timedelta(days=days)
+    since = datetime.now(UTC) - timedelta(days=days)
 
     result = await db.execute(
         select(Product).where(Product.user_id == user.id, Product.is_active)
@@ -232,13 +233,19 @@ async def auto_detect_anomalies(
     products = result.scalars().all()
 
     anomalies = []
-    for p in products:
-        feat_result = await db.execute(
+    features_by_product: dict[uuid.UUID, list[ProductFeature]] = defaultdict(list)
+    if products:
+        product_ids = [p.id for p in products]
+        all_features_result = await db.execute(
             select(ProductFeature)
-            .where(ProductFeature.product_id == p.id, ProductFeature.collected_at >= since)
-            .order_by(ProductFeature.collected_at.asc())
+            .where(ProductFeature.product_id.in_(product_ids), ProductFeature.collected_at >= since)
+            .order_by(ProductFeature.product_id, ProductFeature.collected_at.asc())
         )
-        features = feat_result.scalars().all()
+        for f in all_features_result.scalars():
+            features_by_product[f.product_id].append(f)
+
+    for p in products:
+        features = features_by_product.get(p.id, [])
         if len(features) < 3:
             continue
 

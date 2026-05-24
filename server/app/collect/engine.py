@@ -16,7 +16,6 @@ from app.models.admin import ProxyPool, RiskEvent
 from app.models.collect import CollectTask, CollectTaskItem
 from app.models.product import Product, ProductFeature
 from app.ws.manager import manager
-logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
@@ -189,8 +188,8 @@ class RiskDetector:
                             "risk_level": config["level"],
                             "detail": {"keyword": keyword, "api_msg": data.get("msg", "")},
                         }
-        except (json.JSONDecodeError, AttributeError):
-            logger.warning("Silent exception")
+        except (json.JSONDecodeError, AttributeError) as e:
+            logger.warning("Risk detection JSON parse failed: %s", e)
 
         return None
 
@@ -388,8 +387,8 @@ class CollectEngine:
                                     },
                                     "ts": datetime.now(UTC).isoformat(),
                                 })
-                            except Exception:
-                                logger.warning("Silent exception")
+                            except Exception as e:
+                                logger.warning("WS notify risk alert failed: %s", e)
                             break
                         else:
                             parser = get_parser(task.platform)
@@ -449,8 +448,8 @@ class CollectEngine:
                         },
                         "ts": datetime.now(UTC).isoformat(),
                     })
-                except Exception:
-                    logger.warning("Silent exception")
+                except Exception as e:
+                    logger.warning("WS notify progress failed: %s", e)
 
         await asyncio.gather(*[process_item(item) for item in items])
 
@@ -533,8 +532,8 @@ class CollectEngine:
                 text = await resp.text()
                 if resp.status == 200:
                     return {"raw_text": text, "status_code": resp.status}
-        except Exception:
-            logger.warning("Silent exception")
+        except Exception as e:
+            logger.warning("XHS primary fetch failed, trying fallback: %s", e)
 
         headers2 = dict(fingerprint)
         headers2["Referer"] = f"https://www.xiaohongshu.com/goods/{target_id}"

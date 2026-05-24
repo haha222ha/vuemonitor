@@ -1,10 +1,11 @@
+import logging
 import time
 
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 
 from app.core.redis import get_redis
-import logging
+
 logger = logging.getLogger(__name__)
 
 _metrics: dict[str, dict] = {}
@@ -119,7 +120,7 @@ async def collect_system_metrics():
             gauge_set("db_pool_checked_out", pool_stats["checked_out"])
             gauge_set("db_pool_overflow", pool_stats["overflow"])
         except Exception:
-            logger.warning("Silent exception")
+            logger.debug("DB pool metrics collection failed")
 
         try:
             redis = await get_redis()
@@ -128,9 +129,9 @@ async def collect_system_metrics():
             gauge_set("redis_used_memory_bytes", info.get("used_memory", 0))
             gauge_set("redis_keys_count", info.get("db0", {}).get("keys", 0) if isinstance(info.get("db0"), dict) else 0)
         except Exception:
-            logger.warning("Silent exception")
+            logger.debug("Redis metrics collection failed")
 
     except ImportError:
-        logger.warning("Silent exception")
+        logger.debug("psutil not available for system metrics")
     except Exception:
-        logger.warning("Silent exception")
+        logger.debug("System metrics collection failed")

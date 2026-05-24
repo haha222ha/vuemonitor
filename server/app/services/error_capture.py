@@ -81,8 +81,7 @@ class ErrorCapture:
             _events.pop(0)
 
     def _send_to_sentry(self, event: dict):
-        import json
-        import urllib.request
+        import asyncio
 
         payload = {
             "event_id": event["event_id"],
@@ -105,6 +104,18 @@ class ErrorCapture:
             },
             "extra": event.get("extra", {}),
         }
+
+        try:
+            loop = asyncio.get_running_loop()
+            loop.run_in_executor(None, self._send_to_sentry_sync, payload)
+        except RuntimeError:
+            self._send_to_sentry_sync(payload)
+        except Exception as e:
+            logger.warning(f"Failed to schedule Sentry send: {e}")
+
+    def _send_to_sentry_sync(self, payload: dict):
+        import json
+        import urllib.request
 
         try:
             data = json.dumps(payload).encode("utf-8")

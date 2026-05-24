@@ -70,9 +70,8 @@ class AlertService:
             await client.post(url, json=payload, headers=headers)
 
     async def _send_email(self, config: dict, alert: dict):
-        from app.services.email_service import EmailService
+        from app.services.email_service import email_service
 
-        email_service = EmailService()
         recipients = config.get("recipients", [])
         if not recipients:
             return
@@ -85,8 +84,8 @@ class AlertService:
         for recipient in recipients:
             try:
                 await email_service.send_email(recipient, subject, body)
-            except Exception:
-                logger.warning("Silent exception")
+            except Exception as e:
+                logger.warning("alert_email_send_failed", recipient=recipient, error=str(e))
 
     def _send_log(self, alert: dict):
         settings = get_settings()

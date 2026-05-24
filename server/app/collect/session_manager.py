@@ -108,8 +108,8 @@ class SessionManager:
                 data = json.loads(path.read_text(encoding="utf-8"))
                 if isinstance(data, list):
                     return data
-            except Exception:
-                logger.warning("Silent exception")
+            except Exception as e:
+                logger.warning("Failed to load cookies for %s: %s", platform, e)
         return []
 
     async def _save_cookies(self, platform: str, cookie_jar: aiohttp.CookieJar):
@@ -151,8 +151,8 @@ class SessionManager:
                     {c["name"]: c["value"]},
                     response_url=None,
                 )
-            except Exception:
-                logger.warning("Silent exception")
+            except Exception as e:
+                logger.warning("Failed to update cookie '%s': %s", c.get("name", "?"), e)
 
         connector = aiohttp.TCPConnector(
             limit=20,
@@ -183,12 +183,12 @@ class SessionManager:
         if old_session and not old_session.closed:
             try:
                 await self._save_cookies(platform, old_session.cookie_jar)
-            except Exception:
-                logger.warning("Silent exception")
+            except Exception as e:
+                logger.warning("Failed to save cookies during rotation for %s: %s", platform, e)
             try:
                 await old_session.close()
-            except Exception:
-                logger.warning("Silent exception")
+            except Exception as e:
+                logger.warning("Failed to close session during rotation for %s: %s", platform, e)
         self._session_fingerprints[session_key] = self.generate_fingerprint()
 
     async def _warmup(self, session: aiohttp.ClientSession, platform: str, fingerprint: dict):
@@ -209,8 +209,8 @@ class SessionManager:
                 ) as _resp:
                     pass
                 await asyncio.sleep(random.uniform(0.5, 1.5))
-            except Exception:
-                logger.warning("Silent exception")
+            except Exception as e:
+                logger.warning("Warmup request failed for %s: %s", platform, e)
 
     async def close_all(self):
         for key, session in self._sessions.items():
@@ -218,12 +218,12 @@ class SessionManager:
                 platform = key.split(":")[0]
                 try:
                     await self._save_cookies(platform, session.cookie_jar)
-                except Exception:
-                    logger.warning("Silent exception")
+                except Exception as e:
+                    logger.warning("Failed to save cookies on close for %s: %s", platform, e)
                 try:
                     await session.close()
-                except Exception:
-                    logger.warning("Silent exception")
+                except Exception as e:
+                    logger.warning("Failed to close session on shutdown for %s: %s", platform, e)
         self._sessions.clear()
         self._session_fingerprints.clear()
         self._request_counts.clear()

@@ -1,4 +1,6 @@
 import hashlib
+import logging
+import os
 import secrets
 import uuid
 from datetime import UTC, datetime, timedelta
@@ -7,13 +9,25 @@ from shared.constants.feature_gates import PLAN_FEATURES_MAP, PLAN_LIMITS
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config import get_settings
 from app.core.exceptions import BadRequestException, NotFoundException
 from app.models.license import LicenseActivation, LicenseChangeLog, LicenseCode
 from app.models.user import User
 
 _PLAN_CODES = {"F": "free", "P": "pro", "M": "premium", "E": "enterprise"}
 _PLAN_REVERSE = {v: k for k, v in _PLAN_CODES.items()}
-_CHECKSUM_SECRET = "xhs365_license_checksum_v2"
+
+_DEFAULT_CHECKSUM_SECRET = "xhs365_license_checksum_v2"
+_CHECKSUM_SECRET = (
+    getattr(get_settings(), "LICENSE_CHECKSUM_SECRET", None)
+    or os.getenv("LICENSE_CHECKSUM_SECRET")
+    or _DEFAULT_CHECKSUM_SECRET
+)
+
+if _CHECKSUM_SECRET == _DEFAULT_CHECKSUM_SECRET:
+    logging.getLogger(__name__).warning(
+        "LICENSE_CHECKSUM_SECRET using default value - set env var LICENSE_CHECKSUM_SECRET for production"
+    )
 
 
 class LicenseService:

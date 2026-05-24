@@ -22,7 +22,7 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 
 _admin_login_attempts: dict[str, list[float]] = {}
 _ADMIN_MAX_ATTEMPTS = 5
-_ADMIN_LOCKOUT_SECONDS = 300
+_ADMIN_LOCKOUT_SECONDS = 900
 
 
 class AdminLoginRequest(BaseModel):

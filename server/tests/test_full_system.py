@@ -1,11 +1,11 @@
-import sys
-import os
 import asyncio
-import uuid
+import os
+import sys
 import time
 import traceback
-from datetime import datetime, timedelta, timezone
-from unittest.mock import AsyncMock, MagicMock, patch
+import uuid
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -106,7 +106,7 @@ def test_imports():
                     record(module, f"{mod_path} ({classes})", PASS)
             else:
                 record(module, mod_path, PASS)
-        except Exception as e:
+        except Exception:
             record(module, f"{mod_path}", FAIL, traceback.format_exc()[:200])
 
 
@@ -116,8 +116,12 @@ def test_imports():
 def test_security():
     module = "SECURITY"
     from app.core.security import (
-        hash_password, verify_password, create_access_token,
-        create_refresh_token, decode_access_token, decode_refresh_token,
+        create_access_token,
+        create_refresh_token,
+        decode_access_token,
+        decode_refresh_token,
+        hash_password,
+        verify_password,
     )
 
     def t_hash_verify():
@@ -186,7 +190,7 @@ def test_security():
 # ═══════════════════════════════════════════════════════════════
 def test_config():
     module = "CONFIG"
-    from app.config import get_settings, Settings
+    from app.config import Settings, get_settings
 
     def t_type():
         s = get_settings()
@@ -236,8 +240,11 @@ def test_config():
 def test_exceptions():
     module = "EXCEPTIONS"
     from app.core.exceptions import (
-        AppException, NotFoundException, UnauthorizedException,
-        ForbiddenException, BadRequestException, register_exception_handlers,
+        BadRequestException,
+        ForbiddenException,
+        NotFoundException,
+        UnauthorizedException,
+        register_exception_handlers,
     )
 
     def t_not_found():
@@ -286,7 +293,7 @@ def test_exceptions():
 # ═══════════════════════════════════════════════════════════════
 def test_schemas():
     module = "SCHEMA"
-    from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse
+    from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
 
     def t_register_valid():
         r = RegisterRequest(email="test@example.com", nickname="test", password="TestPass123")
@@ -348,7 +355,7 @@ def test_schemas():
 # ═══════════════════════════════════════════════════════════════
 def test_feature_gates():
     module = "FEATURE_GATE"
-    from shared.constants.feature_gates import PLAN_LIMITS, PLAN_HIERARCHY, is_plan_sufficient
+    from shared.constants.feature_gates import PLAN_LIMITS, is_plan_sufficient
 
     def t_all_plans():
         if all(k in PLAN_LIMITS for k in ["free", "pro", "premium", "enterprise"]):
@@ -614,7 +621,7 @@ def test_ws_manager():
 # ═══════════════════════════════════════════════════════════════
 def test_ai_providers():
     module = "AI_PROVIDER"
-    from app.ai.providers import get_provider, ANALYSIS_PROMPTS
+    from app.ai.providers import ANALYSIS_PROMPTS, get_provider
 
     def t_basic():
         if "basic_analysis" in ANALYSIS_PROMPTS:
@@ -744,14 +751,14 @@ def test_api_routes():
 # ═══════════════════════════════════════════════════════════════
 def test_models():
     module = "MODELS"
-    from app.models.user import User, RefreshToken
-    from app.models.product import Product, ProductFeature
-    from app.models.monitor import MonitorRule, Notification
+    from app.models.admin import ProxyPool
+    from app.models.ai import AIAnalysis
     from app.models.collect import CollectTask, CollectTaskItem
-    from app.models.admin import ProxyPool, AdminAuditLog, RiskEvent
-    from app.models.license import LicenseCode
-    from app.models.ai import AIAnalysis, AIReport
     from app.models.feature_gate import FeatureGate, FeatureGateUsage
+    from app.models.license import LicenseCode
+    from app.models.monitor import MonitorRule, Notification
+    from app.models.product import Product, ProductFeature
+    from app.models.user import RefreshToken, User
 
     model_checks = [
         ("User", User, ["email", "nickname", "password_hash", "plan", "role", "is_active"]),
@@ -784,10 +791,11 @@ def test_models():
 # ═══════════════════════════════════════════════════════════════
 def test_api_endpoints():
     module = "API_E2E"
-    from httpx import AsyncClient, ASGITransport
-    from app.main import app
+    from httpx import ASGITransport, AsyncClient
+
     from app.core.database import get_db
     from app.core.security import create_access_token, hash_password
+    from app.main import app
 
     mock_user = MagicMock()
     mock_user.id = uuid.uuid4()
@@ -908,7 +916,7 @@ def test_api_endpoints():
 
             r = await client.post("/api/v1/sync/push", json={
                 "platform": "xhs", "platform_product_id": "test123",
-                "features": [{"price": 99.9, "collected_at": datetime.now(timezone.utc).isoformat()}]
+                "features": [{"price": 99.9, "collected_at": datetime.now(UTC).isoformat()}]
             }, headers={"Authorization": f"Bearer {user_token}"})
             if r.status_code in (200, 201, 401, 403, 404, 422, 500):
                 record(module, "POST /sync/push (可达)", PASS)
@@ -994,7 +1002,7 @@ def test_error_codes():
 # ═══════════════════════════════════════════════════════════════
 def test_scheduler():
     module = "SCHEDULER"
-    from app.scheduler.tasks import process_pending_tasks, check_proxy_health
+    from app.scheduler.tasks import check_proxy_health, process_pending_tasks
 
     if asyncio.iscoroutinefunction(process_pending_tasks):
         record(module, "process_pending_tasks 是协程函数", PASS)
@@ -1012,8 +1020,8 @@ def test_scheduler():
 # ═══════════════════════════════════════════════════════════════
 def test_login_rate_limit():
     module = "RATE_LIMIT"
-    from app.api.auth import _MAX_ATTEMPTS, _LOCKOUT_SECONDS
-    from app.api.admin import _ADMIN_MAX_ATTEMPTS, _ADMIN_LOCKOUT_SECONDS
+    from app.api.admin import _ADMIN_LOCKOUT_SECONDS, _ADMIN_MAX_ATTEMPTS
+    from app.api.auth import _LOCKOUT_SECONDS, _MAX_ATTEMPTS
 
     if _MAX_ATTEMPTS > 0:
         record(module, "用户登录最大尝试次数 > 0", PASS)

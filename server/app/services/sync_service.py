@@ -1,12 +1,15 @@
+import logging
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import select, func, and_
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.product import Product, ProductFeature
 from app.models.category import ProductCategory
+from app.models.product import Product, ProductFeature
 from app.ws.manager import manager
+
+logger = logging.getLogger(__name__)
 
 
 class SyncService:
@@ -121,124 +124,128 @@ class SyncService:
 
         for cat_data in categories:
             try:
-                cat_id = uuid.UUID(cat_data["id"]) if "id" in cat_data else uuid.uuid4()
-                result = await self.db.execute(
-                    select(ProductCategory).where(ProductCategory.id == cat_id)
-                )
-                existing = result.scalar_one_or_none()
-
-                if existing:
-                    for key in ["name", "icon", "color", "sort_order", "parent_id"]:
-                        if key in cat_data:
-                            setattr(existing, key, cat_data[key])
-                else:
-                    category = ProductCategory(
-                        id=cat_id,
-                        user_id=user_id,
-                        name=cat_data.get("name", ""),
-                        icon=cat_data.get("icon"),
-                        color=cat_data.get("color"),
-                        sort_order=cat_data.get("sort_order", 0),
-                        parent_id=uuid.UUID(cat_data["parent_id"]) if cat_data.get("parent_id") else None,
+                async with self.db.begin_nested():
+                    cat_id = uuid.UUID(cat_data["id"]) if "id" in cat_data else uuid.uuid4()
+                    result = await self.db.execute(
+                        select(ProductCategory).where(ProductCategory.id == cat_id)
                     )
-                    self.db.add(category)
-                stats["categories"] += 1
+                    existing = result.scalar_one_or_none()
+
+                    if existing:
+                        for key in ["name", "icon", "color", "sort_order", "parent_id"]:
+                            if key in cat_data:
+                                setattr(existing, key, cat_data[key])
+                    else:
+                        category = ProductCategory(
+                            id=cat_id,
+                            user_id=user_id,
+                            name=cat_data.get("name", ""),
+                            icon=cat_data.get("icon"),
+                            color=cat_data.get("color"),
+                            sort_order=cat_data.get("sort_order", 0),
+                            parent_id=uuid.UUID(cat_data["parent_id"]) if cat_data.get("parent_id") else None,
+                        )
+                        self.db.add(category)
+                    stats["categories"] += 1
             except Exception as e:
                 logger.warning(f"sync category failed: {e}")
                 stats["errors"] += 1
 
         for prod_data in products:
             try:
-                prod_id = uuid.UUID(prod_data["id"]) if "id" in prod_data else uuid.uuid4()
-                result = await self.db.execute(
-                    select(Product).where(
-                        Product.user_id == user_id,
-                        Product.id == prod_id,
+                async with self.db.begin_nested():
+                    prod_id = uuid.UUID(prod_data["id"]) if "id" in prod_data else uuid.uuid4()
+                    result = await self.db.execute(
+                        select(Product).where(
+                            Product.user_id == user_id,
+                            Product.id == prod_id,
+                        )
                     )
-                )
-                existing = result.scalar_one_or_none()
+                    existing = result.scalar_one_or_none()
 
-                if existing:
-                    for key in ["product_name", "shop_name", "image_url", "category_id", "category", "product_url", "is_active"]:
-                        if key in prod_data:
-                            if key == "category_id" and prod_data[key]:
-                                prod_data[key] = uuid.UUID(prod_data[key])
-                            if key == "is_active":
-                                setattr(existing, key, int(prod_data[key]))
-                            else:
-                                setattr(existing, key, prod_data[key])
-                else:
-                    product = Product(
-                        id=prod_id,
-                        user_id=user_id,
-                        platform=prod_data.get("platform", "xhs"),
-                        platform_product_id=prod_data.get("platform_product_id", ""),
-                        product_name=prod_data.get("product_name"),
-                        shop_name=prod_data.get("shop_name"),
-                        image_url=prod_data.get("image_url"),
-                        category_id=uuid.UUID(prod_data["category_id"]) if prod_data.get("category_id") else None,
-                        category=prod_data.get("category"),
-                        product_url=prod_data.get("product_url"),
-                        is_active=int(prod_data.get("is_active", True)),
-                        last_collected_at=datetime.fromisoformat(prod_data["last_collected_at"]) if prod_data.get("last_collected_at") else None,
-                    )
-                    self.db.add(product)
-                stats["products"] += 1
+                    if existing:
+                        for key in ["product_name", "shop_name", "image_url", "category_id", "category", "product_url", "is_active"]:
+                            if key in prod_data:
+                                if key == "category_id" and prod_data[key]:
+                                    prod_data[key] = uuid.UUID(prod_data[key])
+                                if key == "is_active":
+                                    setattr(existing, key, int(prod_data[key]))
+                                else:
+                                    setattr(existing, key, prod_data[key])
+                    else:
+                        product = Product(
+                            id=prod_id,
+                            user_id=user_id,
+                            platform=prod_data.get("platform", "xhs"),
+                            platform_product_id=prod_data.get("platform_product_id", ""),
+                            product_name=prod_data.get("product_name"),
+                            shop_name=prod_data.get("shop_name"),
+                            image_url=prod_data.get("image_url"),
+                            category_id=uuid.UUID(prod_data["category_id"]) if prod_data.get("category_id") else None,
+                            category=prod_data.get("category"),
+                            product_url=prod_data.get("product_url"),
+                            is_active=int(prod_data.get("is_active", True)),
+                            last_collected_at=datetime.fromisoformat(prod_data["last_collected_at"]) if prod_data.get("last_collected_at") else None,
+                        )
+                        self.db.add(product)
+                    stats["products"] += 1
             except Exception as e:
                 logger.warning(f"sync product failed: {e}")
                 stats["errors"] += 1
 
         for feat_data in features:
             try:
-                feat_id = uuid.UUID(feat_data["id"]) if "id" in feat_data else uuid.uuid4()
-                product_id = uuid.UUID(feat_data["product_id"]) if feat_data.get("product_id") else None
-                if not product_id:
-                    continue
+                async with self.db.begin_nested():
+                    feat_id = uuid.UUID(feat_data["id"]) if "id" in feat_data else uuid.uuid4()
+                    product_id = uuid.UUID(feat_data["product_id"]) if feat_data.get("product_id") else None
+                    if not product_id:
+                        continue
 
-                pf = ProductFeature(
-                    id=feat_id,
-                    product_id=product_id,
-                    price=feat_data.get("price"),
-                    original_price=feat_data.get("original_price"),
-                    sales_count=feat_data.get("sales_count"),
-                    monthly_sales=feat_data.get("monthly_sales"),
-                    rating=feat_data.get("rating"),
-                    review_count=feat_data.get("review_count"),
-                    favorite_count=feat_data.get("favorite_count"),
-                    stock_status=feat_data.get("stock_status"),
-                    extra_features=feat_data.get("extra_features", {}),
-                    source=feat_data.get("source", "local"),
-                    collected_at=datetime.fromisoformat(feat_data["collected_at"]) if feat_data.get("collected_at") else datetime.now(UTC),
-                )
-                self.db.add(pf)
-                stats["features"] += 1
+                    pf = ProductFeature(
+                        id=feat_id,
+                        product_id=product_id,
+                        price=feat_data.get("price"),
+                        original_price=feat_data.get("original_price"),
+                        sales_count=feat_data.get("sales_count"),
+                        monthly_sales=feat_data.get("monthly_sales"),
+                        rating=feat_data.get("rating"),
+                        review_count=feat_data.get("review_count"),
+                        favorite_count=feat_data.get("favorite_count"),
+                        stock_status=feat_data.get("stock_status"),
+                        extra_features=feat_data.get("extra_features", {}),
+                        source=feat_data.get("source", "local"),
+                        collected_at=datetime.fromisoformat(feat_data["collected_at"]) if feat_data.get("collected_at") else datetime.now(UTC),
+                    )
+                    self.db.add(pf)
+                    stats["features"] += 1
             except Exception as e:
                 logger.warning(f"sync feature failed: {e}")
                 stats["errors"] += 1
 
         for deletion in deletions:
             try:
-                del_type = deletion.get("type")
-                del_id = deletion.get("id")
-                if not del_type or not del_id:
-                    continue
+                async with self.db.begin_nested():
+                    del_type = deletion.get("type")
+                    del_id = deletion.get("id")
+                    if not del_type or not del_id:
+                        continue
 
-                if del_type == "product":
-                    result = await self.db.execute(
-                        select(Product).where(Product.id == uuid.UUID(del_id), Product.user_id == user_id)
-                    )
-                    product = result.scalar_one_or_none()
-                    if product:
-                        product.is_active = 0
-                        stats["deletions"] += 1
-                elif del_type == "category":
-                    result = await self.db.execute(
-                        select(ProductCategory).where(ProductCategory.id == uuid.UUID(del_id), ProductCategory.user_id == user_id)
-                    )
-                    category = result.scalar_one_or_none()
-                    if category:
-                        await self.db.delete(category)
-                        stats["deletions"] += 1
+                    if del_type == "product":
+                        result = await self.db.execute(
+                            select(Product).where(Product.id == uuid.UUID(del_id), Product.user_id == user_id)
+                        )
+                        product = result.scalar_one_or_none()
+                        if product:
+                            product.is_active = 0
+                            stats["deletions"] += 1
+                    elif del_type == "category":
+                        result = await self.db.execute(
+                            select(ProductCategory).where(ProductCategory.id == uuid.UUID(del_id), ProductCategory.user_id == user_id)
+                        )
+                        category = result.scalar_one_or_none()
+                        if category:
+                            await self.db.delete(category)
+                            stats["deletions"] += 1
             except Exception as e:
                 logger.warning(f"sync deletion failed: {e}")
                 stats["errors"] += 1
@@ -341,7 +348,7 @@ class SyncService:
             if include_products:
                 del_query = select(Product).where(
                     Product.user_id == user_id,
-                    Product.is_active == 0,
+                    not Product.is_active,
                     Product.updated_at >= since,
                 )
                 del_result = await self.db.execute(del_query)
@@ -375,7 +382,7 @@ class SyncService:
 
     async def get_sync_status(self, user_id: uuid.UUID) -> dict:
         product_count = await self.db.scalar(
-            select(func.count()).select_from(Product).where(Product.user_id == user_id, Product.is_active == 1)
+            select(func.count()).select_from(Product).where(Product.user_id == user_id, Product.is_active)
         )
         feature_count = await self.db.scalar(
             select(func.count()).select_from(ProductFeature)

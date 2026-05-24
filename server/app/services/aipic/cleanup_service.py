@@ -44,8 +44,8 @@ async def _cleanup_temp_files():
             if mtime < cutoff:
                 os.remove(filepath)
                 cleaned += 1
-        except Exception:
-            logger.warning("Silent exception")
+        except Exception as e:
+            logger.warning("Failed to clean temp file %s: %s", filename, e)
 
     if cleaned > 0:
         logger.info(f"AI作图清理了 {cleaned} 个过期临时文件")
@@ -104,6 +104,6 @@ async def stop_aipic_cleanup():
         try:
             await _cleanup_task
         except asyncio.CancelledError:
-            logger.warning("Silent exception")
+            logger.debug("AIPIC cleanup task cancelled during shutdown")
         _cleanup_task = None
     logger.info("AI作图清理Worker已停止")

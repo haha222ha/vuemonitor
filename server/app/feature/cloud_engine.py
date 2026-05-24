@@ -484,46 +484,35 @@ class CloudFeatureEngine:
 
     async def _save_ranking(self, ranking: ProductRanking) -> None:
 
-        result = await self.db.execute(
-            text("""
-                SELECT EXISTS (
-                    SELECT 1 FROM information_schema.tables
-                    WHERE table_name = 'product_rankings'
-                )
-            """)
-        )
-        exists = result.scalar()
-
-        if not exists:
-            await self.db.execute(text("""
-                CREATE TABLE product_rankings (
-                    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-                    category VARCHAR(100),
-                    price_percentile FLOAT,
-                    sales_percentile FLOAT,
-                    rating_percentile FLOAT,
-                    overall_rank INTEGER,
-                    category_rank INTEGER,
-                    category_total INTEGER,
-                    lifecycle_stage VARCHAR(20),
-                    trend_short VARCHAR(10),
-                    trend_long VARCHAR(10),
-                    sales_velocity FLOAT,
-                    growth_rate_7d FLOAT,
-                    growth_rate_30d FLOAT,
-                    volatility FLOAT,
-                    competition_index FLOAT,
-                    calculated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-                )
-            """))
-            await self.db.execute(text("""
-                CREATE INDEX IF NOT EXISTS idx_product_rankings_product_id ON product_rankings(product_id)
-            """))
-            await self.db.execute(text("""
-                CREATE UNIQUE INDEX IF NOT EXISTS idx_product_rankings_product_unique
-                ON product_rankings(product_id)
-            """))
+        await self.db.execute(text("""
+            CREATE TABLE IF NOT EXISTS product_rankings (
+                id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+                category VARCHAR(100),
+                price_percentile FLOAT,
+                sales_percentile FLOAT,
+                rating_percentile FLOAT,
+                overall_rank INTEGER,
+                category_rank INTEGER,
+                category_total INTEGER,
+                lifecycle_stage VARCHAR(20),
+                trend_short VARCHAR(10),
+                trend_long VARCHAR(10),
+                sales_velocity FLOAT,
+                growth_rate_7d FLOAT,
+                growth_rate_30d FLOAT,
+                volatility FLOAT,
+                competition_index FLOAT,
+                calculated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+            )
+        """))
+        await self.db.execute(text("""
+            CREATE INDEX IF NOT EXISTS idx_product_rankings_product_id ON product_rankings(product_id)
+        """))
+        await self.db.execute(text("""
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_product_rankings_product_unique
+            ON product_rankings(product_id)
+        """))
 
         await self.db.execute(text("""
             INSERT INTO product_rankings

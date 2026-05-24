@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, func
+from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, desc, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -31,4 +31,5 @@ class ProductMetrics(UUIDPrimaryKeyMixin, Base):
     __table_args__ = (
         Index("idx_product_metrics_product_id", "product_id"),
         Index("idx_product_metrics_snapshot_time", "snapshot_time"),
+        Index("idx_product_metrics_product_snapshot", "product_id", desc("snapshot_time")),
     )

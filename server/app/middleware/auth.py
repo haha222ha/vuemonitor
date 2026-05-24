@@ -11,6 +11,7 @@ from app.core.database import get_db
 from app.core.exceptions import ForbiddenException, UnauthorizedException
 from app.core.security import decode_access_token
 from app.models.user import User
+from app.services.token_blacklist import is_token_blacklisted
 
 bearer_scheme = HTTPBearer()
 
@@ -26,6 +27,10 @@ async def get_current_user(
             raise UnauthorizedException(message="Token无效")
     except Exception:
         raise UnauthorizedException(message="Token无效或已过期")
+
+    token_jti = payload.get("jti")
+    if token_jti and await is_token_blacklisted(token_jti):
+        raise UnauthorizedException(message="Token已失效，请重新登录")
 
     result = await db.execute(select(User).where(User.id == uuid.UUID(user_id)))
     user = result.scalar_one_or_none()

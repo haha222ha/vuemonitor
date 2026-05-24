@@ -35,7 +35,8 @@ async_session_factory = async_sessionmaker(
     expire_on_commit=False,
 )
 
-_slow_query_threshold = 2.0
+_slow_query_threshold = settings.DB_SLOW_QUERY_THRESHOLD
+_pool_leak_threshold = settings.DB_POOL_LEAK_THRESHOLD
 
 
 @event.listens_for(engine.sync_engine, "before_cursor_execute")
@@ -50,6 +51,13 @@ def _after_cursor_execute(conn, cursor, statement, parameters, context, executem
         logger.warning(
             f"Slow query detected ({elapsed:.2f}s): {statement[:200]}..."
         )
+    pool = engine.pool
+    if hasattr(pool, "checkedout"):
+        total_capacity = settings.DB_POOL_SIZE + settings.DB_MAX_OVERFLOW
+        if total_capacity > 0 and pool.checkedout() / total_capacity > _pool_leak_threshold:
+            logger.warning(
+                f"DB pool near exhaustion: {pool.checkedout()}/{total_capacity} connections in use"
+            )
 
 
 class Base(DeclarativeBase):

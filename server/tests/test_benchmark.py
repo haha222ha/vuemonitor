@@ -1,18 +1,15 @@
-import sys
+import json
 import os
+import sys
 import time
 import uuid
-import json
-import asyncio
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-import pytest
-import requests
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 client = TestClient(app)
@@ -74,7 +71,7 @@ class TestBenchmark:
         latencies = []
         for _ in range(30):
             start = time.perf_counter()
-            resp = client.get("/api/v1/products?page=1&page_size=20", headers=self._auth_headers())
+            client.get("/api/v1/products?page=1&page_size=20", headers=self._auth_headers())
             elapsed = (time.perf_counter() - start) * 1000
             latencies.append(elapsed)
 
@@ -88,7 +85,7 @@ class TestBenchmark:
         latencies = []
         for _ in range(20):
             start = time.perf_counter()
-            resp = client.post("/api/v1/auth/login", json={
+            client.post("/api/v1/auth/login", json={
                 "account": TEST_ACCOUNT,
                 "password": TEST_PASSWORD,
             })

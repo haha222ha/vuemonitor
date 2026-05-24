@@ -227,15 +227,14 @@ class AlertRuleEngine:
             recipients = channels["email"] if isinstance(channels["email"], list) else [channels["email"]]
             for recipient in recipients:
                 try:
-                    from app.services.email_service import EmailService
-                    email_service = EmailService()
+                    from app.services.email_service import email_service
                     await email_service.send_email(
                         recipient,
                         f"[{event.severity.upper()}] {event.title}",
                         event.detail,
                     )
-                except Exception:
-                    logger.warning("Silent exception")
+                except Exception as e:
+                    logger.error("alert_rule_engine_email_failed", extra={"recipient": recipient, "error": str(e)})
 
     async def get_events(
         self,

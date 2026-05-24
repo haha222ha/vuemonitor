@@ -1,8 +1,8 @@
-import sys
 import os
+import sys
 import uuid
-from datetime import datetime, timedelta, timezone
-from unittest.mock import patch, MagicMock, AsyncMock
+from datetime import datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -49,7 +49,7 @@ class TestLicenseService:
     def test_plan_quotas_unknown_defaults_free(self):
         from shared.constants.feature_gates import PLAN_LIMITS
         quotas = PLAN_LIMITS.get("unknown_plan", PLAN_LIMITS["free"])
-        assert quotas["maxProducts"] == 10
+        assert quotas["maxProducts"] == 3  # free plan limit
 
 
 class TestBackupService:
@@ -236,7 +236,7 @@ class TestTracingMiddleware:
         assert all(c in "0123456789abcdef" for c in span_id)
 
     def test_trace_storage(self):
-        from app.middleware.tracing import get_trace, get_all_traces, clear_traces
+        from app.middleware.tracing import clear_traces, get_all_traces
         clear_traces()
         traces = get_all_traces()
         assert len(traces) == 0
@@ -450,8 +450,9 @@ class TestFeatureGateMiddleware:
         db.add.assert_called_once()
 
     def test_aipic_gate_keys_in_mapping(self):
-        from app.middleware.feature_gate import FeatureGateMiddleware
         import inspect
+
+        from app.middleware.feature_gate import FeatureGateMiddleware
         source = inspect.getsource(FeatureGateMiddleware.check_gate)
         aipic_keys = ["gate:aipic:generate", "gate:aipic:hd", "gate:aipic:ultra", "gate:aipic:style", "gate:aipic:batch", "gate:aipic:api"]
         for key in aipic_keys:

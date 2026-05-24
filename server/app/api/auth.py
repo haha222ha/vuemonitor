@@ -1,5 +1,4 @@
 import logging
-import time
 from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, Request
@@ -7,21 +6,24 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.cache import rate_limit_sliding_window
 from app.core.database import get_db
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException, UnauthorizedException
+from app.core.redis import get_redis
+from app.core.security import decode_access_token
 from app.middleware.auth import CurrentUser
 from app.models.license import LicenseActivation, LicenseCode
 from app.schemas.auth import LoginRequest, RefreshTokenRequest, RegisterRequest, TokenResponse, UserInfoResponse
 from app.services.auth_service import AuthService
 from app.services.operation_audit import record_operation
+from app.services.token_blacklist import blacklist_token
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-_login_attempts: dict[str, list[float]] = {}
-_MAX_ATTEMPTS = 10
-_LOCKOUT_SECONDS = 300
+_LOGIN_MAX_ATTEMPTS = 5
+_LOGIN_LOCKOUT_SECONDS = 900
 
 
 @router.post("/register", response_model=UserInfoResponse)
@@ -48,17 +50,18 @@ async def register(req: RegisterRequest, db: AsyncSession = Depends(get_db)):
 @router.post("/login", response_model=TokenResponse)
 async def login(req: LoginRequest, request: Request, db: AsyncSession = Depends(get_db)):
     client_ip = request.client.host if request.client else "unknown"
-    now = time.time()
-    attempts = _login_attempts.get(client_ip, [])
-    attempts = [t for t in attempts if now - t < _LOCKOUT_SECONDS]
-    if len(attempts) >= _MAX_ATTEMPTS:
-        raise ForbiddenException(message=f"登录尝试过多，请{_LOCKOUT_SECONDS}秒后重试")
-    _login_attempts[client_ip] = attempts
+    login_rate_key = f"login_attempts:{client_ip}"
+    allowed, remaining = await rate_limit_sliding_window(
+        login_rate_key, _LOGIN_MAX_ATTEMPTS, _LOGIN_LOCKOUT_SECONDS
+    )
+    if not allowed:
+        raise ForbiddenException(message=f"登录尝试过多，请{_LOGIN_LOCKOUT_SECONDS}秒后重试")
 
     try:
         svc = AuthService(db)
         result = await svc.login(req)
-        _login_attempts.pop(client_ip, None)
+        redis = await get_redis()
+        await redis.delete(f"ratelimit:{login_rate_key}")
         user_id = result.data.user_id if hasattr(result, "data") and result.data else None
         await record_operation(
             user_id=str(user_id) if user_id else "unknown",
@@ -78,6 +81,29 @@ async def login(req: LoginRequest, request: Request, db: AsyncSession = Depends(
 async def refresh_token(req: RefreshTokenRequest, db: AsyncSession = Depends(get_db)):
     svc = AuthService(db)
     return await svc.refresh_access_token(req.refresh_token)
+
+
+@router.post("/logout")
+async def logout(user: CurrentUser, request: Request):
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        try:
+            payload = decode_access_token(auth_header[7:])
+            token_jti = payload.get("jti")
+            token_exp = datetime.fromtimestamp(payload.get("exp", 0), tz=UTC)
+            if token_jti:
+                await blacklist_token(token_jti, token_exp)
+        except Exception:
+            logging.getLogger("auth").debug("Logout token cleanup failed, ignoring")
+
+    await record_operation(
+        user_id=str(user.id),
+        action="auth:logout",
+        resource_type="session",
+        ip_address=request.client.host if request.client else "unknown",
+    )
+
+    return {"code": 0, "message": "已成功登出"}
 
 
 @router.get("/me", response_model=UserInfoResponse)

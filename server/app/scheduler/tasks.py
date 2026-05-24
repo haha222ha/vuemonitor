@@ -2,6 +2,7 @@ import logging
 import statistics
 import uuid
 from datetime import UTC, datetime, timedelta
+from functools import wraps
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -13,13 +14,39 @@ from app.core.database import async_session_factory
 from app.models.admin import ProxyPool
 from app.models.collect import CollectTask
 from app.ws.manager import manager
-logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
 scheduler = AsyncIOScheduler()
 
 
+def scheduled_task(max_retries: int = 3, retry_delay: int = 60):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            last_error = None
+            for attempt in range(1, max_retries + 1):
+                try:
+                    return await func(*args, **kwargs)
+                except Exception as e:
+                    last_error = e
+                    if attempt < max_retries:
+                        logger.warning(
+                            f"Scheduled task {func.__name__} failed (attempt {attempt}/{max_retries}): {e}, "
+                            f"retrying in {retry_delay}s"
+                        )
+                        import asyncio
+                        await asyncio.sleep(retry_delay)
+                    else:
+                        logger.error(
+                            f"Scheduled task {func.__name__} failed after {max_retries} attempts: {e}"
+                        )
+            raise last_error
+        return wrapper
+    return decorator
+
+
+@scheduled_task(max_retries=2, retry_delay=30)
 async def process_pending_tasks():
     async with async_session_factory() as db:
         result = await db.execute(
@@ -46,6 +73,7 @@ async def process_pending_tasks():
                 logger.error(f"Task {task.id} failed: {e}")
 
 
+@scheduled_task(max_retries=2, retry_delay=60)
 async def check_proxy_health():
     async with async_session_factory() as db:
         result = await db.execute(
@@ -82,17 +110,18 @@ async def check_proxy_health():
 
 async def cleanup_expired_tokens():
     async with async_session_factory() as db:
+        from sqlalchemy import delete as sql_delete
+
         from app.models.user import RefreshToken
         result = await db.execute(
-            select(RefreshToken).where(RefreshToken.expires_at < datetime.now(UTC))
+            sql_delete(RefreshToken).where(RefreshToken.expires_at < datetime.now(UTC)).returning(RefreshToken.id)
         )
-        expired = result.scalars().all()
-        for token in expired:
-            await db.delete(token)
+        deleted_count = len(result.fetchall())
         await db.commit()
-        logger.info(f"Cleaned up {len(expired)} expired refresh tokens")
+        logger.info(f"Cleaned up {deleted_count} expired refresh tokens")
 
 
+@scheduled_task(max_retries=1, retry_delay=30)
 async def evaluate_monitor_rules():
     from app.monitor.evaluator import RuleEvaluator
 
@@ -171,21 +200,21 @@ async def compute_feature_rankings():
             logger.error(f"Feature ranking computation failed: {e}")
 
 
+@scheduled_task(max_retries=1, retry_delay=30)
 async def auto_detect_anomalies():
-    from app.models.product import Product
-    from app.models.product import ProductFeature
     from app.models.alert_rule import AlertEvent
+    from app.models.product import Product, ProductFeature
 
-    METRICS = ["price", "sales_count"]
-    Z_THRESHOLD = 2.5
-    DAYS = 7
-    MIN_SAMPLES = 5
+    metrics = ["price", "sales_count"]
+    z_threshold = 2.5
+    days = 7
+    min_samples = 5
 
-    since = datetime.now(UTC) - timedelta(days=DAYS)
+    since = datetime.now(UTC) - timedelta(days=days)
 
     async with async_session_factory() as db:
         result = await db.execute(
-            select(Product).where(Product.is_active == 1)
+            select(Product).where(Product.is_active)
         )
         products = result.scalars().all()
 
@@ -203,17 +232,17 @@ async def auto_detect_anomalies():
             )
             features = feat_result.scalars().all()
 
-            if len(features) < MIN_SAMPLES:
+            if len(features) < min_samples:
                 continue
 
-            for metric in METRICS:
+            for metric in metrics:
                 values = []
                 for f in features:
                     v = getattr(f, metric, None)
                     if v is not None:
                         values.append(float(v))
 
-                if len(values) < MIN_SAMPLES:
+                if len(values) < min_samples:
                     continue
 
                 latest_val = values[0]
@@ -230,7 +259,7 @@ async def auto_detect_anomalies():
 
                 z_score = (latest_val - mean_val) / stdev_val
 
-                if abs(z_score) < Z_THRESHOLD:
+                if abs(z_score) < z_threshold:
                     continue
 
                 direction = "up" if z_score > 0 else "down"
@@ -242,7 +271,7 @@ async def auto_detect_anomalies():
                 recent_event = await db.execute(
                     select(AlertEvent).where(
                         AlertEvent.user_id == p.user_id,
-                        AlertEvent.is_acknowledged == False,
+                        not AlertEvent.is_acknowledged,
                         AlertEvent.created_at >= datetime.now(UTC) - timedelta(hours=24),
                     )
                 )
@@ -259,7 +288,7 @@ async def auto_detect_anomalies():
                     title=f"{p.product_name or p.platform_product_id} {metric_labels.get(metric, metric)}{direction_labels[direction]}",
                     detail=f"商品「{p.product_name or p.platform_product_id}」的{metric_labels.get(metric, metric)}出现异常{direction_labels[direction]}，当前值 {latest_val:.2f}，历史均值 {mean_val:.2f}，Z-score {z_score:.2f}",
                     metric_value=latest_val,
-                    threshold_value=Z_THRESHOLD,
+                    threshold_value=z_threshold,
                     context={
                         "auto_detect": True,
                         "product_id": str(p.id),
@@ -288,8 +317,8 @@ async def auto_detect_anomalies():
                         },
                         "ts": datetime.now(UTC).isoformat(),
                     })
-                except Exception:
-                    logger.warning("Silent exception")
+                except Exception as e:
+                    logger.warning("WS notify anomaly failed: %s", e)
 
         if total_anomalies > 0:
             await db.commit()

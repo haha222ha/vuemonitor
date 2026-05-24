@@ -1,14 +1,15 @@
 import asyncio
 import json
+import logging
 import time
 import zlib
 from collections import deque
 from datetime import UTC, datetime
 
-from fastapi import APIRouter, Query, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.core.security import decode_access_token
-import logging
+
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -29,8 +30,8 @@ class ConnectionManager:
         if user_id in self.active_connections:
             try:
                 await self.active_connections[user_id].close(code=4002)
-            except Exception:
-                logger.warning("Silent exception")
+            except Exception as e:
+                logger.warning("Close old WS connection failed: %s", e)
         self.active_connections[user_id] = websocket
         self.last_seen[user_id] = time.time()
 
@@ -114,7 +115,7 @@ WS_MESSAGE_TYPES = [
 ]
 
 
-async def _ws_heartbeat(websocket: WebSocket, user_id: str):
+async def _ws_heartbeat(websocket: WebSocket, user_id: str, pong_event: asyncio.Event):
     missed_pings = 0
     max_missed = 3
     while True:
@@ -123,7 +124,11 @@ async def _ws_heartbeat(websocket: WebSocket, user_id: str):
             break
         try:
             await websocket.send_json({"type": "ping", "ts": datetime.now(UTC).isoformat()})
-            missed_pings += 1
+            if pong_event.is_set():
+                pong_event.clear()
+                missed_pings = 0
+            else:
+                missed_pings += 1
             if missed_pings > max_missed:
                 manager.disconnect(user_id)
                 break
@@ -133,7 +138,20 @@ async def _ws_heartbeat(websocket: WebSocket, user_id: str):
 
 
 @router.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+
+    try:
+        auth_msg_raw = await asyncio.wait_for(websocket.receive_text(), timeout=10)
+        auth_msg = json.loads(auth_msg_raw)
+        token = auth_msg.get("token") or auth_msg.get("data", {}).get("token")
+        if not token:
+            await websocket.close(code=4001)
+            return
+    except (TimeoutError, json.JSONDecodeError):
+        await websocket.close(code=4001)
+        return
+
     try:
         payload = decode_access_token(token)
         user_id = payload.get("sub")
@@ -141,10 +159,12 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
             await websocket.close(code=4001)
             return
 
+        import uuid as uuid_mod
+
+        from sqlalchemy import select
+
         from app.core.database import async_session_factory
         from app.models.user import User
-        from sqlalchemy import select
-        import uuid as uuid_mod
 
         async with async_session_factory() as session:
             result = await session.execute(
@@ -159,7 +179,9 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
         return
 
     await manager.connect(user_id, websocket)
-    heartbeat_task = asyncio.create_task(_ws_heartbeat(websocket, user_id))
+    await websocket.send_json({"type": "auth", "status": "ok"})
+    pong_event = asyncio.Event()
+    heartbeat_task = asyncio.create_task(_ws_heartbeat(websocket, user_id, pong_event))
     try:
         while True:
             data = await websocket.receive_text()
@@ -168,6 +190,7 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
                 msg_type = msg.get("type", "")
                 if msg_type == "pong":
                     manager.last_seen[user_id] = time.time()
+                    pong_event.set()
                 elif msg_type == "ping":
                     await websocket.send_json({"type": "pong", "ts": datetime.now(UTC).isoformat()})
                 elif msg_type == "sync:pull":

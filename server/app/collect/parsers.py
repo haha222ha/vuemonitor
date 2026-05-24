@@ -60,8 +60,8 @@ class XHSParser(BaseParser):
                 detail = note.get("note", note)
                 if isinstance(detail, dict):
                     return self._parse_note_item(detail)
-        except (json.JSONDecodeError, KeyError):
-            logger.warning("Silent exception")
+        except (json.JSONDecodeError, KeyError) as e:
+            logger.warning("XHS INITIAL_STATE parse failed for %s: %s", target_id, e)
 
         return None
 
@@ -82,7 +82,7 @@ class XHSParser(BaseParser):
                 try:
                     price = Decimal(price_clean)
                 except Exception:
-                    logger.warning("Silent exception")
+                    logger.warning("XHS price parse failed for %s: %s", item.get("note_id", item.get("id", "?")), price_str)
 
         return {
             "platform": "xhs",
@@ -165,7 +165,7 @@ class DouyinParser(BaseParser):
                     if isinstance(aweme, dict):
                         return self._parse_aweme(aweme)
         except (json.JSONDecodeError, KeyError):
-            logger.warning("Silent exception")
+            logger.warning("Douyin ROUTER_DATA parse failed for %s", target_id)
         return None
 
     def _parse_aweme(self, item: dict) -> dict:
@@ -182,7 +182,7 @@ class DouyinParser(BaseParser):
             try:
                 price = Decimal(str(product_info["price"]).replace(",", ""))
             except Exception:
-                logger.warning("Silent exception")
+                logger.warning("Douyin price parse failed for %s: %s", item.get("aweme_id", item.get("id", "")), product_info.get("price"))
 
         return {
             "platform": "douyin",
@@ -239,7 +239,7 @@ class TaobaoParser(BaseParser):
                     try:
                         price = Decimal(price_clean)
                     except Exception:
-                        logger.warning("Silent exception")
+                        logger.warning("Taobao price parse failed for %s: %s", target_id, price_str)
             elif isinstance(price_str, (int, float)):
                 price = Decimal(str(price_str))
 
@@ -306,7 +306,7 @@ class JDParser(BaseParser):
             try:
                 price = Decimal(price_match.group(1))
             except Exception:
-                logger.warning("Silent exception")
+                logger.warning("JD price parse failed for %s", target_id)
 
         image_url = None
         img_match = re.search(r'"img"\s*:\s*"(//img[^"]+)"', raw_text)
@@ -363,7 +363,7 @@ class PDDParser(BaseParser):
                 price_val = float(min_price) / 100 if float(min_price) > 10000 else float(min_price)
                 price = Decimal(str(round(price_val, 2)))
             except Exception:
-                logger.warning("Silent exception")
+                logger.warning("PDD price parse failed for %s: %s", target_id, min_price)
 
         thumb_url = goods.get("thumb_url", goods.get("image_url", ""))
         if thumb_url and not thumb_url.startswith("http"):

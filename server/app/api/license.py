@@ -61,9 +61,11 @@ async def activate_license(
     db: AsyncSession = Depends(get_db),
 ):
     svc = LicenseService(db)
-    from app.main import licenseManager
-
-    fingerprint = licenseManager.getMachineFingerprint() if licenseManager else req.license_key
+    try:
+        from app.main import licenseManager  # type: ignore
+        fingerprint = licenseManager.getMachineFingerprint() if licenseManager else req.license_key
+    except ImportError:
+        fingerprint = req.license_key
     ip_address = request.client.host if request.client else None
 
     result = await svc.activate(
