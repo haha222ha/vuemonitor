@@ -1,0 +1,117 @@
+{
+  "topic_id": "T20260523001",
+  "topic_name": "AI代运营副业：0基础如何接到第一单并稳定月入5000+",
+  "category": "经济决策",
+  "sub_scenario": "AI代运营",
+  "target_platform": ["小红书", "抖音"],
+  "target_audience": "想用AI做副业的上班族、自由职业者、大学生",
+  "opportunity_score": 80,
+  "lifecycle_stage": "爆发期",
+  "verdict": "RECOMMENDED",
+  "verdict_score": 35,
+  "commercial_paths": [
+    {
+      "type": "虚拟产品",
+      "description": "AI代运营副业启动报告（含接单渠道+报价体系+交付流程+工具链）",
+      "price_range": "29.9-69.9",
+      "platform": "小红书店铺/私域"
+    },
+    {
+      "type": "虚拟产品",
+      "description": "AI代运营接单话术模板+报价单",
+      "price_range": "9.9-29.9",
+      "platform": "小红书店铺"
+    },
+    {
+      "type": "课程",
+      "description": "AI代运营0到1实战课（从接单到交付全流程）",
+      "price_range": "199-499",
+      "platform": "小红书/知识付费平台"
+    },
+    {
+      "type": "信息差产品",
+      "description": "AI代运营行业报价数据库（按行业/内容类型/交付周期）",
+      "price_range": "49.9-99",
+      "platform": "私域"
+    }
+  ],
+  "content_layer": "D",
+  "layer_name": "商业机会型",
+  "decision_layer": {
+    "core_decision_type": "经济",
+    "sub_scenario": "AI代运营",
+    "persona_decision_map": [
+      {
+        "persona": "上班族",
+        "current_state": "听说AI代运营能赚钱，但不知道怎么开始",
+        "decision_pressure": "怕错过AI红利期，又怕投入时间没有回报",
+        "recommended_direction": "从图文代运营切入，利用下班2小时接单",
+        "why_now": "企业AI内容需求爆发，供给不足，窗口期12-18个月",
+        "avoid_mistake": "不要一上来就接大单，先从小单积累案例和流程"
+      },
+      {
+        "persona": "自由职业者",
+        "current_state": "已有设计/文案/运营经验，想叠加AI能力提效",
+        "decision_pressure": "传统服务利润下滑，AI工具让效率翻倍但不知道怎么定价",
+        "recommended_direction": "将现有服务AI化，报价不变但交付效率提升50%+",
+        "why_now": "客户对AI内容接受度快速提升，先发优势明显",
+        "avoid_mistake": "不要直接告诉客户用AI生成，要包装为AI辅助+人工精修"
+      },
+      {
+        "persona": "大学生",
+        "current_state": "会用AI工具，但不知道怎么变现",
+        "decision_pressure": "想经济独立但缺乏社会经验和客户资源",
+        "recommended_direction": "从校园周边商家入手，提供低价AI内容代运营",
+        "why_now": "本地商家对AI内容需求觉醒但不会操作，学生有时间优势",
+        "avoid_mistake": "不要只做低价竞争，要积累案例后逐步提价"
+      }
+    ],
+    "decision_time_window": "窗口期12-18个月（2026年5月-2027年5月）"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "high",
+    "compatibility_score": 92,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI代运营副业启动报告",
+        "content_type": "虚拟产品",
+        "target_platform": ["小红书", "抖音"],
+        "content_angles": [
+          "认知反差：AI代运营月入5000+，但90%的人不知道怎么接单",
+          "焦虑驱动：AI红利窗口只剩12-18个月，再不进入就晚了",
+          "路径对比：0基础vs有经验，AI代运营的3条不同起步路径"
+        ],
+        "viral_hook": "0基础用AI代运营，下班2小时月入5000+",
+        "monetization_hook": "AI代运营启动报告/接单话术模板/报价体系SOP"
+      }
+    ]
+  },
+  "risk_matrix": {
+    "time_cost": 4,
+    "money_cost": 2,
+    "execution_difficulty": 5,
+    "platform_risk": 3
+  },
+  "user_psychology": {
+    "anxiety": "AI红利窗口期有限，怕错过又怕做不起来",
+    "desire": "想用AI做副业，稳定月入5000+，不影响主业",
+    "fear": "接不到单/报价太低/交付不了/被AI替代",
+    "paying_driver": "信息差（不知道怎么接单）+确定性（想要可复制的SOP）+时间窗口（怕错过红利）"
+  },
+  "content_angles": [
+    "AI代运营是什么：帮企业用AI生产内容的副业方向",
+    "市场规模：2026年AI内容代运营市场规模预估",
+    "3条起步路径：0基础/有经验/大学生各自怎么切入",
+    "变现路径：4种变现模式详解（单次服务/月度托管/培训/产品）",
+    "人群适配：3类人群的AI代运营策略差异",
+    "竞争格局：蓝海vs红海，哪些细分赛道还有机会",
+    "常见误区：90%新手会踩的5个坑",
+    "案例拆解：月入5000+的AI代运营真实案例",
+    "AI工具链：5个必备AI工具+使用技巧",
+    "行动框架：7天从0到第一单的执行计划"
+  ],
+  "keywords": ["AI代运营", "副业接单", "AI内容生产", "中小企业", "0基础副业"],
+  "exported_at": "2026-05-23"
+}

@@ -1,0 +1,152 @@
+{
+  "topic_id": "T20260520007",
+  "generated_at": "2026-05-20",
+  "status": "fresh",
+  "freshness_score": 1.4,
+  "source": {
+    "prompt_id": "十",
+    "prompt_name": "决策场景分类与选题映射",
+    "data_basis": "2026年5月经济决策焦虑信号扫描：AI副业变现成为年度最热赛道，一人公司模式爆发",
+    "converted_by": "九、输出格式规范"
+  },
+  "category": "经济决策",
+  "topic_name": "2026 AI副业变现路径决策：普通人如何用AI打造第二收入",
+  "topic_description": "AI工具让个体创业者拥有超级杠杆，一人公司月入10万+成为可能，但副业选择信息差巨大，多数人不知道从哪开始",
+  "keywords": ["AI副业", "变现路径", "一人公司", "第二收入", "AI赚钱"],
+  "target_platform": ["小红书", "抖音", "B站"],
+  "target_audience": "上班族、自由职业者、想发展副业的普通人",
+  "opportunity_score": 93,
+  "priority_score": 165.75,
+  "score_breakdown": {
+    "traffic_growth": 10,
+    "willingness_to_pay": 9,
+    "competition_level": 7,
+    "platform_support": 9,
+    "ai_scalability": 10,
+    "virtual_product_fit": 10,
+    "anxiety_intensity": 9,
+    "lifecycle": 8,
+    "low_cost_entry": 8,
+    "ordinary_person_fit": 7
+  },
+  "lifecycle_stage": "爆发期",
+  "lifecycle_prediction": {
+    "30_days": "AI工具持续迭代，副业教程搜索量高位运行",
+    "90_days": "暑期副业需求上升，学生+上班族双重驱动",
+    "180_days": "AI副业成为常态化需求，从热点转为刚需"
+  },
+  "decision_layer": {
+    "core_decision_type": "经济决策",
+    "decision_domain": "经济",
+    "sub_scenario": "AI副业变现",
+    "persona_decision_map": [
+      {
+        "persona": "上班族",
+        "current_state": "工资增长停滞，想发展副业但时间有限",
+        "decision_pressure": "不知道选哪条副业路径，怕踩坑浪费时间",
+        "recommended_direction": "AI+内容创作/知识付费，利用AI提效实现时间杠杆",
+        "why_now": "AI工具让副业门槛大幅降低，每天2小时即可启动",
+        "avoid_mistake": "不要选择需要大量时间投入的传统副业，要选AI赋能的轻资产模式"
+      },
+      {
+        "persona": "自由职业者",
+        "current_state": "收入不稳定，想用AI提升效率拓展业务",
+        "decision_pressure": "AI工具太多不知道选哪个，怕投入产出不成正比",
+        "recommended_direction": "AI工具+原有技能叠加，实现服务升级和规模化",
+        "why_now": "AI让一人公司成为可能，边际成本趋近于零",
+        "avoid_mistake": "不要追求全栈AI，要选择1-2个核心工具深度掌握"
+      },
+      {
+        "persona": "碎片时间探索者",
+        "current_state": "想利用碎片时间赚钱，但不知道做什么",
+        "decision_pressure": "信息过载，每个方向都有人说好有人说坑",
+        "recommended_direction": "从AI内容生成/模板售卖等虚拟产品切入",
+        "why_now": "虚拟产品边际成本为零，是最适合碎片时间的变现方式",
+        "avoid_mistake": "不要选择需要囤货/售后的实物电商，要选纯线上虚拟产品"
+      }
+    ],
+    "decision_time_window": "全年",
+    "seasonal_peak": "全年（暑期/年底为小高峰）"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "high",
+    "compatibility_score": 95,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI副业变现路径决策",
+        "content_type": "信息差产品",
+        "target_platform": ["小红书", "抖音"],
+        "content_angles": [
+          "认知反差：AI副业不是躺赚，但确实比传统副业效率高10倍",
+          "焦虑驱动：工资增长停滞，不发展第二收入=财务脆弱",
+          "路径对比：6大AI副业路径投入产出比全拆解"
+        ],
+        "viral_hook": "用AI做副业月入过万的3个真实路径/别再做传统副业了",
+        "monetization_hook": "AI副业决策报告/变现路径工具包"
+      }
+    ]
+  },
+  "commercial_paths": [
+    {
+      "type": "信息差产品",
+      "description": "2026 AI副业变现路径决策报告",
+      "price_range": "99-399",
+      "platform": "小红书/私域"
+    },
+    {
+      "type": "工具",
+      "description": "AI副业适配度测评+启动成本计算器",
+      "price_range": "49-199",
+      "platform": "微信小程序/私域"
+    },
+    {
+      "type": "课程",
+      "description": "AI副业从0到1实操课",
+      "price_range": "299-999",
+      "platform": "小红书/知识付费平台"
+    },
+    {
+      "type": "虚拟产品",
+      "description": "AI副业工具包（提示词模板+工作流SOP）",
+      "price_range": "49-299",
+      "platform": "私域"
+    }
+  ],
+  "user_psychology": {
+    "anxiety": "工资不够花，不发展副业财务脆弱",
+    "desire": "想用AI工具高效赚钱，实现收入多元化",
+    "fear": "选错副业方向，投入时间金钱却没回报",
+    "paying_driver": "收入确定性+路径清晰度+启动成本可控"
+  },
+  "is_series": true,
+  "series_name": "AI副业变现决策",
+  "series_episode": 1,
+  "consumed_at": null,
+  "output_path": null,
+  "content_angles": [
+    "6大AI副业路径投入产出比全拆解",
+    "AI副业vs传统副业：效率差距到底有多大",
+    "一人公司模式：用AI实现月入10万+的底层逻辑",
+    "每天2小时启动AI副业的最小可行方案",
+    "不同人群的AI副业最优选择",
+    "AI副业启动成本明细：0成本/低成本/中成本方案",
+    "AI副业变现的3个阶段和关键里程碑",
+    "AI副业常见的5个坑和避坑指南",
+    "2026年最值得做的3个AI副业方向",
+    "从0到月入5000的AI副业行动框架"
+  ],
+  "risk_matrix": {
+    "time_cost": 4,
+    "money_cost": 3,
+    "execution_difficulty": 5,
+    "platform_risk": 3
+  },
+  "risk_warnings": [
+    "AI副业需要持续学习新工具，技术迭代可能导致方法过时",
+    "部分AI副业存在平台政策风险，需关注合规要求",
+    "变现周期因人而异，不建议辞职all-in副业"
+  ],
+  "tags": ["AI副业", "变现", "一人公司", "第二收入", "AI赚钱", "2026"]
+}

@@ -1,0 +1,95 @@
+{
+  "_description": "副业机会库 —— 记录所有通过机会判断的RECOMMENDED选题，是系统的核心资产",
+  "_version": "1.0",
+  "last_updated": "2026-05-23",
+  "opportunities": [
+    {
+      "id": "OPP-001",
+      "source_topic_id": "T20260520007",
+      "name": "AI副业变现路径决策",
+      "category": "AI副业变现",
+      "sub_category": "AI赋能多方向变现",
+      "difficulty": "medium",
+      "startup_cost": 0,
+      "monthly_ceiling": "3000-50000",
+      "time_to_first_revenue": "2-8周",
+      "risk_level": "low",
+      "recommend": true,
+      "verdict_score": 42,
+      "verdict_detail": {
+        "monetization_path_authenticity": 9,
+        "competition_heat": 4,
+        "ordinary_person_fit": 8,
+        "sustained_demand": 8,
+        "copy_barrier": 5
+      },
+      "persona_fit": ["上班族", "自由职业者", "碎片时间探索者"],
+      "platform": ["小红书", "抖音", "B站"],
+      "lifecycle_stage": "爆发期",
+      "first_identified": "2026-05-20",
+      "last_verified": "2026-05-23",
+      "trend_direction": "上升",
+      "key_metrics": {
+        "search_growth": "高位运行",
+        "competitor_count": "中等（5-10个头部）",
+        "content_saturation": "中等",
+        "monetization_readiness": "高（信息差产品+虚拟产品+工具）"
+      },
+      "commercial_paths": [
+        {"type": "信息差产品", "description": "AI副业变现路径决策报告", "price_range": "99-399"},
+        {"type": "工具", "description": "AI副业适配度测评+启动成本计算器", "price_range": "49-199"},
+        {"type": "课程", "description": "AI副业快速启动课", "price_range": "299-999"},
+        {"type": "虚拟产品", "description": "AI副业工具包+模板库", "price_range": "199-599"}
+      ],
+      "status": "active",
+      "output_path": "AI内容工厂/output/T20260520007/",
+      "score_history": [
+        {"date": "2026-05-20", "score": 42, "verdict": "RECOMMENDED", "note": "首次评估"}
+      ]
+    },
+    {
+      "id": "OPP-002",
+      "source_topic_id": "T20260523001",
+      "name": "AI代运营副业启动",
+      "category": "AI副业变现",
+      "sub_category": "AI代运营",
+      "difficulty": "easy",
+      "startup_cost": 0,
+      "monthly_ceiling": "5000-15000（兼职）/ 20000-50000（全职）",
+      "time_to_first_revenue": "1-2周",
+      "risk_level": "low",
+      "recommend": true,
+      "verdict_score": 35,
+      "verdict_detail": {
+        "monetization_path_authenticity": 9,
+        "competition_heat": 5,
+        "ordinary_person_fit": 8,
+        "sustained_demand": 7,
+        "copy_barrier": 6
+      },
+      "persona_fit": ["上班族", "自由职业者", "大学生"],
+      "platform": ["小红书", "抖音"],
+      "lifecycle_stage": "爆发期",
+      "first_identified": "2026-05-23",
+      "last_verified": "2026-05-23",
+      "trend_direction": "上升",
+      "key_metrics": {
+        "search_growth": "周环比+68%",
+        "competitor_count": "较少（1-3个深度内容KOL）",
+        "content_saturation": "低",
+        "monetization_readiness": "高（虚拟产品+模板+课程）"
+      },
+      "commercial_paths": [
+        {"type": "虚拟产品", "description": "AI代运营副业启动报告", "price_range": "29.9-69.9"},
+        {"type": "虚拟产品", "description": "接单话术模板+报价单", "price_range": "9.9-29.9"},
+        {"type": "课程", "description": "AI代运营0到1实战课", "price_range": "199-499"},
+        {"type": "信息差产品", "description": "AI代运营行业报价数据库", "price_range": "49.9-99"}
+      ],
+      "score_history": [
+        {"date": "2026-05-23", "score": 35, "verdict": "RECOMMENDED", "note": "首次评估"}
+      ],
+      "status": "active",
+      "output_path": null
+    }
+  ]
+}

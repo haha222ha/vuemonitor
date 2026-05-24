@@ -4,8 +4,10 @@ import traceback
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from sqlalchemy import text
 
 from app.api.router import api_router
 from app.config import get_settings
@@ -25,6 +27,7 @@ from app.scheduler.tasks import setup_scheduler
 from app.services.aipic.cleanup_service import start_aipic_cleanup, stop_aipic_cleanup
 from app.services.aipic.worker_service import start_aipic_workers, stop_aipic_workers
 from app.services.alert_service import configure_structlog
+from app.services.email_service import email_service
 from app.services.error_capture import setup_error_capture
 from app.services.sla_monitor import sla_monitor
 from app.task_queue.handlers import register_builtin_handlers
@@ -59,6 +62,8 @@ async def lifespan(app: FastAPI):
     await sla_monitor.start()
     await start_aipic_workers()
     await start_aipic_cleanup()
+    email_service.start_worker()
+    graceful_shutdown.start_heartbeat()
     recovered = await graceful_shutdown.recover_from_checkpoints()
     if recovered:
         logger.info(f"Recovered {len(recovered)} tasks from previous shutdown")
@@ -85,6 +90,7 @@ async def lifespan(app: FastAPI):
     await stop_worker()
     await stop_aipic_workers()
     await stop_aipic_cleanup()
+    await email_service.stop_worker()
     await close_redis()
     from app.services.discovery_db import DiscoveryDatabase
     instance = DiscoveryDatabase.get_instance()
@@ -96,6 +102,9 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     lifespan=lifespan,
+    docs_url="/docs" if settings.is_development else None,
+    redoc_url="/redoc" if settings.is_development else None,
+    openapi_url="/openapi.json" if settings.is_development else None,
 )
 
 app.add_middleware(SecurityHeadersMiddleware)
@@ -116,23 +125,82 @@ app.add_middleware(
 register_exception_handlers(app)
 
 
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    settings = get_settings()
+    errors = []
+    for err in exc.errors():
+        loc = " -> ".join(str(l) for l in err.get("loc", []))
+        errors.append(f"{loc}: {err.get('msg', '')}")
+    response_detail = errors if not settings.is_production else ["参数验证失败"]
+    return JSONResponse(
+        status_code=422,
+        content={
+            "code": 422,
+            "message": "请求参数验证失败",
+            "detail": response_detail,
+        },
+    )
+
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger = logging.getLogger("uvicorn.error")
     logger.error(f"Unhandled exception on {request.method} {request.url.path}: {exc}\n{traceback.format_exc()}")
+
+    detail = "Internal Server Error"
+    if settings.is_development:
+        detail = f"{type(exc).__name__}: {str(exc)[:200]}"
+
     return JSONResponse(
         status_code=500,
         content={
             "code": 500,
             "message": "服务器内部错误",
-            "detail": str(exc) if settings.DEBUG else "Internal Server Error",
+            "detail": detail,
         },
     )
 
 
 @app.get("/health")
 async def root_health():
-    return {"status": "ok"}
+    import time
+
+    from app.core.database import async_session_factory
+    from app.core.redis import check_redis_health
+
+    checks: dict[str, any] = {}
+    overall = "healthy"
+
+    start = time.time()
+    try:
+        async with async_session_factory() as db:
+            await db.execute(text("SELECT 1"))
+        checks["database"] = {"status": "up", "latency_ms": round((time.time() - start) * 1000, 1)}
+    except Exception as e:
+        checks["database"] = {"status": "down", "error": str(e)[:100]}
+        overall = "degraded"
+
+    start = time.time()
+    redis_ok = await check_redis_health()
+    checks["redis"] = {
+        "status": "up" if redis_ok else "down",
+        "latency_ms": round((time.time() - start) * 1000, 1),
+        "fallback": "memory" if not redis_ok else None,
+    }
+    if not redis_ok:
+        overall = "degraded"
+
+    from app.config import get_settings
+    s = get_settings()
+    checks["scheduler"] = {"status": "running" if scheduler.running else "stopped"}
+
+    return {
+        "status": overall,
+        "timestamp": time.time(),
+        "version": getattr(s, "VERSION", "unknown"),
+        "checks": checks,
+    }
 
 
 @app.get("/metrics")
@@ -143,3 +211,20 @@ async def metrics():
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(ws_router)
+
+
+@app.post("/api/v1/monitoring/web-vitals")
+async def receive_web_vitals(request: Request):
+    import logging
+    try:
+        body = await request.json()
+        metrics = body.get("metrics", [])
+        logger = logging.getLogger("web_vitals")
+        for m in metrics:
+            logger.info(
+                "metric=%s value=%.2f rating=%s nav=%s",
+                m.get("name"), m.get("value", 0), m.get("rating"), m.get("navigationType"),
+            )
+    except Exception as e:
+        logger.debug("Web vitals metrics parse failed: %s", e)
+    return {"ok": True}

@@ -1,0 +1,155 @@
+{
+  "_comment": "选题模板 — 趋势型选题和决策型选题共用此模板。决策型选题额外包含decision_layer/content_engine_bridge/risk_matrix，趋势型选题这3个字段为null",
+  "_source_note": "source.prompt_id：趋势型选题填'二'~'八'，决策型选题填'十'",
+  "topic_id": "T20260520001",
+  "generated_at": "2026-05-20",
+  "status": "fresh",
+  "freshness_score": 1.2,
+  "source": {
+    "prompt_id": "十",
+    "prompt_name": "决策场景分类与选题映射",
+    "data_basis": "2026年5月20日多平台决策焦虑信号扫描",
+    "converted_by": "九、输出格式规范"
+  },
+  "category": "升学决策",
+  "topic_name": "2026高考志愿填报：AI时代最值得选的10个专业方向",
+  "topic_description": "高考志愿填报信息差巨大，AI时代专业选择逻辑彻底改变，家长和学生决策焦虑爆发",
+  "keywords": ["高考志愿", "专业选择", "AI时代", "就业前景", "信息差"],
+  "target_platform": ["小红书", "抖音", "B站"],
+  "target_audience": "高考生家长、高三学生、高中规划老师",
+  "opportunity_score": 92,
+  "priority_score": 143.52,
+  "score_breakdown": {
+    "traffic_growth": 10,
+    "willingness_to_pay": 9,
+    "competition_level": 6,
+    "platform_support": 9,
+    "ai_scalability": 8,
+    "virtual_product_fit": 9,
+    "anxiety_intensity": 10,
+    "lifecycle": 7,
+    "low_cost_entry": 8,
+    "ordinary_person_fit": 6
+  },
+  "lifecycle_stage": "爆发期",
+  "lifecycle_prediction": {
+    "30_days": "高考出分后搜索量爆发，内容需求极强",
+    "90_days": "志愿填报结束，转向专业前景分析",
+    "180_days": "进入下一轮备考周期，需求回落但持续"
+  },
+  "decision_layer": {
+    "core_decision_type": "升学决策",
+    "decision_domain": "升学",
+    "sub_scenario": "志愿填报",
+    "persona_decision_map": [
+      {
+        "persona": "高考生家长",
+        "current_state": "出分后面临志愿填报，信息过载",
+        "decision_pressure": "选错专业影响孩子一生",
+        "recommended_direction": "AI时代就业前景导向的专业选择",
+        "why_now": "AI正在重塑就业市场，传统专业选择逻辑失效",
+        "avoid_mistake": "不要只看当前热门，要看3-5年后就业趋势"
+      },
+      {
+        "persona": "高三学生",
+        "current_state": "对专业一无所知，迷茫焦虑",
+        "decision_pressure": "不知道自己适合什么",
+        "recommended_direction": "兴趣+能力+趋势三维匹配",
+        "why_now": "AI时代新职业不断出现，选择空间更大也更迷茫",
+        "avoid_mistake": "不要盲目跟风热门，要结合自身优势"
+      }
+    ],
+    "decision_time_window": "6月出分后2周内",
+    "seasonal_peak": "6-7月"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "high",
+    "compatibility_score": 95,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI时代最值得选的10个专业方向",
+        "content_type": "信息差产品",
+        "target_platform": ["小红书", "抖音"],
+        "content_angles": [
+          "认知反差：传统热门专业正在被AI淘汰",
+          "焦虑驱动：选错专业=浪费4年+失业",
+          "路径对比：AI时代vs传统时代的专业选择逻辑"
+        ],
+        "viral_hook": "2026年这10个专业千万别选/AI时代最赚钱的5个专业",
+        "monetization_hook": "志愿填报决策报告/专业前景数据库"
+      }
+    ]
+  },
+  "commercial_paths": [
+    {
+      "type": "信息差产品",
+      "description": "2026高考志愿填报AI决策报告",
+      "price_range": "99-499",
+      "platform": "小红书/私域"
+    },
+    {
+      "type": "工具",
+      "description": "AI专业选择分析器",
+      "price_range": "49-199",
+      "platform": "微信小程序/私域"
+    },
+    {
+      "type": "课程",
+      "description": "志愿填报策略课",
+      "price_range": "299-999",
+      "platform": "小红书/知识付费平台"
+    },
+    {
+      "type": "虚拟产品",
+      "description": "专业就业前景数据库",
+      "price_range": "199-599",
+      "platform": "私域"
+    }
+  ],
+  "user_psychology": {
+    "anxiety": "选错专业影响一生，信息差太大",
+    "desire": "想选一个未来有前景的专业",
+    "fear": "AI取代传统岗位，4年后毕业即失业",
+    "paying_driver": "信息差+决策确定性+未来安全感"
+  },
+  "is_series": true,
+  "series_name": "2026高考志愿填报决策",
+  "series_episode": 1,
+  "consumed_at": null,
+  "output_path": null,
+  "content_angles": [
+    "AI正在淘汰哪些传统热门专业",
+    "2026年就业市场最缺什么人才",
+    "志愿填报的3个致命误区",
+    "AI时代最有前景的5个新专业",
+    "如何用AI工具辅助志愿填报",
+    "不同分数段的最优专业选择策略",
+    "专业vs城市vs学校：优先级排序",
+    "家长最常犯的志愿填报错误",
+    "从就业倒推专业选择的逻辑",
+    "志愿填报决策框架：3步选出最优解"
+  ],
+  "risk_matrix": {
+    "time_cost": 3,
+    "money_cost": 2,
+    "execution_difficulty": 4,
+    "platform_risk": 2
+  },
+  "risk_warnings": [
+    "志愿填报有强季节性，6-7月后需求骤降",
+    "政策变化可能导致专业前景预判失误",
+    "需要持续更新就业数据保持权威性"
+  ],
+  "tags": ["高考", "志愿填报", "专业选择", "AI时代", "就业前景", "2026"],
+
+  "_validation_rules": {
+    "required_fields": ["topic_id", "topic_name", "category", "target_platform", "target_audience", "opportunity_score", "lifecycle_stage", "commercial_paths", "user_psychology", "content_angles", "keywords", "status", "source"],
+    "lifecycle_stage_enum": ["早期", "爆发期", "饱和期"],
+    "status_enum": ["fresh", "queued", "consumed", "archived", "abandoned"],
+    "decision_type_enum": ["经济"],
+    "decision_only_fields": ["decision_layer", "content_engine_bridge", "risk_matrix"],
+    "note": "本系统仅处理经济决策(D层)选题。决策型选题必须包含decision_only_fields且不为null。"
+  }
+}

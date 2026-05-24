@@ -1,8 +1,17 @@
+import os
 import secrets
 import warnings
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _read_docker_secret(name: str) -> str | None:
+    secret_path = Path(f"/run/secrets/{name}")
+    if secret_path.exists():
+        return secret_path.read_text().strip()
+    return None
 
 
 class Settings(BaseSettings):
@@ -16,8 +25,24 @@ class Settings(BaseSettings):
     DB_NAME: str = "vuemonitor"
     DB_USER: str = "saas_user"
     DB_PASSWORD: str = ""
-    DB_POOL_SIZE: int = 20
-    DB_MAX_OVERFLOW: int = 10
+    DB_POOL_SIZE: int = 10
+    DB_MAX_OVERFLOW: int = 5
+    DB_SLOW_QUERY_THRESHOLD: float = 2.0
+    DB_POOL_LEAK_THRESHOLD: float = 0.9
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if os.getenv("ENVIRONMENT") == "production":
+            if not self.DB_PASSWORD:
+                self.DB_PASSWORD = _read_docker_secret("db_password") or ""
+            if not self.REDIS_PASSWORD:
+                self.REDIS_PASSWORD = _read_docker_secret("redis_password") or ""
+            if not self.JWT_SECRET:
+                self.JWT_SECRET = _read_docker_secret("jwt_secret") or ""
+            if not self.JWT_REFRESH_SECRET:
+                self.JWT_REFRESH_SECRET = _read_docker_secret("jwt_refresh_secret") or ""
+            if not self.ENCRYPTION_KEY:
+                self.ENCRYPTION_KEY = _read_docker_secret("encryption_key") or ""
 
     @property
     def DATABASE_URL(self) -> str:
@@ -53,6 +78,8 @@ class Settings(BaseSettings):
     DEEPSEEK_MODEL: str = "deepseek-v4-flash"
     AI_DEFAULT_PROVIDER: str = "deepseek"
     AI_DEFAULT_MODEL: str = "deepseek-v4-flash"
+
+    INTEL_SYNC_API_KEY: str = ""
 
     SMTP_HOST: str = ""
     SMTP_PORT: int = 587

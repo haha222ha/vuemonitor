@@ -1,0 +1,61 @@
+{
+  "product_type": "weekly_report",
+  "generated_at": "2026-05-20",
+  "report_id": "WR20260520",
+  "week_range": "2026-05-13 至 2026-05-20",
+  "title": "商业情报周度趋势报告 - 第21周",
+  "executive_summary": "本周AI副业赛道持续升温，情绪经济出现新信号",
+  "weekly_trends": [
+    {
+      "trend": "AI自动化代运营",
+      "week_start_score": 82,
+      "week_end_score": 87,
+      "change": "+5",
+      "status": "上升",
+      "key_events": ["小红书相关笔记增长45%", "多个KOL开始讨论"]
+    }
+  ],
+  "consumption_stats": {
+    "topics_generated_this_week": 15,
+    "topics_consumed_this_week": 12,
+    "content_pieces_produced": 120,
+    "series_active": 3,
+    "series_completed": 1
+  ],
+  "score_changes": [
+    {
+      "topic_id": "T20260515001",
+      "topic_name": "AI副业趋势",
+      "previous_score": 85,
+      "current_score": 88,
+      "change_reason": "平台流量倾斜加剧"
+    }
+  ],
+  "lifecycle_tracking": [
+    {
+      "topic_id": "T20260501001",
+      "topic_name": "情绪经济研究",
+      "previous_stage": "早期",
+      "current_stage": "爆发期",
+      "days_in_current_stage": 14
+    }
+  ],
+  "next_week_forecast": [
+    {
+      "prediction": "AI代运营竞争将加剧",
+      "confidence": "高",
+      "recommended_action": "加快内容产出节奏"
+    },
+    {
+      "prediction": "情绪经济可能出现新细分方向",
+      "confidence": "中",
+      "recommended_action": "持续监控相关关键词"
+    }
+  ],
+  "commercial_insights": {
+    "best_performing_topic": "AI副业趋势",
+    "best_performing_reason": "内容互动率最高，转化路径清晰",
+    "emerging_opportunity": "AI+垂直行业代运营",
+    "risk_to_watch": "内容同质化加剧"
+  }
+}

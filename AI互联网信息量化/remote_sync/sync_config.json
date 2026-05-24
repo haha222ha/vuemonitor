@@ -1,0 +1,29 @@
+{
+  "remote_host": "https://api.xhs365.cn",
+  "api_token": "",
+  "sync_options": {
+    "batch_size": 50,
+    "retry_count": 3,
+    "retry_delay_seconds": 5,
+    "timeout_seconds": 60,
+    "request_delay_ms": 200
+  },
+  "targets": {
+    "trends": true,
+    "signals": true,
+    "opportunities": true,
+    "risks": true,
+    "emotions": true,
+    "xhs_topics": true
+  },
+  "auto_sync": {
+    "enabled": false,
+    "on_content_complete": true,
+    "daily_schedule": ["08:00", "20:00"]
+  },
+  "logging": {
+    "level": "INFO",
+    "log_dir": "logs",
+    "max_log_files": 30
+  }
+}

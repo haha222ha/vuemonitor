@@ -1,0 +1,66 @@
+{
+  "_description": "平台趋势库 —— 记录各平台的最新趋势变化、流量信号、政策变动。是每日简报和每周报告的数据来源",
+  "_version": "1.0",
+  "last_updated": "2026-05-23",
+  "trends": [
+    {
+      "id": "TRD-001",
+      "platform": "小红书",
+      "trend_name": "AI工具教程内容爆发",
+      "category": "AI副业",
+      "evidence": "AI工具相关笔记搜索量同比增长120%，#AI副业 话题阅读量突破10亿",
+      "direction": "快速上升",
+      "first_observed": "2026-04-01",
+      "peak_expected": "2026-08-01",
+      "lifecycle": "早期",
+      "actionable_insight": "AI工具对比/测评/教程类内容有6-12周红利窗口期",
+      "affected_opportunities": ["AI副业变现", "AI代运营", "AI模板售卖"],
+      "risk_note": "内容同质化速度加快，需差异化定位"
+    },
+    {
+      "id": "TRD-002",
+      "platform": "小红书",
+      "trend_name": "一人公司/轻创业内容增长",
+      "category": "轻创业",
+      "evidence": "#一人公司 话题笔记数月增45%，互动率高于平台均值30%",
+      "direction": "上升",
+      "first_observed": "2026-03-15",
+      "peak_expected": "2026-12-01",
+      "lifecycle": "爆发期",
+      "actionable_insight": "实操型/数据驱动型内容比理论型内容互动率高出2.5倍",
+      "affected_opportunities": ["轻创业", "知识付费", "虚拟产品经营"],
+      "risk_note": "需注意平台对商业内容的合规要求"
+    },
+    {
+      "id": "TRD-003",
+      "platform": "抖音",
+      "trend_name": "副业/搞钱内容算法倾斜",
+      "category": "平台红利",
+      "evidence": "抖音2026年Q1对'副业'类内容给予额外流量扶持，垂类账号增长迅速",
+      "direction": "上升",
+      "first_observed": "2026-02-01",
+      "peak_expected": "2026-09-01",
+      "lifecycle": "爆发期",
+      "actionable_insight": "抖音副业内容仍有流量红利，建议小红书+抖音双平台分发",
+      "affected_opportunities": ["AI副业变现", "平台红利捕捉"],
+      "risk_note": "抖音对硬广审核比小红书更严格"
+    }
+  ],
+  "platform_signals": {
+    "小红书": {
+      "current_focus": "AI工具 + 一人公司 + 知识付费",
+      "traffic_signal": "副业/搞钱类内容流量倾斜中",
+      "policy_risk": "商业内容合规要求趋严，虚拟产品需开店"
+    },
+    "抖音": {
+      "current_focus": "副业实操 + 结果展示",
+      "traffic_signal": "副业垂类流量扶持期",
+      "policy_risk": "硬广审核严格，需软植入"
+    },
+    "视频号": {
+      "current_focus": "正在测试副业内容推荐算法",
+      "traffic_signal": "早期红利，值得关注",
+      "policy_risk": "规则尚不明朗"
+    }
+  }
+}

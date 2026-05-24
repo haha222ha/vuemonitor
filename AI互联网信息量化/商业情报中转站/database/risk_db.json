@@ -1,0 +1,59 @@
+{
+  "_description": "风险淘汰库 —— 记录被机会判断淘汰的AVOID选题，以及已被市场验证失效的赛道。会员可查询'哪些方向已经不赚钱了'",
+  "_version": "1.0",
+  "last_updated": "2026-05-23",
+  "eliminated": [
+    {
+      "id": "RISK-001",
+      "name": "短视频搬运",
+      "category": "内容副业",
+      "status": "dead",
+      "eliminated_date": "2025-10-01",
+      "reason": "平台算法全面升级，搬运内容不再有流量，原创检测AI已成熟",
+      "alternative": "AI原创内容生成 + 深度解读",
+      "source": "平台公告 + 行业共识"
+    },
+    {
+      "id": "RISK-002",
+      "name": "无货源电商",
+      "category": "电商副业",
+      "status": "dying",
+      "eliminated_date": "2026-01-15",
+      "reason": "平台严打，退货率持续攀升至40%+，利润趋零",
+      "alternative": "虚拟产品/知识付费/数字资源",
+      "source": "电商平台数据 + 行业报告"
+    },
+    {
+      "id": "RISK-003",
+      "name": "刷单/刷评",
+      "category": "灰色副业",
+      "status": "dead",
+      "eliminated_date": "2025-06-01",
+      "reason": "违法+平台AI检测+法律风险",
+      "alternative": "正规内容营销/KOL合作",
+      "source": "法律风险 + 平台公告"
+    },
+    {
+      "id": "RISK-004",
+      "name": "AI写作代写论文",
+      "category": "AI副业",
+      "status": "dead",
+      "eliminated_date": "2026-03-01",
+      "reason": "学术诚信红线，平台全面封禁，法律风险极高",
+      "alternative": "AI辅助商业写作/营销文案/技术文档",
+      "source": "政策文件 + 平台公告"
+    }
+  ],
+  "warnings": [
+    {
+      "id": "WARN-001",
+      "name": "AI内容号同质化",
+      "category": "AI副业",
+      "status": "monitoring",
+      "first_observed": "2026-05-01",
+      "risk_description": "小红书AI内容号增长过快，同质化严重，3个月内可能进入红海",
+      "early_signals": ["同类笔记数月增60%", "互动率下降", "平台可能限流"],
+      "recommended_action": "差异化定位，加入真人实操案例和独家数据"
+    }
+  ]
+}

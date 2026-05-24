@@ -1,0 +1,43 @@
+{
+  "_description": "用户情绪数据库 —— 记录各平台用户对副业方向的情绪变化、焦虑关键词、需求迁移。数据来源：Prompt四（用户需求洞察）+ topics中的user_psychology字段",
+  "_version": "1.0",
+  "last_updated": "2026-05-24",
+  "emotions": [
+    {
+      "id": "EMO-001",
+      "emotion_type": "焦虑",
+      "intensity": "high",
+      "keyword_cluster": ["被AI取代", "失业", "副业刚需", "35岁危机"],
+      "platform_source": "小红书",
+      "trend_direction": "快速上升",
+      "first_observed": "2026-01-01",
+      "related_opportunities": ["AI副业变现", "AI代运营"],
+      "persona_affected": ["上班族", "35岁以上职场人"],
+      "insight": "用户焦虑从'要不要学AI'转变为'怎么用AI赚钱'，需求从学习转向变现"
+    },
+    {
+      "id": "EMO-002",
+      "emotion_type": "急切",
+      "intensity": "medium",
+      "keyword_cluster": ["一人公司", "轻创业", "自由职业", "数字游民"],
+      "platform_source": "小红书",
+      "trend_direction": "上升",
+      "first_observed": "2026-03-01",
+      "related_opportunities": ["轻创业", "虚拟产品经营"],
+      "persona_affected": ["自由职业者", "有积蓄的上班族"],
+      "insight": "用户对'不依赖单一收入来源'的需求显著增强，愿为启动方案付费"
+    },
+    {
+      "id": "EMO-003",
+      "emotion_type": "困惑",
+      "intensity": "high",
+      "keyword_cluster": ["副业怎么选", "哪个方向赚钱", "副业踩坑", "副业避雷"],
+      "platform_source": "小红书",
+      "trend_direction": "快速上升",
+      "first_observed": "2026-04-01",
+      "related_opportunities": ["AI副业变现路径决策"],
+      "persona_affected": ["副业新手", "零基础探索者"],
+      "insight": "用户最大的痛点是'选择困难'——方向太多不知道选哪个，这正是决策报告的核心需求"
+    }
+  ]
+}

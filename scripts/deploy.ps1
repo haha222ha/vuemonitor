@@ -44,6 +44,11 @@ cd web-user
 npm install --quiet 2>/dev/null
 npm run build 2>/dev/null
 
+echo '  重建情报系统前端...'
+cd /opt/vuemonitor/web-intel
+npm install --quiet 2>/dev/null
+npm run build 2>/dev/null
+
 echo '  数据库迁移...'
 cd /opt/vuemonitor/server
 source .venv/bin/activate

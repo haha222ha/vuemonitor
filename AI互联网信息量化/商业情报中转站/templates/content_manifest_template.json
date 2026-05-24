@@ -1,0 +1,56 @@
+{
+  "version": "1.0",
+  "generated_at": "2026-05-20",
+  "content_factory_root": "AI内容工厂/output/",
+  "topics": [
+    {
+      "topic_name": "AI副业趋势",
+      "topic_id": "T20260515001",
+      "generated_at": "2026-05-15",
+      "status": "completed",
+      "outputs": {
+        "html": "xiaohongshu/_html/AI副业趋势/Day01/",
+        "xiaohongshu": "xiaohongshu/AI副业趋势/",
+        "days_produced": ["Day01"],
+        "total_days": 1
+      },
+      "files": {
+        "Day01": {
+          "title": "title.txt",
+          "cover": "cover.txt",
+          "note": "note.md",
+          "comments": "comments.txt",
+          "images": ["images/image_01.png", "images/image_02.png", "images/image_03.png", "images/image_04.png", "images/image_05.png", "images/image_06.png"]
+        }
+      }
+    },
+    {
+      "topic_name": "AI自动化创业",
+      "topic_id": "T20260516001",
+      "generated_at": "2026-05-16",
+      "status": "completed",
+      "outputs": {
+        "html": "xiaohongshu/_html/AI自动化创业/Day01/",
+        "xiaohongshu": "xiaohongshu/AI自动化创业/",
+        "days_produced": ["Day01"],
+        "total_days": 1
+      },
+      "files": {
+        "Day01": {
+          "title": "title.txt",
+          "cover": "cover.txt",
+          "note": "note.md",
+          "comments": "comments.txt",
+          "images": ["images/image_01.png", "images/image_02.png", "images/image_03.png", "images/image_04.png", "images/image_05.png", "images/image_06.png"]
+        }
+      }
+    }
+  ],
+  "statistics": {
+    "total_topics": 4,
+    "completed_topics": 4,
+    "total_days_produced": 4,
+    "total_images_generated": 24,
+    "last_updated": "2026-05-20"
+  }
+}

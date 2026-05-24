@@ -14,6 +14,7 @@ from app.api.dashboard import router as dashboard_router
 from app.api.discovery import router as discovery_router
 from app.api.feature import router as feature_router
 from app.api.gdpr import router as gdpr_router
+from app.api.intelligence.router import intel_router
 from app.api.license import router as license_router
 from app.api.monitor import router as monitor_router
 from app.api.notifications import router as notifications_router
@@ -25,7 +26,8 @@ from app.api.system import router as system_router
 from app.api.task_queue import router as task_queue_router
 from app.api.teams import router as teams_router
 from app.api.users import router as users_router
-from app.middleware.auth import AdminUser, require_role
+from app.middleware.auth import AdminUser
+
 
 async def require_admin(user: AdminUser):
     return user
@@ -57,6 +59,7 @@ api_router.include_router(categories_router)
 api_router.include_router(aipic_generate_router)
 api_router.include_router(aipic_user_router)
 api_router.include_router(aipic_admin_router)
+api_router.include_router(intel_router)
 
 
 @api_router.get("/health", tags=["health"])
@@ -82,6 +85,7 @@ async def health_check():
 
 @api_router.get("/diagnose", tags=["health"])
 async def diagnose(user=Depends(require_admin)):
+    import logging
     import traceback
 
     from sqlalchemy import text
@@ -89,15 +93,16 @@ async def diagnose(user=Depends(require_admin)):
     from app.core.database import async_session_factory, engine
     from app.core.redis import get_redis
 
+    _logger = logging.getLogger("diagnose")
     results = {"database": {}, "redis": {}, "tables": {}, "auth_test": {}}
 
     try:
         async with engine.begin() as conn:
-            result = await conn.execute(text("SELECT 1"))
+            await conn.execute(text("SELECT 1"))
             results["database"]["connection"] = "ok"
     except Exception as e:
-        results["database"]["connection"] = f"error: {e}"
-        results["database"]["traceback"] = traceback.format_exc()
+        _logger.error("Database connection check failed: %s\n%s", e, traceback.format_exc())
+        results["database"]["connection"] = "error"
 
     try:
         async with engine.begin() as conn:
@@ -108,7 +113,8 @@ async def diagnose(user=Depends(require_admin)):
             results["tables"]["list"] = tables
             results["tables"]["count"] = len(tables)
     except Exception as e:
-        results["tables"]["error"] = str(e)
+        _logger.error("Table listing failed: %s", e)
+        results["tables"]["error"] = "query_failed"
 
     required_tables = ["users", "refresh_tokens", "products", "monitor_tasks", "alert_rules", "alert_events", "security_audit_log"]
     if "list" in results["tables"]:
@@ -120,8 +126,8 @@ async def diagnose(user=Depends(require_admin)):
             count = result.scalar()
             results["auth_test"]["user_count"] = count
     except Exception as e:
-        results["auth_test"]["query_error"] = str(e)
-        results["auth_test"]["traceback"] = traceback.format_exc()
+        _logger.error("Auth test query failed: %s\n%s", e, traceback.format_exc())
+        results["auth_test"]["query_error"] = "query_failed"
 
     try:
         redis = await get_redis()

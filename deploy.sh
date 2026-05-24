@@ -191,6 +191,9 @@ deploy_native() {
 
     cd "$SCRIPT_DIR/web-admin"
     npm install --legacy-peer-deps 2>/dev/null && npm run build 2>/dev/null
+
+    cd "$SCRIPT_DIR/web-intel"
+    npm install --legacy-peer-deps 2>/dev/null && npm run build 2>/dev/null
     echo -e "       ${GREEN}OK${NC}"
 
     echo -e "  ${CYAN}配置 systemd 服务...${NC}"

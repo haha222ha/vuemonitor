@@ -6,12 +6,14 @@ on:
     paths:
       - "web-admin/**"
       - "web-user/**"
+      - "web-intel/**"
       - "shared/**"
   pull_request:
     branches: [main]
     paths:
       - "web-admin/**"
       - "web-user/**"
+      - "web-intel/**"
       - "shared/**"
 
 env:
@@ -23,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        project: [web-admin, web-user]
+        project: [web-admin, web-user, web-intel]
     defaults:
       run:
         working-directory: ${{ matrix.project }}
@@ -59,8 +61,8 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     strategy:
       matrix:
-        project: [web-admin, web-user]
-    steps:
+        project: [web-admin, web-user, web-intel]
+    steps:   # docker-build job
       - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx

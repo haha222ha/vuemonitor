@@ -1,0 +1,54 @@
+{
+  "product_type": "daily_brief",
+  "generated_at": "2026-05-20",
+  "report_id": "DB20260520",
+  "title": "商业情报每日简报 - 2026年5月20日",
+  "summary": "今日扫描12个平台，识别3个新趋势，2个高机会方向",
+  "trends_top10": [
+    {
+      "rank": 1,
+      "trend_name": "AI自动化代运营",
+      "growth_reason": "中小企业AI能力缺口扩大",
+      "opportunity_score": 87,
+      "lifecycle_stage": "早期爆发",
+      "recommended_action": "立即切入"
+    }
+  ],
+  "new_demands": [
+    {
+      "demand": "AI代运营服务",
+      "source_platform": "小红书",
+      "evidence": "相关搜索量增长120%",
+      "commercial_value": "高"
+    }
+  ],
+  "opportunity_top5": [
+    {
+      "topic_id": "T20260520001",
+      "topic_name": "AI自动化代运营",
+      "score": 87,
+      "reason": "需求大、竞争低、可规模化"
+    }
+  ],
+  "risk_warnings": [
+    {
+      "risk": "AI代运营竞争可能在3个月内加剧",
+      "severity": "中",
+      "timeline": "90天内"
+    }
+  ],
+  "recommended_actions": [
+    {
+      "action": "立即生产AI代运营相关内容",
+      "priority": "高",
+      "platform": "小红书",
+      "content_type": "商业情报笔记"
+    }
+  ],
+  "statistics": {
+    "total_topics_generated": 5,
+    "total_topics_consumed": 3,
+    "total_content_produced": 30,
+    "active_series": 2
+  }
+}

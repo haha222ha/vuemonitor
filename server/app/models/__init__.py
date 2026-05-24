@@ -29,6 +29,18 @@ from app.models.collect import CollectTask, CollectTaskItem
 from app.models.db_config import DbConfig
 from app.models.feature_engine import CategoryStat, EnhancedFeature, Feature
 from app.models.feature_gate import FeatureGate, FeatureGateUsage
+from app.models.intelligence import (
+    IntelAuthCode,
+    IntelMembership,
+    IntelSyncBatch,
+    IntelligenceOpportunity,
+    IntelligencePlatformSignal,
+    IntelligenceReport,
+    IntelligenceRisk,
+    IntelligenceTrend,
+    IntelligenceUserEmotion,
+    IntelligenceXhsTopic,
+)
 from app.models.license import LicenseActivation, LicenseChangeLog, LicenseCode
 from app.models.membership import MembershipPlan, UserMembership
 from app.models.monitor import MonitorRule, Notification
@@ -94,6 +106,16 @@ __all__ = [
     "ProductIdMapping",
     "DbConfig",
     "ProductCategory",
+    "IntelligenceTrend",
+    "IntelligenceOpportunity",
+    "IntelligenceRisk",
+    "IntelligenceXhsTopic",
+    "IntelligencePlatformSignal",
+    "IntelligenceUserEmotion",
+    "IntelligenceReport",
+    "IntelAuthCode",
+    "IntelMembership",
+    "IntelSyncBatch",
     "AipicConfig",
     "AipicAuthCode",
     "AipicUserCredits",
