@@ -1,49 +1,65 @@
-node_modules/
-dist/
-out/
-release/
-release-new/
-.vite/
-*.pyc
+# Secrets - NEVER commit these
+secrets/
+*.txt
+secrets.txt
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Python
 __pycache__/
-*.pyo
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
 *.egg-info/
-.eggs/
-*.egg
+server/dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
 .pytest_cache/
 .coverage
 htmlcov/
-.mypy_cache/
-.ruff_cache/
-.venv/
-venv/
-env/
-*.db
-*.sqlite3
-.env
-!.env.example
+.tox/
+
+# Logs
 *.log
 logs/
+
+# OS
 .DS_Store
 Thumbs.db
-*.swp
-*.swo
-*~
-.idea/
-.vscode/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.lnk
-browser_data/
-*.pma
-历史/
-baidu_auth.json
+
+# Database
+*.dump
+*.dump.enc
+*.sql
+
+# Backup
+backup_data/
 backups/
-test-screenshots/
-progress.md
-findings.md
-task_plan.md
-deploy/downloads/*.exe
-deploy/downloads/*.blockmap
+
+# Electron build artifacts
+client/release/
+client/release-new/
+client/dist/
+*.exe
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+
+# Encryption key files
+.enc_key
+
