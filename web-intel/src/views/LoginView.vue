@@ -3,6 +3,7 @@
     <div class="login-card">
       <h2 class="login-title">AI Intelligence OS</h2>
       <p class="login-subtitle">输入授权码即可登录，无需注册</p>
+      <el-alert v-if="kickReason" :title="kickReason" type="warning" :closable="true" show-icon class="kick-alert" />
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="handleLogin">
         <el-form-item label="授权码" prop="code">
           <el-input
@@ -32,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue"
+import { reactive, ref, computed } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { ElMessage } from "element-plus"
 import type { FormInstance, FormRules } from "element-plus"
@@ -43,6 +44,8 @@ const router = useRouter()
 const route = useRoute()
 const auth = useIntelAuthStore()
 const formRef = ref<FormInstance>()
+
+const kickReason = computed(() => (route.query.reason as string) || "")
 
 const form = reactive({ code: "" })
 const rules: FormRules = {
@@ -89,6 +92,9 @@ async function handleLogin() {
   color: #909399;
   font-size: 14px;
   margin-bottom: 32px;
+}
+.kick-alert {
+  margin-bottom: 16px;
 }
 .login-btn {
   width: 100%;

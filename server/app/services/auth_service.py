@@ -106,7 +106,16 @@ class AuthService:
         if not user or not user.is_active:
             raise UnauthorizedException(message="用户不存在或已禁用")
 
-        new_access = create_access_token(subject=str(user.id), extra={"plan": user.plan, "role": user.role})
+        extra = {"plan": user.plan, "role": user.role}
+        try:
+            from app.api.intelligence.auth import get_intel_session_id
+            current_sid = await get_intel_session_id(user.id)
+            if current_sid:
+                extra["sid"] = current_sid
+        except Exception:
+            pass
+
+        new_access = create_access_token(subject=str(user.id), extra=extra)
         new_refresh = create_refresh_token(subject=str(user.id))
 
         await self.db.delete(rt)

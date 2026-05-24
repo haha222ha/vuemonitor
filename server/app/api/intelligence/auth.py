@@ -1,5 +1,6 @@
 import logging
 import secrets
+import uuid
 from datetime import UTC, datetime, timedelta
 from hashlib import sha256
 
@@ -9,6 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.redis import get_redis
 from app.core.security import create_access_token, create_refresh_token, hash_password
 from app.middleware.auth import CurrentUser
 from app.models.intelligence import IntelAuthCode, IntelMembership
@@ -17,6 +19,27 @@ from app.models.user import RefreshToken, User
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["intel-auth"])
+
+_INTEL_SESSION_PREFIX = "intel_session:"
+_INTEL_SESSION_TTL = 86400 * 365
+
+
+async def _create_intel_session(user_id: uuid.UUID) -> str:
+    session_id = secrets.token_hex(16)
+    redis = await get_redis()
+    key = f"{_INTEL_SESSION_PREFIX}{user_id}"
+    await redis.set(key, session_id, ex=_INTEL_SESSION_TTL)
+    return session_id
+
+
+async def get_intel_session_id(user_id: uuid.UUID) -> str | None:
+    try:
+        redis = await get_redis()
+        key = f"{_INTEL_SESSION_PREFIX}{user_id}"
+        val = await redis.get(key)
+        return val.decode() if val else None
+    except Exception:
+        return None
 
 
 class CodeLoginRequest(BaseModel):
@@ -85,7 +108,18 @@ async def code_login(
             existing_membership.status = "expired"
             raise HTTPException(status_code=400, detail="授权码已过期，请使用新的授权码")
 
-        access_token = create_access_token(subject=str(user.id), extra={"plan": user.plan, "role": user.role})
+        session_id = await _create_intel_session(user.id)
+
+        old_rts = await db.execute(
+            select(RefreshToken).where(RefreshToken.user_id == user.id)
+        )
+        for old_rt in old_rts.scalars().all():
+            await db.delete(old_rt)
+
+        access_token = create_access_token(
+            subject=str(user.id),
+            extra={"plan": user.plan, "role": user.role, "sid": session_id},
+        )
         refresh_token = create_refresh_token(subject=str(user.id))
 
         token_hash = sha256(refresh_token.encode()).hexdigest()
@@ -141,7 +175,12 @@ async def code_login(
 
         days_remaining = (expires_at - now).days
 
-        access_token = create_access_token(subject=str(user.id), extra={"plan": user.plan, "role": user.role})
+        session_id = await _create_intel_session(user.id)
+
+        access_token = create_access_token(
+            subject=str(user.id),
+            extra={"plan": user.plan, "role": user.role, "sid": session_id},
+        )
         refresh_token = create_refresh_token(subject=str(user.id))
 
         token_hash = sha256(refresh_token.encode()).hexdigest()

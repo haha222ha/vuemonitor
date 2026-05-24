@@ -68,6 +68,12 @@ api.interceptors.response.use(
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: number; _auth_retry?: boolean }
 
     if (error.response?.status === 401 && !originalRequest._auth_retry) {
+      const detail = (error.response?.data as { detail?: string })?.detail
+      if (detail === "账号已在其他设备登录，请重新授权") {
+        clearAuthAndRedirect("账号已在其他设备登录")
+        return Promise.reject(error)
+      }
+
       if (originalRequest.url?.includes("/auth/")) {
         clearAuthAndRedirect()
         return Promise.reject(error)
@@ -131,12 +137,17 @@ api.interceptors.response.use(
   }
 )
 
-function clearAuthAndRedirect() {
+function clearAuthAndRedirect(reason?: string) {
   localStorage.removeItem("intel_token")
   localStorage.removeItem("intel_refresh_token")
+  localStorage.removeItem("intel_auth_code")
   localStorage.removeItem("intel_username")
+  localStorage.removeItem("intel_membership")
   if (!window.location.pathname.endsWith("/login")) {
-    window.location.href = "/login"
+    const params = new URLSearchParams()
+    if (reason) params.set("reason", reason)
+    const query = params.toString()
+    window.location.href = `/login${query ? `?${query}` : ""}`
   }
 }
 
