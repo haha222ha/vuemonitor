@@ -60,12 +60,15 @@
           <el-tag :type="planTagType" size="small" class="plan-tag">
             {{ auth.planLabel }}
           </el-tag>
-          <span class="days-badge" v-if="auth.daysRemaining > 0">
-            剩余 {{ auth.daysRemaining }} 天
+          <span class="days-badge" :class="{ 'days-warning': auth.daysRemaining > 0 && auth.daysRemaining <= 7, 'days-expired': auth.daysRemaining <= 0 }">
+            <el-icon v-if="auth.daysRemaining <= 7 && auth.daysRemaining > 0"><Warning /></el-icon>
+            <template v-if="auth.daysRemaining > 0">剩余 {{ auth.daysRemaining }} 天</template>
+            <template v-else>已过期</template>
           </span>
+          <span class="expire-date" v-if="auth.expiresAt">到期：{{ formatDate(auth.expiresAt) }}</span>
           <el-dropdown @command="handleCommand">
             <span class="user-info">
-              {{ username }}
+              <el-icon><UserFilled /></el-icon>
               <el-icon><ArrowDown /></el-icon>
             </span>
             <template #dropdown>
@@ -90,15 +93,13 @@ import { useRoute, useRouter } from "vue-router"
 import { useIntelAuthStore } from "@/stores/auth"
 import {
   Monitor, TrendCharts, Opportunity, Warning, Document,
-  Connection, ChatDotRound, Fold, Expand, ArrowDown,
+  Connection, ChatDotRound, Fold, Expand, ArrowDown, UserFilled,
 } from "@element-plus/icons-vue"
 
 const route = useRoute()
 const router = useRouter()
 const auth = useIntelAuthStore()
 const collapsed = ref(false)
-
-const username = computed(() => localStorage.getItem("intel_username") || "用户")
 
 const pageTitle = computed(() => {
   const map: Record<string, string> = {
@@ -120,6 +121,15 @@ const planTagType = computed(() => {
   const map: Record<string, string> = { free: "info", pro: "success", enterprise: "warning" }
   return map[auth.planName] || "info"
 })
+
+function formatDate(isoStr: string): string {
+  try {
+    const d = new Date(isoStr)
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
+  } catch {
+    return isoStr
+  }
+}
 
 function handleCommand(command: string) {
   if (command === "logout") {
@@ -190,6 +200,17 @@ function handleCommand(command: string) {
   font-weight: 500;
 }
 .days-badge {
+  font-size: 12px;
+  color: #67c23a;
+  font-weight: 500;
+}
+.days-badge.days-warning {
+  color: #e6a23c;
+}
+.days-badge.days-expired {
+  color: #f56c6c;
+}
+.expire-date {
   font-size: 12px;
   color: #909399;
 }

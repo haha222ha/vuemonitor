@@ -2,22 +2,29 @@
   <div class="login-page">
     <div class="login-card">
       <h2 class="login-title">AI Intelligence OS</h2>
-      <p class="login-subtitle">登录以访问商业情报系统</p>
+      <p class="login-subtitle">输入授权码即可登录，无需注册</p>
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="handleLogin">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="form.username" placeholder="请输入用户名" size="large" />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="form.password" type="password" placeholder="请输入密码" size="large" show-password @keyup.enter="handleLogin" />
+        <el-form-item label="授权码" prop="code">
+          <el-input
+            v-model="form.code"
+            placeholder="请输入授权码"
+            size="large"
+            maxlength="64"
+            @keyup.enter="handleLogin"
+          >
+            <template #prefix>
+              <el-icon><Key /></el-icon>
+            </template>
+          </el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" size="large" :loading="auth.loading" class="login-btn" @click="handleLogin">
-            登 录
+            授权登录
           </el-button>
         </el-form-item>
-        <div class="login-links">
-          <span>没有账号？</span>
-          <a href="https://www.xhs365.cn" target="_blank">前往 XHS365 注册</a>
+        <div class="login-hint">
+          <el-icon><InfoFilled /></el-icon>
+          <span>授权码即账号，登录后信息保存在本地，无需重复输入</span>
         </div>
       </el-form>
     </div>
@@ -29,6 +36,7 @@ import { reactive, ref } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { ElMessage } from "element-plus"
 import type { FormInstance, FormRules } from "element-plus"
+import { Key, InfoFilled } from "@element-plus/icons-vue"
 import { useIntelAuthStore } from "@/stores/auth"
 
 const router = useRouter()
@@ -36,22 +44,21 @@ const route = useRoute()
 const auth = useIntelAuthStore()
 const formRef = ref<FormInstance>()
 
-const form = reactive({ username: "", password: "" })
+const form = reactive({ code: "" })
 const rules: FormRules = {
-  username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-  password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+  code: [{ required: true, message: "请输入授权码", trigger: "blur" }],
 }
 
 async function handleLogin() {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return
-  const success = await auth.login(form.username, form.password)
+  const success = await auth.codeLogin(form.code)
   if (success) {
     ElMessage.success("登录成功")
     const redirect = (route.query.redirect as string) || "/dashboard"
     router.push(redirect)
   } else {
-    ElMessage.error(auth.error || "登录失败")
+    ElMessage.error(auth.error || "授权码无效")
   }
 }
 </script>
@@ -65,7 +72,7 @@ async function handleLogin() {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
 }
 .login-card {
-  width: 400px;
+  width: 420px;
   padding: 40px;
   background: #fff;
   border-radius: 12px;
@@ -86,14 +93,13 @@ async function handleLogin() {
 .login-btn {
   width: 100%;
 }
-.login-links {
+.login-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #c0c4cc;
   text-align: center;
-  font-size: 13px;
-  color: #909399;
-}
-.login-links a {
-  color: #4fc3f7;
-  text-decoration: none;
-  margin-left: 4px;
+  justify-content: center;
 }
 </style>
