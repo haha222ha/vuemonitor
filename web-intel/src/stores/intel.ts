@@ -57,7 +57,7 @@ export const useIntelStore = defineStore("intel", () => {
     loading.value = true
     error.value = ""
     try {
-      const { data } = await api.get("/intel/")
+      const { data } = await api.get("/intel/dashboard")
       dashboard.value = data
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail || "加载失败"
