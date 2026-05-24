@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import axios from "axios";
+import { ElMessage } from "element-plus";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api/v1";
 const BASE_PATH = import.meta.env.BASE_URL || "/";
 
 const routes = [
@@ -10,6 +9,7 @@ const routes = [
   {
     path: BASE_PATH.slice(0, -1) || "/",
     component: () => import("../layouts/AdminLayout.vue"),
+    meta: { requiresAuth: true },
     children: [
       { path: "dashboard", component: () => import("../views/DashboardView.vue") },
       { path: "users", component: () => import("../views/UsersView.vue") },
@@ -30,30 +30,62 @@ const routes = [
 
 const router = createRouter({ history: createWebHistory(BASE_PATH), routes });
 
-router.beforeEach(async (to, _from, next) => {
+function decodeJWTPayload(token: string): Record<string, unknown> | null {
+  try {
+    const base64 = token.split(".")[1];
+    const json = atob(base64.replace(/-/g, "+").replace(/_/g, "/"));
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function isTokenValid(token: string): boolean {
+  const payload = decodeJWTPayload(token);
+  if (!payload || !payload.exp) return false;
+  return (payload.exp as number) * 1000 > Date.now();
+}
+
+function hasAdminRole(token: string): boolean {
+  const payload = decodeJWTPayload(token);
+  if (!payload) return false;
+  const role = payload.role as string || "";
+  return ["admin", "super_admin"].includes(role);
+}
+
+const loginPath = `${BASE_PATH}login`.replace(/\/+/g, "/");
+
+router.beforeEach((to, _from, next) => {
   const token = localStorage.getItem("admin_token");
-  const loginPath = `${BASE_PATH}login`;
 
   if (to.path === loginPath) {
+    if (token && isTokenValid(token)) {
+      next(`${BASE_PATH}dashboard`.replace(/\/+/g, "/"));
+      return;
+    }
     next();
     return;
   }
 
-  if (!token) {
-    next(loginPath);
-    return;
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!token || !isTokenValid(token)) {
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_refresh_token");
+      localStorage.removeItem("admin_username");
+      next({ path: loginPath, query: { redirect: to.fullPath } });
+      return;
+    }
+
+    if (!hasAdminRole(token)) {
+      ElMessage.error("无管理员权限");
+      localStorage.removeItem("admin_token");
+      next({ path: loginPath });
+      return;
+    }
   }
 
-  try {
-    await axios.get(`${API_BASE_URL}/admin/stats`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    next();
-  } catch {
-    localStorage.removeItem("admin_token");
-    next(`${BASE_PATH}login`.replace("//", "/"));
-  }
+  next();
 });
 
 export default router;
-export { BASE_PATH, API_BASE_URL };
+export { BASE_PATH };

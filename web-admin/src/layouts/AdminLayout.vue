@@ -34,8 +34,10 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from "vue-router";
 import { ref, onUnmounted } from "vue";
+import { useAdminStore } from "../stores/admin";
 const route = useRoute();
 const router = useRouter();
+const adminStore = useAdminStore();
 const adminUsername = ref(localStorage.getItem("admin_username") || "管理员");
 const currentTime = ref(new Date().toLocaleTimeString());
 const timer = setInterval(() => {
@@ -43,7 +45,7 @@ const timer = setInterval(() => {
 }, 60000);
 onUnmounted(() => clearInterval(timer));
 function logout() {
-  localStorage.removeItem("admin_token");
+  adminStore.logout();
   router.push("/login");
 }
 </script>

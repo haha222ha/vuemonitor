@@ -17,8 +17,8 @@ router = APIRouter(prefix="/admin", tags=["intel-admin"])
 
 
 class GenerateCodesRequest(BaseModel):
-    plan: str = Field(..., pattern="^(free|weekly|monthly|yearly|enterprise)$")
-    duration_days: int = Field(..., ge=1, le=3650)
+    plan: str = Field(..., pattern="^(weekly|monthly|yearly)$")
+    duration_days: int = Field(default=0, ge=0, le=3650)
     count: int = Field(default=1, ge=1, le=100)
     max_activations: int = Field(default=1, ge=1)
     note: str | None = None
@@ -38,6 +38,9 @@ def _generate_code() -> str:
     return "-".join(segments)
 
 
+_INTEL_PLAN_DURATION = {"weekly": 7, "monthly": 30, "yearly": 365}
+
+
 @router.post("/codes/generate")
 async def generate_intel_codes(
     req: GenerateCodesRequest,
@@ -45,6 +48,7 @@ async def generate_intel_codes(
     db: AsyncSession = Depends(get_db),
 ):
     batch_id = req.batch_id or secrets.token_hex(4)
+    duration = req.duration_days or _INTEL_PLAN_DURATION.get(req.plan, 30)
     codes = []
 
     for _ in range(req.count):
@@ -52,7 +56,7 @@ async def generate_intel_codes(
         auth_code = IntelAuthCode(
             code=code,
             plan=req.plan,
-            duration_days=req.duration_days,
+            duration_days=duration,
             max_activations=req.max_activations,
             batch_id=batch_id,
             note=req.note,
@@ -64,7 +68,7 @@ async def generate_intel_codes(
             "id": str(auth_code.id),
             "code": code,
             "plan": req.plan,
-            "duration_days": req.duration_days,
+            "duration_days": duration,
             "batch_id": batch_id,
         })
 
@@ -223,7 +227,7 @@ async def intel_stats(
     )
 
     plan_counts = {}
-    plans = ["free", "weekly", "monthly", "yearly", "enterprise"]
+    plans = ["weekly", "monthly", "yearly"]
     for p in plans:
         result = await db.execute(
             select(func.count(IntelMembership.id)).where(

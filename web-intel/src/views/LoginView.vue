@@ -28,6 +28,27 @@
           <span>授权码即账号，登录后信息保存在本地，无需重复输入</span>
         </div>
       </el-form>
+      <div class="plans-section">
+        <h3 class="plans-title">套餐方案</h3>
+        <div class="plans-grid">
+          <div class="plan-card">
+            <div class="plan-name">7天趋势精选</div>
+            <div class="plan-duration">7天</div>
+            <div class="plan-desc">热门趋势速览</div>
+          </div>
+          <div class="plan-card plan-card--popular">
+            <div class="plan-badge">推荐</div>
+            <div class="plan-name">月度会员</div>
+            <div class="plan-duration">30天</div>
+            <div class="plan-desc">深度情报分析</div>
+          </div>
+          <div class="plan-card">
+            <div class="plan-name">年费会员</div>
+            <div class="plan-duration">365天</div>
+            <div class="plan-desc">全年无间断追踪</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -107,5 +128,60 @@ async function handleLogin() {
   color: #c0c4cc;
   text-align: center;
   justify-content: center;
+}
+.plans-section {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+.plans-title {
+  text-align: center;
+  font-size: 14px;
+  color: #909399;
+  margin-bottom: 12px;
+}
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.plan-card {
+  text-align: center;
+  padding: 12px 8px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  position: relative;
+}
+.plan-card--popular {
+  background: #ecf5ff;
+  border-color: #409eff;
+}
+.plan-badge {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #409eff;
+  color: #fff;
+  font-size: 10px;
+  padding: 1px 8px;
+  border-radius: 8px;
+}
+.plan-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 4px;
+}
+.plan-duration {
+  font-size: 18px;
+  font-weight: 700;
+  color: #409eff;
+}
+.plan-desc {
+  font-size: 11px;
+  color: #909399;
+  margin-top: 4px;
 }
 </style>

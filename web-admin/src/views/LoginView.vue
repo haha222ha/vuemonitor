@@ -13,11 +13,12 @@
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { useAdminStore } from "../stores/admin";
 
 const router = useRouter();
+const route = useRoute();
 const adminStore = useAdminStore();
 const loading = ref(false);
 const form = reactive({ username: "", password: "" });
@@ -26,7 +27,8 @@ async function handleLogin() {
   loading.value = true;
   try {
     await adminStore.login(form.username, form.password);
-    router.push("/dashboard");
+    const redirect = (route.query.redirect as string) || "/dashboard";
+    router.push(redirect);
     ElMessage.success("登录成功");
   } catch { ElMessage.error("登录失败"); }
   finally { loading.value = false; }

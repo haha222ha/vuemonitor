@@ -7,7 +7,8 @@ interface User {
   username: string;
   email: string;
   role: string;
-  status: number; // Assuming status is a number (e.g., 0 for inactive, 1 for active)
+  plan: string;
+  status: number;
   created_at: string;
   updated_at: string;
 }
