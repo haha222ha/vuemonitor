@@ -14,6 +14,7 @@ const routes = [
       { path: "dashboard", component: () => import("../views/DashboardView.vue") },
       { path: "users", component: () => import("../views/UsersView.vue") },
       { path: "licenses", component: () => import("../views/LicensesView.vue") },
+      { path: "intel-codes", component: () => import("../views/IntelCodesView.vue") },
       { path: "collect", component: () => import("../views/CollectView.vue") },
       { path: "proxies", component: () => import("../views/ProxiesView.vue") },
       { path: "risk-events", component: () => import("../views/RiskEventsView.vue") },
