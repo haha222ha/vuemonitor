@@ -19,7 +19,19 @@ cd /opt/vuemonitor && sudo rm -rf client/node_modules 2>/dev/null; git fetch ori
 cd /opt/vuemonitor/server && source .venv/bin/activate && python ../scripts/seed_admin.py --email admin@xhs365.cn --password '你的强密码'
 ```
 
-## 配置 SMTP（`server/.env`）
+## 售卖（授权码 + QQ，无需支付）
+
+- 用户教程：`https://www.xhs365.cn/purchase`
+- 运营手册：[docs/SELLING.md](docs/SELLING.md)
+- admin 生成授权码 → 用户设置页激活
+
+## 全量验收（主机）
+
+```bash
+bash /opt/vuemonitor/scripts/verify_launch.sh
+```
+
+## 配置 SMTP（可选，`server/.env`）
 
 ```env
 SMTP_HOST=smtp.example.com

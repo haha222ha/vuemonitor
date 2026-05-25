@@ -108,6 +108,11 @@
     <footer class="footer">
       <div class="footer-inner">
         <div class="footer-brand"><span class="logo-icon">◆</span> XHS365</div>
+        <div class="footer-links-mini">
+          <router-link to="/faq">FAQ</router-link>
+          <router-link to="/terms">服务条款</router-link>
+          <router-link to="/privacy">隐私政策</router-link>
+        </div>
         <div class="footer-copy">© 2026 XHS365. All rights reserved.</div>
       </div>
     </footer>
@@ -364,6 +369,18 @@
   gap: 6px;
 }
 
+.footer-links-mini {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+}
+.footer-links-mini a {
+  color: #6a6a7a;
+  text-decoration: none;
+}
+.footer-links-mini a:hover {
+  color: #818cf8;
+}
 .footer-copy { font-size: 12px; color: #4a4a5a; }
 
 @media (max-width: 900px) {

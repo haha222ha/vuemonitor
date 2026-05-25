@@ -2,10 +2,20 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import api from "../utils/api";
 
-interface License {
-  id: number;
-  // Add other fields as needed
-  [key: string]: any;
+export interface License {
+  id: string;
+  code: string;
+  plan: string;
+  duration_days: number;
+  status: string;
+  batch_id?: string;
+  created_at?: string;
+}
+
+export interface GenerateResult {
+  codes: string[];
+  count: number;
+  batch_id: string | null;
 }
 
 export const useLicensesStore = defineStore("licenses", () => {
@@ -16,42 +26,25 @@ export const useLicensesStore = defineStore("licenses", () => {
   async function fetchLicenses(page: number, pageSize: number, status?: string) {
     loading.value = true;
     try {
-      const params: Record<string, any> = { page, pageSize };
-      if (status) {
-        params.status = status;
-      }
+      const params: Record<string, unknown> = { page, page_size: pageSize };
+      if (status) params.status = status;
       const { data } = await api.get("/admin/licenses", { params });
-      licenses.value = data.items || data;
-      total.value = data.total || licenses.value.length;
-    } catch (error) {
-      // Error handling silent; views can handle UI feedback
+      licenses.value = data?.items || [];
+      total.value = data?.total ?? licenses.value.length;
     } finally {
       loading.value = false;
     }
   }
 
-  async function generateLicense(data: Record<string, any>) {
-    try {
-      await api.post("/admin/licenses/generate", data);
-      // Optionally refetch licenses
-      await fetchLicenses(1, 10); // Reset to first page, adjust as needed
-    } catch (error) {
-      // Error handling silent; views can handle UI feedback
-    }
+  async function generateLicense(body: Record<string, unknown>): Promise<GenerateResult> {
+    const { data } = await api.post("/admin/licenses/generate", body);
+    return data as GenerateResult;
   }
 
-  async function revokeLicense(id: number) {
-    try {
-      await api.put(`/admin/licenses/${id}/revoke`);
-      // Optionally update local state: remove or mark revoked
-      const index = licenses.value.findIndex(license => license.id === id);
-      if (index !== -1) {
-        licenses.value.splice(index, 1);
-        total.value = Math.max(total.value - 1, 0);
-      }
-    } catch (error) {
-      // Error handling silent; views can handle UI feedback
-    }
+  async function revokeLicense(id: string) {
+    await api.post(`/admin/licenses/${id}/revoke`);
+    const index = licenses.value.findIndex((l) => l.id === id);
+    if (index !== -1) licenses.value.splice(index, 1);
   }
 
   return { licenses, total, loading, fetchLicenses, generateLicense, revokeLicense };

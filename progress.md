@@ -15,6 +15,16 @@
 
 **待继续**：GitHub SSH 自动部署 Secrets、生产 SMTP/AI Key、Electron 打包
 
+### 会话 #7 — 2026-05-25（Sprint 1+2 自动化）
+
+**代码已 push `23929d55`**：
+- `sprint1_runner.py` / `sprint2_runner.py` / `run_sprints.sh`
+- Web 登录后 `fetchUser` 修复（`/user/profile`）
+- `/license/activate` 修复 device_fingerprint
+- `host-update.sh` 集成 Sprint 验收 + `check_production_env.py`
+- `client/scripts/package-win.ps1` Electron 打包
+- `docs/SPRINT1-2.md`
+
 ### 会话 #6 — 2026-05-25（全自动化上线）
 
 **新增自动化**：

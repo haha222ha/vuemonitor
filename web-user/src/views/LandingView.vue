@@ -582,9 +582,9 @@
             </div>
             <div class="footer-col">
               <h4>法律</h4>
-              <a href="#">服务条款</a>
-              <a href="#">隐私政策</a>
-              <a href="#">Cookie政策</a>
+              <router-link to="/terms">服务条款</router-link>
+              <router-link to="/privacy">隐私政策</router-link>
+              <router-link to="/faq">常见问题</router-link>
             </div>
           </div>
         </div>

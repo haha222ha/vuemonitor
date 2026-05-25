@@ -1,3 +1,4 @@
+from pathlib import Path
 from urllib.parse import quote
 
 from fastapi import APIRouter
@@ -5,6 +6,8 @@ from fastapi import APIRouter
 from app.config import get_settings
 
 router = APIRouter(prefix="/public", tags=["public"])
+
+_REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 @router.get("/support")
@@ -30,5 +33,27 @@ async def support_contact():
             "qq_qr_url": qr_url,
             "title": settings.SUPPORT_TITLE,
             "hint": settings.SUPPORT_HINT,
+        },
+    }
+
+
+@router.get("/downloads")
+async def client_downloads():
+    """桌面客户端下载信息（安装包由 Nginx 静态目录提供）。"""
+    settings = get_settings()
+    site = (settings.SUPPORT_SITE_URL or "").rstrip("/")
+    rel = settings.CLIENT_INSTALLER_PATH.replace("\\", "/")
+    installer_path = _REPO_ROOT / rel
+    available = installer_path.is_file()
+    filename = installer_path.name if available else "XHS365-Setup-latest.exe"
+    url = f"{site}/downloads/{filename}" if site else f"/downloads/{filename}"
+    return {
+        "code": 0,
+        "data": {
+            "version": settings.CLIENT_VERSION,
+            "platform": "windows",
+            "installer_url": url,
+            "installer_available": available,
+            "hint": "安装包未上传时请联系 QQ 客服获取" if not available else None,
         },
     }

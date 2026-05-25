@@ -61,13 +61,22 @@
         </div>
 
         <div class="dl-buttons">
-          <a :href="installerUrl" class="btn-dl-primary" download>
+          <a
+            v-if="installerAvailable"
+            :href="installerUrl"
+            class="btn-dl-primary"
+            download
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             免费下载 Windows 版
           </a>
+          <router-link v-else to="/purchase" class="btn-dl-primary btn-dl-muted">
+            安装包筹备中 · 联系 QQ 客服获取
+          </router-link>
         </div>
 
-        <p class="dl-hint">安装如遇 Windows 安全提示，点击「更多信息」→「仍要运行」即可</p>
+        <p v-if="installerAvailable" class="dl-hint">安装如遇 Windows 安全提示，点击「更多信息」→「仍要运行」即可</p>
+        <p v-else class="dl-hint dl-warn">{{ downloadHint || "安装包尚未上传至服务器，请先使用 Web 版或联系客服。" }}</p>
       </div>
     </section>
 
@@ -166,10 +175,28 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+import api from "../utils/api";
 
 const navScrolled = ref(false);
-const version = "0.1.0";
-const installerUrl = `/downloads/XHS365-Setup-${version}.exe`;
+const version = ref("0.1.0");
+const installerUrl = ref("/downloads/XHS365-Setup-latest.exe");
+const installerAvailable = ref(false);
+const downloadHint = ref("");
+
+async function loadDownloadInfo() {
+  try {
+    const res = await api.get("/public/downloads");
+    const d = res.data?.data;
+    if (d) {
+      version.value = d.version || version.value;
+      if (d.installer_url) installerUrl.value = d.installer_url;
+      installerAvailable.value = !!d.installer_available;
+      downloadHint.value = d.hint || "";
+    }
+  } catch {
+    installerAvailable.value = false;
+  }
+}
 
 const vObserve = {
   mounted(el: HTMLElement) {
@@ -199,7 +226,10 @@ function onScroll() {
   navScrolled.value = window.scrollY > 20;
 }
 
-onMounted(() => window.addEventListener("scroll", onScroll, { passive: true }));
+onMounted(() => {
+  loadDownloadInfo();
+  window.addEventListener("scroll", onScroll, { passive: true });
+});
 onUnmounted(() => window.removeEventListener("scroll", onScroll));
 </script>
 
@@ -380,6 +410,16 @@ onUnmounted(() => window.removeEventListener("scroll", onScroll));
 .btn-dl-primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-dl-muted {
+  text-decoration: none;
+  background: rgba(99, 102, 241, 0.35);
+  font-size: 14px;
+}
+
+.dl-warn {
+  color: rgba(251, 191, 36, 0.85) !important;
 }
 
 .dl-hint {

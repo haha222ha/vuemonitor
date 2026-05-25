@@ -69,6 +69,14 @@ for app in web-user web-admin web-intel; do
 done
 ok "前端 dist 已就绪 (user/admin/intel)"
 
+# --- 2b. 客户端安装包同步到静态目录（/downloads/）---
+if [ -d "$ROOT/deploy/downloads" ]; then
+  mkdir -p "$ROOT/web-user/dist/downloads"
+  cp -f "$ROOT/deploy/downloads/"*.exe "$ROOT/web-user/dist/downloads/" 2>/dev/null || true
+  cp -f "$ROOT/deploy/downloads/"*.yml "$ROOT/web-user/dist/downloads/" 2>/dev/null || true
+  ok "downloads 静态文件已同步到 web-user/dist/downloads"
+fi
+
 # --- 3. Python 依赖 + 迁移（轻量安装，避免 OOM）---
 log "更新 Python 依赖..."
 cd "$ROOT/server"

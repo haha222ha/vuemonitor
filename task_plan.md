@@ -303,25 +303,25 @@
 ## 阶段 L：产品化与发布（P3-低优）
 
 ### L-1 用户文档
-- [ ] 更新用户使用说明
-- [ ] 添加FAQ
-- [ ] 添加视频教程链接
+- [x] FAQ `/faq`
+- [x] 购买教程 `/purchase` + [docs/SELLING.md](docs/SELLING.md)
+- [ ] 视频教程链接
 
 ### L-2 定价页面
-- [ ] 验证PricingView数据与后端一致
-- [ ] 添加支付流程（如需）
+- [x] PricingView 与 feature_gates 对齐（Premium 500 商品）
+- [x] 人工售卖流程（不接支付）
 
 ### L-3 落地页优化
-- [ ] 优化LandingView SEO
+- [x] 服务条款 `/terms`、隐私 `/privacy`
 - [ ] 添加产品截图/演示
 - [ ] 添加客户评价
 
 ### L-4 发布检查清单
-- [ ] 所有P0/P1问题已修复
-- [ ] 端到端测试通过
+- [x] 授权码售卖链路（admin 生成 + Web 激活）
+- [ ] 浏览器 E2E 手工验收
 - [ ] 安全审计通过
-- [ ] 性能基准达标
-- [ ] 文档完整
+- [ ] Windows 安装包上传 `deploy/downloads/`
+- [x] `scripts/verify_launch.sh`
 
 ---
 
