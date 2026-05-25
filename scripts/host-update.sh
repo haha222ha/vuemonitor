@@ -2,7 +2,7 @@
 # XHS365 主机一键更新 — 针对 2G RAM / 2 CPU（git pull 部署，不在服务器上 npm build）
 #
 # 【主机一键命令，复制这一行即可】
-#   cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main && bash scripts/host-update.sh
+#   cd /opt/vuemonitor && sudo rm -rf client/node_modules 2>/dev/null; git fetch origin main && git reset --hard origin/main && bash scripts/host-update.sh
 #
 set -euo pipefail
 
@@ -43,23 +43,17 @@ fi
 
 # --- 1. 拉取代码 ---
 log "拉取最新代码 (origin/main)..."
-# 修复误提交 node_modules 导致的 Permission denied（2G 主机不需要 client 依赖）
+# 2G 主机不跑 Electron 构建，删除历史误提交的 node_modules，避免 git reset Permission denied
 if [ -d "client/node_modules" ]; then
-  chmod -R u+w client/node_modules 2>/dev/null || true
-  rm -rf client/node_modules/.vite 2>/dev/null \
-    || sudo rm -rf client/node_modules/.vite 2>/dev/null \
+  log "清理 client/node_modules（服务器不需要）..."
+  sudo rm -rf client/node_modules 2>/dev/null \
+    || rm -rf client/node_modules 2>/dev/null \
     || true
 fi
 
 git fetch origin main
 BEFORE=$(git rev-parse HEAD)
-if ! git reset --hard origin/main 2>/dev/null; then
-  warn "git reset 失败，修复 client/node_modules 权限后重试..."
-  sudo chown -R "$(whoami):$(whoami)" client/node_modules 2>/dev/null \
-    || sudo rm -rf client/node_modules 2>/dev/null \
-    || true
-  git reset --hard origin/main
-fi
+git reset --hard origin/main
 AFTER=$(git rev-parse HEAD)
 if [ "$BEFORE" = "$AFTER" ]; then
   ok "代码已是最新 ($AFTER)"
