@@ -84,11 +84,7 @@ fi
 
 if [[ -n "$TEST_TO" ]]; then
   echo "Sending test email to $TEST_TO ..."
-  PY="$ROOT/server/.venv/bin/python3"
-  if [[ ! -x "$PY" ]]; then
-    PY="$(command -v python3)"
-  fi
-  PYTHONPATH="$ROOT/server" "$PY" "$ROOT/scripts/test_smtp.py" --to "$TEST_TO" \
+  bash "$ROOT/scripts/run-server-cmd.sh" "$ROOT/scripts/test_smtp.py" --to "$TEST_TO" \
     && echo "Test email sent." \
     || echo "Test send failed — try SMTP_PORT=994 SMTP_USE_SSL=true; journalctl -u vuemonitor -n 30"
 else

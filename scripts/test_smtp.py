@@ -7,13 +7,11 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import os
 import sys
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SERVER = os.path.join(ROOT, "server")
-sys.path.insert(0, SERVER)
-os.environ.setdefault("PYTHONPATH", SERVER)
+from server_env import bootstrap
+
+bootstrap()
 
 
 async def main() -> int:
