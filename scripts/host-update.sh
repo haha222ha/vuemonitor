@@ -43,9 +43,23 @@ fi
 
 # --- 1. 拉取代码 ---
 log "拉取最新代码 (origin/main)..."
+# 修复误提交 node_modules 导致的 Permission denied（2G 主机不需要 client 依赖）
+if [ -d "client/node_modules" ]; then
+  chmod -R u+w client/node_modules 2>/dev/null || true
+  rm -rf client/node_modules/.vite 2>/dev/null \
+    || sudo rm -rf client/node_modules/.vite 2>/dev/null \
+    || true
+fi
+
 git fetch origin main
 BEFORE=$(git rev-parse HEAD)
-git reset --hard origin/main
+if ! git reset --hard origin/main 2>/dev/null; then
+  warn "git reset 失败，修复 client/node_modules 权限后重试..."
+  sudo chown -R "$(whoami):$(whoami)" client/node_modules 2>/dev/null \
+    || sudo rm -rf client/node_modules 2>/dev/null \
+    || true
+  git reset --hard origin/main
+fi
 AFTER=$(git rev-parse HEAD)
 if [ "$BEFORE" = "$AFTER" ]; then
   ok "代码已是最新 ($AFTER)"

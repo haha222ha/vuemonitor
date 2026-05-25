@@ -23,7 +23,13 @@ build/
 
 # Node
 node_modules/
+**/node_modules/
+client/node_modules/
 **/.vite/
+client/dist/
+web-user/node_modules/
+web-admin/node_modules/
+web-intel/node_modules/
 
 # IDE
 .idea/
