@@ -11,3 +11,19 @@ cd /opt/vuemonitor && sudo rm -rf client/node_modules 2>/dev/null; git fetch ori
 ```bash
 bash /opt/vuemonitor/scripts/diagnose-api.sh
 ```
+
+## 配置网易企业邮 SMTP（主机一行）
+
+SSH 登录服务器后，**只改两处**：`SMTP_PASS` 里的授权码、`TEST_TO` 改成你要收测试信的邮箱，然后整行复制执行：
+
+```bash
+cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main && SMTP_PASS='粘贴网易授权码' TEST_TO='你的邮箱@example.com' bash scripts/configure_smtp.sh
+```
+
+若 587 发信失败，改用 SSL 994（仍是一行，授权码同上）：
+
+```bash
+cd /opt/vuemonitor && SMTP_HOST=smtp.qiye.163.com SMTP_PORT=994 SMTP_USE_TLS=false SMTP_USE_SSL=true SMTP_PASS='粘贴网易授权码' TEST_TO='你的邮箱@example.com' bash scripts/configure_smtp.sh
+```
+
+不想把密码写在命令里：先 `git pull` 后只执行 `bash scripts/configure_smtp.sh`，按提示输入授权码。
