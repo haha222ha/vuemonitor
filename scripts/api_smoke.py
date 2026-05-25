@@ -69,7 +69,7 @@ def run_smoke(base_url: str, skip_auth: bool) -> list[CheckResult]:
 
     public_gets = [
         ("categories", "/api/v1/categories"),
-        ("discovery", "/api/v1/discovery/hot"),
+        ("discovery", "/api/v1/discovery/hot-goods"),
     ]
     for name, path in public_gets:
         status, payload = _request("GET", f"{base}{path}")
