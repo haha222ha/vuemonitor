@@ -5,3 +5,9 @@
 ```bash
 cd /opt/vuemonitor && sudo rm -rf client/node_modules 2>/dev/null; git fetch origin main && git reset --hard origin/main && bash scripts/host-update.sh
 ```
+
+健康检查失败时诊断（复制一行）：
+
+```bash
+bash /opt/vuemonitor/scripts/diagnose-api.sh
+```

@@ -108,15 +108,31 @@ if systemctl is-active --quiet nginx 2>/dev/null; then
   ok "Nginx 已 reload"
 fi
 
-# --- 5. 健康检查 ---
+# --- 5. 健康检查（2G 主机启动较慢，最多等待 90s）---
 log "健康检查..."
-sleep 3
 HEALTH_URL="${HEALTH_URL:-http://127.0.0.1:8000/health}"
-CODE=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || echo "000")
-if [ "$CODE" = "200" ]; then
-  ok "API health HTTP $CODE"
-else
-  fail "API health HTTP $CODE — 查看: journalctl -u vuemonitor -n 50 --no-pager"
+CODE="000"
+for i in $(seq 1 18); do
+  if systemctl is-active --quiet vuemonitor 2>/dev/null; then
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" 2>/dev/null || echo "000")
+    # 去掉 curl 失败时可能带出的换行
+    CODE="${CODE//$'\n'/}"
+    if [ "$CODE" = "200" ]; then
+      ok "API health HTTP $CODE (${i} 次尝试)"
+      break
+    fi
+  fi
+  sleep 5
+done
+
+if [ "$CODE" != "200" ]; then
+  echo ""
+  warn "API 未响应 (HTTP $CODE)，最近日志："
+  sudo systemctl status vuemonitor --no-pager -l 2>/dev/null | tail -20 || true
+  echo ""
+  sudo journalctl -u vuemonitor -n 40 --no-pager 2>/dev/null || true
+  echo ""
+  fail "请先修复 vuemonitor 服务后重试。诊断: bash scripts/diagnose-api.sh"
 fi
 
 if [ -f "$ROOT/scripts/api_smoke.py" ]; then
