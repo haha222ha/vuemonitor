@@ -23,7 +23,6 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@pinia/testing": "^1.0.3",
     "@types/node": "^25.7.0",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/test-utils": "^2.4.10",
