@@ -142,28 +142,28 @@ function extractFilename(path: string): string {
   return clean.split("/").pop() || ""
 }
 
+/** 线上 /static/reports/ 若未配 Nginx 反代会落到 SPA index.html，故统一走 API 文件接口 */
 function resolveReportUrl(item: ReportListItem): string {
   const path = item.content_html || item.file_path || ""
   if (!path) return ""
 
   const origin = window.location.origin
-
-  if (path.startsWith("http")) {
-    if (/localhost|127\.0\.0\.1/i.test(path)) {
-      const filename = extractFilename(path)
-      return filename ? `${origin}/static/reports/${encodeURIComponent(filename)}` : ""
-    }
-    return path
+  let filename = extractFilename(path)
+  if (!filename && path.startsWith("http")) {
+    filename = extractFilename(path)
   }
-
-  const filename = extractFilename(path)
   if (!filename) return ""
 
-  if (path.startsWith("/static/reports/")) {
-    return `${origin}/static/reports/${encodeURIComponent(filename)}`
-  }
+  const encoded = encodeURIComponent(filename)
+  return `${origin}/api/v1/intel/reports/files/${encoded}`
+}
 
-  return `${origin}/static/reports/${encodeURIComponent(filename)}`
+function isSpaIndexHtml(html: string): boolean {
+  if (!html || html.length < 80) return false
+  return (
+    (html.includes('id="app"') || html.includes("id='app'")) &&
+    (html.includes("/assets/index-") || html.includes("vite") || html.includes("web-intel"))
+  )
 }
 
 function reportTypeLabel(t: string) {
@@ -196,12 +196,18 @@ async function loadReportContent(item: ReportListItem) {
       timeout: 60000,
       headers: { Accept: "text/html" },
     })
-    if (typeof data === "string" && data.includes("<html")) {
-      reportHtmlInline.value = data
-      reportFrameUrl.value = ""
+    if (typeof data !== "string" || !data.includes("<html")) {
+      reportError.value = "报告内容为空或格式异常"
+      return
     }
+    if (isSpaIndexHtml(data)) {
+      reportError.value = "服务器未正确暴露报告文件（返回了站点首页）。请联系管理员执行一键部署并检查 Nginx。"
+      return
+    }
+    reportHtmlInline.value = data
+    reportFrameUrl.value = ""
   } catch {
-    reportFrameUrl.value = url
+    reportError.value = "加载报告失败，请尝试「新窗口打开」或稍后重试"
   } finally {
     reportLoading.value = false
   }
