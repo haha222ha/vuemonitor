@@ -82,31 +82,30 @@
 > 2026-05-25：已添加 `scripts/api_smoke.py` 自动化冒烟；邮件验证码接入 `email_service`；Client `TrendChart` 移除假数据。
 
 ### E-1 用户注册登录流程
-- [ ] Web-User: 注册 → 登录 → Token获取 → 用户信息
-- [ ] Client: 注册 → 登录 → Token持久化 → 自动刷新
-- [ ] 验证JWT过期后自动刷新
+- [x] API 自动化 `sprint1_runner.py`（注册/登录/刷新/profile）
+- [x] Web-User 修复 `fetchUser` → `/user/profile`
+- [ ] Client: 注册 → 登录 → Token持久化 → 自动刷新（手工）
 
 ### E-2 商品管理流程
-- [ ] 创建商品 → 查看商品列表 → 商品详情 → 编辑商品
+- [x] API 自动化：创建/列表/详情
 - [ ] 验证商品数据在Web-User和Client间同步
 
 ### E-3 数据采集流程
-- [ ] Client: 创建采集任务 → Chromium采集 → 数据入库
+- [ ] Client: 创建采集任务 → Chromium采集 → 数据入库（需 Cookie）
 - [ ] 验证采集数据同步到服务端
 - [ ] Web-User: 查看采集数据和进度
 
 ### E-4 AI分析流程
-- [ ] 选择商品 → 触发AI分析 → 获取分析结果
-- [ ] 验证basic_analysis（免费套餐）
+- [x] API 自动化 `sprint1_runner.py --run-ai`（需 Key）
 - [ ] 验证Feature Gate对付费分析的限制
 
 ### E-5 监控告警流程
-- [ ] 创建监控规则 → 规则评估 → 告警触发 → 通知推送
-- [ ] 验证告警事件列表
+- [x] API 自动化：监控规则+通知列表
+- [ ] 规则评估触发真实告警事件（待数据）
 
 ### E-6 授权码流程
-- [ ] Admin创建授权码 → 用户激活 → 套餐升级
-- [ ] 验证Feature Gate随套餐变化
+- [x] API 自动化 `sprint2_runner.py` + 修复 `/license/activate` fingerprint
+- [ ] 验证Feature Gate随套餐变化（Web/Client UI）
 
 ### E-7 团队协作流程
 - [ ] 创建团队 → 邀请成员 → 共享规则/商品
@@ -117,12 +116,12 @@
 - [ ] 验证积分扣减
 
 ### E-9 发现页流程
-- [ ] 搜索商品/店铺 → 爆款列表 → 商品详情
-- [ ] 验证Discovery数据库查询
+- [x] API：`/discovery/hot-goods`（sprint2）
+- [ ] Discovery DB 文件配置与 UI
 
 ### E-10 数据同步流程
-- [ ] Client → Server 数据推送
-- [ ] Server → Client 数据拉取
+- [x] API：push/pull/batch/status（sprint2）
+- [ ] Client → Server 端到端（桌面端手工）
 - [ ] 冲突检测和解决
 
 ### E-11 GDPR合规流程
@@ -208,14 +207,12 @@
 ## 阶段 I：Electron打包发布（P2-中优）
 
 ### I-1 打包环境准备
-- [ ] 确认Windows构建环境
-- [ ] 安装electron-builder依赖
-- [ ] 准备应用图标（build/icon.ico）
+- [x] `client/scripts/package-win.ps1` 脚本
+- [ ] 确认Windows构建环境执行一次
 
 ### I-2 首次打包测试
-- [ ] npm run build（3步构建）
-- [ ] npm run dist（electron-builder打包）
-- [ ] 验证安装包生成
+- [ ] npm run build + dist（开发机执行 package-win.ps1）
+- [ ] 验证安装包生成并上传 deploy/downloads
 
 ### I-3 安装测试
 - [ ] 安装XHS365-Setup-0.1.0.exe

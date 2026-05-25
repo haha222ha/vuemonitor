@@ -13,6 +13,8 @@ export interface TrendItem {
   direction: string
   risk_level: string
   user_emotion: string
+  actionable_insight?: string
+  evidence?: string
 }
 
 export interface OpportunityItem {

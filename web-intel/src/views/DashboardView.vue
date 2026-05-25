@@ -1,9 +1,34 @@
 <template>
   <div class="dashboard">
+    <UpgradeBanner />
+    <section v-if="showDailyBrief && intel.dashboard" class="daily-brief">
+      <div class="brief-header">
+        <h3>📡 今日副业简报</h3>
+        <el-button type="primary" link @click="$router.push('/reports')">查看本周决策报告 →</el-button>
+      </div>
+      <div class="brief-grid">
+        <div class="brief-card brief-signal" v-if="briefSignal">
+          <div class="brief-label">今日信号</div>
+          <div class="brief-title">{{ briefSignal.title }}</div>
+          <p class="brief-text">{{ briefSignal.text }}</p>
+        </div>
+        <div class="brief-card brief-risk" v-if="briefRisk">
+          <div class="brief-label">风险提醒</div>
+          <div class="brief-title">{{ briefRisk.name }}</div>
+          <p class="brief-text">{{ briefRisk.reason }}</p>
+        </div>
+        <div class="brief-card brief-action" v-if="briefAction">
+          <div class="brief-label">今日行动</div>
+          <div class="brief-title">{{ briefAction.name }}</div>
+          <p class="brief-text">{{ briefAction.text }}</p>
+        </div>
+      </div>
+    </section>
+
     <div class="page-header">
       <div class="header-title-area">
         <h2>商业情报仪表盘</h2>
-        <p class="header-subtitle" v-if="intel.dashboard">实时监控互联网商业情报动态</p>
+        <p class="header-subtitle" v-if="intel.dashboard">AI 副业趋势 · 机会 · 风险 实时监控</p>
       </div>
       <el-tag v-if="intel.dashboard" type="success" size="small" effect="dark" class="live-tag">
         <span class="live-dot"></span>
@@ -235,6 +260,7 @@
 import { onMounted, computed } from "vue"
 import { useIntelStore } from "@/stores/intel"
 import { useIntelAuthStore } from "@/stores/auth"
+import UpgradeBanner from "@/components/UpgradeBanner.vue"
 import { TrendCharts, Opportunity, Warning, Right } from "@element-plus/icons-vue"
 import { getScoreColor, getDirectionIcon } from "@/utils/theme"
 import { Bar, Doughnut } from "vue-chartjs"
@@ -245,6 +271,32 @@ const intel = useIntelStore()
 const auth = useIntelAuthStore()
 
 const planLabel = computed(() => auth.planLabel)
+
+const showDailyBrief = computed(() => auth.planName === "weekly")
+
+const briefSignal = computed(() => {
+  const t = intel.dashboard?.top_trends?.[0]
+  if (!t) return null
+  const ext = t as { actionable_insight?: string; evidence?: string }
+  return {
+    title: t.title,
+    text: ext.actionable_insight || ext.evidence || `${t.category} · 机会分 ${t.opportunity_score}`,
+  }
+})
+
+const briefRisk = computed(() => {
+  const r = intel.dashboard?.top_risks?.[0]
+  if (!r) return null
+  return { name: r.name, reason: r.reason || r.alternative || "请关注风险变化" }
+})
+
+const briefAction = computed(() => {
+  const o = intel.dashboard?.top_opportunities?.[0]
+  if (!o) return null
+  const paths = o.commercial_paths
+  const text = Array.isArray(paths) && paths.length ? String(paths[0]) : `评分 ${o.verdict_score} · ${o.persona_fit || "查看机会详情"}`
+  return { name: o.name, text }
+})
 
 function generateSparkline(count: number): string {
   const points: string[] = []
@@ -321,6 +373,51 @@ onMounted(() => {
 
 <style scoped>
 .dashboard { max-width: 1400px; }
+
+.daily-brief {
+  margin-bottom: 24px;
+  padding: 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+  color: #e2e8f0;
+}
+.brief-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.brief-header h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.brief-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.brief-card {
+  padding: 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.brief-label {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+.brief-title {
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+.brief-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.9;
+}
 
 .page-header {
   display: flex;

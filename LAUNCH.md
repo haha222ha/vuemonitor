@@ -35,4 +35,14 @@ SMTP_FROM=noreply@xhs365.cn
 DEEPSEEK_API_KEY=sk-...
 ```
 
-完成后去掉 E2E 的 `--skip-ai`（host-update 内默认 skip-ai，有 Key 可手动跑完整 E2E）。
+完成后在主机跑完整 Sprint（含 AI）：
+
+```bash
+cd /opt/vuemonitor/server && source .venv/bin/activate
+RUN_AI=1 ADMIN_EMAIL=admin@xhs365.cn ADMIN_PASSWORD='你的密码' \
+  bash /opt/vuemonitor/scripts/run_sprints.sh
+```
+
+详见 [docs/SPRINT1-2.md](docs/SPRINT1-2.md)。
+
+Windows 打包：`client\scripts\package-win.ps1`

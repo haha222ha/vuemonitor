@@ -139,17 +139,20 @@ if [ -f "$ROOT/scripts/api_smoke.py" ]; then
   python3 "$ROOT/scripts/api_smoke.py" --base-url "${SMOKE_BASE:-http://127.0.0.1:8000}" || warn "冒烟部分失败"
 fi
 
-if [ -f "$ROOT/scripts/e2e_api_flow.py" ]; then
-  log "API 黄金路径 E2E..."
+if [ -f "$ROOT/scripts/run_sprints.sh" ]; then
+  log "Sprint 1+2 API 验收..."
   cd "$ROOT/server"
   # shellcheck disable=SC1091
   source .venv/bin/activate
   export PYTHONPATH="$ROOT/server"
-  if python3 "$ROOT/scripts/e2e_api_flow.py" --base-url "${SMOKE_BASE:-http://127.0.0.1:8000}" --skip-ai; then
-    ok "E2E 黄金路径通过"
+  export API_BASE="${SMOKE_BASE:-http://127.0.0.1:8000}"
+  export RUN_AI="${RUN_AI:-0}"
+  if bash "$ROOT/scripts/run_sprints.sh"; then
+    ok "Sprint 1+2 通过"
   else
-    warn "E2E 未全部通过（检查 AI Key 或日志）"
+    warn "Sprint 未全部通过（见上方 FAIL；可配置 DEEPSEEK_API_KEY 后 RUN_AI=1）"
   fi
+  python3 "$ROOT/scripts/check_production_env.py" || warn "生产 .env 仍有未配置项"
   cd "$ROOT"
 fi
 

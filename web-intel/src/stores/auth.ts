@@ -1,6 +1,7 @@
 import { defineStore } from "pinia"
 import { ref, computed } from "vue"
 import api from "@/utils/api"
+import { planLabel as getPlanLabel, PLAN_TAG_TYPE, upgradeTarget } from "@/utils/plan"
 
 export interface IntelMembership {
   plan: string
@@ -36,10 +37,9 @@ export const useIntelAuthStore = defineStore("intelAuth", () => {
   const isLoggedIn = computed(() => !!localStorage.getItem("intel_token"))
   const hasMembership = computed(() => membership.value?.status === "active" && (membership.value?.days_remaining ?? 0) > 0)
   const planName = computed(() => membership.value?.plan || "free")
-  const planLabel = computed(() => {
-    const map: Record<string, string> = { free: "免费版", pro: "专业版", enterprise: "企业版" }
-    return map[membership.value?.plan || ""] || membership.value?.plan || "未知"
-  })
+  const planLabel = computed(() => getPlanLabel(membership.value?.plan || "free"))
+  const planTagType = computed(() => PLAN_TAG_TYPE[membership.value?.plan || "free"] || "info")
+  const needsUpgrade = computed(() => upgradeTarget(planName.value) !== null)
   const daysRemaining = computed(() => membership.value?.days_remaining ?? 0)
   const expiresAt = computed(() => membership.value?.expires_at || "")
 
@@ -118,6 +118,8 @@ export const useIntelAuthStore = defineStore("intelAuth", () => {
     hasMembership,
     planName,
     planLabel,
+    planTagType,
+    needsUpgrade,
     daysRemaining,
     expiresAt,
     codeLogin,

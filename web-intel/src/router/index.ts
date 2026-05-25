@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router"
 import { ElMessage } from "element-plus"
+import { canAccessRoute } from "@/utils/plan"
 
 const routes = [
   { path: "/", redirect: "/dashboard" },
@@ -14,6 +15,7 @@ const routes = [
       { path: "trends", component: () => import("../views/TrendsView.vue") },
       { path: "opportunities", component: () => import("../views/OpportunitiesView.vue") },
       { path: "risks", component: () => import("../views/RisksView.vue") },
+      { path: "reports", component: () => import("../views/ReportsView.vue") },
       { path: "topics", component: () => import("../views/TopicsView.vue") },
       { path: "signals", component: () => import("../views/SignalsView.vue") },
       { path: "emotions", component: () => import("../views/EmotionsView.vue") },
@@ -60,6 +62,19 @@ router.beforeEach((to, _from, next) => {
       localStorage.removeItem("intel_username")
       next({ path: "/login", query: { redirect: to.fullPath } })
       return
+    }
+    try {
+      const raw = localStorage.getItem("intel_membership")
+      const m = raw ? JSON.parse(raw) as { plan?: string } : null
+      const plan = m?.plan || "free"
+      const pathKey = "/" + (to.path.split("/").filter(Boolean)[0] || "dashboard")
+      if (!canAccessRoute(plan, pathKey)) {
+        ElMessage.warning("当前套餐无权访问该模块，请升级会员")
+        next("/dashboard")
+        return
+      }
+    } catch {
+      /* ignore */
     }
   }
 

@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.config import get_settings
 from app.middleware.auth import CurrentUser
+from app.api.intelligence.plan_utils import get_effective_membership
 from app.models.intelligence import IntelMembership
 
 logger = logging.getLogger(__name__)
@@ -34,14 +35,7 @@ async def get_intel_membership(
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ) -> IntelMembership:
-    result = await db.execute(
-        select(IntelMembership).where(
-            IntelMembership.user_id == user.id,
-            IntelMembership.status == "active",
-            IntelMembership.expires_at > datetime.now(UTC),
-        ).order_by(IntelMembership.expires_at.desc())
-    )
-    membership = result.scalars().first()
+    membership = await get_effective_membership(user.id, db)
     if not membership:
         raise HTTPException(status_code=403, detail="no active intel membership")
     return membership

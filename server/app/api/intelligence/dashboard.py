@@ -75,6 +75,8 @@ async def get_dashboard(
             "platform": t.platform, "opportunity_score": t.opportunity_score,
             "lifecycle": t.lifecycle, "direction": t.direction,
             "risk_level": t.risk_level, "user_emotion": t.user_emotion,
+            "actionable_insight": t.actionable_insight,
+            "evidence": t.evidence,
         }
 
     def opp_to_dict(o):

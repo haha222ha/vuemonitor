@@ -25,6 +25,7 @@ class LicenseVerifyRequest(BaseModel):
 class LicenseActivateRequest(BaseModel):
     license_key: str = Field(..., min_length=1, max_length=64)
     device_name: str | None = Field(None, max_length=128)
+    device_fingerprint: str | None = Field(None, min_length=8, max_length=255)
 
 
 class LicenseHeartbeatRequest(BaseModel):
@@ -61,11 +62,7 @@ async def activate_license(
     db: AsyncSession = Depends(get_db),
 ):
     svc = LicenseService(db)
-    try:
-        from app.main import licenseManager  # type: ignore
-        fingerprint = licenseManager.getMachineFingerprint() if licenseManager else req.license_key
-    except ImportError:
-        fingerprint = req.license_key
+    fingerprint = (req.device_fingerprint or "").strip() or f"web-{user.id}"
     ip_address = request.client.host if request.client else None
 
     result = await svc.activate(

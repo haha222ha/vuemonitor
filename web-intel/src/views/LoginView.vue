@@ -1,8 +1,8 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h2 class="login-title">AI Intelligence OS</h2>
-      <p class="login-subtitle">输入授权码即可登录，无需注册</p>
+      <h2 class="login-title">AI 副业情报系统</h2>
+      <p class="login-subtitle">小红书购买授权码后在此登录，聚焦 AI 副业变现决策</p>
       <el-alert v-if="kickReason" :title="kickReason" type="warning" :closable="true" show-icon class="kick-alert" />
       <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="handleLogin">
         <el-form-item label="授权码" prop="code">

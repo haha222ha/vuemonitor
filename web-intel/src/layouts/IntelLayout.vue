@@ -7,7 +7,7 @@
             <span class="logo-icon-text">AI</span>
           </div>
           <transition name="logo-fade">
-            <span v-if="!collapsed" class="logo-text">Intelligence OS</span>
+            <span v-if="!collapsed" class="logo-text">AI副业情报</span>
           </transition>
         </div>
       </div>
@@ -73,6 +73,7 @@
         </div>
       </el-header>
       <el-main class="intel-main">
+        <OnboardingGuide />
         <router-view v-slot="{ Component }">
           <transition name="page-fade" mode="out-in">
             <component :is="Component" />
@@ -88,9 +89,12 @@ import { ref, computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useIntelAuthStore } from "@/stores/auth"
 import { useIntelStore } from "@/stores/intel"
+import OnboardingGuide from "@/components/OnboardingGuide.vue"
+import { visibleMenuItems } from "@/utils/plan"
 import {
   Monitor, TrendCharts, Opportunity, Warning, Document,
   Connection, ChatDotRound, Fold, Expand, ArrowDown, UserFilled,
+  DataAnalysis,
 } from "@element-plus/icons-vue"
 
 const route = useRoute()
@@ -99,15 +103,30 @@ const auth = useIntelAuthStore()
 const intel = useIntelStore()
 const collapsed = ref(false)
 
-const menuItems = computed(() => [
-  { path: "/dashboard", label: "仪表盘", icon: Monitor, badge: "" },
-  { path: "/trends", label: "趋势分析", icon: TrendCharts, badge: intel.dashboard?.summary?.active_trends ? String(intel.dashboard.summary.active_trends) : "" },
-  { path: "/opportunities", label: "商业机会", icon: Opportunity, badge: "" },
-  { path: "/risks", label: "风险预警", icon: Warning, badge: intel.dashboard?.summary?.active_risks ? String(intel.dashboard.summary.active_risks) : "" },
-  { path: "/topics", label: "选题库", icon: Document, badge: "" },
-  { path: "/signals", label: "平台信号", icon: Connection, badge: "" },
-  { path: "/emotions", label: "用户情绪", icon: ChatDotRound, badge: "" },
-])
+const MENU_ICONS: Record<string, typeof Monitor> = {
+  "/dashboard": Monitor,
+  "/trends": TrendCharts,
+  "/opportunities": Opportunity,
+  "/risks": Warning,
+  "/reports": DataAnalysis,
+  "/topics": Document,
+  "/signals": Connection,
+  "/emotions": ChatDotRound,
+}
+
+const menuItems = computed(() =>
+  visibleMenuItems(auth.planName).map((m) => ({
+    path: m.path,
+    label: m.label,
+    icon: MENU_ICONS[m.path] || Document,
+    badge:
+      m.path === "/trends" && intel.dashboard?.summary?.active_trends
+        ? String(intel.dashboard.summary.active_trends)
+        : m.path === "/risks" && intel.dashboard?.summary?.active_risks
+          ? String(intel.dashboard.summary.active_risks)
+          : "",
+  })),
+)
 
 const pageTitle = computed(() => {
   const map: Record<string, string> = {
@@ -115,6 +134,7 @@ const pageTitle = computed(() => {
     trends: "趋势分析",
     opportunities: "商业机会",
     risks: "风险预警",
+    reports: "决策报告",
     topics: "选题库",
     signals: "平台信号",
     emotions: "用户情绪",
@@ -125,10 +145,7 @@ const pageTitle = computed(() => {
 
 const activeMenu = computed(() => "/" + (route.path.split("/")[1] || "dashboard"))
 
-const planTagType = computed(() => {
-  const map: Record<string, string> = { free: "info", pro: "success", enterprise: "warning" }
-  return map[auth.planName] || "info"
-})
+const planTagType = computed(() => auth.planTagType || "info")
 
 function formatDate(isoStr: string): string {
   try {

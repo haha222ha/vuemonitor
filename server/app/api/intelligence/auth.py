@@ -13,6 +13,12 @@ from app.core.database import get_db
 from app.core.redis import get_redis
 from app.core.security import create_access_token, create_refresh_token, hash_password
 from app.middleware.auth import CurrentUser
+from app.api.intelligence.plan_utils import (
+    apply_effective_plan_to_user,
+    compute_membership_expires,
+    get_effective_membership,
+    list_active_memberships,
+)
 from app.models.intelligence import IntelAuthCode, IntelMembership
 from app.models.user import RefreshToken, User
 
@@ -100,12 +106,14 @@ async def code_login(
         if not user:
             raise HTTPException(status_code=500, detail="关联用户不存在")
 
-        days_remaining = (existing_membership.expires_at - now).days
+        effective = await get_effective_membership(user.id, db) or existing_membership
+        days_remaining = (effective.expires_at - now).days
         if days_remaining <= 0:
             existing_membership.status = "expired"
             await db.flush()
             raise HTTPException(status_code=400, detail="授权码已过期，请使用新的授权码")
 
+        await apply_effective_plan_to_user(user, db)
         session_id = await _create_intel_session(user.id)
 
         old_rts = await db.execute(
@@ -127,10 +135,10 @@ async def code_login(
         user.last_login_at = now
 
         membership_resp = IntelMembershipResponse(
-            plan=existing_membership.plan,
-            started_at=existing_membership.started_at.isoformat(),
-            expires_at=existing_membership.expires_at.isoformat(),
-            status=existing_membership.status,
+            plan=effective.plan,
+            started_at=effective.started_at.isoformat(),
+            expires_at=effective.expires_at.isoformat(),
+            status=effective.status,
             days_remaining=days_remaining,
         )
     else:
@@ -149,14 +157,16 @@ async def code_login(
         db.add(user)
         await db.flush()
 
+        expires_at = compute_membership_expires(
+            now, [], auth_code.plan, auth_code.duration_days
+        )
         if auth_code.status == "unused":
             auth_code.status = "active"
             auth_code.activated_at = now
-            auth_code.expires_at = now + timedelta(days=auth_code.duration_days)
+            auth_code.expires_at = expires_at
 
         auth_code.current_activations += 1
 
-        expires_at = auth_code.expires_at or (now + timedelta(days=auth_code.duration_days))
         membership = IntelMembership(
             user_id=user.id,
             auth_code_id=auth_code.id,
@@ -167,12 +177,10 @@ async def code_login(
         )
         db.add(membership)
 
-        user.plan = auth_code.plan
-        user.plan_expires_at = expires_at
         user.last_login_at = now
-
         await db.flush()
-
+        effective = await apply_effective_plan_to_user(user, db) or membership
+        expires_at = effective.expires_at
         days_remaining = (expires_at - now).days
 
         session_id = await _create_intel_session(user.id)
@@ -188,10 +196,10 @@ async def code_login(
         db.add(rt)
 
         membership_resp = IntelMembershipResponse(
-            plan=membership.plan,
-            started_at=membership.started_at.isoformat(),
-            expires_at=membership.expires_at.isoformat(),
-            status=membership.status,
+            plan=effective.plan,
+            started_at=effective.started_at.isoformat(),
+            expires_at=effective.expires_at.isoformat(),
+            status=effective.status,
             days_remaining=days_remaining,
         )
 
@@ -237,32 +245,38 @@ async def activate_intel_code(
     if existing_result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="你已使用此授权码激活过")
 
+    active_before = await list_active_memberships(user.id, db, now=now)
+
     if auth_code.status == "unused":
         auth_code.status = "active"
         auth_code.activated_at = now
-        auth_code.expires_at = now + timedelta(days=auth_code.duration_days)
 
     auth_code.current_activations += 1
+
+    expires_at = compute_membership_expires(
+        now, active_before, auth_code.plan, auth_code.duration_days
+    )
+    auth_code.expires_at = expires_at
 
     membership = IntelMembership(
         user_id=user.id,
         auth_code_id=auth_code.id,
         plan=auth_code.plan,
         started_at=now,
-        expires_at=auth_code.expires_at or (now + timedelta(days=auth_code.duration_days)),
+        expires_at=expires_at,
         status="active",
     )
     db.add(membership)
 
     await db.flush()
-
-    days_remaining = (membership.expires_at - now).days
+    effective = await apply_effective_plan_to_user(user, db) or membership
+    days_remaining = (effective.expires_at - now).days
 
     return IntelMembershipResponse(
-        plan=membership.plan,
-        started_at=membership.started_at.isoformat(),
-        expires_at=membership.expires_at.isoformat(),
-        status=membership.status,
+        plan=effective.plan,
+        started_at=effective.started_at.isoformat(),
+        expires_at=effective.expires_at.isoformat(),
+        status=effective.status,
         days_remaining=days_remaining,
     )
 
@@ -273,18 +287,13 @@ async def get_intel_membership(
     db: AsyncSession = Depends(get_db),
 ):
     now = datetime.now(UTC)
-    result = await db.execute(
-        select(IntelMembership).where(
-            IntelMembership.user_id == user.id,
-            IntelMembership.status == "active",
-        ).order_by(IntelMembership.expires_at.desc())
-    )
-    membership = result.scalars().first()
+    membership = await get_effective_membership(user.id, db)
 
     if not membership:
         raise HTTPException(status_code=404, detail="无有效情报系统会员")
 
-    days_remaining = (membership.expires_at - now).days
+    days_remaining = max(0, (membership.expires_at - now).days)
+    await apply_effective_plan_to_user(user, db)
 
     return IntelMembershipResponse(
         plan=membership.plan,

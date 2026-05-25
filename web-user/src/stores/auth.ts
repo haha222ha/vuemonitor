@@ -30,8 +30,8 @@ export const useAuthStore = defineStore("auth", () => {
   async function fetchUser() {
     if (!token.value) return;
     try {
-      const { data } = await api.get("/auth/me");
-      user.value = data?.data || data;
+      const { data } = await api.get("/user/profile");
+      user.value = data;
       localStorage.setItem("user_info", JSON.stringify(user.value));
     } catch {
       user.value = null;
