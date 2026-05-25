@@ -110,6 +110,11 @@
         </div>
 
         <div class="panel" style="margin-top: 20px;">
+          <h3>联系客服</h3>
+          <SupportQqPanel />
+        </div>
+
+        <div class="panel" style="margin-top: 20px;">
           <h3>语言设置</h3>
           <el-form label-width="100px">
             <el-form-item label="界面语言">
@@ -210,6 +215,7 @@ import api from "../../utils/api";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { Key, Refresh, CircleCheckFilled, Loading, Download, Document } from "@element-plus/icons-vue";
 import { useI18n, type Locale } from "../../i18n";
+import SupportQqPanel from "../../components/SupportQqPanel.vue";
 
 const auth = useAuthStore();
 const { t, setLocale, getLocale } = useI18n();

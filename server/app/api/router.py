@@ -20,6 +20,7 @@ from app.api.monitor import router as monitor_router
 from app.api.notifications import router as notifications_router
 from app.api.operation_audit import router as operation_audit_router
 from app.api.products import router as products_router
+from app.api.public import router as public_router
 from app.api.security_audit import router as security_audit_router
 from app.api.sync import router as sync_router
 from app.api.system import router as system_router
@@ -34,6 +35,7 @@ async def require_admin(user: AdminUser):
 
 api_router = APIRouter()
 
+api_router.include_router(public_router)
 api_router.include_router(auth_router)
 api_router.include_router(sync_router)
 api_router.include_router(products_router)

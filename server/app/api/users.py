@@ -131,7 +131,14 @@ async def request_reset_password(
 
     await _send_verification_code(req.email, "password_reset", code)
 
-    return {"code": 0, "message": "如果该邮箱已注册，您将收到重置验证码"}
+    from app.config import get_settings
+
+    settings = get_settings()
+    if email_service.is_configured:
+        msg = "如果该邮箱已注册，您将收到重置验证码"
+    else:
+        msg = "邮件找回暂未开通，请联系 QQ 客服协助重置密码"
+    return {"code": 0, "message": msg, "support_qq": settings.SUPPORT_QQ or None}
 
 
 @router.post("/reset-password/confirm")

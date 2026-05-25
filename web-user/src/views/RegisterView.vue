@@ -23,7 +23,7 @@
           <el-input v-model="form.confirmPassword" type="password" placeholder="再次输入密码" size="large" show-password />
         </el-form-item>
         <el-form-item label="邮箱（选填）" prop="email">
-          <el-input v-model="form.email" placeholder="用于找回密码，可不填" size="large" />
+          <el-input v-model="form.email" placeholder="可不填；找回密码请找 QQ 客服" size="large" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" size="large" :loading="loading" style="width: 100%" native-type="submit">
@@ -31,6 +31,8 @@
           </el-button>
         </el-form-item>
       </el-form>
+
+      <SupportQqPanel compact />
 
       <div class="auth-footer">
         已有账户？<router-link to="/login">登录</router-link>
@@ -41,6 +43,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
+import SupportQqPanel from "../components/SupportQqPanel.vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { ElMessage } from "element-plus";

@@ -529,7 +529,7 @@
                 <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>团队协作</li>
                 <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>专属客服</li>
               </ul>
-              <a href="mailto:contact@xhs365.cn" class="btn-outline btn-block">联系我们</a>
+              <a href="#contact-qq" class="btn-outline btn-block">联系 QQ 客服</a>
             </div>
           </div>
         </div>
@@ -575,11 +575,9 @@
               <a href="#platforms">平台支持</a>
               <router-link to="/download">下载客户端</router-link>
             </div>
-            <div class="footer-col">
-              <h4>支持</h4>
-              <a href="#">帮助中心</a>
-              <a href="#">使用教程</a>
-              <a href="#">API文档</a>
+            <div class="footer-col" id="contact-qq">
+              <h4>客服</h4>
+              <SupportQqPanel compact />
             </div>
             <div class="footer-col">
               <h4>法律</h4>
@@ -599,6 +597,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+import SupportQqPanel from "../components/SupportQqPanel.vue";
 import "../assets/landing.css";
 
 const navScrolled = ref(false);

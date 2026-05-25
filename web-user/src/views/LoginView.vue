@@ -26,6 +26,8 @@
         </el-form-item>
       </el-form>
 
+      <SupportQqPanel compact />
+
       <div class="auth-footer">
         还没有账户？<router-link to="/register">免费注册</router-link>
       </div>
@@ -35,6 +37,7 @@
 
 <script setup lang="ts">
 import { ref, reactive } from "vue";
+import SupportQqPanel from "../components/SupportQqPanel.vue";
 import { useRouter, useRoute } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { ElMessage } from "element-plus";
