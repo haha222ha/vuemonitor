@@ -8,6 +8,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.intelligence.content_filter import is_demo_content
 from app.api.intelligence.deps import get_intel_plan, verify_sync_token
 from app.core.database import get_db
 from app.models.intelligence import IntelligenceReport
@@ -43,7 +44,7 @@ async def list_reports(
     stmt = stmt.order_by(IntelligenceReport.report_date.desc())
 
     result = await db.execute(stmt)
-    reports = result.scalars().all()
+    reports = [r for r in result.scalars().all() if not is_demo_content(r.title)]
 
     return {
         "plan": plan,

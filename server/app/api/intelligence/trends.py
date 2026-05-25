@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.intelligence.content_filter import is_demo_content
 from app.api.intelligence.deps import get_intel_plan
 from app.core.database import get_db
 from app.models.intelligence import IntelligenceTrend
@@ -36,7 +37,10 @@ async def list_trends(
     stmt = stmt.order_by(IntelligenceTrend.opportunity_score.desc())
 
     result = await db.execute(stmt)
-    trends = result.scalars().all()
+    trends = [
+        t for t in result.scalars().all()
+        if not is_demo_content(t.title, t.category, t.evidence)
+    ]
 
     return {
         "plan": plan,

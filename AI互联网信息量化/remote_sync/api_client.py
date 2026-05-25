@@ -126,6 +126,40 @@ class IntelSyncClient:
             return data
         return []
 
+    def _load_risk_items(self) -> list[dict]:
+        data = self._load_json("risk_db.json")
+        items: list[dict] = []
+        severity_map = {"dead": "high", "dying": "medium", "monitoring": "medium", "escalating": "high"}
+
+        for entry in data.get("eliminated", []):
+            items.append({
+                "name": entry["name"],
+                "category": entry.get("category"),
+                "severity": severity_map.get(entry.get("status"), "high"),
+                "status": entry.get("status") or "dead",
+                "reason": entry.get("reason"),
+                "alternative": entry.get("alternative"),
+                "risk_type": "eliminated",
+                "source": entry.get("source"),
+            })
+
+        for warn in data.get("warnings", []):
+            signals = warn.get("early_signals") or []
+            items.append({
+                "name": warn["name"],
+                "category": warn.get("category"),
+                "severity": severity_map.get(warn.get("status"), "medium"),
+                "status": warn.get("status") or "monitoring",
+                "reason": warn.get("risk_description"),
+                "alternative": warn.get("recommended_action"),
+                "risk_type": "warning",
+                "risk_description": warn.get("risk_description"),
+                "recommended_action": warn.get("recommended_action"),
+                "early_signals": signals if isinstance(signals, list) else [signals],
+            })
+
+        return items
+
     def _load_topic_files(self) -> list[dict]:
         if not TOPICS_DIR.exists():
             raise FileNotFoundError(f"Topics directory not found: {TOPICS_DIR}")
@@ -180,7 +214,9 @@ class IntelSyncClient:
 
         logger.info(f"[Sync] loading {file_name} -> {endpoint} (key={key_field})")
 
-        if is_directory:
+        if endpoint == "risks":
+            items = self._load_risk_items()
+        elif is_directory:
             items = self._load_topic_files()
         else:
             data = self._load_json(file_name)

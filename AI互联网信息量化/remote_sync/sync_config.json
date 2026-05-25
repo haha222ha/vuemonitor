@@ -17,9 +17,17 @@
     "xhs_topics": true
   },
   "auto_sync": {
-    "enabled": false,
+    "enabled": true,
     "on_content_complete": true,
-    "daily_schedule": ["08:00", "20:00"]
+    "daily_schedule": ["08:00", "20:00"],
+    "use_windows_task": true,
+    "runner": "scheduled_sync.ps1"
+  },
+  "report_upload": {
+    "enabled": true,
+    "output_root": "AI互联网信息量化/AI内容工厂/output",
+    "max_topics": 3,
+    "report_type": "weekly"
   },
   "logging": {
     "level": "INFO",

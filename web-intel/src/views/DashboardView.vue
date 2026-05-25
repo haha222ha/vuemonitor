@@ -122,15 +122,13 @@
                 <div class="trend-title">{{ item.title }}</div>
                 <div class="trend-meta">
                   <el-tag size="small" effect="plain">{{ item.category }}</el-tag>
-                  <span class="trend-score" :style="{ color: getScoreColor(item.opportunity_score) }">
-                    {{ item.opportunity_score }}分
+                  <span v-if="formatTrendScore(item.opportunity_score)" class="trend-score">
+                    {{ formatTrendScore(item.opportunity_score) }}
                   </span>
                   <el-tag size="small" v-if="item.lifecycle" type="success" effect="plain">{{ item.lifecycle }}</el-tag>
                 </div>
               </div>
-              <div class="trend-score-badge" :style="{ color: getScoreColor(item.opportunity_score), borderColor: getScoreColor(item.opportunity_score) + '40' }">
-                {{ item.opportunity_score }}
-              </div>
+              <ScoreBadge v-if="item.opportunity_score" :score="item.opportunity_score" kind="trend" size="sm" :show-unit="false" />
             </div>
           </div>
         </el-card>
@@ -159,9 +157,7 @@
           <div v-else class="opp-list intel-card-stagger">
             <div v-for="item in intel.dashboard.top_opportunities" :key="item.id" class="opp-item" :class="'verdict-' + (item.verdict || '').toLowerCase()" @click="$router.push('/opportunities')">
               <div class="opp-left">
-                <div class="opp-score-ring" :style="{ borderColor: getScoreColor(item.verdict_score) }">
-                  <span :style="{ color: getScoreColor(item.verdict_score) }">{{ item.verdict_score }}</span>
-                </div>
+                <ScoreBadge :score="item.verdict_score" kind="opportunity" size="sm" :show-unit="false" />
               </div>
               <div class="opp-right">
                 <div class="opp-title">{{ item.name }}</div>
@@ -262,7 +258,9 @@ import { useIntelStore } from "@/stores/intel"
 import { useIntelAuthStore } from "@/stores/auth"
 import UpgradeBanner from "@/components/UpgradeBanner.vue"
 import { TrendCharts, Opportunity, Warning, Right } from "@element-plus/icons-vue"
-import { getScoreColor, getDirectionIcon } from "@/utils/theme"
+import ScoreBadge from "@/components/ScoreBadge.vue"
+import { getDirectionIcon } from "@/utils/theme"
+import { formatScore, isDisplayableScore, getTrendScoreColor, getOpportunityScoreColor } from "@/utils/score"
 import { Bar, Doughnut } from "vue-chartjs"
 import { defaultChartOptions, doughnutOptions, chartColors } from "@/utils/charts"
 import type { ChartData } from "chart.js"
@@ -271,6 +269,10 @@ const intel = useIntelStore()
 const auth = useIntelAuthStore()
 
 const planLabel = computed(() => auth.planLabel)
+
+function formatTrendScore(score: unknown): string {
+  return formatScore(score)
+}
 
 const showDailyBrief = computed(() => auth.planName === "weekly")
 
@@ -319,9 +321,9 @@ const trendChartData = computed<ChartData<"bar"> | null>(() => {
     labels: trends.map((t) => t.title.length > 8 ? t.title.slice(0, 8) + "…" : t.title),
     datasets: [{
       label: "机会评分",
-      data: trends.map((t) => t.opportunity_score),
-      backgroundColor: trends.map((t) => getScoreColor(t.opportunity_score) + "cc"),
-      borderColor: trends.map((t) => getScoreColor(t.opportunity_score)),
+      data: trends.map((t) => t.opportunity_score || 0),
+      backgroundColor: trends.map((t) => getTrendScoreColor(t.opportunity_score || 0) + "cc"),
+      borderColor: trends.map((t) => getTrendScoreColor(t.opportunity_score || 0)),
       borderWidth: 1,
       borderRadius: 6,
     }],

@@ -63,9 +63,7 @@
               <span class="dir-icon">{{ getDirectionIcon(item.direction) }}</span>
               <span class="dir-text">{{ getDirectionLabel(item.direction) }}</span>
             </div>
-            <div class="score-badge" :style="{ color: getScoreColor(item.opportunity_score), borderColor: getScoreColor(item.opportunity_score) + '30' }">
-              {{ item.opportunity_score }}
-            </div>
+            <ScoreBadge :score="item.opportunity_score" kind="trend" size="sm" :show-unit="false" />
           </div>
           <div class="card-title">{{ item.title }}</div>
           <div class="card-meta">
@@ -110,9 +108,7 @@
             <span>{{ getDirectionIcon(detailItem.direction) }}</span>
             <span>{{ getDirectionLabel(detailItem.direction) }}</span>
           </div>
-          <div class="detail-score-big" :style="{ color: getScoreColor(detailItem.opportunity_score) }">
-            {{ detailItem.opportunity_score }}<span class="score-unit">分</span>
-          </div>
+          <ScoreBadge :score="detailItem.opportunity_score" kind="trend" size="lg" />
         </div>
 
         <el-descriptions :column="2" border>
@@ -165,7 +161,9 @@
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
 import { exportJSON, exportCSV, deleteItem, truncate, isAdmin, fetchWithCache, clearCache } from "@/utils/intel"
-import { getScoreColor, getDirectionIcon, getDirectionLabel } from "@/utils/theme"
+import ScoreBadge from "@/components/ScoreBadge.vue"
+import { getDirectionIcon, getDirectionLabel } from "@/utils/theme"
+import { isDisplayableScore, getTrendScoreColor } from "@/utils/score"
 
 interface TrendItem {
   id: string

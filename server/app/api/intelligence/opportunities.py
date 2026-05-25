@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.intelligence.content_filter import is_demo_content
 from app.api.intelligence.deps import get_intel_plan
 from app.core.database import get_db
 from app.models.intelligence import IntelligenceOpportunity
@@ -32,7 +33,10 @@ async def list_opportunities(
     stmt = stmt.order_by(IntelligenceOpportunity.verdict_score.desc())
 
     result = await db.execute(stmt)
-    opps = result.scalars().all()
+    opps = [
+        o for o in result.scalars().all()
+        if not is_demo_content(o.name, o.category, o.sub_category)
+    ]
 
     return {
         "plan": plan,
@@ -40,6 +44,7 @@ async def list_opportunities(
         "items": [
             {
                 "id": str(o.id), "name": o.name, "category": o.category,
+                "topic_id": o.source_topic_id,
                 "sub_category": o.sub_category, "verdict_score": o.verdict_score,
                 "verdict": o.verdict, "verdict_detail": o.verdict_detail,
                 "difficulty": o.difficulty, "startup_cost": o.startup_cost,

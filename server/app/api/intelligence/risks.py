@@ -2,11 +2,20 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.intelligence.content_filter import is_demo_content
 from app.api.intelligence.deps import get_intel_plan
 from app.core.database import get_db
 from app.models.intelligence import IntelligenceRisk
 
 router = APIRouter(prefix="/risks", tags=["intel-risks"])
+
+_DISPLAY_STATUSES = (
+    "active",
+    "monitoring",
+    "escalating",
+    "dead",
+    "dying",
+)
 
 
 @router.get("")
@@ -19,22 +28,25 @@ async def list_risks(
     if plan == "free":
         return {"plan": "free", "count": 0, "items": [], "message": "free tier does not include risks"}
 
-    stmt = select(IntelligenceRisk).where(
-        IntelligenceRisk.status.in_(["active", "monitoring"])
-    )
-
-    if plan == "weekly":
-        stmt = stmt.limit(3)
+    stmt = select(IntelligenceRisk).where(IntelligenceRisk.status.in_(_DISPLAY_STATUSES))
 
     if severity:
         stmt = stmt.where(IntelligenceRisk.severity == severity)
     if risk_type:
         stmt = stmt.where(IntelligenceRisk.risk_type == risk_type)
 
-    stmt = stmt.order_by(IntelligenceRisk.severity.desc())
+    stmt = stmt.order_by(IntelligenceRisk.severity.desc(), IntelligenceRisk.created_at.desc())
 
     result = await db.execute(stmt)
-    risks = result.scalars().all()
+    all_risks = result.scalars().all()
+
+    risks = [
+        r for r in all_risks
+        if not is_demo_content(r.name, r.reason, r.risk_description, r.alternative)
+    ]
+
+    if plan == "weekly":
+        risks = risks[:3]
 
     return {
         "plan": plan,

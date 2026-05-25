@@ -127,6 +127,72 @@ def format_summary(summary: dict) -> None:
     print("=" * 60)
 
 
+def _repo_root() -> Path:
+    return PACKAGE_DIR.parent.parent
+
+
+def _load_intel_production_config() -> dict:
+    path = _repo_root() / "config" / "intel_production.json"
+    if not path.exists():
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _resolve_output_root(config: dict, prod: dict) -> Path | None:
+    ru = prod.get("report_upload") or config.get("report_upload") or {}
+    if not ru.get("enabled", False):
+        return None
+    raw = ru.get("output_root", "AI互联网信息量化/AI内容工厂/output")
+    root = Path(raw)
+    if not root.is_absolute():
+        root = _repo_root() / root
+    return root if root.exists() else None
+
+
+def run_scheduled_report_upload(client: IntelSyncClient, config: dict, prod: dict) -> list[dict]:
+    log = logging.getLogger(__name__)
+    output_root = _resolve_output_root(config, prod)
+    if not output_root:
+        log.info("[Scheduled] Report upload disabled or output dir missing")
+        return []
+
+    ru = prod.get("report_upload") or config.get("report_upload") or {}
+    max_topics = int(ru.get("max_topics", 2))
+    report_type = ru.get("report_type", "weekly")
+
+    topic_dirs = sorted(
+        [p for p in output_root.iterdir() if p.is_dir() and p.name.startswith("T")],
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )[:max_topics]
+
+    all_results: list[dict] = []
+    week_number = datetime.now().strftime("%Y-W%W")
+
+    for topic_dir in topic_dirs:
+        html_dir = topic_dir / "html"
+        if not html_dir.is_dir():
+            continue
+        log.info(f"[Scheduled] Uploading reports from {html_dir}")
+        print(f"[Scheduled] Reports: {topic_dir.name}")
+        try:
+            results = client.upload_reports_from_dir(
+                reports_dir=html_dir,
+                report_type=report_type,
+                week_number=week_number,
+            )
+            all_results.extend(results)
+        except Exception as e:
+            log.error(f"[Scheduled] Report upload failed for {topic_dir.name}: {e}")
+            print(f"  [ERR] {topic_dir.name}: {e}")
+
+    ok = sum(1 for r in all_results if r.get("status") == "ok")
+    err = sum(1 for r in all_results if r.get("status") == "error")
+    print(f"[Scheduled] Reports uploaded: {ok} ok, {err} errors")
+    return all_results
+
+
 def run_dry_run(config: dict, base_url: str, api_token: str):
     print("[DRY RUN] Validating configuration and data files...")
     print()
@@ -217,6 +283,11 @@ def main():
     parser.add_argument("--upload-reports", type=str, default="", help="Upload report files from directory")
     parser.add_argument("--report-type", type=str, default="weekly", help="Report type for upload (weekly|monthly)")
     parser.add_argument("--week-number", type=str, default="", help="Week number for report upload")
+    parser.add_argument(
+        "--scheduled",
+        action="store_true",
+        help="Scheduled run: full sync + optional report upload from production config",
+    )
 
     args = parser.parse_args()
 
@@ -290,6 +361,7 @@ def main():
     logger.info("Starting full sync...")
     print("[Sync] Starting...")
     start_time = time.time()
+    prod_cfg = _load_intel_production_config() if args.scheduled else {}
 
     try:
         summary = client.sync_all(targets_config)
@@ -302,6 +374,13 @@ def main():
         total_errors = sum(
             r.get("errors", 0) for r in summary.get("detail", {}).values()
         )
+
+        if args.scheduled:
+            print()
+            print("[Scheduled] Post-sync report upload...")
+            report_results = run_scheduled_report_upload(client, config, prod_cfg)
+            report_errors = sum(1 for r in report_results if r.get("status") == "error")
+            total_errors += report_errors
 
         logger.info(f"Sync complete. Duration: {elapsed:.1f}s, Errors: {total_errors}")
         logger.info(f"Full summary: {json.dumps(summary, ensure_ascii=False)}")

@@ -3,9 +3,13 @@
     <div class="page-header">
       <div class="header-title-area">
         <h2>风险预警</h2>
-        <p class="header-subtitle" v-if="items.length">实时监控商业风险，提前预警规避陷阱</p>
+        <p class="header-subtitle" v-if="items.length">淘汰赛道与监测预警，按分类浏览</p>
       </div>
       <div class="header-actions">
+        <el-select v-model="categoryFilter" placeholder="业务分类" clearable size="small" style="width: 140px">
+          <el-option label="全部分类" value="" />
+          <el-option v-for="cat in categories" :key="cat" :label="cat" :value="cat" />
+        </el-select>
         <el-radio-group v-model="viewMode" size="small">
           <el-radio-button value="card">卡片</el-radio-button>
           <el-radio-button value="table">表格</el-radio-button>
@@ -45,6 +49,12 @@
       </div>
     </div>
 
+    <el-tabs v-if="items.length" v-model="riskTypeTab" class="risk-type-tabs">
+      <el-tab-pane label="全部" name="all" />
+      <el-tab-pane :label="`淘汰赛道 (${eliminatedCount})`" name="eliminated" />
+      <el-tab-pane :label="`监测预警 (${warningCount})`" name="warning" />
+    </el-tabs>
+
     <div v-if="loading" class="loading-placeholder">
       <el-skeleton :rows="6" animated />
     </div>
@@ -68,10 +78,11 @@
             <div class="severity-badge" :class="'sev-' + (item.severity || '').toLowerCase()">
               {{ severityLabel(item.severity) }}
             </div>
-            <el-tag v-if="item.status === 'active'" type="danger" size="small" effect="dark">
-              <span class="pulse-dot"></span> 活跃
+            <el-tag v-if="isMonitoringStatus(item)" type="danger" size="small" effect="dark">
+              <span class="pulse-dot"></span> 监测中
             </el-tag>
-            <el-tag v-else type="info" size="small">已解除</el-tag>
+            <el-tag v-else-if="isEliminatedStatus(item)" type="info" size="small">已淘汰</el-tag>
+            <el-tag v-else type="info" size="small">{{ item.status }}</el-tag>
           </div>
           <div class="risk-name">{{ item.name }}</div>
           <div class="risk-reason">{{ item.reason }}</div>
@@ -185,6 +196,7 @@
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
 import { exportJSON, exportCSV, deleteItem, isAdmin, fetchWithCache, clearCache } from "@/utils/intel"
+import { isDemoContent } from "@/utils/content"
 
 interface RiskItem {
   id: string
@@ -208,6 +220,8 @@ const items = ref<RiskItem[]>([])
 const loading = ref(false)
 const searchText = ref("")
 const severityFilter = ref("")
+const categoryFilter = ref("")
+const riskTypeTab = ref("all")
 const viewMode = ref<"card" | "table">("card")
 const currentPage = ref(1)
 const pageSize = 15
@@ -218,10 +232,28 @@ function severityCount(level: string): number {
   return items.value.filter(i => i.severity?.toLowerCase() === level).length
 }
 
-const activeCount = computed(() => items.value.filter(i => i.status === 'active').length)
+const categories = computed(() => {
+  const cats = new Set(items.value.map((i) => i.category).filter(Boolean))
+  return Array.from(cats).sort()
+})
 
-const filteredItems = computed(() => {
-  let result = items.value
+function isMonitoringStatus(item: RiskItem): boolean {
+  return item.risk_type === "warning" || ["monitoring", "escalating", "active"].includes(item.status)
+}
+
+function isEliminatedStatus(item: RiskItem): boolean {
+  return item.risk_type === "eliminated" || ["dead", "dying"].includes(item.status)
+}
+
+const eliminatedCount = computed(() => items.value.filter(isEliminatedStatus).length)
+const warningCount = computed(() => items.value.filter(isMonitoringStatus).length)
+
+const activeCount = computed(() => warningCount.value)
+
+function applyRiskFilters(list: RiskItem[]) {
+  let result = list.filter((i) => !isDemoContent(i.name, i.reason, i.risk_description))
+  if (riskTypeTab.value === "eliminated") result = result.filter(isEliminatedStatus)
+  if (riskTypeTab.value === "warning") result = result.filter(isMonitoringStatus)
   if (searchText.value) {
     const s = searchText.value.toLowerCase()
     result = result.filter((i) => i.name.toLowerCase().includes(s) || i.reason?.toLowerCase().includes(s))
@@ -229,21 +261,19 @@ const filteredItems = computed(() => {
   if (severityFilter.value) {
     result = result.filter((i) => i.severity?.toLowerCase() === severityFilter.value)
   }
+  if (categoryFilter.value) {
+    result = result.filter((i) => i.category === categoryFilter.value)
+  }
+  return result
+}
+
+const filteredItems = computed(() => {
+  const result = applyRiskFilters(items.value)
   const start = (currentPage.value - 1) * pageSize
   return result.slice(start, start + pageSize)
 })
 
-const filteredTotal = computed(() => {
-  let result = items.value
-  if (searchText.value) {
-    const s = searchText.value.toLowerCase()
-    result = result.filter((i) => i.name.toLowerCase().includes(s) || i.reason?.toLowerCase().includes(s))
-  }
-  if (severityFilter.value) {
-    result = result.filter((i) => i.severity?.toLowerCase() === severityFilter.value)
-  }
-  return result.length
-})
+const filteredTotal = computed(() => applyRiskFilters(items.value).length)
 
 function severityTagType(s: string): string {
   const map: Record<string, string> = { high: "danger", medium: "warning", low: "info" }
@@ -290,6 +320,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.risk-type-tabs {
+  margin-bottom: 16px;
+}
+
 .risks-page { max-width: 1400px; }
 .page-header {
   display: flex;

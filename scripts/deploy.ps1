@@ -44,8 +44,13 @@ cd web-user
 npm install --quiet 2>/dev/null
 npm run build 2>/dev/null
 
-echo '  重建情报系统前端...'
-cd /opt/vuemonitor/web-intel
+echo '  重建情报系统前端（含店铺链接）...'
+cd /opt/vuemonitor
+if [ -f config/intel_production.json ]; then
+  SHOP_URL=\$(python3 -c "import json;print(json.load(open('config/intel_production.json'))['xhs_shop_url'])")
+  printf 'VITE_API_BASE_URL=/api/v1\nVITE_XHS_SHOP_URL=%s\n' "\$SHOP_URL" > web-intel/.env.production
+fi
+cd web-intel
 npm install --quiet 2>/dev/null
 npm run build 2>/dev/null
 

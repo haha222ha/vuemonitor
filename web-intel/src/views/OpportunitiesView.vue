@@ -58,9 +58,7 @@
         <div class="opp-verdict-bar"></div>
         <div class="card-body">
           <div class="card-top-row">
-            <div class="opp-score-ring" :style="{ borderColor: getScoreColor(item.verdict_score), boxShadow: '0 0 0 3px ' + getScoreColor(item.verdict_score) + '20' }">
-              <span :style="{ color: getScoreColor(item.verdict_score) }">{{ item.verdict_score }}</span>
-            </div>
+            <ScoreBadge :score="item.verdict_score" kind="opportunity" size="md" show-tier />
             <div class="card-title-area">
               <div class="card-title">{{ item.name }}</div>
               <div class="card-meta">
@@ -120,7 +118,7 @@
             <span class="verdict-icon">{{ verdictIcon(detailItem.verdict) }}</span>
             <span class="verdict-text">{{ verdictLabel(detailItem.verdict) }}</span>
           </div>
-          <div class="verdict-score-big" :style="{ color: getScoreColor(detailItem.verdict_score) }">
+          <div class="verdict-score-big" :style="{ color: getOpportunityScoreColor(detailItem.verdict_score) }">
             {{ detailItem.verdict_score }}<span class="score-unit">分</span>
           </div>
         </div>
@@ -204,7 +202,10 @@ import { ref, computed, onMounted } from "vue"
 import { useRouter } from "vue-router"
 import api from "@/utils/api"
 import { exportJSON, exportCSV, deleteItem, formatValue, isAdmin, fetchWithCache, clearCache } from "@/utils/intel"
-import { getScoreColor, getVerdictColor } from "@/utils/theme"
+import { isDemoContent } from "@/utils/content"
+import ScoreBadge from "@/components/ScoreBadge.vue"
+import { getOpportunityScoreColor } from "@/utils/score"
+import { getVerdictColor } from "@/utils/theme"
 
 interface OpportunityItem {
   id: string
@@ -256,7 +257,7 @@ const avgScore = computed(() => {
 })
 
 const filteredItems = computed(() => {
-  let result = items.value
+  let result = items.value.filter((i) => !isDemoContent(i.name, i.category))
   if (searchText.value) {
     const s = searchText.value.toLowerCase()
     result = result.filter((i) => i.name.toLowerCase().includes(s) || i.category?.toLowerCase().includes(s))
@@ -269,7 +270,7 @@ const filteredItems = computed(() => {
 })
 
 const filteredTotal = computed(() => {
-  let result = items.value
+  let result = items.value.filter((i) => !isDemoContent(i.name, i.category))
   if (searchText.value) {
     const s = searchText.value.toLowerCase()
     result = result.filter((i) => i.name.toLowerCase().includes(s) || i.category?.toLowerCase().includes(s))

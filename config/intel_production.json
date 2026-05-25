@@ -1,0 +1,11 @@
+{
+  "_comment": "生产环境配置：修改 xhs_shop_url 后执行 scripts/build-web-intel.ps1 重新构建情报前端",
+  "xhs_shop_url": "https://www.xiaohongshu.com/goods-detail/6a12552cdf36740001798b58",
+  "sync_schedule": ["08:00", "20:00"],
+  "report_upload": {
+    "enabled": true,
+    "output_root": "AI互联网信息量化/AI内容工厂/output",
+    "max_topics": 3,
+    "report_type": "weekly"
+  }
+}
