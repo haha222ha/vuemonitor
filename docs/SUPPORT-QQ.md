@@ -5,9 +5,11 @@
 ## 配置（`server/.env`）
 
 ```env
-SUPPORT_QQ=你的QQ号
-# 可选：上传二维码到 CDN/静态站后填写
-# SUPPORT_QQ_QR_URL=https://www.xhs365.cn/support-qq.png
+SUPPORT_QQ=898382699
+SUPPORT_QQ_QR_URL=/support-qq.png
+SUPPORT_SITE_URL=https://www.xhs365.cn
+
+二维码图片已内置：`web-user/public/support-qq.png`（构建后进 `dist/support-qq.png`）。
 ```
 
 ## API

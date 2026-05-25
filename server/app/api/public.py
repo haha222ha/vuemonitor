@@ -17,10 +17,11 @@ async def support_contact():
     if qq:
         chat_url = f"https://wpa.qq.com/msgrd?v=3&uin={qq}&site=qq&menu=yes"
         if not qr_url:
-            qr_url = (
-                "https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data="
-                + quote(chat_url, safe="")
-            )
+            qr_url = "/support-qq.png"
+        elif qr_url.startswith("/"):
+            site = (settings.SUPPORT_SITE_URL or "").rstrip("/")
+            if site:
+                qr_url = f"{site}{qr_url}"
     return {
         "code": 0,
         "data": {

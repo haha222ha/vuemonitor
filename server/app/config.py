@@ -89,8 +89,9 @@ class Settings(BaseSettings):
     SMTP_USE_TLS: bool = True
     SMTP_USE_SSL: bool = False
 
-    SUPPORT_QQ: str = "459004549"
-    SUPPORT_QQ_QR_URL: str = ""
+    SUPPORT_QQ: str = "898382699"
+    SUPPORT_QQ_QR_URL: str = "/support-qq.png"
+    SUPPORT_SITE_URL: str = "https://www.xhs365.cn"
     SUPPORT_TITLE: str = "QQ 客服"
     SUPPORT_HINT: str = "注册、授权码、套餐问题请扫码或搜索 QQ 添加客服（无需邮箱验证）"
 
