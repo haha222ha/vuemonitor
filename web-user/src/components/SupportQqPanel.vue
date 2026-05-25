@@ -3,7 +3,19 @@
     <p v-if="!compact" class="support-title">{{ info.title || "QQ 客服" }}</p>
     <p class="support-hint">{{ info.hint }}</p>
     <div v-if="info.qq_qr_url" class="qr-wrap">
-      <img :src="info.qq_qr_url" alt="QQ 客服二维码 — 扫一扫加好友" width="200" height="auto" loading="lazy" class="qr-img" />
+      <div class="qr-hover" tabindex="0" aria-label="悬停查看 QQ 二维码大图">
+        <img
+          :src="info.qq_qr_url"
+          alt="QQ 客服"
+          loading="lazy"
+          class="qr-thumb"
+        />
+        <div class="qr-pop">
+          <img :src="info.qq_qr_url" alt="QQ 客服二维码 — 扫一扫加好友" class="qr-pop-img" />
+          <span class="qr-pop-tip">扫一扫加我为好友</span>
+        </div>
+      </div>
+      <p class="qr-hover-hint">悬停查看大图</p>
     </div>
     <div v-if="info.qq" class="qq-row">
       <span class="qq-label">QQ号</span>
@@ -103,15 +115,91 @@ onMounted(load);
 }
 .qr-wrap {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
 }
-.qr-img {
-  max-width: 200px;
-  width: 100%;
+.qr-hover-hint {
+  margin: 0;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+}
+.qr-hover {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  outline: none;
+}
+.qr-thumb {
+  display: block;
+  width: 72px;
   height: auto;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #fff;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease;
+}
+.support-qq.compact .qr-thumb {
+  width: 56px;
+}
+.qr-hover:hover .qr-thumb,
+.qr-hover:focus-visible .qr-thumb {
+  transform: scale(1.03);
+}
+.qr-pop {
+  pointer-events: none;
+  position: absolute;
+  z-index: 100;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.96);
+  padding: 10px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+}
+.qr-pop::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-top-color: #fff;
+}
+.qr-pop-img {
+  display: block;
+  width: 220px;
+  max-width: min(220px, 70vw);
+  height: auto;
+  border-radius: 6px;
+}
+.qr-pop-tip {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+}
+.qr-hover:hover .qr-pop,
+.qr-hover:focus-visible .qr-pop,
+.qr-hover:focus-within .qr-pop {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) scale(1);
+}
+.support-qq.compact .qr-pop {
+  bottom: auto;
+  top: calc(100% + 10px);
+}
+.support-qq.compact .qr-pop::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: #fff;
 }
 .qq-row {
   margin-top: 12px;
