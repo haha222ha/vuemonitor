@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -21,6 +22,34 @@ from app.models.intelligence import (
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/sync", tags=["intel-sync"], dependencies=[Depends(verify_sync_token)])
+
+
+def _filter_item_for_model(item: dict, model_class) -> dict:
+    valid_keys = set(c.name for c in model_class.__table__.columns)
+    dt_columns = {
+        c.name for c in model_class.__table__.columns
+        if hasattr(c, "type") and c.type.__class__.__name__ == "DateTime"
+    }
+    filtered = {}
+    extra = {}
+    for k, v in item.items():
+        if k in valid_keys:
+            if k in dt_columns and isinstance(v, str):
+                try:
+                    v = datetime.fromisoformat(v).replace(tzinfo=timezone.utc)
+                except (ValueError, TypeError):
+                    pass
+            filtered[k] = v
+        else:
+            extra[k] = v
+    if extra and "source_data" in valid_keys:
+        existing = filtered.get("source_data", {})
+        if isinstance(existing, dict):
+            existing.update(extra)
+        else:
+            existing = extra
+        filtered["source_data"] = existing
+    return filtered
 
 
 def _records_match(existing, incoming: dict, key_field: str) -> bool:
@@ -63,6 +92,7 @@ async def _upsert_batch(
                 continue
 
             client_checksum = item.pop("_checksum", "")
+            item = _filter_item_for_model(item, model_class)
             stmt = select(model_class).where(getattr(model_class, key_field) == key_value)
             query_result = await db.execute(stmt)
             existing = query_result.scalar_one_or_none()
