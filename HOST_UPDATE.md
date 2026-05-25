@@ -12,6 +12,20 @@ cd /opt/vuemonitor && sudo rm -rf client/node_modules 2>/dev/null; git fetch ori
 bash /opt/vuemonitor/scripts/diagnose-api.sh
 ```
 
+## git reset 报 Permission denied（AI互联网信息量化 目录）
+
+先修复目录属主再拉代码，或只拉 SMTP 相关文件：
+
+```bash
+sudo chown -R "$(whoami):$(whoami)" "/opt/vuemonitor/AI互联网信息量化" 2>/dev/null; cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main
+```
+
+不整库 reset 时，只更新 SMTP 脚本：
+
+```bash
+cd /opt/vuemonitor && git fetch origin main && git checkout origin/main -- scripts/fix_smtp_host.sh scripts/configure_smtp.sh scripts/test_smtp.py scripts/server_env.py server/app/services/email_service.py
+```
+
 ## 配置网易企业邮 SMTP（主机一行）
 
 SSH 登录服务器后，**只改两处**：`SMTP_PASS` 里的授权码、`TEST_TO` 改成你要收测试信的邮箱，然后整行复制执行：
