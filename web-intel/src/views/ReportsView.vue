@@ -4,7 +4,7 @@
     <div class="page-header">
       <div class="header-title-area">
         <h2>决策报告</h2>
-        <p class="header-subtitle">周度/月度副业决策报告（HTML 完整版，非仪表盘摘要）</p>
+        <p class="header-subtitle">周度/月度副业决策报告（HTML 完整版）</p>
       </div>
       <el-tag v-if="planName" effect="plain">{{ planLabel(planName) }}</el-tag>
     </div>
@@ -19,7 +19,6 @@
     <div v-else-if="!items.length" class="intel-empty-state">
       <div class="intel-empty-state-icon">📄</div>
       <div class="intel-empty-state-text">暂无已上传报告</div>
-      <div class="intel-empty-state-action">本地执行同步并上传 html 报告后会出现在此</div>
     </div>
     <template v-else>
       <el-tabs v-model="typeTab" class="report-tabs">
@@ -37,7 +36,9 @@
               <span v-if="item.report_date">{{ formatDate(item.report_date) }}</span>
             </p>
             <div class="report-actions">
-              <el-button type="primary" size="small" @click="openReport(item)">查看报告</el-button>
+              <el-button type="primary" size="small" :loading="openingId === item.id" @click="openReport(item)">
+                查看报告
+              </el-button>
               <el-button size="small" link @click="openReportNewTab(item)">新窗口打开</el-button>
             </div>
           </el-card>
@@ -51,9 +52,29 @@
       size="92%"
       direction="rtl"
       destroy-on-close
+      @closed="onDrawerClosed"
     >
-      <div v-if="!reportFrameUrl" class="drawer-empty">无法加载报告地址</div>
-      <iframe v-else :src="reportFrameUrl" class="report-iframe" title="报告内容" />
+      <div v-if="reportLoading" class="drawer-loading">
+        <el-skeleton :rows="10" animated />
+      </div>
+      <div v-else-if="reportError" class="drawer-empty">
+        <p>{{ reportError }}</p>
+        <el-button type="primary" @click="retryLoadReport">重试</el-button>
+      </div>
+      <iframe
+        v-else-if="reportFrameUrl && !reportHtmlInline"
+        :src="reportFrameUrl"
+        class="report-iframe"
+        title="报告内容"
+        @error="onIframeError"
+      />
+      <iframe
+        v-else-if="reportHtmlInline"
+        :srcdoc="reportHtmlInline"
+        class="report-iframe"
+        title="报告内容"
+        sandbox="allow-scripts allow-same-origin"
+      />
     </el-drawer>
   </div>
 </template>
@@ -61,12 +82,12 @@
 <script setup lang="ts">
 // AIGC START
 import { ref, computed, onMounted } from "vue"
+import { ElMessage } from "element-plus"
+import axios from "axios"
 import { useIntelAuthStore } from "@/stores/auth"
 import api from "@/utils/api"
 import { planLabel, REPORT_TYPE_LABELS } from "@/utils/plan"
 import UpgradeBanner from "@/components/UpgradeBanner.vue"
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "/api/v1"
 
 interface ReportItem {
   id: string
@@ -85,22 +106,43 @@ const blockedMessage = ref("")
 const drawerOpen = ref(false)
 const activeReport = ref<ReportItem | null>(null)
 const typeTab = ref("all")
+const openingId = ref("")
+const reportLoading = ref(false)
+const reportError = ref("")
+const reportHtmlInline = ref("")
+const reportFrameUrl = ref("")
 
 const planName = computed(() => auth.planName)
 
+function extractFilename(path: string): string {
+  const clean = path.split("?")[0]
+  return clean.split("/").pop() || ""
+}
+
+/** 报告必须通过 /static/reports/ 访问，避免 API 的 X-Frame-Options:DENY 导致 iframe 无法加载 */
 function resolveReportUrl(item: ReportItem): string {
   const path = item.content_html || item.file_path || ""
   if (!path) return ""
-  if (path.startsWith("http")) return path
-  const filename = path.split("/").pop()?.split("?")[0] || ""
-  if (!filename) return ""
-  return `${API_BASE}/intel/reports/files/${encodeURIComponent(filename)}`
-}
 
-const reportFrameUrl = computed(() => {
-  if (!activeReport.value) return ""
-  return resolveReportUrl(activeReport.value)
-})
+  const origin = window.location.origin
+
+  if (path.startsWith("http")) {
+    if (/localhost|127\.0\.0\.1/i.test(path)) {
+      const filename = extractFilename(path)
+      return filename ? `${origin}/static/reports/${encodeURIComponent(filename)}` : ""
+    }
+    return path
+  }
+
+  const filename = extractFilename(path)
+  if (!filename) return ""
+
+  if (path.startsWith("/static/reports/")) {
+    return `${origin}/static/reports/${encodeURIComponent(filename)}`
+  }
+
+  return `${origin}/static/reports/${encodeURIComponent(filename)}`
+}
 
 const filteredByType = computed(() => {
   if (typeTab.value === "all") return items.value
@@ -119,16 +161,62 @@ function formatDate(iso: string) {
   }
 }
 
-function openReport(item: ReportItem) {
+async function loadReportContent(item: ReportItem) {
   const url = resolveReportUrl(item)
-  if (!url) return
+  if (!url) {
+    reportError.value = "报告文件地址无效"
+    return
+  }
+
+  reportLoading.value = true
+  reportError.value = ""
+  reportHtmlInline.value = ""
+  reportFrameUrl.value = url
+
+  try {
+    const { data } = await axios.get(url, {
+      responseType: "text",
+      timeout: 60000,
+      headers: { Accept: "text/html" },
+    })
+    if (typeof data === "string" && data.includes("<html")) {
+      reportHtmlInline.value = data
+      reportFrameUrl.value = ""
+    }
+  } catch {
+    reportFrameUrl.value = url
+  } finally {
+    reportLoading.value = false
+  }
+}
+
+async function openReport(item: ReportItem) {
+  openingId.value = item.id
   activeReport.value = item
   drawerOpen.value = true
+  await loadReportContent(item)
+  openingId.value = ""
 }
 
 function openReportNewTab(item: ReportItem) {
   const url = resolveReportUrl(item)
   if (url) window.open(url, "_blank", "noopener,noreferrer")
+  else ElMessage.warning("无法解析报告地址")
+}
+
+function retryLoadReport() {
+  if (activeReport.value) loadReportContent(activeReport.value)
+}
+
+function onIframeError() {
+  reportError.value = "iframe 加载失败，请点击「新窗口打开」查看"
+}
+
+function onDrawerClosed() {
+  reportHtmlInline.value = ""
+  reportFrameUrl.value = ""
+  reportError.value = ""
+  activeReport.value = null
 }
 
 onMounted(async () => {
@@ -208,7 +296,8 @@ onMounted(async () => {
   border-radius: 8px;
   background: #fff;
 }
-.drawer-empty {
+.drawer-empty,
+.drawer-loading {
   padding: 40px;
   text-align: center;
   color: #909399;
