@@ -45,7 +45,7 @@
           </div>
           <div class="card-paths" v-if="item.commercial_paths?.length">
             <el-tag v-for="(path, idx) in item.commercial_paths.slice(0, 3)" :key="idx" size="small" type="success" effect="plain">
-              {{ typeof path === 'string' ? path : (path as Record<string, unknown>).name || JSON.stringify(path) }}
+              {{ formatPath(path) }}
             </el-tag>
             <el-tag v-if="item.commercial_paths.length > 3" size="small" type="info">+{{ item.commercial_paths.length - 3 }}</el-tag>
           </div>
@@ -108,7 +108,15 @@
           <div class="paths-list">
             <div v-for="(path, idx) in detailItem.commercial_paths" :key="idx" class="path-item">
               <el-tag type="success" size="small">{{ idx + 1 }}</el-tag>
-              <span>{{ typeof path === 'string' ? path : (path as Record<string, unknown>).name || (path as Record<string, unknown>).title || JSON.stringify(path) }}</span>
+              <div class="path-detail" v-if="typeof path === 'object'">
+                <div class="path-main">
+                  <span class="path-type" v-if="(path as Record<string, unknown>).type">{{ (path as Record<string, unknown>).type }}</span>
+                  <span class="path-desc" v-if="(path as Record<string, unknown>).description">{{ (path as Record<string, unknown>).description }}</span>
+                  <span class="path-name" v-else-if="(path as Record<string, unknown>).name">{{ (path as Record<string, unknown>).name }}</span>
+                </div>
+                <span class="path-price" v-if="(path as Record<string, unknown>).price_range">💰 {{ (path as Record<string, unknown>).price_range }}</span>
+              </div>
+              <span v-else>{{ path }}</span>
             </div>
           </div>
         </div>
@@ -219,6 +227,17 @@ function verdictType(verdict: string): string {
 function formatArray(arr: unknown[]): string {
   if (!arr?.length) return "-"
   return arr.map((v) => (typeof v === "string" ? v : JSON.stringify(v))).join("、")
+}
+
+function formatPath(path: unknown): string {
+  if (typeof path === "string") return path
+  if (typeof path === "object" && path !== null) {
+    const p = path as Record<string, unknown>
+    if (p.type && p.description) return `${p.type}：${p.description}`
+    if (p.name) return String(p.name)
+    if (p.type) return String(p.type)
+  }
+  return JSON.stringify(path)
 }
 
 function openDetail(item: OpportunityItem) {
@@ -347,9 +366,38 @@ onMounted(async () => {
 }
 .path-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   font-size: 13px;
   color: #303133;
+}
+.path-detail {
+  flex: 1;
+  background: #f0f9eb;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+.path-main {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.path-type {
+  font-weight: 600;
+  color: #67c23a;
+}
+.path-desc {
+  color: #303133;
+}
+.path-name {
+  color: #303133;
+  font-weight: 500;
+}
+.path-price {
+  font-size: 12px;
+  color: #e6a23c;
+  margin-top: 4px;
+  display: block;
 }
 </style>
