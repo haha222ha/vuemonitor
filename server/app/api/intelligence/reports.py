@@ -10,6 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.intelligence.content_filter import is_demo_content
 from app.api.intelligence.deps import get_intel_plan, verify_sync_token
+from app.api.intelligence.report_display import (
+    extract_topic_id,
+    filter_items_for_plan,
+    infer_display_type,
+)
 from app.core.database import get_db
 from app.models.intelligence import IntelligenceReport
 
@@ -31,10 +36,9 @@ async def list_reports(
 
     if plan == "free":
         return {"plan": "free", "count": 0, "items": [], "message": "free tier does not include reports"}
-    elif plan == "weekly":
-        stmt = stmt.where(IntelligenceReport.report_type == "weekly")
-    elif plan == "monthly":
-        stmt = stmt.where(IntelligenceReport.report_type.in_(["weekly", "monthly"]))
+    elif plan in ("weekly", "monthly"):
+        # 周/月档在返回前按 display_type 再过滤，避免选题报告误标 weekly 混入周度区
+        pass
     elif plan in ("yearly", "enterprise"):
         pass
 
@@ -46,19 +50,32 @@ async def list_reports(
     result = await db.execute(stmt)
     reports = [r for r in result.scalars().all() if not is_demo_content(r.title)]
 
+    items = []
+    for r in reports:
+        display_type = infer_display_type(r.report_type, r.title, r.content_html)
+        topic_id = extract_topic_id(r.title, r.content_html)
+        items.append(
+            {
+                "id": str(r.id),
+                "report_type": r.report_type,
+                "display_type": display_type,
+                "topic_id": topic_id,
+                "title": r.title,
+                "week_number": r.week_number,
+                "report_date": r.report_date.isoformat() if r.report_date else None,
+                "content_json": r.content_json,
+                "content_html": r.content_html,
+                "file_path": r.content_html,
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+            }
+        )
+
+    items = filter_items_for_plan(plan, items)
+
     return {
         "plan": plan,
-        "count": len(reports),
-        "items": [
-            {
-                "id": str(r.id), "report_type": r.report_type,
-                "title": r.title, "week_number": r.week_number,
-                "report_date": r.report_date.isoformat() if r.report_date else None,
-                "content_json": r.content_json, "content_html": r.content_html,
-                "file_path": r.content_html, "created_at": r.created_at.isoformat() if r.created_at else None,
-            }
-            for r in reports
-        ],
+        "count": len(items),
+        "items": items,
     }
 
 

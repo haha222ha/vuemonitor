@@ -4,7 +4,7 @@
     <div class="page-header">
       <div class="header-title-area">
         <h2>决策报告</h2>
-        <p class="header-subtitle">周度/月度副业决策报告（HTML 完整版）</p>
+        <p class="header-subtitle">按类型分区展示：周度 / 月度 / 选题深度，不再混排</p>
       </div>
       <el-tag v-if="planName" effect="plain">{{ planLabel(planName) }}</el-tag>
     </div>
@@ -21,34 +21,42 @@
       <div class="intel-empty-state-text">暂无已上传报告</div>
     </div>
     <template v-else>
-      <el-tabs v-model="typeTab" class="report-tabs">
-        <el-tab-pane label="全部" name="all" />
-        <el-tab-pane label="周度报告" name="weekly" />
-        <el-tab-pane label="月度报告" name="monthly" />
-      </el-tabs>
-      <el-row :gutter="16" class="report-list">
-        <el-col v-for="item in filteredByType" :key="item.id" :xs="24" :sm="12" :md="8">
-          <el-card shadow="hover" class="report-card">
-            <div class="report-type">{{ reportTypeLabel(item.report_type) }}</div>
-            <h3 class="report-title">{{ item.title }}</h3>
-            <p class="report-meta">
-              <span v-if="item.week_number">{{ item.week_number }}</span>
-              <span v-if="item.report_date">{{ formatDate(item.report_date) }}</span>
-            </p>
-            <div class="report-actions">
-              <el-button type="primary" size="small" :loading="openingId === item.id" @click="openReport(item)">
-                查看报告
-              </el-button>
-              <el-button size="small" link @click="openReportNewTab(item)">新窗口打开</el-button>
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
+      <div class="report-summary">
+        共 {{ items.length }} 份，分 {{ sections.length }} 类展示
+      </div>
+      <section v-for="sec in sections" :key="sec.key" class="report-section">
+        <div class="section-head">
+          <h3 class="section-title">{{ sec.title }}</h3>
+          <span class="section-hint">{{ sec.hint }}</span>
+          <el-tag size="small" type="info" effect="plain">{{ sec.items.length }} 份</el-tag>
+        </div>
+        <el-row :gutter="16" class="report-list">
+          <el-col v-for="item in sec.items" :key="item.id" :xs="24" :sm="12" :md="8">
+            <el-card shadow="hover" class="report-card">
+              <div class="report-type-row">
+                <el-tag size="small" :type="sectionTagType(sec.key)">{{ reportTypeLabel(sec.key) }}</el-tag>
+                <span v-if="item.topic_id" class="topic-id">{{ item.topic_id }}</span>
+              </div>
+              <h3 class="report-title">{{ displayTitle(item) }}</h3>
+              <p class="report-meta">
+                <span v-if="item.week_number && sec.key === 'weekly'">{{ item.week_number }}</span>
+                <span v-if="item.report_date">{{ formatDate(item.report_date) }}</span>
+              </p>
+              <div class="report-actions">
+                <el-button type="primary" size="small" :loading="openingId === item.id" @click="openReport(item)">
+                  查看报告
+                </el-button>
+                <el-button size="small" link @click="openReportNewTab(item)">新窗口打开</el-button>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
+      </section>
     </template>
 
     <el-drawer
       v-model="drawerOpen"
-      :title="activeReport?.title || '报告预览'"
+      :title="activeReport ? displayTitle(activeReport) : '报告预览'"
       size="92%"
       direction="rtl"
       destroy-on-close
@@ -87,25 +95,19 @@ import axios from "axios"
 import { useIntelAuthStore } from "@/stores/auth"
 import api from "@/utils/api"
 import { planLabel, REPORT_TYPE_LABELS } from "@/utils/plan"
+import {
+  groupReportsBySection,
+  type ReportListItem,
+  type ReportDisplayType,
+} from "@/utils/reports"
 import UpgradeBanner from "@/components/UpgradeBanner.vue"
-
-interface ReportItem {
-  id: string
-  report_type: string
-  title: string
-  week_number?: string
-  report_date?: string
-  content_html?: string
-  file_path?: string
-}
 
 const auth = useIntelAuthStore()
 const loading = ref(true)
-const items = ref<ReportItem[]>([])
+const items = ref<ReportListItem[]>([])
 const blockedMessage = ref("")
 const drawerOpen = ref(false)
-const activeReport = ref<ReportItem | null>(null)
-const typeTab = ref("all")
+const activeReport = ref<ReportListItem | null>(null)
 const openingId = ref("")
 const reportLoading = ref(false)
 const reportError = ref("")
@@ -113,14 +115,34 @@ const reportHtmlInline = ref("")
 const reportFrameUrl = ref("")
 
 const planName = computed(() => auth.planName)
+const sections = computed(() => groupReportsBySection(items.value))
+
+function sectionTagType(key: ReportDisplayType): string {
+  const map: Record<string, string> = {
+    weekly: "primary",
+    monthly: "success",
+    topic: "warning",
+    quarterly: "",
+    daily: "info",
+    other: "info",
+  }
+  return map[key] || "info"
+}
+
+function displayTitle(item: ReportListItem): string {
+  const t = item.title || ""
+  if (item.topic_id && t.startsWith(item.topic_id)) {
+    return t.replace(new RegExp(`^${item.topic_id}\\s*[·\\-]?\\s*`), "").trim() || t
+  }
+  return t
+}
 
 function extractFilename(path: string): string {
   const clean = path.split("?")[0]
   return clean.split("/").pop() || ""
 }
 
-/** 报告必须通过 /static/reports/ 访问，避免 API 的 X-Frame-Options:DENY 导致 iframe 无法加载 */
-function resolveReportUrl(item: ReportItem): string {
+function resolveReportUrl(item: ReportListItem): string {
   const path = item.content_html || item.file_path || ""
   if (!path) return ""
 
@@ -144,11 +166,6 @@ function resolveReportUrl(item: ReportItem): string {
   return `${origin}/static/reports/${encodeURIComponent(filename)}`
 }
 
-const filteredByType = computed(() => {
-  if (typeTab.value === "all") return items.value
-  return items.value.filter((i) => i.report_type === typeTab.value)
-})
-
 function reportTypeLabel(t: string) {
   return REPORT_TYPE_LABELS[t] || t
 }
@@ -161,7 +178,7 @@ function formatDate(iso: string) {
   }
 }
 
-async function loadReportContent(item: ReportItem) {
+async function loadReportContent(item: ReportListItem) {
   const url = resolveReportUrl(item)
   if (!url) {
     reportError.value = "报告文件地址无效"
@@ -190,7 +207,7 @@ async function loadReportContent(item: ReportItem) {
   }
 }
 
-async function openReport(item: ReportItem) {
+async function openReport(item: ReportListItem) {
   openingId.value = item.id
   activeReport.value = item
   drawerOpen.value = true
@@ -198,7 +215,7 @@ async function openReport(item: ReportItem) {
   openingId.value = ""
 }
 
-function openReportNewTab(item: ReportItem) {
+function openReportNewTab(item: ReportListItem) {
   const url = resolveReportUrl(item)
   if (url) window.open(url, "_blank", "noopener,noreferrer")
   else ElMessage.warning("无法解析报告地址")
@@ -229,7 +246,7 @@ onMounted(async () => {
       items.value = []
     } else {
       items.value = (data?.items || []).filter(
-        (r: ReportItem) => r.title && !/测试|test|demo/i.test(r.title),
+        (r: ReportListItem) => r.title && !/测试|test|demo/i.test(r.title),
       )
     }
   } catch (e: unknown) {
@@ -261,16 +278,47 @@ onMounted(async () => {
   color: var(--intel-text-muted, #909399);
   font-size: 13px;
 }
-.report-tabs {
-  margin-bottom: 16px;
+.report-summary {
+  font-size: 13px;
+  color: #909399;
+  margin-bottom: 20px;
+}
+.report-section {
+  margin-bottom: 32px;
+}
+.section-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--el-border-color-lighter, #ebeef5);
+}
+.section-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+.section-hint {
+  font-size: 12px;
+  color: #909399;
+  flex: 1;
+  min-width: 200px;
 }
 .report-card {
   margin-bottom: 16px;
 }
-.report-type {
-  font-size: 12px;
-  color: #409eff;
-  margin-bottom: 6px;
+.report-type-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.topic-id {
+  font-size: 11px;
+  color: #909399;
+  font-family: ui-monospace, monospace;
 }
 .report-title {
   margin: 0 0 8px;

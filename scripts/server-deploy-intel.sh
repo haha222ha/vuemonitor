@@ -1,6 +1,6 @@
 #!/bin/bash
 # AIGC START
-# intel.xhs365.cn 一键部署（在服务器 /opt/vuemonitor 下整段复制粘贴执行）
+# intel.xhs365.cn 一键部署（与 docs/服务器一键部署-情报站.md 唯一命令一致）
 set -e
 cd /opt/vuemonitor
 
@@ -35,9 +35,18 @@ sudo nginx -t
 sudo nginx -s reload
 sleep 3
 curl -s http://127.0.0.1:8000/health | python3 -m json.tool || echo "health check failed"
-curl -sI http://127.0.0.1/ | head -n 3
+
+SAMPLE=$(ls server/static/reports/weekly_*.html 2>/dev/null | head -1)
+if [ -n "$SAMPLE" ]; then
+  FN=$(basename "$SAMPLE")
+  echo "=== 报告静态路径自检: /static/reports/$FN ==="
+  curl -sI "http://127.0.0.1/static/reports/$FN" | head -n 3
+else
+  echo "WARN: server/static/reports 下暂无 weekly_*.html，本地 scheduled_sync 上传后会生成"
+fi
 
 echo ""
 echo "=== 部署完成 ==="
 echo "前端: https://intel.xhs365.cn"
 echo "若页面未更新: Ctrl+F5 强制刷新浏览器缓存"
+# AIGC END

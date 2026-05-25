@@ -381,14 +381,26 @@ class IntelSyncClient:
         if not reports_dir.exists():
             raise FileNotFoundError(f"Reports directory not found: {reports_dir}")
 
+        topic_id = ""
+        parent = reports_dir.parent
+        if parent.name.startswith("T") and len(parent.name) >= 10:
+            topic_id = parent.name
+
         results = []
         for fp in sorted(reports_dir.glob("*.html")):
             try:
+                rtype = report_type
+                title = fp.stem
+                wk = week_number
+                if topic_id:
+                    rtype = "topic"
+                    title = f"{topic_id} · 副业决策报告"
+                    wk = None
                 result = self.upload_report(
                     file_path=fp,
-                    report_type=report_type,
-                    title=fp.stem,
-                    week_number=week_number,
+                    report_type=rtype,
+                    title=title,
+                    week_number=wk,
                 )
                 results.append({"file": fp.name, "status": "ok", "result": result})
             except Exception as e:
@@ -397,11 +409,18 @@ class IntelSyncClient:
 
         for fp in sorted(reports_dir.glob("*.pdf")):
             try:
+                rtype = report_type
+                title = fp.stem
+                wk = week_number
+                if topic_id:
+                    rtype = "topic"
+                    title = f"{topic_id} · 副业决策报告"
+                    wk = None
                 result = self.upload_report(
                     file_path=fp,
-                    report_type=report_type,
-                    title=fp.stem,
-                    week_number=week_number,
+                    report_type=rtype,
+                    title=title,
+                    week_number=wk,
                 )
                 results.append({"file": fp.name, "status": "ok", "result": result})
             except Exception as e:

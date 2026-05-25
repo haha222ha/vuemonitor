@@ -331,8 +331,12 @@ def main():
             sys.exit(1)
         print()
 
+    all_target_names = ["trends", "signals", "opportunities", "risks", "emotions", "xhs_topics"]
     if args.target:
-        targets_config = {args.target: True}
+        if args.target not in all_target_names:
+            print(f"[ERROR] Unknown target: {args.target}. Choose from: {', '.join(all_target_names)}")
+            sys.exit(1)
+        targets_config = {name: (name == args.target) for name in all_target_names}
         logger.info(f"Single target sync: {args.target}")
     else:
         targets_config = config.get("targets", {})

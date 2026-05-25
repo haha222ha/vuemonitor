@@ -82,6 +82,8 @@ export const REPORT_TYPE_LABELS: Record<string, string> = {
   weekly: "周度决策报告",
   monthly: "月度深度报告",
   quarterly: "季度洞察",
+  topic: "选题深度报告",
   daily: "每日简报",
+  other: "其他",
 }
 // AIGC END

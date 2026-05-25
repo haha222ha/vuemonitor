@@ -1,5 +1,7 @@
 # AIGC START
 # 定时同步入口：数据库全量同步 +（可选）上传最新选题 HTML 报告
+# 推送到 https://intel.xhs365.cn（服务器 47.239.181.111）
+# 仅同步数据/报告文件；前端代码更新请在服务器执行 docs/服务器一键部署-情报站.md 中的一条命令
 # 供 Windows 任务计划程序调用，或手动双击运行
 $ErrorActionPreference = "Stop"
 $SyncDir = $PSScriptRoot
