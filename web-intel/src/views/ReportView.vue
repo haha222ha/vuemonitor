@@ -285,15 +285,24 @@ async function loadReportFiles() {
   try {
     const { data } = await api.get("/intel/reports")
     const reports = data?.items || data || []
-    const matched = reports.find((r: any) => {
+    const sourceId = (item.value as any)?.source_topic_id || ""
+    for (const r of reports) {
       const rTitle = (r.title || "").toLowerCase()
       const iTitle = (item.value?.title || "").toLowerCase()
-      return rTitle && iTitle && (rTitle.includes(iTitle.slice(0, 10)) || iTitle.includes(rTitle.slice(0, 10)))
-    })
-    if (matched?.file_path) {
-      const url = matched.file_path
-      if (url.endsWith(".pdf")) pdfUrl.value = url
-      else if (url.endsWith(".html") || url.endsWith(".htm")) htmlUrl.value = url
+      const titleMatch = rTitle && iTitle && (rTitle.includes(iTitle.slice(0, 10)) || iTitle.includes(rTitle.slice(0, 10)))
+      const idMatch = sourceId && r.file_path && r.file_path.includes(sourceId)
+      if (titleMatch || idMatch) {
+        const url = r.file_path || r.url || ""
+        if (url.endsWith(".pdf")) pdfUrl.value = url
+        else if (url.endsWith(".html") || url.endsWith(".htm")) htmlUrl.value = url
+      }
+    }
+    if (sourceId && !pdfUrl.value) {
+      const directPdf = `/static/reports/${sourceId}_report.pdf`
+      try {
+        const check = await fetch(directPdf, { method: "HEAD" })
+        if (check.ok) pdfUrl.value = directPdf
+      } catch {}
     }
   } catch {}
 }

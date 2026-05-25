@@ -1,7 +1,7 @@
 {
   "_description": "副业机会库 —— 记录所有通过机会判断的RECOMMENDED选题，是系统的核心资产",
-  "_version": "1.0",
-  "last_updated": "2026-05-23",
+  "_version": "1.1",
+  "last_updated": "2026-05-25",
   "opportunities": [
     {
       "id": "OPP-001",
@@ -27,7 +27,7 @@
       "platform": ["小红书", "抖音", "B站"],
       "lifecycle_stage": "爆发期",
       "first_identified": "2026-05-20",
-      "last_verified": "2026-05-23",
+      "last_verified": "2026-05-25",
       "trend_direction": "上升",
       "key_metrics": {
         "search_growth": "高位运行",
@@ -44,7 +44,8 @@
       "status": "active",
       "output_path": "AI内容工厂/output/T20260520007/",
       "score_history": [
-        {"date": "2026-05-20", "score": 42, "verdict": "RECOMMENDED", "note": "首次评估"}
+        {"date": "2026-05-20", "score": 42, "verdict": "RECOMMENDED", "note": "首次评估"},
+        {"date": "2026-05-25", "score": 42, "verdict": "RECOMMENDED", "note": "持续验证，趋势稳定"}
       ]
     },
     {
@@ -71,7 +72,7 @@
       "platform": ["小红书", "抖音"],
       "lifecycle_stage": "爆发期",
       "first_identified": "2026-05-23",
-      "last_verified": "2026-05-23",
+      "last_verified": "2026-05-25",
       "trend_direction": "上升",
       "key_metrics": {
         "search_growth": "周环比+68%",
@@ -90,6 +91,358 @@
       ],
       "status": "active",
       "output_path": null
+    },
+    {
+      "id": "OPP-003",
+      "source_topic_id": "T20260525001",
+      "name": "AI绘画接单副业",
+      "category": "AI设计变现",
+      "sub_category": "AI绘画接单",
+      "difficulty": "easy",
+      "startup_cost": 0,
+      "monthly_ceiling": "3000-8000（兼职）/ 10000-30000（全职）",
+      "time_to_first_revenue": "1-2周",
+      "risk_level": "low",
+      "recommend": true,
+      "verdict_score": 38,
+      "verdict_detail": {
+        "monetization_path_authenticity": 9,
+        "competition_heat": 6,
+        "ordinary_person_fit": 8,
+        "sustained_demand": 7,
+        "copy_barrier": 5
+      },
+      "persona_fit": ["零基础小白", "设计师", "上班族"],
+      "platform": ["小红书", "抖音", "闲鱼"],
+      "lifecycle_stage": "爆发期",
+      "first_identified": "2026-05-25",
+      "last_verified": "2026-05-25",
+      "trend_direction": "快速上升",
+      "key_metrics": {
+        "search_growth": "周环比+120%",
+        "competitor_count": "较少（2-5个深度内容KOL）",
+        "content_saturation": "低",
+        "monetization_readiness": "高（接单+模板+教程）"
+      },
+      "commercial_paths": [
+        {"type": "服务", "description": "AI绘画接单（头像/壁纸/表情包）", "price_range": "10-200/单"},
+        {"type": "虚拟产品", "description": "AI绘画提示词模板包", "price_range": "9.9-49.9"},
+        {"type": "课程", "description": "AI绘画接单0到1实战课", "price_range": "99-399"},
+        {"type": "信息差产品", "description": "AI绘画接单渠道+报价指南", "price_range": "29.9-99"}
+      ],
+      "status": "active",
+      "output_path": null,
+      "score_history": [
+        {"date": "2026-05-25", "score": 38, "verdict": "RECOMMENDED", "note": "首次评估"}
+      ]
+    },
+    {
+      "id": "OPP-004",
+      "source_topic_id": "T20260525002",
+      "name": "AI课程制作变现",
+      "category": "知识付费",
+      "sub_category": "AI课程制作",
+      "difficulty": "medium",
+      "startup_cost": 0,
+      "monthly_ceiling": "5000-30000",
+      "time_to_first_revenue": "2-4周",
+      "risk_level": "low",
+      "recommend": true,
+      "verdict_score": 36,
+      "verdict_detail": {
+        "monetization_path_authenticity": 8,
+        "competition_heat": 6,
+        "ordinary_person_fit": 7,
+        "sustained_demand": 8,
+        "copy_barrier": 6
+      },
+      "persona_fit": ["有专长的上班族", "自由职业者", "老师/培训师"],
+      "platform": ["小红书", "抖音", "B站"],
+      "lifecycle_stage": "爆发期",
+      "first_identified": "2026-05-25",
+      "last_verified": "2026-05-25",
+      "trend_direction": "上升",
+      "key_metrics": {
+        "search_growth": "月环比+80%",
+        "competitor_count": "中等（5-10个头部）",
+        "content_saturation": "中等",
+        "monetization_readiness": "高（课程+工具+模板）"
+      },
+      "commercial_paths": [
+        {"type": "课程", "description": "AI课程制作全流程教程", "price_range": "199-599"},
+        {"type": "工具", "description": "AI课程大纲生成器+课件模板", "price_range": "49-199"},
+        {"type": "信息差产品", "description": "AI课程选题+定价策略报告", "price_range": "29.9-99"},
+        {"type": "服务", "description": "AI课程代制作/优化服务", "price_range": "500-3000/单"}
+      ],
+      "status": "active",
+      "output_path": null,
+      "score_history": [
+        {"date": "2026-05-25", "score": 36, "verdict": "RECOMMENDED", "note": "首次评估"}
+      ]
+    },
+    {
+      "id": "OPP-005",
+      "source_topic_id": "T20260525003",
+      "name": "AI数字人直播带货",
+      "category": "AI直播",
+      "sub_category": "数字人直播",
+      "difficulty": "medium",
+      "startup_cost": 500,
+      "monthly_ceiling": "8000-50000",
+      "time_to_first_revenue": "2-4周",
+      "risk_level": "medium",
+      "recommend": true,
+      "verdict_score": 33,
+      "verdict_detail": {
+        "monetization_path_authenticity": 8,
+        "competition_heat": 5,
+        "ordinary_person_fit": 6,
+        "sustained_demand": 7,
+        "copy_barrier": 7
+      },
+      "persona_fit": ["有电商经验的上班族", "自由职业者", "小店主"],
+      "platform": ["抖音", "视频号", "淘宝直播"],
+      "lifecycle_stage": "早期",
+      "first_identified": "2026-05-25",
+      "last_verified": "2026-05-25",
+      "trend_direction": "快速上升",
+      "key_metrics": {
+        "search_growth": "月环比+200%",
+        "competitor_count": "较少（1-3个深度内容）",
+        "content_saturation": "极低",
+        "monetization_readiness": "中（工具+教程+代运营）"
+      },
+      "commercial_paths": [
+        {"type": "课程", "description": "AI数字人直播0到1实战课", "price_range": "299-799"},
+        {"type": "工具", "description": "AI数字人直播搭建工具包", "price_range": "99-399"},
+        {"type": "服务", "description": "AI数字人直播代搭建服务", "price_range": "1000-5000/单"},
+        {"type": "信息差产品", "description": "AI数字人直播选品+话术指南", "price_range": "49.9-199"}
+      ],
+      "status": "active",
+      "output_path": null,
+      "score_history": [
+        {"date": "2026-05-25", "score": 33, "verdict": "RECOMMENDED", "note": "首次评估，需关注政策风险"}
+      ]
+    },
+    {
+      "id": "OPP-006",
+      "source_topic_id": "T20260525004",
+      "name": "AI写作变现",
+      "category": "AI内容变现",
+      "sub_category": "AI写作",
+      "difficulty": "easy",
+      "startup_cost": 0,
+      "monthly_ceiling": "3000-15000",
+      "time_to_first_revenue": "1-2周",
+      "risk_level": "low",
+      "recommend": true,
+      "verdict_score": 34,
+      "verdict_detail": {
+        "monetization_path_authenticity": 8,
+        "competition_heat": 6,
+        "ordinary_person_fit": 8,
+        "sustained_demand": 7,
+        "copy_barrier": 4
+      },
+      "persona_fit": ["上班族", "大学生", "自由职业者"],
+      "platform": ["小红书", "知乎", "公众号"],
+      "lifecycle_stage": "爆发期",
+      "first_identified": "2026-05-25",
+      "last_verified": "2026-05-25",
+      "trend_direction": "上升",
+      "key_metrics": {
+        "search_growth": "月环比+60%",
+        "competitor_count": "中等（5-10个头部）",
+        "content_saturation": "中等",
+        "monetization_readiness": "高（代写+模板+课程）"
+      },
+      "commercial_paths": [
+        {"type": "服务", "description": "AI商业文案代写服务", "price_range": "50-500/单"},
+        {"type": "虚拟产品", "description": "AI写作提示词模板库", "price_range": "9.9-49.9"},
+        {"type": "课程", "description": "AI写作变现实战课", "price_range": "99-399"},
+        {"type": "信息差产品", "description": "AI写作接单渠道+报价指南", "price_range": "29.9-99"}
+      ],
+      "status": "active",
+      "output_path": null,
+      "score_history": [
+        {"date": "2026-05-25", "score": 34, "verdict": "RECOMMENDED", "note": "首次评估"}
+      ]
+    },
+    {
+      "id": "OPP-007",
+      "source_topic_id": "T20260525005",
+      "name": "AI虚拟产品创业",
+      "category": "虚拟产品",
+      "sub_category": "AI虚拟产品",
+      "difficulty": "easy",
+      "startup_cost": 0,
+      "monthly_ceiling": "5000-30000",
+      "time_to_first_revenue": "1-3周",
+      "risk_level": "low",
+      "recommend": true,
+      "verdict_score": 40,
+      "verdict_detail": {
+        "monetization_path_authenticity": 9,
+        "competition_heat": 5,
+        "ordinary_person_fit": 8,
+        "sustained_demand": 8,
+        "copy_barrier": 6
+      },
+      "persona_fit": ["上班族", "大学生", "自由职业者", "宝妈"],
+      "platform": ["小红书", "闲鱼", "淘宝"],
+      "lifecycle_stage": "爆发期",
+      "first_identified": "2026-05-25",
+      "last_verified": "2026-05-25",
+      "trend_direction": "快速上升",
+      "key_metrics": {
+        "search_growth": "月环比+150%",
+        "competitor_count": "较少（2-5个深度内容）",
+        "content_saturation": "低",
+        "monetization_readiness": "高（模板+素材+工具包）"
+      },
+      "commercial_paths": [
+        {"type": "虚拟产品", "description": "AI模板/素材/工具包售卖", "price_range": "9.9-199"},
+        {"type": "课程", "description": "AI虚拟产品开店0到1课", "price_range": "99-399"},
+        {"type": "信息差产品", "description": "虚拟产品选品+定价策略报告", "price_range": "29.9-99"},
+        {"type": "工具", "description": "AI虚拟产品批量生成工具", "price_range": "49-199"}
+      ],
+      "status": "active",
+      "output_path": null,
+      "score_history": [
+        {"date": "2026-05-25", "score": 40, "verdict": "RECOMMENDED", "note": "首次评估，高潜力赛道"}
+      ]
+    },
+    {
+      "id": "OPP-008",
+      "source_topic_id": "T20260525007",
+      "name": "AI求职加速",
+      "category": "AI职场",
+      "sub_category": "AI求职",
+      "difficulty": "easy",
+      "startup_cost": 0,
+      "monthly_ceiling": "3000-10000（兼职）/ 10000-30000（全职）",
+      "time_to_first_revenue": "1-2周",
+      "risk_level": "low",
+      "recommend": true,
+      "verdict_score": 37,
+      "verdict_detail": {
+        "monetization_path_authenticity": 8,
+        "competition_heat": 4,
+        "ordinary_person_fit": 9,
+        "sustained_demand": 6,
+        "copy_barrier": 5
+      },
+      "persona_fit": ["应届生", "求职者", "职场转型者"],
+      "platform": ["小红书", "知乎", "B站"],
+      "lifecycle_stage": "爆发期",
+      "first_identified": "2026-05-25",
+      "last_verified": "2026-05-25",
+      "trend_direction": "快速上升",
+      "key_metrics": {
+        "search_growth": "周环比+90%",
+        "competitor_count": "较少（1-3个深度内容）",
+        "content_saturation": "低",
+        "monetization_readiness": "高（简历+面试+辅导）"
+      },
+      "commercial_paths": [
+        {"type": "服务", "description": "AI简历优化+面试辅导服务", "price_range": "99-499/单"},
+        {"type": "虚拟产品", "description": "AI简历模板+面试题库", "price_range": "9.9-49.9"},
+        {"type": "课程", "description": "AI求职加速实战课", "price_range": "99-399"},
+        {"type": "工具", "description": "AI简历生成器+模拟面试工具", "price_range": "29.9-99"}
+      ],
+      "status": "active",
+      "output_path": null,
+      "score_history": [
+        {"date": "2026-05-25", "score": 37, "verdict": "RECOMMENDED", "note": "首次评估，毕业季窗口期"}
+      ]
+    },
+    {
+      "id": "OPP-009",
+      "source_topic_id": "T20260525010",
+      "name": "AI职场提效",
+      "category": "AI职场",
+      "sub_category": "AI效率工具",
+      "difficulty": "easy",
+      "startup_cost": 0,
+      "monthly_ceiling": "5000-20000",
+      "time_to_first_revenue": "1-3周",
+      "risk_level": "low",
+      "recommend": true,
+      "verdict_score": 35,
+      "verdict_detail": {
+        "monetization_path_authenticity": 8,
+        "competition_heat": 5,
+        "ordinary_person_fit": 9,
+        "sustained_demand": 8,
+        "copy_barrier": 4
+      },
+      "persona_fit": ["上班族", "管理者", "自由职业者"],
+      "platform": ["小红书", "知乎", "B站"],
+      "lifecycle_stage": "爆发期",
+      "first_identified": "2026-05-25",
+      "last_verified": "2026-05-25",
+      "trend_direction": "上升",
+      "key_metrics": {
+        "search_growth": "月环比+110%",
+        "competitor_count": "中等（5-10个头部）",
+        "content_saturation": "中等",
+        "monetization_readiness": "高（课程+工具+模板）"
+      },
+      "commercial_paths": [
+        {"type": "课程", "description": "AI职场提效全攻略课", "price_range": "99-399"},
+        {"type": "工具", "description": "AI职场效率工具包", "price_range": "29.9-99"},
+        {"type": "虚拟产品", "description": "AI工作流模板+提示词库", "price_range": "9.9-49.9"},
+        {"type": "信息差产品", "description": "AI职场提效工具评测报告", "price_range": "19.9-69.9"}
+      ],
+      "status": "active",
+      "output_path": null,
+      "score_history": [
+        {"date": "2026-05-25", "score": 35, "verdict": "RECOMMENDED", "note": "首次评估"}
+      ]
+    },
+    {
+      "id": "OPP-010",
+      "source_topic_id": "T20260525006",
+      "name": "AI私域运营",
+      "category": "AI营销",
+      "sub_category": "AI私域",
+      "difficulty": "medium",
+      "startup_cost": 0,
+      "monthly_ceiling": "5000-20000（兼职）/ 15000-50000（全职）",
+      "time_to_first_revenue": "2-4周",
+      "risk_level": "low",
+      "recommend": true,
+      "verdict_score": 32,
+      "verdict_detail": {
+        "monetization_path_authenticity": 8,
+        "competition_heat": 6,
+        "ordinary_person_fit": 6,
+        "sustained_demand": 7,
+        "copy_barrier": 6
+      },
+      "persona_fit": ["有私域基础的创业者", "社群运营者", "自由职业者"],
+      "platform": ["微信", "小红书", "企业微信"],
+      "lifecycle_stage": "爆发期",
+      "first_identified": "2026-05-25",
+      "last_verified": "2026-05-25",
+      "trend_direction": "上升",
+      "key_metrics": {
+        "search_growth": "月环比+70%",
+        "competitor_count": "中等（5-8个深度内容）",
+        "content_saturation": "中等",
+        "monetization_readiness": "高（工具+课程+代运营）"
+      },
+      "commercial_paths": [
+        {"type": "课程", "description": "AI私域运营实战课", "price_range": "199-599"},
+        {"type": "工具", "description": "AI私域SOP+话术模板", "price_range": "49-199"},
+        {"type": "服务", "description": "AI私域代运营服务", "price_range": "2000-10000/月"},
+        {"type": "信息差产品", "description": "AI私域工具评测+选型指南", "price_range": "29.9-99"}
+      ],
+      "status": "active",
+      "output_path": null,
+      "score_history": [
+        {"date": "2026-05-25", "score": 32, "verdict": "RECOMMENDED", "note": "首次评估"}
+      ]
     }
   ]
 }

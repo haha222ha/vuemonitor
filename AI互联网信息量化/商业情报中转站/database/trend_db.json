@@ -1,7 +1,7 @@
 {
   "_description": "平台趋势库 —— 记录各平台的最新趋势变化、流量信号、政策变动。是每日简报和每周报告的数据来源",
-  "_version": "1.0",
-  "last_updated": "2026-05-23",
+  "_version": "1.1",
+  "last_updated": "2026-05-25",
   "trends": [
     {
       "id": "TRD-001",
@@ -12,7 +12,7 @@
       "direction": "快速上升",
       "first_observed": "2026-04-01",
       "peak_expected": "2026-08-01",
-      "lifecycle": "早期",
+      "lifecycle": "爆发期",
       "actionable_insight": "AI工具对比/测评/教程类内容有6-12周红利窗口期",
       "affected_opportunities": ["AI副业变现", "AI代运营", "AI模板售卖"],
       "risk_note": "内容同质化速度加快，需差异化定位"
@@ -44,23 +44,103 @@
       "actionable_insight": "抖音副业内容仍有流量红利，建议小红书+抖音双平台分发",
       "affected_opportunities": ["AI副业变现", "平台红利捕捉"],
       "risk_note": "抖音对硬广审核比小红书更严格"
+    },
+    {
+      "id": "TRD-004",
+      "platform": "小红书",
+      "trend_name": "AI绘画接单需求井喷",
+      "category": "AI设计",
+      "evidence": "AI绘画相关笔记搜索量周环比+120%，Midjourney/Stable Diffusion接单需求爆发",
+      "direction": "快速上升",
+      "first_observed": "2026-05-01",
+      "peak_expected": "2026-09-01",
+      "lifecycle": "早期",
+      "actionable_insight": "AI绘画接单教程和案例分享有3-6个月红利窗口",
+      "affected_opportunities": ["AI绘画接单", "AI设计服务", "AI模板售卖"],
+      "risk_note": "低端市场价格战即将出现，需往高端定制方向升级"
+    },
+    {
+      "id": "TRD-005",
+      "platform": "抖音",
+      "trend_name": "AI数字人直播带货兴起",
+      "category": "AI直播",
+      "evidence": "AI数字人直播工具搜索量月增200%，抖音AI直播账号数量翻倍",
+      "direction": "快速上升",
+      "first_observed": "2026-04-15",
+      "peak_expected": "2026-10-01",
+      "lifecycle": "早期",
+      "actionable_insight": "AI数字人直播工具和教程有6个月红利期",
+      "affected_opportunities": ["AI数字人直播", "AI直播代运营"],
+      "risk_note": "平台对AI直播监管趋严，需关注政策变化"
+    },
+    {
+      "id": "TRD-006",
+      "platform": "小红书",
+      "trend_name": "AI虚拟产品店铺爆发",
+      "category": "虚拟产品",
+      "evidence": "AI模板/素材店铺数量增长300%，虚拟产品赛道搜索量月增150%",
+      "direction": "快速上升",
+      "first_observed": "2026-04-20",
+      "peak_expected": "2026-11-01",
+      "lifecycle": "爆发期",
+      "actionable_insight": "虚拟产品店铺教程和选品指南有4-8个月红利",
+      "affected_opportunities": ["AI虚拟产品", "模板售卖", "数字产品"],
+      "risk_note": "同质化竞争严重，差异化是关键"
+    },
+    {
+      "id": "TRD-007",
+      "platform": "全平台",
+      "trend_name": "AI职场提效需求井喷",
+      "category": "职场AI",
+      "evidence": "AI效率工具笔记增长+110%，职场AI课程销量月增80%",
+      "direction": "快速上升",
+      "first_observed": "2026-05-01",
+      "peak_expected": "2026-12-01",
+      "lifecycle": "爆发期",
+      "actionable_insight": "AI职场提效内容覆盖面广，适合做系列化内容",
+      "affected_opportunities": ["AI职场提效", "AI培训", "AI工具推荐"],
+      "risk_note": "企业对AI工具使用有合规要求，需注意"
+    },
+    {
+      "id": "TRD-008",
+      "platform": "小红书",
+      "trend_name": "毕业季AI求职需求爆发",
+      "category": "AI求职",
+      "evidence": "AI简历优化搜索量周环比+90%，求职季AI工具使用率飙升",
+      "direction": "快速上升",
+      "first_observed": "2026-05-10",
+      "peak_expected": "2026-07-01",
+      "lifecycle": "爆发期",
+      "actionable_insight": "毕业季求职窗口期有限，AI求职内容有2个月集中爆发期",
+      "affected_opportunities": ["AI求职加速", "AI简历优化", "AI面试准备"],
+      "risk_note": "求职季结束后需求会大幅下降，需提前布局其他方向"
     }
   ],
   "platform_signals": {
     "小红书": {
-      "current_focus": "AI工具 + 一人公司 + 知识付费",
-      "traffic_signal": "副业/搞钱类内容流量倾斜中",
-      "policy_risk": "商业内容合规要求趋严，虚拟产品需开店"
+      "current_focus": "AI工具 + 一人公司 + 知识付费 + AI绘画 + 虚拟产品",
+      "traffic_signal": "副业/搞钱类内容流量倾斜中，AI相关内容额外加权",
+      "policy_risk": "商业内容合规要求趋严，虚拟产品需开店，AI生成内容需标注"
     },
     "抖音": {
-      "current_focus": "副业实操 + 结果展示",
-      "traffic_signal": "副业垂类流量扶持期",
-      "policy_risk": "硬广审核严格，需软植入"
+      "current_focus": "副业实操 + 结果展示 + AI数字人直播",
+      "traffic_signal": "副业垂类流量扶持期，AI直播内容获得推荐加权",
+      "policy_risk": "硬广审核严格，AI直播需报备，数字人需标注"
     },
     "视频号": {
-      "current_focus": "正在测试副业内容推荐算法",
-      "traffic_signal": "早期红利，值得关注",
-      "policy_risk": "规则尚不明朗"
+      "current_focus": "正在测试副业内容推荐算法，AI内容扶持力度加大",
+      "traffic_signal": "早期红利，值得关注，AI职场类内容表现突出",
+      "policy_risk": "规则尚不明朗，建议小规模测试"
+    },
+    "B站": {
+      "current_focus": "AI教程 + 技术深度内容 + 职场提效",
+      "traffic_signal": "AI相关视频播放量持续增长，中长视频有优势",
+      "policy_risk": "对AI生成内容审核较宽松，但需保证内容质量"
+    },
+    "知乎": {
+      "current_focus": "AI工具评测 + 职场提效 + 求职准备",
+      "traffic_signal": "AI相关问题浏览量月增60%，专业回答有流量倾斜",
+      "policy_risk": "对营销内容审核严格，需以专业角度切入"
     }
   }
 }

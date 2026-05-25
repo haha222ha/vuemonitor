@@ -1,7 +1,7 @@
 {
   "_description": "风险淘汰库 —— 记录被机会判断淘汰的AVOID选题，以及已被市场验证失效的赛道。会员可查询'哪些方向已经不赚钱了'",
-  "_version": "1.0",
-  "last_updated": "2026-05-23",
+  "_version": "1.1",
+  "last_updated": "2026-05-25",
   "eliminated": [
     {
       "id": "RISK-001",
@@ -42,6 +42,26 @@
       "reason": "学术诚信红线，平台全面封禁，法律风险极高",
       "alternative": "AI辅助商业写作/营销文案/技术文档",
       "source": "政策文件 + 平台公告"
+    },
+    {
+      "id": "RISK-005",
+      "name": "AI绘画低端头像代做",
+      "category": "AI设计",
+      "status": "dying",
+      "eliminated_date": "2026-05-15",
+      "reason": "低端AI头像市场已饱和，9.9元价格战严重，利润趋零",
+      "alternative": "AI绘画高端定制/品牌设计/商业插画",
+      "source": "市场数据 + 平台观察"
+    },
+    {
+      "id": "RISK-006",
+      "name": "AI课程倒卖",
+      "category": "知识付费",
+      "status": "dying",
+      "eliminated_date": "2026-05-01",
+      "reason": "版权风险+平台严打+用户信任崩塌，已有多个账号被封",
+      "alternative": "原创AI课程制作/知识整合服务",
+      "source": "平台公告 + 行业观察"
     }
   ],
   "warnings": [
@@ -54,6 +74,36 @@
       "risk_description": "小红书AI内容号增长过快，同质化严重，3个月内可能进入红海",
       "early_signals": ["同类笔记数月增60%", "互动率下降", "平台可能限流"],
       "recommended_action": "差异化定位，加入真人实操案例和独家数据"
+    },
+    {
+      "id": "WARN-002",
+      "name": "AI数字人直播监管风险",
+      "category": "AI直播",
+      "status": "monitoring",
+      "first_observed": "2026-05-10",
+      "risk_description": "抖音对AI数字人直播监管趋严，可能出台新规限制",
+      "early_signals": ["部分AI直播账号被限流", "平台要求标注AI生成", "新规征求意见中"],
+      "recommended_action": "关注平台政策动态，准备真人+AI混合直播方案"
+    },
+    {
+      "id": "WARN-003",
+      "name": "AI虚拟产品版权风险",
+      "category": "虚拟产品",
+      "status": "monitoring",
+      "first_observed": "2026-05-15",
+      "risk_description": "AI生成素材版权归属不明确，可能面临侵权投诉",
+      "early_signals": ["已有AI素材侵权案例", "平台加强审核", "版权方开始维权"],
+      "recommended_action": "使用明确授权的AI工具，添加原创元素，保留创作过程记录"
+    },
+    {
+      "id": "WARN-004",
+      "name": "副业培训过度承诺",
+      "category": "知识付费",
+      "status": "escalating",
+      "first_observed": "2026-04-01",
+      "risk_description": "副业培训市场过度承诺严重，'月入过万'类内容被平台标记，可能引发行业整顿",
+      "early_signals": ["小红书已开始标记'过度承诺'内容", "用户投诉增加", "监管关注"],
+      "recommended_action": "使用真实数据，避免绝对化承诺，展示真实案例和收入范围"
     }
   ]
 }

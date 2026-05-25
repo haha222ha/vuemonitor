@@ -1,7 +1,7 @@
 {
   "_description": "用户情绪数据库 —— 记录各平台用户对副业方向的情绪变化、焦虑关键词、需求迁移。数据来源：Prompt四（用户需求洞察）+ topics中的user_psychology字段",
-  "_version": "1.0",
-  "last_updated": "2026-05-24",
+  "_version": "1.1",
+  "last_updated": "2026-05-25",
   "emotions": [
     {
       "id": "EMO-001",
@@ -38,6 +38,54 @@
       "related_opportunities": ["AI副业变现路径决策"],
       "persona_affected": ["副业新手", "零基础探索者"],
       "insight": "用户最大的痛点是'选择困难'——方向太多不知道选哪个，这正是决策报告的核心需求"
+    },
+    {
+      "id": "EMO-004",
+      "emotion_type": "渴望",
+      "intensity": "high",
+      "keyword_cluster": ["AI绘画赚钱", "接单", "副业收入", "被动收入"],
+      "platform_source": "小红书",
+      "trend_direction": "快速上升",
+      "first_observed": "2026-05-01",
+      "related_opportunities": ["AI绘画接单", "AI设计服务"],
+      "persona_affected": ["设计师", "零基础小白", "上班族"],
+      "insight": "AI绘画是最直观的AI变现方式，用户从'想学'快速转向'想接单赚钱'"
+    },
+    {
+      "id": "EMO-005",
+      "emotion_type": "紧迫",
+      "intensity": "high",
+      "keyword_cluster": ["毕业求职", "简历优化", "面试准备", "AI求职"],
+      "platform_source": "小红书/知乎",
+      "trend_direction": "快速上升",
+      "first_observed": "2026-05-10",
+      "related_opportunities": ["AI求职加速", "AI简历优化"],
+      "persona_affected": ["应届生", "求职者", "职场转型者"],
+      "insight": "毕业季求职焦虑集中爆发，AI求职工具需求井喷，但窗口期仅2个月"
+    },
+    {
+      "id": "EMO-006",
+      "emotion_type": "好奇",
+      "intensity": "medium",
+      "keyword_cluster": ["数字人直播", "AI直播", "无人直播", "自动带货"],
+      "platform_source": "抖音",
+      "trend_direction": "上升",
+      "first_observed": "2026-04-15",
+      "related_opportunities": ["AI数字人直播", "AI直播代运营"],
+      "persona_affected": ["电商从业者", "小店主", "自由职业者"],
+      "insight": "用户对AI数字人直播充满好奇但缺乏实操指导，教程类内容有大量需求"
+    },
+    {
+      "id": "EMO-007",
+      "emotion_type": "期待",
+      "intensity": "medium",
+      "keyword_cluster": ["虚拟产品", "数字产品", "被动收入", "自动售卖"],
+      "platform_source": "小红书",
+      "trend_direction": "上升",
+      "first_observed": "2026-04-20",
+      "related_opportunities": ["AI虚拟产品创业", "模板售卖"],
+      "persona_affected": ["上班族", "大学生", "宝妈"],
+      "insight": "虚拟产品'一次制作持续售卖'的特性对碎片时间用户吸引力极大"
     }
   ]
 }
