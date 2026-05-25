@@ -1,5 +1,9 @@
 #!/bin/bash
 # XHS365 主机一键更新 — 针对 2G RAM / 2 CPU（git pull 部署，不在服务器上 npm build）
+#
+# 【主机一键命令，复制这一行即可】
+#   bash /opt/vuemonitor/scripts/host-update.sh
+#
 set -euo pipefail
 
 RED='\033[0;31m'

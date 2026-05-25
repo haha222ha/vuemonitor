@@ -69,7 +69,6 @@ if (-not $SkipPush) {
 }
 
 Write-Host ""
-Write-Host "  On 2G host run:" -ForegroundColor Green
-Write-Host "    cd /opt/vuemonitor"
-Write-Host "    bash scripts/host-update.sh"
+Write-Host "  Host update (copy one line):" -ForegroundColor Green
+Write-Host "  bash /opt/vuemonitor/scripts/host-update.sh" -ForegroundColor Yellow
 Write-Host ""

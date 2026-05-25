@@ -1,6 +1,3 @@
 #!/bin/bash
-# 兼容旧命令：转发到 2G 优化更新脚本
-set -e
-ROOT="${DEPLOY_ROOT:-/opt/vuemonitor}"
-cd "$ROOT"
-exec bash "$ROOT/scripts/host-update.sh" "$@"
+# 兼容旧入口，等价于: bash /opt/vuemonitor/scripts/host-update.sh
+exec bash /opt/vuemonitor/scripts/host-update.sh "$@"

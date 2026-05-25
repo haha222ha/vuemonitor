@@ -23,17 +23,10 @@ cd D:\vuemonitor
 
 脚本会：构建 web-user / web-admin / web-intel → 跑关键测试 → commit → **push origin/main**。
 
-### 2. 生产机（SSH 登录后）
+### 2. 生产机（SSH 登录后，复制下面这一行）
 
 ```bash
-cd /opt/vuemonitor
-bash scripts/host-update.sh
-```
-
-或沿用旧命令：
-
-```bash
-bash update-v2.sh
+bash /opt/vuemonitor/scripts/host-update.sh
 ```
 
 ### 3. 首次安装 systemd（仅一次）

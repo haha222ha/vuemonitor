@@ -386,6 +386,14 @@ curl http://localhost:8000/health
 
 ## 部署
 
+### 2G 主机一键更新（git push 后复制这一行）
+
+```bash
+bash /opt/vuemonitor/scripts/host-update.sh
+```
+
+详见 [docs/DEPLOY-2G.md](docs/DEPLOY-2G.md)。
+
 ### 生产环境检查清单
 
 - [ ] 修改所有默认密码和密钥
