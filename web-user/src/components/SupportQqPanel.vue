@@ -99,7 +99,17 @@ onMounted(load);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .support-qq.compact {
-  padding: 12px;
+  padding: 8px 10px;
+}
+.support-qq.compact .support-hint {
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+.support-qq.compact .qr-hover-hint {
+  font-size: 10px;
+}
+.support-qq.compact .qq-row {
+  margin-top: 6px;
 }
 .support-title {
   margin: 0 0 8px;
@@ -132,15 +142,15 @@ onMounted(load);
 }
 .qr-thumb {
   display: block;
-  width: 72px;
+  width: 36px;
   height: auto;
-  border-radius: 8px;
+  border-radius: 6px;
   background: #fff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.15s ease;
 }
 .support-qq.compact .qr-thumb {
-  width: 56px;
+  width: 28px;
 }
 .qr-hover:hover .qr-thumb,
 .qr-hover:focus-visible .qr-thumb {
@@ -172,8 +182,8 @@ onMounted(load);
 }
 .qr-pop-img {
   display: block;
-  width: 220px;
-  max-width: min(220px, 70vw);
+  width: 160px;
+  max-width: min(160px, 65vw);
   height: auto;
   border-radius: 6px;
 }
