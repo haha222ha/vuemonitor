@@ -70,5 +70,5 @@ if (-not $SkipPush) {
 
 Write-Host ""
 Write-Host "  Host update (copy one line):" -ForegroundColor Green
-Write-Host "  cd /opt/vuemonitor && sudo rm -rf client/node_modules/.vite 2>/dev/null; git fetch origin main && git reset --hard origin/main && bash scripts/host-update.sh" -ForegroundColor Yellow
+Write-Host "  cd /opt/vuemonitor && sudo rm -rf client/node_modules 2>/dev/null; git fetch origin main && git reset --hard origin/main && bash scripts/host-update.sh" -ForegroundColor Yellow
 Write-Host ""

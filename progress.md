@@ -13,7 +13,17 @@
 - README 技术栈与实现对齐（sql.js、Electron 30、web-admin/intel）
 - `task_plan` 阶段 F  nginx 项标记为已配置
 
-**待继续**：阶段 C 生产部署、阶段 E 全链路手工联调、Electron 打包
+**待继续**：GitHub SSH 自动部署 Secrets、生产 SMTP/AI Key、Electron 打包
+
+### 会话 #6 — 2026-05-25（全自动化上线）
+
+**新增自动化**：
+- `scripts/e2e_api_flow.py` — 注册/商品/监控/AI 黄金路径
+- `scripts/seed_admin.py` — 管理员账号种子
+- `scripts/verify_production.sh` — 外网域名验收
+- `host-update.sh` 集成 E2E + 外网验收
+- `.github/workflows/host-auto-update.yml` — push 后 SSH 更新（需 Secrets）
+- `LAUNCH.md` / `docs/E2E-CHECKLIST.md` — 上线手册
 
 ---
 

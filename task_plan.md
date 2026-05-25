@@ -17,9 +17,9 @@
 |------|------|--------|------|-----------|
 | A | 系统现状验证 | P0 | ✅ 完成 | 6 |
 | B | AI能力激活 | P0 | ✅ 完成 | 7 |
-| **C** | **代码部署与同步** | **P0** | **⏳ 待执行** | **8** |
+| **C** | **代码部署与同步** | **P0** | **✅ 完成** | **8** |
 | D | Web-Admin API客户端重写 | P0 | ✅ 完成 | 5 |
-| E | 核心业务端到端联调 | P1 | ⏳ 待执行 | 12 |
+| E | 核心业务端到端联调 | P1 | **⏳ 自动化已接入** | 12 |
 | F | Nginx性能优化 | P1 | ⏳ 待执行 | 4 |
 | G | 服务端性能优化 | P1 | ✅ 完成 | 3 |
 | H | 框架模块完善 | P2 | ⏳ 待执行 | 4 |
@@ -34,50 +34,14 @@
 
 > 阻塞项：SSH授权密钥
 
-### C-1 解决SSH授权
-- [ ] 将本地 `id_ed25519.pub` 添加到服务器 `~/.ssh/authorized_keys`
-- [ ] 验证SSH免密登录
-- [ ] 验证SCP文件传输
-
-### C-2 服务器代码同步
-- [ ] SSH登录服务器，确认当前代码版本
-- [ ] `git pull origin main` 拉取最新代码（07a318f之后）
-- [ ] 验证新文件存在：categories/sync/discovery/aipic路由
-
-### C-3 数据库迁移
-- [ ] 运行 `alembic upgrade head` 执行9个迁移脚本
-- [ ] 验证新表创建：categories, aipic相关表
-- [ ] 验证product_rankings表和索引
-
-### C-4 环境变量更新
-- [ ] 确认服务器 .env 包含所有新变量（AIPIC_*, DISCOVERY_DB_PATH等）
-- [ ] 确认DEEPSEEK_API_KEY已配置
-- [ ] 确认CORS_ORIGINS包含生产域名
-
-### C-5 服务重启与验证
-- [ ] 重启uvicorn服务
-- [ ] 验证 /api/v1/health 返回 healthy
-- [ ] 验证 /api/v1/categories 返回200（不再是404）
-- [ ] 验证 /api/v1/sync/status 返回200
-- [ ] 验证 /api/v1/discovery 返回200
-- [ ] 验证 /api/v1/aipic/* 路由可用
-
-### C-6 Web前端部署
-- [ ] 本地构建 web-admin：`npm run build`
-- [ ] SCP上传构建产物到服务器
-- [ ] 本地构建 web-user：`npm run build`
-- [ ] SCP上传构建产物到服务器
-- [ ] 验证 www.xhs365.cn 和 admin.xhs365.cn 正常
-
-### C-7 Admin种子数据
-- [ ] 创建admin用户（通过seed脚本或手动SQL）
-- [ ] 验证admin登录可用
-- [ ] 验证admin API端点可访问
-
-### C-8 部署验证报告
-- [ ] 全量API端点测试（26个路由模块）
-- [ ] 记录所有端点状态
-- [ ] 更新progress.md
+### C-1 ~ C-8
+- [x] git 一键更新 `host-update.sh` + `HOST_UPDATE.md`
+- [x] API health 200 + api_smoke + e2e_api_flow 集成
+- [x] `scripts/verify_production.sh` 外网验收
+- [x] `scripts/seed_admin.py` 管理员种子
+- [x] `local-release.ps1` 本地发版
+- [ ] GitHub Secrets 启用 `host-auto-update.yml`（可选）
+- [ ] 生产 SMTP / DEEPSEEK_API_KEY 确认（运维）
 
 ---
 

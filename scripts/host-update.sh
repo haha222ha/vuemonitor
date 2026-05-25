@@ -136,7 +136,26 @@ if [ "$CODE" != "200" ]; then
 fi
 
 if [ -f "$ROOT/scripts/api_smoke.py" ]; then
-  python3 "$ROOT/scripts/api_smoke.py" --base-url "${SMOKE_BASE:-http://127.0.0.1:8000}" --skip-auth || warn "冒烟部分失败（可忽略若仅缺外网）"
+  python3 "$ROOT/scripts/api_smoke.py" --base-url "${SMOKE_BASE:-http://127.0.0.1:8000}" || warn "冒烟部分失败"
+fi
+
+if [ -f "$ROOT/scripts/e2e_api_flow.py" ]; then
+  log "API 黄金路径 E2E..."
+  cd "$ROOT/server"
+  # shellcheck disable=SC1091
+  source .venv/bin/activate
+  export PYTHONPATH="$ROOT/server"
+  if python3 "$ROOT/scripts/e2e_api_flow.py" --base-url "${SMOKE_BASE:-http://127.0.0.1:8000}" --skip-ai; then
+    ok "E2E 黄金路径通过"
+  else
+    warn "E2E 未全部通过（检查 AI Key 或日志）"
+  fi
+  cd "$ROOT"
+fi
+
+if [ -f "$ROOT/scripts/verify_production.sh" ] && [ "${VERIFY_PUBLIC:-1}" = "1" ]; then
+  log "外网域名验收..."
+  bash "$ROOT/scripts/verify_production.sh" || warn "外网验收未全部通过"
 fi
 
 echo ""

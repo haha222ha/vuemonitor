@@ -99,8 +99,11 @@ def run_smoke(base_url: str, skip_auth: bool) -> list[CheckResult]:
     )
     token = None
     if status == 200 and isinstance(payload, dict):
-        data = payload.get("data") or payload
-        token = data.get("access_token") if isinstance(data, dict) else None
+        token = payload.get("access_token")
+        if not token:
+            data = payload.get("data")
+            if isinstance(data, dict):
+                token = data.get("access_token")
     record("auth_login", token is not None, f"HTTP {status}")
 
     if not token:
