@@ -38,12 +38,12 @@ XHS365 是一款基于 Electron 的桌面端数据监控与分析工具，专注
 ## 技术栈
 
 ### 客户端 (Electron)
-- **框架**: Electron 28+
+- **框架**: Electron 30+
 - **前端**: Vue 3 + TypeScript + Vite
 - **UI 库**: Element Plus
 - **状态管理**: Pinia
 - **图表**: ECharts 5
-- **数据库**: better-sqlite3 (本地 SQLite)
+- **数据库**: sql.js（WASM SQLite，本地优先存储）
 - **采集引擎**: Chromium BrowserView + Playwright
 - **自动更新**: electron-updater
 
@@ -57,10 +57,11 @@ XHS365 是一款基于 Electron 的桌面端数据监控与分析工具，专注
 - **链路追踪**: 自研分布式追踪
 - **错误监控**: Sentry (可选)
 
-### Web 管理端
-- **框架**: Vue 3 + TypeScript + Vite
-- **UI 库**: Element Plus
-- **图表**: ECharts 5
+### Web 端
+- **web-user**：用户门户（营销页、监控、团队、AIPic）
+- **web-admin**：运营后台（授权码、用户、代理、审计）
+- **web-intel**：情报分析前端
+- **框架**: Vue 3 + TypeScript + Vite + Element Plus + ECharts 5
 
 ## 项目结构
 

@@ -1,7 +1,10 @@
 <template>
   <div class="signals-page">
     <div class="page-header">
-      <h2>平台信号</h2>
+      <div class="header-title-area">
+        <h2>平台信号</h2>
+        <p class="header-subtitle" v-if="items.length">实时监控平台变化，捕捉流量和政策信号</p>
+      </div>
       <div class="header-actions">
         <el-select v-model="platformFilter" placeholder="平台筛选" clearable size="small" style="width: 140px">
           <el-option label="全部平台" value="" />
@@ -13,20 +16,47 @@
       </div>
     </div>
 
+    <div class="signal-stats" v-if="items.length">
+      <div class="signal-stat-item stat-total">
+        <span class="stat-icon">📡</span>
+        <span class="stat-num">{{ items.length }}</span>
+        <span class="stat-text">总信号数</span>
+      </div>
+      <div class="signal-stat-item stat-high">
+        <span class="stat-icon">🔴</span>
+        <span class="stat-num">{{ impactCount('high') }}</span>
+        <span class="stat-text">高影响</span>
+      </div>
+      <div class="signal-stat-item stat-rising">
+        <span class="stat-icon">📈</span>
+        <span class="stat-num">{{ directionCount('rising') }}</span>
+        <span class="stat-text">上升趋势</span>
+      </div>
+      <div class="signal-stat-item stat-platforms">
+        <span class="stat-icon">📱</span>
+        <span class="stat-num">{{ platforms.length }}</span>
+        <span class="stat-text">覆盖平台</span>
+      </div>
+    </div>
+
     <div v-if="loading" class="loading-placeholder">
       <el-skeleton :rows="6" animated />
     </div>
-    <el-empty v-else-if="!items.length" description="暂无平台信号数据" />
+    <div v-else-if="!items.length" class="intel-empty-state">
+      <div class="intel-empty-state-icon">📡</div>
+      <div class="intel-empty-state-text">暂无平台信号数据</div>
+      <div class="intel-empty-state-action">数据更新后将自动展示</div>
+    </div>
     <div v-else>
       <div v-for="group in groupedItems" :key="group.platform" class="platform-group">
-        <div class="group-header" :style="{ borderLeftColor: platformColor(group.platform) }">
-          <div class="group-icon" :style="{ background: platformIconBg(group.platform), color: platformTextColor(group.platform) }">
+        <div class="group-header" :style="{ borderLeftColor: platformIconBg(group.platform) }">
+          <div class="group-icon" :style="{ background: platformIconBg(group.platform), color: '#fff' }">
             {{ platformEmoji(group.platform) }}
           </div>
           <span class="group-name">{{ group.platform }}</span>
           <el-tag size="small" type="info">{{ group.items.length }} 条信号</el-tag>
         </div>
-        <div class="signal-list">
+        <div class="signal-list intel-card-stagger">
           <div
             v-for="item in group.items"
             :key="item.id || item.platform + item.title"
@@ -76,12 +106,15 @@
 
     <el-dialog v-model="detailVisible" :title="detailItem?.title || detailItem?.platform" width="640px" destroy-on-close>
       <div v-if="detailItem" class="signal-detail">
-        <el-descriptions :column="2" border>
-          <el-descriptions-item label="平台">{{ detailItem.platform }}</el-descriptions-item>
+        <div class="detail-platform-bar" :style="{ background: platformIconBg(detailItem.platform) }">
+          <span class="platform-emoji">{{ platformEmoji(detailItem.platform) }}</span>
+          <span class="platform-name">{{ detailItem.platform }}</span>
+          <el-tag v-if="detailItem.impact_level" :type="impactTagType(detailItem.impact_level)" effect="dark" size="large">
+            {{ detailItem.impact_level }}影响
+          </el-tag>
+        </div>
+        <el-descriptions :column="2" border style="margin-top: var(--spacing-md);">
           <el-descriptions-item label="变化方向" v-if="detailItem.change_direction">{{ detailItem.change_direction }}</el-descriptions-item>
-          <el-descriptions-item label="影响程度" v-if="detailItem.magnitude">
-            <el-tag :type="impactTagType(detailItem.magnitude)" size="small">{{ detailItem.magnitude }}</el-tag>
-          </el-descriptions-item>
           <el-descriptions-item label="信号类型" v-if="detailItem.type">{{ detailItem.type }}</el-descriptions-item>
           <el-descriptions-item label="当前焦点" :span="2" v-if="detailItem.current_focus">{{ detailItem.current_focus }}</el-descriptions-item>
           <el-descriptions-item label="流量信号" :span="2" v-if="detailItem.traffic_signal">{{ detailItem.traffic_signal }}</el-descriptions-item>
@@ -143,6 +176,14 @@ const platforms = computed(() => {
   return Array.from(s).sort()
 })
 
+function impactCount(level: string): number {
+  return items.value.filter(i => i.impact_level?.toLowerCase() === level).length
+}
+
+function directionCount(dir: string): number {
+  return items.value.filter(i => i.change_direction?.toLowerCase() === dir).length
+}
+
 const filteredItems = computed(() => {
   let result = items.value
   if (platformFilter.value) result = result.filter((i) => i.platform === platformFilter.value)
@@ -174,16 +215,6 @@ const groupedItems = computed(() => {
   return Object.entries(groups).map(([platform, items]) => ({ platform, items }))
 })
 
-function platformColor(p: string): string {
-  const map: Record<string, string> = {
-    xiaohongshu: "#e3f2fd",
-    douyin: "#fce4ec",
-    weixin: "#e8f5e9",
-    bilibili: "#fff3e0",
-  }
-  return map[p?.toLowerCase()] || "#f5f5f5"
-}
-
 function platformIconBg(p: string): string {
   const map: Record<string, string> = {
     xiaohongshu: "#ff2442",
@@ -192,10 +223,6 @@ function platformIconBg(p: string): string {
     bilibili: "#fb7299",
   }
   return map[p?.toLowerCase()] || "#909399"
-}
-
-function platformTextColor(p: string): string {
-  return "#fff"
 }
 
 function platformEmoji(p: string): string {
@@ -274,101 +301,130 @@ onMounted(async () => {
 .signals-page { max-width: 1400px; }
 .page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-lg);
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--spacing-md);
 }
-.page-header h2 { margin: 0; font-size: 20px; }
-.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.loading-placeholder { padding: 16px; }
+.header-title-area h2 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--intel-text);
+}
+.header-subtitle {
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
+}
+.header-actions { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
+
+.signal-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.signal-stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius-lg);
+  background: var(--intel-surface);
+  box-shadow: var(--intel-shadow);
+  transition: all var(--transition-base);
+}
+.signal-stat-item:hover {
+  box-shadow: var(--intel-shadow-hover);
+  transform: translateY(-2px);
+}
+.stat-icon { font-size: var(--font-size-xl); }
+.stat-num { font-size: var(--font-size-2xl); font-weight: 800; }
+.stat-text { font-size: var(--font-size-sm); color: var(--intel-text-secondary); }
+.stat-total .stat-num { color: var(--intel-primary); }
+.stat-high .stat-num { color: var(--intel-danger); }
+.stat-rising .stat-num { color: var(--intel-success); }
+.stat-platforms .stat-num { color: var(--intel-info); }
+
+.loading-placeholder { padding: var(--spacing-md); }
 
 .platform-group {
-  margin-bottom: 24px;
+  margin-bottom: var(--spacing-xl);
 }
 .group-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-  padding: 10px 14px;
-  background: #f8f9fa;
-  border-radius: 8px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--intel-bg);
+  border-radius: var(--intel-radius-lg);
   border-left: 4px solid;
 }
 .group-icon {
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  border-radius: var(--intel-radius);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
 }
 .group-name {
-  font-size: 16px;
+  font-size: var(--font-size-md);
   font-weight: 600;
-  color: #303133;
+  color: var(--intel-text);
   flex: 1;
 }
 
 .signal-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 .signal-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+  background: var(--intel-surface);
+  border-radius: var(--intel-radius-lg);
+  box-shadow: var(--intel-shadow);
   cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 12px 16px;
+  transition: all var(--transition-base);
+  padding: var(--spacing-md) var(--spacing-lg);
 }
 .signal-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--intel-shadow-hover);
   transform: translateX(4px);
 }
 .signal-body {
   display: flex;
-  gap: 14px;
+  gap: var(--spacing-md);
   align-items: flex-start;
 }
-.signal-left {
-  padding-top: 4px;
-}
-.signal-strength {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-}
-.strength-dots {
-  display: flex;
-  gap: 3px;
-}
+.signal-left { padding-top: 4px; }
+.signal-strength { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.strength-dots { display: flex; gap: 3px; }
 .dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #e4e7ed;
+  background: var(--intel-border);
   transition: background 0.2s;
 }
-.dot.active { background: #d97706; }
-.strength-high .dot.active { background: #dc2626; }
-.strength-medium .dot.active { background: #d97706; }
-.strength-low .dot.active { background: #059669; }
+.dot.active { background: var(--intel-warning); }
+.strength-high .dot.active { background: var(--intel-danger); }
+.strength-medium .dot.active { background: var(--intel-warning); }
+.strength-low .dot.active { background: var(--intel-success); }
 .signal-right { flex: 1; }
 .signal-title {
-  font-size: 14px;
+  font-size: var(--font-size-md);
   font-weight: 600;
-  color: #303133;
+  color: var(--intel-text);
   margin-bottom: 4px;
 }
 .signal-desc {
-  font-size: 13px;
-  color: #606266;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
   line-height: 1.5;
   margin-bottom: 6px;
 }
@@ -379,23 +435,39 @@ onMounted(async () => {
   align-items: center;
 }
 .signal-time {
-  font-size: 12px;
-  color: #c0c4cc;
+  font-size: var(--font-size-xs);
+  color: var(--intel-text-secondary);
   margin-left: auto;
 }
 .delete-btn { flex-shrink: 0; }
 .pagination-wrap {
-  margin-top: 24px;
+  margin-top: var(--spacing-xl);
   display: flex;
   justify-content: center;
 }
+
 .signal-detail { padding: 0; }
-.detail-section { margin-top: 20px; }
+.detail-platform-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius-lg);
+  color: #fff;
+}
+.platform-emoji { font-size: 20px; }
+.platform-name { font-size: var(--font-size-md); font-weight: 600; flex: 1; }
+.detail-section { margin-top: var(--spacing-lg); }
 .detail-section h4 {
-  font-size: 14px;
-  color: #303133;
-  margin-bottom: 10px;
+  font-size: var(--font-size-md);
+  color: var(--intel-text);
+  margin-bottom: var(--spacing-sm);
   padding-bottom: 6px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2px solid var(--intel-border-light);
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .signal-stats { grid-template-columns: repeat(2, 1fr); }
 }
 </style>

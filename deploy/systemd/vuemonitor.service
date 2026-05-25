@@ -1,0 +1,21 @@
+[Unit]
+Description=XHS365 API Server
+After=network.target postgresql.service redis-server.service redis.service
+Wants=postgresql.service redis-server.service redis.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/vuemonitor/server
+Environment=PYTHONPATH=/opt/vuemonitor/server
+Environment=UVICORN_WORKERS=1
+EnvironmentFile=-/opt/vuemonitor/server/.env
+ExecStart=/opt/vuemonitor/server/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1 --log-level info
+Restart=always
+RestartSec=5
+# 2G 主机：限制进程内存，避免 OOM 拖垮整机
+MemoryMax=768M
+MemoryHigh=640M
+
+[Install]
+WantedBy=multi-user.target

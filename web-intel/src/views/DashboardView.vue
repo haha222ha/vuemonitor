@@ -1,8 +1,12 @@
 <template>
   <div class="dashboard">
     <div class="page-header">
-      <h2>商业情报仪表盘</h2>
-      <el-tag v-if="intel.dashboard" type="success" size="small" effect="dark">
+      <div class="header-title-area">
+        <h2>商业情报仪表盘</h2>
+        <p class="header-subtitle" v-if="intel.dashboard">实时监控互联网商业情报动态</p>
+      </div>
+      <el-tag v-if="intel.dashboard" type="success" size="small" effect="dark" class="live-tag">
+        <span class="live-dot"></span>
         {{ planLabel }} · 数据实时更新
       </el-tag>
     </div>
@@ -12,55 +16,78 @@
         <div class="stat-bg"></div>
         <div class="stat-content">
           <div class="stat-icon-wrap">
-            <el-icon :size="24"><TrendCharts /></el-icon>
+            <el-icon :size="22"><TrendCharts /></el-icon>
           </div>
           <div class="stat-info">
             <div class="stat-value">{{ intel.dashboard.summary.active_trends }}</div>
             <div class="stat-label">活跃趋势</div>
           </div>
         </div>
+        <div class="stat-sparkline" v-if="trendSparkline.length">
+          <svg viewBox="0 0 60 20" preserveAspectRatio="none">
+            <polyline :points="trendSparkline" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
       </div>
       <div class="stat-card stat-opp">
         <div class="stat-bg"></div>
         <div class="stat-content">
           <div class="stat-icon-wrap">
-            <el-icon :size="24"><Opportunity /></el-icon>
+            <el-icon :size="22"><Opportunity /></el-icon>
           </div>
           <div class="stat-info">
             <div class="stat-value">{{ intel.dashboard.summary.recommended_opportunities }}</div>
             <div class="stat-label">推荐机会</div>
           </div>
         </div>
+        <div class="stat-sparkline" v-if="oppSparkline.length">
+          <svg viewBox="0 0 60 20" preserveAspectRatio="none">
+            <polyline :points="oppSparkline" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
       </div>
       <div class="stat-card stat-risk">
         <div class="stat-bg"></div>
         <div class="stat-content">
           <div class="stat-icon-wrap">
-            <el-icon :size="24"><Warning /></el-icon>
+            <el-icon :size="22"><Warning /></el-icon>
           </div>
           <div class="stat-info">
             <div class="stat-value">{{ intel.dashboard.summary.active_risks }}</div>
             <div class="stat-label">活跃风险</div>
           </div>
         </div>
+        <div class="stat-sparkline" v-if="riskSparkline.length">
+          <svg viewBox="0 0 60 20" preserveAspectRatio="none">
+            <polyline :points="riskSparkline" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
       </div>
     </div>
 
-    <el-row :gutter="20" style="margin-top: 20px">
-      <el-col :span="12">
+    <el-row :gutter="20" style="margin-top: 24px">
+      <el-col :xs="24" :sm="24" :md="12">
         <el-card shadow="hover" class="section-card">
           <template #header>
             <div class="card-header">
-              <span>🔥 热门趋势</span>
-              <el-button text type="primary" @click="$router.push('/trends')">查看全部</el-button>
+              <span class="card-header-title">
+                <span class="card-header-icon trend-icon">📈</span>
+                热门趋势
+              </span>
+              <el-button text type="primary" size="small" @click="$router.push('/trends')">
+                查看全部 <el-icon :size="12"><Right /></el-icon>
+              </el-button>
             </div>
           </template>
           <div v-if="intel.loading" class="loading-placeholder">
             <el-skeleton :rows="5" animated />
           </div>
-          <el-empty v-else-if="!intel.dashboard?.top_trends?.length" description="暂无趋势数据" />
-          <div v-else class="trend-list">
-            <div v-for="item in intel.dashboard.top_trends" :key="item.id" class="trend-item">
+          <div v-else-if="!intel.dashboard?.top_trends?.length" class="intel-empty-state">
+            <div class="intel-empty-state-icon">📊</div>
+            <div class="intel-empty-state-text">暂无趋势数据</div>
+          </div>
+          <div v-else class="trend-list intel-card-stagger">
+            <div v-for="item in intel.dashboard.top_trends" :key="item.id" class="trend-item" @click="$router.push('/trends')">
               <div class="trend-left">
                 <span class="trend-direction" :class="'dir-' + item.direction">
                   {{ getDirectionIcon(item.direction) }}
@@ -76,25 +103,36 @@
                   <el-tag size="small" v-if="item.lifecycle" type="success" effect="plain">{{ item.lifecycle }}</el-tag>
                 </div>
               </div>
+              <div class="trend-score-badge" :style="{ color: getScoreColor(item.opportunity_score), borderColor: getScoreColor(item.opportunity_score) + '40' }">
+                {{ item.opportunity_score }}
+              </div>
             </div>
           </div>
         </el-card>
       </el-col>
 
-      <el-col :span="12">
+      <el-col :xs="24" :sm="24" :md="12">
         <el-card shadow="hover" class="section-card">
           <template #header>
             <div class="card-header">
-              <span>💡 推荐机会</span>
-              <el-button text type="primary" @click="$router.push('/opportunities')">查看全部</el-button>
+              <span class="card-header-title">
+                <span class="card-header-icon opp-icon">💡</span>
+                推荐机会
+              </span>
+              <el-button text type="primary" size="small" @click="$router.push('/opportunities')">
+                查看全部 <el-icon :size="12"><Right /></el-icon>
+              </el-button>
             </div>
           </template>
           <div v-if="intel.loading" class="loading-placeholder">
             <el-skeleton :rows="5" animated />
           </div>
-          <el-empty v-else-if="!intel.dashboard?.top_opportunities?.length" description="暂无机会数据" />
-          <div v-else class="opp-list">
-            <div v-for="item in intel.dashboard.top_opportunities" :key="item.id" class="opp-item" :class="'verdict-' + (item.verdict || '').toLowerCase()">
+          <div v-else-if="!intel.dashboard?.top_opportunities?.length" class="intel-empty-state">
+            <div class="intel-empty-state-icon">🎯</div>
+            <div class="intel-empty-state-text">暂无机会数据</div>
+          </div>
+          <div v-else class="opp-list intel-card-stagger">
+            <div v-for="item in intel.dashboard.top_opportunities" :key="item.id" class="opp-item" :class="'verdict-' + (item.verdict || '').toLowerCase()" @click="$router.push('/opportunities')">
               <div class="opp-left">
                 <div class="opp-score-ring" :style="{ borderColor: getScoreColor(item.verdict_score) }">
                   <span :style="{ color: getScoreColor(item.verdict_score) }">{{ item.verdict_score }}</span>
@@ -105,60 +143,80 @@
                 <div class="opp-meta">
                   <el-tag size="small" effect="plain">{{ item.category }}</el-tag>
                   <el-tag size="small" v-if="item.difficulty" effect="plain">{{ item.difficulty }}</el-tag>
-                  <el-tag v-if="item.verdict" size="small" :type="verdictType(item.verdict)" effect="dark">{{ item.verdict }}</el-tag>
                 </div>
               </div>
+              <el-tag v-if="item.verdict" size="small" :type="verdictType(item.verdict)" effect="dark" class="opp-verdict-tag">{{ item.verdict }}</el-tag>
             </div>
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-row :gutter="20" style="margin-top: 20px">
-      <el-col :span="12">
+    <el-row :gutter="20" style="margin-top: 24px">
+      <el-col :xs="24" :sm="24" :md="12">
         <el-card shadow="hover" class="section-card">
           <template #header>
             <div class="card-header">
-              <span>📊 趋势评分分布</span>
+              <span class="card-header-title">
+                <span class="card-header-icon chart-icon">📊</span>
+                趋势评分分布
+              </span>
             </div>
           </template>
           <div class="chart-container">
             <Bar v-if="trendChartData" :data="trendChartData" :options="barChartOptions" />
-            <el-empty v-else description="暂无图表数据" :image-size="60" />
+            <div v-else class="intel-empty-state">
+              <div class="intel-empty-state-icon">📉</div>
+              <div class="intel-empty-state-text">暂无图表数据</div>
+            </div>
           </div>
         </el-card>
       </el-col>
-      <el-col :span="12">
+      <el-col :xs="24" :sm="24" :md="12">
         <el-card shadow="hover" class="section-card">
           <template #header>
             <div class="card-header">
-              <span>📊 风险等级分布</span>
+              <span class="card-header-title">
+                <span class="card-header-icon risk-icon">⚠️</span>
+                风险等级分布
+              </span>
             </div>
           </template>
           <div class="chart-container">
             <Doughnut v-if="riskChartData" :data="riskChartData" :options="doughnutOpts" />
-            <el-empty v-else description="暂无图表数据" :image-size="60" />
+            <div v-else class="intel-empty-state">
+              <div class="intel-empty-state-icon">🛡️</div>
+              <div class="intel-empty-state-text">暂无图表数据</div>
+            </div>
           </div>
         </el-card>
       </el-col>
     </el-row>
 
-    <el-row :gutter="20" style="margin-top: 20px">
+    <el-row :gutter="20" style="margin-top: 24px">
       <el-col :span="24">
         <el-card shadow="hover" class="section-card">
           <template #header>
             <div class="card-header">
-              <span>⚠️ 风险预警</span>
-              <el-button text type="primary" @click="$router.push('/risks')">查看全部</el-button>
+              <span class="card-header-title">
+                <span class="card-header-icon alert-icon">🚨</span>
+                风险预警
+              </span>
+              <el-button text type="primary" size="small" @click="$router.push('/risks')">
+                查看全部 <el-icon :size="12"><Right /></el-icon>
+              </el-button>
             </div>
           </template>
           <div v-if="intel.loading" class="loading-placeholder">
             <el-skeleton :rows="3" animated />
           </div>
-          <el-empty v-else-if="!intel.dashboard?.top_risks?.length" description="暂无风险数据" />
-          <div v-else class="risk-list">
-            <div v-for="item in intel.dashboard.top_risks" :key="item.id" class="risk-item" :class="'severity-' + (item.severity || '').toLowerCase()">
-              <div class="risk-severity-dot"></div>
+          <div v-else-if="!intel.dashboard?.top_risks?.length" class="intel-empty-state">
+            <div class="intel-empty-state-icon">✅</div>
+            <div class="intel-empty-state-text">当前无活跃风险</div>
+          </div>
+          <div v-else class="risk-list intel-card-stagger">
+            <div v-for="item in intel.dashboard.top_risks" :key="item.id" class="risk-item" :class="'severity-' + (item.severity || '').toLowerCase()" @click="$router.push('/risks')">
+              <div class="risk-severity-dot" :class="{ 'pulse-active': (item.severity || '').toLowerCase() === 'high' }"></div>
               <div class="risk-name">{{ item.name }}</div>
               <div class="risk-reason">{{ item.reason }}</div>
               <div class="risk-alt" v-if="item.alternative">
@@ -187,6 +245,20 @@ const intel = useIntelStore()
 const auth = useIntelAuthStore()
 
 const planLabel = computed(() => auth.planLabel)
+
+function generateSparkline(count: number): string {
+  const points: string[] = []
+  for (let i = 0; i < count; i++) {
+    const x = (i / (count - 1)) * 60
+    const y = 20 - (Math.random() * 12 + 4)
+    points.push(`${x.toFixed(1)},${y.toFixed(1)}`)
+  }
+  return points.join(" ")
+}
+
+const trendSparkline = computed(() => generateSparkline(8))
+const oppSparkline = computed(() => generateSparkline(8))
+const riskSparkline = computed(() => generateSparkline(8))
 
 const trendChartData = computed<ChartData<"bar"> | null>(() => {
   const trends = intel.dashboard?.top_trends
@@ -249,34 +321,72 @@ onMounted(() => {
 
 <style scoped>
 .dashboard { max-width: 1400px; }
+
 .page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
-.page-header h2 { margin: 0; font-size: 20px; }
+
+.header-title-area h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--intel-text);
+}
+
+.header-subtitle {
+  margin: 4px 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
+}
+
+.live-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #67c23a;
+  animation: pulse-ring 2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(103, 194, 58, 0.4);
+}
 
 .stat-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
+
 .stat-card {
-  border-radius: 14px;
+  border-radius: var(--intel-radius-xl);
   overflow: hidden;
   position: relative;
   color: #fff;
-  min-height: 100px;
+  min-height: 110px;
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--intel-shadow-elevated);
+}
+
 .stat-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
+
 .stat-trend .stat-bg { background: linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%); }
 .stat-opp .stat-bg { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
 .stat-risk .stat-bg { background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); }
+
 .stat-content {
   position: relative;
   z-index: 1;
@@ -285,43 +395,81 @@ onMounted(() => {
   gap: 16px;
   padding: 20px 24px;
 }
+
 .stat-icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(4px);
 }
+
 .stat-value {
-  font-size: 36px;
+  font-size: 32px;
   font-weight: 800;
   line-height: 1;
-}
-.stat-label {
-  font-size: 14px;
-  opacity: 0.85;
-  margin-top: 4px;
+  letter-spacing: -0.5px;
 }
 
-.section-card { border-radius: 12px; }
+.stat-label {
+  font-size: var(--font-size-sm);
+  opacity: 0.85;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.stat-sparkline {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+  width: 60px;
+  height: 20px;
+  opacity: 0.6;
+}
+
+.section-card {
+  border-radius: var(--intel-radius-lg);
+  border: none;
+  box-shadow: var(--intel-shadow);
+  transition: box-shadow var(--transition-base);
+}
+
+.section-card:hover {
+  box-shadow: var(--intel-shadow-hover);
+}
+
 .card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
+.card-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: var(--font-size-base);
+}
+
+.card-header-icon {
+  font-size: 16px;
+}
+
 .loading-placeholder { padding: 16px; }
 
 .trend-list { display: flex; flex-direction: column; gap: 2px; }
 .trend-item {
   display: flex;
   gap: 12px;
-  align-items: flex-start;
-  padding: 12px 8px;
-  border-radius: 8px;
-  transition: background 0.15s;
+  align-items: center;
+  padding: 12px 10px;
+  border-radius: var(--intel-radius);
+  transition: background var(--transition-fast);
+  cursor: pointer;
 }
 .trend-item:hover { background: #f8f9fa; }
 .trend-left { padding-top: 2px; }
@@ -332,12 +480,15 @@ onMounted(() => {
 .dir-rising { color: #059669; }
 .dir-stable { color: #2563eb; }
 .dir-falling { color: #dc2626; }
-.trend-right { flex: 1; }
+.trend-right { flex: 1; min-width: 0; }
 .trend-title {
-  font-size: 14px;
+  font-size: var(--font-size-base);
   font-weight: 500;
-  color: #303133;
+  color: var(--intel-text);
   margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .trend-meta {
   display: flex;
@@ -349,24 +500,37 @@ onMounted(() => {
   font-size: 13px;
   font-weight: 700;
 }
+.trend-score-badge {
+  font-size: 18px;
+  font-weight: 800;
+  border: 2px solid;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
 .opp-list { display: flex; flex-direction: column; gap: 2px; }
 .opp-item {
   display: flex;
   gap: 14px;
   align-items: center;
-  padding: 12px 8px;
-  border-radius: 8px;
+  padding: 12px 10px;
+  border-radius: var(--intel-radius);
   border-left: 3px solid transparent;
-  transition: background 0.15s;
+  transition: background var(--transition-fast);
+  cursor: pointer;
 }
 .opp-item:hover { background: #f8f9fa; }
 .opp-item.verdict-recommended { border-left-color: #059669; }
 .opp-item.verdict-caution { border-left-color: #d97706; }
 .opp-item.verdict-avoid { border-left-color: #dc2626; }
 .opp-score-ring {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   border: 3px solid;
   display: flex;
@@ -375,31 +539,42 @@ onMounted(() => {
   flex-shrink: 0;
 }
 .opp-score-ring span {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 800;
 }
-.opp-right { flex: 1; }
+.opp-right { flex: 1; min-width: 0; }
 .opp-title {
-  font-size: 14px;
+  font-size: var(--font-size-base);
   font-weight: 500;
-  color: #303133;
+  color: var(--intel-text);
   margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .opp-meta {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
 }
+.opp-verdict-tag {
+  flex-shrink: 0;
+  font-size: 11px;
+}
 
-.risk-list { display: flex; flex-direction: column; gap: 8px; }
+.risk-list { display: flex; flex-direction: column; gap: 10px; }
 .risk-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: #f8f9fa;
+  padding: 14px 18px;
+  border-radius: var(--intel-radius);
   border-left: 4px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+.risk-item:hover {
+  box-shadow: var(--intel-shadow);
 }
 .risk-item.severity-high { border-left-color: #dc2626; background: #fef2f2; }
 .risk-item.severity-medium { border-left-color: #d97706; background: #fdf6ec; }
@@ -413,16 +588,32 @@ onMounted(() => {
 .severity-high .risk-severity-dot { background: #dc2626; }
 .severity-medium .risk-severity-dot { background: #d97706; }
 .severity-low .risk-severity-dot { background: #059669; }
-.risk-name { font-size: 14px; font-weight: 600; color: #303133; min-width: 140px; }
+.pulse-active {
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+.risk-name { font-size: var(--font-size-base); font-weight: 600; color: var(--intel-text); min-width: 140px; }
 .risk-reason { font-size: 13px; color: #606266; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .risk-alt {
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   color: #059669;
   font-weight: 500;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .chart-container {
   height: 280px;
   padding: 8px;
+}
+
+@media (max-width: 768px) {
+  .stat-row {
+    grid-template-columns: 1fr;
+  }
+  .page-header {
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 </style>

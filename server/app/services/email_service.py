@@ -177,6 +177,48 @@ class EmailService:
         )
         return await self.enqueue(to_email, subject, content, html)
 
+    async def send_email_verification_code(self, to_email: str, code: str, ttl_minutes: int = 10) -> bool:
+        subject = "邮箱验证码"
+        content = (
+            f"您的邮箱验证码为：{code}\n\n"
+            f"验证码 {ttl_minutes} 分钟内有效，请勿泄露给他人。"
+        )
+        html = self._build_template_email(
+            title="邮箱验证",
+            greeting="您好：",
+            body=f"""
+            <p>您的邮箱验证码为：</p>
+            <p style="font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #ff2442;">{code}</p>
+            <p style="color: #666;">验证码 {ttl_minutes} 分钟内有效，请勿泄露给他人。</p>
+            """,
+        )
+        if self.is_configured:
+            return await self.enqueue(to_email, subject, content, html)
+        logger.info("[EMAIL DEV] email_verify to=%s code=%s", to_email, code)
+        return False
+
+    async def send_password_reset_code(self, to_email: str, code: str, ttl_minutes: int = 5) -> bool:
+        subject = "密码重置验证码"
+        content = (
+            f"您正在重置 XHS365 账户密码。\n\n"
+            f"验证码：{code}\n"
+            f"验证码 {ttl_minutes} 分钟内有效。如非本人操作，请忽略此邮件。"
+        )
+        html = self._build_template_email(
+            title="密码重置",
+            greeting="您好：",
+            body=f"""
+            <p>您正在重置 XHS365 账户密码。</p>
+            <p>验证码：</p>
+            <p style="font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #ff2442;">{code}</p>
+            <p style="color: #666;">验证码 {ttl_minutes} 分钟内有效。如非本人操作，请忽略此邮件。</p>
+            """,
+        )
+        if self.is_configured:
+            return await self.enqueue(to_email, subject, content, html)
+        logger.info("[EMAIL DEV] password_reset to=%s code=%s", to_email, code)
+        return False
+
     async def send_password_change_email(self, to_email: str) -> bool:
         subject = "密码修改通知"
         content = (

@@ -12,6 +12,7 @@ from app.core.security import hash_password, verify_password
 from app.middleware.auth import CurrentUser
 from app.models.user import User
 from app.schemas.auth import UserInfoResponse
+from app.services.email_service import email_service
 from app.services.operation_audit import record_operation
 
 router = APIRouter(prefix="/user", tags=["user"])
@@ -128,7 +129,7 @@ async def request_reset_password(
     cache_key = f"pwd_reset:{req.email}"
     await cache_set(cache_key, {"code": code, "user_id": str(user.id)}, _RESET_TTL)
 
-    _send_email_mock(req.email, "password_reset", code)
+    await _send_verification_code(req.email, "password_reset", code)
 
     return {"code": 0, "message": "如果该邮箱已注册，您将收到重置验证码"}
 
@@ -167,7 +168,7 @@ async def request_verify_email(
     cache_key = f"email_verify:{user.id}"
     await cache_set(cache_key, {"code": code, "email": user.email}, _VERIFICATION_TTL)
 
-    _send_email_mock(user.email, "email_verify", code)
+    await _send_verification_code(user.email, "email_verify", code)
 
     return {"code": 0, "message": "验证码已发送"}
 
@@ -208,7 +209,10 @@ async def delete_account(
     return {"code": 0, "message": "账户已停用，数据将在30天后删除"}
 
 
-def _send_email_mock(email: str, email_type: str, code: str):
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.info(f"[EMAIL MOCK] type={email_type}, to={email}, code={code}")
+async def _send_verification_code(email: str, email_type: str, code: str) -> None:
+    if email_type == "password_reset":
+        await email_service.send_password_reset_code(email, code, ttl_minutes=_RESET_TTL // 60)
+    else:
+        await email_service.send_email_verification_code(
+            email, code, ttl_minutes=_VERIFICATION_TTL // 60
+        )

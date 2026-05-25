@@ -1,7 +1,10 @@
 <template>
   <div class="opportunities-page">
     <div class="page-header">
-      <h2>商业机会</h2>
+      <div class="header-title-area">
+        <h2>商业机会</h2>
+        <p class="header-subtitle" v-if="items.length">发现高潜力商业机会，精准评估变现路径</p>
+      </div>
       <div class="header-actions">
         <el-select v-model="categoryFilter" placeholder="分类筛选" clearable size="small" style="width: 140px">
           <el-option label="全部" value="" />
@@ -13,11 +16,38 @@
       </div>
     </div>
 
+    <div class="opp-stats" v-if="items.length">
+      <div class="opp-stat-item stat-recommended">
+        <span class="stat-icon">✅</span>
+        <span class="stat-num">{{ verdictCount('RECOMMENDED') }}</span>
+        <span class="stat-text">推荐机会</span>
+      </div>
+      <div class="opp-stat-item stat-caution">
+        <span class="stat-icon">⚠️</span>
+        <span class="stat-num">{{ verdictCount('CAUTION') }}</span>
+        <span class="stat-text">需谨慎</span>
+      </div>
+      <div class="opp-stat-item stat-avoid">
+        <span class="stat-icon">🚫</span>
+        <span class="stat-num">{{ verdictCount('AVOID') }}</span>
+        <span class="stat-text">建议回避</span>
+      </div>
+      <div class="opp-stat-item stat-avg">
+        <span class="stat-icon">📊</span>
+        <span class="stat-num">{{ avgScore }}</span>
+        <span class="stat-text">平均评分</span>
+      </div>
+    </div>
+
     <div v-if="loading" class="loading-placeholder">
       <el-skeleton :rows="8" animated />
     </div>
-    <el-empty v-else-if="!items.length" description="暂无商业机会数据" />
-    <div v-else class="opp-grid">
+    <div v-else-if="!items.length" class="intel-empty-state">
+      <div class="intel-empty-state-icon">💰</div>
+      <div class="intel-empty-state-text">暂无商业机会数据</div>
+      <div class="intel-empty-state-action">数据更新后将自动展示</div>
+    </div>
+    <div v-else class="opp-grid intel-card-stagger">
       <div
         v-for="item in filteredItems"
         :key="item.id"
@@ -28,14 +58,14 @@
         <div class="opp-verdict-bar"></div>
         <div class="card-body">
           <div class="card-top-row">
-            <div class="opp-score-ring" :style="{ borderColor: getScoreColor(item.verdict_score) }">
+            <div class="opp-score-ring" :style="{ borderColor: getScoreColor(item.verdict_score), boxShadow: '0 0 0 3px ' + getScoreColor(item.verdict_score) + '20' }">
               <span :style="{ color: getScoreColor(item.verdict_score) }">{{ item.verdict_score }}</span>
             </div>
             <div class="card-title-area">
               <div class="card-title">{{ item.name }}</div>
               <div class="card-meta">
                 <el-tag size="small" effect="plain">{{ item.category }}</el-tag>
-                <el-tag size="small" v-if="item.verdict" :type="verdictType(item.verdict)" effect="dark">{{ item.verdict }}</el-tag>
+                <el-tag size="small" v-if="item.verdict" :type="verdictType(item.verdict)" effect="dark">{{ verdictLabel(item.verdict) }}</el-tag>
                 <el-tag size="small" v-if="item.difficulty" effect="plain">{{ item.difficulty }}</el-tag>
               </div>
             </div>
@@ -85,15 +115,19 @@
 
     <el-dialog v-model="detailVisible" :title="detailItem?.name" width="720px" destroy-on-close>
       <div v-if="detailItem" class="opp-detail">
+        <div class="detail-verdict-bar" :class="'verdict-' + (detailItem.verdict || '').toLowerCase()">
+          <div class="verdict-badge">
+            <span class="verdict-icon">{{ verdictIcon(detailItem.verdict) }}</span>
+            <span class="verdict-text">{{ verdictLabel(detailItem.verdict) }}</span>
+          </div>
+          <div class="verdict-score-big" :style="{ color: getScoreColor(detailItem.verdict_score) }">
+            {{ detailItem.verdict_score }}<span class="score-unit">分</span>
+          </div>
+        </div>
+
         <el-descriptions :column="2" border>
           <el-descriptions-item label="分类">{{ detailItem.category }}</el-descriptions-item>
           <el-descriptions-item label="子分类" v-if="detailItem.sub_category">{{ detailItem.sub_category }}</el-descriptions-item>
-          <el-descriptions-item label="评分">
-            <el-tag :type="scoreType(detailItem.verdict_score)">{{ detailItem.verdict_score }}分</el-tag>
-          </el-descriptions-item>
-          <el-descriptions-item label="判定">
-            <el-tag :type="verdictType(detailItem.verdict)">{{ detailItem.verdict }}</el-tag>
-          </el-descriptions-item>
           <el-descriptions-item label="难度" v-if="detailItem.difficulty">{{ detailItem.difficulty }}</el-descriptions-item>
           <el-descriptions-item label="启动成本" v-if="detailItem.startup_cost">{{ detailItem.startup_cost }}元</el-descriptions-item>
           <el-descriptions-item label="月收入上限" v-if="detailItem.monthly_ceiling">{{ detailItem.monthly_ceiling }}</el-descriptions-item>
@@ -108,7 +142,7 @@
         </el-descriptions>
 
         <div class="detail-section" v-if="detailItem.verdict_detail && Object.keys(detailItem.verdict_detail).length">
-          <h4>判定详情</h4>
+          <h4>📊 判定详情</h4>
           <div class="verdict-bars">
             <div v-for="(val, key) in detailItem.verdict_detail" :key="key" class="verdict-bar-item">
               <div class="verdict-bar-label">
@@ -123,7 +157,7 @@
         </div>
 
         <div class="detail-section" v-if="detailItem.commercial_paths?.length">
-          <h4>商业化路径</h4>
+          <h4>💰 商业化路径</h4>
           <div class="paths-list">
             <div v-for="(path, idx) in detailItem.commercial_paths" :key="idx" class="path-item">
               <div class="path-index">{{ idx + 1 }}</div>
@@ -141,7 +175,7 @@
         </div>
 
         <div class="detail-section" v-if="detailItem.key_metrics && Object.keys(detailItem.key_metrics).length">
-          <h4>关键指标</h4>
+          <h4>📈 关键指标</h4>
           <div class="json-block">
             <div v-for="(val, key) in detailItem.key_metrics" :key="key" class="json-row">
               <span class="json-key">{{ key }}</span>
@@ -211,6 +245,16 @@ const categories = computed(() => {
   return Array.from(cats).sort()
 })
 
+function verdictCount(verdict: string): number {
+  return items.value.filter(i => i.verdict === verdict).length
+}
+
+const avgScore = computed(() => {
+  if (!items.value.length) return 0
+  const sum = items.value.reduce((acc, i) => acc + (i.verdict_score || 0), 0)
+  return Math.round(sum / items.value.length)
+})
+
 const filteredItems = computed(() => {
   let result = items.value
   if (searchText.value) {
@@ -247,6 +291,16 @@ function verdictType(verdict: string): string {
   return map[verdict] || "info"
 }
 
+function verdictLabel(verdict: string): string {
+  const map: Record<string, string> = { RECOMMENDED: "推荐", CAUTION: "谨慎", AVOID: "回避" }
+  return map[verdict] || verdict
+}
+
+function verdictIcon(verdict: string): string {
+  const map: Record<string, string> = { RECOMMENDED: "✅", CAUTION: "⚠️", AVOID: "🚫" }
+  return map[verdict] || "📋"
+}
+
 function verdictBarColor(val: number): string {
   if (val >= 8) return "#059669"
   if (val >= 5) return "#d97706"
@@ -277,7 +331,7 @@ const VERDICT_LABELS: Record<string, string> = {
   copy_barrier: "抄袭壁垒",
 }
 
-function verdictLabel(key: string): string {
+function verdictDetailLabel(key: string): string {
   return VERDICT_LABELS[key] || key
 }
 
@@ -320,49 +374,89 @@ onMounted(async () => {
 .opportunities-page { max-width: 1400px; }
 .page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-lg);
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--spacing-md);
 }
-.page-header h2 { margin: 0; font-size: 20px; }
-.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.loading-placeholder { padding: 16px; }
+.header-title-area h2 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--intel-text);
+}
+.header-subtitle {
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
+}
+.header-actions { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
+
+.opp-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.opp-stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius-lg);
+  background: var(--intel-surface);
+  box-shadow: var(--intel-shadow);
+  transition: all var(--transition-base);
+}
+.opp-stat-item:hover {
+  box-shadow: var(--intel-shadow-hover);
+  transform: translateY(-2px);
+}
+.stat-icon { font-size: var(--font-size-xl); }
+.stat-num { font-size: var(--font-size-2xl); font-weight: 800; }
+.stat-text { font-size: var(--font-size-sm); color: var(--intel-text-secondary); }
+.stat-recommended .stat-num { color: var(--intel-success); }
+.stat-caution .stat-num { color: var(--intel-warning); }
+.stat-avoid .stat-num { color: var(--intel-danger); }
+.stat-avg .stat-num { color: var(--intel-primary); }
+
+.loading-placeholder { padding: var(--spacing-md); }
+
 .opp-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 16px;
+  gap: var(--spacing-md);
 }
 .opp-card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  background: var(--intel-surface);
+  border-radius: var(--intel-radius-lg);
+  box-shadow: var(--intel-shadow);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all var(--transition-base);
   overflow: hidden;
   position: relative;
 }
 .opp-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: var(--intel-shadow-hover);
 }
-.opp-verdict-bar {
-  height: 3px;
-  width: 100%;
+.opp-card:hover .card-footer .card-action {
+  transform: translateX(4px);
 }
-.opp-card.verdict-recommended .opp-verdict-bar { background: #059669; }
-.opp-card.verdict-caution .opp-verdict-bar { background: #d97706; }
-.opp-card.verdict-avoid .opp-verdict-bar { background: #dc2626; }
-.opp-card.verdict-recommended { border-left: 4px solid #059669; }
-.opp-card.verdict-caution { border-left: 4px solid #d97706; }
-.opp-card.verdict-avoid { border-left: 4px solid #dc2626; }
-.card-body { padding: 16px 18px; }
+.opp-verdict-bar { height: 3px; width: 100%; }
+.opp-card.verdict-recommended .opp-verdict-bar { background: var(--intel-success); }
+.opp-card.verdict-caution .opp-verdict-bar { background: var(--intel-warning); }
+.opp-card.verdict-avoid .opp-verdict-bar { background: var(--intel-danger); }
+.opp-card.verdict-recommended { border-left: 4px solid var(--intel-success); }
+.opp-card.verdict-caution { border-left: 4px solid var(--intel-warning); }
+.opp-card.verdict-avoid { border-left: 4px solid var(--intel-danger); }
+.card-body { padding: var(--spacing-md) var(--spacing-lg); }
 .card-top-row {
   display: flex;
   gap: 14px;
   align-items: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-md);
 }
 .opp-score-ring {
   width: 48px;
@@ -373,17 +467,21 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: all var(--transition-base);
+}
+.opp-card:hover .opp-score-ring {
+  transform: scale(1.05);
 }
 .opp-score-ring span {
-  font-size: 16px;
+  font-size: var(--font-size-lg);
   font-weight: 800;
 }
 .card-title-area { flex: 1; }
 .card-title {
-  font-size: 15px;
+  font-size: var(--font-size-md);
   font-weight: 600;
-  color: #303133;
-  margin-bottom: 8px;
+  color: var(--intel-text);
+  margin-bottom: var(--spacing-sm);
   line-height: 1.5;
 }
 .card-meta {
@@ -392,55 +490,84 @@ onMounted(async () => {
   flex-wrap: wrap;
 }
 .card-details {
-  background: #f5f7fa;
-  border-radius: 6px;
-  padding: 8px 12px;
-  margin-bottom: 10px;
+  background: var(--intel-bg);
+  border-radius: var(--intel-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
 }
 .detail-row {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   padding: 2px 0;
 }
-.detail-label { color: #909399; }
-.detail-value { color: #303133; font-weight: 500; }
+.detail-label { color: var(--intel-text-secondary); }
+.detail-value { color: var(--intel-text); font-weight: 500; }
 .card-paths {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
-  margin-bottom: 8px;
+  margin-bottom: var(--spacing-sm);
 }
 .card-fit {
-  font-size: 12px;
-  color: #909399;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
 }
 .fit-label { color: #606266; }
 .card-footer {
   display: flex;
   justify-content: flex-end;
-  margin-top: 8px;
+  margin-top: var(--spacing-sm);
 }
 .card-action {
-  font-size: 12px;
-  color: #4fc3f7;
+  font-size: var(--font-size-sm);
+  color: var(--intel-accent);
   font-weight: 500;
-  transition: transform 0.2s;
+  transition: transform var(--transition-fast);
 }
-.opp-card:hover .card-action { transform: translateX(4px); }
 .pagination-wrap {
-  margin-top: 24px;
+  margin-top: var(--spacing-lg);
   display: flex;
   justify-content: center;
 }
+
 .opp-detail { padding: 0; }
-.detail-section { margin-top: 20px; }
+.detail-verdict-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.detail-verdict-bar.verdict-recommended { background: linear-gradient(135deg, #f0f9eb 0%, #ecfdf5 100%); }
+.detail-verdict-bar.verdict-caution { background: linear-gradient(135deg, #fdf6ec 0%, #fffbeb 100%); }
+.detail-verdict-bar.verdict-avoid { background: linear-gradient(135deg, #fef0f0 0%, #fef2f2 100%); }
+.verdict-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+}
+.verdict-icon { font-size: var(--font-size-xl); }
+.detail-verdict-bar.verdict-recommended .verdict-text { color: var(--intel-success); }
+.detail-verdict-bar.verdict-caution .verdict-text { color: var(--intel-warning); }
+.detail-verdict-bar.verdict-avoid .verdict-text { color: var(--intel-danger); }
+.verdict-score-big {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+}
+.score-unit { font-size: var(--font-size-base); font-weight: 400; opacity: 0.6; margin-left: 2px; }
+
+.detail-section { margin-top: var(--spacing-lg); }
 .detail-section h4 {
-  font-size: 14px;
-  color: #303133;
+  font-size: var(--font-size-md);
+  color: var(--intel-text);
   margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--intel-border-light);
+  font-weight: 600;
 }
 .verdict-bars {
   display: flex;
@@ -448,9 +575,9 @@ onMounted(async () => {
   gap: 10px;
 }
 .verdict-bar-item {
-  background: #f8f9fa;
-  border-radius: 6px;
-  padding: 10px 12px;
+  background: var(--intel-bg);
+  border-radius: var(--intel-radius);
+  padding: 10px var(--spacing-md);
 }
 .verdict-bar-label {
   display: flex;
@@ -459,17 +586,17 @@ onMounted(async () => {
   margin-bottom: 6px;
 }
 .verdict-key {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   color: #606266;
   font-weight: 500;
 }
 .verdict-score {
-  font-size: 14px;
+  font-size: var(--font-size-md);
   font-weight: 700;
 }
 .verdict-bar-track {
   height: 6px;
-  background: #e4e7ed;
+  background: var(--intel-border);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -479,50 +606,50 @@ onMounted(async () => {
   transition: width 0.6s ease;
 }
 .json-block {
-  background: #f8f9fa;
-  border-radius: 6px;
-  padding: 12px;
+  background: var(--intel-bg);
+  border-radius: var(--intel-radius);
+  padding: var(--spacing-md);
 }
 .json-row {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-md);
   padding: 4px 0;
-  font-size: 13px;
-  border-bottom: 1px solid #f0f0f0;
+  font-size: var(--font-size-sm);
+  border-bottom: 1px solid var(--intel-border-light);
 }
 .json-row:last-child { border-bottom: none; }
-.json-key { color: #909399; min-width: 100px; flex-shrink: 0; }
-.json-val { color: #303133; word-break: break-all; }
+.json-key { color: var(--intel-text-secondary); min-width: 100px; flex-shrink: 0; }
+.json-val { color: var(--intel-text); word-break: break-all; }
 .paths-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 .path-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  font-size: 13px;
-  color: #303133;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text);
 }
 .path-index {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #059669;
+  background: var(--intel-success);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   flex-shrink: 0;
 }
 .path-detail {
   flex: 1;
   background: #f0f9eb;
-  border-radius: 6px;
-  padding: 8px 12px;
+  border-radius: var(--intel-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
 }
 .path-main {
   display: flex;
@@ -530,13 +657,22 @@ onMounted(async () => {
   gap: 6px;
   flex-wrap: wrap;
 }
-.path-type { font-weight: 600; color: #059669; }
-.path-desc { color: #303133; }
-.path-name { color: #303133; font-weight: 500; }
+.path-type { font-weight: 600; color: var(--intel-success); }
+.path-desc { color: var(--intel-text); }
+.path-name { color: var(--intel-text); font-weight: 500; }
 .path-price {
-  font-size: 12px;
-  color: #d97706;
+  font-size: var(--font-size-sm);
+  color: var(--intel-warning);
   margin-top: 4px;
   display: block;
+}
+
+@media (max-width: 768px) {
+  .opp-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .opp-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

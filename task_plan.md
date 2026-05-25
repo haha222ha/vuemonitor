@@ -115,6 +115,8 @@
 
 ## 阶段 E：核心业务端到端联调（P1-高优）
 
+> 2026-05-25：已添加 `scripts/api_smoke.py` 自动化冒烟；邮件验证码接入 `email_service`；Client `TrendChart` 移除假数据。
+
 ### E-1 用户注册登录流程
 - [ ] Web-User: 注册 → 登录 → Token获取 → 用户信息
 - [ ] Client: 注册 → 登录 → Token持久化 → 自动刷新
@@ -173,27 +175,27 @@
 ## 阶段 F：Nginx性能优化（P1-高优）
 
 ### F-1 添加Gzip压缩
-- [ ] 配置gzip on
-- [ ] 配置gzip_types（text/css, application/javascript, application/json等）
-- [ ] 配置gzip_min_length 1024
+- [x] 配置gzip on
+- [x] 配置gzip_types（text/css, application/javascript, application/json等）
+- [x] 配置gzip_min_length 1024
 - [ ] 验证压缩率
 
 ### F-2 添加静态资源缓存
-- [ ] CSS/JS: cache-control max-age=31536000, immutable
+- [x] CSS/JS: cache-control max-age=31536000, immutable
 - [ ] 图片: cache-control max-age=86400
-- [ ] HTML: cache-control no-cache
+- [x] HTML: cache-control no-cache
 - [ ] 添加ETag支持
 
 ### F-3 添加安全头
-- [ ] X-Content-Type-Options: nosniff
-- [ ] X-Frame-Options: DENY
+- [x] X-Content-Type-Options: nosniff
+- [x] X-Frame-Options: DENY
 - [ ] Strict-Transport-Security（如不依赖Cloudflare）
 
 ### F-4 添加速率限制
-- [ ] limit_req_zone by $binary_remote_addr
-- [ ] API路径: 10r/s
-- [ ] 静态路径: 30r/s
-- [ ] 登录路径: 2r/s
+- [x] limit_req_zone by $binary_remote_addr
+- [x] API路径: 10r/s
+- [x] 静态路径: 30r/s
+- [x] 登录路径: 2r/s
 
 ---
 

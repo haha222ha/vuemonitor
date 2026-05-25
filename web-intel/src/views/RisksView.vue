@@ -1,7 +1,10 @@
 <template>
   <div class="risks-page">
     <div class="page-header">
-      <h2>风险预警</h2>
+      <div class="header-title-area">
+        <h2>风险预警</h2>
+        <p class="header-subtitle" v-if="items.length">实时监控商业风险，提前预警规避陷阱</p>
+      </div>
       <div class="header-actions">
         <el-radio-group v-model="viewMode" size="small">
           <el-radio-button value="card">卡片</el-radio-button>
@@ -19,12 +22,39 @@
       </div>
     </div>
 
+    <div class="risk-stats" v-if="items.length">
+      <div class="risk-stat-item stat-high">
+        <span class="stat-icon">🔴</span>
+        <span class="stat-num">{{ severityCount('high') }}</span>
+        <span class="stat-text">高风险</span>
+      </div>
+      <div class="risk-stat-item stat-medium">
+        <span class="stat-icon">🟡</span>
+        <span class="stat-num">{{ severityCount('medium') }}</span>
+        <span class="stat-text">中风险</span>
+      </div>
+      <div class="risk-stat-item stat-low">
+        <span class="stat-icon">🟢</span>
+        <span class="stat-num">{{ severityCount('low') }}</span>
+        <span class="stat-text">低风险</span>
+      </div>
+      <div class="risk-stat-item stat-active">
+        <span class="stat-icon">⚡</span>
+        <span class="stat-num">{{ activeCount }}</span>
+        <span class="stat-text">活跃预警</span>
+      </div>
+    </div>
+
     <div v-if="loading" class="loading-placeholder">
       <el-skeleton :rows="6" animated />
     </div>
-    <el-empty v-else-if="!items.length" description="暂无风险数据" />
+    <div v-else-if="!items.length" class="intel-empty-state">
+      <div class="intel-empty-state-icon">🛡️</div>
+      <div class="intel-empty-state-text">暂无风险数据</div>
+      <div class="intel-empty-state-action">数据更新后将自动展示</div>
+    </div>
 
-    <div v-else-if="viewMode === 'card'" class="risk-grid">
+    <div v-else-if="viewMode === 'card'" class="risk-grid intel-card-stagger">
       <div
         v-for="item in filteredItems"
         :key="item.id"
@@ -38,7 +68,9 @@
             <div class="severity-badge" :class="'sev-' + (item.severity || '').toLowerCase()">
               {{ severityLabel(item.severity) }}
             </div>
-            <el-tag v-if="item.status === 'active'" type="danger" size="small" effect="dark">活跃</el-tag>
+            <el-tag v-if="item.status === 'active'" type="danger" size="small" effect="dark">
+              <span class="pulse-dot"></span> 活跃
+            </el-tag>
             <el-tag v-else type="info" size="small">已解除</el-tag>
           </div>
           <div class="risk-name">{{ item.name }}</div>
@@ -50,6 +82,9 @@
           <div class="card-meta">
             <el-tag v-if="item.risk_type" size="small" type="info" effect="plain">{{ item.risk_type }}</el-tag>
             <el-tag v-if="item.category" size="small" effect="plain">{{ item.category }}</el-tag>
+          </div>
+          <div class="card-footer">
+            <span class="card-action">查看详情 →</span>
           </div>
         </div>
       </div>
@@ -104,13 +139,17 @@
 
     <el-dialog v-model="detailVisible" :title="detailItem?.name" width="640px" destroy-on-close>
       <div v-if="detailItem" class="risk-detail">
+        <div class="detail-severity-bar" :class="'severity-' + (detailItem.severity || '').toLowerCase()">
+          <div class="severity-badge-lg" :class="'sev-' + (detailItem.severity || '').toLowerCase()">
+            {{ severityLabel(detailItem.severity) }}风险
+          </div>
+          <el-tag v-if="detailItem.status === 'active'" type="danger" effect="dark" size="large">
+            <span class="pulse-dot"></span> 活跃预警
+          </el-tag>
+          <el-tag v-else type="info" effect="dark" size="large">已解除</el-tag>
+        </div>
+
         <el-descriptions :column="2" border>
-          <el-descriptions-item label="严重程度">
-            <el-tag :type="severityTagType(detailItem.severity)" size="small">{{ severityLabel(detailItem.severity) }}</el-tag>
-          </el-descriptions-item>
-          <el-descriptions-item label="状态">
-            <el-tag :type="detailItem.status === 'active' ? 'danger' : 'info'" size="small">{{ detailItem.status }}</el-tag>
-          </el-descriptions-item>
           <el-descriptions-item label="风险类型" v-if="detailItem.risk_type">{{ detailItem.risk_type }}</el-descriptions-item>
           <el-descriptions-item label="分类" v-if="detailItem.category">{{ detailItem.category }}</el-descriptions-item>
           <el-descriptions-item label="原因" :span="2">{{ detailItem.reason }}</el-descriptions-item>
@@ -125,7 +164,7 @@
           <el-descriptions-item label="平台" v-if="detailItem.platform">{{ detailItem.platform }}</el-descriptions-item>
         </el-descriptions>
         <div class="detail-section" v-if="detailItem.early_signals?.length">
-          <h4>早期信号列表</h4>
+          <h4>🔔 早期信号列表</h4>
           <div class="tag-list">
             <el-tag v-for="(s, idx) in detailItem.early_signals" :key="idx" size="small" type="warning">
               {{ typeof s === 'string' ? s : JSON.stringify(s) }}
@@ -174,6 +213,12 @@ const currentPage = ref(1)
 const pageSize = 15
 const detailItem = ref<RiskItem | null>(null)
 const detailVisible = ref(false)
+
+function severityCount(level: string): number {
+  return items.value.filter(i => i.severity?.toLowerCase() === level).length
+}
+
+const activeCount = computed(() => items.value.filter(i => i.status === 'active').length)
 
 const filteredItems = computed(() => {
   let result = items.value
@@ -248,44 +293,83 @@ onMounted(async () => {
 .risks-page { max-width: 1400px; }
 .page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-lg);
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--spacing-md);
 }
-.page-header h2 { margin: 0; font-size: 20px; }
-.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.loading-placeholder { padding: 16px; }
+.header-title-area h2 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--intel-text);
+}
+.header-subtitle {
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
+}
+.header-actions { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
+
+.risk-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.risk-stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius-lg);
+  background: var(--intel-surface);
+  box-shadow: var(--intel-shadow);
+  transition: all var(--transition-base);
+}
+.risk-stat-item:hover {
+  box-shadow: var(--intel-shadow-hover);
+  transform: translateY(-2px);
+}
+.stat-icon { font-size: var(--font-size-xl); }
+.stat-num { font-size: var(--font-size-2xl); font-weight: 800; }
+.stat-text { font-size: var(--font-size-sm); color: var(--intel-text-secondary); }
+.stat-high .stat-num { color: var(--intel-danger); }
+.stat-medium .stat-num { color: var(--intel-warning); }
+.stat-low .stat-num { color: var(--intel-success); }
+.stat-active .stat-num { color: var(--intel-danger); }
+
+.loading-placeholder { padding: var(--spacing-md); }
 
 .risk-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 16px;
+  gap: var(--spacing-md);
 }
 .risk-card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  background: var(--intel-surface);
+  border-radius: var(--intel-radius-lg);
+  box-shadow: var(--intel-shadow);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all var(--transition-base);
   overflow: hidden;
 }
 .risk-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: var(--intel-shadow-hover);
 }
-.risk-severity-bar {
-  height: 3px;
-  width: 100%;
+.risk-card:hover .card-footer .card-action {
+  transform: translateX(4px);
 }
-.risk-card.severity-high .risk-severity-bar { background: #dc2626; }
-.risk-card.severity-medium .risk-severity-bar { background: #d97706; }
-.risk-card.severity-low .risk-severity-bar { background: #059669; }
-.risk-card.severity-high { border-left: 4px solid #dc2626; }
-.risk-card.severity-medium { border-left: 4px solid #d97706; }
-.risk-card.severity-low { border-left: 4px solid #059669; }
-.card-body { padding: 16px 18px; }
+.risk-severity-bar { height: 3px; width: 100%; }
+.risk-card.severity-high .risk-severity-bar { background: var(--intel-danger); }
+.risk-card.severity-medium .risk-severity-bar { background: var(--intel-warning); }
+.risk-card.severity-low .risk-severity-bar { background: var(--intel-success); }
+.risk-card.severity-high { border-left: 4px solid var(--intel-danger); }
+.risk-card.severity-medium { border-left: 4px solid var(--intel-warning); }
+.risk-card.severity-low { border-left: 4px solid var(--intel-success); }
+.card-body { padding: var(--spacing-md) var(--spacing-lg); }
 .card-top-row {
   display: flex;
   align-items: center;
@@ -295,40 +379,49 @@ onMounted(async () => {
 .severity-badge {
   padding: 3px 10px;
   border-radius: 10px;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 700;
 }
-.severity-badge.sev-high { background: #fef2f2; color: #dc2626; }
-.severity-badge.sev-medium { background: #fdf6ec; color: #d97706; }
-.severity-badge.sev-low { background: #f0f9eb; color: #059669; }
+.severity-badge.sev-high { background: #fef2f2; color: var(--intel-danger); }
+.severity-badge.sev-medium { background: #fdf6ec; color: var(--intel-warning); }
+.severity-badge.sev-low { background: #f0f9eb; color: var(--intel-success); }
+.pulse-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  margin-right: 4px;
+  animation: pulse-ring 2s ease-in-out infinite;
+}
 .risk-name {
-  font-size: 15px;
+  font-size: var(--font-size-md);
   font-weight: 600;
-  color: #303133;
-  margin-bottom: 8px;
+  color: var(--intel-text);
+  margin-bottom: var(--spacing-sm);
 }
 .risk-reason {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   color: #606266;
   line-height: 1.6;
   margin-bottom: 10px;
 }
 .risk-alt {
-  background: #f0f9eb;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #f0f9eb 0%, #ecfdf5 100%);
+  border-radius: var(--intel-radius);
   padding: 10px 14px;
   margin-bottom: 10px;
   border: 1px solid #a7f3d0;
 }
 .alt-label {
-  font-size: 12px;
-  color: #059669;
+  font-size: var(--font-size-sm);
+  color: var(--intel-success);
   font-weight: 600;
   margin-bottom: 4px;
 }
 .alt-text {
-  font-size: 13px;
-  color: #303133;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text);
   line-height: 1.6;
 }
 .card-meta {
@@ -336,37 +429,80 @@ onMounted(async () => {
   gap: 6px;
   flex-wrap: wrap;
 }
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-sm);
+}
+.card-action {
+  font-size: var(--font-size-sm);
+  color: var(--intel-accent);
+  font-weight: 500;
+  transition: transform var(--transition-fast);
+}
 
 .risk-table-card { margin-top: 0; }
 .alt-highlight {
-  color: #059669;
+  color: var(--intel-success);
   font-weight: 500;
 }
 .alt-highlight-detail {
-  color: #059669;
+  color: var(--intel-success);
   font-weight: 600;
   background: #f0f9eb;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: var(--intel-radius);
 }
 
 .pagination-wrap {
-  margin-top: 16px;
+  margin-top: var(--spacing-lg);
   display: flex;
   justify-content: center;
 }
+
 .risk-detail { padding: 0; }
-.detail-section { margin-top: 20px; }
+.detail-severity-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.detail-severity-bar.severity-high { background: linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%); }
+.detail-severity-bar.severity-medium { background: linear-gradient(135deg, #fdf6ec 0%, #fffbeb 100%); }
+.detail-severity-bar.severity-low { background: linear-gradient(135deg, #f0f9eb 0%, #ecfdf5 100%); }
+.severity-badge-lg {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: var(--intel-radius);
+}
+.severity-badge-lg.sev-high { background: #fef2f2; color: var(--intel-danger); }
+.severity-badge-lg.sev-medium { background: #fdf6ec; color: var(--intel-warning); }
+.severity-badge-lg.sev-low { background: #f0f9eb; color: var(--intel-success); }
+
+.detail-section { margin-top: var(--spacing-lg); }
 .detail-section h4 {
-  font-size: 14px;
-  color: #303133;
+  font-size: var(--font-size-md);
+  color: var(--intel-text);
   margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--intel-border-light);
+  font-weight: 600;
 }
 .tag-list {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .risk-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .risk-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

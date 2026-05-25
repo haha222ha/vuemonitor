@@ -1,7 +1,10 @@
 <template>
   <div class="emotions-page">
     <div class="page-header">
-      <h2>用户情绪分析</h2>
+      <div class="header-title-area">
+        <h2>用户情绪分析</h2>
+        <p class="header-subtitle" v-if="items.length">洞察用户情绪变化，把握内容方向</p>
+      </div>
       <div class="header-actions">
         <el-select v-model="sentimentFilter" placeholder="情绪倾向" clearable size="small" style="width: 140px">
           <el-option label="全部" value="" />
@@ -15,11 +18,38 @@
       </div>
     </div>
 
+    <div class="emotion-stats" v-if="items.length">
+      <div class="emotion-stat-item stat-total">
+        <span class="stat-icon">💭</span>
+        <span class="stat-num">{{ items.length }}</span>
+        <span class="stat-text">情绪关键词</span>
+      </div>
+      <div class="emotion-stat-item stat-positive">
+        <span class="stat-icon">😊</span>
+        <span class="stat-num">{{ sentimentCount('positive') }}</span>
+        <span class="stat-text">正面情绪</span>
+      </div>
+      <div class="emotion-stat-item stat-negative">
+        <span class="stat-icon">😟</span>
+        <span class="stat-num">{{ sentimentCount('negative') }}</span>
+        <span class="stat-text">负面情绪</span>
+      </div>
+      <div class="emotion-stat-item stat-avg">
+        <span class="stat-icon">📊</span>
+        <span class="stat-num">{{ avgIntensity }}%</span>
+        <span class="stat-text">平均强度</span>
+      </div>
+    </div>
+
     <div v-if="loading" class="loading-placeholder">
       <el-skeleton :rows="8" animated />
     </div>
-    <el-empty v-else-if="!items.length" description="暂无用户情绪数据" />
-    <div v-else class="emotion-grid">
+    <div v-else-if="!items.length" class="intel-empty-state">
+      <div class="intel-empty-state-icon">💭</div>
+      <div class="intel-empty-state-text">暂无用户情绪数据</div>
+      <div class="intel-empty-state-action">数据更新后将自动展示</div>
+    </div>
+    <div v-else class="emotion-grid intel-card-stagger">
       <div
         v-for="item in filteredItems"
         :key="item.id || item.keyword"
@@ -71,6 +101,12 @@
           <div class="card-note" v-if="item.insight || item.note">
             {{ item.insight || item.note }}
           </div>
+          <div class="card-footer">
+            <el-tag v-if="item.trend_direction" size="small" :type="item.trend_direction === 'rising' ? 'success' : item.trend_direction === 'falling' ? 'danger' : 'info'" effect="plain">
+              {{ item.trend_direction === 'rising' ? '↑ 上升' : item.trend_direction === 'falling' ? '↓ 下降' : '→ 稳定' }}
+            </el-tag>
+            <span class="card-action">查看详情 →</span>
+          </div>
           <div class="card-actions" v-if="isAdmin()">
             <el-button type="danger" text size="small" @click.stop="handleDelete(item)">删除</el-button>
           </div>
@@ -92,7 +128,14 @@
 
     <el-dialog v-model="detailVisible" :title="detailItem?.keyword || detailItem?.keyword_cluster || '情绪详情'" width="640px" destroy-on-close>
       <div v-if="detailItem" class="emotion-detail">
-        <el-descriptions :column="2" border>
+        <div class="detail-sentiment-bar" :class="'sentiment-' + (detailItem.sentiment || '').toLowerCase()">
+          <span class="sentiment-emoji">{{ sentimentEmoji(detailItem.sentiment) }}</span>
+          <span class="sentiment-text">{{ sentimentLabel(detailItem.sentiment) }}情绪</span>
+          <el-tag v-if="detailItem.trend_direction" :type="detailItem.trend_direction === 'rising' ? 'success' : detailItem.trend_direction === 'falling' ? 'danger' : 'info'" effect="dark" size="large">
+            {{ detailItem.trend_direction === 'rising' ? '上升趋势' : detailItem.trend_direction === 'falling' ? '下降趋势' : '稳定' }}
+          </el-tag>
+        </div>
+        <el-descriptions :column="2" border style="margin-top: var(--spacing-md);">
           <el-descriptions-item label="关键词">{{ detailItem.keyword || "-" }}</el-descriptions-item>
           <el-descriptions-item label="情绪倾向">
             <el-tag :type="sentimentTagType(detailItem.sentiment)" size="small">{{ sentimentLabel(detailItem.sentiment) }}</el-tag>
@@ -115,13 +158,7 @@
           </el-descriptions-item>
           <el-descriptions-item label="讨论量">{{ detailItem.volume ?? "-" }}</el-descriptions-item>
           <el-descriptions-item label="平台来源" v-if="detailItem.platform_source">{{ detailItem.platform_source }}</el-descriptions-item>
-          <el-descriptions-item label="趋势方向" v-if="detailItem.trend_direction">
-            <el-tag :type="detailItem.trend_direction === 'rising' ? 'success' : detailItem.trend_direction === 'falling' ? 'danger' : 'info'" size="small">
-              {{ detailItem.trend_direction === 'rising' ? '上升' : detailItem.trend_direction === 'falling' ? '下降' : '稳定' }}
-            </el-tag>
-          </el-descriptions-item>
           <el-descriptions-item label="情绪类型" v-if="detailItem.emotion_type">{{ detailItem.emotion_type }}</el-descriptions-item>
-          <el-descriptions-item label="原始强度" v-if="detailItem.intensity_raw">{{ detailItem.intensity_raw }}</el-descriptions-item>
         </el-descriptions>
 
         <div class="detail-section" v-if="detailItem.keyword_cluster?.length">
@@ -184,6 +221,17 @@ const pageSize = 12
 const detailItem = ref<EmotionItem | null>(null)
 const detailVisible = ref(false)
 
+function sentimentCount(s: string): number {
+  return items.value.filter(i => i.sentiment?.toLowerCase() === s).length
+}
+
+const avgIntensity = computed(() => {
+  const withIntensity = items.value.filter(i => i.intensity !== undefined)
+  if (!withIntensity.length) return 0
+  const sum = withIntensity.reduce((acc, i) => acc + (i.intensity || 0), 0)
+  return (sum / withIntensity.length * 100).toFixed(0)
+})
+
 const filteredItems = computed(() => {
   let result = items.value
   if (sentimentFilter.value) {
@@ -227,6 +275,11 @@ function sentimentLabel(s?: string): string {
   return map[s?.toLowerCase() || ""] || s || "未知"
 }
 
+function sentimentEmoji(s?: string): string {
+  const map: Record<string, string> = { positive: "😊", neutral: "😐", negative: "😟" }
+  return map[s?.toLowerCase() || ""] || "💭"
+}
+
 function openDetail(item: EmotionItem) {
   detailItem.value = item
   detailVisible.value = true
@@ -265,74 +318,106 @@ onMounted(async () => {
 .emotions-page { max-width: 1400px; }
 .page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-lg);
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--spacing-md);
 }
-.page-header h2 { margin: 0; font-size: 20px; }
-.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.loading-placeholder { padding: 16px; }
+.header-title-area h2 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--intel-text);
+}
+.header-subtitle {
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
+}
+.header-actions { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
+
+.emotion-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.emotion-stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius-lg);
+  background: var(--intel-surface);
+  box-shadow: var(--intel-shadow);
+  transition: all var(--transition-base);
+}
+.emotion-stat-item:hover {
+  box-shadow: var(--intel-shadow-hover);
+  transform: translateY(-2px);
+}
+.stat-icon { font-size: var(--font-size-xl); }
+.stat-num { font-size: var(--font-size-2xl); font-weight: 800; }
+.stat-text { font-size: var(--font-size-sm); color: var(--intel-text-secondary); }
+.stat-total .stat-num { color: var(--intel-primary); }
+.stat-positive .stat-num { color: var(--intel-success); }
+.stat-negative .stat-num { color: var(--intel-danger); }
+.stat-avg .stat-num { color: var(--intel-info); }
+
+.loading-placeholder { padding: var(--spacing-md); }
+
 .emotion-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 16px;
+  gap: var(--spacing-md);
 }
 .emotion-card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  background: var(--intel-surface);
+  border-radius: var(--intel-radius-lg);
+  box-shadow: var(--intel-shadow);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all var(--transition-base);
   overflow: hidden;
 }
 .emotion-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: var(--intel-shadow-hover);
 }
-.sentiment-bar {
-  height: 3px;
-  width: 100%;
+.emotion-card:hover .card-footer .card-action {
+  transform: translateX(4px);
 }
-.emotion-card.sentiment-positive .sentiment-bar { background: #059669; }
-.emotion-card.sentiment-neutral .sentiment-bar { background: #2563eb; }
-.emotion-card.sentiment-negative .sentiment-bar { background: #dc2626; }
-.emotion-card.sentiment-positive { border-left: 4px solid #059669; }
-.emotion-card.sentiment-neutral { border-left: 4px solid #2563eb; }
-.emotion-card.sentiment-negative { border-left: 4px solid #dc2626; }
-.card-body { padding: 16px 18px; }
+.sentiment-bar { height: 3px; width: 100%; }
+.emotion-card.sentiment-positive .sentiment-bar { background: var(--intel-success); }
+.emotion-card.sentiment-neutral .sentiment-bar { background: var(--intel-info); }
+.emotion-card.sentiment-negative .sentiment-bar { background: var(--intel-danger); }
+.emotion-card.sentiment-positive { border-left: 4px solid var(--intel-success); }
+.emotion-card.sentiment-neutral { border-left: 4px solid var(--intel-info); }
+.emotion-card.sentiment-negative { border-left: 4px solid var(--intel-danger); }
+.card-body { padding: var(--spacing-md) var(--spacing-lg); }
 .card-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: var(--spacing-md);
 }
 .keyword {
-  font-size: 15px;
+  font-size: var(--font-size-md);
   font-weight: 600;
-  color: #303133;
+  color: var(--intel-text);
 }
-.intensity-section {
-  margin-bottom: 12px;
-}
+.intensity-section { margin-bottom: var(--spacing-md); }
 .intensity-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 6px;
 }
-.intensity-label {
-  font-size: 12px;
-  color: #909399;
-}
-.intensity-val {
-  font-size: 14px;
-  font-weight: 700;
-}
+.intensity-label { font-size: var(--font-size-xs); color: var(--intel-text-secondary); }
+.intensity-val { font-size: var(--font-size-sm); font-weight: 700; }
 .intensity-track {
   height: 8px;
-  background: #e4e7ed;
+  background: var(--intel-border);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -346,23 +431,16 @@ onMounted(async () => {
   justify-content: space-between;
   margin-top: 4px;
   font-size: 10px;
-  color: #c0c4cc;
+  color: var(--intel-text-secondary);
 }
 .card-stats {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
 }
-.stat-label {
-  font-size: 12px;
-  color: #909399;
-}
-.stat-value {
-  font-size: 18px;
-  font-weight: 600;
-  color: #303133;
-}
+.stat-label { font-size: var(--font-size-xs); color: var(--intel-text-secondary); }
+.stat-value { font-size: var(--font-size-lg); font-weight: 600; color: var(--intel-text); }
 .card-keywords {
   display: flex;
   gap: 4px;
@@ -370,42 +448,65 @@ onMounted(async () => {
   margin-bottom: 6px;
   align-items: center;
 }
-.kw-label {
-  font-size: 12px;
-  color: #909399;
-}
+.kw-label { font-size: var(--font-size-xs); color: var(--intel-text-secondary); }
 .card-note {
-  font-size: 13px;
-  color: #606266;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
   line-height: 1.5;
   margin-top: 6px;
 }
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--spacing-sm);
+}
+.card-action {
+  font-size: var(--font-size-sm);
+  color: var(--intel-accent);
+  font-weight: 500;
+  transition: transform var(--transition-fast);
+}
 .card-actions {
-  margin-top: 8px;
+  margin-top: var(--spacing-sm);
   text-align: right;
 }
 .pagination-wrap {
-  margin-top: 24px;
+  margin-top: var(--spacing-xl);
   display: flex;
   justify-content: center;
 }
+
 .emotion-detail { padding: 0; }
+.detail-sentiment-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius-lg);
+}
+.detail-sentiment-bar.sentiment-positive { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); }
+.detail-sentiment-bar.sentiment-neutral { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); }
+.detail-sentiment-bar.sentiment-negative { background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); }
+.sentiment-emoji { font-size: 24px; }
+.sentiment-text { font-size: var(--font-size-md); font-weight: 600; color: var(--intel-text); flex: 1; }
 .detail-intensity {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-sm);
 }
 .detail-intensity .intensity-track {
   flex: 1;
   height: 10px;
 }
-.detail-section { margin-top: 20px; }
+.detail-section { margin-top: var(--spacing-lg); }
 .detail-section h4 {
-  font-size: 14px;
-  color: #303133;
-  margin-bottom: 10px;
+  font-size: var(--font-size-md);
+  color: var(--intel-text);
+  margin-bottom: var(--spacing-sm);
   padding-bottom: 6px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 2px solid var(--intel-border-light);
+  font-weight: 600;
 }
 .tag-list {
   display: flex;
@@ -413,17 +514,22 @@ onMounted(async () => {
   flex-wrap: wrap;
 }
 .text-block {
-  font-size: 13px;
-  color: #606266;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
   line-height: 1.8;
-  background: #f8f9fa;
-  padding: 12px;
-  border-radius: 6px;
+  background: var(--intel-bg);
+  padding: var(--spacing-md);
+  border-radius: var(--intel-radius);
 }
 .text-block.highlight {
   background: #ecfdf5;
-  color: #303133;
+  color: var(--intel-text);
   font-weight: 500;
-  border-left: 3px solid #059669;
+  border-left: 3px solid var(--intel-success);
+}
+
+@media (max-width: 768px) {
+  .emotion-stats { grid-template-columns: repeat(2, 1fr); }
+  .emotion-grid { grid-template-columns: 1fr; }
 }
 </style>

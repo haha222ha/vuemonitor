@@ -462,3 +462,30 @@ class TestFeatureGateMiddleware:
         from shared.constants.feature_gates import PLAN_LIMITS
         for plan in ["free", "pro", "premium", "enterprise"]:
             assert "aipicDailyLimit" in PLAN_LIMITS[plan], f"aipicDailyLimit missing for {plan}"
+
+
+class TestEmailService:
+    @pytest.mark.asyncio
+    async def test_verification_code_dev_fallback_when_smtp_unconfigured(self, monkeypatch):
+        from app.services.email_service import EmailService
+
+        service = EmailService()
+        monkeypatch.setattr(service.settings, "SMTP_HOST", "")
+        monkeypatch.setattr(service.settings, "SMTP_USER", "")
+        monkeypatch.setattr(service.settings, "SMTP_PASSWORD", "")
+
+        sent = await service.send_email_verification_code("user@example.com", "123456")
+        assert sent is False
+
+    @pytest.mark.asyncio
+    async def test_password_reset_enqueues_when_smtp_configured(self, monkeypatch):
+        from app.services.email_service import EmailService
+
+        service = EmailService()
+        monkeypatch.setattr(service.settings, "SMTP_HOST", "smtp.example.com")
+        monkeypatch.setattr(service.settings, "SMTP_USER", "user")
+        monkeypatch.setattr(service.settings, "SMTP_PASSWORD", "secret")
+
+        queued = await service.send_password_reset_code("user@example.com", "654321")
+        assert queued is True
+        assert service._queue.qsize() == 1

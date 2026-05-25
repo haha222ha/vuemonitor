@@ -3,12 +3,16 @@
     <div v-if="loading" class="loading-wrap">
       <el-skeleton :rows="12" animated />
     </div>
-    <el-empty v-else-if="!topicData" description="未找到选题数据" />
+    <div v-else-if="!topicData" class="intel-empty-state">
+      <div class="intel-empty-state-icon">📄</div>
+      <div class="intel-empty-state-text">未找到选题数据</div>
+      <div class="intel-empty-state-action">请返回选题库重新选择</div>
+    </div>
     <div v-else class="report-content" :style="cssVars">
 
       <div class="report-toolbar">
-        <el-button text @click="$router.back()">
-          <el-icon><ArrowLeft /></el-icon> 返回
+        <el-button text @click="$router.back()" class="back-btn">
+          <el-icon><ArrowLeft /></el-icon> 返回选题库
         </el-button>
         <div class="toolbar-actions">
           <el-button size="small" @click="doExportJSON">导出JSON</el-button>
@@ -22,15 +26,17 @@
       </div>
 
       <div class="intel-report-cover" :class="coverGradientClass">
-        <div class="cover-badge">
-          <el-tag effect="dark" round>{{ theme.emoji }} {{ theme.name }}</el-tag>
-        </div>
-        <h1 class="cover-title">{{ topicData.title || item?.title }}</h1>
-        <div class="cover-meta">
-          <span v-if="topicData.platform">{{ topicData.platform }}</span>
-          <span v-if="topicData.content_type">{{ topicData.content_type }}</span>
-          <span v-if="topicData.hook_type">{{ topicData.hook_type }}</span>
-          <span v-if="topicData.lifecycle_stage">{{ topicData.lifecycle_stage }}</span>
+        <div class="cover-inner">
+          <div class="cover-badge">
+            <el-tag effect="dark" round>{{ theme.emoji }} {{ theme.name }}</el-tag>
+          </div>
+          <h1 class="cover-title">{{ topicData.title || item?.title }}</h1>
+          <div class="cover-meta">
+            <span v-if="topicData.platform" class="meta-chip">{{ topicData.platform }}</span>
+            <span v-if="topicData.content_type" class="meta-chip">{{ topicData.content_type }}</span>
+            <span v-if="topicData.hook_type" class="meta-chip">{{ topicData.hook_type }}</span>
+            <span v-if="topicData.lifecycle_stage" class="meta-chip">{{ topicData.lifecycle_stage }}</span>
+          </div>
         </div>
         <div class="cover-score" v-if="topicData.opportunity_score">
           <div class="score-ring">
@@ -156,7 +162,7 @@
         <div class="intel-report-section-title">⚠️ 风险评估</div>
         <div class="risk-warnings" v-if="topicData.risk_warnings?.length">
           <div v-for="(rw, idx) in topicData.risk_warnings" :key="idx" class="intel-risk-card">
-            <el-icon style="color: #dc2626; margin-right: 8px"><WarningFilled /></el-icon>
+            <el-icon style="color: var(--intel-danger); margin-right: 8px"><WarningFilled /></el-icon>
             {{ rw }}
           </div>
         </div>
@@ -356,24 +362,39 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--spacing-lg);
 }
-.toolbar-actions { display: flex; gap: 8px; }
+.back-btn { font-weight: 500; }
+.toolbar-actions { display: flex; gap: var(--spacing-sm); }
 
-.cover-badge { margin-bottom: 16px; }
+.intel-report-cover {
+  position: relative;
+  border-radius: var(--intel-radius-xl);
+  padding: var(--spacing-2xl) var(--spacing-xl);
+  color: #fff;
+  margin-bottom: var(--spacing-2xl);
+  overflow: hidden;
+}
+.cover-inner { position: relative; z-index: 1; }
+.cover-badge { margin-bottom: var(--spacing-md); }
 .cover-title {
-  font-size: 32px;
+  font-size: var(--font-size-3xl);
   font-weight: 800;
   line-height: 1.3;
-  margin-bottom: 16px;
+  margin-bottom: var(--spacing-md);
   letter-spacing: -0.5px;
 }
 .cover-meta {
   display: flex;
-  gap: 12px;
-  font-size: 14px;
-  opacity: 0.8;
+  gap: var(--spacing-sm);
   flex-wrap: wrap;
+}
+.meta-chip {
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(4px);
+  font-size: var(--font-size-sm);
 }
 .cover-score {
   position: absolute;
@@ -393,22 +414,35 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(4px);
 }
-.score-num { font-size: 28px; font-weight: 800; }
-.score-unit { font-size: 12px; opacity: 0.7; }
+.score-num { font-size: var(--font-size-2xl); font-weight: 800; }
+.score-unit { font-size: var(--font-size-xs); opacity: 0.7; }
+
+.intel-report-section {
+  margin-bottom: var(--spacing-xl);
+  animation: fade-in 0.4s ease both;
+}
+.intel-report-section-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--intel-text);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--intel-border-light);
+}
 
 .summary-text {
-  font-size: 15px;
+  font-size: var(--font-size-md);
   line-height: 1.8;
-  color: #303133;
-  background: #f8f9fa;
-  padding: 16px 20px;
-  border-radius: 8px;
+  color: var(--intel-text);
+  background: var(--intel-bg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius);
   border-left: 4px solid var(--domain-accent);
 }
 
 .score-overview {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-lg);
 }
 .score-big {
   font-size: 56px;
@@ -416,18 +450,18 @@ onMounted(async () => {
   line-height: 1;
 }
 .score-label {
-  font-size: 14px;
-  color: #909399;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
   margin-top: 4px;
 }
 .score-bars-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: var(--spacing-md);
 }
 .score-bar-item {
-  background: #f8f9fa;
-  border-radius: 8px;
+  background: var(--intel-bg);
+  border-radius: var(--intel-radius);
   padding: 10px 14px;
 }
 .score-bar-header {
@@ -435,11 +469,11 @@ onMounted(async () => {
   justify-content: space-between;
   margin-bottom: 6px;
 }
-.score-bar-key { font-size: 13px; color: #606266; }
-.score-bar-val { font-size: 13px; font-weight: 700; }
+.score-bar-key { font-size: var(--font-size-sm); color: var(--intel-text-secondary); }
+.score-bar-val { font-size: var(--font-size-sm); font-weight: 700; }
 .score-bar-track {
   height: 6px;
-  background: #e4e7ed;
+  background: var(--intel-border);
   border-radius: 3px;
   overflow: hidden;
 }
@@ -452,108 +486,121 @@ onMounted(async () => {
 .decision-meta {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
 }
-.decision-sub { font-size: 16px; color: #606266; font-weight: 500; }
+.decision-sub { font-size: var(--font-size-md); color: var(--intel-text-secondary); font-weight: 500; }
 .persona-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
+  gap: var(--spacing-md);
 }
-.persona-tag { margin-bottom: 10px; }
+.intel-persona-card {
+  background: var(--intel-surface);
+  border-radius: var(--intel-radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  box-shadow: var(--intel-shadow);
+  transition: all var(--transition-base);
+}
+.intel-persona-card:hover {
+  box-shadow: var(--intel-shadow-hover);
+}
+.persona-tag { margin-bottom: var(--spacing-sm); }
 .persona-field {
-  font-size: 13px;
-  color: #606266;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
   line-height: 1.6;
   padding: 6px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--intel-border-light);
 }
 .persona-field:last-child { border-bottom: none; }
 .pf-label {
-  color: #909399;
+  color: var(--intel-text-secondary);
   font-weight: 500;
-  margin-right: 8px;
-  font-size: 12px;
+  margin-right: var(--spacing-sm);
+  font-size: var(--font-size-xs);
 }
-.pf-value { color: #303133; }
+.pf-value { color: var(--intel-text); }
 .persona-field.highlight {
   background: #ecfdf5;
-  border-radius: 6px;
+  border-radius: var(--intel-radius);
   padding: 8px 10px;
-  color: #099268;
+  color: var(--intel-success);
   font-weight: 500;
   border-bottom: none;
 }
 .persona-field.warn {
   background: #fef2f2;
-  border-radius: 6px;
+  border-radius: var(--intel-radius);
   padding: 8px 10px;
-  color: #dc2626;
+  color: var(--intel-danger);
   border-bottom: none;
 }
 
 .psychology-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: var(--spacing-md);
 }
 .psy-card {
-  border-radius: 10px;
-  padding: 18px;
+  border-radius: var(--intel-radius-lg);
+  padding: var(--spacing-lg);
   text-align: center;
+  transition: all var(--transition-base);
 }
+.psy-card:hover { transform: translateY(-2px); }
 .psy-card.anxiety { background: #fef2f2; border: 1px solid #fecaca; }
 .psy-card.desire { background: #ecfdf5; border: 1px solid #a7f3d0; }
 .psy-card.fear { background: #fdf6ec; border: 1px solid #fde68a; }
 .psy-card.driver { background: #eff6ff; border: 1px solid #bfdbfe; }
 .psy-icon { font-size: 28px; margin-bottom: 6px; }
-.psy-label { font-size: 12px; color: #909399; margin-bottom: 6px; }
-.psy-value { font-size: 14px; color: #303133; line-height: 1.6; }
+.psy-label { font-size: var(--font-size-xs); color: var(--intel-text-secondary); margin-bottom: 6px; }
+.psy-value { font-size: var(--font-size-sm); color: var(--intel-text); line-height: 1.6; }
 
 .paths-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: var(--spacing-sm);
 }
 .intel-path-card {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
 }
 .path-index {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #059669;
+  background: var(--intel-success);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   flex-shrink: 0;
 }
 .path-content { flex: 1; }
-.path-type { font-weight: 700; color: #059669; margin-bottom: 4px; }
-.path-desc { font-size: 14px; color: #303133; line-height: 1.6; }
-.path-price { font-size: 13px; color: #d97706; margin-top: 4px; }
+.path-type { font-weight: 700; color: var(--intel-success); margin-bottom: 4px; }
+.path-desc { font-size: var(--font-size-sm); color: var(--intel-text); line-height: 1.6; }
+.path-price { font-size: var(--font-size-sm); color: var(--intel-warning); margin-top: 4px; }
 
 .angles-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 .angle-item {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-md);
   align-items: flex-start;
-  font-size: 14px;
-  color: #303133;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text);
   line-height: 1.6;
-  padding: 8px 12px;
-  background: #f8f9fa;
-  border-radius: 6px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--intel-bg);
+  border-radius: var(--intel-radius);
 }
 .angle-num {
   width: 24px;
@@ -564,7 +611,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   flex-shrink: 0;
 }
@@ -573,65 +620,82 @@ onMounted(async () => {
 .risk-warnings {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
 }
 .intel-risk-card {
   display: flex;
   align-items: center;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
+  background: #fef2f2;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--intel-radius);
 }
 .risk-matrix {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: var(--spacing-md);
 }
 .rm-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: #f8f9fa;
-  border-radius: 6px;
+  gap: var(--spacing-sm);
+  background: var(--intel-bg);
+  border-radius: var(--intel-radius);
   padding: 10px 14px;
 }
-.rm-label { font-size: 13px; color: #606266; min-width: 70px; }
+.rm-label { font-size: var(--font-size-sm); color: var(--intel-text-secondary); min-width: 70px; }
 .rm-stars { display: flex; gap: 1px; }
 .rm-star {
-  font-size: 12px;
-  color: #e4e7ed;
+  font-size: var(--font-size-xs);
+  color: var(--intel-border);
   transition: color 0.2s;
 }
-.rm-star.active { color: #d97706; }
-.rm-val { font-size: 13px; font-weight: 700; color: #303133; }
+.rm-star.active { color: var(--intel-warning); }
+.rm-val { font-size: var(--font-size-sm); font-weight: 700; color: var(--intel-text); }
 
-.lifecycle-status { margin-bottom: 16px; }
+.lifecycle-status { margin-bottom: var(--spacing-md); }
 .lifecycle-timeline {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
+.intel-timeline-item {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 3px solid var(--domain-accent);
+  margin-left: 8px;
+  margin-bottom: var(--spacing-sm);
+}
 .tl-key {
-  font-size: 12px;
-  color: #909399;
+  font-size: var(--font-size-xs);
+  color: var(--intel-text-secondary);
   font-weight: 500;
 }
 .tl-val {
-  font-size: 14px;
-  color: #303133;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text);
   line-height: 1.6;
 }
 
 .tags-wrap {
   display: flex;
-  gap: 8px;
+  gap: var(--spacing-sm);
   flex-wrap: wrap;
 }
 .audience-text {
-  font-size: 14px;
-  color: #303133;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text);
   line-height: 1.8;
-  background: #f8f9fa;
-  padding: 14px 18px;
-  border-radius: 8px;
+  background: var(--intel-bg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius);
+}
+
+@media (max-width: 768px) {
+  .cover-score { position: static; transform: none; margin-top: var(--spacing-md); }
+  .score-bars-grid { grid-template-columns: 1fr; }
+  .psychology-grid { grid-template-columns: 1fr; }
+  .risk-matrix { grid-template-columns: 1fr; }
+  .cover-title { font-size: var(--font-size-2xl); }
 }
 </style>

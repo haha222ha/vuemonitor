@@ -1,7 +1,10 @@
 <template>
   <div class="trends-page">
     <div class="page-header">
-      <h2>趋势分析</h2>
+      <div class="header-title-area">
+        <h2>趋势分析</h2>
+        <p class="header-subtitle" v-if="items.length">追踪互联网商业趋势变化，发现增长机会</p>
+      </div>
       <div class="header-actions">
         <el-select v-model="platformFilter" placeholder="平台筛选" clearable size="small" style="width: 140px">
           <el-option label="全部平台" value="" />
@@ -14,11 +17,38 @@
       </div>
     </div>
 
+    <div class="trend-stats" v-if="items.length">
+      <div class="trend-stat-item stat-rising">
+        <span class="stat-icon">↑</span>
+        <span class="stat-num">{{ directionCount('rising') }}</span>
+        <span class="stat-text">上升趋势</span>
+      </div>
+      <div class="trend-stat-item stat-stable">
+        <span class="stat-icon">→</span>
+        <span class="stat-num">{{ directionCount('stable') }}</span>
+        <span class="stat-text">稳定趋势</span>
+      </div>
+      <div class="trend-stat-item stat-falling">
+        <span class="stat-icon">↓</span>
+        <span class="stat-num">{{ directionCount('falling') }}</span>
+        <span class="stat-text">下降趋势</span>
+      </div>
+      <div class="trend-stat-item stat-total">
+        <span class="stat-icon">📊</span>
+        <span class="stat-num">{{ items.length }}</span>
+        <span class="stat-text">总趋势数</span>
+      </div>
+    </div>
+
     <div v-if="loading" class="loading-placeholder">
       <el-skeleton :rows="8" animated />
     </div>
-    <el-empty v-else-if="!items.length" description="暂无趋势数据" />
-    <div v-else class="trend-grid">
+    <div v-else-if="!items.length" class="intel-empty-state">
+      <div class="intel-empty-state-icon">📈</div>
+      <div class="intel-empty-state-text">暂无趋势数据</div>
+      <div class="intel-empty-state-action">数据更新后将自动展示</div>
+    </div>
+    <div v-else class="trend-grid intel-card-stagger">
       <div
         v-for="item in filteredItems"
         :key="item.id"
@@ -33,7 +63,7 @@
               <span class="dir-icon">{{ getDirectionIcon(item.direction) }}</span>
               <span class="dir-text">{{ getDirectionLabel(item.direction) }}</span>
             </div>
-            <div class="score-badge" :style="{ color: getScoreColor(item.opportunity_score) }">
+            <div class="score-badge" :style="{ color: getScoreColor(item.opportunity_score), borderColor: getScoreColor(item.opportunity_score) + '30' }">
               {{ item.opportunity_score }}
             </div>
           </div>
@@ -51,7 +81,11 @@
             <el-tag :type="riskType(item.risk_level)" size="small" effect="dark">风险：{{ item.risk_level }}</el-tag>
           </div>
           <div class="card-insight" v-if="item.actionable_insight">
+            <span class="insight-icon">💡</span>
             {{ truncate(item.actionable_insight, 60) }}
+          </div>
+          <div class="card-footer">
+            <span class="card-action">查看详情 →</span>
           </div>
         </div>
       </div>
@@ -69,18 +103,22 @@
       />
     </div>
 
-    <el-dialog v-model="detailVisible" :title="detailItem?.title" width="720px" destroy-on-close>
+    <el-dialog v-model="detailVisible" :title="detailItem?.title" width="720px" destroy-on-close class="trend-dialog">
       <div v-if="detailItem" class="trend-detail">
+        <div class="detail-header-bar" :class="'dir-' + (detailItem.direction || '').toLowerCase()">
+          <div class="detail-dir-badge">
+            <span>{{ getDirectionIcon(detailItem.direction) }}</span>
+            <span>{{ getDirectionLabel(detailItem.direction) }}</span>
+          </div>
+          <div class="detail-score-big" :style="{ color: getScoreColor(detailItem.opportunity_score) }">
+            {{ detailItem.opportunity_score }}<span class="score-unit">分</span>
+          </div>
+        </div>
+
         <el-descriptions :column="2" border>
           <el-descriptions-item label="分类">{{ detailItem.category }}</el-descriptions-item>
           <el-descriptions-item label="平台">{{ detailItem.platform }}</el-descriptions-item>
-          <el-descriptions-item label="机会评分">
-            <el-tag :type="scoreType(detailItem.opportunity_score)">{{ detailItem.opportunity_score }}分</el-tag>
-          </el-descriptions-item>
           <el-descriptions-item label="生命周期">{{ detailItem.lifecycle }}</el-descriptions-item>
-          <el-descriptions-item label="趋势方向">
-            <el-tag :type="directionType(detailItem.direction)">{{ getDirectionLabel(detailItem.direction) }}</el-tag>
-          </el-descriptions-item>
           <el-descriptions-item label="竞争度">{{ detailItem.competition }}</el-descriptions-item>
           <el-descriptions-item label="风险等级">
             <el-tag :type="riskType(detailItem.risk_level)">{{ detailItem.risk_level }}</el-tag>
@@ -91,22 +129,22 @@
         </el-descriptions>
 
         <div class="detail-section" v-if="detailItem.evidence">
-          <h4>证据</h4>
+          <h4>📋 证据</h4>
           <div class="text-block">{{ detailItem.evidence }}</div>
         </div>
 
         <div class="detail-section" v-if="detailItem.actionable_insight">
-          <h4>行动建议</h4>
+          <h4>💡 行动建议</h4>
           <div class="text-block highlight">{{ detailItem.actionable_insight }}</div>
         </div>
 
         <div class="detail-section" v-if="detailItem.risk_note">
-          <h4>风险备注</h4>
+          <h4>⚠️ 风险备注</h4>
           <el-alert :title="detailItem.risk_note" type="warning" :closable="false" show-icon />
         </div>
 
         <div class="detail-section" v-if="detailItem.affected_opportunities?.length">
-          <h4>关联机会</h4>
+          <h4>🔗 关联机会</h4>
           <div class="tag-list">
             <el-tag v-for="(opp, idx) in detailItem.affected_opportunities" :key="idx" size="small" type="success">
               {{ typeof opp === 'string' ? opp : (opp as Record<string, unknown>).name || JSON.stringify(opp) }}
@@ -157,6 +195,10 @@ const currentPage = ref(1)
 const pageSize = 12
 const detailItem = ref<TrendItem | null>(null)
 const detailVisible = ref(false)
+
+function directionCount(dir: string): number {
+  return items.value.filter(i => (i.direction || '').toLowerCase() === dir).length
+}
 
 const filteredItems = computed(() => {
   let result = items.value
@@ -237,43 +279,87 @@ onMounted(async () => {
 .trends-page { max-width: 1400px; }
 .page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: var(--spacing-lg);
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--spacing-md);
 }
-.page-header h2 { margin: 0; font-size: 20px; }
-.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.loading-placeholder { padding: 16px; }
+.header-title-area h2 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--intel-text);
+}
+.header-subtitle {
+  margin: var(--spacing-xs) 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
+}
+.header-actions { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; }
+
+.trend-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+.trend-stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius-lg);
+  background: var(--intel-surface);
+  box-shadow: var(--intel-shadow);
+  transition: all var(--transition-base);
+}
+.trend-stat-item:hover {
+  box-shadow: var(--intel-shadow-hover);
+  transform: translateY(-2px);
+}
+.stat-icon { font-size: var(--font-size-xl); }
+.stat-num { font-size: var(--font-size-2xl); font-weight: 800; }
+.stat-text { font-size: var(--font-size-sm); color: var(--intel-text-secondary); }
+.stat-rising .stat-num { color: var(--intel-success); }
+.stat-rising .stat-icon { color: var(--intel-success); }
+.stat-stable .stat-num { color: var(--intel-info); }
+.stat-stable .stat-icon { color: var(--intel-info); }
+.stat-falling .stat-num { color: var(--intel-danger); }
+.stat-falling .stat-icon { color: var(--intel-danger); }
+.stat-total .stat-num { color: var(--intel-primary); }
+.stat-total .stat-icon { color: var(--intel-primary); }
+
+.loading-placeholder { padding: var(--spacing-md); }
+
 .trend-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 16px;
+  gap: var(--spacing-md);
 }
 .trend-card {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  background: var(--intel-surface);
+  border-radius: var(--intel-radius-lg);
+  box-shadow: var(--intel-shadow);
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all var(--transition-base);
   overflow: hidden;
 }
 .trend-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+  box-shadow: var(--intel-shadow-hover);
 }
-.trend-dir-bar {
-  height: 3px;
-  width: 100%;
+.trend-card:hover .card-footer .card-action {
+  transform: translateX(4px);
 }
-.trend-card.dir-rising .trend-dir-bar { background: #059669; }
-.trend-card.dir-stable .trend-dir-bar { background: #2563eb; }
-.trend-card.dir-falling .trend-dir-bar { background: #dc2626; }
-.trend-card.dir-rising { border-left: 4px solid #059669; }
-.trend-card.dir-stable { border-left: 4px solid #2563eb; }
-.trend-card.dir-falling { border-left: 4px solid #dc2626; }
-.card-body { padding: 16px 18px; }
+.trend-dir-bar { height: 3px; width: 100%; }
+.trend-card.dir-rising .trend-dir-bar { background: var(--intel-success); }
+.trend-card.dir-stable .trend-dir-bar { background: var(--intel-info); }
+.trend-card.dir-falling .trend-dir-bar { background: var(--intel-danger); }
+.trend-card.dir-rising { border-left: 4px solid var(--intel-success); }
+.trend-card.dir-stable { border-left: 4px solid var(--intel-info); }
+.trend-card.dir-falling { border-left: 4px solid var(--intel-danger); }
+.card-body { padding: var(--spacing-md) var(--spacing-lg); }
 .card-top-row {
   display: flex;
   align-items: center;
@@ -286,21 +372,24 @@ onMounted(async () => {
   gap: 4px;
   padding: 4px 10px;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 600;
 }
-.dir-indicator.dir-rising { background: #ecfdf5; color: #059669; }
-.dir-indicator.dir-stable { background: #eff6ff; color: #2563eb; }
-.dir-indicator.dir-falling { background: #fef2f2; color: #dc2626; }
-.dir-icon { font-size: 14px; }
+.dir-indicator.dir-rising { background: #ecfdf5; color: var(--intel-success); }
+.dir-indicator.dir-stable { background: #eff6ff; color: var(--intel-info); }
+.dir-indicator.dir-falling { background: #fef2f2; color: var(--intel-danger); }
+.dir-icon { font-size: var(--font-size-md); }
 .score-badge {
-  font-size: 24px;
+  font-size: var(--font-size-2xl);
   font-weight: 800;
+  padding: 2px 10px;
+  border-radius: var(--intel-radius);
+  border: 2px solid;
 }
 .card-title {
-  font-size: 15px;
+  font-size: var(--font-size-md);
   font-weight: 600;
-  color: #303133;
+  color: var(--intel-text);
   margin-bottom: 10px;
   line-height: 1.5;
 }
@@ -308,56 +397,109 @@ onMounted(async () => {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  margin-bottom: 8px;
+  margin-bottom: var(--spacing-sm);
 }
 .card-extra {
-  font-size: 12px;
-  color: #909399;
+  font-size: var(--font-size-sm);
+  color: var(--intel-text-secondary);
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-md);
   margin-bottom: 6px;
 }
 .card-risk { margin-top: 4px; }
 .card-insight {
-  font-size: 12px;
-  color: #2563eb;
+  font-size: var(--font-size-sm);
+  color: var(--intel-info);
   margin-top: 6px;
   line-height: 1.5;
   background: #eff6ff;
-  padding: 8px 10px;
-  border-radius: 6px;
+  padding: var(--spacing-sm) 10px;
+  border-radius: var(--intel-radius);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.insight-icon { flex-shrink: 0; }
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--spacing-sm);
+}
+.card-action {
+  font-size: var(--font-size-sm);
+  color: var(--intel-accent);
+  font-weight: 500;
+  transition: transform var(--transition-fast);
 }
 .pagination-wrap {
-  margin-top: 24px;
+  margin-top: var(--spacing-lg);
   display: flex;
   justify-content: center;
 }
+
 .trend-detail { padding: 0; }
-.detail-section { margin-top: 20px; }
+.detail-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--intel-radius-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.detail-header-bar.dir-rising { background: linear-gradient(135deg, #ecfdf5 0%, #f0f9eb 100%); }
+.detail-header-bar.dir-stable { background: linear-gradient(135deg, #eff6ff 0%, #f0f5ff 100%); }
+.detail-header-bar.dir-falling { background: linear-gradient(135deg, #fef2f2 0%, #fff5f5 100%); }
+.detail-dir-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+}
+.detail-header-bar.dir-rising .detail-dir-badge { color: var(--intel-success); }
+.detail-header-bar.dir-stable .detail-dir-badge { color: var(--intel-info); }
+.detail-header-bar.dir-falling .detail-dir-badge { color: var(--intel-danger); }
+.detail-score-big {
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+}
+.score-unit { font-size: var(--font-size-base); font-weight: 400; opacity: 0.6; margin-left: 2px; }
+
+.detail-section { margin-top: var(--spacing-lg); }
 .detail-section h4 {
-  font-size: 14px;
-  color: #303133;
+  font-size: var(--font-size-md);
+  color: var(--intel-text);
   margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--intel-border-light);
+  font-weight: 600;
 }
 .text-block {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   color: #606266;
   line-height: 1.8;
   background: #f8f9fa;
-  padding: 12px;
-  border-radius: 6px;
+  padding: var(--spacing-md);
+  border-radius: var(--intel-radius);
 }
 .text-block.highlight {
   background: #ecfdf5;
-  color: #303133;
+  color: var(--intel-text);
   font-weight: 500;
-  border-left: 3px solid #059669;
+  border-left: 3px solid var(--intel-success);
 }
 .tag-list {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .trend-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .trend-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

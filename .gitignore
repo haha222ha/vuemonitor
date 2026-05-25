@@ -23,6 +23,7 @@ build/
 
 # Node
 node_modules/
+**/.vite/
 
 # IDE
 .idea/

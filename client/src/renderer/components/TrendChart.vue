@@ -15,7 +15,13 @@
     </div>
 
     <div class="chart-content">
-      <div ref="chartRef" class="main-chart" />
+      <div class="main-chart-wrap">
+        <div ref="chartRef" class="main-chart" />
+        <div v-if="!hasChartData" class="chart-empty">
+          <span>暂无趋势数据</span>
+          <span class="chart-empty-hint">添加商品并采集后，将在此展示趋势曲线</span>
+        </div>
+      </div>
 
       <div class="anomaly-panel">
         <h4 class="panel-title">异常点检测</h4>
@@ -60,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, nextTick } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { CircleCheck } from "@element-plus/icons-vue";
 import * as echarts from "echarts";
 
@@ -95,7 +101,11 @@ const timeTabs = [
   { label: "90天", value: "90d" },
 ];
 
-const anomalies = ref<Anomaly[]>(props.anomalies || []);
+const hasChartData = computed(
+  () => Array.isArray(props.data) && props.data.length > 0
+);
+
+const anomalies = ref<Anomaly[]>(props.anomalies ?? []);
 
 const sparklineMetrics = ref<SparklineMetric[]>([
   { key: "sales", label: "销售额", value: "¥125,680", trend: 12.5, data: [120, 132, 125, 148, 138, 156, 142, 168, 155, 172, 160, 185, 170, 195] },
@@ -133,10 +143,14 @@ function formatDateTime(timeStr: string): string {
 }
 
 function initMainChart() {
-  if (!chartRef.value) return;
+  if (!chartRef.value || !hasChartData.value) {
+    mainChart?.dispose();
+    mainChart = null;
+    return;
+  }
 
   mainChart = echarts.init(chartRef.value);
-  const chartData = props.data || generateMockData();
+  const chartData = props.data!;
 
   const option: echarts.EChartsOption = {
     tooltip: {
@@ -262,28 +276,6 @@ function initMainChart() {
   mainChart.setOption(option);
 }
 
-function generateMockData() {
-  const data: { time: string; value: number }[] = [];
-  const now = new Date();
-  for (let i = 13; i >= 0; i--) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-    const time = date.toLocaleDateString("zh-CN", {
-      month: "2-digit",
-      day: "2-digit",
-    });
-    const baseValue = 500 + Math.random() * 300;
-    let value = baseValue;
-    
-    if (i === 5) value = baseValue * 1.8;
-    if (i === 8) value = baseValue * 0.4;
-    if (i === 10) value = baseValue * 1.5;
-    
-    data.push({ time, value: Math.round(value) });
-  }
-  return data;
-}
-
 function generateAnomalyMarkPoints() {
   return anomalies.value.map((a) => ({
     name: a.type,
@@ -358,15 +350,24 @@ function handleResize() {
   Object.values(sparklineCharts.value).forEach((chart) => chart?.resize());
 }
 
-onMounted(() => {
-  if (!props.data) {
-    anomalies.value = [
-      { time: "05/15 14:30", type: "spike", value: "+180%", description: "销售额异常飙升" },
-      { time: "05/12 09:15", type: "drop", value: "-60%", description: "订单量骤降" },
-      { time: "05/10 20:00", type: "anomaly", value: "异常", description: "检测到异常波动" },
-    ];
-  }
+watch(
+  () => props.anomalies,
+  (value) => {
+    anomalies.value = value ?? [];
+    refreshChart();
+  },
+  { deep: true }
+);
 
+watch(
+  () => props.data,
+  () => {
+    refreshChart();
+  },
+  { deep: true }
+);
+
+onMounted(() => {
   nextTick(() => {
     initMainChart();
     sparklineMetrics.value.forEach((metric) => {
@@ -441,6 +442,32 @@ watch(activeTab, () => {
 .chart-content {
   display: flex;
   gap: 16px;
+}
+
+.main-chart-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 280px;
+}
+
+.chart-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #909399;
+  font-size: 14px;
+  background: #fafafa;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.chart-empty-hint {
+  font-size: 12px;
+  color: #c0c4cc;
 }
 
 .main-chart {
