@@ -1,0 +1,137 @@
+{
+  "topic_id": "T20260525010",
+  "generated_at": "2026-05-25",
+  "status": "fresh",
+  "freshness_score": 1.0,
+  "source": {
+    "prompt_id": "十",
+    "prompt_name": "决策场景分类与选题映射",
+    "data_basis": "2026年5月小红书AI效率工具笔记增长+110%，职场人AI提效需求井喷",
+    "converted_by": "九、输出格式规范"
+  },
+  "category": "职业决策",
+  "topic_name": "AI职场提效：8个让打工人每天省2小时的AI工作流实战方案",
+  "topic_description": "AI工具能让职场效率提升3-5倍，但多数人只会聊天不会搭建工作流，不知道如何系统化地将AI融入日常工作",
+  "keywords": ["AI提效", "职场AI", "AI工作流", "效率工具", "AI办公"],
+  "target_platform": ["小红书", "抖音", "B站", "知乎"],
+  "target_audience": "上班族、项目经理、行政人员、数据分析师",
+  "opportunity_score": 84,
+  "priority_score": 140.0,
+  "score_breakdown": {
+    "traffic_growth": 9,
+    "willingness_to_pay": 8,
+    "competition_level": 6,
+    "platform_support": 8,
+    "ai_scalability": 8,
+    "virtual_product_fit": 9,
+    "anxiety_intensity": 8,
+    "lifecycle": 8,
+    "low_cost_entry": 9,
+    "ordinary_person_fit": 9
+  },
+  "lifecycle_stage": "爆发期",
+  "lifecycle_prediction": {
+    "30_days": "AI提效教程持续霸榜，职场人学习热情高涨",
+    "90_days": "企业开始要求员工掌握AI工具，AI能力成为招聘加分项",
+    "180_days": "AI提效成为职场标配技能，不会用AI的人效率差距明显"
+  },
+  "decision_layer": {
+    "core_decision_type": "职业",
+    "decision_domain": "职场发展",
+    "sub_scenario": "AI职场提效",
+    "persona_decision_map": [
+      {
+        "persona": "重复性工作多的上班族",
+        "current_state": "每天被报表/邮件/会议纪要等重复工作占据大量时间",
+        "decision_pressure": "加班多效率低，想用AI提效但不知道怎么系统化",
+        "recommended_direction": "从最耗时的3个重复任务开始，逐一用AI工作流替代",
+        "why_now": "AI工具成熟度快速提升，职场提效案例越来越多",
+        "avoid_mistake": "不要试图一次性改造所有工作，先从最痛的点开始"
+      },
+      {
+        "persona": "管理者/项目经理",
+        "current_state": "团队效率低，想引入AI但不知道怎么落地",
+        "decision_pressure": "竞争对手已经在用AI提效，不跟进就会被淘汰",
+        "recommended_direction": "先自己掌握AI工作流，再逐步推广到团队",
+        "why_now": "AI提效ROI明确，1小时学习可节省每天2小时",
+        "avoid_mistake": "不要强制团队使用AI，要让他们看到效果后自愿采用"
+      }
+    ],
+    "decision_time_window": "窗口期6-12个月",
+    "seasonal_peak": "全年（年底总结/年初规划需求更大）"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "high",
+    "compatibility_score": 90,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI职场提效实战指南",
+        "content_type": "虚拟产品",
+        "target_platform": ["小红书", "知乎"],
+        "content_angles": [
+          "认知反差：用AI的打工人每天省2小时，不用AI的还在加班",
+          "8个AI工作流：从邮件到报表，逐一用AI替代重复工作"
+        ],
+        "viral_hook": "8个AI工作流让打工人每天省2小时",
+        "monetization_hook": "AI提效工具包/工作流模板/提示词库"
+      }
+    ]
+  },
+  "commercial_paths": [
+    {
+      "type": "虚拟产品",
+      "description": "AI职场提效8大工作流全拆解（含提示词+操作指南）",
+      "price_range": "29.9-69.9",
+      "platform": "小红书店铺/私域"
+    },
+    {
+      "type": "虚拟产品",
+      "description": "AI职场提示词模板包（100+场景）",
+      "price_range": "19.9-39.9",
+      "platform": "小红书店铺"
+    },
+    {
+      "type": "课程",
+      "description": "AI职场提效0到1实战课",
+      "price_range": "199-499",
+      "platform": "知识付费平台"
+    }
+  ],
+  "user_psychology": {
+    "anxiety": "不用AI的打工人正在被淘汰，加班多效率低",
+    "desire": "想用AI提效，每天省2小时，准时下班",
+    "fear": "学不会AI/用不好/被领导发现/替代不了人工",
+    "paying_driver": "效率提升+准时下班+职场竞争力"
+  },
+  "is_series": true,
+  "series_name": "AI职场提效",
+  "series_episode": 1,
+  "consumed_at": null,
+  "output_path": null,
+  "content_angles": [
+    "8个AI工作流让打工人每天省2小时",
+    "AI自动写周报/月报的完整流程",
+    "AI处理邮件和会议纪要的工作流",
+    "AI数据分析：从Excel到自动化报表",
+    "AI辅助PPT制作：从大纲到成品10分钟",
+    "AI翻译和文档处理工作流",
+    "AI日程管理和任务优先级排序",
+    "AI辅助决策：数据驱动的快速判断",
+    "每天省2小时的AI工具组合方案",
+    "AI职场提效的常见误区和避坑指南"
+  ],
+  "risk_matrix": {
+    "time_cost": 2,
+    "money_cost": 1,
+    "execution_difficulty": 3,
+    "platform_risk": 1
+  },
+  "risk_warnings": [
+    "AI生成内容需人工审核，避免关键信息错误",
+    "部分公司对AI工具使用有合规要求，需了解政策",
+    "AI提效是渐进过程，不要期望一夜之间效率翻倍"
+  ],
+  "tags": ["AI提效", "职场AI", "AI工作流", "效率工具", "AI办公"]
+}

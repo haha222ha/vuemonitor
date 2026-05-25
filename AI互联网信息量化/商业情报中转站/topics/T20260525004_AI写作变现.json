@@ -1,0 +1,137 @@
+{
+  "topic_id": "T20260525004",
+  "generated_at": "2026-05-25",
+  "status": "fresh",
+  "freshness_score": 1.0,
+  "source": {
+    "prompt_id": "十",
+    "prompt_name": "决策场景分类与选题映射",
+    "data_basis": "2026年5月小红书AI写作笔记互动量周环比+85%，企业内容外包需求增长",
+    "converted_by": "九、输出格式规范"
+  },
+  "category": "经济决策",
+  "topic_name": "AI写作变现：5种从文案代写到内容工厂的商业模式",
+  "topic_description": "AI写作工具让内容生产效率暴增，但多数人只会用不会卖，不知道如何将AI写作能力转化为稳定收入",
+  "keywords": ["AI写作", "文案变现", "内容代写", "AI副业", "ChatGPT写作"],
+  "target_platform": ["小红书", "抖音", "知乎"],
+  "target_audience": "文字工作者、自媒体人、想用AI写作变现的上班族",
+  "opportunity_score": 80,
+  "priority_score": 132.0,
+  "score_breakdown": {
+    "traffic_growth": 8,
+    "willingness_to_pay": 8,
+    "competition_level": 6,
+    "platform_support": 8,
+    "ai_scalability": 10,
+    "virtual_product_fit": 9,
+    "anxiety_intensity": 7,
+    "lifecycle": 7,
+    "low_cost_entry": 9,
+    "ordinary_person_fit": 8
+  },
+  "lifecycle_stage": "成长期",
+  "lifecycle_prediction": {
+    "30_days": "AI写作变现教程持续走红，更多入局者涌入",
+    "90_days": "低端代写市场饱和，高端内容策划需求上升",
+    "180_days": "AI写作成为内容行业标配，纯代写利润下降"
+  },
+  "decision_layer": {
+    "core_decision_type": "经济",
+    "decision_domain": "内容变现",
+    "sub_scenario": "AI写作变现",
+    "persona_decision_map": [
+      {
+        "persona": "文字工作者/自媒体人",
+        "current_state": "已有写作能力，想用AI提效接更多单",
+        "decision_pressure": "AI让写作门槛降低，担心收入被压缩",
+        "recommended_direction": "从代写升级为内容策划，提供AI+人工的复合服务",
+        "why_now": "企业对高质量内容需求持续增长，AI提效后可接更多单",
+        "avoid_mistake": "不要和纯AI生成打价格战，要强调人工把控质量"
+      },
+      {
+        "persona": "上班族/大学生",
+        "current_state": "会用AI写东西，但不知道怎么变现",
+        "decision_pressure": "想赚外快但不知道从哪接单",
+        "recommended_direction": "从公众号/小红书文案代写切入，积累客户后涨价",
+        "why_now": "中小企业内容需求大但预算有限，AI代写性价比高",
+        "avoid_mistake": "不要只做低价代写，要逐步建立个人品牌"
+      }
+    ],
+    "decision_time_window": "窗口期9-12个月",
+    "seasonal_peak": "全年（电商大促前需求更大）"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "high",
+    "compatibility_score": 90,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI写作变现启动报告",
+        "content_type": "虚拟产品",
+        "target_platform": ["小红书", "知乎"],
+        "content_angles": [
+          "认知反差：AI写作不是复制粘贴，会提问的人才能变现",
+          "5种模式：代写/模板/策划/培训/内容工厂，哪种适合你"
+        ],
+        "viral_hook": "用AI写作月入5000+的5种变现模式",
+        "monetization_hook": "AI写作变现报告/提示词模板/接单渠道"
+      }
+    ]
+  },
+  "commercial_paths": [
+    {
+      "type": "虚拟产品",
+      "description": "AI写作变现5种模式全拆解报告",
+      "price_range": "29.9-69.9",
+      "platform": "小红书店铺/私域"
+    },
+    {
+      "type": "虚拟产品",
+      "description": "AI写作提示词模板包（50+场景）",
+      "price_range": "19.9-39.9",
+      "platform": "小红书店铺"
+    },
+    {
+      "type": "课程",
+      "description": "AI写作变现0到1实战课",
+      "price_range": "199-499",
+      "platform": "知识付费平台"
+    }
+  ],
+  "user_psychology": {
+    "anxiety": "AI写作红利期有限，怕错过又怕做不好",
+    "desire": "想用AI写作能力变现，实现副业收入",
+    "fear": "代写被识破/客户不满意/收入不稳定/被AI替代",
+    "paying_driver": "低门槛+可复制+效率高"
+  },
+  "is_series": true,
+  "series_name": "AI写作变现",
+  "series_episode": 1,
+  "consumed_at": null,
+  "output_path": null,
+  "content_angles": [
+    "AI写作变现的5种商业模式详解",
+    "AI写作接单的4个核心渠道",
+    "如何用AI写出客户满意的文案",
+    "AI写作提示词工程：从新手到高手",
+    "AI代写报价体系：按字/按篇/按月",
+    "从代写到内容工厂的升级路径",
+    "AI写作变现的3个常见误区",
+    "5个让客户复购的AI写作服务技巧",
+    "AI写作月入5000+真实案例拆解",
+    "AI写作工具选择指南：ChatGPT/Claude/文心一言"
+  ],
+  "risk_matrix": {
+    "time_cost": 3,
+    "money_cost": 1,
+    "execution_difficulty": 4,
+    "platform_risk": 2
+  },
+  "risk_warnings": [
+    "AI生成内容需人工审核，避免事实错误和抄袭",
+    "低价代写市场竞争激烈，需往高端策划方向升级",
+    "部分客户对AI代写有抵触，需注意沟通方式"
+  ],
+  "tags": ["AI写作", "文案变现", "代写", "ChatGPT", "AI副业"]
+}

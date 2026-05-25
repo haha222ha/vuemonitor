@@ -1,0 +1,137 @@
+{
+  "topic_id": "T20260525008",
+  "generated_at": "2026-05-25",
+  "status": "fresh",
+  "freshness_score": 1.0,
+  "source": {
+    "prompt_id": "十",
+    "prompt_name": "决策场景分类与选题映射",
+    "data_basis": "2026年5月小红书AI自媒体笔记增长+75%，一人媒体工作室模式爆发",
+    "converted_by": "九、输出格式规范"
+  },
+  "category": "经济决策",
+  "topic_name": "AI自媒体矩阵：一人运营5个账号月入2万+的批量内容生产体系",
+  "topic_description": "AI让一个人就能运营多个自媒体账号，但多数人做矩阵失败是因为没有系统化的内容生产和分发流程",
+  "keywords": ["AI自媒体", "内容矩阵", "批量生产", "自媒体运营", "AI内容"],
+  "target_platform": ["小红书", "抖音", "B站", "公众号"],
+  "target_audience": "自媒体人、个人品牌创业者、想通过内容变现的上班族",
+  "opportunity_score": 81,
+  "priority_score": 134.0,
+  "score_breakdown": {
+    "traffic_growth": 8,
+    "willingness_to_pay": 7,
+    "competition_level": 5,
+    "platform_support": 7,
+    "ai_scalability": 10,
+    "virtual_product_fit": 8,
+    "anxiety_intensity": 7,
+    "lifecycle": 7,
+    "low_cost_entry": 8,
+    "ordinary_person_fit": 6
+  },
+  "lifecycle_stage": "成长期",
+  "lifecycle_prediction": {
+    "30_days": "AI自媒体矩阵教程走红，更多创作者尝试",
+    "90_days": "平台开始识别AI内容，质量要求提高",
+    "180_days": "AI自媒体成为标配，纯人工创作效率差距拉大"
+  },
+  "decision_layer": {
+    "core_decision_type": "经济",
+    "decision_domain": "内容变现",
+    "sub_scenario": "AI自媒体矩阵",
+    "persona_decision_map": [
+      {
+        "persona": "个人自媒体人",
+        "current_state": "运营1-2个账号，收入不稳定",
+        "decision_pressure": "单账号收入天花板明显，想做矩阵但精力不够",
+        "recommended_direction": "用AI批量生产内容，1个选题裂变为5个平台的内容",
+        "why_now": "AI内容生产效率提升10倍，一人矩阵成为可能",
+        "avoid_mistake": "不要每个账号做相同内容，要针对平台特性差异化"
+      },
+      {
+        "persona": "想入局自媒体的上班族",
+        "current_state": "想做自媒体但不知道从哪开始",
+        "decision_pressure": "看到别人做自媒体赚钱，自己下班后时间有限",
+        "recommended_direction": "从1个主账号+AI辅助开始，稳定后再扩展矩阵",
+        "why_now": "AI降低了自媒体创作门槛，下班2小时即可启动",
+        "avoid_mistake": "不要一上来就做5个账号，先做好1个再复制"
+      }
+    ],
+    "decision_time_window": "窗口期12个月",
+    "seasonal_peak": "全年"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "high",
+    "compatibility_score": 86,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI自媒体矩阵运营指南",
+        "content_type": "虚拟产品",
+        "target_platform": ["小红书", "抖音"],
+        "content_angles": [
+          "认知反差：一人运营5个账号不是梦，AI让内容矩阵效率提升10倍",
+          "1个选题裂变5个平台内容的批量生产法"
+        ],
+        "viral_hook": "一人用AI运营5个账号月入2万+全流程",
+        "monetization_hook": "AI自媒体矩阵SOP/内容日历/分发工具"
+      }
+    ]
+  },
+  "commercial_paths": [
+    {
+      "type": "虚拟产品",
+      "description": "AI自媒体矩阵运营全流程SOP",
+      "price_range": "49.9-99.9",
+      "platform": "小红书店铺/私域"
+    },
+    {
+      "type": "工具",
+      "description": "AI内容批量生产提示词模板包",
+      "price_range": "29.9-59.9",
+      "platform": "小红书店铺"
+    },
+    {
+      "type": "课程",
+      "description": "AI自媒体矩阵0到1实战课",
+      "price_range": "299-699",
+      "platform": "知识付费平台"
+    }
+  ],
+  "user_psychology": {
+    "anxiety": "单账号收入不稳定，不做矩阵就是等死",
+    "desire": "想用AI高效运营多个账号，实现收入多元化",
+    "fear": "矩阵做不起来/内容质量下降/账号被封/精力分散",
+    "paying_driver": "效率提升+收入多元化+可复制"
+  },
+  "is_series": true,
+  "series_name": "AI自媒体矩阵",
+  "series_episode": 1,
+  "consumed_at": null,
+  "output_path": null,
+  "content_angles": [
+    "1个选题裂变5个平台内容的批量生产法",
+    "AI自媒体矩阵的账号定位策略",
+    "AI批量生产小红书图文的完整流程",
+    "AI批量生产抖音脚本的3种方法",
+    "自媒体矩阵内容日历规划指南",
+    "AI内容分发自动化工具对比",
+    "5个账号月入2万+的矩阵案例拆解",
+    "AI自媒体矩阵的数据分析体系",
+    "避免AI内容被平台限流的5个技巧",
+    "从1个账号到5个账号的扩展节奏"
+  ],
+  "risk_matrix": {
+    "time_cost": 5,
+    "money_cost": 3,
+    "execution_difficulty": 6,
+    "platform_risk": 5
+  },
+  "risk_warnings": [
+    "平台对AI内容检测趋严，需保证内容质量和原创度",
+    "矩阵运营精力分散风险，需做好优先级管理",
+    "同质化内容可能导致账号限流"
+  ],
+  "tags": ["AI自媒体", "内容矩阵", "批量生产", "自媒体运营", "AI内容"]
+}

@@ -1,0 +1,137 @@
+{
+  "topic_id": "T20260525007",
+  "generated_at": "2026-05-25",
+  "status": "fresh",
+  "freshness_score": 1.0,
+  "source": {
+    "prompt_id": "十",
+    "prompt_name": "决策场景分类与选题映射",
+    "data_basis": "2026年5月小红书AI简历/求职笔记增长+90%，求职焦虑驱动付费意愿",
+    "converted_by": "九、输出格式规范"
+  },
+  "category": "职业决策",
+  "topic_name": "AI求职加速：用AI工具从简历优化到面试准备的求职全链路方案",
+  "topic_description": "2026年求职市场竞争激烈，AI工具让求职效率提升5倍，但多数人不知道如何系统化使用AI辅助求职",
+  "keywords": ["AI求职", "AI简历", "面试准备", "求职工具", "AI面试"],
+  "target_platform": ["小红书", "B站", "知乎"],
+  "target_audience": "应届毕业生、跳槽职场人、转行者",
+  "opportunity_score": 86,
+  "priority_score": 142.0,
+  "score_breakdown": {
+    "traffic_growth": 9,
+    "willingness_to_pay": 9,
+    "competition_level": 6,
+    "platform_support": 8,
+    "ai_scalability": 8,
+    "virtual_product_fit": 9,
+    "anxiety_intensity": 10,
+    "lifecycle": 7,
+    "low_cost_entry": 8,
+    "ordinary_person_fit": 9
+  },
+  "lifecycle_stage": "爆发期",
+  "lifecycle_prediction": {
+    "30_days": "毕业季求职需求爆发，AI求职工具搜索量激增",
+    "90_days": "秋招提前批启动，AI求职成为标配",
+    "180_days": "AI求职工具成为求职者必备，市场从教育期进入成熟期"
+  },
+  "decision_layer": {
+    "core_decision_type": "职业",
+    "decision_domain": "求职发展",
+    "sub_scenario": "AI辅助求职",
+    "persona_decision_map": [
+      {
+        "persona": "应届毕业生",
+        "current_state": "不知道怎么写简历，面试紧张不知道怎么准备",
+        "decision_pressure": "毕业季竞争激烈，怕找不到好工作",
+        "recommended_direction": "用AI优化简历+模拟面试+岗位匹配，系统化提升求职竞争力",
+        "why_now": "毕业季求职窗口期有限，AI工具可快速提升求职效率",
+        "avoid_mistake": "不要完全依赖AI生成简历，要结合个人经历精修"
+      },
+      {
+        "persona": "跳槽职场人",
+        "current_state": "想跳槽但简历多年没更新，不知道怎么包装经验",
+        "decision_pressure": "年龄焦虑+机会成本，怕跳槽失败",
+        "recommended_direction": "用AI重新包装工作经历，突出成果和量化数据",
+        "why_now": "金三银四求职季，好岗位竞争激烈需快速出手",
+        "avoid_mistake": "不要在简历上造假，AI辅助要基于真实经历"
+      }
+    ],
+    "decision_time_window": "毕业季/金三银四/金九银十",
+    "seasonal_peak": "3-5月/9-11月"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "high",
+    "compatibility_score": 88,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI求职加速指南",
+        "content_type": "虚拟产品",
+        "target_platform": ["小红书", "B站"],
+        "content_angles": [
+          "认知反差：用AI求职的人拿offer速度是普通人的3倍",
+          "焦虑驱动：毕业季竞争激烈，不用AI工具就是在裸奔"
+        ],
+        "viral_hook": "用AI工具7天拿到3个offer的求职全攻略",
+        "monetization_hook": "AI求职工具包/简历模板/面试题库"
+      }
+    ]
+  },
+  "commercial_paths": [
+    {
+      "type": "虚拟产品",
+      "description": "AI求职全链路工具包（简历+面试+岗位匹配）",
+      "price_range": "29.9-79.9",
+      "platform": "小红书店铺/私域"
+    },
+    {
+      "type": "虚拟产品",
+      "description": "AI简历优化模板包（50+行业）",
+      "price_range": "19.9-49.9",
+      "platform": "小红书店铺"
+    },
+    {
+      "type": "服务",
+      "description": "AI简历1对1精修服务",
+      "price_range": "99-299",
+      "platform": "私域"
+    }
+  ],
+  "user_psychology": {
+    "anxiety": "求职竞争激烈，不用AI工具可能被淘汰",
+    "desire": "想快速拿到好offer，提升求职效率",
+    "fear": "简历被刷/面试失败/薪资谈低/入职后不适应",
+    "paying_driver": "求职焦虑+效率提升+结果导向"
+  },
+  "is_series": true,
+  "series_name": "AI求职加速",
+  "series_episode": 1,
+  "consumed_at": null,
+  "output_path": null,
+  "content_angles": [
+    "AI简历优化的5个核心技巧",
+    "用AI模拟面试的完整流程",
+    "AI岗位匹配：找到最适合你的职位",
+    "AI求职信/自荐信生成指南",
+    "面试常见问题AI回答模板",
+    "AI薪资谈判策略和话术",
+    "不同行业AI简历模板差异",
+    "AI求职时间管理：7天冲刺计划",
+    "用AI拿到3个offer的真实案例",
+    "AI求职工具选择指南：免费vs付费"
+  ],
+  "risk_matrix": {
+    "time_cost": 3,
+    "money_cost": 2,
+    "execution_difficulty": 3,
+    "platform_risk": 2
+  },
+  "risk_warnings": [
+    "AI生成简历需人工审核，避免千篇一律",
+    "面试仍需真实能力支撑，AI只能辅助准备",
+    "部分企业开始检测AI生成简历，需注意自然度"
+  ],
+  "tags": ["AI求职", "AI简历", "面试准备", "求职工具", "毕业季"]
+}

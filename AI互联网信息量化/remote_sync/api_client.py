@@ -72,6 +72,7 @@ SYNC_TARGETS = [
 class IntelSyncClient:
     def __init__(self, base_url: str, api_token: str):
         self.base_url = base_url.rstrip("/")
+        self._api_token = api_token
         self.client = httpx.Client(
             base_url=self.base_url,
             headers={
@@ -307,18 +308,28 @@ class IntelSyncClient:
             report_date = datetime.now().strftime("%Y-%m-%d")
 
         with open(file_path, "rb") as f:
-            response = self.client.post(
-                "/api/v1/intel/reports/upload",
-                files={"file": (file_path.name, f)},
-                data={
-                    "report_type": report_type,
-                    "title": title,
-                    "week_number": week_number or "",
-                    "report_date": report_date,
+            upload_client = httpx.Client(
+                base_url=self.base_url,
+                headers={
+                    "Authorization": f"Bearer {self._api_token}",
+                    "X-Sync-Source": "local_workstation",
                 },
-                headers={"Authorization": self.client.headers.get("Authorization", "")},
+                timeout=120,
             )
-            response.raise_for_status()
+            try:
+                response = upload_client.post(
+                    "/api/v1/intel/reports/upload",
+                    files={"file": (file_path.name, f)},
+                    data={
+                        "report_type": report_type,
+                        "title": title,
+                        "week_number": week_number or "",
+                        "report_date": report_date,
+                    },
+                )
+                response.raise_for_status()
+            finally:
+                upload_client.close()
 
         result = response.json()
         logger.info(f"[Sync] Report uploaded: {file_path.name} -> {result.get('url', 'N/A')}")

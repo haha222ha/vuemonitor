@@ -1,0 +1,137 @@
+{
+  "topic_id": "T20260525009",
+  "generated_at": "2026-05-25",
+  "status": "fresh",
+  "freshness_score": 1.0,
+  "source": {
+    "prompt_id": "十",
+    "prompt_name": "决策场景分类与选题映射",
+    "data_basis": "2026年5月小红书AI翻译/跨境电商笔记增长+55%，出海副业需求爆发",
+    "converted_by": "九、输出格式规范"
+  },
+  "category": "经济决策",
+  "topic_name": "AI跨境电商副业：零经验用AI工具做跨境选品和内容本地化",
+  "topic_description": "AI翻译和内容生成工具让跨境电商门槛大幅降低，但选品、物流、合规等环节仍让新手望而却步",
+  "keywords": ["AI跨境电商", "选品工具", "AI翻译", "出海副业", "跨境运营"],
+  "target_platform": ["小红书", "抖音", "知乎"],
+  "target_audience": "想做跨境电商的上班族、大学生、传统电商转型者",
+  "opportunity_score": 76,
+  "priority_score": 120.0,
+  "score_breakdown": {
+    "traffic_growth": 7,
+    "willingness_to_pay": 8,
+    "competition_level": 5,
+    "platform_support": 6,
+    "ai_scalability": 9,
+    "virtual_product_fit": 5,
+    "anxiety_intensity": 8,
+    "lifecycle": 7,
+    "low_cost_entry": 5,
+    "ordinary_person_fit": 5
+  },
+  "lifecycle_stage": "成长期",
+  "lifecycle_prediction": {
+    "30_days": "AI跨境教程走红，更多新手尝试",
+    "90_days": "旺季到来，跨境选品和运营需求爆发",
+    "180_days": "AI跨境成为标配，竞争从工具转向供应链"
+  },
+  "decision_layer": {
+    "core_decision_type": "经济",
+    "decision_domain": "电商变现",
+    "sub_scenario": "AI跨境电商",
+    "persona_decision_map": [
+      {
+        "persona": "零经验新手",
+        "current_state": "听说跨境电商赚钱，但完全不知道怎么开始",
+        "decision_pressure": "怕投入资金打水漂，又怕错过出海红利",
+        "recommended_direction": "从无货源模式切入，用AI选品+翻译+客服降低启动成本",
+        "why_now": "AI工具让跨境门槛大幅降低，零经验也能启动",
+        "avoid_mistake": "不要一上来就大量备货，先小成本验证选品"
+      },
+      {
+        "persona": "传统电商转型者",
+        "current_state": "国内电商竞争激烈，想拓展海外市场",
+        "decision_pressure": "不懂外语和海外市场，转型风险大",
+        "recommended_direction": "用AI翻译+本地化工具快速适配海外市场",
+        "why_now": "国内电商内卷严重，出海是增长确定性最高的方向",
+        "avoid_mistake": "不要直接搬国内产品，要针对海外市场做本地化"
+      }
+    ],
+    "decision_time_window": "窗口期12-18个月",
+    "seasonal_peak": "黑五/圣诞/Prime Day"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "medium",
+    "compatibility_score": 72,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI跨境电商启动指南",
+        "content_type": "虚拟产品",
+        "target_platform": ["小红书", "知乎"],
+        "content_angles": [
+          "认知反差：不懂外语也能做跨境电商，AI工具全搞定",
+          "零经验AI跨境启动的3种模式对比"
+        ],
+        "viral_hook": "零经验用AI做跨境电商月入过万全攻略",
+        "monetization_hook": "AI跨境启动包/选品数据库/翻译模板"
+      }
+    ]
+  },
+  "commercial_paths": [
+    {
+      "type": "虚拟产品",
+      "description": "AI跨境电商启动全流程SOP",
+      "price_range": "49.9-99.9",
+      "platform": "小红书店铺/私域"
+    },
+    {
+      "type": "工具",
+      "description": "AI跨境选品数据库（1000+高需求品类）",
+      "price_range": "29.9-79.9",
+      "platform": "私域"
+    },
+    {
+      "type": "课程",
+      "description": "AI跨境电商0到1实战课",
+      "price_range": "399-999",
+      "platform": "知识付费平台"
+    }
+  ],
+  "user_psychology": {
+    "anxiety": "国内电商太卷，不做跨境可能错过出海红利",
+    "desire": "想用AI工具低成本做跨境电商，赚美金",
+    "fear": "选品失败/物流出问题/被投诉/汇率损失",
+    "paying_driver": "出海红利+AI降门槛+美金收入"
+  },
+  "is_series": true,
+  "series_name": "AI跨境电商副业",
+  "series_episode": 1,
+  "consumed_at": null,
+  "output_path": null,
+  "content_angles": [
+    "AI跨境选品的5个核心指标",
+    "零经验AI跨境启动的3种模式",
+    "AI翻译和内容本地化工具对比",
+    "跨境平台选择：Amazon/Temu/TikTok Shop",
+    "AI跨境客服自动化方案",
+    "跨境物流和仓储的最低成本方案",
+    "AI跨境选品数据库使用指南",
+    "月入过万的AI跨境案例拆解",
+    "跨境合规和知识产权避坑指南",
+    "AI跨境数据分析：如何找到蓝海品类"
+  ],
+  "risk_matrix": {
+    "time_cost": 6,
+    "money_cost": 6,
+    "execution_difficulty": 7,
+    "platform_risk": 5
+  },
+  "risk_warnings": [
+    "跨境电商资金投入比纯虚拟产品高，需控制风险",
+    "海外市场合规要求复杂，需注意税务和知识产权",
+    "汇率波动和物流成本可能影响利润"
+  ],
+  "tags": ["AI跨境电商", "选品", "AI翻译", "出海", "跨境运营"]
+}

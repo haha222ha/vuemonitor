@@ -1,0 +1,137 @@
+{
+  "topic_id": "T20260525002",
+  "generated_at": "2026-05-25",
+  "status": "fresh",
+  "freshness_score": 1.0,
+  "source": {
+    "prompt_id": "十",
+    "prompt_name": "决策场景分类与选题映射",
+    "data_basis": "2026年5月小红书知识付费笔记增长+45%，AI课程制作需求爆发",
+    "converted_by": "九、输出格式规范"
+  },
+  "category": "经济决策",
+  "topic_name": "AI课程制作变现：用AI工具批量生产知识付费课程的方法论",
+  "topic_description": "AI工具让课程制作效率提升10倍，但多数人不知道如何选题、如何用AI辅助制作、如何上架销售",
+  "keywords": ["AI课程", "知识付费", "课程制作", "AI副业", "在线教育"],
+  "target_platform": ["小红书", "抖音", "B站"],
+  "target_audience": "有知识储备想变现的职场人、培训师、自由职业者",
+  "opportunity_score": 82,
+  "priority_score": 135.0,
+  "score_breakdown": {
+    "traffic_growth": 8,
+    "willingness_to_pay": 9,
+    "competition_level": 5,
+    "platform_support": 8,
+    "ai_scalability": 9,
+    "virtual_product_fit": 10,
+    "anxiety_intensity": 7,
+    "lifecycle": 8,
+    "low_cost_entry": 7,
+    "ordinary_person_fit": 6
+  },
+  "lifecycle_stage": "成长期",
+  "lifecycle_prediction": {
+    "30_days": "AI课程制作教程搜索量持续上升",
+    "90_days": "暑期在线学习需求爆发，课程销量高峰",
+    "180_days": "市场洗牌，精品课程胜出，粗制滥造被淘汰"
+  },
+  "decision_layer": {
+    "core_decision_type": "经济",
+    "decision_domain": "知识变现",
+    "sub_scenario": "AI课程制作",
+    "persona_decision_map": [
+      {
+        "persona": "有专业知识的职场人",
+        "current_state": "有知识储备但不知道怎么包装成课程",
+        "decision_pressure": "看到同行做课程赚钱，自己却不知道从哪开始",
+        "recommended_direction": "用AI辅助大纲设计+脚本生成+课件制作，快速产出MVP课程",
+        "why_now": "AI让课程制作周期从月缩短到周，先发优势明显",
+        "avoid_mistake": "不要追求完美，先上架MVP再迭代"
+      },
+      {
+        "persona": "培训师/讲师",
+        "current_state": "已有线下课程，想转线上扩大收入",
+        "decision_pressure": "线下课收入天花板明显，线上课程竞争激烈",
+        "recommended_direction": "用AI将线下内容快速数字化，多平台分发",
+        "why_now": "知识付费平台对AI相关课程流量扶持力度大",
+        "avoid_mistake": "不要直接搬线下内容，要针对线上学习习惯重新设计"
+      }
+    ],
+    "decision_time_window": "窗口期12-18个月",
+    "seasonal_peak": "暑期/年底（学习需求高峰）"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "high",
+    "compatibility_score": 85,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI课程制作变现指南",
+        "content_type": "虚拟产品",
+        "target_platform": ["小红书", "抖音"],
+        "content_angles": [
+          "认知反差：AI让课程制作效率提升10倍，但90%的人还在用传统方式",
+          "路径对比：有知识vs没知识，AI课程制作的不同策略"
+        ],
+        "viral_hook": "用AI做课程月入过万的全流程拆解",
+        "monetization_hook": "AI课程制作SOP/选题工具包/上架指南"
+      }
+    ]
+  },
+  "commercial_paths": [
+    {
+      "type": "虚拟产品",
+      "description": "AI课程制作全流程SOP（含选题+脚本+课件+上架）",
+      "price_range": "49.9-99.9",
+      "platform": "小红书店铺/私域"
+    },
+    {
+      "type": "课程",
+      "description": "AI课程制作0到1实战课",
+      "price_range": "299-699",
+      "platform": "知识付费平台"
+    },
+    {
+      "type": "工具",
+      "description": "AI课程选题数据库（500+高需求选题）",
+      "price_range": "29.9-59.9",
+      "platform": "私域"
+    }
+  ],
+  "user_psychology": {
+    "anxiety": "知识变现窗口期有限，怕错过红利又怕做不好",
+    "desire": "想用AI高效制作课程，实现被动收入",
+    "fear": "课程卖不动/内容质量差/被投诉退款/平台限流",
+    "paying_driver": "效率提升+可复制流程+被动收入潜力"
+  },
+  "is_series": true,
+  "series_name": "AI课程制作变现",
+  "series_episode": 1,
+  "consumed_at": null,
+  "output_path": null,
+  "content_angles": [
+    "AI课程选题的5个黄金标准",
+    "用AI 7天做出一门完整课程的流程",
+    "AI课程脚本生成的3种方法",
+    "知识付费平台选择指南：小红书/抖音/得到/小鹅通",
+    "AI课程定价策略：9.9/99/999分别适合什么内容",
+    "AI课程封面和标题的爆款公式",
+    "课程上架后的3种推广方式",
+    "AI课程制作必备的8个AI工具",
+    "月入过万的AI课程真实案例拆解",
+    "AI课程常见差评原因和预防方法"
+  ],
+  "risk_matrix": {
+    "time_cost": 5,
+    "money_cost": 3,
+    "execution_difficulty": 6,
+    "platform_risk": 4
+  },
+  "risk_warnings": [
+    "知识付费市场对内容质量要求越来越高，粗制滥造会被淘汰",
+    "AI生成内容需人工审核，避免事实错误",
+    "平台对AI课程审核趋严，需注意合规"
+  ],
+  "tags": ["AI课程", "知识付费", "课程制作", "AI变现", "在线教育"]
+}

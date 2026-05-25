@@ -1,0 +1,137 @@
+{
+  "topic_id": "T20260525003",
+  "generated_at": "2026-05-25",
+  "status": "fresh",
+  "freshness_score": 1.0,
+  "source": {
+    "prompt_id": "十",
+    "prompt_name": "决策场景分类与选题映射",
+    "data_basis": "2026年5月短视频带货GMV同比增长200%，AI数字人直播搜索量暴增",
+    "converted_by": "九、输出格式规范"
+  },
+  "category": "经济决策",
+  "topic_name": "AI数字人直播带货：低成本启动24小时自动变现的实操指南",
+  "topic_description": "AI数字人直播让一个人就能运营24小时直播间，但技术门槛和选品策略让多数人望而却步",
+  "keywords": ["AI数字人", "直播带货", "自动直播", "AI直播", "虚拟主播"],
+  "target_platform": ["抖音", "小红书", "快手"],
+  "target_audience": "想做直播带货但不想露脸的创业者、中小商家、个体户",
+  "opportunity_score": 78,
+  "priority_score": 125.0,
+  "score_breakdown": {
+    "traffic_growth": 8,
+    "willingness_to_pay": 7,
+    "competition_level": 5,
+    "platform_support": 7,
+    "ai_scalability": 9,
+    "virtual_product_fit": 6,
+    "anxiety_intensity": 8,
+    "lifecycle": 6,
+    "low_cost_entry": 7,
+    "ordinary_person_fit": 6
+  },
+  "lifecycle_stage": "爆发期",
+  "lifecycle_prediction": {
+    "30_days": "AI数字人直播工具大量涌现，入局者激增",
+    "90_days": "平台开始规范AI直播，合规要求提高",
+    "180_days": "头部玩家形成规模效应，新入局者需差异化"
+  },
+  "decision_layer": {
+    "core_decision_type": "经济",
+    "decision_domain": "电商变现",
+    "sub_scenario": "AI数字人直播",
+    "persona_decision_map": [
+      {
+        "persona": "不想露脸的创业者",
+        "current_state": "想做直播带货但不想真人出镜",
+        "decision_pressure": "真人直播太累，AI直播又怕效果不好",
+        "recommended_direction": "从低价标品切入，用AI数字人做24小时日不落直播",
+        "why_now": "AI数字人技术成熟度快速提升，观众接受度提高",
+        "avoid_mistake": "不要选需要深度讲解的高客单产品，AI数字人适合标品"
+      },
+      {
+        "persona": "中小商家",
+        "current_state": "请主播成本高，自己播没时间",
+        "decision_pressure": "直播流量越来越贵，不播没流量，播了成本高",
+        "recommended_direction": "AI数字人+真人混合模式，高峰真人低峰AI",
+        "why_now": "直播电商进入精细化运营阶段，降本增效是刚需",
+        "avoid_mistake": "不要完全依赖AI直播，关键时段仍需真人互动"
+      }
+    ],
+    "decision_time_window": "窗口期6-12个月",
+    "seasonal_peak": "双11/618/年货节"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "medium",
+    "compatibility_score": 75,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI数字人直播启动指南",
+        "content_type": "虚拟产品",
+        "target_platform": ["抖音", "小红书"],
+        "content_angles": [
+          "认知反差：AI数字人直播月入3万+，但选错品就是亏钱",
+          "路径对比：纯AI vs AI+真人混合，哪种模式更适合你"
+        ],
+        "viral_hook": "不露脸用AI数字人24小时直播带货全攻略",
+        "monetization_hook": "AI直播启动包/选品清单/话术模板"
+      }
+    ]
+  },
+  "commercial_paths": [
+    {
+      "type": "虚拟产品",
+      "description": "AI数字人直播启动SOP（含工具选择+选品+话术）",
+      "price_range": "49.9-99.9",
+      "platform": "私域"
+    },
+    {
+      "type": "工具",
+      "description": "AI直播话术生成器+选品数据库",
+      "price_range": "29.9-79.9",
+      "platform": "私域"
+    },
+    {
+      "type": "服务",
+      "description": "AI数字人直播代搭建服务",
+      "price_range": "999-2999",
+      "platform": "私域"
+    }
+  ],
+  "user_psychology": {
+    "anxiety": "直播红利在消退，不抓住AI直播可能错过最后机会",
+    "desire": "想低成本做直播，24小时自动赚钱",
+    "fear": "AI直播被封号/效果差/投入打水漂",
+    "paying_driver": "降本增效+自动化+低门槛"
+  },
+  "is_series": true,
+  "series_name": "AI数字人直播带货",
+  "series_episode": 1,
+  "consumed_at": null,
+  "output_path": null,
+  "content_angles": [
+    "AI数字人直播的5个主流工具对比",
+    "适合AI数字人直播的10个品类",
+    "AI数字人直播话术模板（开场/促单/答疑）",
+    "AI+真人混合直播的最优排班方案",
+    "AI数字人直播的合规红线和避坑指南",
+    "从0搭建AI直播间的完整流程",
+    "AI直播选品的3个核心指标",
+    "AI数字人直播月入3万+案例拆解",
+    "抖音/快手AI直播政策解读",
+    "AI直播数据分析：如何优化转化率"
+  ],
+  "risk_matrix": {
+    "time_cost": 5,
+    "money_cost": 5,
+    "execution_difficulty": 6,
+    "platform_risk": 7
+  },
+  "risk_warnings": [
+    "平台对AI直播监管趋严，需关注最新政策变化",
+    "AI数字人直播转化率普遍低于真人直播",
+    "部分品类不适合AI直播，选品失误会直接亏损"
+  ],
+  "tags": ["AI数字人", "直播带货", "自动直播", "AI副业", "虚拟主播"]
+}

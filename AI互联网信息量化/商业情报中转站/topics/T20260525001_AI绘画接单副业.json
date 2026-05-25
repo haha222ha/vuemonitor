@@ -1,0 +1,137 @@
+{
+  "topic_id": "T20260525001",
+  "generated_at": "2026-05-25",
+  "status": "fresh",
+  "freshness_score": 1.0,
+  "source": {
+    "prompt_id": "十",
+    "prompt_name": "决策场景分类与选题映射",
+    "data_basis": "2026年5月小红书AI绘画笔记搜索量周环比+120%，Midjourney/Stable Diffusion接单需求井喷",
+    "converted_by": "九、输出格式规范"
+  },
+  "category": "经济决策",
+  "topic_name": "AI绘画接单副业：从零开始到稳定月入8000的完整路径",
+  "topic_description": "AI绘画工具让零基础的人也能产出商业级插画，但多数人不知道怎么找到付费客户、怎么报价、怎么保证交付质量",
+  "keywords": ["AI绘画", "Midjourney接单", "AI插画", "副业接单", "AI设计"],
+  "target_platform": ["小红书", "抖音"],
+  "target_audience": "对AI绘画感兴趣的上班族、设计师、大学生",
+  "opportunity_score": 85,
+  "priority_score": 140.0,
+  "score_breakdown": {
+    "traffic_growth": 9,
+    "willingness_to_pay": 8,
+    "competition_level": 6,
+    "platform_support": 8,
+    "ai_scalability": 10,
+    "virtual_product_fit": 9,
+    "anxiety_intensity": 8,
+    "lifecycle": 7,
+    "low_cost_entry": 9,
+    "ordinary_person_fit": 8
+  },
+  "lifecycle_stage": "爆发期",
+  "lifecycle_prediction": {
+    "30_days": "AI绘画教程和接单分享持续霸榜小红书",
+    "90_days": "市场分化，低端价格战出现，高端定制需求增长",
+    "180_days": "AI绘画成为设计行业标配技能，纯AI出图竞争力下降"
+  },
+  "decision_layer": {
+    "core_decision_type": "经济",
+    "decision_domain": "副业变现",
+    "sub_scenario": "AI绘画接单",
+    "persona_decision_map": [
+      {
+        "persona": "零基础小白",
+        "current_state": "觉得AI绘画很酷，但不知道怎么变现",
+        "decision_pressure": "看到别人月入过万，自己却连第一单都接不到",
+        "recommended_direction": "从头像/壁纸/表情包等低门槛品类切入，积累作品集",
+        "why_now": "AI绘画需求爆发，客户对AI出图接受度快速提升",
+        "avoid_mistake": "不要一上来就接商业插画，先从简单品类练手"
+      },
+      {
+        "persona": "有设计基础的设计师",
+        "current_state": "已有设计技能，想用AI提效接更多单",
+        "decision_pressure": "AI让设计门槛降低，担心被替代又想利用AI提效",
+        "recommended_direction": "AI+人工精修模式，主打高端定制，保持溢价能力",
+        "why_now": "客户需要AI效率+人工品质的复合服务",
+        "avoid_mistake": "不要和纯AI出图者打价格战，要强调品质差异"
+      }
+    ],
+    "decision_time_window": "窗口期6-12个月",
+    "seasonal_peak": "全年（电商旺季需求更大）"
+  },
+  "content_engine_bridge": {
+    "can_convert_to_topic": true,
+    "monetization_potential": "high",
+    "compatibility_score": 88,
+    "is_series_content": true,
+    "topic_suggestions": [
+      {
+        "topic_name": "AI绘画接单启动报告",
+        "content_type": "虚拟产品",
+        "target_platform": ["小红书", "抖音"],
+        "content_angles": [
+          "认知反差：AI绘画月入8000+，但90%的人卡在第一步",
+          "路径对比：零基础vs有经验，AI绘画接单的不同起步策略"
+        ],
+        "viral_hook": "零基础AI绘画接单月入8000+全攻略",
+        "monetization_hook": "AI绘画接单报告/报价模板/作品集模板"
+      }
+    ]
+  },
+  "commercial_paths": [
+    {
+      "type": "虚拟产品",
+      "description": "AI绘画接单启动报告（含接单渠道+报价体系+交付模板）",
+      "price_range": "29.9-69.9",
+      "platform": "小红书店铺/私域"
+    },
+    {
+      "type": "虚拟产品",
+      "description": "AI绘画提示词模板包（按场景分类1000+）",
+      "price_range": "19.9-49.9",
+      "platform": "小红书店铺"
+    },
+    {
+      "type": "课程",
+      "description": "AI绘画接单0到1实战课",
+      "price_range": "199-499",
+      "platform": "知识付费平台"
+    }
+  ],
+  "user_psychology": {
+    "anxiety": "AI绘画红利窗口期有限，怕错过又怕做不起来",
+    "desire": "想用AI绘画技能变现，实现副业收入",
+    "fear": "接不到单/报价太低/客户不满意/被AI替代",
+    "paying_driver": "信息差+可复制SOP+低启动成本"
+  },
+  "is_series": true,
+  "series_name": "AI绘画接单副业",
+  "series_episode": 1,
+  "consumed_at": null,
+  "output_path": null,
+  "content_angles": [
+    "AI绘画接单的5大品类和报价区间",
+    "零基础7天从0到第一单的执行计划",
+    "AI绘画接单的3个核心渠道",
+    "Midjourney vs Stable Diffusion接单选择指南",
+    "AI绘画交付SOP：从需求确认到成品交付",
+    "5个让客户复购的AI绘画服务技巧",
+    "AI绘画接单常见纠纷和避坑指南",
+    "如何用AI绘画作品集吸引客户主动找你",
+    "AI绘画副业月入8000+的真实案例拆解",
+    "AI绘画接单定价策略：按张/按项目/按月托管"
+  ],
+  "risk_matrix": {
+    "time_cost": 3,
+    "money_cost": 2,
+    "execution_difficulty": 4,
+    "platform_risk": 3
+  },
+  "risk_warnings": [
+    "AI绘画工具迭代快，需持续学习新功能",
+    "低端市场价格战激烈，需往高端定制方向升级",
+    "版权争议风险，商用需注意素材授权"
+  ],
+  "tags": ["AI绘画", "Midjourney", "副业接单", "AI设计", "变现"]
+}
