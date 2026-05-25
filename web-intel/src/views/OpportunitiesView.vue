@@ -18,16 +18,27 @@
     </div>
     <el-empty v-else-if="!items.length" description="暂无商业机会数据" />
     <div v-else class="opp-grid">
-      <el-card v-for="item in filteredItems" :key="item.id" shadow="hover" class="opp-card" @click="openDetail(item)">
+      <div
+        v-for="item in filteredItems"
+        :key="item.id"
+        class="opp-card"
+        :class="'verdict-' + (item.verdict || '').toLowerCase()"
+        @click="openReport(item)"
+      >
+        <div class="opp-verdict-bar"></div>
         <div class="card-body">
-          <div class="card-title">{{ item.name }}</div>
-          <div class="card-meta">
-            <el-tag size="small">{{ item.category }}</el-tag>
-            <el-tag size="small" :type="scoreType(item.verdict_score)">
-              评分 {{ item.verdict_score }}
-            </el-tag>
-            <el-tag size="small" v-if="item.verdict" :type="verdictType(item.verdict)">{{ item.verdict }}</el-tag>
-            <el-tag size="small" v-if="item.difficulty">难度 {{ item.difficulty }}</el-tag>
+          <div class="card-top-row">
+            <div class="opp-score-ring" :style="{ borderColor: getScoreColor(item.verdict_score) }">
+              <span :style="{ color: getScoreColor(item.verdict_score) }">{{ item.verdict_score }}</span>
+            </div>
+            <div class="card-title-area">
+              <div class="card-title">{{ item.name }}</div>
+              <div class="card-meta">
+                <el-tag size="small" effect="plain">{{ item.category }}</el-tag>
+                <el-tag size="small" v-if="item.verdict" :type="verdictType(item.verdict)" effect="dark">{{ item.verdict }}</el-tag>
+                <el-tag size="small" v-if="item.difficulty" effect="plain">{{ item.difficulty }}</el-tag>
+              </div>
+            </div>
           </div>
           <div class="card-details" v-if="item.startup_cost || item.monthly_ceiling">
             <div class="detail-row" v-if="item.startup_cost">
@@ -53,8 +64,11 @@
             <span class="fit-label">适合：</span>
             <span>{{ formatArray(item.persona_fit) }}</span>
           </div>
+          <div class="card-footer">
+            <span class="card-action">查看详情 →</span>
+          </div>
         </div>
-      </el-card>
+      </div>
     </div>
 
     <div v-if="items.length > 0" class="pagination-wrap">
@@ -99,14 +113,11 @@
             <div v-for="(val, key) in detailItem.verdict_detail" :key="key" class="verdict-bar-item">
               <div class="verdict-bar-label">
                 <span class="verdict-key">{{ verdictLabel(key as string) }}</span>
-                <span class="verdict-score">{{ val }}/10</span>
+                <span class="verdict-score" :style="{ color: verdictBarColor(Number(val)) }">{{ val }}/10</span>
               </div>
-              <el-progress
-                :percentage="Math.round((Number(val) / 10) * 100)"
-                :stroke-width="12"
-                :color="verdictColor(Number(val))"
-                :show-text="false"
-              />
+              <div class="verdict-bar-track">
+                <div class="verdict-bar-fill" :style="{ width: Number(val) * 10 + '%', background: verdictBarColor(Number(val)) }"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -115,7 +126,7 @@
           <h4>商业化路径</h4>
           <div class="paths-list">
             <div v-for="(path, idx) in detailItem.commercial_paths" :key="idx" class="path-item">
-              <el-tag type="success" size="small">{{ idx + 1 }}</el-tag>
+              <div class="path-index">{{ idx + 1 }}</div>
               <div class="path-detail" v-if="typeof path === 'object'">
                 <div class="path-main">
                   <span class="path-type" v-if="(path as Record<string, unknown>).type">{{ (path as Record<string, unknown>).type }}</span>
@@ -156,8 +167,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
+import { useRouter } from "vue-router"
 import api from "@/utils/api"
-import { exportJSON, exportCSV, deleteItem, formatValue, isAdmin } from "@/utils/intel"
+import { exportJSON, exportCSV, deleteItem, formatValue, isAdmin, fetchWithCache, clearCache } from "@/utils/intel"
+import { getScoreColor, getVerdictColor } from "@/utils/theme"
 
 interface OpportunityItem {
   id: string
@@ -179,9 +192,11 @@ interface OpportunityItem {
   key_metrics: Record<string, unknown>
   commercial_paths: unknown[]
   trend_direction?: string
+  topic_id?: string
   [key: string]: unknown
 }
 
+const router = useRouter()
 const items = ref<OpportunityItem[]>([])
 const loading = ref(false)
 const searchText = ref("")
@@ -232,6 +247,12 @@ function verdictType(verdict: string): string {
   return map[verdict] || "info"
 }
 
+function verdictBarColor(val: number): string {
+  if (val >= 8) return "#059669"
+  if (val >= 5) return "#d97706"
+  return "#dc2626"
+}
+
 function formatArray(arr: unknown[]): string {
   if (!arr?.length) return "-"
   return arr.map((v) => (typeof v === "string" ? v : JSON.stringify(v))).join("、")
@@ -260,15 +281,13 @@ function verdictLabel(key: string): string {
   return VERDICT_LABELS[key] || key
 }
 
-function verdictColor(val: number): string {
-  if (val >= 8) return "#67c23a"
-  if (val >= 5) return "#e6a23c"
-  return "#f56c6c"
-}
-
-function openDetail(item: OpportunityItem) {
-  detailItem.value = item
-  detailVisible.value = true
+function openReport(item: OpportunityItem) {
+  if (item.topic_id) {
+    router.push(`/report/${item.topic_id}`)
+  } else {
+    detailItem.value = item
+    detailVisible.value = true
+  }
 }
 
 async function handleDelete(item: OpportunityItem | null) {
@@ -276,6 +295,7 @@ async function handleDelete(item: OpportunityItem | null) {
   const ok = await deleteItem("opportunities", item.id, item.name)
   if (ok) {
     items.value = items.value.filter((i) => i.id !== item.id)
+    clearCache("opportunities")
     detailVisible.value = false
   }
 }
@@ -287,8 +307,7 @@ function handlePageChange() {
 onMounted(async () => {
   loading.value = true
   try {
-    const { data } = await api.get("/intel/opportunities")
-    items.value = data?.items || data || []
+    items.value = await fetchWithCache<OpportunityItem>("opportunities", "/intel/opportunities")
   } catch {
     items.value = []
   } finally {
@@ -315,27 +334,68 @@ onMounted(async () => {
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
 }
-.opp-card { cursor: pointer; transition: transform 0.2s; }
-.opp-card:hover { transform: translateY(-2px); }
-.card-body { padding: 0; }
+.opp-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  overflow: hidden;
+  position: relative;
+}
+.opp-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+.opp-verdict-bar {
+  height: 3px;
+  width: 100%;
+}
+.opp-card.verdict-recommended .opp-verdict-bar { background: #059669; }
+.opp-card.verdict-caution .opp-verdict-bar { background: #d97706; }
+.opp-card.verdict-avoid .opp-verdict-bar { background: #dc2626; }
+.opp-card.verdict-recommended { border-left: 4px solid #059669; }
+.opp-card.verdict-caution { border-left: 4px solid #d97706; }
+.opp-card.verdict-avoid { border-left: 4px solid #dc2626; }
+.card-body { padding: 16px 18px; }
+.card-top-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.opp-score-ring {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.opp-score-ring span {
+  font-size: 16px;
+  font-weight: 800;
+}
+.card-title-area { flex: 1; }
 .card-title {
   font-size: 15px;
   font-weight: 600;
   color: #303133;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   line-height: 1.5;
 }
 .card-meta {
   display: flex;
   gap: 6px;
   flex-wrap: wrap;
-  margin-bottom: 8px;
 }
 .card-details {
   background: #f5f7fa;
   border-radius: 6px;
   padding: 8px 12px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .detail-row {
   display: flex;
@@ -349,13 +409,25 @@ onMounted(async () => {
   display: flex;
   gap: 4px;
   flex-wrap: wrap;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 .card-fit {
   font-size: 12px;
   color: #909399;
 }
 .fit-label { color: #606266; }
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+.card-action {
+  font-size: 12px;
+  color: #4fc3f7;
+  font-weight: 500;
+  transition: transform 0.2s;
+}
+.opp-card:hover .card-action { transform: translateX(4px); }
 .pagination-wrap {
   margin-top: 24px;
   display: flex;
@@ -369,6 +441,42 @@ onMounted(async () => {
   margin-bottom: 10px;
   padding-bottom: 6px;
   border-bottom: 1px solid #f0f0f0;
+}
+.verdict-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.verdict-bar-item {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.verdict-bar-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.verdict-key {
+  font-size: 13px;
+  color: #606266;
+  font-weight: 500;
+}
+.verdict-score {
+  font-size: 14px;
+  font-weight: 700;
+}
+.verdict-bar-track {
+  height: 6px;
+  background: #e4e7ed;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.verdict-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.6s ease;
 }
 .json-block {
   background: #f8f9fa;
@@ -393,9 +501,22 @@ onMounted(async () => {
 .path-item {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
   font-size: 13px;
   color: #303133;
+}
+.path-index {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #059669;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 .path-detail {
   flex: 1;
@@ -409,47 +530,13 @@ onMounted(async () => {
   gap: 6px;
   flex-wrap: wrap;
 }
-.path-type {
-  font-weight: 600;
-  color: #67c23a;
-}
-.path-desc {
-  color: #303133;
-}
-.path-name {
-  color: #303133;
-  font-weight: 500;
-}
+.path-type { font-weight: 600; color: #059669; }
+.path-desc { color: #303133; }
+.path-name { color: #303133; font-weight: 500; }
 .path-price {
   font-size: 12px;
-  color: #e6a23c;
+  color: #d97706;
   margin-top: 4px;
   display: block;
-}
-.verdict-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.verdict-bar-item {
-  background: #f8f9fa;
-  border-radius: 6px;
-  padding: 10px 12px;
-}
-.verdict-bar-label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-}
-.verdict-key {
-  font-size: 13px;
-  color: #606266;
-  font-weight: 500;
-}
-.verdict-score {
-  font-size: 14px;
-  font-weight: 700;
-  color: #303133;
 }
 </style>

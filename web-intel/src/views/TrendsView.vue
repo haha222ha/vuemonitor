@@ -19,30 +19,42 @@
     </div>
     <el-empty v-else-if="!items.length" description="暂无趋势数据" />
     <div v-else class="trend-grid">
-      <el-card v-for="item in filteredItems" :key="item.id" shadow="hover" class="trend-card" @click="openDetail(item)">
+      <div
+        v-for="item in filteredItems"
+        :key="item.id"
+        class="trend-card"
+        :class="'dir-' + (item.direction || '').toLowerCase()"
+        @click="openDetail(item)"
+      >
+        <div class="trend-dir-bar"></div>
         <div class="card-body">
+          <div class="card-top-row">
+            <div class="dir-indicator" :class="'dir-' + (item.direction || '').toLowerCase()">
+              <span class="dir-icon">{{ getDirectionIcon(item.direction) }}</span>
+              <span class="dir-text">{{ getDirectionLabel(item.direction) }}</span>
+            </div>
+            <div class="score-badge" :style="{ color: getScoreColor(item.opportunity_score) }">
+              {{ item.opportunity_score }}
+            </div>
+          </div>
           <div class="card-title">{{ item.title }}</div>
           <div class="card-meta">
-            <el-tag size="small">{{ item.category }}</el-tag>
-            <el-tag size="small" :type="scoreType(item.opportunity_score)">
-              {{ item.opportunity_score }}分
-            </el-tag>
-            <el-tag size="small" v-if="item.platform">{{ item.platform }}</el-tag>
-            <el-tag size="small" v-if="item.lifecycle" type="success">{{ item.lifecycle }}</el-tag>
-            <el-tag size="small" v-if="item.direction" :type="directionType(item.direction)">{{ directionLabel(item.direction) }}</el-tag>
+            <el-tag size="small" effect="plain">{{ item.category }}</el-tag>
+            <el-tag size="small" v-if="item.platform" effect="plain">{{ item.platform }}</el-tag>
+            <el-tag size="small" v-if="item.lifecycle" type="success" effect="plain">{{ item.lifecycle }}</el-tag>
           </div>
           <div class="card-extra" v-if="item.user_emotion || item.competition">
             <span v-if="item.user_emotion">用户情绪：{{ item.user_emotion }}</span>
             <span v-if="item.competition">竞争度：{{ item.competition }}</span>
           </div>
           <div class="card-risk" v-if="item.risk_level">
-            <el-tag :type="riskType(item.risk_level)" size="small">风险：{{ item.risk_level }}</el-tag>
+            <el-tag :type="riskType(item.risk_level)" size="small" effect="dark">风险：{{ item.risk_level }}</el-tag>
           </div>
           <div class="card-insight" v-if="item.actionable_insight">
             {{ truncate(item.actionable_insight, 60) }}
           </div>
         </div>
-      </el-card>
+      </div>
     </div>
 
     <div v-if="items.length > 0" class="pagination-wrap">
@@ -67,7 +79,7 @@
           </el-descriptions-item>
           <el-descriptions-item label="生命周期">{{ detailItem.lifecycle }}</el-descriptions-item>
           <el-descriptions-item label="趋势方向">
-            <el-tag :type="directionType(detailItem.direction)">{{ directionLabel(detailItem.direction) }}</el-tag>
+            <el-tag :type="directionType(detailItem.direction)">{{ getDirectionLabel(detailItem.direction) }}</el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="竞争度">{{ detailItem.competition }}</el-descriptions-item>
           <el-descriptions-item label="风险等级">
@@ -114,7 +126,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
-import { exportJSON, exportCSV, deleteItem, truncate, isAdmin } from "@/utils/intel"
+import { exportJSON, exportCSV, deleteItem, truncate, isAdmin, fetchWithCache, clearCache } from "@/utils/intel"
+import { getScoreColor, getDirectionIcon, getDirectionLabel } from "@/utils/theme"
 
 interface TrendItem {
   id: string
@@ -186,11 +199,6 @@ function directionType(d: string): string {
   return map[d?.toLowerCase()] || "info"
 }
 
-function directionLabel(d: string): string {
-  const map: Record<string, string> = { rising: "上升", stable: "稳定", falling: "下降" }
-  return map[d?.toLowerCase()] || d
-}
-
 function openDetail(item: TrendItem) {
   detailItem.value = item
   detailVisible.value = true
@@ -201,6 +209,7 @@ async function handleDelete(item: TrendItem | null) {
   const ok = await deleteItem("trends", item.id, item.title)
   if (ok) {
     items.value = items.value.filter((i) => i.id !== item.id)
+    clearCache("trends")
     detailVisible.value = false
   }
 }
@@ -215,8 +224,7 @@ function handlePageChange() {
 onMounted(async () => {
   loading.value = true
   try {
-    const { data } = await api.get("/intel/trends")
-    items.value = data?.items || data || []
+    items.value = await fetchWithCache<TrendItem>("trends", "/intel/trends")
   } catch {
     items.value = []
   } finally {
@@ -243,9 +251,52 @@ onMounted(async () => {
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
 }
-.trend-card { cursor: pointer; transition: transform 0.2s; }
-.trend-card:hover { transform: translateY(-2px); }
-.card-body { padding: 0; }
+.trend-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+.trend-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+.trend-dir-bar {
+  height: 3px;
+  width: 100%;
+}
+.trend-card.dir-rising .trend-dir-bar { background: #059669; }
+.trend-card.dir-stable .trend-dir-bar { background: #2563eb; }
+.trend-card.dir-falling .trend-dir-bar { background: #dc2626; }
+.trend-card.dir-rising { border-left: 4px solid #059669; }
+.trend-card.dir-stable { border-left: 4px solid #2563eb; }
+.trend-card.dir-falling { border-left: 4px solid #dc2626; }
+.card-body { padding: 16px 18px; }
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.dir-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.dir-indicator.dir-rising { background: #ecfdf5; color: #059669; }
+.dir-indicator.dir-stable { background: #eff6ff; color: #2563eb; }
+.dir-indicator.dir-falling { background: #fef2f2; color: #dc2626; }
+.dir-icon { font-size: 14px; }
+.score-badge {
+  font-size: 24px;
+  font-weight: 800;
+}
 .card-title {
   font-size: 15px;
   font-weight: 600;
@@ -269,9 +320,12 @@ onMounted(async () => {
 .card-risk { margin-top: 4px; }
 .card-insight {
   font-size: 12px;
-  color: #409eff;
+  color: #2563eb;
   margin-top: 6px;
   line-height: 1.5;
+  background: #eff6ff;
+  padding: 8px 10px;
+  border-radius: 6px;
 }
 .pagination-wrap {
   margin-top: 24px;
@@ -296,9 +350,10 @@ onMounted(async () => {
   border-radius: 6px;
 }
 .text-block.highlight {
-  background: #ecf5ff;
+  background: #ecfdf5;
   color: #303133;
   font-weight: 500;
+  border-left: 3px solid #059669;
 }
 .tag-list {
   display: flex;

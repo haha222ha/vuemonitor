@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
 from app.api.router import api_router
@@ -211,6 +212,10 @@ async def metrics():
 
 app.include_router(api_router, prefix="/api/v1")
 app.include_router(ws_router)
+
+REPORTS_STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "reports")
+os.makedirs(REPORTS_STATIC_DIR, exist_ok=True)
+app.mount("/static/reports", StaticFiles(directory=REPORTS_STATIC_DIR), name="static-reports")
 
 
 @app.post("/api/v1/monitoring/web-vitals")

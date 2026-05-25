@@ -3,6 +3,10 @@
     <div class="page-header">
       <h2>风险预警</h2>
       <div class="header-actions">
+        <el-radio-group v-model="viewMode" size="small">
+          <el-radio-button value="card">卡片</el-radio-button>
+          <el-radio-button value="table">表格</el-radio-button>
+        </el-radio-group>
         <el-select v-model="severityFilter" placeholder="严重程度" clearable size="small" style="width: 120px">
           <el-option label="全部" value="" />
           <el-option label="高" value="high" />
@@ -19,6 +23,38 @@
       <el-skeleton :rows="6" animated />
     </div>
     <el-empty v-else-if="!items.length" description="暂无风险数据" />
+
+    <div v-else-if="viewMode === 'card'" class="risk-grid">
+      <div
+        v-for="item in filteredItems"
+        :key="item.id"
+        class="risk-card"
+        :class="'severity-' + (item.severity || '').toLowerCase()"
+        @click="openDetail(item)"
+      >
+        <div class="risk-severity-bar"></div>
+        <div class="card-body">
+          <div class="card-top-row">
+            <div class="severity-badge" :class="'sev-' + (item.severity || '').toLowerCase()">
+              {{ severityLabel(item.severity) }}
+            </div>
+            <el-tag v-if="item.status === 'active'" type="danger" size="small" effect="dark">活跃</el-tag>
+            <el-tag v-else type="info" size="small">已解除</el-tag>
+          </div>
+          <div class="risk-name">{{ item.name }}</div>
+          <div class="risk-reason">{{ item.reason }}</div>
+          <div class="risk-alt" v-if="item.alternative">
+            <div class="alt-label">✅ 替代方案</div>
+            <div class="alt-text">{{ item.alternative }}</div>
+          </div>
+          <div class="card-meta">
+            <el-tag v-if="item.risk_type" size="small" type="info" effect="plain">{{ item.risk_type }}</el-tag>
+            <el-tag v-if="item.category" size="small" effect="plain">{{ item.category }}</el-tag>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <el-card v-else shadow="hover" class="risk-table-card">
       <el-table :data="filteredItems" style="width: 100%" @row-click="openDetail">
         <el-table-column prop="name" label="风险项" min-width="180" />
@@ -35,7 +71,12 @@
           </template>
         </el-table-column>
         <el-table-column prop="reason" label="原因" min-width="240" show-overflow-tooltip />
-        <el-table-column prop="alternative" label="替代方案" min-width="200" show-overflow-tooltip />
+        <el-table-column prop="alternative" label="替代方案" min-width="200" show-overflow-tooltip>
+          <template #default="{ row }">
+            <span v-if="row.alternative" class="alt-highlight">{{ row.alternative }}</span>
+            <span v-else>-</span>
+          </template>
+        </el-table-column>
         <el-table-column prop="risk_type" label="风险类型" width="110">
           <template #default="{ row }">
             <el-tag v-if="row.risk_type" size="small" type="info">{{ row.risk_type }}</el-tag>
@@ -47,19 +88,19 @@
           </template>
         </el-table-column>
       </el-table>
-
-      <div class="pagination-wrap">
-        <el-pagination
-          v-model:current-page="currentPage"
-          :page-size="pageSize"
-          :total="filteredTotal"
-          layout="total, prev, pager, next"
-          background
-          small
-          @current-change="handlePageChange"
-        />
-      </div>
     </el-card>
+
+    <div v-if="items.length > 0" class="pagination-wrap">
+      <el-pagination
+        v-model:current-page="currentPage"
+        :page-size="pageSize"
+        :total="filteredTotal"
+        layout="total, prev, pager, next"
+        background
+        small
+        @current-change="handlePageChange"
+      />
+    </div>
 
     <el-dialog v-model="detailVisible" :title="detailItem?.name" width="640px" destroy-on-close>
       <div v-if="detailItem" class="risk-detail">
@@ -73,7 +114,10 @@
           <el-descriptions-item label="风险类型" v-if="detailItem.risk_type">{{ detailItem.risk_type }}</el-descriptions-item>
           <el-descriptions-item label="分类" v-if="detailItem.category">{{ detailItem.category }}</el-descriptions-item>
           <el-descriptions-item label="原因" :span="2">{{ detailItem.reason }}</el-descriptions-item>
-          <el-descriptions-item label="替代方案" :span="2">{{ detailItem.alternative }}</el-descriptions-item>
+          <el-descriptions-item label="替代方案" :span="2">
+            <span v-if="detailItem.alternative" class="alt-highlight-detail">{{ detailItem.alternative }}</span>
+            <span v-else>-</span>
+          </el-descriptions-item>
           <el-descriptions-item label="风险描述" :span="2" v-if="detailItem.risk_description">{{ detailItem.risk_description }}</el-descriptions-item>
           <el-descriptions-item label="建议行动" :span="2" v-if="detailItem.recommended_action">{{ detailItem.recommended_action }}</el-descriptions-item>
           <el-descriptions-item label="早期信号" :span="2" v-if="detailItem.early_signal">{{ detailItem.early_signal }}</el-descriptions-item>
@@ -101,7 +145,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
-import { exportJSON, exportCSV, deleteItem, isAdmin } from "@/utils/intel"
+import { exportJSON, exportCSV, deleteItem, isAdmin, fetchWithCache, clearCache } from "@/utils/intel"
 
 interface RiskItem {
   id: string
@@ -125,6 +169,7 @@ const items = ref<RiskItem[]>([])
 const loading = ref(false)
 const searchText = ref("")
 const severityFilter = ref("")
+const viewMode = ref<"card" | "table">("card")
 const currentPage = ref(1)
 const pageSize = 15
 const detailItem = ref<RiskItem | null>(null)
@@ -175,6 +220,7 @@ async function handleDelete(item: RiskItem | null) {
   const ok = await deleteItem("risks", item.id, item.name)
   if (ok) {
     items.value = items.value.filter((i) => i.id !== item.id)
+    clearCache("risks")
     detailVisible.value = false
   }
 }
@@ -189,8 +235,7 @@ function handlePageChange() {
 onMounted(async () => {
   loading.value = true
   try {
-    const { data } = await api.get("/intel/risks")
-    items.value = data?.items || data || []
+    items.value = await fetchWithCache<RiskItem>("risks", "/intel/risks")
   } catch {
     items.value = []
   } finally {
@@ -212,7 +257,99 @@ onMounted(async () => {
 .page-header h2 { margin: 0; font-size: 20px; }
 .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .loading-placeholder { padding: 16px; }
+
+.risk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+.risk-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+.risk-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+.risk-severity-bar {
+  height: 3px;
+  width: 100%;
+}
+.risk-card.severity-high .risk-severity-bar { background: #dc2626; }
+.risk-card.severity-medium .risk-severity-bar { background: #d97706; }
+.risk-card.severity-low .risk-severity-bar { background: #059669; }
+.risk-card.severity-high { border-left: 4px solid #dc2626; }
+.risk-card.severity-medium { border-left: 4px solid #d97706; }
+.risk-card.severity-low { border-left: 4px solid #059669; }
+.card-body { padding: 16px 18px; }
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.severity-badge {
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.severity-badge.sev-high { background: #fef2f2; color: #dc2626; }
+.severity-badge.sev-medium { background: #fdf6ec; color: #d97706; }
+.severity-badge.sev-low { background: #f0f9eb; color: #059669; }
+.risk-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 8px;
+}
+.risk-reason {
+  font-size: 13px;
+  color: #606266;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.risk-alt {
+  background: #f0f9eb;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  border: 1px solid #a7f3d0;
+}
+.alt-label {
+  font-size: 12px;
+  color: #059669;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.alt-text {
+  font-size: 13px;
+  color: #303133;
+  line-height: 1.6;
+}
+.card-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .risk-table-card { margin-top: 0; }
+.alt-highlight {
+  color: #059669;
+  font-weight: 500;
+}
+.alt-highlight-detail {
+  color: #059669;
+  font-weight: 600;
+  background: #f0f9eb;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
 .pagination-wrap {
   margin-top: 16px;
   display: flex;

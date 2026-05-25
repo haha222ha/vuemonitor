@@ -17,6 +17,7 @@ const routes = [
       { path: "topics", component: () => import("../views/TopicsView.vue") },
       { path: "signals", component: () => import("../views/SignalsView.vue") },
       { path: "emotions", component: () => import("../views/EmotionsView.vue") },
+      { path: "report/:topicId", component: () => import("../views/ReportView.vue") },
     ],
   },
   { path: "/:pathMatch(.*)*", redirect: "/dashboard" },

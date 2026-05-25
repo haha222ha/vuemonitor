@@ -1,6 +1,42 @@
 import api from "@/utils/api"
 import { ElMessage, ElMessageBox } from "element-plus"
 
+interface CacheEntry<T> {
+  data: T
+  ts: number
+}
+
+const cache = new Map<string, CacheEntry<unknown>>()
+const CACHE_TTL = 5 * 60 * 1000
+
+export function getCached<T>(key: string): T | null {
+  const entry = cache.get(key)
+  if (!entry) return null
+  if (Date.now() - entry.ts > CACHE_TTL) {
+    cache.delete(key)
+    return null
+  }
+  return entry.data as T
+}
+
+export function setCache<T>(key: string, data: T): void {
+  cache.set(key, { data, ts: Date.now() })
+}
+
+export function clearCache(key?: string): void {
+  if (key) cache.delete(key)
+  else cache.clear()
+}
+
+export async function fetchWithCache<T>(key: string, url: string): Promise<T[]> {
+  const cached = getCached<T[]>(key)
+  if (cached) return cached
+  const { data } = await api.get(url)
+  const items = data?.items || data || []
+  setCache(key, items)
+  return items
+}
+
 export function isAdmin(): boolean {
   const token = localStorage.getItem("intel_token")
   if (!token) return false

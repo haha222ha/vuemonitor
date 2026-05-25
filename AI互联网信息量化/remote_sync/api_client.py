@@ -289,6 +289,81 @@ class IntelSyncClient:
 
         return summary
 
+    def upload_report(
+        self,
+        file_path: str | Path,
+        report_type: str = "weekly",
+        title: str | None = None,
+        week_number: str | None = None,
+        report_date: str | None = None,
+    ) -> dict:
+        file_path = Path(file_path)
+        if not file_path.exists():
+            raise FileNotFoundError(f"Report file not found: {file_path}")
+
+        if not title:
+            title = file_path.stem
+        if not report_date:
+            report_date = datetime.now().strftime("%Y-%m-%d")
+
+        with open(file_path, "rb") as f:
+            response = self.client.post(
+                "/api/v1/intel/reports/upload",
+                files={"file": (file_path.name, f)},
+                data={
+                    "report_type": report_type,
+                    "title": title,
+                    "week_number": week_number or "",
+                    "report_date": report_date,
+                },
+                headers={"Authorization": self.client.headers.get("Authorization", "")},
+            )
+            response.raise_for_status()
+
+        result = response.json()
+        logger.info(f"[Sync] Report uploaded: {file_path.name} -> {result.get('url', 'N/A')}")
+        return result
+
+    def upload_reports_from_dir(
+        self,
+        reports_dir: str | Path,
+        report_type: str = "weekly",
+        week_number: str | None = None,
+    ) -> list[dict]:
+        reports_dir = Path(reports_dir)
+        if not reports_dir.exists():
+            raise FileNotFoundError(f"Reports directory not found: {reports_dir}")
+
+        results = []
+        for fp in sorted(reports_dir.glob("*.html")):
+            try:
+                result = self.upload_report(
+                    file_path=fp,
+                    report_type=report_type,
+                    title=fp.stem,
+                    week_number=week_number,
+                )
+                results.append({"file": fp.name, "status": "ok", "result": result})
+            except Exception as e:
+                logger.error(f"[Sync] Failed to upload report {fp.name}: {e}")
+                results.append({"file": fp.name, "status": "error", "error": str(e)})
+
+        for fp in sorted(reports_dir.glob("*.pdf")):
+            try:
+                result = self.upload_report(
+                    file_path=fp,
+                    report_type=report_type,
+                    title=fp.stem,
+                    week_number=week_number,
+                )
+                results.append({"file": fp.name, "status": "ok", "result": result})
+            except Exception as e:
+                logger.error(f"[Sync] Failed to upload report {fp.name}: {e}")
+                results.append({"file": fp.name, "status": "error", "error": str(e)})
+
+        logger.info(f"[Sync] Reports upload complete: {len(results)} files processed")
+        return results
+
     def health_check(self) -> dict:
         resp = self.client.get("/api/v1/health")
         resp.raise_for_status()

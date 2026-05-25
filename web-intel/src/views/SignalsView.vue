@@ -17,27 +17,49 @@
       <el-skeleton :rows="6" animated />
     </div>
     <el-empty v-else-if="!items.length" description="暂无平台信号数据" />
-    <div v-else class="signal-list">
-      <el-card v-for="item in filteredItems" :key="item.id || item.platform" shadow="hover" class="signal-card" @click="openDetail(item)">
-        <div class="signal-body">
-          <div class="signal-left">
-            <div class="signal-icon" :style="{ background: iconColor(item.platform) }">
-              <el-icon :size="16"><Connection /></el-icon>
-            </div>
+    <div v-else>
+      <div v-for="group in groupedItems" :key="group.platform" class="platform-group">
+        <div class="group-header" :style="{ borderLeftColor: platformColor(group.platform) }">
+          <div class="group-icon" :style="{ background: platformIconBg(group.platform), color: platformTextColor(group.platform) }">
+            {{ platformEmoji(group.platform) }}
           </div>
-          <div class="signal-right">
-            <div class="signal-title">{{ item.title || item.platform }}</div>
-            <div class="signal-desc" v-if="item.description">{{ truncate(item.description, 80) }}</div>
-            <div class="signal-meta">
-              <el-tag size="small" v-if="item.platform">{{ item.platform }}</el-tag>
-              <el-tag size="small" v-if="item.type" :type="signalTagType(item.type)">{{ item.type }}</el-tag>
-              <el-tag size="small" v-if="item.impact_level" :type="impactTagType(item.impact_level)">影响: {{ item.impact_level }}</el-tag>
-              <span class="signal-time" v-if="item.detected_at">{{ item.detected_at?.slice(0, 10) }}</span>
-            </div>
-          </div>
-          <el-button v-if="isAdmin()" type="danger" text size="small" @click.stop="handleDelete(item)" class="delete-btn">删除</el-button>
+          <span class="group-name">{{ group.platform }}</span>
+          <el-tag size="small" type="info">{{ group.items.length }} 条信号</el-tag>
         </div>
-      </el-card>
+        <div class="signal-list">
+          <div
+            v-for="item in group.items"
+            :key="item.id || item.platform + item.title"
+            class="signal-card"
+            @click="openDetail(item)"
+          >
+            <div class="signal-body">
+              <div class="signal-left">
+                <div class="signal-strength" :class="'strength-' + (item.impact_level || 'low').toLowerCase()">
+                  <span class="strength-dots">
+                    <span v-for="n in 3" :key="n" class="dot" :class="{ active: n <= strengthLevel(item.impact_level) }"></span>
+                  </span>
+                </div>
+              </div>
+              <div class="signal-right">
+                <div class="signal-title">{{ item.title || item.platform }}</div>
+                <div class="signal-desc" v-if="item.description">{{ truncate(item.description, 80) }}</div>
+                <div class="signal-meta">
+                  <el-tag size="small" v-if="item.type" :type="signalTagType(item.type)" effect="plain">{{ item.type }}</el-tag>
+                  <el-tag size="small" v-if="item.impact_level" :type="impactTagType(item.impact_level)" effect="dark">
+                    影响: {{ item.impact_level }}
+                  </el-tag>
+                  <el-tag size="small" v-if="item.change_direction" :type="directionTagType(item.change_direction)" effect="plain">
+                    {{ item.change_direction }}
+                  </el-tag>
+                  <span class="signal-time" v-if="item.detected_at">{{ item.detected_at?.slice(0, 10) }}</span>
+                </div>
+              </div>
+              <el-button v-if="isAdmin()" type="danger" text size="small" @click.stop="handleDelete(item)" class="delete-btn">删除</el-button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div v-if="items.length > 0" class="pagination-wrap">
@@ -87,8 +109,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
-import { Connection } from "@element-plus/icons-vue"
-import { exportJSON, exportCSV, deleteItem, truncate, isAdmin } from "@/utils/intel"
+import { exportJSON, exportCSV, deleteItem, truncate, isAdmin, fetchWithCache, clearCache } from "@/utils/intel"
 
 interface SignalItem {
   id?: string
@@ -113,7 +134,7 @@ const loading = ref(false)
 const searchText = ref("")
 const platformFilter = ref("")
 const currentPage = ref(1)
-const pageSize = 15
+const pageSize = 30
 const detailItem = ref<SignalItem | null>(null)
 const detailVisible = ref(false)
 
@@ -143,14 +164,53 @@ const filteredTotal = computed(() => {
   return result.length
 })
 
-function iconColor(platform: string): string {
+const groupedItems = computed(() => {
+  const groups: Record<string, SignalItem[]> = {}
+  for (const item of filteredItems.value) {
+    const p = item.platform || "未知"
+    if (!groups[p]) groups[p] = []
+    groups[p].push(item)
+  }
+  return Object.entries(groups).map(([platform, items]) => ({ platform, items }))
+})
+
+function platformColor(p: string): string {
   const map: Record<string, string> = {
     xiaohongshu: "#e3f2fd",
     douyin: "#fce4ec",
     weixin: "#e8f5e9",
     bilibili: "#fff3e0",
   }
-  return map[platform?.toLowerCase()] || "#f5f5f5"
+  return map[p?.toLowerCase()] || "#f5f5f5"
+}
+
+function platformIconBg(p: string): string {
+  const map: Record<string, string> = {
+    xiaohongshu: "#ff2442",
+    douyin: "#161823",
+    weixin: "#07c160",
+    bilibili: "#fb7299",
+  }
+  return map[p?.toLowerCase()] || "#909399"
+}
+
+function platformTextColor(p: string): string {
+  return "#fff"
+}
+
+function platformEmoji(p: string): string {
+  const map: Record<string, string> = {
+    xiaohongshu: "📕",
+    douyin: "🎵",
+    weixin: "💬",
+    bilibili: "📺",
+  }
+  return map[p?.toLowerCase()] || "📡"
+}
+
+function strengthLevel(level?: string): number {
+  const map: Record<string, number> = { high: 3, medium: 2, low: 1 }
+  return map[level?.toLowerCase() || ""] || 1
 }
 
 function signalTagType(type?: string): string {
@@ -171,6 +231,11 @@ function impactTagType(level?: string): string {
   return map[level?.toLowerCase() || ""] || "info"
 }
 
+function directionTagType(dir?: string): string {
+  const map: Record<string, string> = { rising: "success", falling: "danger", stable: "info" }
+  return map[dir?.toLowerCase() || ""] || "info"
+}
+
 function openDetail(item: SignalItem) {
   detailItem.value = item
   detailVisible.value = true
@@ -181,6 +246,7 @@ async function handleDelete(item: SignalItem | null) {
   const ok = await deleteItem("signals", item.id, item.platform)
   if (ok) {
     items.value = items.value.filter((i) => i.id !== item.id)
+    clearCache("signals")
     detailVisible.value = false
   }
 }
@@ -195,8 +261,7 @@ function handlePageChange() {
 onMounted(async () => {
   loading.value = true
   try {
-    const { data } = await api.get("/intel/signals")
-    items.value = data?.items || data || []
+    items.value = await fetchWithCache<SignalItem>("signals", "/intel/signals")
   } catch {
     items.value = []
   } finally {
@@ -218,28 +283,82 @@ onMounted(async () => {
 .page-header h2 { margin: 0; font-size: 20px; }
 .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .loading-placeholder { padding: 16px; }
-.signal-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+
+.platform-group {
+  margin-bottom: 24px;
 }
-.signal-card { cursor: pointer; transition: transform 0.2s; }
-.signal-card:hover { transform: translateY(-1px); }
-.signal-body {
+.group-header {
   display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid;
 }
-.signal-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+.group-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  color: #606266;
+  font-size: 16px;
 }
+.group-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  flex: 1;
+}
+
+.signal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.signal-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 12px 16px;
+}
+.signal-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateX(4px);
+}
+.signal-body {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.signal-left {
+  padding-top: 4px;
+}
+.signal-strength {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.strength-dots {
+  display: flex;
+  gap: 3px;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e4e7ed;
+  transition: background 0.2s;
+}
+.dot.active { background: #d97706; }
+.strength-high .dot.active { background: #dc2626; }
+.strength-medium .dot.active { background: #d97706; }
+.strength-low .dot.active { background: #059669; }
 .signal-right { flex: 1; }
 .signal-title {
   font-size: 14px;

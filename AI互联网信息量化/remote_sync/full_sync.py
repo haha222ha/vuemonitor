@@ -214,6 +214,9 @@ def main():
     parser.add_argument("--dry-run", action="store_true", help="Validate config and data files without pushing")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
     parser.add_argument("--no-health-check", action="store_true", help="Skip health check before sync")
+    parser.add_argument("--upload-reports", type=str, default="", help="Upload report files from directory")
+    parser.add_argument("--report-type", type=str, default="weekly", help="Report type for upload (weekly|monthly)")
+    parser.add_argument("--week-number", type=str, default="", help="Week number for report upload")
 
     args = parser.parse_args()
 
@@ -262,6 +265,27 @@ def main():
         logger.info(f"Single target sync: {args.target}")
     else:
         targets_config = config.get("targets", {})
+
+    if args.upload_reports:
+        print("[Reports] Uploading report files...")
+        client = IntelSyncClient(base_url, api_token)
+        try:
+            results = client.upload_reports_from_dir(
+                reports_dir=args.upload_reports,
+                report_type=args.report_type,
+                week_number=args.week_number or None,
+            )
+            ok_count = sum(1 for r in results if r["status"] == "ok")
+            err_count = sum(1 for r in results if r["status"] == "error")
+            print(f"  Uploaded: {ok_count} ok, {err_count} errors")
+            for r in results:
+                icon = "OK" if r["status"] == "ok" else "ERR"
+                print(f"  [{icon}] {r['file']}")
+        except Exception as e:
+            logger.error(f"Report upload failed: {e}", exc_info=True)
+            print(f"\n[FATAL] Report upload failed: {e}")
+            sys.exit(1)
+        return
 
     logger.info("Starting full sync...")
     print("[Sync] Starting...")

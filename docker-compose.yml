@@ -25,6 +25,7 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD must be set in .env}
     volumes:
       - ./server/app:/app/app
+      - intel_reports:/app/static/reports
     restart: unless-stopped
     deploy:
       resources:
@@ -50,6 +51,30 @@ services:
     build: ./web-admin
     ports:
       - "3000:80"
+    depends_on:
+      server:
+        condition: service_healthy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  web-intel:
+    build: ./web-intel
+    ports:
+      - "5173:80"
     depends_on:
       server:
         condition: service_healthy
@@ -189,3 +214,4 @@ volumes:
   postgres_data:
   redis_data:
   backup_data:
+  intel_reports:

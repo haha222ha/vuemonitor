@@ -20,31 +20,50 @@
     </div>
     <el-empty v-else-if="!items.length" description="暂无用户情绪数据" />
     <div v-else class="emotion-grid">
-      <el-card v-for="item in filteredItems" :key="item.id || item.keyword" shadow="hover" class="emotion-card" @click="openDetail(item)">
+      <div
+        v-for="item in filteredItems"
+        :key="item.id || item.keyword"
+        class="emotion-card"
+        :class="'sentiment-' + (item.sentiment || '').toLowerCase()"
+        @click="openDetail(item)"
+      >
+        <div class="sentiment-bar"></div>
         <div class="card-body">
           <div class="card-header-row">
             <span class="keyword">{{ item.keyword || item.keyword_cluster }}</span>
-            <el-tag :type="sentimentTagType(item.sentiment)" size="small" effect="plain">
+            <el-tag :type="sentimentTagType(item.sentiment)" size="small" effect="dark">
               {{ sentimentLabel(item.sentiment) }}
             </el-tag>
           </div>
-          <div class="card-stats" v-if="item.intensity !== undefined || item.volume !== undefined">
-            <div class="stat-item" v-if="item.intensity !== undefined">
-              <span class="stat-label">情绪强度</span>
-              <el-progress
-                :percentage="Math.round((item.intensity || 0) * 100)"
-                :color="intensityColor(item.intensity)"
-                :stroke-width="8"
-              />
+          <div class="intensity-section" v-if="item.intensity !== undefined">
+            <div class="intensity-header">
+              <span class="intensity-label">情绪强度</span>
+              <span class="intensity-val" :style="{ color: getIntensityColor(item.intensity) }">
+                {{ (item.intensity * 100).toFixed(0) }}%
+              </span>
             </div>
-            <div class="stat-item" v-if="item.volume !== undefined">
-              <span class="stat-label">讨论量</span>
-              <span class="stat-value">{{ item.volume }}</span>
+            <div class="intensity-track">
+              <div
+                class="intensity-fill"
+                :style="{
+                  width: (item.intensity * 100) + '%',
+                  background: getIntensityColor(item.intensity)
+                }"
+              ></div>
             </div>
+            <div class="intensity-levels">
+              <span class="level-low">低</span>
+              <span class="level-mid">中</span>
+              <span class="level-high">高</span>
+            </div>
+          </div>
+          <div class="card-stats" v-if="item.volume !== undefined">
+            <span class="stat-label">讨论量</span>
+            <span class="stat-value">{{ item.volume }}</span>
           </div>
           <div class="card-keywords" v-if="item.related_keywords?.length">
             <span class="kw-label">关联词：</span>
-            <el-tag v-for="kw in item.related_keywords.slice(0, 6)" :key="kw" size="small" type="info">{{ kw }}</el-tag>
+            <el-tag v-for="kw in item.related_keywords.slice(0, 6)" :key="kw" size="small" type="info" effect="plain">{{ kw }}</el-tag>
             <el-tag v-if="item.related_keywords.length > 6" size="small" type="info">
               +{{ item.related_keywords.length - 6 }}
             </el-tag>
@@ -56,7 +75,7 @@
             <el-button type="danger" text size="small" @click.stop="handleDelete(item)">删除</el-button>
           </div>
         </div>
-      </el-card>
+      </div>
     </div>
 
     <div v-if="items.length > 0" class="pagination-wrap">
@@ -79,12 +98,20 @@
             <el-tag :type="sentimentTagType(detailItem.sentiment)" size="small">{{ sentimentLabel(detailItem.sentiment) }}</el-tag>
           </el-descriptions-item>
           <el-descriptions-item label="情绪强度">
-            <el-progress
-              :percentage="Math.round((detailItem.intensity || 0) * 100)"
-              :color="intensityColor(detailItem.intensity)"
-              :stroke-width="10"
-              style="width: 160px"
-            />
+            <div class="detail-intensity">
+              <div class="intensity-track">
+                <div
+                  class="intensity-fill"
+                  :style="{
+                    width: ((detailItem.intensity || 0) * 100) + '%',
+                    background: getIntensityColor(detailItem.intensity || 0)
+                  }"
+                ></div>
+              </div>
+              <span :style="{ color: getIntensityColor(detailItem.intensity || 0), fontWeight: 700 }">
+                {{ ((detailItem.intensity || 0) * 100).toFixed(0) }}%
+              </span>
+            </div>
           </el-descriptions-item>
           <el-descriptions-item label="讨论量">{{ detailItem.volume ?? "-" }}</el-descriptions-item>
           <el-descriptions-item label="平台来源" v-if="detailItem.platform_source">{{ detailItem.platform_source }}</el-descriptions-item>
@@ -128,7 +155,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
-import { exportJSON, exportCSV, deleteItem, isAdmin } from "@/utils/intel"
+import { exportJSON, exportCSV, deleteItem, isAdmin, fetchWithCache, clearCache } from "@/utils/intel"
+import { getIntensityColor } from "@/utils/theme"
 
 interface EmotionItem {
   id?: string
@@ -199,13 +227,6 @@ function sentimentLabel(s?: string): string {
   return map[s?.toLowerCase() || ""] || s || "未知"
 }
 
-function intensityColor(value?: number): string {
-  if (!value) return "#909399"
-  if (value >= 0.7) return "#f56c6c"
-  if (value >= 0.4) return "#e6a23c"
-  return "#67c23a"
-}
-
 function openDetail(item: EmotionItem) {
   detailItem.value = item
   detailVisible.value = true
@@ -216,6 +237,7 @@ async function handleDelete(item: EmotionItem | null) {
   const ok = await deleteItem("emotions", item.id, item.keyword || "该情绪数据")
   if (ok) {
     items.value = items.value.filter((i) => i.id !== item.id)
+    clearCache("emotions")
     detailVisible.value = false
   }
 }
@@ -230,8 +252,7 @@ function handlePageChange() {
 onMounted(async () => {
   loading.value = true
   try {
-    const { data } = await api.get("/intel/emotions")
-    items.value = data?.items || data || []
+    items.value = await fetchWithCache<EmotionItem>("emotions", "/intel/emotions")
   } catch {
     items.value = []
   } finally {
@@ -258,32 +279,84 @@ onMounted(async () => {
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
 }
-.emotion-card { cursor: pointer; transition: transform 0.2s; }
-.emotion-card:hover { transform: translateY(-2px); }
-.card-body { padding: 0; }
+.emotion-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+.emotion-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+.sentiment-bar {
+  height: 3px;
+  width: 100%;
+}
+.emotion-card.sentiment-positive .sentiment-bar { background: #059669; }
+.emotion-card.sentiment-neutral .sentiment-bar { background: #2563eb; }
+.emotion-card.sentiment-negative .sentiment-bar { background: #dc2626; }
+.emotion-card.sentiment-positive { border-left: 4px solid #059669; }
+.emotion-card.sentiment-neutral { border-left: 4px solid #2563eb; }
+.emotion-card.sentiment-negative { border-left: 4px solid #dc2626; }
+.card-body { padding: 16px 18px; }
 .card-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 .keyword {
   font-size: 15px;
   font-weight: 600;
   color: #303133;
 }
+.intensity-section {
+  margin-bottom: 12px;
+}
+.intensity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.intensity-label {
+  font-size: 12px;
+  color: #909399;
+}
+.intensity-val {
+  font-size: 14px;
+  font-weight: 700;
+}
+.intensity-track {
+  height: 8px;
+  background: #e4e7ed;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.intensity-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+.intensity-levels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 10px;
+  color: #c0c4cc;
+}
 .card-stats {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
   margin-bottom: 10px;
 }
-.stat-item { }
 .stat-label {
   font-size: 12px;
   color: #909399;
-  display: block;
-  margin-bottom: 4px;
 }
 .stat-value {
   font-size: 18px;
@@ -317,6 +390,15 @@ onMounted(async () => {
   justify-content: center;
 }
 .emotion-detail { padding: 0; }
+.detail-intensity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.detail-intensity .intensity-track {
+  flex: 1;
+  height: 10px;
+}
 .detail-section { margin-top: 20px; }
 .detail-section h4 {
   font-size: 14px;
@@ -339,8 +421,9 @@ onMounted(async () => {
   border-radius: 6px;
 }
 .text-block.highlight {
-  background: #ecf5ff;
+  background: #ecfdf5;
   color: #303133;
   font-weight: 500;
+  border-left: 3px solid #059669;
 }
 </style>

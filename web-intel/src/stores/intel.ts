@@ -1,6 +1,7 @@
 import { defineStore } from "pinia"
 import { ref } from "vue"
 import api from "@/utils/api"
+import { getCached, setCache, clearCache } from "@/utils/intel"
 
 export interface TrendItem {
   id: string
@@ -19,6 +20,7 @@ export interface OpportunityItem {
   name: string
   category: string
   verdict_score: number
+  verdict?: string
   difficulty: string
   startup_cost: string
   monthly_ceiling: string
@@ -54,11 +56,17 @@ export const useIntelStore = defineStore("intel", () => {
   const error = ref("")
 
   async function fetchDashboard(): Promise<void> {
+    const cached = getCached<DashboardSummary>("dashboard")
+    if (cached) {
+      dashboard.value = cached
+      return
+    }
     loading.value = true
     error.value = ""
     try {
       const { data } = await api.get("/intel/dashboard")
       dashboard.value = data
+      setCache("dashboard", data)
     } catch (e: unknown) {
       const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail || "加载失败"
       error.value = msg
@@ -67,5 +75,9 @@ export const useIntelStore = defineStore("intel", () => {
     }
   }
 
-  return { dashboard, loading, error, fetchDashboard }
+  function invalidateCache(): void {
+    clearCache()
+  }
+
+  return { dashboard, loading, error, fetchDashboard, invalidateCache }
 })
