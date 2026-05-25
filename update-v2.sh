@@ -1,3 +1,2 @@
 #!/bin/bash
-# 兼容旧入口，等价于: bash /opt/vuemonitor/scripts/host-update.sh
-exec bash /opt/vuemonitor/scripts/host-update.sh "$@"
+cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main && exec bash scripts/host-update.sh "$@"

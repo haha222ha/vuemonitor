@@ -26,7 +26,7 @@ cd D:\vuemonitor
 ### 2. 生产机（SSH 登录后，复制下面这一行）
 
 ```bash
-bash /opt/vuemonitor/scripts/host-update.sh
+cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main && bash scripts/host-update.sh
 ```
 
 ### 3. 首次安装 systemd（仅一次）

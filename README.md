@@ -389,7 +389,7 @@ curl http://localhost:8000/health
 ### 2G 主机一键更新（git push 后复制这一行）
 
 ```bash
-bash /opt/vuemonitor/scripts/host-update.sh
+cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main && bash scripts/host-update.sh
 ```
 
 详见 [docs/DEPLOY-2G.md](docs/DEPLOY-2G.md)。
