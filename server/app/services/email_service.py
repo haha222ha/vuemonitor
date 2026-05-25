@@ -96,6 +96,11 @@ class EmailService:
             return False
 
     def _smtp_send(self, msg: MIMEMultipart, to_email: str) -> None:
+        if self.settings.SMTP_USE_SSL:
+            with smtplib.SMTP_SSL(self.settings.SMTP_HOST, self.settings.SMTP_PORT) as server:
+                server.login(self.settings.SMTP_USER, self.settings.SMTP_PASSWORD)
+                server.sendmail(self.settings.SMTP_FROM, [to_email], msg.as_string())
+            return
         with smtplib.SMTP(self.settings.SMTP_HOST, self.settings.SMTP_PORT) as server:
             if self.settings.SMTP_USE_TLS:
                 server.starttls()

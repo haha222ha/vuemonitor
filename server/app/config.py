@@ -87,6 +87,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     SMTP_FROM: str = "noreply@xhs365.cn"
     SMTP_USE_TLS: bool = True
+    SMTP_USE_SSL: bool = False
 
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"]
 
