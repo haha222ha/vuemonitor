@@ -36,7 +36,8 @@ async def list_topics(
                 "id": str(t.id), "title": t.title, "hook_type": t.hook_type,
                 "emotion": t.emotion, "platform": t.platform,
                 "content_type": t.content_type, "ctr_prediction": t.ctr_prediction,
-                "competition": t.competition, "topic_data": t.topic_data,
+                "competition": t.competition, "source_topic_id": t.source_topic_id,
+                "topic_data": t.topic_data,
                 "created_at": t.created_at.isoformat() if t.created_at else None,
             }
             for t in topics

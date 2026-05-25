@@ -12,6 +12,9 @@
         </el-button>
         <div class="toolbar-actions">
           <el-button size="small" @click="doExportJSON">导出JSON</el-button>
+          <el-button size="small" @click="viewHTML" v-if="htmlUrl">
+            <el-icon><View /></el-icon> 查看HTML报告
+          </el-button>
           <el-button size="small" type="primary" @click="downloadPDF" v-if="pdfUrl">
             <el-icon><Download /></el-icon> 下载PDF
           </el-button>
@@ -200,7 +203,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import { useRoute } from "vue-router"
-import { ArrowLeft, Download, WarningFilled } from "@element-plus/icons-vue"
+import { ArrowLeft, Download, View, WarningFilled } from "@element-plus/icons-vue"
 import api from "@/utils/api"
 import { exportJSON, fetchWithCache } from "@/utils/intel"
 import { getThemeByCategory, getThemeKeyByCategory, getScoreColor } from "@/utils/theme"
@@ -274,10 +277,26 @@ const cssVars = computed(() => ({
   "--domain-bg": theme.value.bg,
 }))
 
-const pdfUrl = computed(() => {
-  if (!item.value?.id) return ""
-  return `/static/reports/${item.value.source_topic_id || item.value.id}/report.pdf`
-})
+const pdfUrl = ref("")
+const htmlUrl = ref("")
+
+async function loadReportFiles() {
+  if (!item.value) return
+  try {
+    const { data } = await api.get("/intel/reports")
+    const reports = data?.items || data || []
+    const matched = reports.find((r: any) => {
+      const rTitle = (r.title || "").toLowerCase()
+      const iTitle = (item.value?.title || "").toLowerCase()
+      return rTitle && iTitle && (rTitle.includes(iTitle.slice(0, 10)) || iTitle.includes(rTitle.slice(0, 10)))
+    })
+    if (matched?.file_path) {
+      const url = matched.file_path
+      if (url.endsWith(".pdf")) pdfUrl.value = url
+      else if (url.endsWith(".html") || url.endsWith(".htm")) htmlUrl.value = url
+    }
+  } catch {}
+}
 
 function doExportJSON() {
   if (!item.value) return
@@ -286,7 +305,18 @@ function doExportJSON() {
 
 function downloadPDF() {
   if (!pdfUrl.value) return
-  window.open(pdfUrl.value, "_blank")
+  const a = document.createElement("a")
+  a.href = pdfUrl.value
+  a.download = `${item.value?.title || "报告"}.pdf`
+  a.target = "_blank"
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
+function viewHTML() {
+  if (!htmlUrl.value) return
+  window.open(htmlUrl.value, "_blank")
 }
 
 onMounted(async () => {
@@ -295,6 +325,7 @@ onMounted(async () => {
     const topicId = route.params.topicId as string
     const items = await fetchWithCache<TopicItem>("topics", "/intel/topics")
     item.value = items.find((t) => t.id === topicId) || null
+    if (item.value) await loadReportFiles()
   } catch {
     item.value = null
   } finally {
