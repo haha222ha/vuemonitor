@@ -27,3 +27,9 @@ cd /opt/vuemonitor && SMTP_HOST=smtp.qiye.163.com SMTP_PORT=994 SMTP_USE_TLS=fal
 ```
 
 不想把密码写在命令里：先 `git pull` 后只执行 `bash scripts/configure_smtp.sh`，按提示输入授权码。
+
+测试发信（主机用 `server/.venv`，不是 `server/venv`）：
+
+```bash
+cd /opt/vuemonitor && PYTHONPATH=/opt/vuemonitor/server /opt/vuemonitor/server/.venv/bin/python3 scripts/test_smtp.py --to 你的邮箱@example.com
+```

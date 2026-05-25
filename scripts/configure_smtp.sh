@@ -84,9 +84,13 @@ fi
 
 if [[ -n "$TEST_TO" ]]; then
   echo "Sending test email to $TEST_TO ..."
-  # shellcheck disable=SC1091
-  source "$ROOT/server/venv/bin/activate" 2>/dev/null || true
-  python3 "$ROOT/scripts/test_smtp.py" --to "$TEST_TO" && echo "Test email queued/sent." || echo "Test send failed — check journalctl -u vuemonitor"
+  PY="$ROOT/server/.venv/bin/python3"
+  if [[ ! -x "$PY" ]]; then
+    PY="$(command -v python3)"
+  fi
+  PYTHONPATH="$ROOT/server" "$PY" "$ROOT/scripts/test_smtp.py" --to "$TEST_TO" \
+    && echo "Test email sent." \
+    || echo "Test send failed — try SMTP_PORT=994 SMTP_USE_SSL=true; journalctl -u vuemonitor -n 30"
 else
   echo "Skip test (set TEST_TO=your@email.com to send test mail)"
 fi
