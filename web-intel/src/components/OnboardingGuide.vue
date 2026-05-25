@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    title="欢迎使用 AI 副业情报系统"
+    title="欢迎使用副业财富情报"
     width="480px"
     :close-on-click-modal="false"
     class="onboarding-dialog"

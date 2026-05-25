@@ -7,7 +7,7 @@
             <span class="logo-icon-text">AI</span>
           </div>
           <transition name="logo-fade">
-            <span v-if="!collapsed" class="logo-text">AI副业情报</span>
+            <span v-if="!collapsed" class="logo-text">副业财富情报</span>
           </transition>
         </div>
       </div>

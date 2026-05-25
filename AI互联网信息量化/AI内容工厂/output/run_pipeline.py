@@ -1,6 +1,7 @@
 """
 统一生产入口 run_pipeline.py
-整合：质检 → 报告生成 → 封面生成 → PDF导出 → 小红书内容生成
+整合：质检 → 报告生成 → 封面生成 → PDF导出 → 每日情报单篇（见 generate_daily_intel.py）
+⚠️ 已废弃：10天 Day01~Day10 小红书矩阵
 用法：
   python run_pipeline.py check          # 仅质检
   python run_pipeline.py covers         # 重新生成封面

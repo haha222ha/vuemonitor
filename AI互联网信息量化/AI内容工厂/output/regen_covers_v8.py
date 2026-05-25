@@ -8,9 +8,9 @@
   - Flexbox/Grid = 自动布局（不再手动计算Y坐标）
   - Playwright = 像素级精确截图（支持Google Fonts/CDN/响应式）
 
-Day1  目录体封面：渐变背景+目录卡片+FREE/LOCK标记+数据仪表盘
-Day2-9 深度钩子封面：超大数字+数据曲线+进度条+指标卡片
-Day10 促单封面：行动清单+数据对比图+大CTA按钮
+每日情报封面（仅两类，禁止「10天」文案）：
+  A 目录体：渐变背景+目录卡片+FREE/LOCK+数据仪表盘
+  B 数字判断体：超大数字+趋势曲线+双证据卡
 """
 import os
 import sys
@@ -652,12 +652,12 @@ def build_day1_html(tid, theme):
 
     <!-- CTA -->
     <div class="cta-btn" style="margin-top:16px;">
-        >> AI决策分析师 · 数据洞察 <<
+        >> 副业财富情报 · 数据洞察 <<
     </div>
 </div>
 
 <div class="footer">
-    <span class="footer-text">AI决策分析师 · 报告预览</span>
+    <span class="footer-text">副业财富情报 · 报告预览</span>
     <span class="footer-text">数据驱动决策</span>
 </div>
 </body></html>"""
@@ -752,12 +752,12 @@ def build_day2_9_html(tid, theme, day):
 
     <!-- CTA -->
     <div class="cta-btn">
-        >> AI决策分析师 · 数据洞察 <<
+        >> 副业财富情报 · 数据洞察 <<
     </div>
 </div>
 
 <div class="footer">
-    <span class="footer-text">AI决策分析师 · 深度洞察</span>
+    <span class="footer-text">副业财富情报 · 深度洞察</span>
     <span class="footer-text">Day{day}/10</span>
 </div>
 </body></html>"""
@@ -859,12 +859,12 @@ def build_day10_html(tid, theme):
 
     <!-- CTA -->
     <div class="cta-btn" style="padding:20px 0;font-size:20px;">
-        >> AI决策分析师 · 数据洞察 <<
+        >> 副业财富情报 · 数据洞察 <<
     </div>
 </div>
 
 <div class="footer">
-    <span class="footer-text">AI决策分析师 · 行动框架</span>
+    <span class="footer-text">副业财富情报 · 行动框架</span>
     <span class="footer-text">完整报告解锁</span>
 </div>
 </body></html>"""
