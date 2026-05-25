@@ -57,8 +57,16 @@ updates = {
     "SMTP_USE_SSL": os.environ["SMTP_USE_SSL"],
 }
 
+def env_line(key: str, val: str) -> str:
+    # dotenv 会把 $ 当变量展开；密码/含特殊字符的值必须加引号
+    if key == "SMTP_PASSWORD" or "$" in val or "%" in val or " " in val:
+        escaped = val.replace("'", "'\"'\"'")
+        return f"{key}='{escaped}'"
+    return f"{key}={val}"
+
+
 for key, val in updates.items():
-    line = f"{key}={val}\n"
+    line = env_line(key, val) + "\n"
     pattern = re.compile(rf"^{re.escape(key)}=.*$", re.MULTILINE)
     if pattern.search(text):
         text = pattern.sub(line.rstrip(), text)
@@ -85,9 +93,12 @@ fi
 
 if [[ -n "$TEST_TO" ]]; then
   echo "Sending test email to $TEST_TO ..."
-  bash "$ROOT/scripts/run-server-cmd.sh" "$ROOT/scripts/test_smtp.py" --to "$TEST_TO" \
-    && echo "Test email sent." \
-    || echo "Test send failed — try SMTP_PORT=994 SMTP_USE_SSL=true; journalctl -u vuemonitor -n 30"
+  (
+    cd "$ROOT/server"
+    export PYTHONPATH="$ROOT/server"
+    "$ROOT/server/.venv/bin/python3" "$ROOT/scripts/test_smtp.py" --to "$TEST_TO"
+  ) && echo "Test email sent." \
+    || echo "Test send failed — check SMTP_PASSWORD is quoted in .env; journalctl -u vuemonitor -n 30"
 else
   echo "Skip test (set TEST_TO=your@email.com to send test mail)"
 fi
