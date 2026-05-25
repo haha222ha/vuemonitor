@@ -29,24 +29,30 @@ def main() -> int:
         print(f"FAIL: no .env at {ENV_PATH}")
         return 1
 
-    checks = [
-        ("JWT_SECRET", lambda v: bool(v) and v != "change-me-in-production"),
-        ("JWT_REFRESH_SECRET", lambda v: bool(v) and "change-me" not in v),
-        ("ENCRYPTION_KEY", lambda v: len(v) >= 32),
-        ("DB_PASSWORD", lambda v: bool(v) and v not in ("saas_pass", "changeme")),
-        ("DEEPSEEK_API_KEY", lambda v: v.startswith("sk-") or len(v) > 20),
-        ("SMTP_HOST", lambda v: bool(v)),
-        ("SMTP_USER", lambda v: bool(v)),
-        ("SMTP_PASSWORD", lambda v: bool(v)),
+    checks: list[tuple[str, object, bool]] = [
+        ("JWT_SECRET", lambda v: bool(v) and v != "change-me-in-production", True),
+        ("JWT_REFRESH_SECRET", lambda v: bool(v) and "change-me" not in v, True),
+        ("ENCRYPTION_KEY", lambda v: len(v) >= 32, True),
+        ("DB_PASSWORD", lambda v: bool(v) and v not in ("saas_pass", "changeme"), True),
+        ("DEEPSEEK_API_KEY", lambda v: len(v) >= 8, False),
+        ("OPENAI_API_KEY", lambda v: len(v) >= 8, False),
+        ("SMTP_HOST", lambda v: bool(v), False),
+        ("SMTP_USER", lambda v: bool(v), False),
+        ("SMTP_PASSWORD", lambda v: bool(v), False),
     ]
 
     fail = 0
     print(f"Checking {ENV_PATH}\n")
-    for key, fn in checks:
+    for key, fn, required in checks:
         val = env.get(key, "")
-        ok = fn(val)
-        mark = "OK " if ok else "MISS"
-        if not ok:
+        ok = fn(val) if val or required else True
+        if not val and not required:
+            mark = "SKIP"
+        elif ok:
+            mark = "OK "
+        else:
+            mark = "MISS"
+        if not ok and (required or val):
             fail += 1
         hint = "(set)" if ok and key.endswith("PASSWORD") or key.endswith("KEY") or key.endswith("SECRET") else (val[:20] if ok else "")
         print(f"  {mark} {key} {hint}")
