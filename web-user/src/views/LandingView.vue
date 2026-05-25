@@ -485,7 +485,7 @@
             <div class="pricing-card-inner">
               <div class="pricing-plan">Pro</div>
               <div class="pricing-name">专业版</div>
-              <div class="pricing-price"><span class="price-amount">¥99</span><span class="price-period">/月</span></div>
+              <div class="pricing-price"><span class="price-amount">¥49</span><span class="price-period">/月</span></div>
               <div class="pricing-desc">AI驱动选品，效率翻倍</div>
               <ul class="pricing-features">
                 <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>50个商品监控</li>
@@ -495,14 +495,14 @@
                 <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>爆品预测</li>
                 <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>AI评分报告</li>
               </ul>
-              <router-link to="/register" class="btn-primary btn-block">立即升级</router-link>
+              <router-link to="/purchase" class="btn-primary btn-block">联系客服购买</router-link>
             </div>
           </div>
           <div class="pricing-card" v-observe>
             <div class="pricing-card-inner">
               <div class="pricing-plan">Premium</div>
               <div class="pricing-name">高级版</div>
-              <div class="pricing-price"><span class="price-amount">¥299</span><span class="price-period">/月</span></div>
+              <div class="pricing-price"><span class="price-amount">¥149</span><span class="price-period">/月</span></div>
               <div class="pricing-desc">完整AI决策能力</div>
               <ul class="pricing-features">
                 <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>无限商品监控</li>
@@ -512,7 +512,7 @@
                 <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>自定义看板</li>
                 <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>数据导出</li>
               </ul>
-              <router-link to="/register" class="btn-outline btn-block">选择方案</router-link>
+              <router-link to="/purchase" class="btn-outline btn-block">联系客服购买</router-link>
             </div>
           </div>
           <div class="pricing-card" v-observe>
@@ -529,7 +529,7 @@
                 <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>团队协作</li>
                 <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>专属客服</li>
               </ul>
-              <a href="#contact-qq" class="btn-outline btn-block">联系 QQ 客服</a>
+              <router-link to="/purchase" class="btn-outline btn-block">联系 QQ 客服</router-link>
             </div>
           </div>
         </div>

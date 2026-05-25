@@ -6,6 +6,7 @@ import { useI18n } from "../i18n";
 const routes = [
   { path: "/", name: "Landing", component: () => import(/* webpackChunkName: "landing" */ "../views/LandingView.vue") },
   { path: "/pricing", name: "Pricing", component: () => import(/* webpackChunkName: "pricing" */ "../views/PricingView.vue") },
+  { path: "/purchase", name: "Purchase", component: () => import(/* webpackChunkName: "purchase" */ "../views/PurchaseGuideView.vue") },
   { path: "/download", name: "Download", component: () => import(/* webpackChunkName: "download" */ "../views/DownloadView.vue") },
   { path: "/login", name: "Login", component: () => import(/* webpackChunkName: "auth" */ "../views/LoginView.vue") },
   { path: "/register", name: "Register", component: () => import(/* webpackChunkName: "auth" */ "../views/RegisterView.vue") },

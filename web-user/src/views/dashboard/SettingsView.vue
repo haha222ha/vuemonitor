@@ -58,6 +58,10 @@
       <el-col :span="12">
         <div class="panel">
           <h3>授权码激活</h3>
+          <p class="license-tip">
+            购买套餐后，客服会通过 QQ 发送授权码。
+            <router-link to="/purchase">查看购买教程</router-link>
+          </p>
           <el-input
             v-model="licenseCode"
             placeholder="请输入授权码"
@@ -496,6 +500,20 @@ onMounted(() => {
   font-weight: 600;
   color: #fff;
   margin: 0 0 16px;
+}
+
+.license-tip {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.5;
+}
+.license-tip a {
+  color: #818cf8;
+  text-decoration: none;
+}
+.license-tip a:hover {
+  text-decoration: underline;
 }
 
 .panel-title-row {

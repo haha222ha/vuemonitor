@@ -57,7 +57,7 @@
           <li class="disabled">✗ 爆品预测</li>
           <li class="disabled">✗ 风险预警</li>
         </ul>
-        <router-link to="/register" class="btn-primary btn-full">升级 Pro</router-link>
+        <router-link to="/purchase" class="btn-primary btn-full">联系客服购买 Pro</router-link>
       </div>
 
       <div class="plan-card">
@@ -68,7 +68,7 @@
         </div>
         <p class="plan-desc">完整AI决策能力，选品利器</p>
         <ul class="plan-features">
-          <li>✓ 无限监控商品</li>
+          <li>✓ 监控 500 个商品</li>
           <li>✓ 爆品概率预测</li>
           <li>✓ 多维评分模型</li>
           <li>✓ 风险预警</li>
@@ -77,7 +77,7 @@
           <li>✓ 7天/30天趋势预测</li>
           <li>✓ 优先客服支持</li>
         </ul>
-        <router-link to="/register" class="btn-outline btn-full">升级 Premium</router-link>
+        <router-link to="/purchase" class="btn-outline btn-full">联系客服购买 Premium</router-link>
       </div>
 
       <div class="plan-card">
@@ -96,8 +96,13 @@
           <li>✓ SLA保障</li>
           <li>✓ 定制化开发</li>
         </ul>
-        <a href="#" class="btn-outline btn-full">联系我们</a>
+        <router-link to="/purchase" class="btn-outline btn-full">联系客服咨询 Enterprise</router-link>
       </div>
+    </section>
+
+    <section class="purchase-note">
+      <p>付款后客服发送<strong>授权码</strong>，在 <router-link to="/dashboard/settings">设置页</router-link> 激活即可。</p>
+      <router-link to="/purchase" class="purchase-link">查看购买与激活教程 →</router-link>
     </section>
 
     <footer class="footer">
@@ -312,6 +317,29 @@
 
 .plan-features li.disabled {
   color: #4a4a5a;
+}
+
+.purchase-note {
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+  text-align: center;
+}
+.purchase-note p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.65);
+}
+.purchase-note strong {
+  color: #fff;
+}
+.purchase-link {
+  font-size: 14px;
+  color: #818cf8;
+  text-decoration: none;
+}
+.purchase-link:hover {
+  text-decoration: underline;
 }
 
 .footer {

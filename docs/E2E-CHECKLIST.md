@@ -21,6 +21,14 @@
 - [ ] 创建监控规则并查看通知
 - [ ] admin 后台登录（seed_admin 后）
 
+## 售卖路径（授权码，无支付）
+
+- [ ] `/purchase` 购买教程页可打开，QQ 二维码正常
+- [ ] `/pricing` Pro/Premium 按钮跳转购买页
+- [ ] admin 生成 Pro 授权码 → 用户设置页激活 → 套餐变为 Pro
+
+详见 [SELLING.md](SELLING.md)。
+
 ## GitHub 自动部署（可选）
 
 仓库 Settings → Secrets：
