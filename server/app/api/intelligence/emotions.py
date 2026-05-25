@@ -25,12 +25,28 @@ async def list_emotions(
         "count": len(emotions),
         "items": [
             {
-                "id": str(e.id), "keyword": e.keyword,
-                "emotion_type": e.emotion_type, "intensity": e.intensity,
-                "keyword_cluster": e.keyword_cluster, "platform_source": e.platform_source,
+                "id": str(e.id),
+                "keyword": e.keyword,
+                "sentiment": e.emotion_type or "neutral",
+                "intensity": _parse_intensity(e.intensity),
+                "volume": 0,
+                "keyword_cluster": e.keyword_cluster if isinstance(e.keyword_cluster, list) else [],
+                "related_keywords": e.keyword_cluster if isinstance(e.keyword_cluster, list) else [],
+                "platform_source": e.platform_source,
                 "trend_direction": e.trend_direction,
+                "emotion_type": e.emotion_type,
+                "intensity_raw": e.intensity,
                 "created_at": e.created_at.isoformat() if e.created_at else None,
             }
             for e in emotions
         ],
     }
+
+
+def _parse_intensity(val) -> float:
+    if val is None:
+        return 0.5
+    if isinstance(val, (int, float)):
+        return float(val)
+    mapping = {"high": 0.9, "medium": 0.6, "low": 0.3, "极高": 0.95, "高": 0.8, "中": 0.5, "低": 0.3, "极低": 0.1}
+    return mapping.get(str(val).lower(), 0.5)

@@ -50,6 +50,9 @@ async def list_trends(
                 "evidence": t.evidence, "actionable_insight": t.actionable_insight,
                 "affected_opportunities": t.affected_opportunities,
                 "risk_note": t.risk_note, "trend_history": t.trend_history,
+                "user_emotion": t.user_emotion,
+                "monetization_potential": t.monetization_potential,
+                "freshness_days": t.freshness_days,
                 "peak_expected": t.peak_expected.isoformat() if t.peak_expected else None,
                 "created_at": t.created_at.isoformat() if t.created_at else None,
             }

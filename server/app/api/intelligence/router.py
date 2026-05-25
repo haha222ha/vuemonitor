@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.api.intelligence.admin import router as admin_router
 from app.api.intelligence.auth import router as auth_router
 from app.api.intelligence.dashboard import router as dashboard_router
+from app.api.intelligence.data import router as data_router
 from app.api.intelligence.emotions import router as emotions_router
 from app.api.intelligence.opportunities import router as opportunities_router
 from app.api.intelligence.reports import router as reports_router
@@ -25,3 +26,4 @@ intel_router.include_router(topics_router)
 intel_router.include_router(signals_router)
 intel_router.include_router(emotions_router)
 intel_router.include_router(reports_router)
+intel_router.include_router(data_router)
