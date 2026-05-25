@@ -25,6 +25,7 @@ SYNC_TARGETS = [
         "field_map": {
             "trend_name": "title",
         },
+        "drop_fields": ["id"],
     },
     {
         "file": "trend_db.json",
@@ -37,21 +38,21 @@ SYNC_TARGETS = [
         "endpoint": "opportunities",
         "key_field": "name",
         "data_key": "opportunities",
+        "drop_fields": ["id"],
     },
     {
         "file": "risk_db.json",
         "endpoint": "risks",
         "key_field": "name",
         "data_key": "eliminated",
+        "drop_fields": ["id"],
     },
     {
         "file": "user_emotion_db.json",
         "endpoint": "emotions",
         "key_field": "keyword",
         "data_key": "emotions",
-        "field_map": {
-            "insight": "keyword",
-        },
+        "drop_fields": ["id", "first_observed", "related_opportunities", "persona_affected", "insight"],
     },
     {
         "file": "topics",
@@ -63,6 +64,7 @@ SYNC_TARGETS = [
             "topic_name": "title",
             "topic_id": "source_topic_id",
         },
+        "drop_fields": ["id"],
     },
 ]
 
@@ -157,8 +159,11 @@ class IntelSyncClient:
 
     def _transform(self, items: list[dict], target: dict) -> list[dict]:
         field_map = target.get("field_map")
+        drop_fields = target.get("drop_fields", [])
         if field_map:
             items = [self._apply_field_map(item, field_map) for item in items]
+        if drop_fields:
+            items = [{k: v for k, v in item.items() if k not in drop_fields} for item in items]
         if target["endpoint"] == "emotions":
             items = [self._process_emotion_item(item) for item in items]
         if target["endpoint"] == "topics":

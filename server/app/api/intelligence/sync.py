@@ -30,9 +30,12 @@ def _filter_item_for_model(item: dict, model_class) -> dict:
         c.name for c in model_class.__table__.columns
         if hasattr(c, "type") and c.type.__class__.__name__ == "DateTime"
     }
+    skip_keys = {"id", "created_at", "updated_at"}
     filtered = {}
     extra = {}
     for k, v in item.items():
+        if k in skip_keys:
+            continue
         if k in valid_keys:
             if k in dt_columns and isinstance(v, str):
                 try:
