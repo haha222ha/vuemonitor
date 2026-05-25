@@ -1,6 +1,19 @@
 import api from "@/utils/api"
 import { ElMessage, ElMessageBox } from "element-plus"
 
+export function isAdmin(): boolean {
+  const token = localStorage.getItem("intel_token")
+  if (!token) return false
+  try {
+    const parts = token.split(".")
+    if (parts.length !== 3) return false
+    const payload = JSON.parse(atob(parts[1]))
+    return payload.role === "admin" || payload.role === "super_admin"
+  } catch {
+    return false
+  }
+}
+
 export function exportJSON(data: unknown, filename: string) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" })
   const url = URL.createObjectURL(blob)

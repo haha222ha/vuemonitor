@@ -43,7 +43,7 @@
         </el-table-column>
         <el-table-column label="操作" width="80" fixed="right">
           <template #default="{ row }">
-            <el-button type="danger" text size="small" @click.stop="handleDelete(row)">删除</el-button>
+            <el-button v-if="isAdmin()" type="danger" text size="small" @click.stop="handleDelete(row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -90,7 +90,7 @@
         </div>
       </div>
       <template #footer>
-        <el-button @click="handleDelete(detailItem)" type="danger" size="small">删除</el-button>
+        <el-button v-if="isAdmin()" @click="handleDelete(detailItem)" type="danger" size="small">删除</el-button>
         <el-button @click="exportJSON([detailItem], detailItem?.name || '风险')" size="small">导出</el-button>
         <el-button @click="detailVisible = false" size="small">关闭</el-button>
       </template>
@@ -101,7 +101,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
-import { exportJSON, exportCSV, deleteItem } from "@/utils/intel"
+import { exportJSON, exportCSV, deleteItem, isAdmin } from "@/utils/intel"
 
 interface RiskItem {
   id: string

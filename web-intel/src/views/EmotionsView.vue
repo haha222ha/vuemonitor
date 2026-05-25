@@ -52,7 +52,7 @@
           <div class="card-note" v-if="item.insight || item.note">
             {{ item.insight || item.note }}
           </div>
-          <div class="card-actions">
+          <div class="card-actions" v-if="isAdmin()">
             <el-button type="danger" text size="small" @click.stop="handleDelete(item)">删除</el-button>
           </div>
         </div>
@@ -117,7 +117,7 @@
         </div>
       </div>
       <template #footer>
-        <el-button @click="handleDelete(detailItem)" type="danger" size="small">删除</el-button>
+        <el-button v-if="isAdmin()" @click="handleDelete(detailItem)" type="danger" size="small">删除</el-button>
         <el-button @click="exportJSON([detailItem], detailItem?.keyword || '情绪')" size="small">导出</el-button>
         <el-button @click="detailVisible = false" size="small">关闭</el-button>
       </template>
@@ -128,7 +128,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
-import { exportJSON, exportCSV, deleteItem } from "@/utils/intel"
+import { exportJSON, exportCSV, deleteItem, isAdmin } from "@/utils/intel"
 
 interface EmotionItem {
   id?: string

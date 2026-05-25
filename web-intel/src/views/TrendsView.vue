@@ -103,7 +103,7 @@
         </div>
       </div>
       <template #footer>
-        <el-button @click="handleDelete(detailItem)" type="danger" size="small">删除</el-button>
+        <el-button v-if="isAdmin()" @click="handleDelete(detailItem)" type="danger" size="small">删除</el-button>
         <el-button @click="doExportJSON" size="small">导出</el-button>
         <el-button @click="detailVisible = false" size="small">关闭</el-button>
       </template>
@@ -114,7 +114,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
-import { exportJSON, exportCSV, deleteItem, truncate } from "@/utils/intel"
+import { exportJSON, exportCSV, deleteItem, truncate, isAdmin } from "@/utils/intel"
 
 interface TrendItem {
   id: string

@@ -95,10 +95,18 @@
 
         <div class="detail-section" v-if="detailItem.verdict_detail && Object.keys(detailItem.verdict_detail).length">
           <h4>判定详情</h4>
-          <div class="json-block">
-            <div v-for="(val, key) in detailItem.verdict_detail" :key="key" class="json-row">
-              <span class="json-key">{{ key }}</span>
-              <span class="json-val">{{ formatValue(val) }}</span>
+          <div class="verdict-bars">
+            <div v-for="(val, key) in detailItem.verdict_detail" :key="key" class="verdict-bar-item">
+              <div class="verdict-bar-label">
+                <span class="verdict-key">{{ verdictLabel(key as string) }}</span>
+                <span class="verdict-score">{{ val }}/10</span>
+              </div>
+              <el-progress
+                :percentage="Math.round((Number(val) / 10) * 100)"
+                :stroke-width="12"
+                :color="verdictColor(Number(val))"
+                :show-text="false"
+              />
             </div>
           </div>
         </div>
@@ -138,7 +146,7 @@
         </div>
       </div>
       <template #footer>
-        <el-button @click="handleDelete(detailItem)" type="danger" size="small">删除</el-button>
+        <el-button v-if="isAdmin()" @click="handleDelete(detailItem)" type="danger" size="small">删除</el-button>
         <el-button @click="exportJSON([detailItem!], detailItem!.name)" size="small">导出</el-button>
         <el-button @click="detailVisible = false" size="small">关闭</el-button>
       </template>
@@ -149,7 +157,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
-import { exportJSON, exportCSV, deleteItem, formatValue } from "@/utils/intel"
+import { exportJSON, exportCSV, deleteItem, formatValue, isAdmin } from "@/utils/intel"
 
 interface OpportunityItem {
   id: string
@@ -238,6 +246,24 @@ function formatPath(path: unknown): string {
     if (p.type) return String(p.type)
   }
   return JSON.stringify(path)
+}
+
+const VERDICT_LABELS: Record<string, string> = {
+  monetization_path_authenticity: "变现路径真实性",
+  competition_heat: "竞争热度",
+  ordinary_person_fit: "普通人适配度",
+  sustained_demand: "持续需求",
+  copy_barrier: "抄袭壁垒",
+}
+
+function verdictLabel(key: string): string {
+  return VERDICT_LABELS[key] || key
+}
+
+function verdictColor(val: number): string {
+  if (val >= 8) return "#67c23a"
+  if (val >= 5) return "#e6a23c"
+  return "#f56c6c"
 }
 
 function openDetail(item: OpportunityItem) {
@@ -399,5 +425,31 @@ onMounted(async () => {
   color: #e6a23c;
   margin-top: 4px;
   display: block;
+}
+.verdict-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.verdict-bar-item {
+  background: #f8f9fa;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+.verdict-bar-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.verdict-key {
+  font-size: 13px;
+  color: #606266;
+  font-weight: 500;
+}
+.verdict-score {
+  font-size: 14px;
+  font-weight: 700;
+  color: #303133;
 }
 </style>

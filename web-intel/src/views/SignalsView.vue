@@ -35,7 +35,7 @@
               <span class="signal-time" v-if="item.detected_at">{{ item.detected_at?.slice(0, 10) }}</span>
             </div>
           </div>
-          <el-button type="danger" text size="small" @click.stop="handleDelete(item)" class="delete-btn">删除</el-button>
+          <el-button v-if="isAdmin()" type="danger" text size="small" @click.stop="handleDelete(item)" class="delete-btn">删除</el-button>
         </div>
       </el-card>
     </div>
@@ -76,7 +76,7 @@
         </div>
       </div>
       <template #footer>
-        <el-button @click="handleDelete(detailItem)" type="danger" size="small">删除</el-button>
+        <el-button v-if="isAdmin()" @click="handleDelete(detailItem)" type="danger" size="small">删除</el-button>
         <el-button @click="exportJSON([detailItem], detailItem?.platform || '信号')" size="small">导出</el-button>
         <el-button @click="detailVisible = false" size="small">关闭</el-button>
       </template>
@@ -88,7 +88,7 @@
 import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
 import { Connection } from "@element-plus/icons-vue"
-import { exportJSON, exportCSV, deleteItem, truncate } from "@/utils/intel"
+import { exportJSON, exportCSV, deleteItem, truncate, isAdmin } from "@/utils/intel"
 
 interface SignalItem {
   id?: string
