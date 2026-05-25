@@ -1,0 +1,32 @@
+{
+  "batch_id": "B20260522001",
+  "category": "考研决策",
+  "color_scheme": "education",
+  "filled_at": "B20260522001",
+  "products": [
+    {
+      "product_id": "001",
+      "type": "self_assess",
+      "title": "考研选学校5维自评[自评表]",
+      "path": "C:\\Users\\lucas\\Desktop\\AI互联网信息量化\\AI决策工具工厂\\output\\B20260522001\\html\\001.html"
+    },
+    {
+      "product_id": "002",
+      "type": "compare",
+      "title": "考研报班还是自学[对比表]",
+      "path": "C:\\Users\\lucas\\Desktop\\AI互联网信息量化\\AI决策工具工厂\\output\\B20260522001\\html\\002.html"
+    },
+    {
+      "product_id": "003",
+      "type": "checklist",
+      "title": "考研入门条件检查清单[清单]",
+      "path": "C:\\Users\\lucas\\Desktop\\AI互联网信息量化\\AI决策工具工厂\\output\\B20260522001\\html\\003.html"
+    },
+    {
+      "product_id": "004",
+      "type": "info_guide",
+      "title": "考研辅导机构横向测评[攻略]",
+      "path": "C:\\Users\\lucas\\Desktop\\AI互联网信息量化\\AI决策工具工厂\\output\\B20260522001\\html\\004.html"
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>
+  @page { size: A4; margin: 12mm 10mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    color: {{PRIMARY_COLOR}}; background: #fff;
+    max-width: 190mm; margin: 0 auto; padding: 0;
+  }
+
+  .header {
+    background: linear-gradient(135deg, {{PRIMARY_COLOR}}, {{PRIMARY_COLOR}}DD);
+    color: #fff; padding: 28px 32px; border-radius: 12px 12px 0 0;
+  }
+  .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; }
+  .header .sub { font-size: 15px; opacity: 0.9; }
+  .header .meta { font-size: 12px; opacity: 0.65; margin-top: 8px; }
+
+  .content { padding: 28px 32px; }
+
+  /* Section标题 */
+  .section-title {
+    font-size: 20px; font-weight: 700; color: {{ACCENT_COLOR}};
+    margin-bottom: 16px; margin-top: 28px; padding-bottom: 8px;
+    border-bottom: 2px solid {{ACCENT_COLOR}}33;
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  /* 对比表格 */
+  .info-table {
+    width: 100%; border-collapse: collapse; margin-bottom: 24px;
+    font-size: 14px;
+  }
+  .info-table thead th {
+    background: {{PRIMARY_COLOR}}; color: #fff; padding: 12px 14px;
+    font-weight: 600; text-align: left; font-size: 13px;
+  }
+  .info-table tbody td {
+    padding: 11px 14px; border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle;
+  }
+  .info-table tbody tr:hover { background: {{BG_COLOR}}; }
+  .info-table .highlight-row { background: {{ACCENT_COLOR}}0A; }
+  .info-table .rec-star { color: {{ACCENT_COLOR}}; font-weight: 700; }
+
+  /* 分人群推荐 */
+  .persona-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    margin-bottom: 24px;
+  }
+  .persona-card {
+    background: {{BG_COLOR}}; border-radius: 10px; padding: 18px 20px;
+    border: 1px solid transparent; transition: all 0.2s;
+  }
+  .persona-card:hover { border-color: {{ACCENT_COLOR}}44; }
+  .persona-card .persona-icon { font-size: 28px; margin-bottom: 8px; }
+  .persona-card .persona-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .persona-card .persona-rec { font-size: 14px; color: {{ACCENT_COLOR}}; font-weight: 600; margin-bottom: 4px; }
+  .persona-card .persona-reason { font-size: 12px; color: #888; line-height: 1.5; }
+
+  /* 避坑列表 */
+  .tips-list { margin-bottom: 24px; }
+  .tips-list .tip-item {
+    display: flex; align-items: flex-start; padding: 10px 0;
+    border-bottom: 1px solid #f5f5f5; font-size: 14px; line-height: 1.6;
+  }
+  .tips-list .tip-num {
+    width: 28px; height: 28px; background: {{ACCENT_COLOR}};
+    color: #fff; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 13px; font-weight: 700;
+    margin-right: 12px; flex-shrink: 0;
+  }
+
+  .footer {
+    text-align: center; padding: 16px 32px; font-size: 11px;
+    color: #aaa; border-top: 1px solid #eee;
+  }
+  .footer .disclaimer { margin-top: 4px; font-size: 10px; opacity: 0.7; }
+
+  @media print {
+    body { max-width: 100%; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>{{TITLE}}</h1>
+  <div class="sub">{{SUBTITLE}}</div>
+  <div class="meta">{{CATEGORY}} · ¥{{PRICE}} · 产品ID: {{PRODUCT_ID}}</div>
+</div>
+
+<div class="content">
+
+  <!-- Section 1: 概览对比表格 -->
+  <div class="section-title">📊 {{SECTION_1_TITLE}}</div>
+  {{SECTION_1_CONTENT}}
+
+  <!-- Section 2: 分人群推荐 -->
+  <div class="section-title">👥 {{SECTION_2_TITLE}}</div>
+  <div class="persona-grid">
+    {{SECTION_2_CONTENT}}
+  </div>
+
+  <!-- Section 3: 避坑清单 -->
+  <div class="section-title">⚠️ {{SECTION_3_TITLE}}</div>
+  <div class="tips-list">
+    {{SECTION_3_CONTENT}}
+  </div>
+
+</div>
+
+<div class="footer">
+  <div>{{PRODUCT_ID}} · AI决策工具工厂 · {{CATEGORY}}</div>
+  <div class="disclaimer">⚠️ 本工具仅供个人参考，不构成专业建议。信息具有时效性，请以各平台最新公告为准。</div>
+</div>
+
+</body>
+</html>

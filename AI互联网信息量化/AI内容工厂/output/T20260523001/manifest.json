@@ -1,0 +1,25 @@
+{
+  "topic_id": "T20260523001",
+  "topic_name": "AI代运营副业：0基础如何接到第一单并稳定月入5000+",
+  "category": "经济决策",
+  "content_layer": "D",
+  "layer_name": "商业机会型",
+  "generated_at": "2026-05-23",
+  "outputs": {
+    "html": "output/T20260523001/html/report.html",
+    "pdf": "output/T20260523001/pdf/report.pdf",
+    "xiaohongshu": {
+      "Day01": "output/T20260523001/xiaohongshu/Day01/"
+    }
+  },
+  "compliance_check": {
+    "p0_passed": true,
+    "p1_passed": true,
+    "p2_passed": true,
+    "disclaimers_added": true,
+    "no_absolute_terms": true,
+    "no_medical_claims": true,
+    "no_diversion": true
+  },
+  "status": "completed"
+}

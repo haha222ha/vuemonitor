@@ -1,4 +1,4 @@
-ï»¿import { EventEmitter } from "events";
+import { EventEmitter } from "events";
 import { getStorage } from "../storage/sqlite";
 import { normalizer, NormalizedXHSData, NormalizationResult } from "../collect/normalizer";
 import { featureEngine } from "../feature/feature-engine";
@@ -50,10 +50,10 @@ export class DataMart extends EventEmitter {
     const existing = this.findExistingProduct(key);
 
     if (existing) {
-      logger.debug("DataMart", "æ›´æ–°å·²æœ‰å•†å“æ•°æ®", { key, productId: existing.id });
+      logger.debug("DataMart", "¸üÐÂÒÑÓÐÉÌÆ·Êý¾Ý", { key, productId: existing.id });
       return this.updateExisting(existing, normalized, anomalies, key);
     } else {
-      logger.debug("DataMart", "åˆ›å»ºæ–°å•†å“æ•°æ®", { key });
+      logger.debug("DataMart", "´´½¨ÐÂÉÌÆ·Êý¾Ý", { key });
       return this.createNew(normalized, userId, anomalies, key);
     }
   }
@@ -72,7 +72,7 @@ export class DataMart extends EventEmitter {
         this.dedupCache.set(key, { id: row.id, lastCollected: row.last_collected_at || "" });
       }
       this.cacheLoaded = true;
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
   }
 
   private findExistingProduct(key: string): { id: string; lastCollected: string } | null {
@@ -143,7 +143,7 @@ export class DataMart extends EventEmitter {
             this.emit("monitor:triggered", { productId: existing.id, count: triggered });
           }
         }
-      } catch (err) { logger.warn("[Main] operation failed:", err); }
+      } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
     });
     return result;
   }
@@ -223,7 +223,7 @@ export class DataMart extends EventEmitter {
       if (rows.length > 0 && rows[0].sales_count !== null) {
         return Math.max(0, normalized.sales_count - rows[0].sales_count);
       }
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
 
     return null;
   }

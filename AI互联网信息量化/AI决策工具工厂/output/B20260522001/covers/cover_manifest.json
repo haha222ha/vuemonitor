@@ -1,0 +1,22 @@
+{
+  "batch_id": "B20260522001",
+  "total": 4,
+  "files": [
+    {
+      "name": "001_cover.png",
+      "product_id": "001"
+    },
+    {
+      "name": "002_cover.png",
+      "product_id": "002"
+    },
+    {
+      "name": "003_cover.png",
+      "product_id": "003"
+    },
+    {
+      "name": "004_cover.png",
+      "product_id": "004"
+    }
+  ]
+}

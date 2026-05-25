@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1080px; height: 1440px;
+    background: {{BG_COLOR}};
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  /* 顶部装饰条 */
+  .top-bar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 8px; background: {{ACCENT_COLOR}};
+  }
+  /* 品类图标 */
+  .emoji {
+    font-size: 96px; margin-bottom: 50px; margin-top: 60px;
+    line-height: 1;
+  }
+  /* 主标题 */
+  .title {
+    font-size: 46px; font-weight: 700; color: {{PRIMARY_COLOR}};
+    text-align: center; padding: 0 80px; line-height: 1.35;
+    margin-bottom: 24px; letter-spacing: 1px;
+  }
+  /* 副标题 */
+  .subtitle {
+    font-size: 28px; color: {{PRIMARY_COLOR}}; opacity: 0.65;
+    text-align: center; margin-bottom: 60px;
+  }
+  /* 分割线 */
+  .divider {
+    width: 180px; height: 5px; background: {{ACCENT_COLOR}};
+    margin-bottom: 55px; border-radius: 3px;
+  }
+  /* 钩子文案 */
+  .hook {
+    font-size: 32px; color: {{PRIMARY_COLOR}}; text-align: center;
+    padding: 0 100px; line-height: 1.5; margin-bottom: 70px;
+    font-weight: 500;
+  }
+  /* CTA按钮 */
+  .cta {
+    background: {{ACCENT_COLOR}}; color: #FFFFFF;
+    font-size: 34px; font-weight: 700;
+    padding: 26px 90px; border-radius: 60px;
+    text-align: center; margin-bottom: 90px;
+    letter-spacing: 2px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  }
+  /* 底部说明 */
+  .footer {
+    font-size: 20px; color: {{PRIMARY_COLOR}}; opacity: 0.35;
+    position: absolute; bottom: 60px;
+  }
+  /* 底部装饰线 */
+  .bottom-bar {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; background: {{ACCENT_COLOR}}; opacity: 0.3;
+  }
+</style>
+</head>
+<body>
+  <div class="top-bar"></div>
+  <div class="emoji">{{CATEGORY_EMOJI}}</div>
+  <div class="title">{{COVER_TITLE}}</div>
+  <div class="subtitle">{{COVER_SUBTITLE}}</div>
+  <div class="divider"></div>
+  <div class="hook">{{COVER_HOOK}}</div>
+  <div class="cta">测测你最适合哪种</div>
+  <div class="footer">{{PRODUCT_ID}} · AI决策工具工厂</div>
+  <div class="bottom-bar"></div>
+</body>
+</html>

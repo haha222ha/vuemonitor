@@ -44,7 +44,7 @@ export class LocalPermissionCache {
       this.rebuildGates();
       this.rebuildQuotas(data.usage || {});
       this.saveToDisk();
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
   }
 
   checkGate(gateKey: string): boolean {
@@ -92,7 +92,7 @@ export class LocalPermissionCache {
       if (fs.existsSync(this.cachePath)) {
         fs.unlinkSync(this.cachePath);
       }
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
   }
 
   updateFromLicense(license: { plan: string; features: string[]; isValid: boolean }): void {
@@ -147,6 +147,6 @@ export class LocalPermissionCache {
   private saveToDisk(): void {
     try {
       fs.writeFileSync(this.cachePath, JSON.stringify(this.state, null, 2), "utf-8");
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
   }
 }

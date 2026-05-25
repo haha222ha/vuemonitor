@@ -290,6 +290,13 @@ function onResize() {
   }
 }
 
+function onKeydown(e: KeyboardEvent) {
+  if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+    e.preventDefault();
+    showGlobalSearch.value = !showGlobalSearch.value;
+  }
+}
+
 function handleSearch(query: string) {
   if (query) {
     showGlobalSearch.value = true;
@@ -313,12 +320,7 @@ onMounted(() => {
   window.addEventListener("resize", onResize);
   onResize();
 
-  window.addEventListener("keydown", (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-      e.preventDefault();
-      showGlobalSearch.value = !showGlobalSearch.value;
-    }
-  });
+  window.addEventListener("keydown", onKeydown);
 
   try {
     if (window.electronAPI) {
@@ -326,7 +328,7 @@ onMounted(() => {
         notificationStore.handleNewNotification(data as import("../stores/notification").NotificationItem);
       });
     }
-  } catch {}
+  } catch (e) { console.warn("[MainLayout] notification:local subscribe failed:", e); }
 
   try {
     if (window.electronAPI) {
@@ -361,7 +363,7 @@ onMounted(() => {
       }
     });
     }
-  } catch {}
+  } catch (e) { console.warn("[MainLayout] ws notification subscribe failed:", e); }
 });
 
 onUnmounted(() => {
@@ -369,6 +371,7 @@ onUnmounted(() => {
   if (unsubscribeLocal) unsubscribeLocal();
   if (unsubscribeWs) unsubscribeWs();
   window.removeEventListener("resize", onResize);
+  window.removeEventListener("keydown", onKeydown);
 });
 </script>
 

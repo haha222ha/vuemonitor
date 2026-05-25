@@ -14,7 +14,7 @@ def is_plan_sufficient(user_plan: PlanTier, required_plan: PlanTier) -> bool:
     return PLAN_HIERARCHY.get(user_plan, 0) >= PLAN_HIERARCHY.get(required_plan, 0)
 
 
-PLAN_LIMITS: dict[PlanTier, dict] = {
+PLAN_LIMITS: dict[str, dict] = {
     "free": {
         "maxProducts": 3,
         "maxConcurrency": 1,

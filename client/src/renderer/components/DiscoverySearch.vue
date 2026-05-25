@@ -171,7 +171,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive } from "vue";
 import { Search, TopRight, Star } from "@element-plus/icons-vue";
 
 interface Product {
@@ -322,8 +322,6 @@ function getCategoryLabel(value: string): string {
   return cat?.label || "";
 }
 
-onMounted(() => {
-});
 </script>
 
 <style lang="scss" scoped>

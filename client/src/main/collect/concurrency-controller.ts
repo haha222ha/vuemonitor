@@ -1,4 +1,4 @@
-ï»¿import { EventEmitter } from "events";
+import { EventEmitter } from "events";
 import { logger } from "../logger/logger";
 
 export interface ConcurrencyConfig {
@@ -117,11 +117,11 @@ export class ConcurrencyController extends EventEmitter {
           this.emit("resource:warning", {
             type: "memory",
             usage: this.lastResourceUsage.memory,
-            message: `å†…å­˜ä½¿ç”¨ç‡è¿‡é«˜(${(this.lastResourceUsage.memory * 100).toFixed(1)}%)ï¼Œå¹¶å‘æ•°å·²è‡ªåŠ¨è°ƒæ•´ä¸º${recommended}`,
+            message: `ÄÚ´æÊ¹ÓÃÂÊ¹ı¸ß(${(this.lastResourceUsage.memory * 100).toFixed(1)}%)£¬²¢·¢ÊıÒÑ×Ô¶¯µ÷ÕûÎª${recommended}`,
           });
         }
       }
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
   }
 
   destroy(): void {

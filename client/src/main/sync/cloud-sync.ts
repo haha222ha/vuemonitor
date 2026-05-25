@@ -905,7 +905,7 @@ export class CloudSyncManager extends EventEmitter {
               pulled++;
             }
           }
-        } catch (err) { logger.warn("[Main] operation failed:", err); }
+        } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
       }
 
       try {
@@ -935,7 +935,7 @@ export class CloudSyncManager extends EventEmitter {
             }
           }
         }
-      } catch (err) { logger.warn("[CloudSync] category pull failed:", err); }
+      } catch (err) { logger.warn("[CloudSync] category pull failed:", String(err)); }
 
       this.emit("sync:pulled", { count: pulled });
       if (this.conflicts.filter(c => c.resolution === "pending").length > 0) {
@@ -1013,7 +1013,7 @@ export class CloudSyncManager extends EventEmitter {
         const rows = storage.query("SELECT * FROM categories WHERE id = ?", [localId]) as Record<string, unknown>[];
         return rows.length > 0 ? rows[0] : null;
       }
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
     return null;
   }
 

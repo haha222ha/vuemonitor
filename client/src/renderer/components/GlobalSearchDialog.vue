@@ -265,14 +265,14 @@ function addRecent(item: SearchItem) {
   recentItems.value = [recent, ...recentItems.value.filter((r) => r.key !== item.key)].slice(0, 10);
   try {
     localStorage.setItem("recent-visits", JSON.stringify(recentItems.value));
-  } catch {}
+  } catch (e) { console.warn("[GlobalSearch] save recent failed:", e); }
 }
 
 function loadRecent() {
   try {
     const saved = localStorage.getItem("recent-visits");
     if (saved) recentItems.value = JSON.parse(saved);
-  } catch {}
+  } catch (e) { console.warn("[GlobalSearch] load recent failed:", e); }
 }
 
 watch(

@@ -134,6 +134,7 @@ import StatCard from "../components/StatCard.vue";
 import EmptyState from "../components/EmptyState.vue";
 import TaskItem from "../components/TaskItem.vue";
 import { useSchedulerData } from "../composables/useSchedulerData";
+import { statusTagType, statusLabel, platformTagType, taskTypeLabel } from "../utils/taskLabels";
 import { Cpu, List, Clock, Timer, TrendCharts, VideoPlay, VideoPause, Plus } from "@element-plus/icons-vue";
 
 const {
@@ -155,26 +156,6 @@ const createRules = {
 
 const showDetailDialog = ref(false);
 const currentDetail = ref<any>(null);
-
-function statusTagType(status: string) {
-  const map: Record<string, string> = { pending: "info", running: "", completed: "success", failed: "danger", cancelled: "warning" };
-  return map[status] || "info";
-}
-
-function statusLabel(status: string) {
-  const map: Record<string, string> = { pending: "待执行", running: "运行中", completed: "已完成", failed: "失败", cancelled: "已取消" };
-  return map[status] || status;
-}
-
-function platformTagType(platform: string) {
-  const map: Record<string, string> = { xhs: "danger", taobao: "warning", jd: "primary", pdd: "success", douyin: "" };
-  return map[platform] || "info";
-}
-
-function taskTypeLabel(type: string) {
-  const map: Record<string, string> = { product: "商品采集", shop: "店铺采集", category: "品类采集" };
-  return map[type] || type;
-}
 
 async function openDetail(taskId: string) {
   const detail = await viewTaskDetail(taskId);

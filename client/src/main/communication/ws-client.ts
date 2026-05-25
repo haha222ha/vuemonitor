@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿import WebSocket from "ws";
+﻿﻿﻿﻿﻿﻿﻿﻿﻿import WebSocket from "ws";
 import { BrowserWindow } from "electron";
 import axios from "axios";
 import { logger } from "../logger/logger";
@@ -69,7 +69,7 @@ export class WSCommunication {
           if (msg.type === "monitor:triggered" || msg.type === "notification:new") {
             this.sendToRenderer("notification", msg);
           }
-        } catch (err) { logger.warn("[Main] operation failed:", err); }
+        } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
       });
 
       this.ws.on("close", () => {

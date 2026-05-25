@@ -1,0 +1,34 @@
+{
+  "topic_id": "T20260520007",
+  "topic_name": "2026 AI副业变现路径决策：普通人如何用AI打造第二收入",
+  "category": "经济决策",
+  "content_layer": "D",
+  "generated_at": "2026-05-20",
+  "product_code": "DIH-FD007",
+  "outputs": {
+    "xiaohongshu": {
+      "Day1": "xiaohongshu/Day1/",
+      "Day10": "xiaohongshu/Day10/",
+      "Day2": "xiaohongshu/Day2/",
+      "Day3": "xiaohongshu/Day3/",
+      "Day4": "xiaohongshu/Day4/",
+      "Day5": "xiaohongshu/Day5/",
+      "Day6": "xiaohongshu/Day6/",
+      "Day7": "xiaohongshu/Day7/",
+      "Day8": "xiaohongshu/Day8/",
+      "Day9": "xiaohongshu/Day9/"
+    },
+    "html_report": "html/DIH-FD007_2026_AI副业变现路径决策-普通人如_v1.html",
+    "pdf_report": "pdf/DIH-FD007_2026_AI副业变现路径决策-普通人如_v1.pdf"
+  },
+  "compliance_check": {
+    "p0_passed": true,
+    "p1_passed": true,
+    "p2_passed": true,
+    "disclaimers_added": true,
+    "no_absolute_terms": true,
+    "no_medical_claims": true,
+    "no_diversion": true
+  },
+  "status": "completed"
+}

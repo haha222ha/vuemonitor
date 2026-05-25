@@ -115,7 +115,12 @@ import { ref, onMounted, watch, nextTick } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus";
 import { ArrowLeft } from "@element-plus/icons-vue";
-import * as echarts from "echarts";
+import * as echarts from "echarts/core";
+import { LineChart, RadarChart, BarChart } from "echarts/charts";
+import { GridComponent, TooltipComponent, LegendComponent, RadarComponent, GraphicComponent } from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
+
+echarts.use([LineChart, RadarChart, BarChart, GridComponent, TooltipComponent, LegendComponent, RadarComponent, GraphicComponent, CanvasRenderer]);
 import api from "../../utils/api";
 
 const route = useRoute();
@@ -155,7 +160,8 @@ function getPercentileColor(val?: number) {
 }
 
 function formatAIResult(text: string) {
-  return text.replace(/\n/g, "<br/>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+  const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return escaped.replace(/\n/g, "<br/>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 }
 
 function growthLabel(key: string) {

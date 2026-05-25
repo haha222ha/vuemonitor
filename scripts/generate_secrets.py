@@ -1,8 +1,9 @@
-"""Generate production secrets for .env file.
+"""Generate production secrets for .env file and Docker Secrets.
 
 Usage:
     python scripts/generate_secrets.py > .env.production
     python scripts/generate_secrets.py --check .env
+    python scripts/generate_secrets.py --docker-secrets   # 生成 secrets/ 目录
 """
 
 import secrets
@@ -142,6 +143,38 @@ def check_docker_compose(filepath: str = "docker-compose.yml") -> list[str]:
     return issues
 
 
+def generate_docker_secrets():
+    secrets_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "secrets")
+    os.makedirs(secrets_dir, exist_ok=True)
+
+    secret_files = {
+        "db_password": generate_secret(24),
+        "redis_password": generate_secret(24),
+        "jwt_secret": generate_secret(48),
+        "jwt_refresh_secret": generate_secret(48),
+        "encryption_key": generate_hex(16),
+        "backup_encryption_key": generate_hex(32),
+    }
+
+    for name, value in secret_files.items():
+        filepath = os.path.join(secrets_dir, f"{name}.txt")
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(value)
+        print(f"  [OK] secrets/{name}.txt ({len(value)} chars)")
+
+    gitignore = os.path.join(os.path.dirname(os.path.dirname(__file__)), ".gitignore")
+    if os.path.exists(gitignore):
+        with open(gitignore, "r", encoding="utf-8") as f:
+            content = f.read()
+        if "secrets/" not in content:
+            with open(gitignore, "a", encoding="utf-8") as f:
+                f.write("\n# Docker secrets\nsecrets/\n")
+            print("  [OK] Added secrets/ to .gitignore")
+
+    print(f"\n  Docker secrets generated in: {secrets_dir}")
+    print("  [WARNING] Ensure secrets/ directory is never committed to git!")
+
+
 def main():
     if len(sys.argv) > 1:
         if sys.argv[1] == "--check":
@@ -153,9 +186,12 @@ def main():
             docker_issues = check_docker_compose()
             for issue in docker_issues:
                 print(issue)
+        elif sys.argv[1] == "--docker-secrets":
+            print("Generating Docker Secrets files...")
+            generate_docker_secrets()
         else:
             print(f"未知参数: {sys.argv[1]}")
-            print("用法: python generate_secrets.py [--check <filepath>]")
+            print("用法: python generate_secrets.py [--check <filepath> | --docker-secrets]")
             sys.exit(1)
     else:
         print(generate_env())

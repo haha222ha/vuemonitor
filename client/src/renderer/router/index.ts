@@ -91,7 +91,7 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
   let token: string | null = null;
   if (window.electronAPI) {
-    token = await window.electronAPI.invoke("secure-storage:get", "access_token");
+    token = await window.electronAPI.invoke("secure-storage:get", "access_token") as string | null;
   } else {
     token = localStorage.getItem("access_token");
   }

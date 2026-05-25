@@ -19,6 +19,42 @@
       </div>
     </div>
 
+    <div v-if="selectedProduct" class="quick-actions-bar">
+      <span class="quick-label">快速分析：</span>
+      <el-button-group>
+        <el-button size="small" @click="quickAnalyze('basic_analysis')" :disabled="analysisLoading">
+          <el-icon><Refresh /></el-icon>
+          基础分析
+        </el-button>
+        <el-button v-if="auth.userPlan !== 'free'" size="small" @click="quickAnalyze('trend_score')" :disabled="analysisLoading">
+          <el-icon><Refresh /></el-icon>
+          趋势评分
+        </el-button>
+        <el-button v-if="auth.userPlan !== 'free'" size="small" @click="quickAnalyze('competitor_analysis')" :disabled="analysisLoading">
+          <el-icon><Refresh /></el-icon>
+          竞品分析
+        </el-button>
+        <el-button v-if="auth.userPlan === 'premium' || auth.userPlan === 'enterprise'" size="small" @click="quickAnalyze('prediction')" :disabled="analysisLoading">
+          <el-icon><Refresh /></el-icon>
+          爆品预测
+        </el-button>
+        <el-button v-if="auth.userPlan === 'premium' || auth.userPlan === 'enterprise'" size="small" @click="quickAnalyze('risk_warning')" :disabled="analysisLoading">
+          <el-icon><Refresh /></el-icon>
+          风险预警
+        </el-button>
+      </el-button-group>
+      <div class="quick-right">
+        <el-button v-if="analysisResult" size="small" type="primary" @click="generateReport" :loading="reportGenerating">
+          <el-icon><Document /></el-icon>
+          {{ reportGenerating ? '生成中...' : '生成报告' }}
+        </el-button>
+        <el-button v-if="auth.userPlan === 'premium' || auth.userPlan === 'enterprise'" size="small" @click="goToProductSelection">
+          <el-icon><MagicStick /></el-icon>
+          智能选品
+        </el-button>
+      </div>
+    </div>
+
     <el-row :gutter="20">
       <el-col :span="16">
         <div class="panel">
@@ -406,13 +442,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue";
+import { ref, reactive, computed, onMounted, watch } from "vue";
 import { useAuthStore } from "../../stores/auth";
 import api from "../../utils/api";
-import { Loading, Refresh, WarningFilled } from "@element-plus/icons-vue";
+import { Loading, Refresh, WarningFilled, Document, MagicStick } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
+import { useRoute } from "vue-router";
 
 const auth = useAuthStore();
+const route = useRoute();
 const products = ref<any[]>([]);
 const selectedProduct = ref("");
 const analysisType = ref("basic_analysis");
@@ -421,6 +459,7 @@ const analysisResult = ref<any>(null);
 const gateError = ref("");
 const history = ref<any[]>([]);
 const historyLoading = ref(false);
+const reportGenerating = ref(false);
 
 const quotaInfo = reactive({ used: 0, limit: 0 });
 const aiStatus = reactive({ enabled: false, providers: [] as string[], defaultProvider: "" });
@@ -554,6 +593,41 @@ async function runAnalysis() {
   }
 }
 
+function quickAnalyze(type: string) {
+  analysisType.value = type;
+  runAnalysis();
+}
+
+async function generateReport() {
+  if (!selectedProduct.value || !analysisResult.value) return;
+  reportGenerating.value = true;
+  try {
+    const { data } = await api.post("/ai/reports", {
+      product_id: selectedProduct.value,
+      analysis_type: analysisType.value,
+      content: analysisResult.value,
+    });
+    const reportId = data?.data?.id;
+    if (reportId) {
+      ElMessage.success("报告生成成功");
+      setTimeout(() => {
+        window.open(`/dashboard/ai/reports/${reportId}`, "_blank");
+      }, 500);
+    } else {
+      ElMessage.success("报告已保存");
+    }
+  } catch (e: any) {
+    ElMessage.error(e?.response?.data?.message || "报告生成失败");
+  } finally {
+    reportGenerating.value = false;
+  }
+}
+
+function goToProductSelection() {
+  analysisType.value = "product_selection";
+  runAnalysis();
+}
+
 function loadHistory(h: any) {
   selectedProduct.value = h.product_id || "";
   analysisResult.value = h.result || null;
@@ -603,6 +677,17 @@ onMounted(async () => {
   try {
     const { data } = await api.get("/products", { params: { page_size: 100 } });
     products.value = data?.data?.items || [];
+    
+    const productId = route.query.product_id as string;
+    if (productId && products.value.length > 0) {
+      const product = products.value.find(p => p.id === productId);
+      if (product) {
+        selectedProduct.value = productId;
+        setTimeout(() => {
+          runAnalysis();
+        }, 300);
+      }
+    }
   } catch {}
   fetchHistory();
   fetchQuota();
@@ -668,6 +753,29 @@ onMounted(async () => {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.quick-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(99, 102, 241, 0.06);
+  border-radius: 8px;
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.quick-label {
+  font-size: 13px;
+  color: #a5b4fc;
+  font-weight: 500;
+}
+
+.quick-right {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
 }
 
 .type-label {

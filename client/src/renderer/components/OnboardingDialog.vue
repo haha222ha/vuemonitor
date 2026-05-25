@@ -91,7 +91,7 @@ const currentStep = computed(() => steps[current.value]);
 function finish() {
   try {
     localStorage.setItem("onboarding-completed", "true");
-  } catch {}
+  } catch (e) { console.warn("[Onboarding] save completed failed:", e); }
   emit("close");
 }
 </script>

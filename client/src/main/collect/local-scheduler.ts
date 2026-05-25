@@ -1,4 +1,4 @@
-ï»¿import { EventEmitter } from "events";
+import { EventEmitter } from "events";
 import { getStorage } from "../storage/sqlite";
 import { logger } from "../logger/logger";
 
@@ -76,7 +76,7 @@ export class LocalScheduler extends EventEmitter {
     await this.loadTasks();
     this.startMainLoop();
     this.emit("scheduler:started");
-    logger.info("LocalScheduler", "è°ƒåº¦å™¨å¯åŠ¨", { taskCount: this.registeredTasks.size });
+    logger.info("LocalScheduler", "µ÷¶ÈÆ÷Æô¶¯", { taskCount: this.registeredTasks.size });
   }
 
   stop(): void {
@@ -90,7 +90,7 @@ export class LocalScheduler extends EventEmitter {
       this.mainLoopTimer = null;
     }
     this.emit("scheduler:stopped");
-    logger.info("LocalScheduler", "è°ƒåº¦å™¨åœæ­¢");
+    logger.info("LocalScheduler", "µ÷¶ÈÆ÷Í£Ö¹");
   }
 
   getState(): SchedulerState {
@@ -139,7 +139,7 @@ export class LocalScheduler extends EventEmitter {
     }
 
     this.emit("task:added", { task: scheduledTask });
-    logger.info("LocalScheduler", "æ·»åŠ å®šæ—¶ä»»åŠ¡", { id, product: task.product_name, frequency: task.frequency_minutes });
+    logger.info("LocalScheduler", "Ìí¼Ó¶¨Ê±ÈÎÎñ", { id, product: task.product_name, frequency: task.frequency_minutes });
     return scheduledTask;
   }
 
@@ -157,10 +157,10 @@ export class LocalScheduler extends EventEmitter {
     try {
       const storage = getStorage();
       storage.run("DELETE FROM scheduled_tasks WHERE id = ?", [taskId]);
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
 
     this.emit("task:removed", { taskId });
-    logger.info("LocalScheduler", "ç§»é™¤å®šæ—¶ä»»åŠ¡", { taskId });
+    logger.info("LocalScheduler", "ÒÆ³ı¶¨Ê±ÈÎÎñ", { taskId });
     return true;
   }
 
@@ -235,10 +235,10 @@ export class LocalScheduler extends EventEmitter {
         }
         this.emit("task:auto_disabled", {
           taskId,
-          reason: `è¿ç»­å¤±è´¥${task.consecutive_failures}æ¬¡ï¼Œå·²è‡ªåŠ¨ç¦ç”¨`,
+          reason: `Á¬ĞøÊ§°Ü${task.consecutive_failures}´Î£¬ÒÑ×Ô¶¯½ûÓÃ`,
           consecutiveFailures: task.consecutive_failures,
         });
-        logger.warn("LocalScheduler", "ä»»åŠ¡è¿ç»­å¤±è´¥å·²è‡ªåŠ¨ç¦ç”¨", {
+        logger.warn("LocalScheduler", "ÈÎÎñÁ¬ĞøÊ§°ÜÒÑ×Ô¶¯½ûÓÃ", {
           taskId,
           consecutiveFailures: task.consecutive_failures,
         });
@@ -281,7 +281,7 @@ export class LocalScheduler extends EventEmitter {
       retryAt,
     });
 
-    logger.info("LocalScheduler", "å®‰æ’ä»»åŠ¡é‡è¯•", {
+    logger.info("LocalScheduler", "°²ÅÅÈÎÎñÖØÊÔ", {
       taskId: task.id,
       retryCount: task.retry_count,
       maxRetries: task.max_retries,
@@ -305,7 +305,7 @@ export class LocalScheduler extends EventEmitter {
     }
 
     this.emit("task:manual_retry", { taskId });
-    logger.info("LocalScheduler", "æ‰‹åŠ¨é‡è¯•ä»»åŠ¡", { taskId });
+    logger.info("LocalScheduler", "ÊÖ¶¯ÖØÊÔÈÎÎñ", { taskId });
     return true;
   }
 
@@ -433,9 +433,9 @@ export class LocalScheduler extends EventEmitter {
           this.scheduleTask(task);
         }
       }
-      logger.info("LocalScheduler", "åŠ è½½å®šæ—¶ä»»åŠ¡", { count: this.registeredTasks.size });
+      logger.info("LocalScheduler", "¼ÓÔØ¶¨Ê±ÈÎÎñ", { count: this.registeredTasks.size });
     } catch (e) {
-      logger.error("LocalScheduler", "åŠ è½½ä»»åŠ¡å¤±è´¥", { error: String(e) });
+      logger.error("LocalScheduler", "¼ÓÔØÈÎÎñÊ§°Ü", { error: String(e) });
     }
   }
 
@@ -461,16 +461,16 @@ export class LocalScheduler extends EventEmitter {
 
     try {
       storage.run(`ALTER TABLE scheduled_tasks ADD COLUMN last_run_status TEXT`);
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
     try {
       storage.run(`ALTER TABLE scheduled_tasks ADD COLUMN retry_count INTEGER NOT NULL DEFAULT 0`);
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
     try {
       storage.run(`ALTER TABLE scheduled_tasks ADD COLUMN max_retries INTEGER NOT NULL DEFAULT 3`);
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
     try {
       storage.run(`ALTER TABLE scheduled_tasks ADD COLUMN consecutive_failures INTEGER NOT NULL DEFAULT 0`);
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
   }
 
   private async persistTask(task: ScheduledTask): Promise<void> {
@@ -501,7 +501,7 @@ export class LocalScheduler extends EventEmitter {
         ]
       );
     } catch (e) {
-      logger.error("LocalScheduler", "æŒä¹…åŒ–ä»»åŠ¡å¤±è´¥", { taskId: task.id, error: String(e) });
+      logger.error("LocalScheduler", "³Ö¾Ã»¯ÈÎÎñÊ§°Ü", { taskId: task.id, error: String(e) });
     }
   }
 

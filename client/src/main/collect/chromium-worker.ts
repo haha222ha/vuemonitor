@@ -1,4 +1,4 @@
-ï»¿import { BrowserView, BrowserWindow, session, app } from "electron";
+import { BrowserView, BrowserWindow, session, app } from "electron";
 import * as path from "path";
 import * as fs from "fs";
 import { EventEmitter } from "events";
@@ -111,8 +111,8 @@ const XHS_COLLECT_CONFIG = {
       var salesEl = document.querySelector('span.spu-text');
       var sales = 0;
       if (salesEl) {
-        var salesText = salesEl.textContent.replace('å·²å”®', '').trim();
-        if (salesText.includes('ä¸‡')) {
+        var salesText = salesEl.textContent.replace('ÒÑÊÛ', '').trim();
+        if (salesText.includes('Íò')) {
           var num = parseFloat(salesText.replace(/[^0-9.]/g, ''));
           sales = Math.floor(num * 10000);
         } else {
@@ -130,9 +130,9 @@ const XHS_COLLECT_CONFIG = {
       if (shopSalesElements && shopSalesElements.length > 0) {
         for (var j = 0; j < shopSalesElements.length; j++) {
           var sText = shopSalesElements[j].textContent.trim();
-          if (sText.includes('å·²å”®')) {
-            var sNum = sText.replace('å·²å”®', '').trim();
-            if (sNum.includes('ä¸‡')) {
+          if (sText.includes('ÒÑÊÛ')) {
+            var sNum = sText.replace('ÒÑÊÛ', '').trim();
+            if (sNum.includes('Íò')) {
               shopSales = Math.floor(parseFloat(sNum.replace(/[^0-9.]/g, '')) * 10000);
             } else {
               shopSales = parseInt(sNum.replace(/[^0-9]/g, '')) || 0;
@@ -240,7 +240,7 @@ const XHS_COLLECT_CONFIG = {
       var match = pathname.match(/\\/user\\/profile\\/([a-f0-9]+)/);
       data.platform_product_id = match ? match[1] : '';
       data.product_url = window.location.href;
-      data.product_name = data.shop_name + 'çš„ä¸»é¡µ';
+      data.product_name = data.shop_name + 'µÄÖ÷Ò³';
 
       return data;
     })()
@@ -248,10 +248,10 @@ const XHS_COLLECT_CONFIG = {
 };
 
 const RISK_KEYWORDS = [
-  "éªŒè¯ç ", "captcha", "verify", "å®‰å…¨éªŒè¯",
-  "é¢‘ç¹", "rate limit", "429", "å°ç¦", "blocked", "forbidden", "403",
-  "æ“ä½œè¿‡äºé¢‘ç¹", "è¯·ç¨åå†è¯•", "å¼‚å¸¸",
-  "æ»‘åŠ¨éªŒè¯", "å›¾å½¢éªŒè¯", "äººæœºéªŒè¯", "robot", "automated",
+  "ÑéÖ¤Âë", "captcha", "verify", "°²È«ÑéÖ¤",
+  "Æµ·±", "rate limit", "429", "·â½û", "blocked", "forbidden", "403",
+  "²Ù×÷¹ıÓÚÆµ·±", "ÇëÉÔºóÔÙÊÔ", "Òì³£",
+  "»¬¶¯ÑéÖ¤", "Í¼ĞÎÑéÖ¤", "ÈË»úÑéÖ¤", "robot", "automated",
   "access denied", "unusual traffic", "suspicious activity",
 ];
 
@@ -312,11 +312,11 @@ export class ChromiumCollectWorker extends EventEmitter {
           for (const item of data) {
             this.checkpointData.set(item.taskId, item);
           }
-          logger.info("ChromiumWorker", "åŠ è½½æ–­ç‚¹ç»­é‡‡æ•°æ®", { count: this.checkpointData.size });
+          logger.info("ChromiumWorker", "¼ÓÔØ¶ÏµãĞø²ÉÊı¾İ", { count: this.checkpointData.size });
         }
       }
     } catch (e) {
-      logger.warn("ChromiumWorker", "åŠ è½½æ–­ç‚¹æ•°æ®å¤±è´¥", { error: String(e) });
+      logger.warn("ChromiumWorker", "¼ÓÔØ¶ÏµãÊı¾İÊ§°Ü", { error: String(e) });
     }
   }
 
@@ -325,7 +325,7 @@ export class ChromiumCollectWorker extends EventEmitter {
       const data = Array.from(this.checkpointData.values());
       fs.writeFileSync(this.checkpointPath, JSON.stringify(data, null, 2), "utf-8");
     } catch (e) {
-      logger.warn("ChromiumWorker", "ä¿å­˜æ–­ç‚¹æ•°æ®å¤±è´¥", { error: String(e) });
+      logger.warn("ChromiumWorker", "±£´æ¶ÏµãÊı¾İÊ§°Ü", { error: String(e) });
     }
   }
 
@@ -334,7 +334,7 @@ export class ChromiumCollectWorker extends EventEmitter {
       const mem = process.memoryUsage();
       const heapMB = Math.round(mem.heapUsed / 1024 / 1024);
       if (heapMB > this.maxMemoryMB) {
-        logger.warn("ChromiumWorker", "å†…å­˜ä½¿ç”¨è¶…è¿‡é˜ˆå€¼ï¼Œæš‚åœæ–°ä»»åŠ¡", { heapMB, maxMB: this.maxMemoryMB });
+        logger.warn("ChromiumWorker", "ÄÚ´æÊ¹ÓÃ³¬¹ıãĞÖµ£¬ÔİÍ£ĞÂÈÎÎñ", { heapMB, maxMB: this.maxMemoryMB });
         if (!this.isPaused) {
           this.pauseQueue();
           this.emit("memory:high", { heapMB, maxMB: this.maxMemoryMB });
@@ -379,7 +379,7 @@ export class ChromiumCollectWorker extends EventEmitter {
 
     this.saveCheckpoint();
     this.emit("task:batch_queued", { count: tasks.length, queueLength: this.taskQueue.length, shards: shards.length });
-    logger.info("ChromiumWorker", "åˆ†ç‰‡å…¥é˜Ÿé‡‡é›†ä»»åŠ¡", { count: tasks.length, shardSize, shards: shards.length });
+    logger.info("ChromiumWorker", "·ÖÆ¬Èë¶Ó²É¼¯ÈÎÎñ", { count: tasks.length, shardSize, shards: shards.length });
     this.processQueue();
   }
 
@@ -406,7 +406,7 @@ export class ChromiumCollectWorker extends EventEmitter {
       this.taskQueue.push(task);
     }
     this.emit("task:batch_queued", { count: pending.length, queueLength: this.taskQueue.length });
-    logger.info("ChromiumWorker", "ä»æ–­ç‚¹æ¢å¤é‡‡é›†ä»»åŠ¡", { count: pending.length });
+    logger.info("ChromiumWorker", "´Ó¶Ïµã»Ö¸´²É¼¯ÈÎÎñ", { count: pending.length });
     this.processQueue();
     return pending.length;
   }
@@ -417,7 +417,7 @@ export class ChromiumCollectWorker extends EventEmitter {
       if (fs.existsSync(this.checkpointPath)) {
         fs.unlinkSync(this.checkpointPath);
       }
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
   }
 
   setMainWindow(window: BrowserWindow): void {
@@ -482,7 +482,7 @@ export class ChromiumCollectWorker extends EventEmitter {
     this.collectSession = session.fromPartition("persist:xhs-collect", { cache: true });
     const initialUA = this.generateUA();
     this.collectSession.setUserAgent(initialUA);
-    logger.info("ChromiumWorker", "é‡‡é›†ä¼šè¯åˆå§‹åŒ–", { ua: initialUA.substring(0, 60) });
+    logger.info("ChromiumWorker", "²É¼¯»á»°³õÊ¼»¯", { ua: initialUA.substring(0, 60) });
 
     this.collectSession.webRequest.onBeforeSendHeaders((details, callback) => {
       details.requestHeaders["Referer"] = "https://www.xiaohongshu.com/";
@@ -541,25 +541,25 @@ export class ChromiumCollectWorker extends EventEmitter {
   }
 
   async checkCookieHealth(): Promise<{ valid: boolean; count: number; details: string }> {
-    if (!this.collectSession) return { valid: false, count: 0, details: "ä¼šè¯æœªåˆå§‹åŒ–" };
+    if (!this.collectSession) return { valid: false, count: 0, details: "»á»°Î´³õÊ¼»¯" };
     const cookies = await this.collectSession.cookies.get({ domain: ".xiaohongshu.com" });
     const essentialCookies = ["web_session", "a1", "webId"];
     const found = essentialCookies.filter((name) => cookies.some((c) => c.name === name));
 
     if (found.length === 0) {
-      return { valid: false, count: cookies.length, details: "ç¼ºå°‘å…³é”®Cookieï¼Œå¯èƒ½éœ€è¦ç™»å½•" };
+      return { valid: false, count: cookies.length, details: "È±ÉÙ¹Ø¼üCookie£¬¿ÉÄÜĞèÒªµÇÂ¼" };
     }
     if (cookies.length < 3) {
-      return { valid: false, count: cookies.length, details: "Cookieæ•°é‡è¿‡å°‘ï¼Œä¼šè¯å¯èƒ½è¿‡æœŸ" };
+      return { valid: false, count: cookies.length, details: "CookieÊıÁ¿¹ıÉÙ£¬»á»°¿ÉÄÜ¹ıÆÚ" };
     }
 
     const now = Date.now() / 1000;
     const expiredCount = cookies.filter((c) => c.expirationDate && c.expirationDate < now).length;
     if (expiredCount > cookies.length * 0.5) {
-      return { valid: false, count: cookies.length, details: `${expiredCount}ä¸ªCookieå·²è¿‡æœŸ` };
+      return { valid: false, count: cookies.length, details: `${expiredCount}¸öCookieÒÑ¹ıÆÚ` };
     }
 
-    return { valid: true, count: cookies.length, details: `Cookieå¥åº·ï¼Œå…±${cookies.length}ä¸ª` };
+    return { valid: true, count: cookies.length, details: `Cookie½¡¿µ£¬¹²${cookies.length}¸ö` };
   }
 
   enqueue(task: CollectTask): void {
@@ -573,7 +573,7 @@ export class ChromiumCollectWorker extends EventEmitter {
       this.taskQueue.push(task);
     }
     this.emit("task:batch_queued", { count: tasks.length, queueLength: this.taskQueue.length });
-    logger.info("ChromiumWorker", "æ‰¹é‡å…¥é˜Ÿé‡‡é›†ä»»åŠ¡", { count: tasks.length, queueLength: this.taskQueue.length });
+    logger.info("ChromiumWorker", "ÅúÁ¿Èë¶Ó²É¼¯ÈÎÎñ", { count: tasks.length, queueLength: this.taskQueue.length });
     this.processQueue();
   }
 
@@ -582,7 +582,7 @@ export class ChromiumCollectWorker extends EventEmitter {
     if (idx !== -1) {
       this.taskQueue.splice(idx, 1);
       this.emit("task:cancelled", { taskId });
-      logger.info("ChromiumWorker", "å–æ¶ˆé‡‡é›†ä»»åŠ¡", { taskId });
+      logger.info("ChromiumWorker", "È¡Ïû²É¼¯ÈÎÎñ", { taskId });
       return true;
     }
     return false;
@@ -596,7 +596,7 @@ export class ChromiumCollectWorker extends EventEmitter {
 
   private async rateLimitGuard(): Promise<void> {
     if (this.isPaused) {
-      throw new Error("é‡‡é›†é˜Ÿåˆ—å·²æš‚åœï¼ˆé£æ§è§¦å‘ï¼‰ï¼Œè¯·æ‰‹åŠ¨æ¢å¤");
+      throw new Error("²É¼¯¶ÓÁĞÒÑÔİÍ££¨·ç¿Ø´¥·¢£©£¬ÇëÊÖ¶¯»Ö¸´");
     }
 
     const baseMin = 2000;
@@ -636,7 +636,7 @@ export class ChromiumCollectWorker extends EventEmitter {
 
     if (this.consecutiveRiskCount >= 3 || riskType === "ip_blocked") {
       this.pauseQueue();
-      logger.warn("ChromiumWorker", "é£æ§è¾¾åˆ°ä¸´ç•Œé˜ˆå€¼ï¼Œæš‚åœé‡‡é›†é˜Ÿåˆ—", { riskType, consecutiveCount: this.consecutiveRiskCount, backoffMultiplier: this.backoffMultiplier });
+      logger.warn("ChromiumWorker", "·ç¿Ø´ïµ½ÁÙ½çãĞÖµ£¬ÔİÍ£²É¼¯¶ÓÁĞ", { riskType, consecutiveCount: this.consecutiveRiskCount, backoffMultiplier: this.backoffMultiplier });
       this.emit("risk:critical", {
         riskType,
         consecutiveCount: this.consecutiveRiskCount,
@@ -746,7 +746,7 @@ export class ChromiumCollectWorker extends EventEmitter {
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error(`é‡‡é›†è¶…æ—¶: ${task.targetType}/${task.targetId}`));
+        reject(new Error(`²É¼¯³¬Ê±: ${task.targetType}/${task.targetId}`));
       }, XHS_COLLECT_CONFIG.timeout);
 
       let settled = false;
@@ -825,11 +825,11 @@ export class ChromiumCollectWorker extends EventEmitter {
       });
 
       view.webContents.on("did-fail-load", (_event, errorCode, errorDesc) => {
-        settle(() => reject(new Error(`é¡µé¢åŠ è½½å¤±è´¥: ${errorCode} ${errorDesc}`)));
+        settle(() => reject(new Error(`Ò³Ãæ¼ÓÔØÊ§°Ü: ${errorCode} ${errorDesc}`)));
       });
 
       view.webContents.on("render-process-gone", () => {
-        settle(() => reject(new Error("æ¸²æŸ“è¿›ç¨‹å´©æºƒ")));
+        settle(() => reject(new Error("äÖÈ¾½ø³Ì±ÀÀ£")));
       });
 
       view.webContents.loadURL(url);
@@ -847,7 +847,7 @@ export class ChromiumCollectWorker extends EventEmitter {
           return {
             riskType: "redirect",
             riskLevel: "medium",
-            detail: `é£æ§æ£€æµ‹: é¡µé¢è¢«é‡å®šå‘åˆ°${pattern}é¡µé¢`,
+            detail: `·ç¿Ø¼ì²â: Ò³Ãæ±»ÖØ¶¨Ïòµ½${pattern}Ò³Ãæ`,
           };
         }
       }
@@ -872,7 +872,7 @@ export class ChromiumCollectWorker extends EventEmitter {
         return {
           riskType: "captcha",
           riskLevel: "high",
-          detail: `é£æ§æ£€æµ‹: å‘ç°éªŒè¯ç å…ƒç´  (${captchaDetected.selector})`,
+          detail: `·ç¿Ø¼ì²â: ·¢ÏÖÑéÖ¤ÂëÔªËØ (${captchaDetected.selector})`,
         };
       }
 
@@ -903,14 +903,14 @@ export class ChromiumCollectWorker extends EventEmitter {
           return {
             riskType: "behavior_detected",
             riskLevel: "high",
-            detail: "é£æ§æ£€æµ‹: æ£€æµ‹åˆ°è‡ªåŠ¨åŒ–æµè§ˆå™¨ç‰¹å¾",
+            detail: "·ç¿Ø¼ì²â: ¼ì²âµ½×Ô¶¯»¯ä¯ÀÀÆ÷ÌØÕ÷",
           };
         }
         if (behaviorResult.detectedScripts && behaviorResult.detectedScripts.length >= 2) {
           return {
             riskType: "behavior_detected",
             riskLevel: "low",
-            detail: `é£æ§æ£€æµ‹: å‘ç°åçˆ¬è„šæœ¬ (${behaviorResult.detectedScripts.join(", ")})`,
+            detail: `·ç¿Ø¼ì²â: ·¢ÏÖ·´ÅÀ½Å±¾ (${behaviorResult.detectedScripts.join(", ")})`,
           };
         }
       }
@@ -922,7 +922,7 @@ export class ChromiumCollectWorker extends EventEmitter {
         return {
           riskType: "login_required",
           riskLevel: "high",
-          detail: "é£æ§æ£€æµ‹: é¡µé¢å‡ºç°ç™»å½•è¡¨å•ï¼Œå¯èƒ½éœ€è¦å…ˆç™»å½•å°çº¢ä¹¦",
+          detail: "·ç¿Ø¼ì²â: Ò³Ãæ³öÏÖµÇÂ¼±íµ¥£¬¿ÉÄÜĞèÒªÏÈµÇÂ¼Ğ¡ºìÊé",
         };
       }
 
@@ -936,15 +936,15 @@ export class ChromiumCollectWorker extends EventEmitter {
       for (const keyword of RISK_KEYWORDS) {
         if (combined.includes(keyword.toLowerCase())) {
           let riskType = "rate_limit";
-          if (["éªŒè¯ç ", "captcha", "verify", "å®‰å…¨éªŒè¯", "æ»‘åŠ¨éªŒè¯", "å›¾å½¢éªŒè¯", "äººæœºéªŒè¯"].includes(keyword)) {
+          if (["ÑéÖ¤Âë", "captcha", "verify", "°²È«ÑéÖ¤", "»¬¶¯ÑéÖ¤", "Í¼ĞÎÑéÖ¤", "ÈË»úÑéÖ¤"].includes(keyword)) {
             riskType = "captcha";
-          } else if (["å°ç¦", "blocked", "forbidden", "403"].includes(keyword)) {
+          } else if (["·â½û", "blocked", "forbidden", "403"].includes(keyword)) {
             riskType = "ip_blocked";
           }
           return {
             riskType,
             riskLevel: RISK_LEVEL_MAP[riskType] || "medium",
-            detail: `é£æ§æ£€æµ‹: å‘ç°å…³é”®è¯"${keyword}"`,
+            detail: `·ç¿Ø¼ì²â: ·¢ÏÖ¹Ø¼ü´Ê"${keyword}"`,
           };
         }
       }
@@ -967,7 +967,7 @@ export class ChromiumCollectWorker extends EventEmitter {
             resolve();
             return;
           }
-        } catch (err) { logger.warn("[Main] operation failed:", err); }
+        } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
 
         if (Date.now() - start > timeoutMs) {
           resolve();
@@ -984,7 +984,7 @@ export class ChromiumCollectWorker extends EventEmitter {
     if (view) {
       try {
         view.webContents.close();
-      } catch (err) { logger.warn("[Main] operation failed:", err); }
+      } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
       this.views.delete(taskId);
     }
   }

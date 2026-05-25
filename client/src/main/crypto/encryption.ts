@@ -1,5 +1,7 @@
 import * as crypto from "crypto";
+import * as fs from "fs";
 import * as os from "os";
+import * as path from "path";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
@@ -14,19 +16,62 @@ const SENSITIVE_FIELDS = new Set([
 ]);
 
 let masterKey: Buffer | null = null;
+let _keySalt: Buffer | null = null;
 
 function deriveKey(passphrase: string, salt: Buffer): Buffer {
   return crypto.pbkdf2Sync(passphrase, salt, ITERATIONS, 32, "sha512");
 }
 
-export function initEncryption(passphrase: string): void {
+function getKeyFilePath(): string {
+  const dataDir = path.join(process.cwd(), "data");
+  if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+  return path.join(dataDir, ".enc_key");
+}
+
+function loadOrGenerateKeySalt(): { passphrase: string; salt: Buffer } {
+  const keyFile = getKeyFilePath();
+  const machineId = getMachineFingerprint();
+
+  if (fs.existsSync(keyFile)) {
+    try {
+      const stored = JSON.parse(fs.readFileSync(keyFile, "utf-8"));
+      if (stored.salt && stored.version === 2) {
+        return {
+          passphrase: machineId,
+          salt: Buffer.from(stored.salt, "base64"),
+        };
+      }
+    } catch {}
+  }
+
+  const salt = crypto.randomBytes(SALT_LENGTH);
+  try {
+    fs.writeFileSync(keyFile, JSON.stringify({
+      salt: salt.toString("base64"),
+      version: 2,
+      created_at: new Date().toISOString(),
+    }), { mode: 0o600 });
+  } catch {}
+
+  return { passphrase: machineId, salt };
+}
+
+export function initEncryption(passphrase?: string): void {
   if (masterKey) return;
   const machineId = getMachineFingerprint();
-  masterKey = deriveKey(passphrase + machineId, Buffer.from(machineId, "hex"));
+
+  if (passphrase) {
+    _keySalt = _keySalt || Buffer.from(machineId, "hex");
+    masterKey = deriveKey(passphrase + machineId, _keySalt!);
+  } else {
+    const { passphrase: derivedPass, salt } = loadOrGenerateKeySalt();
+    _keySalt = salt;
+    masterKey = deriveKey(derivedPass, salt);
+  }
 }
 
 export function encryptField(plaintext: string): string {
-  if (!masterKey) initEncryption(getDefaultPassphrase());
+  if (!masterKey) initEncryption();
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(ALGORITHM, masterKey!, iv);
   const encrypted = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
@@ -35,7 +80,7 @@ export function encryptField(plaintext: string): string {
 }
 
 export function decryptField(ciphertext: string): string {
-  if (!masterKey) initEncryption(getDefaultPassphrase());
+  if (!masterKey) initEncryption();
   const data = Buffer.from(ciphertext, "base64");
   const iv = data.subarray(0, IV_LENGTH);
   const authTag = data.subarray(IV_LENGTH, IV_LENGTH + AUTH_TAG_LENGTH);
@@ -87,12 +132,8 @@ function getMachineFingerprint(): string {
     const raw = `${hostname}:${cpus.length}:${totalMem}`;
     return crypto.createHash("sha256").update(raw).digest("hex").substring(0, 32);
   } catch {
-    return "default-machine-fingerprint-0000";
+    throw new Error("Cannot generate machine fingerprint for encryption");
   }
-}
-
-function getDefaultPassphrase(): string {
-  return "vuemonitor-local-encryption-key";
 }
 
 export function hashValue(value: string): string {

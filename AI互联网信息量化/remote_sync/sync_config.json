@@ -1,6 +1,6 @@
 {
-  "remote_host": "https://api.xhs365.cn",
-  "api_token": "",
+  "remote_host": "https://intel.xhs365.cn",
+  "api_token": "REDACTED_INTEL_SYNC_KEY",
   "sync_options": {
     "batch_size": 50,
     "retry_count": 3,

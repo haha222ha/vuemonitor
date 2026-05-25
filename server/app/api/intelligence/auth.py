@@ -84,9 +84,6 @@ async def code_login(
     if auth_code.status == "revoked":
         raise HTTPException(status_code=400, detail="授权码已被吊销")
 
-    if auth_code.current_activations >= auth_code.max_activations:
-        raise HTTPException(status_code=400, detail="授权码已达最大激活次数")
-
     existing_membership_result = await db.execute(
         select(IntelMembership).where(
             IntelMembership.auth_code_id == auth_code.id,
@@ -106,6 +103,7 @@ async def code_login(
         days_remaining = (existing_membership.expires_at - now).days
         if days_remaining <= 0:
             existing_membership.status = "expired"
+            await db.flush()
             raise HTTPException(status_code=400, detail="授权码已过期，请使用新的授权码")
 
         session_id = await _create_intel_session(user.id)
@@ -136,6 +134,8 @@ async def code_login(
             days_remaining=days_remaining,
         )
     else:
+        if auth_code.current_activations >= auth_code.max_activations:
+            raise HTTPException(status_code=400, detail="授权码已达最大激活次数")
         nickname = f"intel_{secrets.token_hex(4)}"
         random_password = secrets.token_hex(16)
         user = User(

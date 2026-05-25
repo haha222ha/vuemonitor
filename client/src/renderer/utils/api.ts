@@ -21,7 +21,7 @@ function onTokenRefreshed(newToken: string) {
 
 async function getAccessToken(): Promise<string | null> {
   if (window.electronAPI) {
-    return await window.electronAPI.invoke("secure-storage:get", "access_token");
+    return await window.electronAPI.invoke("secure-storage:get", "access_token") as string | null;
   }
   return localStorage.getItem("access_token");
 }
@@ -78,7 +78,7 @@ api.interceptors.response.use(
       isRefreshing = true;
       let refreshToken: string | null = null;
       if (window.electronAPI) {
-        refreshToken = await window.electronAPI.invoke("secure-storage:get", "refresh_token");
+        refreshToken = await window.electronAPI.invoke("secure-storage:get", "refresh_token") as string | null;
       } else {
         refreshToken = localStorage.getItem("refresh_token");
       }

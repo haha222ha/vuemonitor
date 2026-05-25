@@ -19,6 +19,15 @@ groups:
           summary: "High 5xx error rate ({{ $value | humanizePercentage }})"
           description: "More than 5% of requests are returning 5xx errors."
 
+      - alert: CriticalErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical 5xx error rate ({{ $value | humanizePercentage }})"
+          description: "More than 10% of requests are returning 5xx errors for 2+ minutes."
+
       - alert: HighLatency
         expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2.0
         for: 5m
@@ -27,6 +36,24 @@ groups:
         annotations:
           summary: "High P95 latency ({{ $value }}s)"
           description: "95th percentile request latency exceeds 2 seconds."
+
+      - alert: CriticalLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 5.0
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical P95 latency ({{ $value }}s)"
+          description: "95th percentile request latency exceeds 5 seconds for 3+ minutes."
+
+      - alert: HighRateLimiting
+        expr: rate(http_requests_total{status="429"}[5m]) / rate(http_requests_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High rate limiting ({{ $value | humanizePercentage }})"
+          description: "More than 10% of requests are being rate limited."
 
   - name: vuemonitor_database
     rules:
@@ -39,6 +66,15 @@ groups:
           summary: "Database connection pool near exhaustion"
           description: "Over 90% of database connections are in use."
 
+      - alert: DatabasePoolWarning
+        expr: db_pool_checked_out / db_pool_size > 0.7
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool usage high"
+          description: "Over 70% of database connections are in use."
+
       - alert: DatabasePoolOverflow
         expr: db_pool_overflow > 0
         for: 2m
@@ -47,6 +83,35 @@ groups:
         annotations:
           summary: "Database pool overflow detected"
           description: "Connection pool is overflowing ({{ $value }} connections)."
+
+  - name: vuemonitor_redis
+    rules:
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+          description: "Redis has been unreachable for more than 1 minute."
+
+      - alert: RedisHighMemory
+        expr: redis_used_memory_bytes > 200000000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage high ({{ $value | humanize }}B)"
+          description: "Redis memory usage exceeds 200MB."
+
+      - alert: RedisManyConnections
+        expr: redis_connected_clients > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis has many connected clients ({{ $value }})"
+          description: "Redis connected clients exceeds 100."
 
   - name: vuemonitor_system
     rules:
@@ -59,6 +124,15 @@ groups:
           summary: "High memory usage ({{ $value | humanize }}B)"
           description: "Process RSS memory exceeds 800MB."
 
+      - alert: CriticalMemoryUsage
+        expr: process_memory_rss_bytes > 1000000000
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical memory usage ({{ $value | humanize }}B)"
+          description: "Process RSS memory exceeds 1GB. May OOM soon."
+
       - alert: HighCPUUsage
         expr: process_cpu_percent > 80
         for: 5m
@@ -67,3 +141,29 @@ groups:
         annotations:
           summary: "High CPU usage ({{ $value }}%)"
           description: "Process CPU usage exceeds 80%."
+
+  - name: vuemonitor_slo
+    rules:
+      - alert: SLOAvailabilityBudgetBurn
+        expr: |
+          (
+            1 - (rate(http_requests_total{status!~"5.."}[1h]) / rate(http_requests_total[1h]))
+          ) > (1 - 0.999) * 14.4
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SLO availability budget burning too fast"
+          description: "Error budget is being consumed at >14.4x the allowed rate. Current error rate: {{ $value | humanizePercentage }}"
+
+      - alert: SLOLatencyBudgetBurn
+        expr: |
+          (
+            1 - (rate(http_request_duration_seconds_bucket{le="0.5"}[1h]) / rate(http_request_duration_seconds_count[1h]))
+          ) > (1 - 0.5) * 14.4
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SLO latency budget burning too fast"
+          description: "P95 latency SLO is being violated. Too many requests exceed 500ms."

@@ -1,4 +1,4 @@
-ï»¿import { getStorage } from "../storage/sqlite";
+import { getStorage } from "../storage/sqlite";
 import { EventEmitter } from "events";
 import * as fs from "fs";
 import * as path from "path";
@@ -85,7 +85,7 @@ class CrashRecoveryManager extends EventEmitter {
     this.ensureCheckpointDir();
     this.loadStats();
     this.cleanupExpiredCheckpoints();
-    logger.info("CrashRecovery", "å´©æºƒæ¢å¤ç®¡ç†å™¨åˆå§‹åŒ–å®Œæˆ");
+    logger.info("CrashRecovery", "±ÀÀ£»Ö¸´¹ÜÀíÆ÷³õÊ¼»¯Íê³É");
   }
 
   private ensureTable(): void {
@@ -117,7 +117,7 @@ class CrashRecoveryManager extends EventEmitter {
         fs.mkdirSync(this.checkpointDir, { recursive: true });
       }
     } catch (e) {
-      logger.warn("CrashRecovery", "åˆ›å»ºæ£€æŸ¥ç‚¹ç›®å½•å¤±è´¥", { error: String(e) });
+      logger.warn("CrashRecovery", "´´½¨¼ì²éµãÄ¿Â¼Ê§°Ü", { error: String(e) });
     }
   }
 
@@ -134,7 +134,7 @@ class CrashRecoveryManager extends EventEmitter {
         this.stats = { ...this.stats, ...loaded };
       }
     } catch (e) {
-      logger.warn("CrashRecovery", "åŠ è½½æ¢å¤ç»Ÿè®¡å¤±è´¥", { error: String(e) });
+      logger.warn("CrashRecovery", "¼ÓÔØ»Ö¸´Í³¼ÆÊ§°Ü", { error: String(e) });
     }
   }
 
@@ -143,7 +143,7 @@ class CrashRecoveryManager extends EventEmitter {
       const statsPath = path.join(this.checkpointDir, "recovery-stats.json");
       fs.writeFileSync(statsPath, JSON.stringify(this.stats, null, 2), "utf-8");
     } catch (e) {
-      logger.warn("CrashRecovery", "æŒä¹…åŒ–æ¢å¤ç»Ÿè®¡å¤±è´¥", { error: String(e) });
+      logger.warn("CrashRecovery", "³Ö¾Ã»¯»Ö¸´Í³¼ÆÊ§°Ü", { error: String(e) });
     }
   }
 
@@ -167,15 +167,15 @@ class CrashRecoveryManager extends EventEmitter {
           }
         } catch {
           const filePath = path.join(this.checkpointDir, file);
-          try { fs.unlinkSync(filePath); cleaned++; } catch (err) { logger.warn("[Main] operation failed:", err); }
+          try { fs.unlinkSync(filePath); cleaned++; } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
         }
       }
 
       if (cleaned > 0) {
-        logger.info("CrashRecovery", "æ¸…ç†è¿‡æœŸæ£€æŸ¥ç‚¹", { cleaned });
+        logger.info("CrashRecovery", "ÇåÀí¹ýÆÚ¼ì²éµã", { cleaned });
       }
     } catch (e) {
-      logger.warn("CrashRecovery", "æ¸…ç†æ£€æŸ¥ç‚¹å¤±è´¥", { error: String(e) });
+      logger.warn("CrashRecovery", "ÇåÀí¼ì²éµãÊ§°Ü", { error: String(e) });
     }
   }
 
@@ -254,7 +254,7 @@ class CrashRecoveryManager extends EventEmitter {
       const filePath = this.checkpointPath(checkpoint.taskId);
       fs.writeFileSync(filePath, JSON.stringify(checkpoint, null, 2), "utf-8");
     } catch (e) {
-      logger.warn("CrashRecovery", "ä¿å­˜æ£€æŸ¥ç‚¹å¤±è´¥", { taskId: checkpoint.taskId, error: String(e) });
+      logger.warn("CrashRecovery", "±£´æ¼ì²éµãÊ§°Ü", { taskId: checkpoint.taskId, error: String(e) });
     }
 
     this.emit("checkpoint:saved", checkpoint.taskId, checkpoint.phase, checkpoint.progress);
@@ -271,7 +271,7 @@ class CrashRecoveryManager extends EventEmitter {
         return JSON.parse(raw) as TaskCheckpoint;
       }
     } catch (e) {
-      logger.warn("CrashRecovery", "åŠ è½½æ£€æŸ¥ç‚¹å¤±è´¥", { taskId, error: String(e) });
+      logger.warn("CrashRecovery", "¼ÓÔØ¼ì²éµãÊ§°Ü", { taskId, error: String(e) });
     }
     return null;
   }
@@ -284,7 +284,7 @@ class CrashRecoveryManager extends EventEmitter {
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
       }
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
   }
 
   startPeriodicCheckpoint(taskId: string, getProgress: () => { phase: TaskCheckpoint["phase"]; progress: number; partialData?: string | null }): void {
@@ -300,7 +300,7 @@ class CrashRecoveryManager extends EventEmitter {
           partialData: state.partialData ?? null,
           timestamp: new Date().toISOString(),
         });
-      } catch (err) { logger.warn("[Main] operation failed:", err); }
+      } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
     }, CHECKPOINT_INTERVAL_MS);
 
     this.checkpointTimers.set(taskId, timer);
@@ -327,7 +327,7 @@ class CrashRecoveryManager extends EventEmitter {
       return {
         taskId: task.id,
         strategy: "resume_from_checkpoint",
-        reason: `ä»»åŠ¡åœ¨${checkpoint.phase}é˜¶æ®µä¸­æ–­ï¼Œè¿›åº¦${checkpoint.progress}%ï¼Œå¯ä»Žæ£€æŸ¥ç‚¹æ¢å¤`,
+        reason: `ÈÎÎñÔÚ${checkpoint.phase}½×¶ÎÖÐ¶Ï£¬½ø¶È${checkpoint.progress}%£¬¿É´Ó¼ì²éµã»Ö¸´`,
         retryDelay: 0,
         checkpoint,
       };
@@ -337,7 +337,7 @@ class CrashRecoveryManager extends EventEmitter {
       return {
         taskId: task.id,
         strategy: "manual",
-        reason: `å·²è¾¾åˆ°æœ€å¤§é‡è¯•æ¬¡æ•°(${task.maxRetries})ï¼Œéœ€è¦æ‰‹åŠ¨å¤„ç†`,
+        reason: `ÒÑ´ïµ½×î´óÖØÊÔ´ÎÊý(${task.maxRetries})£¬ÐèÒªÊÖ¶¯´¦Àí`,
         retryDelay: 0,
         checkpoint: null,
       };
@@ -349,7 +349,7 @@ class CrashRecoveryManager extends EventEmitter {
         return {
           taskId: task.id,
           strategy: "skip",
-          reason: `éžçž¬æ€é”™è¯¯: ${task.error.substring(0, 100)}`,
+          reason: `·ÇË²Ì¬´íÎó: ${task.error.substring(0, 100)}`,
           retryDelay: 0,
           checkpoint: null,
         };
@@ -360,7 +360,7 @@ class CrashRecoveryManager extends EventEmitter {
       return {
         taskId: task.id,
         strategy: "manual",
-        reason: "ä»»åŠ¡å› é£ŽæŽ§æ£€æµ‹ä¸­æ–­ï¼Œéœ€è¦æ‰‹åŠ¨ç¡®è®¤åŽé‡è¯•",
+        reason: "ÈÎÎñÒò·ç¿Ø¼ì²âÖÐ¶Ï£¬ÐèÒªÊÖ¶¯È·ÈÏºóÖØÊÔ",
         retryDelay: this.calculateBackoffDelay(task.retryCount),
         checkpoint: null,
       };
@@ -370,7 +370,7 @@ class CrashRecoveryManager extends EventEmitter {
     return {
       taskId: task.id,
       strategy: "retry",
-      reason: `è‡ªåŠ¨é‡è¯•(ç¬¬${task.retryCount + 1}æ¬¡)ï¼Œå»¶è¿Ÿ${Math.round(retryDelay / 1000)}ç§’`,
+      reason: `×Ô¶¯ÖØÊÔ(µÚ${task.retryCount + 1}´Î)£¬ÑÓ³Ù${Math.round(retryDelay / 1000)}Ãë`,
       retryDelay,
       checkpoint,
     };
@@ -379,9 +379,9 @@ class CrashRecoveryManager extends EventEmitter {
   private isTransientError(error: string): boolean {
     const transientPatterns = [
       /timeout/i, /ETIMEDOUT/i, /ECONNRESET/i, /ECONNREFUSED/i,
-      /ENOTFOUND/i, /socket hang up/i, /network/i, /ä¸´æ—¶/i,
-      /è¶…æ—¶/i, /rate limit/i, /429/i, /503/i, /502/i,
-      /é¡µé¢åŠ è½½å¤±è´¥/i, /é‡‡é›†è¶…æ—¶/i,
+      /ENOTFOUND/i, /socket hang up/i, /network/i, /ÁÙÊ±/i,
+      /³¬Ê±/i, /rate limit/i, /429/i, /503/i, /502/i,
+      /Ò³Ãæ¼ÓÔØÊ§°Ü/i, /²É¼¯³¬Ê±/i,
     ];
     return transientPatterns.some((p) => p.test(error));
   }
@@ -398,10 +398,10 @@ class CrashRecoveryManager extends EventEmitter {
       const hasEssentialFields = partial.product_name && partial.platform_product_id;
 
       if (hasEssentialFields && checkpoint.progress >= 60) {
-        logger.info("CrashRecovery", "æ£€æµ‹åˆ°æœ‰æ•ˆéƒ¨åˆ†æ•°æ®ï¼Œé€‰æ‹©ä½¿ç”¨éƒ¨åˆ†æ•°æ®", { taskId: task.id, progress: checkpoint.progress });
+        logger.info("CrashRecovery", "¼ì²âµ½ÓÐÐ§²¿·ÖÊý¾Ý£¬Ñ¡ÔñÊ¹ÓÃ²¿·ÖÊý¾Ý", { taskId: task.id, progress: checkpoint.progress });
         return "use_partial";
       }
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
 
     return "re_collect";
   }
@@ -456,7 +456,7 @@ class CrashRecoveryManager extends EventEmitter {
 
     if (pending.length > 0) {
       this.emit("recovery:pending", pending, plans);
-      logger.info("CrashRecovery", "å´©æºƒæ¢å¤å®Œæˆ", {
+      logger.info("CrashRecovery", "±ÀÀ£»Ö¸´Íê³É", {
         recovered: pending.length,
         discarded,
         strategies: plans.map((p) => `${p.taskId}:${p.strategy}`).join(","),

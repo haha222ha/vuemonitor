@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>
+  @page { size: A4; margin: 12mm 10mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    color: {{PRIMARY_COLOR}}; background: #fff;
+    max-width: 190mm; margin: 0 auto; padding: 0;
+  }
+
+  /* 页头 */
+  .header {
+    background: linear-gradient(135deg, {{PRIMARY_COLOR}}, {{PRIMARY_COLOR}}DD);
+    color: #fff; padding: 28px 32px; border-radius: 12px 12px 0 0;
+  }
+  .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; }
+  .header .sub { font-size: 15px; opacity: 0.9; margin-bottom: 4px; }
+  .header .meta { font-size: 12px; opacity: 0.65; margin-top: 8px; }
+
+  /* 主体内容 */
+  .content { padding: 28px 32px; }
+
+  /* 评分表 */
+  .score-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  .score-table th {
+    background: {{PRIMARY_COLOR}}; color: #fff; padding: 12px 14px;
+    font-size: 14px; font-weight: 600; text-align: left;
+  }
+  .score-table th:last-child { text-align: center; width: 120px; }
+  .score-table td {
+    padding: 14px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: top;
+  }
+  .score-table td:first-child { font-weight: 600; width: 140px; }
+  .score-table td:nth-child(2) { width: 60px; text-align: center; color: {{ACCENT_COLOR}}; font-weight: 700; }
+  .score-table tr:hover td { background: {{BG_COLOR}}; }
+  .score-table .criteria { font-size: 12px; color: #666; margin-top: 4px; line-height: 1.5; }
+
+  .score-table input[type="number"] {
+    width: 64px; height: 40px; text-align: center; font-size: 20px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; outline: none; color: {{PRIMARY_COLOR}};
+    transition: all 0.2s;
+  }
+  .score-table input[type="number"]:focus { border-color: {{ACCENT_COLOR}}; box-shadow: 0 0 0 3px {{ACCENT_COLOR}}22; }
+  .score-table input[type="number"].filled { border-color: {{ACCENT_COLOR}}; }
+
+  /* 输入提示 */
+  .input-hint { font-size: 12px; color: #999; margin-bottom: 16px; text-align: right; }
+
+  /* 结果卡片 */
+  .result-card {
+    background: linear-gradient(135deg, {{BG_COLOR}}, #fff);
+    border: 2px solid {{ACCENT_COLOR}}33; border-radius: 14px;
+    padding: 28px 32px; margin-bottom: 20px;
+    transition: all 0.3s;
+  }
+  .result-card.active { border-color: {{ACCENT_COLOR}}; box-shadow: 0 4px 20px {{ACCENT_COLOR}}15; }
+
+  .result-card .total-score {
+    font-size: 48px; font-weight: 700; color: {{ACCENT_COLOR}};
+    text-align: center; margin-bottom: 6px;
+  }
+  .result-card .total-label { font-size: 14px; color: #888; text-align: center; margin-bottom: 20px; }
+
+  /* 分档结果 */
+  .tier-result { display: none; padding: 20px; border-radius: 10px; margin-top: 16px; }
+  .tier-result.show { display: block; }
+  .tier-result.tier-high { background: {{TIER_HIGH_COLOR}}15; border-left: 4px solid {{TIER_HIGH_COLOR}}; }
+  .tier-result.tier-mid  { background: {{TIER_MID_COLOR}}15; border-left: 4px solid {{TIER_MID_COLOR}}; }
+  .tier-result.tier-low  { background: {{TIER_LOW_COLOR}}15; border-left: 4px solid {{TIER_LOW_COLOR}}; }
+
+  .tier-result .tier-label { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .tier-result.tier-high .tier-label { color: {{TIER_HIGH_COLOR}}; }
+  .tier-result.tier-mid  .tier-label { color: {{TIER_MID_COLOR}}; }
+  .tier-result.tier-low  .tier-label { color: {{TIER_LOW_COLOR}}; }
+
+  .tier-result .verdict { font-size: 20px; font-weight: 700; margin-bottom: 10px; color: {{PRIMARY_COLOR}}; }
+  .tier-result .action {
+    font-size: 15px; color: #555; line-height: 1.6;
+    padding: 12px 16px; background: #fff; border-radius: 8px;
+  }
+
+  /* 进度条 */
+  .progress-bar {
+    height: 8px; background: #eee; border-radius: 4px;
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; border-radius: 4px; transition: width 0.4s ease;
+    background: linear-gradient(90deg, {{TIER_LOW_COLOR}}, {{TIER_MID_COLOR}}, {{TIER_HIGH_COLOR}});
+  }
+
+  /* 页脚 */
+  .footer {
+    text-align: center; padding: 16px 32px; font-size: 11px;
+    color: #aaa; border-top: 1px solid #eee;
+  }
+  .footer .disclaimer { margin-top: 4px; font-size: 10px; opacity: 0.7; }
+
+  /* 重置按钮 */
+  .btn-reset {
+    display: inline-block; padding: 8px 20px; font-size: 13px;
+    border: 1px solid #ccc; border-radius: 6px; background: #fff;
+    color: #666; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-reset:hover { border-color: {{ACCENT_COLOR}}; color: {{ACCENT_COLOR}}; }
+
+  @media print {
+    body { max-width: 100%; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .btn-reset { display: none; }
+    .input-hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>{{TITLE}}</h1>
+  <div class="sub">{{SUBTITLE}}</div>
+  <div class="meta">{{CATEGORY}} · ¥{{PRICE}} · 产品ID: {{PRODUCT_ID}}</div>
+</div>
+
+<div class="content">
+
+  <div class="input-hint">💡 每个维度输入1-5分，系统自动计算加权总分</div>
+
+  <table class="score-table">
+    <thead>
+      <tr>
+        <th>评估维度</th>
+        <th>权重</th>
+        <th>评分标准</th>
+        <th>你的评分</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{DIM_1_NAME}}</td>
+        <td>{{DIM_1_WEIGHT}}%</td>
+        <td><div class="criteria">{{DIM_1_CRITERIA}}</div></td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_1_WEIGHT}}" data-idx="1" oninput="recalc()" placeholder="1-5"></td>
+      </tr>
+      <tr>
+        <td>{{DIM_2_NAME}}</td>
+        <td>{{DIM_2_WEIGHT}}%</td>
+        <td><div class="criteria">{{DIM_2_CRITERIA}}</div></td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_2_WEIGHT}}" data-idx="2" oninput="recalc()" placeholder="1-5"></td>
+      </tr>
+      <tr>
+        <td>{{DIM_3_NAME}}</td>
+        <td>{{DIM_3_WEIGHT}}%</td>
+        <td><div class="criteria">{{DIM_3_CRITERIA}}</div></td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_3_WEIGHT}}" data-idx="3" oninput="recalc()" placeholder="1-5"></td>
+      </tr>
+      <tr>
+        <td>{{DIM_4_NAME}}</td>
+        <td>{{DIM_4_WEIGHT}}%</td>
+        <td><div class="criteria">{{DIM_4_CRITERIA}}</div></td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_4_WEIGHT}}" data-idx="4" oninput="recalc()" placeholder="1-5"></td>
+      </tr>
+      <tr>
+        <td>{{DIM_5_NAME}}</td>
+        <td>{{DIM_5_WEIGHT}}%</td>
+        <td><div class="criteria">{{DIM_5_CRITERIA}}</div></td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_5_WEIGHT}}" data-idx="5" oninput="recalc()" placeholder="1-5"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="result-card" id="resultCard">
+    <div class="total-score" id="totalScore">—</div>
+    <div class="total-label">加权总分 / 5.0</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width: 0%;"></div></div>
+
+    <div class="tier-result tier-high" id="tierHigh">
+      <div class="tier-label">🟢 高分段 · {{TIER_HIGH_RANGE}}</div>
+      <div class="verdict">{{TIER_HIGH_VERDICT}}</div>
+      <div class="action">{{TIER_HIGH_ACTION}}</div>
+    </div>
+    <div class="tier-result tier-mid" id="tierMid">
+      <div class="tier-label">🟡 中分段 · {{TIER_MID_RANGE}}</div>
+      <div class="verdict">{{TIER_MID_VERDICT}}</div>
+      <div class="action">{{TIER_MID_ACTION}}</div>
+    </div>
+    <div class="tier-result tier-low" id="tierLow">
+      <div class="tier-label">🔴 低分段 · {{TIER_LOW_RANGE}}</div>
+      <div class="verdict">{{TIER_LOW_VERDICT}}</div>
+      <div class="action">{{TIER_LOW_ACTION}}</div>
+    </div>
+  </div>
+
+  <p style="text-align:right;"><button class="btn-reset" onclick="resetAll()">🔄 重新打分</button></p>
+
+</div>
+
+<div class="footer">
+  <div>{{PRODUCT_ID}} · AI决策工具工厂 · {{CATEGORY}}</div>
+  <div class="disclaimer">⚠️ 本工具仅供个人参考，不构成专业建议。最终决策请结合自身实际情况判断。</div>
+</div>
+
+<script>
+const TIER_HIGH = {min: 4.0, max: 5.0};
+const TIER_MID  = {min: 2.5, max: 4.0};
+const TIER_LOW  = {min: 1.0, max: 2.5};
+
+function recalc() {
+  const inputs = document.querySelectorAll('.score-table input[type="number"]');
+  let totalWeighted = 0;
+  let filled = 0;
+
+  inputs.forEach(inp => {
+    let val = parseInt(inp.value);
+    if (isNaN(val) || val < 1) val = 0;
+    if (val > 5) { val = 5; inp.value = 5; }
+    const weight = parseFloat(inp.dataset.weight) / 100;
+    if (val > 0) {
+      totalWeighted += val * weight;
+      filled++;
+      inp.classList.add('filled');
+    } else {
+      inp.classList.remove('filled');
+    }
+  });
+
+  // 更新显示
+  const scoreEl = document.getElementById('totalScore');
+  const progressFill = document.getElementById('progressFill');
+  const card = document.getElementById('resultCard');
+
+  if (filled === 0) {
+    scoreEl.textContent = '—';
+    progressFill.style.width = '0%';
+    card.classList.remove('active');
+    hideAllTiers();
+  } else {
+    const rounded = Math.round(totalWeighted * 100) / 100;
+    scoreEl.textContent = rounded.toFixed(2);
+    progressFill.style.width = (rounded / 5 * 100) + '%';
+    card.classList.add('active');
+    showTier(rounded);
+  }
+}
+
+function showTier(score) {
+  document.getElementById('tierHigh').classList.remove('show');
+  document.getElementById('tierMid').classList.remove('show');
+  document.getElementById('tierLow').classList.remove('show');
+
+  if (score >= TIER_HIGH.min) {
+    document.getElementById('tierHigh').classList.add('show');
+  } else if (score >= TIER_MID.min) {
+    document.getElementById('tierMid').classList.add('show');
+  } else {
+    document.getElementById('tierLow').classList.add('show');
+  }
+}
+
+function hideAllTiers() {
+  document.getElementById('tierHigh').classList.remove('show');
+  document.getElementById('tierMid').classList.remove('show');
+  document.getElementById('tierLow').classList.remove('show');
+}
+
+function resetAll() {
+  document.querySelectorAll('.score-table input[type="number"]').forEach(inp => {
+    inp.value = '';
+    inp.classList.remove('filled');
+  });
+  document.getElementById('totalScore').textContent = '—';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('resultCard').classList.remove('active');
+  hideAllTiers();
+}
+</script>
+
+</body>
+</html>

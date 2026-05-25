@@ -140,7 +140,6 @@ api.interceptors.response.use(
 function clearAuthAndRedirect(reason?: string) {
   localStorage.removeItem("intel_token")
   localStorage.removeItem("intel_refresh_token")
-  localStorage.removeItem("intel_auth_code")
   localStorage.removeItem("intel_username")
   localStorage.removeItem("intel_membership")
   if (!window.location.pathname.endsWith("/login")) {

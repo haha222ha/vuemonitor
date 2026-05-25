@@ -8,12 +8,13 @@
       </div>
       <el-menu :default-active="activeMenu" router class="sidebar-menu">
         <el-menu-item index="/dashboard">
-          <el-icon><Monitor /></el-icon>
-          <span>{{ t('nav.dashboard') }}</span>
+          <el-icon><TrendCharts /></el-icon>
+          <span>机会雷达</span>
+          <el-badge v-if="opportunityCount > 0" :value="opportunityCount" :max="99" class="nav-badge" />
         </el-menu-item>
         <el-menu-item index="/dashboard/monitor">
-          <el-icon><View /></el-icon>
-          <span>{{ t('nav.products') }}</span>
+          <el-icon><Star /></el-icon>
+          <span>机会商品</span>
         </el-menu-item>
         <el-menu-item index="/dashboard/discovery">
           <el-icon><Search /></el-icon>
@@ -21,18 +22,18 @@
         </el-menu-item>
         <el-menu-item index="/dashboard/compare">
           <el-icon><ScaleToOriginal /></el-icon>
-          <span>商品对比</span>
+          <span>竞品对比</span>
         </el-menu-item>
         <el-menu-item index="/dashboard/collect">
           <el-icon><Upload /></el-icon>
-          <span>{{ t('nav.monitor') }}</span>
+          <span>数据采集</span>
         </el-menu-item>
         <el-sub-menu index="/dashboard/ai-group">
           <template #title>
             <el-icon><MagicStick /></el-icon>
-            <span>{{ t('nav.ai') }}</span>
+            <span>AI助手</span>
           </template>
-          <el-menu-item index="/dashboard/ai">AI分析</el-menu-item>
+          <el-menu-item index="/dashboard/ai">智能分析</el-menu-item>
           <el-menu-item index="/dashboard/ai/reports">分析报告</el-menu-item>
         </el-sub-menu>
         <el-menu-item index="/dashboard/aipic">
@@ -122,7 +123,7 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import { useWebSocket } from "../composables/useWebSocket";
-import { Monitor, View, Upload, MagicStick, Setting, Bell, User, DataAnalysis, Picture, Search, ScaleToOriginal } from "@element-plus/icons-vue";
+import { Monitor, View, Upload, MagicStick, Setting, Bell, User, DataAnalysis, Picture, Search, ScaleToOriginal, TrendCharts, Star } from "@element-plus/icons-vue";
 import api from "../utils/api";
 import { useI18n } from "../i18n";
 
@@ -136,6 +137,7 @@ const showNotifications = ref(false);
 const notifications = ref<any[]>([]);
 const notificationTotal = ref(0);
 const unreadCount = ref(0);
+const opportunityCount = ref(0);
 let pollTimer: ReturnType<typeof setInterval> | null = null;
 
 const { on: wsOn, off: wsOff, connect: wsConnect } = useWebSocket();
@@ -143,12 +145,12 @@ const { on: wsOn, off: wsOff, connect: wsConnect } = useWebSocket();
 const activeMenu = computed(() => route.path);
 const pageTitle = computed(() => {
   const map: Record<string, string> = {
-    "/dashboard": "数据总览",
-    "/dashboard/monitor": "商品监控",
+    "/dashboard": "机会雷达",
+    "/dashboard/monitor": "机会商品",
     "/dashboard/discovery": "商品发现",
-    "/dashboard/compare": "商品对比",
-    "/dashboard/collect": "采集中心",
-    "/dashboard/ai": "AI分析",
+    "/dashboard/compare": "竞品对比",
+    "/dashboard/collect": "数据采集",
+    "/dashboard/ai": "智能分析",
     "/dashboard/team": "团队协作",
     "/dashboard/notifications": "通知中心",
     "/dashboard/settings": "设置",
@@ -179,6 +181,16 @@ async function fetchUnreadCount() {
     const { data } = await api.get("/notifications/unread-count");
     unreadCount.value = data?.data?.unread_count || 0;
   } catch {}
+}
+
+async function fetchOpportunityCount() {
+  try {
+    const { data } = await api.get("/feature/product-rankings");
+    const items = data?.data?.items || [];
+    opportunityCount.value = Math.ceil(items.length * 0.3);
+  } catch {
+    opportunityCount.value = 0;
+  }
 }
 
 async function fetchNotifications() {
@@ -247,10 +259,14 @@ onMounted(() => {
     auth.fetchUser();
   }
   fetchUnreadCount();
+  fetchOpportunityCount();
   wsConnect();
   wsOn("monitor:triggered", onWsNotification);
   wsOn("notification:new", onWsNotification);
-  pollTimer = setInterval(fetchUnreadCount, 60000);
+  pollTimer = setInterval(() => {
+    fetchUnreadCount();
+    fetchOpportunityCount();
+  }, 60000);
 });
 
 onUnmounted(() => {

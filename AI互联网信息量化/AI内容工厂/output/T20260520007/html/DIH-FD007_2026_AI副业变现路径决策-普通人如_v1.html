@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>2026 AI副业变现路径决策</title>
+<style>
+:root { --accent: #E11D48; --primary: #0F0F23; --bg: #fafafa; --text: #1a1a2e; --muted: #6b7280; --border: #e5e7eb; --card-bg: #fff; }
+@page { size: A4; margin: 20mm 18mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'PingFang SC','Microsoft YaHei','Noto Sans SC',system-ui,sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 11pt; }
+.page { page-break-after: always; padding: 0; min-height: 297mm; position: relative; }
+.page:last-child { page-break-after: avoid; }
+.cover { background: linear-gradient(135deg, #0F0F23 0%, #1a0a1a 100%); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 60px 50px; }
+.cover-tag { font-size: 10pt; letter-spacing: 4px; color: var(--accent); border: 1px solid var(--accent); padding: 4px 16px; border-radius: 4px; margin-bottom: 40px; }
+.cover h1 { font-size: 32pt; font-weight: 900; line-height: 1.2; margin-bottom: 16px; letter-spacing: -1px; }
+.cover h2 { font-size: 14pt; font-weight: 300; color: rgba(255,255,255,0.7); margin-bottom: 50px; }
+.cover-meta { font-size: 9pt; color: rgba(255,255,255,0.4); letter-spacing: 1px; }
+.cover-line { width: 60px; height: 3px; background: var(--accent); margin: 30px auto; border-radius: 2px; }
+h2 { font-size: 16pt; color: var(--primary); margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
+h3 { font-size: 12pt; color: var(--primary); margin: 16px 0 8px; }
+h4 { font-size: 11pt; color: var(--text); margin: 12px 0 6px; }
+p { margin-bottom: 10px; }
+.section { padding: 30px 40px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+.card-accent { border-left: 4px solid var(--accent); }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 9.5pt; }
+th { background: var(--primary); color: #fff; padding: 8px 10px; text-align: left; font-weight: 600; }
+td { padding: 7px 10px; border-bottom: 1px solid var(--border); }
+tr:nth-child(even) td { background: #f8f9fa; }
+.source { font-size: 8pt; color: var(--muted); margin-top: 4px; font-style: italic; }
+.highlight { background: linear-gradient(135deg, rgba(225,29,72,0.1), rgba(225,29,72,0.05)); border: 1px solid rgba(225,29,72,0.2); border-radius: 8px; padding: 16px; margin: 12px 0; }
+.highlight-title { font-weight: 700; color: var(--accent); margin-bottom: 6px; font-size: 11pt; }
+.tag { display: inline-block; font-size: 8pt; padding: 2px 8px; border-radius: 3px; margin-right: 4px; margin-bottom: 4px; }
+.tag-red { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.tag-green { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.tag-blue { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.tag-gold { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.assessment-table input { width: 48px; height: 32px; font-size: 15px; font-weight: 700; border: 2px solid #d1d5db; border-radius: 6px; padding: 4px; outline: none; transition: all 0.2s; color: var(--primary); background: #fff; cursor: pointer; text-align: center; }
+.assessment-table input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(225,29,72,0.15); }
+.assess-result { background: linear-gradient(135deg, var(--primary) 0%, #1a0a1a 100%); border-radius: 12px; padding: 24px 28px; margin: 20px 0; color: #fff; text-align: center; }
+.assess-result-score { font-size: 28pt; font-weight: 900; color: var(--accent); }
+.assess-result-text { font-size: 11pt; margin-top: 8px; opacity: 0.9; }
+.timeline { position: relative; padding-left: 30px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--accent); }
+.timeline-item { position: relative; margin-bottom: 16px; }
+.timeline-item::before { content: ''; position: absolute; left: -26px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); border: 2px solid #fff; box-shadow: 0 0 0 2px var(--accent); }
+.timeline-time { font-size: 9pt; color: var(--accent); font-weight: 700; }
+.timeline-content { font-size: 10pt; margin-top: 2px; }
+.disclaimer { background: #f8f9fa; border: 1px solid var(--border); border-radius: 6px; padding: 16px; font-size: 8.5pt; color: var(--muted); margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<!-- 封面 -->
+<div class="page cover">
+  <div class="cover-tag">经济决策 · D层商业机会型</div>
+  <h1>2026 AI副业<br>变现路径决策</h1>
+  <div class="cover-line"></div>
+  <h2>普通人如何用AI开启第二收入</h2>
+  <div class="cover-meta">
+    报告编号：T20260520007 &nbsp;|&nbsp; 发布日期：2026年5月<br>
+    决策领域：经济决策 &nbsp;|&nbsp; 内容层级：D层（商业机会型）
+  </div>
+</div>
+
+<!-- 核心摘要 -->
+<div class="page section">
+  <h2>核心摘要 Executive Summary</h2>
+  <div class="card card-accent">
+    <div class="highlight-title">结论一：AI副业市场规模突破千亿，普通人入场窗口已打开</div>
+    <p>艾瑞咨询数据显示，2025年中国AI应用市场规模达1800亿元，其中个人创作者和小微企业贡献了35%的AI工具消费。AI降低了内容创作和产品开发的门槛，普通人用AI做副业不再是概念，而是正在发生的现实。<span class="source">数据来源：艾瑞咨询《2025年中国AI应用市场研究报告》</span></p>
+  </div>
+  <div class="card card-accent">
+    <div class="highlight-title">结论二：6条变现路径，最低¥0启动成本</div>
+    <p>信息产品（¥99-399）、AI工具套壳（¥49-199）、课程培训（¥299-999）、虚拟产品模板（¥9-49）、AI代运营服务（¥2000-10000/月）、AI内容矩阵（广告+带货）。其中3条路径可实现零成本启动。</p>
+  </div>
+  <div class="card card-accent">
+    <div class="highlight-title">结论三：80%的AI副业失败，死在3个地方</div>
+    <p>失败原因高度集中：①只做不卖（有产品没流量）占45%；②追热点不深耕（3个月换方向）占25%；③定价错误（免费思维或过高定价）占10%。成功者的共同特征：先验证需求，再投入生产。</p>
+  </div>
+  <div class="card card-accent">
+    <div class="highlight-title">结论四：AI副业的本质是"信息差+效率差"变现</div>
+    <p>你不需要比所有人都懂AI，只需要比你的目标用户多懂一点，然后用AI把交付效率提升10倍。这就是AI副业的核心公式：信息差 × AI效率 = 副业收入。</p>
+  </div>
+  <div class="card card-accent">
+    <div class="highlight-title">结论五：7天可验证需求，30天可实现首单</div>
+    <p>AI副业不需要长周期投入。用"最小可行产品"方法：7天验证需求是否存在，30天完成首单验证，3个月稳定月入3000-10000元。关键是用AI缩短从0到1的时间。</p>
+  </div>
+</div>
+
+<!-- 趋势洞察 -->
+<div class="page section">
+  <h2>一、趋势洞察：AI副业为什么是2026年最大机会</h2>
+  <h3>1.1 市场规模与增长</h3>
+  <table>
+    <tr><th>指标</th><th>2024年</th><th>2025年</th><th>2026年（预测）</th><th>增速</th></tr>
+    <tr><td>AI应用市场规模</td><td>980亿</td><td>1800亿</td><td>3200亿</td><td><span class="tag tag-green">+78%</span></td></tr>
+    <tr><td>个人AI创作者数量</td><td>280万</td><td>650万</td><td>1200万</td><td><span class="tag tag-green">+85%</span></td></tr>
+    <tr><td>AI副业月入过万比例</td><td>8%</td><td>15%</td><td>22%（预测）</td><td><span class="tag tag-green">+47%</span></td></tr>
+    <tr><td>AI工具付费用户</td><td>1200万</td><td>2800万</td><td>5000万</td><td><span class="tag tag-green">+79%</span></td></tr>
+  </table>
+  <p class="source">数据来源：艾瑞咨询、QuestMobile、CNNIC综合整理</p>
+
+  <h3>1.2 为什么是现在？</h3>
+  <div class="card">
+    <h4>窗口期一：AI工具成本断崖式下降</h4>
+    <p>GPT-4级别API调用成本从2024年的$30/百万token降至2026年的$3/百万token，降幅90%。这意味着用AI做产品的边际成本几乎为零。</p>
+  </div>
+  <div class="card">
+    <h4>窗口期二：用户认知拐点已到</h4>
+    <p>CNNIC数据显示，中国AI工具用户渗透率从2024年的18%飙升至2026年的42%。用户不再需要被教育"什么是AI"，而是主动寻找"AI能帮我做什么"。</p>
+  </div>
+  <div class="card">
+    <h4>窗口期三：平台生态红利</h4>
+    <p>小红书、抖音、微信等平台对AI生成内容的容忍度提升，同时AI相关话题流量倾斜明显。小红书#AI副业话题浏览量突破8亿。</p>
+  </div>
+</div>
+
+<!-- 6条变现路径 -->
+<div class="page section">
+  <h2>二、6条AI副业变现路径全解析</h2>
+
+  <div class="highlight">
+    <div class="highlight-title">路径一：信息产品（知识付费）</div>
+    <p><strong>产品形态</strong>：AI提示词包/行业报告/操作手册/模板库<br>
+    <strong>定价区间</strong>：¥99-399<br>
+    <strong>启动成本</strong>：¥0（用免费AI工具即可生产）<br>
+    <strong>月入预期</strong>：3000-20000元<br>
+    <strong>核心能力</strong>：信息整合+AI提效+精准定位<br>
+    <strong>代表案例</strong>：小红书博主"AI效率指南"，提示词包月销500+份，月入2万+</p>
+  </div>
+
+  <div class="highlight">
+    <div class="highlight-title">路径二：AI工具套壳/定制</div>
+    <p><strong>产品形态</strong>：基于API的垂直场景工具/小程序/网页应用<br>
+    <strong>定价区间</strong>：¥49-199/月<br>
+    <strong>启动成本</strong>：¥500-2000（API费用+服务器）<br>
+    <strong>月入预期</strong>：5000-50000元<br>
+    <strong>核心能力</strong>：需求洞察+API调用+简单前端<br>
+    <strong>代表案例</strong>：程序员用GPT API做"AI周报生成器"，月活2000+，月入3万</p>
+  </div>
+
+  <div class="highlight">
+    <div class="highlight-title">路径三：课程培训</div>
+    <p><strong>产品形态</strong>：AI技能课程/训练营/1对1咨询<br>
+    <strong>定价区间</strong>：¥299-999<br>
+    <strong>启动成本</strong>：¥0-500<br>
+    <strong>月入预期</strong>：5000-30000元<br>
+    <strong>核心能力</strong>：教学设计+实操经验+社群运营<br>
+    <strong>代表案例</strong>："AI副业实战营"7天训练营，每期100人，月入5万+</p>
+  </div>
+
+  <div class="highlight">
+    <div class="highlight-title">路径四：虚拟产品模板</div>
+    <p><strong>产品形态</strong>：PPT模板/简历模板/海报模板/Notion模板<br>
+    <strong>定价区间</strong>：¥9-49<br>
+    <strong>启动成本</strong>：¥0<br>
+    <strong>月入预期</strong>：2000-15000元<br>
+    <strong>核心能力</strong>：设计审美+AI生图+批量生产<br>
+    <strong>代表案例</strong>：设计师用Midjourney批量生成PPT模板，淘宝月销2000+份</p>
+  </div>
+</div>
+
+<!-- 路径续+评估 -->
+<div class="page section">
+  <h2>二（续）：6条AI副业变现路径</h2>
+
+  <div class="highlight">
+    <div class="highlight-title">路径五：AI代运营服务</div>
+    <p><strong>产品形态</strong>：帮企业/个人用AI做内容/运营/客服<br>
+    <strong>定价区间</strong>：¥2000-10000/月<br>
+    <strong>启动成本</strong>：¥0-500<br>
+    <strong>月入预期</strong>：5000-30000元<br>
+    <strong>核心能力</strong>：AI工具熟练度+行业理解+客户沟通<br>
+    <strong>代表案例</strong>：帮3家本地餐饮店做AI内容运营，月入1.5万</p>
+  </div>
+
+  <div class="highlight">
+    <div class="highlight-title">路径六：AI内容矩阵（广告+带货）</div>
+    <p><strong>产品形态</strong>：多平台AI内容账号矩阵<br>
+    <strong>定价区间</strong>：广告费500-5000/条 + 带货佣金<br>
+    <strong>启动成本</strong>：¥0<br>
+    <strong>月入预期</strong>：3000-50000元（取决于粉丝量）<br>
+    <strong>核心能力</strong>：内容策划+AI批量生产+平台运营<br>
+    <strong>代表案例</strong>：3个小红书账号矩阵，AI生成内容，月广告收入2万+</p>
+  </div>
+
+  <h3>6条路径对比总表</h3>
+  <table>
+    <tr><th>路径</th><th>启动成本</th><th>上手周期</th><th>月入上限</th><th>难度</th><th>适合人群</th></tr>
+    <tr><td>信息产品</td><td>¥0</td><td>1-2周</td><td>2万</td><td><span class="tag tag-green">低</span></td><td>各行业从业者</td></tr>
+    <tr><td>AI工具套壳</td><td>¥500-2K</td><td>2-4周</td><td>5万</td><td><span class="tag tag-blue">中</span></td><td>有技术基础</td></tr>
+    <tr><td>课程培训</td><td>¥0-500</td><td>2-4周</td><td>3万</td><td><span class="tag tag-blue">中</span></td><td>有教学能力</td></tr>
+    <tr><td>虚拟模板</td><td>¥0</td><td>1周</td><td>1.5万</td><td><span class="tag tag-green">低</span></td><td>设计/审美好</td></tr>
+    <tr><td>AI代运营</td><td>¥0-500</td><td>1-2周</td><td>3万</td><td><span class="tag tag-green">低</span></td><td>运营/营销背景</td></tr>
+    <tr><td>内容矩阵</td><td>¥0</td><td>2-4周</td><td>5万</td><td><span class="tag tag-blue">中</span></td><td>内容创作者</td></tr>
+  </table>
+
+  <h3>变现路径自评工具</h3>
+  <table class="assessment-table" id="assess1">
+    <thead><tr><th>维度</th><th>权重</th><th>评分标准</th><th>路径A</th><th>路径B</th></tr></thead>
+    <tbody>
+      <tr><td>启动成本</td><td>25%</td><td>5=0元 4=<500 3=<2K 2=<5K 1=>5K</td>
+        <td class="score-cell"><input type="number" min="1" max="5" step="1" data-weight="0.25" data-col="A" oninput="calcAssess1()"></td>
+        <td class="score-cell"><input type="number" min="1" max="5" step="1" data-weight="0.25" data-col="B" oninput="calcAssess1()"></td></tr>
+      <tr><td>月入潜力</td><td>25%</td><td>5=>3万 4=1-3万 3=5K-1万 2=2-5K 1=<2K</td>
+        <td class="score-cell"><input type="number" min="1" max="5" step="1" data-weight="0.25" data-col="A" oninput="calcAssess1()"></td>
+        <td class="score-cell"><input type="number" min="1" max="5" step="1" data-weight="0.25" data-col="B" oninput="calcAssess1()"></td></tr>
+      <tr><td>个人适配</td><td>25%</td><td>5=高度匹配 4=较匹配 3=一般 2=不太匹配 1=不匹配</td>
+        <td class="score-cell"><input type="number" min="1" max="5" step="1" data-weight="0.25" data-col="A" oninput="calcAssess1()"></td>
+        <td class="score-cell"><input type="number" min="1" max="5" step="1" data-weight="0.25" data-col="B" oninput="calcAssess1()"></td></tr>
+      <tr><td>可持续性</td><td>25%</td><td>5=长期 4=1年+ 3=6月+ 2=3月+ 1=短期</td>
+        <td class="score-cell"><input type="number" min="1" max="5" step="1" data-weight="0.25" data-col="A" oninput="calcAssess1()"></td>
+        <td class="score-cell"><input type="number" min="1" max="5" step="1" data-weight="0.25" data-col="B" oninput="calcAssess1()"></td></tr>
+    </tbody>
+    <tfoot>
+      <tr><td colspan="3" style="font-weight:700;">加权总分</td>
+        <td class="score-cell" style="font-weight:700;"><span id="total1A">-</span>/5.0</td>
+        <td class="score-cell" style="font-weight:700;"><span id="total1B">-</span>/5.0</td></tr>
+    </tfoot>
+  </table>
+  <div id="result1" class="assess-result" style="display:none;">
+    <div class="assess-result-score" id="result1Score"></div>
+    <div class="assess-result-text" id="result1Text"></div>
+  </div>
+</div>
+
+<!-- 人群适配 -->
+<div class="page section">
+  <h2>三、人群适配：你是哪种副业人？</h2>
+
+  <div class="card card-accent">
+    <h4>上班族（朝九晚六，每天2-3小时副业时间）</h4>
+    <p><strong>最优路径</strong>：信息产品 + AI代运营<br>
+    <strong>核心策略</strong>：利用行业经验做信息产品，下班后用AI代运营接单<br>
+    <strong>月入预期</strong>：3000-8000元<br>
+    <strong>关键</strong>：不要辞职做副业！先验证再投入</p>
+  </div>
+
+  <div class="card card-accent">
+    <h4>自由职业者（时间灵活，已有一定客户基础）</h4>
+    <p><strong>最优路径</strong>：AI工具套壳 + 课程培训<br>
+    <strong>核心策略</strong>：用AI提升服务效率10倍，把方法论打包成课程<br>
+    <strong>月入预期</strong>：8000-30000元<br>
+    <strong>关键</strong>：AI是效率放大器，不是替代品</p>
+  </div>
+
+  <div class="card card-accent">
+    <h4>副业探索者（无明确方向，想先试水）</h4>
+    <p><strong>最优路径</strong>：虚拟产品模板 + 内容矩阵<br>
+    <strong>核心策略</strong>：零成本启动，先跑通最小闭环<br>
+    <strong>月入预期</strong>：1000-5000元<br>
+    <strong>关键</strong>：先赚到第一个100元，再考虑放大</p>
+  </div>
+
+  <h3>人群-路径匹配矩阵</h3>
+  <table>
+    <tr><th>路径</th><th>上班族</th><th>自由职业</th><th>探索者</th></tr>
+    <tr><td>信息产品</td><td><span class="tag tag-green">★★★★★</span></td><td><span class="tag tag-green">★★★★</span></td><td><span class="tag tag-blue">★★★</span></td></tr>
+    <tr><td>AI工具套壳</td><td><span class="tag tag-blue">★★★</span></td><td><span class="tag tag-green">★★★★★</span></td><td><span class="tag tag-gold">★★</span></td></tr>
+    <tr><td>课程培训</td><td><span class="tag tag-blue">★★★</span></td><td><span class="tag tag-green">★★★★★</span></td><td><span class="tag tag-gold">★★</span></td></tr>
+    <tr><td>虚拟模板</td><td><span class="tag tag-green">★★★★</span></td><td><span class="tag tag-green">★★★★</span></td><td><span class="tag tag-green">★★★★★</span></td></tr>
+    <tr><td>AI代运营</td><td><span class="tag tag-green">★★★★★</span></td><td><span class="tag tag-green">★★★★</span></td><td><span class="tag tag-blue">★★★</span></td></tr>
+    <tr><td>内容矩阵</td><td><span class="tag tag-blue">★★★</span></td><td><span class="tag tag-green">★★★★</span></td><td><span class="tag tag-green">★★★★★</span></td></tr>
+  </table>
+</div>
+
+<!-- 冷启动+定价 -->
+<div class="page section">
+  <h2>四、冷启动与定价策略</h2>
+  <h3>4.1 7天冷启动法</h3>
+  <div class="timeline">
+    <div class="timeline-item"><div class="timeline-time">Day 1-2</div><div class="timeline-content">确定目标用户画像，找到3个精准痛点</div></div>
+    <div class="timeline-item"><div class="timeline-time">Day 3-4</div><div class="timeline-content">用AI制作最小可行产品（MVP），1个核心功能即可</div></div>
+    <div class="timeline-item"><div class="timeline-time">Day 5-6</div><div class="timeline-content">在目标用户聚集的社群/平台发布，收集反馈</div></div>
+    <div class="timeline-item"><div class="timeline-time">Day 7</div><div class="timeline-content">根据反馈迭代，决定继续还是调整方向</div></div>
+  </div>
+
+  <h3>4.2 定价策略</h3>
+  <table>
+    <tr><th>产品类型</th><th>错误定价</th><th>正确定价</th><th>定价逻辑</th></tr>
+    <tr><td>提示词包/模板</td><td>免费或¥1</td><td>¥29-99</td><td>太便宜=没价值感，¥29是心理门槛</td></tr>
+    <tr><td>行业报告</td><td>¥9.9</td><td>¥99-199</td><td>信息差价值远高于制作成本</td></tr>
+    <tr><td>课程/训练营</td><td>¥49</td><td>¥299-999</td><td>低价课完课率<5%，合理定价筛选真用户</td></tr>
+    <tr><td>AI工具订阅</td><td>¥9/月</td><td>¥49-199/月</td><td>参考SaaS定价，月费<200用户决策快</td></tr>
+    <tr><td>代运营服务</td><td>¥500/月</td><td>¥2000-10000/月</td><td>按效果收费，基础费+提成模式</td></tr>
+  </table>
+
+  <h3>4.3 变现公式</h3>
+  <div class="highlight">
+    <div class="highlight-title">AI副业收入 = 流量 × 转化率 × 客单价 × 复购率</div>
+    <p>• 流量：AI帮你10倍提效生产内容 → 内容量↑ → 流量↑<br>
+    • 转化率：精准定位痛点 → 转化率3-8%（行业平均1-2%）<br>
+    • 客单价：信息差产品天然高毛利 → 客单价¥99-999<br>
+    • 复购率：持续输出+社群运营 → 复购率20-40%</p>
+  </div>
+</div>
+
+<!-- 风险+行动 -->
+<div class="page section">
+  <h2>五、风险提示与行动指南</h2>
+  <h3>5.1 风险矩阵</h3>
+  <table>
+    <tr><th>风险</th><th>等级</th><th>描述</th><th>应对</th></tr>
+    <tr><td>需求验证不足</td><td><span class="tag tag-red">高</span></td><td>做了没人买</td><td>7天冷启动法，先验证再生产</td></tr>
+    <tr><td>AI政策风险</td><td><span class="tag tag-blue">中</span></td><td>平台限制AI内容</td><td>AI辅助+人工优化，保持人味</td></tr>
+    <tr><td>同质化竞争</td><td><span class="tag tag-blue">中</span></td><td>大量人涌入同一赛道</td><td>深耕垂直领域，建立壁垒</td></tr>
+    <tr><td>时间管理</td><td><span class="tag tag-gold">中低</span></td><td>副业影响主业</td><td>每天固定2小时，设止损线</td></tr>
+    <tr><td>法律合规</td><td><span class="tag tag-gold">中低</span></td><td>AI生成内容版权问题</td><td>了解平台规则，标注AI辅助</td></tr>
+  </table>
+
+  <h3>5.2 30天行动计划</h3>
+  <div class="timeline">
+    <div class="timeline-item"><div class="timeline-time">第1周</div><div class="timeline-content">确定副业方向+目标用户+核心痛点，7天冷启动验证</div></div>
+    <div class="timeline-item"><div class="timeline-time">第2周</div><div class="timeline-content">制作MVP产品，在3个渠道发布，收集首批反馈</div></div>
+    <div class="timeline-item"><div class="timeline-time">第3周</div><div class="timeline-content">根据反馈迭代产品，优化定价和转化路径</div></div>
+    <div class="timeline-item"><div class="timeline-time">第4周</div><div class="timeline-content">实现首单，建立交付流程，开始规模化</div></div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>免责声明</strong>：本报告内容基于公开信息整理，数据来源包括艾瑞咨询、QuestMobile、CNNIC等机构发布的公开报告。报告中的收入预期、市场规模等数据仅供参考，不构成具体投资或创业建议。实际收益因个人能力、市场变化等因素而异。AI副业需遵守相关法律法规和平台规则。
+  </div>
+</div>
+
+<script>
+function calcAssess1() {
+  const table = document.getElementById('assess1');
+  const inputs = table.querySelectorAll('input');
+  let wSumA=0,wSumB=0,sumA=0,sumB=0,countA=0,countB=0;
+  inputs.forEach(inp => {
+    const w=parseFloat(inp.dataset.weight), v=parseFloat(inp.value)||0;
+    if(v>=1&&v<=5){
+      if(inp.dataset.col==='A'){wSumA+=v*w;sumA+=w;countA++;}
+      if(inp.dataset.col==='B'){wSumB+=v*w;sumB+=w;countB++;}
+    }
+  });
+  const tA=sumA>0?(wSumA/sumA).toFixed(2):'-', tB=sumB>0?(wSumB/sumB).toFixed(2):'-';
+  document.getElementById('total1A').textContent=tA;
+  document.getElementById('total1B').textContent=tB;
+  const result=document.getElementById('result1');
+  if(countA>=4||countB>=4){
+    result.style.display='block';
+    let w='',s='',t='';
+    if(countA>=4&&countB>=4){
+      if(parseFloat(tA)>parseFloat(tB)){w='路径A';s=tA;t='路径A综合评分更高，建议优先尝试';}
+      else if(parseFloat(tB)>parseFloat(tA)){w='路径B';s=tB;t='路径B综合评分更高，建议优先尝试';}
+      else{w='两路径持平';s=tA;t='评分接近，建议结合个人偏好选择';}
+    }else if(countA>=4){w='路径A';s=tA;t='请继续填写路径B的评分进行对比';}
+    else{w='路径B';s=tB;t='请继续填写路径A的评分进行对比';}
+    document.getElementById('result1Score').textContent=w+' '+s+'/5.0';
+    document.getElementById('result1Text').textContent=t;
+  }else{result.style.display='none';}
+}
+</script>
+</body>
+</html>

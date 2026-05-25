@@ -1,0 +1,56 @@
+{
+  "education": {
+    "name": "教育·升学",
+    "primary": "#1E3A5F",
+    "accent": "#D4A843",
+    "bg": "#F8F9FA",
+    "emoji": "🎓",
+    "tiers": {"high": "#059669", "mid": "#D97706", "low": "#DC2626"},
+    "categories": ["考研决策", "考公决策", "考编决策", "教资备考", "一建二建", "留学决策", "高考志愿", "考证资格", "专升本"]
+  },
+  "career": {
+    "name": "职业·成长",
+    "primary": "#2D2D2D",
+    "accent": "#2563EB",
+    "bg": "#FAFAFA",
+    "emoji": "💼",
+    "tiers": {"high": "#059669", "mid": "#D97706", "low": "#DC2626"},
+    "categories": ["职业选择", "职场转型", "技能学习", "面试求职", "跳槽评估", "行业选择"]
+  },
+  "lifestyle": {
+    "name": "生活·消费",
+    "primary": "#3D3D3D",
+    "accent": "#EA580C",
+    "bg": "#FFF7ED",
+    "emoji": "🛒",
+    "tiers": {"high": "#059669", "mid": "#D97706", "low": "#DC2626"},
+    "categories": ["育儿教育", "消费决策", "健康决策", "保险配置", "买房决策", "租房决策", "买车决策"]
+  },
+  "business": {
+    "name": "商业·副业",
+    "primary": "#0F0F23",
+    "accent": "#E11D48",
+    "bg": "#FEF2F2",
+    "emoji": "💰",
+    "tiers": {"high": "#059669", "mid": "#D97706", "low": "#DC2626"},
+    "categories": ["副业选择", "自媒体运营", "副业变现", "创业方向", "跨境电商", "知识付费"]
+  },
+  "tech": {
+    "name": "科技·工具",
+    "primary": "#0A0A2E",
+    "accent": "#00D4AA",
+    "bg": "#F5F5FF",
+    "emoji": "🤖",
+    "tiers": {"high": "#059669", "mid": "#D97706", "low": "#DC2626"},
+    "categories": ["AI工具选择", "效率工具", "编程学习", "技术选型", "硬件选购"]
+  },
+  "creative": {
+    "name": "设计·创意",
+    "primary": "#1A1A2E",
+    "accent": "#E94560",
+    "bg": "#FFF5F5",
+    "emoji": "🎨",
+    "tiers": {"high": "#059669", "mid": "#D97706", "low": "#DC2626"},
+    "categories": ["设计软件", "素材资源", "配色方案", "字体选择", "创意工具"]
+  }
+}

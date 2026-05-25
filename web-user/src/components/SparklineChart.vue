@@ -4,7 +4,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from "vue";
-import * as echarts from "echarts";
+import * as echarts from "echarts/core";
+import { LineChart } from "echarts/charts";
+import { GridComponent, TooltipComponent, GraphicComponent } from "echarts/components";
+import { CanvasRenderer } from "echarts/renderers";
+
+echarts.use([LineChart, GridComponent, TooltipComponent, GraphicComponent, CanvasRenderer]);
 
 const props = withDefaults(defineProps<{
   data: number[];

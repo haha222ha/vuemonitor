@@ -6,6 +6,7 @@ import "element-plus/dist/index.css";
 import App from "./App.vue";
 import router from "./router";
 import { useI18n } from "./i18n";
+import { initWebVitals } from "./utils/webVitals";
 import { watch } from "vue";
 
 const i18n = useI18n();
@@ -47,3 +48,4 @@ window.addEventListener("unhandledrejection", (event) => {
 });
 
 app.mount("#app");
+initWebVitals();

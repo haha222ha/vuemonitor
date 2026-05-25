@@ -796,6 +796,7 @@ export function useSettingsData() {
   }
 
   let statusTimer: ReturnType<typeof setInterval> | null = null;
+  const _unsubscribes: Array<(() => void) | null> = [];
 
   function init() {
     licenseStore.fetchLicense();
@@ -810,15 +811,19 @@ export function useSettingsData() {
     fetchSecuritySummary();
     fetchSecurityLogs();
     statusTimer = setInterval(refreshSyncStatus, 10000);
-    safeOn("sync:conflict:detected", () => { loadConflicts(); });
-    safeOn("sync:conflict:resolved", () => { loadConflicts(); });
-    safeOn("sync:complete", () => { loadServerSyncStatus(); });
+    _unsubscribes.push(safeOn("sync:conflict:detected", () => { loadConflicts(); }));
+    _unsubscribes.push(safeOn("sync:conflict:resolved", () => { loadConflicts(); }));
+    _unsubscribes.push(safeOn("sync:complete", () => { loadServerSyncStatus(); }));
     loadServerSyncStatus();
   }
 
   function cleanup() {
     if (statusTimer) { clearInterval(statusTimer); }
     if (logAutoRefreshTimer) { clearInterval(logAutoRefreshTimer); }
+    for (const unsub of _unsubscribes) {
+      if (unsub) unsub();
+    }
+    _unsubscribes.length = 0;
   }
 
   return {

@@ -35,6 +35,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { platformTagType, statusTagType, statusLabel, taskTypeLabel } from "../utils/taskLabels";
 
 export interface SchedulerTask {
   id: string;
@@ -58,26 +59,6 @@ defineEmits<{
 }>();
 
 const taskLabel = computed(() => `${taskTypeLabel(props.task.task_type)} - ${props.task.platform}`);
-
-function platformTagType(platform: string) {
-  const map: Record<string, string> = { xhs: "danger", taobao: "warning", jd: "primary", pdd: "success", douyin: "" };
-  return map[platform] || "info";
-}
-
-function statusTagType(status: string) {
-  const map: Record<string, string> = { pending: "info", running: "", completed: "success", failed: "danger", cancelled: "warning" };
-  return map[status] || "info";
-}
-
-function statusLabel(status: string) {
-  const map: Record<string, string> = { pending: "待执行", running: "运行中", completed: "已完成", failed: "失败", cancelled: "已取消" };
-  return map[status] || status;
-}
-
-function taskTypeLabel(type: string) {
-  const map: Record<string, string> = { product: "商品采集", shop: "店铺采集", category: "品类采集" };
-  return map[type] || type;
-}
 
 function progressColor(status: string) {
   const map: Record<string, string> = { running: "#4F46E5", pending: "#94A3B8", completed: "#10B981", failed: "#EF4444" };

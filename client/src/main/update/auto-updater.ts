@@ -1,4 +1,4 @@
-ï»¿import { app, BrowserWindow, dialog } from "electron";
+import { app, BrowserWindow, dialog } from "electron";
 import { autoUpdater, UpdateInfo } from "electron-updater";
 import { EventEmitter } from "events";
 import * as fs from "fs";
@@ -73,7 +73,7 @@ class AutoUpdateManager extends EventEmitter {
     try {
       const historyPath = path.join(app.getPath("userData"), HISTORY_FILE);
       fs.writeFileSync(historyPath, JSON.stringify(this.status.updateHistory, null, 2));
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
   }
 
   private setupAutoUpdater(): void {
@@ -251,9 +251,9 @@ class AutoUpdateManager extends EventEmitter {
     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
       dialog.showMessageBox(this.mainWindow, {
         type: "info",
-        title: "ç‰ˆæœ¬å›æ»š",
-        message: `å³å°†å›æ»šåˆ°ç‰ˆæœ¬ ${lastSuccessful.fromVersion}`,
-        detail: "è¯·æ‰‹åŠ¨ä¸‹è½½å¹¶å®‰è£…æ—§ç‰ˆæœ¬å®‰è£…åŒ…ã€‚",
+        title: "°æ±¾»Ø¹ö",
+        message: `¼´½«»Ø¹öµ½°æ±¾ ${lastSuccessful.fromVersion}`,
+        detail: "ÇëÊÖ¶¯ÏÂÔØ²¢°²×°¾É°æ±¾°²×°°ü¡£",
       });
     }
   }

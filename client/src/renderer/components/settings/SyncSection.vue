@@ -51,7 +51,7 @@
           </div>
           <div class="server-info-item">
             <span class="server-info-label">最后更新</span>
-            <span class="server-info-value">{{ serverSyncInfo.last_product_update ? formatSyncTime(serverSyncInfo.last_product_update) : "-" }}</span>
+            <span class="server-info-value">{{ serverSyncInfo.last_product_update ? formatSyncTime(serverSyncInfo.last_product_update as string) : "-" }}</span>
           </div>
         </div>
       </div>

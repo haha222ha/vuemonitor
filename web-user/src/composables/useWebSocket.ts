@@ -24,43 +24,29 @@ export function useWebSocket() {
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const host = window.location.host;
-    const wsUrl = `${protocol}//${host}/api/v1/ws?token=${token}`;
+    const wsUrl = `${protocol}//${host}/api/v1/ws`;
 
     const socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
-      connected.value = true;
-      ws.value = socket;
-      reconnectAttempts.value = 0; // Reset on successful connection
-      // Flush message queue
-      while (messageQueue.length > 0) {
-        const msg = messageQueue.shift();
-        if (msg) {
-          socket.send(JSON.stringify(msg));
-        }
-      }
-    };
-
-    socket.onclose = () => {
-      connected.value = false;
-      ws.value = null;
-      // Exponential backoff with max delay of 30 seconds
-      if (auth.isLoggedIn && reconnectAttempts.value < maxReconnectAttempts) {
-        const delay = Math.min(1000 * 2 ** reconnectAttempts.value, 30000);
-        reconnectAttempts.value++;
-        setTimeout(() => {
-          connect();
-        }, delay);
-      }
-    };
-
-    socket.onerror = () => {
-      connected.value = false;
+      socket.send(JSON.stringify({ type: "auth", token }));
     };
 
     socket.onmessage = (event) => {
       try {
         const msg: WSMessage = JSON.parse(event.data);
+
+        if (msg.type === "auth" && msg.status === "ok") {
+          connected.value = true;
+          ws.value = socket;
+          reconnectAttempts.value = 0;
+          while (messageQueue.length > 0) {
+            const queuedMsg = messageQueue.shift();
+            if (queuedMsg) socket.send(JSON.stringify(queuedMsg));
+          }
+          return;
+        }
+
         lastMessage.value = msg;
 
         if (msg.type === "ping") {
@@ -78,6 +64,22 @@ export function useWebSocket() {
           wildcardHandlers.forEach((fn) => fn(msg));
         }
       } catch {}
+    };
+
+    socket.onclose = () => {
+      connected.value = false;
+      ws.value = null;
+      if (auth.isLoggedIn && reconnectAttempts.value < maxReconnectAttempts) {
+        const delay = Math.min(1000 * 2 ** reconnectAttempts.value, 30000);
+        reconnectAttempts.value++;
+        setTimeout(() => {
+          connect();
+        }, delay);
+      }
+    };
+
+    socket.onerror = () => {
+      connected.value = false;
     };
   }
 

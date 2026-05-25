@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from "vue"
+import { reactive, ref, computed, onMounted } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { ElMessage } from "element-plus"
 import type { FormInstance, FormRules } from "element-plus"
@@ -72,6 +72,14 @@ const form = reactive({ code: "" })
 const rules: FormRules = {
   code: [{ required: true, message: "请输入授权码", trigger: "blur" }],
 }
+
+onMounted(() => {
+  const savedCode = localStorage.getItem("intel_auth_code")
+  if (savedCode) {
+    form.code = savedCode
+    handleLogin()
+  }
+})
 
 async function handleLogin() {
   const valid = await formRef.value?.validate().catch(() => false)

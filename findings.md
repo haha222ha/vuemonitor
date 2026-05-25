@@ -1,224 +1,259 @@
-# XHS365 深度审计发现
+# XHS365 全面深度审计发现（v2）
 
-> 审计日期：2026-05-22 | 基于代码全量审查 + 需求文档对照
-
----
-
-## 一、子系统审计发现
-
-### 1.1 服务端（FastAPI）— 代码完成度 90%
-
-| 文件 | 行数 | 发现 |
-|------|------|------|
-| [server/app/main.py](file:///d:/vuemonitor/server/app/main.py) | ~150 | ✅ 完善的lifespan管理，含安全检查、恢复、种子数据 |
-| [server/app/api/router.py](file:///d:/vuemonitor/server/app/api/router.py) | ~100 | ✅ 26个路由模块注册，含health/diagnose端点 |
-| [server/app/ai/service.py](file:///d:/vuemonitor/server/app/ai/service.py) | — | ✅ 9种分析类型 + 规则引擎fallback + 缓存 + WebSocket推送 |
-| [server/app/ai/providers.py](file:///d:/vuemonitor/server/app/ai/providers.py) | — | ✅ OpenAI + DeepSeek双Provider，自动切换 |
-| [server/app/middleware/](file:///d:/vuemonitor/server/app/middleware/) | 9个文件 | ✅ 认证/特性门控/日志/Prometheus/配额/限流/安全审计/安全头/链路追踪 |
-| [server/app/models/__init__.py](file:///d:/vuemonitor/server/app/models/__init__.py) | — | ✅ 37+ ORM模型，含完整关联关系 |
-| 关键缺失 | — | ⚠️ AI API Key未配置（OpenAI/DeepSeek） |
-| 关键缺失 | — | ⚠️ 数据库密码已更换但需验证线上状态 |
-
-### 1.2 Electron客户端 — 代码完成度 85%
-
-| 文件 | 行数 | 发现 |
-|------|------|------|
-| [client/src/main/index.ts](file:///d:/vuemonitor/client/src/main/index.ts) | ~250 | ✅ 完善的bootstrap流程，含崩溃恢复/离线模式/性能监控 |
-| [client/src/main/ipc/handlers.ts](file:///d:/vuemonitor/client/src/main/ipc/handlers.ts) | 19 | ✅ 路由分发到5个子handler模块（Collect/Storage/Sync/Service） |
-| [client/src/main/collect/chromium-worker.ts](file:///d:/vuemonitor/client/src/main/collect/chromium-worker.ts) | — | ✅ 分片队列 + 并发门控 + 视图池 |
-| [client/src/main/collect/playwright-collector.ts](file:///d:/vuemonitor/client/src/main/collect/playwright-collector.ts) | — | ✅ 无头浏览器 + 截图 + 数据提取 |
-| [client/src/main/collect/data-mart.ts](file:///d:/vuemonitor/client/src/main/collect/data-mart.ts) | — | ✅ 去重 + 融合 + 质量评分 + 缓存失效 |
-| [client/src/main/sync/cloud-sync.ts](file:///d:/vuemonitor/client/src/main/sync/cloud-sync.ts) | — | ✅ 755行，push/pull/conflict resolution |
-| [client/src/main/license/license-manager.ts](file:///d:/vuemonitor/client/src/main/license/license-manager.ts) | — | ✅ 设备指纹 + 激活/停用 |
-| [client/src/renderer/router/index.ts](file:///d:/vuemonitor/client/src/renderer/router/index.ts) | ~100 | ✅ 14个路由（含登录）+ 路由守卫 + Token持久化 |
-| [client/src/renderer/views/SettingsView.vue](file:///d:/vuemonitor/client/src/renderer/views/SettingsView.vue) | 1465 | ⚠️ 过长，需拆分 |
-| [client/src/renderer/views/DashboardView.vue](file:///d:/vuemonitor/client/src/renderer/views/DashboardView.vue) | 771 | ⚠️ 过长，需拆分 |
-| UI重设计 | [2026-05-13-electron-ui-redesign.md](file:///d:/vuemonitor/docs/superpowers/specs/2026-05-13-electron-ui-redesign.md) | ⚠️ 设计完成但未实施到代码 |
-| 关键缺失 | — | ⚠️ 未打包测试 |
-| 关键缺失 | — | ⚠️ 崩溃恢复逻辑不完整（快照/检查点待完善） |
-
-### 1.3 Web-user前端 — 代码完成度 80%
-
-| 文件 | 发现 |
-|------|------|
-| [web-user/src/views/dashboard/](file:///d:/vuemonitor/web-user/src/views/dashboard/) | ✅ 12个子页面：DashboardHome/AIAnalysis/AIReport/CollectCenter/CompareView/DiscoveryView/MonitorList/NotificationsView/ProductDetailView/SettingsView/TeamView/AdminMonitorView |
-| [web-user/src/stores/](file:///d:/vuemonitor/web-user/src/stores/) | ✅ 5个Store：auth/monitor/notifications/products/teams |
-| [web-user/src/views/LandingView.vue](file:///d:/vuemonitor/web-user/src/views/LandingView.vue) | ✅ 营销落地页 |
-| [web-user/src/views/PricingView.vue](file:///d:/vuemonitor/web-user/src/views/PricingView.vue) | ✅ 定价对比页 |
-| 关键缺失 | ⚠️ 前后端联调未开始 |
-| 关键缺失 | ⚠️ AI分析页→后端API链路未测试 |
-
-### 1.4 Web-admin后台 — 代码完成度 75%
-
-| 文件 | 发现 |
-|------|------|
-| [web-admin/src/views/](file:///d:/vuemonitor/web-admin/src/views/) | ✅ 12个管理页面：Dashboard/Users/Licenses/Collect/Proxies/RiskEvents/AuditLogs/SystemMonitor/AlertConfig/SecurityAudit/GDPR/Benchmark |
-| [web-admin/src/stores/](file:///d:/vuemonitor/web-admin/src/stores/) | ✅ 12个Store：admin/users/dashboard/collect/proxies/riskEvents/alertConfig/systemMonitor/securityAudit/gdpr/licenses/benchmark/auditLogs |
-| 关键缺失 | ⚠️ Admin登录联调未验证 |
-| 关键缺失 | ⚠️ 部分页面为占位实现 |
+> 审计日期：2026-05-23 | 基于代码全量审查 + 运行时验证 + 基础设施分析
+> 前版日期：2026-05-22 | 本次为第二轮深度审计
 
 ---
 
-## 二、代码质量发现
+## 〇、审计范围与方法
 
-### 2.1 优点
-
-| 发现 | 详情 |
+| 维度 | 方法 |
 |------|------|
-| 架构分层清晰 | API → Service → Model → Core 严格分层 |
-| 异常处理完善 | 统一异常处理器 + 自定义异常类体系 |
-| 缓存策略成熟 | Redis装饰器 + 批量操作 + 失效策略 |
-| 安全多层防护 | 认证/限流/安全审计/安全头/CORS 五层 |
-| 数据库迁移规范 | Alembic版本化管理，8个迁移脚本 |
-| 双Provider AI | OpenAI/DeepSeek自动切换 + 规则引擎fallback |
-| 完整的IPC白名单 | 120+ IPC通道白名单，防止任意调用 |
-
-### 2.2 问题发现
-
-| # | 问题 | 严重度 | 位置 | 建议 |
-|---|------|--------|------|------|
-| CQ-1 | View文件过大 | 🟡 | [SettingsView.vue (1465行)](file:///d:/vuemonitor/client/src/renderer/views/SettingsView.vue)，[DashboardView.vue (771行)](file:///d:/vuemonitor/client/src/renderer/views/DashboardView.vue) | 拆分为子组件 |
-| CQ-2 | AI分析结果纯文本渲染 | 🟡 | [AIView.vue](file:///d:/vuemonitor/client/src/renderer/views/AIView.vue) | 使用结构化组件渲染 |
-| CQ-3 | 组件复用度低 | 🟡 | [client/src/renderer/components/](file:///d:/vuemonitor/client/src/renderer/components/) | 已有34个组件但views仍过大 |
-| CQ-4 | UI风格不统一 | 🟡 | 多处inline style | 统一为设计Token CSS变量 |
-| CQ-5 | Admin暴力破解防护仅内存级 | 🟡 | [auth.py](file:///d:/vuemonitor/server/app/api/auth.py) `_MAX_ATTEMPTS=5` | 迁移到Redis持久化 |
-| CQ-6 | DeepSeek API使用第三方代理 | 🟡 | `base_url="https://www.packyapi.com/v1"` | 评估代理可靠性，考虑直连 |
-| CQ-7 | 测试覆盖不完整 | 🟡 | [server/tests/](file:///d:/vuemonitor/server/tests/) | 10个测试文件但以集成测试为主 |
+| 服务端代码 | 全量审查 config/main/database/security/cache/redis/auth/middleware/router |
+| 客户端代码 | 结构审查 + 依赖分析 + 打包配置 |
+| Web前端代码 | 全量审查 api.ts/router/stores/views |
+| 基础设施 | Docker/Nginx/GitHub Actions/监控配置 |
+| 安全 | 认证/授权/加密/限流/CORS/CSP/审计日志 |
 
 ---
 
-## 三、安全审计发现（更新）
+## 一、系统全景
 
-### 3.1 已修复项
+### 1.1 子系统矩阵
 
-| # | 问题 | 修复状态 |
-|---|------|----------|
-| SEC-1 | JWT_SECRET默认值 | ✅ 本地已更换为强随机值 |
-| SEC-2 | ENCRYPTION_KEY默认值 | ✅ 本地已更换 |
-| SEC-3 | PostgreSQL默认密码 | ✅ 服务器已更换为Xhs365Secure2026 |
-| SEC-4 | Redis无密码 | ✅ 服务器已配置Xhs365Redis2026 |
-| SEC-5 | 端口暴露 | ✅ PostgreSQL/Redis仅监听localhost |
-| SEC-6 | HTTPS缺失 | ✅ Cloudflare Flexible SSL |
-| SEC-7 | CORS开发环境 | ✅ 生产环境已移除localhost |
+| 子系统 | 技术栈 | 代码完成度 | 功能可用度 | 生产就绪度 |
+|--------|--------|-----------|-----------|-----------|
+| Server (FastAPI) | Python 3.11 + SQLAlchemy + Redis | 90% | 70% | 50% |
+| Client (Electron) | Electron 30 + Vue 3.5 + Playwright | 85% | 60% | 20% |
+| Web-User | Vue 3.4 + Element Plus + ECharts | 80% | 40% | 40% |
+| Web-Admin | Vue 3.4 + Element Plus | 75% | 35% | 35% |
+| Infrastructure | Docker + Nginx + Prometheus | 70% | 30% | 25% |
 
-### 3.2 待处理项
+### 1.2 代码规模统计
 
-| # | 问题 | 风险 | 建议 |
+| 子系统 | 文件数 | 核心模块 |
+|--------|--------|----------|
+| Server | ~90 Python文件 | 26 API路由 + 9中间件 + 37模型 + 11服务 |
+| Client | ~80 TS/Vue文件 | 14视图 + 34组件 + 9 Store + 12主进程模块 |
+| Web-User | ~40 Vue/TS文件 | 13视图 + 16组件 + 5 Store |
+| Web-Admin | ~30 Vue/TS文件 | 13视图 + 13 Store |
+
+---
+
+## 二、本次审计新发现（v2 新增）
+
+### 2.1 🔴 严重问题（5个）
+
+| # | 问题 | 位置 | 影响 | 修复建议 |
+|---|------|------|------|----------|
+| NEW-1 | Web-Admin API客户端过于简陋 | [web-admin/src/utils/api.ts](file:///d:/vuemonitor/web-admin/src/utils/api.ts) (29行) | 无Token刷新/无重试/无并发控制/无错误提示，Admin后台几乎不可用 | 参照web-user的api.ts重写，添加Token刷新队列+重试+错误处理 |
+| NEW-2 | Admin路由守卫每次导航都发API请求验证 | [web-admin/src/router/index.ts:42-49](file:///d:/vuemonitor/web-admin/src/router/index.ts#L42-L49) | 每次路由切换都请求/admin/stats，性能极差且Token过期时体验差 | 改用JWT本地解码验证+定时刷新 |
+| NEW-3 | 限流中间件每次请求解码JWT | [server/app/middleware/rate_limit.py:117-123](file:///d:/vuemonitor/server/app/middleware/rate_limit.py#L117-L123) | 高并发下JWT解码成为性能瓶颈 | 缓存plan到Redis或使用请求级state传递 |
+| NEW-4 | Nginx缺少静态资源缓存和压缩配置 | [nginx/nginx.conf](file:///d:/vuemonitor/nginx/nginx.conf) | 前端资源无缓存头/无gzip，加载慢且浪费带宽 | 添加gzip+缓存头+ETag |
+| NEW-5 | 服务器运行旧代码，缺少4个路由模块 | 服务器 vs 本地代码 | /categories, /sync, /discovery, /aipic 路由404 | 部署最新代码+运行alembic迁移 |
+
+### 2.2 🟡 中等问题（8个）
+
+| # | 问题 | 位置 | 影响 | 修复建议 |
+|---|------|------|------|----------|
+| NEW-6 | Web-Admin无TypeScript类型检查 | 无typecheck脚本 | Admin代码无类型安全保障 | 添加vue-tsc --noEmit |
+| NEW-7 | Web-User admin权限仅客户端校验 | [web-user/src/router/index.ts:55-60](file:///d:/vuemonitor/web-user/src/router/index.ts#L55-L60) | 客户端可绕过admin路由守卫 | 服务端已有保护，但客户端应增加提示 |
+| NEW-8 | AIPic使用独立OpenAI Key | [server/app/config.py:95-100](file:///d:/vuemonitor/server/app/config.py#L95-L100) | 需要额外配置AIPIC_OPENAI_API_KEY | 文档说明或统一Key管理 |
+| NEW-9 | Docker Compose开发/生产配置不一致 | docker-compose.yml vs docker-compose.prod.yml | 开发环境端口暴露方式不同 | 统一配置策略 |
+| NEW-10 | 备份服务无加密 | [docker-compose.yml db-backup](file:///d:/vuemonitor/docker-compose.yml) | pg_dump明文存储，数据泄露风险 | 添加AES-256加密步骤 |
+| NEW-11 | 日志脱敏模块存在但未全面应用 | [server/app/core/log_sanitizer.py](file:///d:/vuemonitor/server/app/core/log_sanitizer.py) | 部分日志路径可能泄露敏感信息 | 审计所有logger调用点 |
+| NEW-12 | CSP在开发模式完全缺失 | [server/app/middleware/security_headers.py:30-31](file:///d:/vuemonitor/server/app/middleware/security_headers.py#L30-L31) | 开发环境无XSS防护 | 开发环境也添加基础CSP |
+| NEW-13 | Web-User build命令使用npx | [web-user/package.json:8](file:///d:/vuemonitor/web-user/package.json#L8) | `npx vite build` 不一致，其他项目用 `vite build` | 统一为 `vite build` |
+
+### 2.3 🟢 低优先级问题（5个）
+
+| # | 问题 | 位置 | 建议 |
 |---|------|------|------|
-| SEC-8 | 备份文件未加密 | 🟡 中 | AES-256加密备份文件 |
-| SEC-9 | 日志可能含敏感信息 | 🟡 中 | 添加日志脱敏过滤器 |
-| SEC-10 | Admin暴力破解可绕过 | 🟡 中 | Redis持久化失败计数 |
-| SEC-11 | CSP允许unsafe-inline | 🟢 低 | Electron环境可接受 |
+| NEW-14 | 依赖版本范围宽松（≥） | 所有package.json | 锁定主版本号 |
+| NEW-15 | Web-Admin缺少i18n | web-admin/src/ | Admin暂不需要，但长期应添加 |
+| NEW-16 | Web-User缺少lint脚本 | web-user/package.json | 添加eslint配置 |
+| NEW-17 | Server缺少requirements.txt锁定 | server/ | 添加pip freeze或pipenv |
+| NEW-18 | Client vite配置有timestamp残留 | client/vite.config.mts.timestamp-* | 清理构建残留文件 |
 
 ---
 
-## 四、部署基础设施发现
+## 三、安全审计深度分析
 
-### 4.1 服务器状态（2026-05-16最后记录）
+### 3.1 认证流程分析
 
-| 项目 | 状态 |
-|------|------|
-| 服务器IP | 47.239.181.111（阿里云ECS） |
-| 配置 | 2C / 1.6GB RAM / 40GB磁盘 |
-| Nginx | ✅ 运行中 (0.0.0.0:80) |
-| uvicorn | ✅ 运行中 (0.0.0.0:8000) |
-| PostgreSQL | ✅ 运行中 (127.0.0.1:5432) |
-| Redis | ✅ 运行中 (127.0.0.1:6379) |
-| www.xhs365.cn | ✅ 可访问 |
-| admin.xhs365.cn | ✅ 可访问 |
+```
+用户登录 → AuthService.login()
+  → bcrypt密码验证 ✅
+  → 创建Access Token (HS256, 30min) ✅
+  → 创建Refresh Token (HS256, 7天) ✅
+  → Refresh Token SHA256哈希后存DB ✅
+  → 登录失败计数(Redis滑动窗口) ✅
+```
 
-### 4.2 已解决的基础设施问题
+**安全评估**：
+- ✅ bcrypt密码哈希 + 72字节截断保护
+- ✅ Access/Refresh双Token机制
+- ✅ Refresh Token哈希存储（不存明文）
+- ✅ 登录失败限流（5次/15分钟）
+- ✅ Token刷新时轮换Refresh Token
+- ⚠️ JWT使用HS256对称算法——生产环境建议考虑RS256非对称算法
+- ⚠️ 无Token黑名单机制——用户登出后Token仍有效直到过期
 
-| 问题 | 解决方案 |
-|------|----------|
-| 服务器曾宕机 | 已恢复，所有service正常运行 |
-| 网站未更新 | update.sh已升级为6步流程（含web-admin构建+重启nginx） |
-| web-admin blank page | vite base从/admin/改为/（子域名部署场景） |
-| npm build OOM | 服务器RAM不足，确认无法在服务器执行npm build |
-| Swap不足 | 2GB Swap已添加 |
+### 3.2 限流体系分析
 
-### 4.3 待解决的基础设施问题
+```
+请求 → RedisRateLimitMiddleware
+  → 解码JWT获取plan ⚠️ 性能问题
+  → 按plan/method/path查找限流配置
+  → Redis滑动窗口计数
+  → 突发流量2倍容限
+  → 返回429 + Retry-After头
+```
 
-| 问题 | 影响 | 建议 |
+**限流配置评估**：
+- ✅ 三级套餐差异化限流（free/pro/enterprise）
+- ✅ 特殊路径覆盖（登录/注册/AI/GDPR）
+- ✅ 突发流量容限
+- ⚠️ JWT解码在中间件层重复执行——应从auth中间件传递plan
+- ⚠️ client_id使用token前缀而非user_id——限流粒度不够精确
+
+### 3.3 安全头分析
+
+| Header | 生产环境 | 开发环境 | 评估 |
+|--------|---------|---------|------|
+| X-Content-Type-Options | ✅ nosniff | ✅ nosniff | 良好 |
+| X-Frame-Options | ✅ DENY | ✅ DENY | 良好 |
+| X-XSS-Protection | ✅ 1; mode=block | ✅ 1; mode=block | 良好 |
+| Referrer-Policy | ✅ strict-origin | ✅ strict-origin | 良好 |
+| HSTS | ✅ 31536000s | ❌ 缺失 | 开发环境可接受 |
+| CSP | ✅ nonce-based | ❌ 缺失 | ⚠️ 开发环境应添加基础CSP |
+| Cache-Control | ✅ no-store | ✅ no-store | 良好 |
+
+### 3.4 数据库安全分析
+
+| 项目 | 状态 | 详情 |
 |------|------|------|
-| 服务器只1.6GB RAM | npm build会OOM | 升级到4GB或在本地构建后scp上传 |
-| CI/CD未连接部署 | git push不触发自动部署 | GitHub Actions添加SSH deploy步骤 |
-| 监控体系未激活 | 无法及时发现故障 | 配置Prometheus+Grafana |
-| 备份无加密 | 数据泄露风险 | AES-256加密备份 |
+| 连接池 | ✅ | pool_pre_ping + pool_recycle=1800s + 慢查询检测 |
+| 池泄漏检测 | ✅ | 阈值0.9 (90%使用率告警) |
+| 注入防护 | ✅ | SQLAlchemy ORM参数化查询 |
+| 迁移管理 | ✅ | Alembic 9个版本化迁移 |
+| 备份 | ⚠️ | 每日自动备份但未加密 |
 
 ---
 
-## 五、模块完成度对照
+## 四、前端架构对比分析
 
-### 5.1 代码完整模块（18个）
+### 4.1 API客户端对比
 
-| 编号 | 模块 | 位置 | 评估 |
-|------|------|------|------|
-| M01 | Electron主进程调度 | [client/src/main/](file:///d:/vuemonitor/client/src/main/) | ✅ 完整 |
-| M02 | Vue UI展示层 | [client/src/renderer/](file:///d:/vuemonitor/client/src/renderer/) | ✅ 完整（14个视图+34个组件） |
-| M03-A | Chromium实时采集 | [client/src/main/collect/chromium-worker.ts](file:///d:/vuemonitor/client/src/main/collect/chromium-worker.ts) | ✅ 完整 |
-| M03-B | Playwright补采 | [client/src/main/collect/playwright-collector.ts](file:///d:/vuemonitor/client/src/main/collect/playwright-collector.ts) | ✅ 完整 |
-| M03-C | Node标准化 | [client/src/main/collect/normalizer.ts](file:///d:/vuemonitor/client/src/main/collect/normalizer.ts) | ✅ 完整 |
-| M04 | 统一数据中台 | [client/src/main/collect/data-mart.ts](file:///d:/vuemonitor/client/src/main/collect/data-mart.ts) | ✅ 完整 |
-| M05 | Feature Engine(本地) | [client/src/main/feature/feature-engine.ts](file:///d:/vuemonitor/client/src/main/feature/feature-engine.ts) | ✅ 完整 |
-| M07 | 本地存储 | [client/src/main/storage/sqlite.ts](file:///d:/vuemonitor/client/src/main/storage/sqlite.ts) | ✅ 完整 |
-| M08 | 本地权限缓存 | [client/src/main/permission/permission-cache.ts](file:///d:/vuemonitor/client/src/main/permission/permission-cache.ts) | ✅ 完整 |
-| M09 | 通信层 | [client/src/main/communication/ws-client.ts](file:///d:/vuemonitor/client/src/main/communication/ws-client.ts) | ✅ 完整 |
-| M10 | API Gateway | [server/app/api/router.py](file:///d:/vuemonitor/server/app/api/router.py) | ✅ 完整（26个路由模块） |
-| M11 | 用户系统 | [server/app/api/auth.py](file:///d:/vuemonitor/server/app/api/auth.py)，[server/app/api/users.py](file:///d:/vuemonitor/server/app/api/users.py) | ✅ 完整 |
-| M12 | 授权码系统 | [server/app/api/license.py](file:///d:/vuemonitor/server/app/api/license.py)，[client/src/main/license/license-manager.ts](file:///d:/vuemonitor/client/src/main/license/license-manager.ts) | ✅ 完整 |
-| M13 | Feature Gate | [server/app/middleware/feature_gate.py](file:///d:/vuemonitor/server/app/middleware/feature_gate.py)，[shared/constants/feature_gates.py](file:///d:/vuemonitor/shared/constants/feature_gates.py) | ✅ 完整 |
-| M15 | AI分析引擎 | [server/app/ai/](file:///d:/vuemonitor/server/app/ai/) | ✅ 代码完整（API Key未配置） |
-| M18 | PostgreSQL | [database/schema.sql](file:///d:/vuemonitor/database/schema.sql) | ✅ 完整（42张表） |
-| M22 | Web-admin | [web-admin/src/](file:///d:/vuemonitor/web-admin/src/) | ✅ 完整（12个页面） |
-| - | Web-user | [web-user/src/](file:///d:/vuemonitor/web-user/src/) | ✅ 完整 |
+| 特性 | Web-User | Web-Admin | 差距 |
+|------|----------|-----------|------|
+| Token刷新 | ✅ 自动刷新+队列 | ❌ 无 | 严重 |
+| 重试机制 | ✅ 指数退避2次 | ❌ 无 | 严重 |
+| 错误提示 | ✅ ElMessage | ❌ 静默失败 | 严重 |
+| 响应解包 | ✅ data字段自动解包 | ❌ 无 | 中等 |
+| 请求队列 | ✅ 并发刷新排队 | ❌ 无 | 严重 |
+| 代码行数 | 153行 | 29行 | 5倍差距 |
 
-### 5.2 框架就绪模块（4个）
+**结论**：Web-Admin的API客户端需要完全重写，参照Web-User的实现。
 
-| 编号 | 模块 | 缺口 |
-|------|------|------|
-| M20 | 崩溃恢复 | 任务快照/检查点/自动重启逻辑待完善 |
-| M21 | 定时任务调度器 | 周期性调度/失败重试/Cron待完善 |
-| M21-B | API高并发采集引擎 | 真实API采集/代理池/风控待完善 |
-| M23 | 通知系统 | 邮件通知接入(SMTP)未配置 |
+### 4.2 路由守卫对比
 
-### 5.3 待开发模块（3个）
-
-| 编号 | 模块 | 备注 |
-|------|------|------|
-| M14 | Feature Engine(云端) | 与M05逻辑复用，增加群体行为聚合 |
-| M16 | AI报告生成器 | 标准商业决策输出 + PDF + 多模板 |
-| M17 | 匿名聚合模块 | MVP阶段可暂缓 |
+| 特性 | Web-User | Web-Admin |
+|------|----------|-----------|
+| 认证检查 | localStorage + Store初始化 | 每次API调用验证 |
+| Token刷新 | 自动刷新机制 | 无 |
+| 权限检查 | 客户端role判断 | 无role判断 |
+| 性能 | O(1)本地验证 | O(n)网络请求 |
 
 ---
 
-## 六、超出需求文档的实现
+## 五、基础设施深度分析
 
-| 实现 | 说明 | 影响 |
+### 5.1 Docker配置评估
+
+| 项目 | docker-compose.yml | docker-compose.prod.yml | 评估 |
+|------|-------------------|------------------------|------|
+| Server端口 | 127.0.0.1:8000 | 需检查 | ✅ 开发环境安全 |
+| PostgreSQL | 容器内 | 需检查 | ⚠️ 确认生产无端口映射 |
+| Redis密码 | ✅ requirepass | ✅ | 良好 |
+| 健康检查 | ✅ 全服务 | ✅ | 良好 |
+| 资源限制 | ✅ CPU+Memory | ✅ | 良好 |
+| 日志管理 | ✅ json-file+限制 | ✅ | 良好 |
+
+### 5.2 Nginx配置评估
+
+| 项目 | 状态 | 建议 |
 |------|------|------|
-| 9种AI分析类型 | basic/trend/prediction/risk/competitor/selection/report/optimization/batch | 超出需求预期 |
-| AI报告模板系统 | AIReportTemplate模型+默认模板(商品/竞品/趋势/风险) | M16部分已实现 |
-| 告警规则引擎 | AlertRule+AlertEvent+多指标/操作符/严重级别 | 超出预期 |
-| 团队协作 | Team+Member+SharedRule+SharedProduct+Invitation | 完整实现 |
-| GDPR合规 | 数据导出/删除请求API，11张表覆盖 | M24已实现 |
-| 安全审计双体系 | SecurityAuditLog+OperationAuditLog | 超出预期 |
-| 任务队列 | TaskQueue+TaskPriority | M21部分实现 |
-| 会员体系 | MembershipPlan+UserMembership | Phase 2就绪 |
-| AI预测 | AIPrediction模型+评分+标签+分解 | Phase 2就绪 |
-| 特征引擎云端 | Feature+CategoryStat+EnhancedFeature | M14框架就绪 |
-| AIPic作图系统 | 完整的AI作图模块(生成/风格/队列/积分) | 独立子系统 |
+| 反向代理 | ✅ | 良好 |
+| WebSocket支持 | ✅ /ws/ 路径 | 良好 |
+| 负载均衡 | ✅ least_conn | 良好 |
+| 故障转移 | ✅ next_upstream | 良好 |
+| Gzip压缩 | ❌ 缺失 | 🔴 必须添加 |
+| 静态缓存 | ❌ 缺失 | 🟡 应添加 |
+| 安全头 | ❌ 缺失 | 🟡 依赖Cloudflare |
+| 速率限制 | ❌ 缺失 | 🟡 应添加limit_req |
+| 访问日志 | ❌ 未配置 | 🟢 低优先级 |
+
+### 5.3 CI/CD评估
+
+| 流水线 | 触发条件 | 部署 | 评估 |
+|--------|---------|------|------|
+| Server CI/CD | push main | Docker构建+推送 | ✅ 代码级完整 |
+| Client CI/CD | push main | 构建+发布 | ✅ 代码级完整 |
+| Web CI/CD | push main | 构建 | ✅ 代码级完整 |
+| Deploy | workflow_run | SSH+rsync+docker | ✅ 代码级完整 |
+| **实际运行** | **从未触发** | **手动部署** | 🔴 **CI/CD断裂** |
 
 ---
 
-## 七、系统薄弱点
+## 六、综合评分（v2 更新）
 
-| 薄弱点 | 描述 | 风险等级 |
-|--------|------|----------|
-| 端到端未验证 | 核心业务流程未完整跑通 | 🔴 高 |
-| AI不可用 | API Key未配置，核心卖点不工作 | 🔴 高 |
-| Electron未打包 | 桌面客户端无法分发 | 🔴 高 |
-| 服务器资源低 | 1.6GB RAM不足以编译前端 | 🟡 中 |
-| 监控缺失 | 无生产监控告警 | 🟡 中 |
-| 测试不足 | 以集成测试为主，缺少单元测试覆盖 | 🟡 中 |
-| CI/CD断裂 | GitHub Actions不触发部署 | 🟡 中 |
-| 文档滞后 | UI重设计等新文档未同步到代码 | 🟢 低 |
+| 维度 | v1评分 | v2评分 | 变化 | 说明 |
+|------|--------|--------|------|------|
+| 架构完整性 | 95 | 93 | ↓2 | Web-Admin API客户端过于简陋 |
+| 安全性 | 75 | 72 | ↓3 | 发现Admin客户端安全缺陷、JWT重复解码 |
+| 部署就绪度 | 80 | 65 | ↓15 | 服务器运行旧代码、CI/CD未连接 |
+| 代码质量 | 90 | 85 | ↓5 | Admin代码质量明显低于其他子系统 |
+| 功能完整性 | 95 | 90 | ↓5 | 4个路由模块未部署 |
+| **综合评分** | **87** | **81** | **↓6** | 主要因部署差距和Admin质量拉低 |
+
+---
+
+## 七、关键路径分析
+
+### 7.1 阻塞依赖图
+
+```
+SSH授权 ──→ 代码部署 ──→ 数据库迁移 ──→ API全量验证
+                                          ↓
+AI Key配置 ──────────────────────────→ AI功能验证
+                                          ↓
+                                    端到端业务联调
+                                          ↓
+                               ┌──────────┼──────────┐
+                               ↓          ↓          ↓
+                          Electron打包  Web联调   Admin联调
+                               ↓          ↓          ↓
+                               └──────────┼──────────┘
+                                          ↓
+                                    生产环境加固
+                                          ↓
+                                    产品化发布
+```
+
+### 7.2 最短关键路径
+
+1. **解决SSH授权** → 2. **部署最新代码** → 3. **数据库迁移** → 4. **端到端验证** → 5. **打包发布**
+
+---
+
+## 八、风险矩阵
+
+| 风险 | 概率 | 影响 | 风险等级 | 缓解措施 |
+|------|------|------|---------|---------|
+| 服务器再次宕机 | 中 | 高 | 🔴 | 添加监控告警+自动重启 |
+| 数据丢失 | 低 | 极高 | 🟡 | 备份已启用但需加密 |
+| AI API代理不稳定 | 中 | 中 | 🟡 | 已有规则引擎fallback |
+| 用户数据泄露 | 低 | 极高 | 🟡 | 安全头+HTTPS+加密已就位 |
+| 代码部署失败 | 中 | 高 | 🟡 | 需要回滚方案 |
+| Electron打包失败 | 中 | 中 | 🟡 | 需要测试打包流程 |

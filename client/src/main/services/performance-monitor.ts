@@ -1,4 +1,4 @@
-ï»¿import { EventEmitter } from "events";
+import { EventEmitter } from "events";
 import { BrowserWindow, app } from "electron";
 import * as os from "os";
 import { logger } from "../logger/logger";
@@ -78,7 +78,7 @@ class PerformanceMonitor extends EventEmitter {
     if (this.isRunning) return;
     this.isRunning = true;
     this.timer = setInterval(() => this.sample(), SAMPLE_INTERVAL);
-    logger.info("PerformanceMonitor", "æ€§èƒ½ç›‘æ§å·²å¯åŠ¨");
+    logger.info("PerformanceMonitor", "ĞÔÄÜ¼à¿ØÒÑÆô¶¯");
   }
 
   stop(): void {
@@ -114,7 +114,7 @@ class PerformanceMonitor extends EventEmitter {
 
       this.sendToRenderer("perf:metrics", { metrics, alerts: newAlerts });
     } catch (err) {
-      logger.error("PerformanceMonitor", `é‡‡æ ·å¤±è´¥: ${err}`);
+      logger.error("PerformanceMonitor", `²ÉÑùÊ§°Ü: ${err}`);
     }
   }
 
@@ -172,7 +172,7 @@ class PerformanceMonitor extends EventEmitter {
       }
 
       this.lastDiskInfo = currentDisk;
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
 
     return {
       timestamp: new Date().toISOString(),
@@ -210,7 +210,7 @@ class PerformanceMonitor extends EventEmitter {
       alerts.push({
         type: "cpu",
         severity: "critical",
-        message: `CPU ä½¿ç”¨ç‡è¿‡é«˜: ${metrics.cpu.usage}%`,
+        message: `CPU Ê¹ÓÃÂÊ¹ı¸ß: ${metrics.cpu.usage}%`,
         threshold: CPU_CRITICAL,
         current: metrics.cpu.usage,
         timestamp: metrics.timestamp,
@@ -219,7 +219,7 @@ class PerformanceMonitor extends EventEmitter {
       alerts.push({
         type: "cpu",
         severity: "warning",
-        message: `CPU ä½¿ç”¨ç‡åé«˜: ${metrics.cpu.usage}%`,
+        message: `CPU Ê¹ÓÃÂÊÆ«¸ß: ${metrics.cpu.usage}%`,
         threshold: CPU_WARNING,
         current: metrics.cpu.usage,
         timestamp: metrics.timestamp,
@@ -231,7 +231,7 @@ class PerformanceMonitor extends EventEmitter {
       alerts.push({
         type: "memory",
         severity: "critical",
-        message: `å†…å­˜ä½¿ç”¨ç‡è¿‡é«˜: ${Math.round(memRatio * 100)}%`,
+        message: `ÄÚ´æÊ¹ÓÃÂÊ¹ı¸ß: ${Math.round(memRatio * 100)}%`,
         threshold: MEMORY_CRITICAL,
         current: Math.round(memRatio * 100),
         timestamp: metrics.timestamp,
@@ -240,7 +240,7 @@ class PerformanceMonitor extends EventEmitter {
       alerts.push({
         type: "memory",
         severity: "warning",
-        message: `å†…å­˜ä½¿ç”¨ç‡åé«˜: ${Math.round(memRatio * 100)}%`,
+        message: `ÄÚ´æÊ¹ÓÃÂÊÆ«¸ß: ${Math.round(memRatio * 100)}%`,
         threshold: MEMORY_WARNING,
         current: Math.round(memRatio * 100),
         timestamp: metrics.timestamp,

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>{{TITLE}}</title>
+<style>
+  @page { size: A4; margin: 12mm 10mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    color: {{PRIMARY_COLOR}}; background: #fff;
+    max-width: 190mm; margin: 0 auto; padding: 0;
+  }
+
+  .header {
+    background: linear-gradient(135deg, {{PRIMARY_COLOR}}, {{PRIMARY_COLOR}}DD);
+    color: #fff; padding: 28px 32px; border-radius: 12px 12px 0 0;
+  }
+  .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; }
+  .header .sub { font-size: 15px; opacity: 0.9; }
+  .header .meta { font-size: 12px; opacity: 0.65; margin-top: 8px; }
+
+  .content { padding: 28px 32px; }
+
+  .compare-table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  .compare-table th {
+    background: {{PRIMARY_COLOR}}; color: #fff; padding: 14px 16px;
+    font-size: 14px; font-weight: 600; text-align: left;
+  }
+  .compare-table th:first-child { width: 130px; }
+  .compare-table th:nth-child(2) { width: 60px; text-align: center; }
+  .compare-table th:nth-child(3),
+  .compare-table th:nth-child(4) { text-align: center; width: 110px; }
+  .compare-table td {
+    padding: 14px 16px; border-bottom: 1px solid #eee; font-size: 14px;
+    vertical-align: top;
+  }
+  .compare-table td:first-child { font-weight: 600; }
+  .compare-table td:nth-child(2) { text-align: center; color: {{ACCENT_COLOR}}; font-weight: 700; }
+  .compare-table td:nth-child(3),
+  .compare-table td:nth-child(4) { text-align: center; }
+  .compare-table tr:hover td { background: {{BG_COLOR}}; }
+  .compare-table .criteria { font-size: 12px; color: #666; margin-top: 4px; line-height: 1.5; }
+
+  .compare-table input[type="number"] {
+    width: 56px; height: 36px; text-align: center; font-size: 18px; font-weight: 700;
+    border: 2px solid #ddd; border-radius: 8px; outline: none; color: {{PRIMARY_COLOR}};
+    transition: all 0.2s;
+  }
+  .compare-table input[type="number"]:focus { border-color: {{ACCENT_COLOR}}; box-shadow: 0 0 0 3px {{ACCENT_COLOR}}22; }
+  .compare-table input[type="number"].filled { border-color: {{ACCENT_COLOR}}; }
+
+  .input-hint { font-size: 12px; color: #999; margin-bottom: 16px; text-align: right; }
+
+  /* 汇总行 */
+  .summary-row td {
+    font-weight: 700; font-size: 18px; background: {{BG_COLOR}};
+    border-top: 2px solid {{ACCENT_COLOR}};
+  }
+  .summary-row .winner { color: {{ACCENT_COLOR}}; }
+  .summary-row .loser { opacity: 0.5; }
+
+  /* 推荐结果 */
+  .winner-card {
+    background: linear-gradient(135deg, {{BG_COLOR}}, #fff);
+    border: 2px solid {{ACCENT_COLOR}}55; border-radius: 14px;
+    padding: 24px 32px; margin-bottom: 20px;
+  }
+  .winner-card .badge {
+    display: inline-block; background: {{ACCENT_COLOR}}; color: #fff;
+    font-size: 13px; font-weight: 600; padding: 4px 14px; border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .winner-card .rec-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; color: {{PRIMARY_COLOR}}; }
+  .winner-card .rec-desc { font-size: 14px; color: #666; line-height: 1.6; }
+
+  .footer {
+    text-align: center; padding: 16px 32px; font-size: 11px;
+    color: #aaa; border-top: 1px solid #eee;
+  }
+  .footer .disclaimer { margin-top: 4px; font-size: 10px; opacity: 0.7; }
+
+  .btn-reset {
+    display: inline-block; padding: 8px 20px; font-size: 13px;
+    border: 1px solid #ccc; border-radius: 6px; background: #fff;
+    color: #666; cursor: pointer;
+  }
+  .btn-reset:hover { border-color: {{ACCENT_COLOR}}; color: {{ACCENT_COLOR}}; }
+
+  @media print {
+    body { max-width: 100%; }
+    .header { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .btn-reset, .input-hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>{{TITLE}}</h1>
+  <div class="sub">{{SUBTITLE}}</div>
+  <div class="meta">{{CATEGORY}} · ¥{{PRICE}} · 产品ID: {{PRODUCT_ID}}</div>
+</div>
+
+<div class="content">
+
+  <div class="input-hint">💡 为每个方案的各维度打分（1-5），系统自动计算加权总分并推荐最优方案</div>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>评估维度</th>
+        <th>权重</th>
+        <th>方案A</th>
+        <th>方案B</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{DIM_1_NAME}}</td>
+        <td>{{DIM_1_WEIGHT}}%</td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_1_WEIGHT}}" data-col="A" oninput="recalc()" placeholder="1-5"></td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_1_WEIGHT}}" data-col="B" oninput="recalc()" placeholder="1-5"></td>
+      </tr>
+      <tr><td colspan="4"><div class="criteria">评分标准：{{DIM_1_CRITERIA}}</div></td></tr>
+
+      <tr>
+        <td>{{DIM_2_NAME}}</td>
+        <td>{{DIM_2_WEIGHT}}%</td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_2_WEIGHT}}" data-col="A" oninput="recalc()" placeholder="1-5"></td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_2_WEIGHT}}" data-col="B" oninput="recalc()" placeholder="1-5"></td>
+      </tr>
+      <tr><td colspan="4"><div class="criteria">评分标准：{{DIM_2_CRITERIA}}</div></td></tr>
+
+      <tr>
+        <td>{{DIM_3_NAME}}</td>
+        <td>{{DIM_3_WEIGHT}}%</td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_3_WEIGHT}}" data-col="A" oninput="recalc()" placeholder="1-5"></td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_3_WEIGHT}}" data-col="B" oninput="recalc()" placeholder="1-5"></td>
+      </tr>
+      <tr><td colspan="4"><div class="criteria">评分标准：{{DIM_3_CRITERIA}}</div></td></tr>
+
+      <tr>
+        <td>{{DIM_4_NAME}}</td>
+        <td>{{DIM_4_WEIGHT}}%</td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_4_WEIGHT}}" data-col="A" oninput="recalc()" placeholder="1-5"></td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_4_WEIGHT}}" data-col="B" oninput="recalc()" placeholder="1-5"></td>
+      </tr>
+      <tr><td colspan="4"><div class="criteria">评分标准：{{DIM_4_CRITERIA}}</div></td></tr>
+
+      <tr>
+        <td>{{DIM_5_NAME}}</td>
+        <td>{{DIM_5_WEIGHT}}%</td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_5_WEIGHT}}" data-col="A" oninput="recalc()" placeholder="1-5"></td>
+        <td><input type="number" min="1" max="5" step="1" data-weight="{{DIM_5_WEIGHT}}" data-col="B" oninput="recalc()" placeholder="1-5"></td>
+      </tr>
+      <tr><td colspan="4"><div class="criteria">评分标准：{{DIM_5_CRITERIA}}</div></td></tr>
+    </tbody>
+    <tfoot>
+      <tr class="summary-row">
+        <td colspan="2" style="text-align:right; font-size:16px;">加权总分</td>
+        <td style="text-align:center;" id="scoreA">—</td>
+        <td style="text-align:center;" id="scoreB">—</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <div class="winner-card" id="winnerCard" style="display:none;">
+    <div class="badge">🏆 最优选择</div>
+    <div class="rec-title" id="winnerName">—</div>
+    <div class="rec-desc">加权总分最高，在多数关键维度上匹配你的需求。建议优先考虑该方案，结合其他方案的优势做最终决策。</div>
+  </div>
+
+  <p style="text-align:right;"><button class="btn-reset" onclick="resetAll()">🔄 重新打分</button></p>
+
+</div>
+
+<div class="footer">
+  <div>{{PRODUCT_ID}} · AI决策工具工厂 · {{CATEGORY}}</div>
+  <div class="disclaimer">⚠️ 本工具仅供个人参考，不构成专业建议。最终决策请结合自身实际情况判断。</div>
+</div>
+
+<script>
+function recalc() {
+  let totalA = 0, totalB = 0;
+  let filled = 0;
+
+  document.querySelectorAll('.compare-table input[type="number"]').forEach(inp => {
+    let val = parseInt(inp.value);
+    if (isNaN(val) || val < 1) val = 0;
+    if (val > 5) { val = 5; inp.value = 5; }
+    const weight = parseFloat(inp.dataset.weight) / 100;
+    const col = inp.dataset.col;
+    if (val > 0) {
+      if (col === 'A') totalA += val * weight;
+      if (col === 'B') totalB += val * weight;
+      filled++;
+      inp.classList.add('filled');
+    } else {
+      inp.classList.remove('filled');
+    }
+  });
+
+  const sa = document.getElementById('scoreA');
+  const sb = document.getElementById('scoreB');
+
+  if (filled === 0) {
+    sa.textContent = '—'; sb.textContent = '—';
+    sa.classList.remove('winner', 'loser'); sb.classList.remove('winner', 'loser');
+    document.getElementById('winnerCard').style.display = 'none';
+  } else {
+    const ra = Math.round(totalA * 100) / 100;
+    const rb = Math.round(totalB * 100) / 100;
+    sa.textContent = ra.toFixed(2) + ' / 5.0';
+    sb.textContent = rb.toFixed(2) + ' / 5.0';
+
+    sa.classList.remove('winner', 'loser'); sb.classList.remove('winner', 'loser');
+
+    if (ra > rb) {
+      sa.classList.add('winner'); sb.classList.add('loser');
+      document.getElementById('winnerName').textContent = '方案A的加权总分最高';
+    } else if (rb > ra) {
+      sb.classList.add('winner'); sa.classList.add('loser');
+      document.getElementById('winnerName').textContent = '方案B的加权总分最高';
+    } else {
+      document.getElementById('winnerName').textContent = '两个方案的加权总分相同';
+    }
+
+    document.getElementById('winnerCard').style.display = 'block';
+  }
+}
+
+function resetAll() {
+  document.querySelectorAll('.compare-table input[type="number"]').forEach(inp => {
+    inp.value = ''; inp.classList.remove('filled');
+  });
+  document.getElementById('scoreA').textContent = '—';
+  document.getElementById('scoreB').textContent = '—';
+  document.getElementById('scoreA').classList.remove('winner', 'loser');
+  document.getElementById('scoreB').classList.remove('winner', 'loser');
+  document.getElementById('winnerCard').style.display = 'none';
+}
+</script>
+
+</body>
+</html>

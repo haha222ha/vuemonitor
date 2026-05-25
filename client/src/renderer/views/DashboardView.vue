@@ -301,7 +301,7 @@ function loadLayout() {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed)) editableCards.value = parsed;
     }
-  } catch {}
+  } catch (e) { console.warn("[Dashboard] load layout failed:", e); }
 }
 
 function saveLayout() {

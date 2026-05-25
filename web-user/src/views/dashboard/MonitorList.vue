@@ -50,6 +50,10 @@
           <img v-if="p.image_url" :src="p.image_url" :alt="p.product_name" />
           <div v-else class="image-placeholder">{{ platformEmoji(p.platform) }}</div>
           <el-tag class="card-platform" size="small">{{ platformLabel(p.platform) }}</el-tag>
+          <div v-if="p.percentile !== undefined" class="card-percentile">
+            <span class="percentile-label">TOP</span>
+            <span class="percentile-value">{{ p.percentile }}%</span>
+          </div>
         </div>
         <div class="card-body">
           <h4 class="card-title">{{ p.product_name }}</h4>
@@ -84,6 +88,16 @@
           </div>
           <div v-if="p.sparkline_data && p.sparkline_data.length >= 2" class="card-sparkline">
             <SparklineChart :data="p.sparkline_data" :color="p.trend > 0 ? '#22c55e' : p.trend < 0 ? '#ef4444' : '#6366f1'" width="100%" height="28px" />
+          </div>
+          <div class="card-actions">
+            <el-button size="small" text @click.stop="compareProduct(p)">
+              <el-icon><ScaleToOriginal /></el-icon>
+              对比
+            </el-button>
+            <el-button size="small" text type="primary" @click.stop="analyzeProduct(p)">
+              <el-icon><MagicStick /></el-icon>
+              AI分析
+            </el-button>
           </div>
         </div>
       </div>
@@ -144,7 +158,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 import api from "../../utils/api";
 import { ElMessage, ElMessageBox } from "element-plus";
-import { Loading, Grid, Menu } from "@element-plus/icons-vue";
+import { Loading, Grid, Menu, ScaleToOriginal, MagicStick } from "@element-plus/icons-vue";
 import WaterfallLayout from "../../components/WaterfallLayout.vue";
 import ProductWaterfallCard from "../../components/ProductWaterfallCard.vue";
 import ExcelImportDialog from "../../components/ExcelImportDialog.vue";
@@ -306,6 +320,30 @@ async function addProduct() {
 
 function viewDetail(row: any) {
   router.push(`/dashboard/monitor/${row.id}`);
+}
+
+function compareProduct(product: any) {
+  const existing = localStorage.getItem('compare_products')
+  const compareList = existing ? JSON.parse(existing) : []
+  const exists = compareList.find((p: any) => p.id === product.id)
+  
+  if (!exists) {
+    if (compareList.length >= 5) {
+      ElMessage.warning('最多只能对比5个商品')
+      return
+    }
+    compareList.push({ id: product.id, name: product.product_name })
+    localStorage.setItem('compare_products', JSON.stringify(compareList))
+    ElMessage.success(`已添加到对比列表，当前${compareList.length}/5`)
+  } else {
+    ElMessage.info('该商品已在对比列表中')
+  }
+  
+  router.push('/dashboard/compare')
+}
+
+function analyzeProduct(product: any) {
+  router.push(`/dashboard/ai?product_id=${product.id}`)
 }
 
 async function confirmDelete(row: any) {
@@ -511,6 +549,42 @@ onMounted(() => {
 .last-collect {
   font-size: 12px;
   color: #4a4a5a;
+}
+
+.card-percentile {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-radius: 6px;
+  padding: 2px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-percentile .percentile-label {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.card-percentile .percentile-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.card-actions .el-button {
+  padding: 4px 10px;
+  font-size: 12px;
 }
 
 .parse-result {

@@ -1,0 +1,154 @@
+{
+  "dashboard": {
+    "title": "VueMonitor System Overview",
+    "tags": ["vueMonitor", "system"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total[5m])",
+            "legendFormat": "{{method}} {{path}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "id": 2,
+        "title": "Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{status=~\"5..\"}[5m])",
+            "legendFormat": "5xx errors"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "id": 3,
+        "title": "Latency (p95)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95 latency"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}
+      },
+      {
+        "id": 4,
+        "title": "Active Connections",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "pg_pool_active_connections",
+            "legendFormat": "Active DB connections"
+          },
+          {
+            "expr": "redis_connected_clients",
+            "legendFormat": "Redis clients"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8}
+      },
+      {
+        "id": 5,
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "container_memory_usage_bytes",
+            "legendFormat": "Memory used"
+          },
+          {
+            "expr": "container_spec_memory_limit_bytes",
+            "legendFormat": "Memory limit"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8}
+      },
+      {
+        "id": 6,
+        "title": "CPU Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(container_cpu_usage_seconds_total[5m])",
+            "legendFormat": "CPU usage"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8}
+      },
+      {
+        "id": 7,
+        "title": "AI API Calls",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(ai_api_calls_total[5m])",
+            "legendFormat": "{{provider}} {{model}}"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8}
+      },
+      {
+        "id": 8,
+        "title": "Collection Tasks",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "collect_tasks_pending",
+            "legendFormat": "Pending"
+          },
+          {
+            "expr": "collect_tasks_running",
+            "legendFormat": "Running"
+          },
+          {
+            "expr": "collect_tasks_completed_total",
+            "legendFormat": "Completed"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 24, "w": 12, "h": 8}
+      },
+      {
+        "id": 9,
+        "title": "Alert Events",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "alert_events_total",
+            "legendFormat": "Total alerts"
+          },
+          {
+            "expr": "rate(alert_events_total[1h])",
+            "legendFormat": "Alerts/hour"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 32, "w": 12, "h": 8}
+      },
+      {
+        "id": 10,
+        "title": "Rate Limit Hits",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(rate_limit_hits_total[5m])",
+            "legendFormat": "Rate limited requests"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 32, "w": 12, "h": 8}
+      }
+    ],
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  }
+}

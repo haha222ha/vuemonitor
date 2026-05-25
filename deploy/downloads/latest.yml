@@ -1,8 +1,21 @@
 version: 0.1.0
+releaseDate: '2026-05-23'
 files:
-  - url: XHS365-Setup-0.1.0.exe
-    sha512: 9xeX/DHU+J0OrdkUDBbLVHe45pMJkj9PmKFHkpECM9uhBTkip+fbTBHVvXK6XFGYZY+6hUDlLoO3m4Ce26CnVA==
-    size: 106345952
-path: XHS365-Setup-0.1.0.exe
-sha512: 9xeX/DHU+J0OrdkUDBbLVHe45pMJkj9PmKFHkpECM9uhBTkip+fbTBHVvXK6XFGYZY+6hUDlLoO3m4Ce26CnVA==
-releaseDate: '2026-05-17T10:21:24.508Z'
+  - url: XHS365-0.1.0-win.exe
+    sha512: REPLACE_WITH_ACTUAL_SHA512
+    size: 0
+  - url: XHS365-0.1.0-mac.dmg
+    sha512: REPLACE_WITH_ACTUAL_SHA512
+    size: 0
+  - url: XHS365-0.1.0-linux.AppImage
+    sha512: REPLACE_WITH_ACTUAL_SHA512
+    size: 0
+path: updates/latest.yml
+sha512: REPLACE_WITH_ACTUAL_SHA512
+releaseName: 'v0.1.0 — 首个正式版'
+releaseNotes: |
+  - 商品监控与数据采集
+  - AI智能分析（DeepSeek）
+  - 告警规则与通知
+  - AI智能作图
+  - GDPR合规数据管理

@@ -274,7 +274,7 @@ export class LicenseManager {
       license.lastVerified = new Date().toISOString();
       this.saveLicense(license);
       this.cachedLicense = license;
-    } catch (err) { logger.warn("[Main] operation failed:", err); }
+    } catch (err) { logger.warn("[Main] operation failed:", String(err)); }
   }
 
   getCurrentLicense(): LicenseInfo | null {
