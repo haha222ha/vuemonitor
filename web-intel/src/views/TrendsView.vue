@@ -17,6 +17,12 @@
       </div>
     </div>
 
+    <IntelCategoryTabs
+      v-if="categoryTabs.length > 1"
+      v-model="categoryTab"
+      :tabs="categoryTabs"
+    />
+
     <div class="trend-stats" v-if="items.length">
       <div class="trend-stat-item stat-rising">
         <span class="stat-icon">↑</span>
@@ -67,7 +73,7 @@
           </div>
           <div class="card-title">{{ item.title }}</div>
           <div class="card-meta">
-            <el-tag size="small" effect="plain">{{ item.category }}</el-tag>
+            <el-tag size="small" :type="getCategoryStyle(item.category).type" effect="light">{{ item.category }}</el-tag>
             <el-tag size="small" v-if="item.platform" effect="plain">{{ item.platform }}</el-tag>
             <el-tag size="small" v-if="item.lifecycle" type="success" effect="plain">{{ item.lifecycle }}</el-tag>
           </div>
@@ -162,6 +168,8 @@ import { ref, computed, onMounted } from "vue"
 import api from "@/utils/api"
 import { exportJSON, exportCSV, deleteItem, truncate, isAdmin, fetchWithCache, clearCache } from "@/utils/intel"
 import ScoreBadge from "@/components/ScoreBadge.vue"
+import IntelCategoryTabs from "@/components/IntelCategoryTabs.vue"
+import { getCategoryStyle, collectCategories } from "@/utils/categoryStyle"
 import { getDirectionIcon, getDirectionLabel } from "@/utils/theme"
 import { isDisplayableScore, getTrendScoreColor } from "@/utils/score"
 
@@ -189,6 +197,20 @@ const items = ref<TrendItem[]>([])
 const loading = ref(false)
 const searchText = ref("")
 const platformFilter = ref("")
+const categoryTab = ref("all")
+
+const categoryTabs = computed(() => {
+  const cats = collectCategories(items.value, (i) => i.category)
+  return [
+    { value: "all", label: "全部分类", count: items.value.length, icon: "🏷️" },
+    ...cats.map((c) => ({
+      value: c,
+      label: c,
+      count: items.value.filter((i) => i.category === c).length,
+      accent: getCategoryStyle(c).accent,
+    })),
+  ]
+})
 const currentPage = ref(1)
 const pageSize = 12
 const detailItem = ref<TrendItem | null>(null)
@@ -207,6 +229,9 @@ const filteredItems = computed(() => {
   if (platformFilter.value) {
     result = result.filter((i) => i.platform === platformFilter.value)
   }
+  if (categoryTab.value !== "all") {
+    result = result.filter((i) => i.category === categoryTab.value)
+  }
   const start = (currentPage.value - 1) * pageSize
   return result.slice(start, start + pageSize)
 })
@@ -219,6 +244,9 @@ const filteredTotal = computed(() => {
   }
   if (platformFilter.value) {
     result = result.filter((i) => i.platform === platformFilter.value)
+  }
+  if (categoryTab.value !== "all") {
+    result = result.filter((i) => i.category === categoryTab.value)
   }
   return result.length
 })

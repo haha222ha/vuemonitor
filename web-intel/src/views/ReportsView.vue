@@ -4,7 +4,7 @@
     <div class="page-header">
       <div class="header-title-area">
         <h2>决策报告</h2>
-        <p class="header-subtitle">按类型分区展示：周度 / 月度 / 选题深度，不再混排</p>
+        <p class="header-subtitle">按报告类型标签筛选，分区浏览周度 / 月度 / 选题深度报告</p>
       </div>
       <el-tag v-if="planName" effect="plain">{{ planLabel(planName) }}</el-tag>
     </div>
@@ -21,34 +21,48 @@
       <div class="intel-empty-state-text">暂无已上传报告</div>
     </div>
     <template v-else>
-      <div class="report-summary">
-        共 {{ items.length }} 份，分 {{ sections.length }} 类展示
+      <IntelCategoryTabs v-model="reportTypeTab" :tabs="reportTypeTabs" />
+
+      <div v-if="!visibleSections.length" class="intel-empty-state">
+        <div class="intel-empty-state-text">该分类下暂无报告</div>
       </div>
-      <section v-for="sec in sections" :key="sec.key" class="report-section">
-        <div class="section-head">
-          <h3 class="section-title">{{ sec.title }}</h3>
+
+      <section v-for="sec in visibleSections" :key="sec.key" class="report-section">
+        <div class="section-head" :style="{ borderLeftColor: reportStyle(sec.key).accent }">
+          <div class="section-head-main">
+            <el-tag size="small" :type="reportStyle(sec.key).type" effect="dark">{{ reportTypeLabel(sec.key) }}</el-tag>
+            <h3 class="section-title">{{ sec.title }}</h3>
+          </div>
           <span class="section-hint">{{ sec.hint }}</span>
-          <el-tag size="small" type="info" effect="plain">{{ sec.items.length }} 份</el-tag>
+          <span class="section-count">{{ sec.items.length }} 份</span>
         </div>
         <el-row :gutter="16" class="report-list">
-          <el-col v-for="item in sec.items" :key="item.id" :xs="24" :sm="12" :md="8">
-            <el-card shadow="hover" class="report-card">
-              <div class="report-type-row">
-                <el-tag size="small" :type="sectionTagType(sec.key)">{{ reportTypeLabel(sec.key) }}</el-tag>
-                <span v-if="item.topic_id" class="topic-id">{{ item.topic_id }}</span>
+          <el-col v-for="item in sec.items" :key="item.id" :xs="24" :sm="12" :lg="8">
+            <div
+              class="report-card"
+              :style="{ '--card-accent': reportStyle(sec.key).accent, '--card-bg': reportStyle(sec.key).bg }"
+            >
+              <div class="report-card-accent" />
+              <div class="report-card-body">
+                <div class="report-type-row">
+                  <el-tag size="small" :type="reportStyle(sec.key).type" effect="light">
+                    {{ reportTypeLabel(sec.key) }}
+                  </el-tag>
+                  <span v-if="item.topic_id" class="topic-id">{{ item.topic_id }}</span>
+                  <span v-if="item.week_number && sec.key === 'weekly'" class="week-badge">{{ item.week_number }}</span>
+                </div>
+                <h3 class="report-title">{{ displayTitle(item) }}</h3>
+                <p class="report-meta">
+                  <span v-if="item.report_date">📅 {{ formatDate(item.report_date) }}</span>
+                </p>
+                <div class="report-actions">
+                  <el-button type="primary" size="small" :loading="openingId === item.id" @click="openReport(item)">
+                    查看报告
+                  </el-button>
+                  <el-button size="small" link @click="openReportNewTab(item)">新窗口打开</el-button>
+                </div>
               </div>
-              <h3 class="report-title">{{ displayTitle(item) }}</h3>
-              <p class="report-meta">
-                <span v-if="item.week_number && sec.key === 'weekly'">{{ item.week_number }}</span>
-                <span v-if="item.report_date">{{ formatDate(item.report_date) }}</span>
-              </p>
-              <div class="report-actions">
-                <el-button type="primary" size="small" :loading="openingId === item.id" @click="openReport(item)">
-                  查看报告
-                </el-button>
-                <el-button size="small" link @click="openReportNewTab(item)">新窗口打开</el-button>
-              </div>
-            </el-card>
+            </div>
           </el-col>
         </el-row>
       </section>
@@ -97,10 +111,13 @@ import api from "@/utils/api"
 import { planLabel, REPORT_TYPE_LABELS } from "@/utils/plan"
 import {
   groupReportsBySection,
+  REPORT_SECTION_META,
   type ReportListItem,
   type ReportDisplayType,
 } from "@/utils/reports"
 import UpgradeBanner from "@/components/UpgradeBanner.vue"
+import IntelCategoryTabs, { type CategoryTabItem } from "@/components/IntelCategoryTabs.vue"
+import { getReportTypeStyle } from "@/utils/categoryStyle"
 
 const auth = useIntelAuthStore()
 const loading = ref(true)
@@ -115,18 +132,33 @@ const reportHtmlInline = ref("")
 const reportFrameUrl = ref("")
 
 const planName = computed(() => auth.planName)
+const reportTypeTab = ref("all")
 const sections = computed(() => groupReportsBySection(items.value))
 
-function sectionTagType(key: ReportDisplayType): string {
-  const map: Record<string, string> = {
-    weekly: "primary",
-    monthly: "success",
-    topic: "warning",
-    quarterly: "",
-    daily: "info",
-    other: "info",
+const reportTypeTabs = computed((): CategoryTabItem[] => {
+  const all = sections.value
+  const total = items.value.length
+  const tabs: CategoryTabItem[] = [{ value: "all", label: "全部报告", count: total, icon: "📑" }]
+  for (const sec of all) {
+    const st = getReportTypeStyle(sec.key)
+    tabs.push({
+      value: sec.key,
+      label: REPORT_SECTION_META[sec.key as ReportDisplayType]?.title || sec.title,
+      count: sec.items.length,
+      accent: st.accent,
+      icon: sec.key === "weekly" ? "📅" : sec.key === "topic" ? "🎯" : "📊",
+    })
   }
-  return map[key] || "info"
+  return tabs
+})
+
+const visibleSections = computed(() => {
+  if (reportTypeTab.value === "all") return sections.value
+  return sections.value.filter((s) => s.key === reportTypeTab.value)
+})
+
+function reportStyle(key: string) {
+  return getReportTypeStyle(key)
 }
 
 function displayTitle(item: ReportListItem): string {
@@ -284,59 +316,95 @@ onMounted(async () => {
   color: var(--intel-text-muted, #909399);
   font-size: 13px;
 }
-.report-summary {
-  font-size: 13px;
-  color: #909399;
-  margin-bottom: 20px;
-}
 .report-section {
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
 .section-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 10px 12px 10px 14px;
+  border-left: 4px solid #409eff;
+  background: var(--el-fill-color-light, #f5f7fa);
+  border-radius: 8px;
+}
+.section-head-main {
+  display: flex;
+  align-items: center;
   gap: 10px;
-  margin-bottom: 14px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--el-border-color-lighter, #ebeef5);
 }
 .section-title {
   margin: 0;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 600;
 }
 .section-hint {
   font-size: 12px;
   color: #909399;
   flex: 1;
-  min-width: 200px;
+  min-width: 160px;
+}
+.section-count {
+  font-size: 12px;
+  color: #606266;
+  font-weight: 600;
 }
 .report-card {
+  position: relative;
   margin-bottom: 16px;
+  border-radius: 10px;
+  border: 1px solid var(--el-border-color-lighter, #ebeef5);
+  background: var(--card-bg, #fff);
+  overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.report-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+.report-card-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--card-accent, #409eff);
+}
+.report-card-body {
+  padding: 16px 16px 16px 20px;
 }
 .report-type-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 .topic-id {
   font-size: 11px;
   color: #909399;
   font-family: ui-monospace, monospace;
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 4px;
+}
+.week-badge {
+  font-size: 11px;
+  color: #606266;
 }
 .report-title {
   margin: 0 0 8px;
-  font-size: 16px;
-  line-height: 1.4;
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: #303133;
 }
 .report-meta {
   font-size: 12px;
   color: #909399;
-  margin: 0 0 12px;
-  display: flex;
-  gap: 8px;
+  margin: 0 0 14px;
 }
 .report-actions {
   display: flex;

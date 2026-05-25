@@ -111,8 +111,9 @@
             <div class="intel-empty-state-icon">📊</div>
             <div class="intel-empty-state-text">暂无趋势数据</div>
           </div>
-          <div v-else class="trend-list intel-card-stagger">
-            <div v-for="item in intel.dashboard.top_trends" :key="item.id" class="trend-item" @click="$router.push('/trends')">
+          <IntelCategoryTabs v-if="dashboardTrendTabs.length > 1" v-model="trendCatTab" :tabs="dashboardTrendTabs" />
+          <div class="trend-list intel-card-stagger">
+            <div v-for="item in filteredDashboardTrends" :key="item.id" class="trend-item" @click="$router.push('/trends')">
               <div class="trend-left">
                 <span class="trend-direction" :class="'dir-' + item.direction">
                   {{ getDirectionIcon(item.direction) }}
@@ -121,7 +122,7 @@
               <div class="trend-right">
                 <div class="trend-title">{{ item.title }}</div>
                 <div class="trend-meta">
-                  <el-tag size="small" effect="plain">{{ item.category }}</el-tag>
+                  <el-tag size="small" :type="getCategoryStyle(item.category).type" effect="light">{{ item.category }}</el-tag>
                   <span v-if="formatTrendScore(item.opportunity_score)" class="trend-score">
                     {{ formatTrendScore(item.opportunity_score) }}
                   </span>
@@ -154,15 +155,16 @@
             <div class="intel-empty-state-icon">🎯</div>
             <div class="intel-empty-state-text">暂无机会数据</div>
           </div>
-          <div v-else class="opp-list intel-card-stagger">
-            <div v-for="item in intel.dashboard.top_opportunities" :key="item.id" class="opp-item" :class="'verdict-' + (item.verdict || '').toLowerCase()" @click="$router.push('/opportunities')">
+          <IntelCategoryTabs v-if="dashboardOppTabs.length > 1" v-model="oppCatTab" :tabs="dashboardOppTabs" />
+          <div class="opp-list intel-card-stagger">
+            <div v-for="item in filteredDashboardOpps" :key="item.id" class="opp-item" :class="'verdict-' + (item.verdict || '').toLowerCase()" @click="$router.push('/opportunities')">
               <div class="opp-left">
                 <ScoreBadge :score="item.verdict_score" kind="opportunity" size="sm" :show-unit="false" />
               </div>
               <div class="opp-right">
                 <div class="opp-title">{{ item.name }}</div>
                 <div class="opp-meta">
-                  <el-tag size="small" effect="plain">{{ item.category }}</el-tag>
+                  <el-tag size="small" :type="getCategoryStyle(item.category).type" effect="light">{{ item.category }}</el-tag>
                   <el-tag size="small" v-if="item.difficulty" effect="plain">{{ item.difficulty }}</el-tag>
                 </div>
               </div>
@@ -253,10 +255,12 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from "vue"
+import { onMounted, computed, ref } from "vue"
 import { useIntelStore } from "@/stores/intel"
 import { useIntelAuthStore } from "@/stores/auth"
 import UpgradeBanner from "@/components/UpgradeBanner.vue"
+import IntelCategoryTabs from "@/components/IntelCategoryTabs.vue"
+import { getCategoryStyle, collectCategories } from "@/utils/categoryStyle"
 import { TrendCharts, Opportunity, Warning, Right } from "@element-plus/icons-vue"
 import ScoreBadge from "@/components/ScoreBadge.vue"
 import { getDirectionIcon } from "@/utils/theme"
@@ -269,6 +273,49 @@ const intel = useIntelStore()
 const auth = useIntelAuthStore()
 
 const planLabel = computed(() => auth.planLabel)
+
+const trendCatTab = ref("all")
+const oppCatTab = ref("all")
+
+const dashboardTrendTabs = computed(() => {
+  const list = intel.dashboard?.top_trends || []
+  const cats = collectCategories(list, (t) => t.category)
+  return [
+    { value: "all", label: "全部", count: list.length, icon: "📈" },
+    ...cats.map((c) => ({
+      value: c,
+      label: c,
+      count: list.filter((t) => t.category === c).length,
+      accent: getCategoryStyle(c).accent,
+    })),
+  ]
+})
+
+const filteredDashboardTrends = computed(() => {
+  const list = intel.dashboard?.top_trends || []
+  if (trendCatTab.value === "all") return list
+  return list.filter((t) => t.category === trendCatTab.value)
+})
+
+const dashboardOppTabs = computed(() => {
+  const list = intel.dashboard?.top_opportunities || []
+  const cats = collectCategories(list, (o) => o.category)
+  return [
+    { value: "all", label: "全部", count: list.length, icon: "💡" },
+    ...cats.map((c) => ({
+      value: c,
+      label: c,
+      count: list.filter((o) => o.category === c).length,
+      accent: getCategoryStyle(c).accent,
+    })),
+  ]
+})
+
+const filteredDashboardOpps = computed(() => {
+  const list = intel.dashboard?.top_opportunities || []
+  if (oppCatTab.value === "all") return list
+  return list.filter((o) => o.category === oppCatTab.value)
+})
 
 function formatTrendScore(score: unknown): string {
   return formatScore(score)
