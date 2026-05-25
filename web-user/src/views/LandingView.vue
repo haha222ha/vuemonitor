@@ -574,6 +574,7 @@
               <a href="#pricing">价格方案</a>
               <a href="#platforms">平台支持</a>
               <router-link to="/download">下载客户端</router-link>
+              <router-link to="/purchase">购买与激活</router-link>
             </div>
             <div class="footer-col" id="contact-qq">
               <h4>客服</h4>
