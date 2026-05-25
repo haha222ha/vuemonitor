@@ -20,10 +20,12 @@ SSH 登录服务器后，**只改两处**：`SMTP_PASS` 里的授权码、`TEST_
 cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main && SMTP_PASS='粘贴网易授权码' TEST_TO='你的邮箱@example.com' bash scripts/configure_smtp.sh
 ```
 
-若 587 发信失败，改用 SSL 994（仍是一行，授权码同上）：
+（脚本默认 **994 + SSL**；阿里云上 587 常被网易断开。）
+
+测试发信：
 
 ```bash
-cd /opt/vuemonitor && SMTP_HOST=smtp.qiye.163.com SMTP_PORT=994 SMTP_USE_TLS=false SMTP_USE_SSL=true SMTP_PASS='粘贴网易授权码' TEST_TO='你的邮箱@example.com' bash scripts/configure_smtp.sh
+bash /opt/vuemonitor/scripts/run-server-cmd.sh /opt/vuemonitor/scripts/test_smtp.py --to 你的邮箱@example.com
 ```
 
 不想把密码写在命令里：先 `git pull` 后只执行 `bash scripts/configure_smtp.sh`，按提示输入授权码。

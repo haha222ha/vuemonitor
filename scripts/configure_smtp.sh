@@ -13,12 +13,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="${ENV_FILE:-$ROOT/server/.env}"
 
+# 网易企业邮：云主机上 587+STARTTLS 常被断开，默认用 SSL 994
 SMTP_HOST="${SMTP_HOST:-smtp.qiye.163.com}"
-SMTP_PORT="${SMTP_PORT:-587}"
+SMTP_PORT="${SMTP_PORT:-994}"
 SMTP_USER="${SMTP_USER:-netease@elysys.net}"
 SMTP_FROM="${SMTP_FROM:-$SMTP_USER}"
-SMTP_USE_TLS="${SMTP_USE_TLS:-true}"
-SMTP_USE_SSL="${SMTP_USE_SSL:-false}"
+SMTP_USE_TLS="${SMTP_USE_TLS:-false}"
+SMTP_USE_SSL="${SMTP_USE_SSL:-true}"
 TEST_TO="${TEST_TO:-}"
 
 if [[ -z "${SMTP_PASS:-}" ]]; then
