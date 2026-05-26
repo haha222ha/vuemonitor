@@ -41,9 +41,16 @@ def setup_logging(log_level: str = "INFO", log_dir: Path | None = None):
 
 def load_config(config_path: Path) -> dict:
     if not config_path.exists():
-        print(f"[ERROR] config file not found: {config_path}")
-        print("[INFO] create one from sync_config.json template")
-        sys.exit(1)
+        example = config_path.parent / "sync_config.example.json"
+        if example.exists():
+            import shutil
+
+            shutil.copy(example, config_path)
+            print(f"[INFO] 已从模板创建 {config_path}，请配置环境变量 INTEL_SYNC_API_KEY")
+        else:
+            print(f"[ERROR] config file not found: {config_path}")
+            print("[INFO] copy sync_config.example.json to sync_config.json")
+            sys.exit(1)
 
     with open(config_path, "r", encoding="utf-8") as f:
         return json.load(f)
@@ -51,7 +58,10 @@ def load_config(config_path: Path) -> dict:
 
 def resolve_credentials(config: dict, args) -> tuple[str, str]:
     base_url = args.base_url or os.environ.get("INTEL_SYNC_URL") or config.get("remote_host", "")
-    api_token = args.api_token or os.environ.get("INTEL_SYNC_API_KEY") or config.get("api_token", "")
+    raw_token = args.api_token or config.get("api_token", "") or ""
+    if raw_token in ("", "REDACTED_INTEL_SYNC_KEY"):
+        raw_token = ""
+    api_token = raw_token or os.environ.get("INTEL_SYNC_API_KEY") or ""
 
     if not base_url:
         print("[ERROR] remote_host not set. Use --base-url or set INTEL_SYNC_URL env var")

@@ -2,6 +2,9 @@
 secrets/
 *.txt
 secrets.txt
+# 本地情报同步密钥（使用 sync_config.example.json 复制 + 环境变量 INTEL_SYNC_API_KEY）
+AI互联网信息量化/remote_sync/sync_config.json
+.git-replace-secrets.txt
 
 # Environment files
 .env

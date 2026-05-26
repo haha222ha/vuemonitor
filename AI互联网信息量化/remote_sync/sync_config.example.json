@@ -1,0 +1,11 @@
+{
+  "remote_host": "https://intel.xhs365.cn",
+  "api_token": "从环境变量 INTEL_SYNC_API_KEY 读取，勿提交到 git",
+  "sync_options": {
+    "batch_size": 50,
+    "retry_count": 3,
+    "retry_delay_seconds": 5,
+    "timeout_seconds": 60,
+    "request_delay_ms": 200
+  }
+}
