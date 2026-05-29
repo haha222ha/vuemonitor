@@ -8,15 +8,18 @@ from typing import Any
 from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.cache import invalidate_user_cache
 from app.core.database import get_db
-from app.core.exceptions import ForbiddenException
+from app.core.exceptions import BadRequestException, ForbiddenException
 from app.core.redis import get_redis
 from app.middleware.auth import CurrentUser
 from app.models.feature_gate import FeatureGateUsage
 from app.models.product import Product
 from app.services.discovery_db import discovery_db
+from app.services.operation_audit import record_operation
 from app.services.discovery_quota import (
     DISCOVERY_QUOTA_HINT,
     STORE_ADD_MAX_PER_REQUEST,
@@ -95,8 +98,26 @@ class _LRURefCache:
 
 _ref_cache = _LRURefCache()
 
+_PLATFORM_PRODUCT_ID_MAX = 255
+_PRODUCT_NAME_MAX = 500
+
+
+def _normalize_goods_id(raw: object) -> str:
+    goods_id = str(raw or "").strip().replace("\x00", "")
+    if not goods_id:
+        raise ForbiddenException(code=42022, message="无效的商品引用")
+    if len(goods_id) > _PLATFORM_PRODUCT_ID_MAX:
+        goods_id = goods_id[:_PLATFORM_PRODUCT_ID_MAX]
+    return goods_id
+
+
+def _normalize_product_name(product_name: str | None, goods_id: str) -> str:
+    name = (product_name or "").strip().replace("\x00", "") or f"XHS商品 {goods_id[:8]}"
+    return name[:_PRODUCT_NAME_MAX]
+
 
 def _encode_ref(raw_id: str) -> str:
+    raw_id = str(raw_id)
     short = hashlib.sha256(raw_id.encode()).hexdigest()[:16]
     _ref_cache.set(short, raw_id)
     return short
@@ -481,15 +502,22 @@ async def add_to_monitor(
 
         added = []
         for item in pending:
+            goods_id = _normalize_goods_id(item["goods_id"])
             product = Product(
                 user_id=user.id,
                 platform="xhs",
-                platform_product_id=item["goods_id"],
-                product_name=item["title"] or f"XHS商品 {item['goods_id'][:8]}",
+                platform_product_id=goods_id,
+                product_name=_normalize_product_name(item.get("title"), goods_id),
             )
             db.add(product)
-            added.append(item["goods_id"])
-        await db.flush()
+            added.append(goods_id)
+        try:
+            await db.flush()
+        except IntegrityError as e:
+            logger.warning("add_to_monitor store flush failed: %s", e)
+            raise BadRequestException(message="添加失败，部分商品可能已存在或商品ID无效") from e
+        await gate.record_usage(user.id, "gate:monitor:add")
+        await invalidate_user_cache(str(user.id))
         quota = await get_discovery_quota(str(user.id), ip, user.plan)
         return {
             "code": 0,
@@ -501,9 +529,10 @@ async def add_to_monitor(
             },
         }
 
-    goods_id = await _decode_ref(req.ref_id)
-    if not goods_id:
-        raise ForbiddenException(code=42022, message="无效的商品引用")
+    raw_goods_id = await _decode_ref(req.ref_id)
+    if not raw_goods_id:
+        raise ForbiddenException(code=42022, message="无效的商品引用，请重新搜索后再添加")
+    goods_id = _normalize_goods_id(raw_goods_id)
 
     existing = await db.execute(
         select(Product).where(
@@ -519,14 +548,29 @@ async def add_to_monitor(
         str(user.id), ip, user.plan, amount=1, action="add_to_monitor"
     )
 
+    product_name = _normalize_product_name(req.product_name, goods_id)
     product = Product(
         user_id=user.id,
         platform="xhs",
         platform_product_id=goods_id,
-        product_name=req.product_name or f"XHS商品 {goods_id[:8]}",
+        product_name=product_name,
     )
     db.add(product)
-    await db.flush()
+    try:
+        await db.flush()
+    except IntegrityError as e:
+        logger.warning("add_to_monitor goods flush failed: %s", e)
+        raise BadRequestException(message="添加失败，商品可能已存在或商品ID过长/无效") from e
+
+    await gate.record_usage(user.id, "gate:monitor:add")
+    await record_operation(
+        user_id=str(user.id),
+        action="create",
+        resource_type="product",
+        resource_id=str(product.id),
+        detail=f"discovery_ref={req.ref_id}, platform_product_id={goods_id[:32]}",
+    )
+    await invalidate_user_cache(str(user.id))
 
     quota = await get_discovery_quota(str(user.id), ip, user.plan)
     return {

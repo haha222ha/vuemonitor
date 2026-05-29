@@ -10,6 +10,13 @@ import urllib.request
 BASE = os.environ.get("VERIFY_API_BASE", "http://127.0.0.1:8000/api/v1")
 
 
+def _read_http_error(exc: urllib.error.HTTPError) -> str:
+    try:
+        return exc.read().decode("utf-8", errors="replace")
+    except Exception:
+        return str(exc)
+
+
 def post(path: str, body: dict, token: str | None = None) -> dict:
     headers = {"Content-Type": "application/json"}
     if token:
@@ -20,8 +27,11 @@ def post(path: str, body: dict, token: str | None = None) -> dict:
         headers=headers,
         method="POST",
     )
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read())
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"POST {path} HTTP {e.code}: {_read_http_error(e)}") from e
 
 
 def get(path: str, token: str) -> dict:
@@ -29,8 +39,11 @@ def get(path: str, token: str) -> dict:
         f"{BASE}{path}",
         headers={"Authorization": f"Bearer {token}"},
     )
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.loads(r.read())
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read())
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"GET {path} HTTP {e.code}: {_read_http_error(e)}") from e
 
 
 def main() -> int:

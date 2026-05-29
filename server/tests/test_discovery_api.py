@@ -416,6 +416,44 @@ class TestDiscoveryTopSold:
         assert data["code"] == 0
 
 
+class TestDiscoveryAddToMonitor:
+    @pytest.mark.asyncio
+    async def test_add_to_monitor_goods_success(self):
+        user = _make_mock_user(plan="free")
+        ref = "822b85dda5856756"
+        goods_id = "goods_001"
+
+        async def fake_decode(ref_id: str):
+            return goods_id if ref_id == ref else None
+
+        with patch("app.api.discovery.discovery_db", _make_discovery_db_mock()), \
+             patch("app.api.discovery._decode_ref", side_effect=fake_decode), \
+             patch("app.api.discovery.assert_ref_owner", AsyncMock()), \
+             patch("app.api.discovery.record_operation", AsyncMock()), \
+             patch("app.api.discovery.invalidate_user_cache", AsyncMock()), \
+             _patch_discovery_redis(quota_used=1):
+            async with _test_client(user) as (client, mock_db):
+                mock_result = MagicMock()
+                mock_result.scalar_one_or_none = MagicMock(return_value=None)
+                mock_db.execute = AsyncMock(return_value=mock_result)
+
+                response = await client.post(
+                    "/api/v1/discovery/add-to-monitor",
+                    json={
+                        "ref_id": ref,
+                        "product_name": "测试商品",
+                        "mode": "goods",
+                    },
+                )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["code"] == 0
+        assert data["data"]["mode"] == "goods"
+        assert "product_id" in data["data"]
+        assert data["data"]["quota"]["used_today"] >= 1
+
+
 class TestDiscoveryQuotaExhaustion:
     @pytest.mark.asyncio
     async def test_search_quota_exhausted_free_user(self):
