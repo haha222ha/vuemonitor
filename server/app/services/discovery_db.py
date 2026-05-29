@@ -118,6 +118,9 @@ class DiscoveryDatabase:
         self._pool.clear()
         self._initialized = False
 
+    def is_ready(self) -> bool:
+        return bool(self._initialized and self._pool)
+
     async def reload(self) -> None:
         await self.close()
         await self.connect()
@@ -544,8 +547,21 @@ class DiscoveryDatabase:
                 return {"total_goods": 0, "total_stores": 0, "total_keywords": 0}
 
 
-discovery_db = DiscoveryDatabase.__new__(DiscoveryDatabase)
-discovery_db._pool = []
-discovery_db._db_path = None
-discovery_db._semaphore = None
-discovery_db._initialized = False
+class _DiscoveryDbProxy:
+    """将 API 层 discovery_db 引用转发到 lifespan 初始化的单例。"""
+
+    def _instance(self) -> "DiscoveryDatabase":
+        inst = DiscoveryDatabase.get_instance()
+        if inst is None:
+            raise RuntimeError("Discovery database not initialized")
+        return inst
+
+    def is_ready(self) -> bool:
+        inst = DiscoveryDatabase.get_instance()
+        return bool(inst and inst.is_ready())
+
+    def __getattr__(self, name: str):
+        return getattr(self._instance(), name)
+
+
+discovery_db = _DiscoveryDbProxy()

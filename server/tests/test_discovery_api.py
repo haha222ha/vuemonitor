@@ -1,7 +1,7 @@
 import os
 import sys
 import uuid
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
 from unittest.mock import AsyncMock, MagicMock, patch
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -101,6 +101,46 @@ def _teardown():
     app.dependency_overrides.clear()
 
 
+def _mock_discovery_db_ready(mock_discovery) -> None:
+    mock_discovery.is_ready = MagicMock(return_value=True)
+    mock_discovery.get_stats = AsyncMock(
+        return_value={"total_goods": 100000, "total_stores": 5000, "total_keywords": 200}
+    )
+
+
+def _make_discovery_db_mock() -> MagicMock:
+    mock = MagicMock()
+    _mock_discovery_db_ready(mock)
+    return mock
+
+
+def _make_redis_mock(*, quota_used: int | None = None) -> AsyncMock:
+    mock_redis = AsyncMock()
+
+    async def _get(key: str):
+        if quota_used is not None and str(key).startswith("discovery:quota:"):
+            return str(quota_used)
+        return None
+
+    mock_redis.get = AsyncMock(side_effect=_get)
+    mock_redis.set = AsyncMock(return_value=True)
+    used = quota_used or 0
+    mock_redis.incrby = AsyncMock(return_value=used + 1)
+    mock_redis.expire = AsyncMock(return_value=True)
+    mock_redis.decrby = AsyncMock(return_value=used)
+    return mock_redis
+
+
+@contextmanager
+def _patch_discovery_redis(*, quota_used: int | None = None):
+    redis = _make_redis_mock(quota_used=quota_used)
+    getter = AsyncMock(return_value=redis)
+    with patch("app.api.discovery.get_redis", getter), patch(
+        "app.services.discovery_quota.get_redis", getter
+    ):
+        yield redis
+
+
 @asynccontextmanager
 async def _test_client(user=None):
     mock_db = _setup_auth(user or _make_mock_user())
@@ -115,19 +155,16 @@ class TestDiscoveryQuota:
     @pytest.mark.asyncio
     async def test_get_quota_pro_user(self):
         user = _make_mock_user(plan="pro")
-        with patch("app.api.discovery.discovery_db") as mock_discovery:
-            mock_discovery.get_stats = AsyncMock(return_value={
-                "total_goods": 100000,
-                "total_stores": 5000,
-                "total_keywords": 200,
-            })
+        mock_discovery = _make_discovery_db_mock()
+        with patch("app.api.discovery.discovery_db", mock_discovery), _patch_discovery_redis(quota_used=0):
             async with _test_client(user) as (client, _):
                 response = await client.get("/api/v1/discovery/quota")
 
         assert response.status_code == 200
         data = response.json()
         assert data["code"] == 0
-        assert "daily_limit" in data["data"]
+        assert data["data"]["daily_limit"] == 200
+        assert "quota_hint" in data["data"]
         assert data["data"]["db_stats"]["total_goods"] == 100000
 
 
@@ -135,19 +172,14 @@ class TestDiscoverySearch:
     @pytest.mark.asyncio
     async def test_search_goods_pro_user(self):
         user = _make_mock_user(plan="pro")
-        with patch("app.api.discovery.discovery_db") as mock_discovery, \
-             patch("app.api.discovery.get_redis", new_callable=AsyncMock) as mock_redis_fn:
-            mock_discovery.search_goods = AsyncMock(return_value={
-                "items": SAMPLE_GOODS,
-                "total": 2,
-                "page": 1,
-                "page_size": 20,
-            })
-            mock_redis = AsyncMock()
-            mock_redis.get = AsyncMock(return_value=None)
-            mock_redis.set = AsyncMock(return_value=None)
-            mock_redis_fn.return_value = mock_redis
-
+        mock_discovery = _make_discovery_db_mock()
+        mock_discovery.search_goods = AsyncMock(return_value={
+            "items": SAMPLE_GOODS,
+            "total": 2,
+            "page": 1,
+            "page_size": 20,
+        })
+        with patch("app.api.discovery.discovery_db", mock_discovery), _patch_discovery_redis(quota_used=0):
             async with _test_client(user) as (client, _):
                 response = await client.post(
                     "/api/v1/discovery/search",
@@ -158,6 +190,7 @@ class TestDiscoverySearch:
         data = response.json()
         assert data["code"] == 0
         assert len(data["data"]["items"]) == 2
+        assert data["data"]["quota"]["daily_limit"] == 200
         item = data["data"]["items"][0]
         assert item["deal_price"] == 99.9
         assert item["sold_num"] is None
@@ -166,19 +199,14 @@ class TestDiscoverySearch:
     @pytest.mark.asyncio
     async def test_search_goods_free_user_masked(self):
         user = _make_mock_user(plan="free")
-        with patch("app.api.discovery.discovery_db") as mock_discovery, \
-             patch("app.api.discovery.get_redis", new_callable=AsyncMock) as mock_redis_fn:
-            mock_discovery.search_goods = AsyncMock(return_value={
-                "items": SAMPLE_GOODS,
-                "total": 2,
-                "page": 1,
-                "page_size": 20,
-            })
-            mock_redis = AsyncMock()
-            mock_redis.get = AsyncMock(return_value=None)
-            mock_redis.set = AsyncMock(return_value=None)
-            mock_redis_fn.return_value = mock_redis
-
+        mock_discovery = _make_discovery_db_mock()
+        mock_discovery.search_goods = AsyncMock(return_value={
+            "items": SAMPLE_GOODS,
+            "total": 2,
+            "page": 1,
+            "page_size": 20,
+        })
+        with patch("app.api.discovery.discovery_db", mock_discovery), _patch_discovery_redis(quota_used=0):
             async with _test_client(user) as (client, _):
                 response = await client.post(
                     "/api/v1/discovery/search",
@@ -195,19 +223,14 @@ class TestDiscoverySearch:
     @pytest.mark.asyncio
     async def test_search_goods_premium_user_full_data(self):
         user = _make_mock_user(plan="premium")
-        with patch("app.api.discovery.discovery_db") as mock_discovery, \
-             patch("app.api.discovery.get_redis", new_callable=AsyncMock) as mock_redis_fn:
-            mock_discovery.search_goods = AsyncMock(return_value={
-                "items": SAMPLE_GOODS,
-                "total": 2,
-                "page": 1,
-                "page_size": 20,
-            })
-            mock_redis = AsyncMock()
-            mock_redis.get = AsyncMock(return_value=None)
-            mock_redis.set = AsyncMock(return_value=None)
-            mock_redis_fn.return_value = mock_redis
-
+        mock_discovery = _make_discovery_db_mock()
+        mock_discovery.search_goods = AsyncMock(return_value={
+            "items": SAMPLE_GOODS,
+            "total": 2,
+            "page": 1,
+            "page_size": 20,
+        })
+        with patch("app.api.discovery.discovery_db", mock_discovery), _patch_discovery_redis(quota_used=0):
             async with _test_client(user) as (client, _):
                 response = await client.post(
                     "/api/v1/discovery/search",
@@ -246,19 +269,14 @@ class TestDiscoveryStores:
     @pytest.mark.asyncio
     async def test_search_stores_pro_user(self):
         user = _make_mock_user(plan="pro")
-        with patch("app.api.discovery.discovery_db") as mock_discovery, \
-             patch("app.api.discovery.get_redis", new_callable=AsyncMock) as mock_redis_fn:
-            mock_discovery.search_stores = AsyncMock(return_value={
-                "items": SAMPLE_STORES,
-                "total": 1,
-                "page": 1,
-                "page_size": 20,
-            })
-            mock_redis = AsyncMock()
-            mock_redis.get = AsyncMock(return_value=None)
-            mock_redis.set = AsyncMock(return_value=None)
-            mock_redis_fn.return_value = mock_redis
-
+        mock_discovery = _make_discovery_db_mock()
+        mock_discovery.search_stores = AsyncMock(return_value={
+            "items": SAMPLE_STORES,
+            "total": 1,
+            "page": 1,
+            "page_size": 20,
+        })
+        with patch("app.api.discovery.discovery_db", mock_discovery), _patch_discovery_redis(quota_used=0):
             async with _test_client(user) as (client, _):
                 response = await client.post(
                     "/api/v1/discovery/stores",
@@ -275,19 +293,14 @@ class TestDiscoveryStores:
     @pytest.mark.asyncio
     async def test_search_stores_free_user_masked(self):
         user = _make_mock_user(plan="free")
-        with patch("app.api.discovery.discovery_db") as mock_discovery, \
-             patch("app.api.discovery.get_redis", new_callable=AsyncMock) as mock_redis_fn:
-            mock_discovery.search_stores = AsyncMock(return_value={
-                "items": SAMPLE_STORES,
-                "total": 1,
-                "page": 1,
-                "page_size": 20,
-            })
-            mock_redis = AsyncMock()
-            mock_redis.get = AsyncMock(return_value=None)
-            mock_redis.set = AsyncMock(return_value=None)
-            mock_redis_fn.return_value = mock_redis
-
+        mock_discovery = _make_discovery_db_mock()
+        mock_discovery.search_stores = AsyncMock(return_value={
+            "items": SAMPLE_STORES,
+            "total": 1,
+            "page": 1,
+            "page_size": 20,
+        })
+        with patch("app.api.discovery.discovery_db", mock_discovery), _patch_discovery_redis(quota_used=0):
             async with _test_client(user) as (client, _):
                 response = await client.post(
                     "/api/v1/discovery/stores",
@@ -304,11 +317,12 @@ class TestDiscoveryKeywords:
     @pytest.mark.asyncio
     async def test_get_keywords(self):
         user = _make_mock_user(plan="pro")
-        with patch("app.api.discovery.discovery_db") as mock_discovery:
-            mock_discovery.get_hot_keywords = AsyncMock(return_value={
-                "items": SAMPLE_KEYWORDS,
-                "total": 2,
-            })
+        mock_discovery = _make_discovery_db_mock()
+        mock_discovery.get_hot_keywords = AsyncMock(return_value={
+            "items": SAMPLE_KEYWORDS,
+            "total": 2,
+        })
+        with patch("app.api.discovery.discovery_db", mock_discovery):
             async with _test_client(user) as (client, _):
                 response = await client.get(
                     "/api/v1/discovery/keywords",
@@ -350,19 +364,14 @@ class TestDiscoveryHotGoods:
     @pytest.mark.asyncio
     async def test_hot_goods_pro_user_allowed(self):
         user = _make_mock_user(plan="pro")
-        with patch("app.api.discovery.discovery_db") as mock_discovery, \
-             patch("app.api.discovery.get_redis", new_callable=AsyncMock) as mock_redis_fn:
-            mock_discovery.get_hot_goods = AsyncMock(return_value={
-                "items": SAMPLE_GOODS,
-                "total": 2,
-                "page": 1,
-                "page_size": 20,
-            })
-            mock_redis = AsyncMock()
-            mock_redis.get = AsyncMock(return_value=None)
-            mock_redis.set = AsyncMock(return_value=None)
-            mock_redis_fn.return_value = mock_redis
-
+        mock_discovery = _make_discovery_db_mock()
+        mock_discovery.get_hot_goods = AsyncMock(return_value={
+            "items": SAMPLE_GOODS,
+            "total": 2,
+            "page": 1,
+            "page_size": 20,
+        })
+        with patch("app.api.discovery.discovery_db", mock_discovery), _patch_discovery_redis(quota_used=0):
             async with _test_client(user) as (client, _):
                 response = await client.get(
                     "/api/v1/discovery/hot-goods",
@@ -389,19 +398,14 @@ class TestDiscoveryTopSold:
     @pytest.mark.asyncio
     async def test_top_sold_premium_user_allowed(self):
         user = _make_mock_user(plan="premium")
-        with patch("app.api.discovery.discovery_db") as mock_discovery, \
-             patch("app.api.discovery.get_redis", new_callable=AsyncMock) as mock_redis_fn:
-            mock_discovery.get_top_sold = AsyncMock(return_value={
-                "items": SAMPLE_GOODS,
-                "total": 2,
-                "page": 1,
-                "page_size": 20,
-            })
-            mock_redis = AsyncMock()
-            mock_redis.get = AsyncMock(return_value=None)
-            mock_redis.set = AsyncMock(return_value=None)
-            mock_redis_fn.return_value = mock_redis
-
+        mock_discovery = _make_discovery_db_mock()
+        mock_discovery.get_top_sold = AsyncMock(return_value={
+            "items": SAMPLE_GOODS,
+            "total": 2,
+            "page": 1,
+            "page_size": 20,
+        })
+        with patch("app.api.discovery.discovery_db", mock_discovery), _patch_discovery_redis(quota_used=0):
             async with _test_client(user) as (client, _):
                 response = await client.get(
                     "/api/v1/discovery/top-sold",
@@ -416,24 +420,15 @@ class TestDiscoveryQuotaExhaustion:
     @pytest.mark.asyncio
     async def test_search_quota_exhausted_free_user(self):
         user = _make_mock_user(plan="free")
-        with patch("app.api.discovery.discovery_db") as mock_discovery, \
-             patch("app.api.discovery.get_redis", new_callable=AsyncMock) as mock_redis_fn:
-            mock_discovery.search_goods = AsyncMock(return_value={
-                "items": SAMPLE_GOODS,
-                "total": 2,
-                "page": 1,
-                "page_size": 20,
-            })
-            mock_redis = AsyncMock()
-            mock_redis.get = AsyncMock(return_value=None)
-            mock_redis.set = AsyncMock(return_value=None)
-            mock_redis_fn.return_value = mock_redis
-
-            async with _test_client(user) as (client, mock_db):
-                mock_result = MagicMock()
-                mock_result.scalar = MagicMock(return_value=5)
-                mock_db.execute = AsyncMock(return_value=mock_result)
-
+        mock_discovery = _make_discovery_db_mock()
+        mock_discovery.search_goods = AsyncMock(return_value={
+            "items": SAMPLE_GOODS,
+            "total": 2,
+            "page": 1,
+            "page_size": 20,
+        })
+        with patch("app.api.discovery.discovery_db", mock_discovery), _patch_discovery_redis(quota_used=20):
+            async with _test_client(user) as (client, _):
                 response = await client.post(
                     "/api/v1/discovery/search",
                     json={"keyword": "美妆", "page": 1, "page_size": 20},

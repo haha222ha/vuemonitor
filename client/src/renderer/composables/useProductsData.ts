@@ -1,4 +1,4 @@
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
 import { parseXHSUrl } from "@shared/constants/platforms";
@@ -16,6 +16,17 @@ export interface ProductRanking {
   lifecycle: string;
 }
 
+export interface DiscoveryQuotaState {
+  plan?: string;
+  daily_limit: number;
+  used_today: number;
+  remaining: number;
+  quota_hint: string;
+}
+
+const DISCOVERY_QUOTA_HINT_FALLBACK =
+  "「搜索添加」使用云端商品发现库，按账号与当前 IP 合计计次，每日 0 点重置。免费版每日 20 次，Pro 每日 200 次。「粘贴链接」不占用发现库额度。";
+
 export function useProductsData() {
   const productStore = useProductStore();
   const collectStore = useCollectStore();
@@ -31,6 +42,7 @@ export function useProductsData() {
   const discoveryResults = ref<Product[]>([]);
   const discoveryLoading = ref(false);
   const discoveryHasSearched = ref(false);
+  const discoveryQuota = ref<DiscoveryQuotaState | null>(null);
   const showCollect = ref(false);
   const showSchedule = ref(false);
   const addFormRef = ref<FormInstance>();
@@ -167,21 +179,99 @@ export function useProductsData() {
     } catch { ElMessage.error("添加失败"); }
   }
 
+  function applyDiscoveryQuotaPayload(payload: Record<string, unknown> | undefined) {
+    if (!payload) return;
+    const q = (payload.quota as Record<string, unknown> | undefined) ?? payload;
+    if (q.daily_limit === undefined && q.remaining === undefined) return;
+    discoveryQuota.value = {
+      plan: String(q.plan ?? discoveryQuota.value?.plan ?? ""),
+      daily_limit: Number(q.daily_limit ?? -1),
+      used_today: Number(q.used_today ?? 0),
+      remaining: Number(q.remaining ?? 0),
+      quota_hint: String(
+        payload.quota_hint ?? q.quota_hint ?? payload.policy_hint ?? DISCOVERY_QUOTA_HINT_FALLBACK,
+      ),
+    };
+  }
+
+  async function fetchDiscoveryQuota() {
+    try {
+      const { data } = await api.get("/discovery/quota");
+      if (data?.code === 0 && data.data) {
+        applyDiscoveryQuotaPayload(data.data);
+      }
+    } catch {
+      if (!discoveryQuota.value) {
+        discoveryQuota.value = {
+          daily_limit: 20,
+          used_today: 0,
+          remaining: 20,
+          quota_hint: DISCOVERY_QUOTA_HINT_FALLBACK,
+        };
+      }
+    }
+  }
+
+  watch(showAdd, (open) => {
+    if (open) void fetchDiscoveryQuota();
+  });
+
+  watch(addTab, (tab) => {
+    if (tab === "search" && showAdd.value) void fetchDiscoveryQuota();
+  });
+
   async function searchDiscovery() {
     if (!discoveryKeyword.value.trim()) return;
     discoveryLoading.value = true;
     discoveryHasSearched.value = true;
+    const payload = {
+      keyword: discoveryKeyword.value.trim(),
+      page: 1,
+      page_size: 20,
+    };
     try {
-      const { data } = await api.post("/discovery/search", {
-        keyword: discoveryKeyword.value,
-        page: 1,
-        page_size: 20,
-      });
-      if (data.code === 0) {
-        discoveryResults.value = data.data.items;
+      try {
+        const { data } = await api.post("/discovery/search", payload);
+        if (data.code === 42021) {
+          applyDiscoveryQuotaPayload(data.detail as Record<string, unknown> | undefined);
+          ElMessage.warning(data.message || "今日「搜索添加」次数已用完，请明日再试或使用「粘贴链接」");
+          discoveryResults.value = [];
+          return;
+        }
+        if (data.code === 0) {
+          discoveryResults.value = data.data?.items || [];
+          applyDiscoveryQuotaPayload(data.data);
+          if (discoveryResults.value.length === 0) {
+            ElMessage.info("未找到匹配商品，请换关键词或检查云端发现库是否已部署");
+          }
+          return;
+        }
+        ElMessage.warning(data.message || "搜索失败");
+        return;
+      } catch (err: unknown) {
+        const ax = err as { response?: { data?: { code?: number; message?: string; detail?: Record<string, unknown> } } };
+        if (ax.response?.data?.code === 42021) {
+          applyDiscoveryQuotaPayload(ax.response.data.detail);
+          ElMessage.warning(ax.response.data.message || "今日「搜索添加」次数已用完");
+          discoveryResults.value = [];
+          return;
+        }
+        // 云端 API 不可用时走 Electron IPC 兜底
       }
-    } catch {
+
+      if (window.electronAPI?.invoke) {
+        const result = await window.electronAPI.invoke("discovery:search", payload) as { code?: number; data?: { items?: unknown[] } };
+        discoveryResults.value = (result?.data?.items || []) as typeof discoveryResults.value;
+        if (discoveryResults.value.length === 0) {
+          ElMessage.info("未找到匹配商品。请确认服务器已配置 DISCOVERY_DB_PATH 并导入发现库。");
+        }
+      } else {
+        discoveryResults.value = [];
+        ElMessage.warning("当前环境无法搜索商品发现库");
+      }
+    } catch (err) {
       discoveryResults.value = [];
+      ElMessage.error(`搜索失败: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       discoveryLoading.value = false;
     }
@@ -205,19 +295,60 @@ export function useProductsData() {
   }
 
   async function addFromDiscovery(item: { ref?: string; title?: string; store_name?: string }) {
-    if (!permissionStore.canAddProduct) {
-      ElMessage.warning("当前套餐商品数量已达上限，请升级");
+    const refId = String(item.ref || "").trim();
+    if (!refId) {
+      ElMessage.warning("该条目缺少引用ID，无法加入监控，请重新搜索");
       return;
     }
     try {
-      await api.post("/discovery/add-to-monitor", {
-        ref_id: item.ref,
-        product_name: item.title,
-        mode: "goods",
-      });
-      ElMessage.success("已加入监控");
-      await productStore.fetchProducts();
-    } catch { ElMessage.error("添加失败"); }
+      try {
+        const { data } = await api.post("/discovery/add-to-monitor", {
+          ref_id: refId,
+          product_name: item.title,
+          mode: "goods",
+        });
+        if (data?.code === 42021) {
+          applyDiscoveryQuotaPayload(data.detail as Record<string, unknown> | undefined);
+          ElMessage.warning(data.message || "今日「搜索添加」次数已用完");
+          return;
+        }
+        if (data?.code === 0) {
+          applyDiscoveryQuotaPayload(data.data);
+          ElMessage.success("已加入监控");
+          await productStore.fetchProducts();
+          return;
+        }
+        ElMessage.warning(data?.message || "加入监控失败");
+        return;
+      } catch (err: unknown) {
+        const ax = err as { response?: { data?: { code?: number; message?: string; detail?: Record<string, unknown> } } };
+        if (ax.response?.data?.code === 42021) {
+          applyDiscoveryQuotaPayload(ax.response.data.detail);
+          ElMessage.warning(ax.response.data.message || "今日「搜索添加」次数已用完");
+          return;
+        }
+        // network/api 失败时走 IPC 兜底
+      }
+
+      if (window.electronAPI?.invoke) {
+        const result = await window.electronAPI.invoke("discovery:add-to-monitor", {
+          ref_id: refId,
+          product_name: item.title,
+          mode: "goods",
+        }) as { code?: number; message?: string };
+        if ((result?.code ?? 1) === 0) {
+          ElMessage.success("已加入监控");
+          await productStore.fetchProducts();
+          return;
+        }
+        ElMessage.warning(result?.message || "加入监控失败，请稍后重试");
+        return;
+      }
+
+      ElMessage.error("添加失败：当前环境无法访问发现库服务");
+    } catch (err) {
+      ElMessage.error(`添加失败: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   function resetAddDialog() {
@@ -255,7 +386,6 @@ export function useProductsData() {
   }
 
   function addSchedule(product: Record<string, unknown>) {
-    if (!permissionStore.canAutoRefresh) { ElMessage.warning("定时采集需要Pro及以上版本"); return; }
     scheduleProduct.value = product;
     showSchedule.value = true;
   }
@@ -382,7 +512,8 @@ export function useProductsData() {
   return {
     productStore, collectStore, schedulerStore, permissionStore,
     productRankings, rankingsLoading,
-    showAdd, addTab, discoveryKeyword, discoveryResults, discoveryLoading, discoveryHasSearched,
+    showAdd, addTab, discoveryKeyword, discoveryResults, discoveryLoading, discoveryHasSearched, discoveryQuota,
+    fetchDiscoveryQuota,
     showCollect, showSchedule,
     addFormRef, addForm, addRules,
     concurrency, collectScope, collectCategory, scheduleFrequency, scheduleProduct,

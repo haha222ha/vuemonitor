@@ -16,12 +16,12 @@ def is_plan_sufficient(user_plan: PlanTier, required_plan: PlanTier) -> bool:
 
 PLAN_LIMITS: dict[str, dict] = {
     "free": {
-        "maxProducts": 3,
-        "maxConcurrency": 1,
-        "dailyCollectLimit": 20,
-        "maxScheduleTasks": 0,
-        "aiCallsPerDay": 3,
-        "discoverySearchPerDay": 5,
+        "maxProducts": -1,
+        "maxConcurrency": 2,
+        "dailyCollectLimit": 200,
+        "maxScheduleTasks": 100,
+        "aiCallsPerDay": 10,
+        "discoverySearchPerDay": 20,
         "discoveryBurstPerDay": 0,
         "excelImportPerDay": 0,
         "historyDays": 7,
@@ -35,7 +35,7 @@ PLAN_LIMITS: dict[str, dict] = {
         "dailyCollectLimit": 500,
         "maxScheduleTasks": 20,
         "aiCallsPerDay": 50,
-        "discoverySearchPerDay": 50,
+        "discoverySearchPerDay": 200,
         "discoveryBurstPerDay": 0,
         "excelImportPerDay": 10,
         "historyDays": 30,

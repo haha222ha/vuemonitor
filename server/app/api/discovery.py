@@ -5,7 +5,7 @@ from collections import OrderedDict
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +17,15 @@ from app.middleware.auth import CurrentUser
 from app.models.feature_gate import FeatureGateUsage
 from app.models.product import Product
 from app.services.discovery_db import discovery_db
+from app.services.discovery_quota import (
+    DISCOVERY_QUOTA_HINT,
+    STORE_ADD_MAX_PER_REQUEST,
+    assert_ref_owner,
+    bind_ref_to_user,
+    consume_discovery_quota,
+    get_client_ip,
+    get_discovery_quota,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -45,13 +54,6 @@ class AddToMonitorRequest(BaseModel):
     product_name: str | None = None
     mode: str = Field("goods", pattern="^(goods|store)$")
 
-
-DAILY_SEARCH_LIMITS = {
-    "free": 5,
-    "pro": 50,
-    "premium": 200,
-    "enterprise": -1,
-}
 
 TITLE_MAX_LEN: dict[str, int] = {
     "free": 15,
@@ -123,7 +125,7 @@ async def _persist_ref(short: str, raw_id: str) -> None:
         logger.warning(f"Redis persist for ref failed: {e}")
 
 
-async def _mask_goods_item(item: dict, plan: str) -> dict:
+async def _mask_goods_item(item: dict, plan: str, user_id: str) -> dict:
     title_raw = item.get("title", "")
     store_name_raw = item.get("store_name", "")
 
@@ -132,6 +134,7 @@ async def _mask_goods_item(item: dict, plan: str) -> dict:
 
     ref = _encode_ref(item["goods_id"])
     await _persist_ref(ref, item["goods_id"])
+    await bind_ref_to_user(ref, user_id)
 
     masked: dict[str, Any] = {
         "ref": ref,
@@ -159,13 +162,14 @@ async def _mask_goods_item(item: dict, plan: str) -> dict:
     return masked
 
 
-async def _mask_store_item(item: dict, plan: str) -> dict:
+async def _mask_store_item(item: dict, plan: str, user_id: str) -> dict:
     store_name_raw = item.get("store_name", "")
     store_max = STORE_NAME_MAX_LEN.get(plan, 8)
 
     raw_store_id = f"store:{item['store_id']}"
     ref = _encode_ref(raw_store_id)
     await _persist_ref(ref, raw_store_id)
+    await bind_ref_to_user(ref, user_id)
 
     masked: dict[str, Any] = {
         "ref": ref,
@@ -184,8 +188,12 @@ async def _mask_store_item(item: dict, plan: str) -> dict:
 
 
 async def _check_and_record_search(user: CurrentUser, db: AsyncSession, gate_key: str) -> int:
+    """爆品/榜单等独立 gate，不走 discovery 云端搜索+添加合计额度。"""
+    from shared.constants.feature_gates import PLAN_LIMITS
+
     plan = user.plan or "free"
-    daily_limit = DAILY_SEARCH_LIMITS.get(plan, 5)
+    limits = PLAN_LIMITS.get(plan, PLAN_LIMITS["free"])
+    daily_limit = limits.get("discoveryBurstPerDay", 0)
 
     if daily_limit > 0:
         today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -214,45 +222,27 @@ async def _check_and_record_search(user: CurrentUser, db: AsyncSession, gate_key
     return daily_limit
 
 
-async def _get_remaining_quota(user: CurrentUser, db: AsyncSession) -> dict[str, Any]:
-    plan = user.plan or "free"
-    daily_limit = DAILY_SEARCH_LIMITS.get(plan, 5)
-
-    today_start = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
-    count_result = await db.execute(
-        select(func.count()).where(
-            FeatureGateUsage.user_id == user.id,
-            FeatureGateUsage.gate_key == "gate:discovery:search",
-            FeatureGateUsage.used_at >= today_start,
-        )
-    )
-    used = count_result.scalar() or 0
-
-    return {
-        "plan": plan,
-        "daily_limit": daily_limit,
-        "used_today": used,
-        "remaining": max(0, daily_limit - used) if daily_limit > 0 else -1,
-    }
-
-
 @router.get("/quota")
 async def get_quota(
+    request: Request,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
-    quota = await _get_remaining_quota(user, db)
+    ip = get_client_ip(request)
+    quota = await get_discovery_quota(str(user.id), ip, user.plan)
     stats = await discovery_db.get_stats()
-    return {"code": 0, "data": {**quota, "db_stats": stats}}
+    return {"code": 0, "data": {**quota, "db_stats": stats, "policy_hint": DISCOVERY_QUOTA_HINT}}
 
 
 @router.post("/search")
 async def search_goods(
     req: DiscoverySearchRequest,
+    request: Request,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
-    await _check_and_record_search(user, db, "gate:discovery:search")
+    ip = get_client_ip(request)
+    quota = await consume_discovery_quota(str(user.id), ip, user.plan, amount=1, action="search")
 
     plan = user.plan or "free"
 
@@ -267,7 +257,12 @@ async def search_goods(
         category=req.category,
     )
 
-    items = await asyncio.gather(*[_mask_goods_item(item, plan) for item in result["items"]])
+    db_ready = discovery_db.is_ready()
+    stats = await discovery_db.get_stats() if db_ready else {"total_goods": 0, "total_stores": 0, "total_keywords": 0}
+
+    items = await asyncio.gather(
+        *[_mask_goods_item(item, plan, str(user.id)) for item in result["items"]]
+    )
 
     return {
         "code": 0,
@@ -276,6 +271,13 @@ async def search_goods(
             "total": result["total"],
             "page": result["page"],
             "page_size": result["page_size"],
+            "db_ready": db_ready,
+            "db_stats": stats,
+            "quota": quota,
+            "quota_hint": DISCOVERY_QUOTA_HINT,
+            "hint": None
+            if db_ready and stats.get("total_goods", 0) > 0
+            else "商品发现库未就绪：请在云主机配置 DISCOVERY_DB_PATH 并部署精简版 xhs_discovery_slim.db",
         },
     }
 
@@ -283,10 +285,12 @@ async def search_goods(
 @router.post("/stores")
 async def search_stores(
     req: StoreSearchRequest,
+    request: Request,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
-    await _check_and_record_search(user, db, "gate:discovery:search")
+    ip = get_client_ip(request)
+    await consume_discovery_quota(str(user.id), ip, user.plan, amount=1, action="search_stores")
 
     plan = user.plan or "free"
 
@@ -296,7 +300,9 @@ async def search_stores(
         page_size=req.page_size,
     )
 
-    items = await asyncio.gather(*[_mask_store_item(item, plan) for item in result["items"]])
+    items = await asyncio.gather(
+        *[_mask_store_item(item, plan, str(user.id)) for item in result["items"]]
+    )
 
     return {
         "code": 0,
@@ -312,12 +318,14 @@ async def search_stores(
 @router.get("/stores/{ref}/goods")
 async def get_store_goods(
     ref: str,
+    request: Request,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=5, le=50),
 ):
-    await _check_and_record_search(user, db, "gate:discovery:search")
+    ip = get_client_ip(request)
+    await consume_discovery_quota(str(user.id), ip, user.plan, amount=1, action="store_goods")
 
     plan = user.plan or "free"
 
@@ -332,7 +340,9 @@ async def get_store_goods(
         page_size=page_size,
     )
 
-    items = await asyncio.gather(*[_mask_goods_item(item, plan) for item in result["items"]])
+    items = await asyncio.gather(
+        *[_mask_goods_item(item, plan, str(user.id)) for item in result["items"]]
+    )
 
     return {"code": 0, "data": {"items": items, "total": result["total"]}}
 
@@ -350,6 +360,7 @@ async def get_hot_keywords(
 
 @router.get("/hot-goods")
 async def get_hot_goods(
+    request: Request,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
     page: int = Query(1, ge=1),
@@ -364,7 +375,8 @@ async def get_hot_goods(
             message="热门商品榜为Pro及以上会员专属功能，升级即可查看",
         )
 
-    await _check_and_record_search(user, db, "gate:discovery:search")
+    ip = get_client_ip(request)
+    await consume_discovery_quota(str(user.id), ip, user.plan, amount=1, action="hot_goods")
 
     result = await discovery_db.get_hot_goods(
         page=page,
@@ -372,7 +384,9 @@ async def get_hot_goods(
         category=category,
     )
 
-    items = await asyncio.gather(*[_mask_goods_item(item, plan) for item in result["items"]])
+    items = await asyncio.gather(
+        *[_mask_goods_item(item, plan, str(user.id)) for item in result["items"]]
+    )
 
     return {"code": 0, "data": {"items": items, "total": result["total"], "page": result["page"], "page_size": result["page_size"]}}
 
@@ -401,7 +415,9 @@ async def get_top_sold(
         min_sold=min_sold,
     )
 
-    items = await asyncio.gather(*[_mask_goods_item(item, plan) for item in result["items"]])
+    items = await asyncio.gather(
+        *[_mask_goods_item(item, plan, str(user.id)) for item in result["items"]]
+    )
 
     return {"code": 0, "data": {"items": items, "total": result["total"], "page": result["page"], "page_size": result["page_size"]}}
 
@@ -418,12 +434,17 @@ async def get_stats(
 @router.post("/add-to-monitor")
 async def add_to_monitor(
     req: AddToMonitorRequest,
+    request: Request,
     user: CurrentUser,
     db: AsyncSession = Depends(get_db),
 ):
     from app.middleware.feature_gate import FeatureGateMiddleware
+
     gate = FeatureGateMiddleware(db)
     await gate.check_gate(user, "gate:monitor:add")
+
+    ip = get_client_ip(request)
+    await assert_ref_owner(req.ref_id, str(user.id))
 
     if req.mode == "store":
         store_key = await _decode_ref(req.ref_id)
@@ -431,8 +452,10 @@ async def add_to_monitor(
             raise ForbiddenException(code=42022, message="无效的店铺引用")
         store_id = store_key[6:]
 
-        store_result = await discovery_db.get_store_goods(store_id=store_id, page=1, page_size=50)
-        added = []
+        store_result = await discovery_db.get_store_goods(
+            store_id=store_id, page=1, page_size=STORE_ADD_MAX_PER_REQUEST
+        )
+        pending: list[dict] = []
         for item in store_result["items"]:
             existing = await db.execute(
                 select(Product).where(
@@ -443,6 +466,21 @@ async def add_to_monitor(
             )
             if existing.scalar_one_or_none():
                 continue
+            pending.append(item)
+            if len(pending) >= STORE_ADD_MAX_PER_REQUEST:
+                break
+
+        if pending:
+            await consume_discovery_quota(
+                str(user.id),
+                ip,
+                user.plan,
+                amount=len(pending),
+                action="add_to_monitor_store",
+            )
+
+        added = []
+        for item in pending:
             product = Product(
                 user_id=user.id,
                 platform="xhs",
@@ -452,32 +490,54 @@ async def add_to_monitor(
             db.add(product)
             added.append(item["goods_id"])
         await db.flush()
-        return {"code": 0, "data": {"added_count": len(added), "mode": "store"}}
-    else:
-        goods_id = await _decode_ref(req.ref_id)
-        if not goods_id:
-            raise ForbiddenException(code=42022, message="无效的商品引用")
+        quota = await get_discovery_quota(str(user.id), ip, user.plan)
+        return {
+            "code": 0,
+            "data": {
+                "added_count": len(added),
+                "mode": "store",
+                "quota": quota,
+                "quota_hint": DISCOVERY_QUOTA_HINT,
+            },
+        }
 
-        existing = await db.execute(
-            select(Product).where(
-                Product.user_id == user.id,
-                Product.platform == "xhs",
-                Product.platform_product_id == goods_id,
-            )
+    goods_id = await _decode_ref(req.ref_id)
+    if not goods_id:
+        raise ForbiddenException(code=42022, message="无效的商品引用")
+
+    existing = await db.execute(
+        select(Product).where(
+            Product.user_id == user.id,
+            Product.platform == "xhs",
+            Product.platform_product_id == goods_id,
         )
-        if existing.scalar_one_or_none():
-            return {"code": 1, "message": "该商品已在监控列表中"}
+    )
+    if existing.scalar_one_or_none():
+        return {"code": 1, "message": "该商品已在监控列表中"}
 
-        product = Product(
-            user_id=user.id,
-            platform="xhs",
-            platform_product_id=goods_id,
-            product_name=req.product_name or f"XHS商品 {goods_id[:8]}",
-        )
-        db.add(product)
-        await db.flush()
+    await consume_discovery_quota(
+        str(user.id), ip, user.plan, amount=1, action="add_to_monitor"
+    )
 
-        return {"code": 0, "data": {"product_id": str(product.id), "mode": "goods"}}
+    product = Product(
+        user_id=user.id,
+        platform="xhs",
+        platform_product_id=goods_id,
+        product_name=req.product_name or f"XHS商品 {goods_id[:8]}",
+    )
+    db.add(product)
+    await db.flush()
+
+    quota = await get_discovery_quota(str(user.id), ip, user.plan)
+    return {
+        "code": 0,
+        "data": {
+            "product_id": str(product.id),
+            "mode": "goods",
+            "quota": quota,
+            "quota_hint": DISCOVERY_QUOTA_HINT,
+        },
+    }
 
 
 @router.get("/rising-goods")
@@ -504,7 +564,9 @@ async def get_rising_goods(
         category=category,
     )
 
-    items = await asyncio.gather(*[_mask_goods_item(item, plan) for item in result["items"]])
+    items = await asyncio.gather(
+        *[_mask_goods_item(item, plan, str(user.id)) for item in result["items"]]
+    )
 
     return {"code": 0, "data": {"items": items, "total": result["total"], "page": result["page"], "page_size": result["page_size"]}}
 
@@ -533,6 +595,8 @@ async def get_new_goods(
         category=category,
     )
 
-    items = await asyncio.gather(*[_mask_goods_item(item, plan) for item in result["items"]])
+    items = await asyncio.gather(
+        *[_mask_goods_item(item, plan, str(user.id)) for item in result["items"]]
+    )
 
     return {"code": 0, "data": {"items": items, "total": result["total"], "page": result["page"], "page_size": result["page_size"]}}

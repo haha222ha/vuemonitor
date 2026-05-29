@@ -17,6 +17,8 @@ PLAN_LIMITS: dict[str, dict[str, dict[str, tuple[int, int]]]] = {
             "/api/v1/auth/refresh": (5, 60),
             "/api/v1/collect": (5, 120),
             "/api/v1/ai": (5, 120),
+            "/api/v1/discovery/search": (30, 60),
+            "/api/v1/discovery/add-to-monitor": (30, 60),
             "/api/v1/gdpr/export": (2, 3600),
             "/api/v1/gdpr/deletion-request": (1, 86400),
         },

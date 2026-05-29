@@ -164,7 +164,7 @@
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
-              <el-button v-permission="'gate:monitor:auto_refresh'" size="small" @click="addSchedule(row)">定时</el-button>
+              <el-button size="small" @click="addSchedule(row)">定时</el-button>
               <el-button size="small" type="danger" plain @click="confirmDelete(row.id)">删除</el-button>
             </div>
           </template>
@@ -175,6 +175,14 @@
     <el-dialog v-model="showAdd" title="添加小红书商品" width="640px" @close="resetAddDialog">
       <el-tabs v-model="addTab" class="add-product-tabs">
         <el-tab-pane label="粘贴链接" name="link">
+          <el-alert
+            type="info"
+            :closable="false"
+            show-icon
+            class="add-quota-note"
+            title="不占用发现库额度"
+            description="自行粘贴小红书商品链接或填写商品 ID 添加，不计入「搜索添加」每日次数。"
+          />
           <el-form ref="addFormRef" :model="addForm" :rules="addRules" style="margin-top: 16px">
             <el-form-item label="商品链接" prop="noteInput">
               <el-input v-model="addForm.noteInput" placeholder="粘贴小红书商品链接或商品ID" />
@@ -190,6 +198,28 @@
             <span>🔍 搜索添加</span>
           </template>
           <div class="add-search" style="margin-top: 16px">
+            <el-alert
+              type="info"
+              :closable="false"
+              show-icon
+              class="add-quota-note"
+            >
+              <template #title>
+                云端搜索添加
+                <span
+                  v-if="discoveryQuota && discoveryQuota.daily_limit >= 0"
+                  class="add-quota-note__count"
+                >
+                  · 今日剩余 {{ discoveryQuota.remaining }} / {{ discoveryQuota.daily_limit }} 次
+                </span>
+                <span v-else-if="discoveryQuota && discoveryQuota.daily_limit < 0">
+                  · 不限次数
+                </span>
+              </template>
+              <p class="add-quota-note__desc">
+                {{ discoveryQuota?.quota_hint || '按账号与当前 IP 合计计次：免费每日 20 次，Pro 每日 200 次。' }}
+              </p>
+            </el-alert>
             <div class="add-search__bar">
               <el-input
                 v-model="discoveryKeyword"
@@ -349,7 +379,7 @@ function handleCategorySelect(categoryId: string | null, categoryName: string | 
 
 const {
   productStore,
-  showAdd, addTab, discoveryKeyword, discoveryResults, discoveryLoading, discoveryHasSearched,
+  showAdd, addTab, discoveryKeyword, discoveryResults, discoveryLoading, discoveryHasSearched, discoveryQuota,
   showCollect, showSchedule,
   addFormRef, addForm, addRules,
   concurrency, collectScope, collectCategory, scheduleFrequency,
@@ -644,6 +674,21 @@ onMounted(() => {
   gap: 8px;
   padding: 32px 0;
   color: var(--color-text-tertiary);
+  font-size: var(--text-sm);
+}
+
+.add-quota-note {
+  margin-bottom: 12px;
+}
+
+.add-quota-note__count {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.add-quota-note__desc {
+  margin: 4px 0 0;
+  line-height: 1.5;
   font-size: var(--text-sm);
 }
 
