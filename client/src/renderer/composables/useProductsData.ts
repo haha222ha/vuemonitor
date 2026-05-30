@@ -326,15 +326,6 @@ export function useProductsData() {
           applyDiscoveryQuotaPayload(result.data);
           ElMessage.success("已加入监控");
           await productStore.fetchProducts();
-          const goodsId = result.data?.platform_product_id;
-          if (goodsId) {
-            await collectSingle({
-              platform: "xhs",
-              platform_product_id: goodsId,
-              product_name: result.data?.product_name || item.title,
-              targetType: "goods",
-            });
-          }
           return;
         }
         ElMessage.warning(result?.message || "加入监控失败，请稍后重试");

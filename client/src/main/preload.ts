@@ -167,6 +167,7 @@ const ALLOWED_LISTEN_CHANNELS: Record<string, boolean> = {
   "ws:message": true,
   "notification": true,
   "collect:result": true,
+  "collect:status-changed": true,
   "collect:risk_alert": true,
   "concurrency:changed": true,
   "resource:warning": true,

@@ -165,10 +165,21 @@ export const useCollectStore = defineStore("collect", () => {
   function setupListeners() {
     if (!window.electronAPI) return;
     window.electronAPI.on("collect:result", (result: unknown) => {
-      addResult(result as CollectResult);
+      void (async () => {
+        await addResult(result as CollectResult);
+        await fetchStatus();
+        try {
+          const { useProductStore } = await import("./product");
+          await useProductStore().fetchProducts();
+        } catch { /* ignore */ }
+      })();
+    });
+    window.electronAPI.on("collect:status-changed", (patch: unknown) => {
+      const p = patch as Partial<CollectStatus>;
+      status.value = { ...status.value, ...p };
     });
     window.electronAPI.on("collect:risk_alert", (result: unknown) => {
-      addResult(result as CollectResult);
+      void addResult(result as CollectResult);
     });
     window.electronAPI.on("concurrency:changed", (data: unknown) => {
       const d = data as { to: number };

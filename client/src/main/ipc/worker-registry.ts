@@ -49,25 +49,80 @@ export function wireDataMartSync(): void {
 
 let workerInitPromise: Promise<void> | null = null;
 
+function sendCollectStatusPatch(worker: ChromiumCollectWorker): void {
+  const mainWindow = BrowserWindow.getAllWindows()[0];
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.webContents.send("collect:status-changed", {
+    isRunning: worker.getActiveCount() > 0 || worker.getQueueLength() > 0,
+    activeCount: worker.getActiveCount(),
+    queueLength: worker.getQueueLength(),
+  });
+}
+
+async function persistCollectResult(result: CollectResult): Promise<void> {
+  if (result.status !== "success" || !result.data) return;
+
+  const payload: Record<string, unknown> = {
+    ...result.data,
+    platform: result.data.platform || "xhs",
+    platform_product_id: String(result.data.platform_product_id || result.targetId || "").trim(),
+    product_name:
+      String(result.data.product_name || "").trim() ||
+      `XHS商品 ${String(result.targetId || "").slice(0, 8)}`,
+    targetType: result.data.targetType || result.targetType,
+  };
+
+  const normalized = normalizer.normalize(payload);
+  if (normalized.success && normalized.data) {
+    await dataMart.ingest(normalized.data, "local-user");
+    try {
+      const { getStorage } = require("../storage/sqlite");
+      getStorage().flush();
+    } catch (err) {
+      logger.warn("Collect", `flush after ingest failed: ${err}`);
+    }
+    return;
+  }
+
+  logger.warn("Collect", `normalize failed for ${result.targetId}: ${normalized.errors.join("; ")}`);
+}
+
 export function getWorker(): ChromiumCollectWorker {
   if (!chromiumWorker) {
     chromiumWorker = new ChromiumCollectWorker();
     workerInitPromise = chromiumWorker.init();
 
     chromiumWorker.on("task:result", (result: CollectResult) => {
-      if (result.status === "success" && result.data) {
-        const normalized = normalizer.normalize(result.data);
-        if (normalized.success && normalized.data) {
-          dataMart.ingest(normalized.data, "local-user");
+      void persistCollectResult(result).finally(() => {
+        localScheduler.reportTaskResult(
+          result.taskId,
+          result.status === "success" ? "success" : result.status === "risk_detected" ? "risk_detected" : "failed",
+        ).catch(() => {});
+
+        const mainWindow = BrowserWindow.getAllWindows()[0];
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send("collect:result", result);
         }
-      }
+        sendCollectStatusPatch(chromiumWorker!);
+      });
+    });
 
-      localScheduler.reportTaskResult(result.taskId, result.status === "success" ? "success" : result.status === "risk_detected" ? "risk_detected" : "failed").catch(() => {});
-
+    chromiumWorker.on("task:failed", (payload: { taskId: string; error?: string; targetId?: string }) => {
       const mainWindow = BrowserWindow.getAllWindows()[0];
       if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.webContents.send("collect:result", result);
+        mainWindow.webContents.send("collect:result", {
+          taskId: payload.taskId,
+          targetId: payload.targetId || "",
+          status: "failed",
+          error: payload.error,
+          collectedAt: new Date().toISOString(),
+        });
       }
+      sendCollectStatusPatch(chromiumWorker!);
+    });
+
+    chromiumWorker.on("queue:empty", () => {
+      sendCollectStatusPatch(chromiumWorker!);
     });
 
     chromiumWorker.on("task:risk", (result: CollectResult) => {
@@ -118,19 +173,17 @@ export function getPlaywrightCollector(): PlaywrightCollector {
   if (!playwrightCollector) {
     playwrightCollector = new PlaywrightCollector();
     playwrightCollector.on("task:result", (result: PlaywrightResult) => {
-      if (result.status === "success" && result.data) {
-        const normalized = normalizer.normalize(result.data);
-        if (normalized.success && normalized.data) {
-          dataMart.ingest(normalized.data, "local-user");
+      void persistCollectResult(result as CollectResult).finally(() => {
+        localScheduler.reportTaskResult(
+          result.taskId,
+          result.status === "success" ? "success" : result.status === "risk_detected" ? "risk_detected" : "failed",
+        ).catch(() => {});
+
+        const mainWindow = BrowserWindow.getAllWindows()[0];
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send("collect:result", result);
         }
-      }
-
-      localScheduler.reportTaskResult(result.taskId, result.status === "success" ? "success" : result.status === "risk_detected" ? "risk_detected" : "failed").catch(() => {});
-
-      const mainWindow = BrowserWindow.getAllWindows()[0];
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.webContents.send("collect:result", result);
-      }
+      });
     });
     playwrightCollector.on("task:risk", (result: PlaywrightResult) => {
       const mainWindow = BrowserWindow.getAllWindows()[0];

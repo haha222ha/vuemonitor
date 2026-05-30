@@ -111,8 +111,8 @@ const XHS_COLLECT_CONFIG = {
       var salesEl = document.querySelector('span.spu-text');
       var sales = 0;
       if (salesEl) {
-        var salesText = salesEl.textContent.replace('ÒÑÊÛ', '').trim();
-        if (salesText.includes('Íò')) {
+        var salesText = salesEl.textContent.replace('ï¿½ï¿½ï¿½ï¿½', '').trim();
+        if (salesText.includes('ï¿½ï¿½')) {
           var num = parseFloat(salesText.replace(/[^0-9.]/g, ''));
           sales = Math.floor(num * 10000);
         } else {
@@ -130,9 +130,9 @@ const XHS_COLLECT_CONFIG = {
       if (shopSalesElements && shopSalesElements.length > 0) {
         for (var j = 0; j < shopSalesElements.length; j++) {
           var sText = shopSalesElements[j].textContent.trim();
-          if (sText.includes('ÒÑÊÛ')) {
-            var sNum = sText.replace('ÒÑÊÛ', '').trim();
-            if (sNum.includes('Íò')) {
+          if (sText.includes('ï¿½ï¿½ï¿½ï¿½')) {
+            var sNum = sText.replace('ï¿½ï¿½ï¿½ï¿½', '').trim();
+            if (sNum.includes('ï¿½ï¿½')) {
               shopSales = Math.floor(parseFloat(sNum.replace(/[^0-9.]/g, '')) * 10000);
             } else {
               shopSales = parseInt(sNum.replace(/[^0-9]/g, '')) || 0;
@@ -240,7 +240,7 @@ const XHS_COLLECT_CONFIG = {
       var match = pathname.match(/\\/user\\/profile\\/([a-f0-9]+)/);
       data.platform_product_id = match ? match[1] : '';
       data.product_url = window.location.href;
-      data.product_name = data.shop_name + 'µÄÖ÷Ò³';
+      data.product_name = data.shop_name + 'ï¿½ï¿½ï¿½ï¿½Ò³';
 
       return data;
     })()
@@ -248,10 +248,10 @@ const XHS_COLLECT_CONFIG = {
 };
 
 const RISK_KEYWORDS = [
-  "ÑéÖ¤Âë", "captcha", "verify", "°²È«ÑéÖ¤",
-  "Æµ·±", "rate limit", "429", "·â½û", "blocked", "forbidden", "403",
-  "²Ù×÷¹ýÓÚÆµ·±", "ÇëÉÔºóÔÙÊÔ", "Òì³£",
-  "»¬¶¯ÑéÖ¤", "Í¼ÐÎÑéÖ¤", "ÈË»úÑéÖ¤", "robot", "automated",
+  "ï¿½ï¿½Ö¤ï¿½ï¿½", "captcha", "verify", "ï¿½ï¿½È«ï¿½ï¿½Ö¤",
+  "Æµï¿½ï¿½", "rate limit", "429", "ï¿½ï¿½ï¿½", "blocked", "forbidden", "403",
+  "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½", "ï¿½ï¿½ï¿½Ôºï¿½ï¿½ï¿½ï¿½ï¿½", "ï¿½ì³£",
+  "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤", "Í¼ï¿½ï¿½ï¿½ï¿½Ö¤", "ï¿½Ë»ï¿½ï¿½ï¿½Ö¤", "robot", "automated",
   "access denied", "unusual traffic", "suspicious activity",
 ];
 
@@ -312,11 +312,11 @@ export class ChromiumCollectWorker extends EventEmitter {
           for (const item of data) {
             this.checkpointData.set(item.taskId, item);
           }
-          logger.info("ChromiumWorker", "¼ÓÔØ¶ÏµãÐø²ÉÊý¾Ý", { count: this.checkpointData.size });
+          logger.info("ChromiumWorker", "ï¿½ï¿½ï¿½Ø¶Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", { count: this.checkpointData.size });
         }
       }
     } catch (e) {
-      logger.warn("ChromiumWorker", "¼ÓÔØ¶ÏµãÊý¾ÝÊ§°Ü", { error: String(e) });
+      logger.warn("ChromiumWorker", "ï¿½ï¿½ï¿½Ø¶Ïµï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½", { error: String(e) });
     }
   }
 
@@ -325,7 +325,7 @@ export class ChromiumCollectWorker extends EventEmitter {
       const data = Array.from(this.checkpointData.values());
       fs.writeFileSync(this.checkpointPath, JSON.stringify(data, null, 2), "utf-8");
     } catch (e) {
-      logger.warn("ChromiumWorker", "±£´æ¶ÏµãÊý¾ÝÊ§°Ü", { error: String(e) });
+      logger.warn("ChromiumWorker", "ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½", { error: String(e) });
     }
   }
 
@@ -334,7 +334,7 @@ export class ChromiumCollectWorker extends EventEmitter {
       const mem = process.memoryUsage();
       const heapMB = Math.round(mem.heapUsed / 1024 / 1024);
       if (heapMB > this.maxMemoryMB) {
-        logger.warn("ChromiumWorker", "ÄÚ´æÊ¹ÓÃ³¬¹ýãÐÖµ£¬ÔÝÍ£ÐÂÈÎÎñ", { heapMB, maxMB: this.maxMemoryMB });
+        logger.warn("ChromiumWorker", "ï¿½Ú´ï¿½Ê¹ï¿½Ã³ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", { heapMB, maxMB: this.maxMemoryMB });
         if (!this.isPaused) {
           this.pauseQueue();
           this.emit("memory:high", { heapMB, maxMB: this.maxMemoryMB });
@@ -379,7 +379,7 @@ export class ChromiumCollectWorker extends EventEmitter {
 
     this.saveCheckpoint();
     this.emit("task:batch_queued", { count: tasks.length, queueLength: this.taskQueue.length, shards: shards.length });
-    logger.info("ChromiumWorker", "·ÖÆ¬Èë¶Ó²É¼¯ÈÎÎñ", { count: tasks.length, shardSize, shards: shards.length });
+    logger.info("ChromiumWorker", "ï¿½ï¿½Æ¬ï¿½ï¿½Ó²É¼ï¿½ï¿½ï¿½ï¿½ï¿½", { count: tasks.length, shardSize, shards: shards.length });
     this.processQueue();
   }
 
@@ -406,7 +406,7 @@ export class ChromiumCollectWorker extends EventEmitter {
       this.taskQueue.push(task);
     }
     this.emit("task:batch_queued", { count: pending.length, queueLength: this.taskQueue.length });
-    logger.info("ChromiumWorker", "´Ó¶Ïµã»Ö¸´²É¼¯ÈÎÎñ", { count: pending.length });
+    logger.info("ChromiumWorker", "ï¿½Ó¶Ïµï¿½Ö¸ï¿½ï¿½É¼ï¿½ï¿½ï¿½ï¿½ï¿½", { count: pending.length });
     this.processQueue();
     return pending.length;
   }
@@ -482,7 +482,7 @@ export class ChromiumCollectWorker extends EventEmitter {
     this.collectSession = session.fromPartition("persist:xhs-collect", { cache: true });
     const initialUA = this.generateUA();
     this.collectSession.setUserAgent(initialUA);
-    logger.info("ChromiumWorker", "²É¼¯»á»°³õÊ¼»¯", { ua: initialUA.substring(0, 60) });
+    logger.info("ChromiumWorker", "ï¿½É¼ï¿½ï¿½á»°ï¿½ï¿½Ê¼ï¿½ï¿½", { ua: initialUA.substring(0, 60) });
 
     this.collectSession.webRequest.onBeforeSendHeaders((details, callback) => {
       details.requestHeaders["Referer"] = "https://www.xiaohongshu.com/";
@@ -541,25 +541,25 @@ export class ChromiumCollectWorker extends EventEmitter {
   }
 
   async checkCookieHealth(): Promise<{ valid: boolean; count: number; details: string }> {
-    if (!this.collectSession) return { valid: false, count: 0, details: "»á»°Î´³õÊ¼»¯" };
+    if (!this.collectSession) return { valid: false, count: 0, details: "ï¿½á»°Î´ï¿½ï¿½Ê¼ï¿½ï¿½" };
     const cookies = await this.collectSession.cookies.get({ domain: ".xiaohongshu.com" });
     const essentialCookies = ["web_session", "a1", "webId"];
     const found = essentialCookies.filter((name) => cookies.some((c) => c.name === name));
 
     if (found.length === 0) {
-      return { valid: false, count: cookies.length, details: "È±ÉÙ¹Ø¼üCookie£¬¿ÉÄÜÐèÒªµÇÂ¼" };
+      return { valid: false, count: cookies.length, details: "È±ï¿½Ù¹Ø¼ï¿½Cookieï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½Â¼" };
     }
     if (cookies.length < 3) {
-      return { valid: false, count: cookies.length, details: "CookieÊýÁ¿¹ýÉÙ£¬»á»°¿ÉÄÜ¹ýÆÚ" };
+      return { valid: false, count: cookies.length, details: "Cookieï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù£ï¿½ï¿½á»°ï¿½ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½" };
     }
 
     const now = Date.now() / 1000;
     const expiredCount = cookies.filter((c) => c.expirationDate && c.expirationDate < now).length;
     if (expiredCount > cookies.length * 0.5) {
-      return { valid: false, count: cookies.length, details: `${expiredCount}¸öCookieÒÑ¹ýÆÚ` };
+      return { valid: false, count: cookies.length, details: `${expiredCount}ï¿½ï¿½Cookieï¿½Ñ¹ï¿½ï¿½ï¿½` };
     }
 
-    return { valid: true, count: cookies.length, details: `Cookie½¡¿µ£¬¹²${cookies.length}¸ö` };
+    return { valid: true, count: cookies.length, details: `Cookieï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½${cookies.length}ï¿½ï¿½` };
   }
 
   enqueue(task: CollectTask): void {
@@ -573,7 +573,7 @@ export class ChromiumCollectWorker extends EventEmitter {
       this.taskQueue.push(task);
     }
     this.emit("task:batch_queued", { count: tasks.length, queueLength: this.taskQueue.length });
-    logger.info("ChromiumWorker", "ÅúÁ¿Èë¶Ó²É¼¯ÈÎÎñ", { count: tasks.length, queueLength: this.taskQueue.length });
+    logger.info("ChromiumWorker", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó²É¼ï¿½ï¿½ï¿½ï¿½ï¿½", { count: tasks.length, queueLength: this.taskQueue.length });
     this.processQueue();
   }
 
@@ -582,7 +582,7 @@ export class ChromiumCollectWorker extends EventEmitter {
     if (idx !== -1) {
       this.taskQueue.splice(idx, 1);
       this.emit("task:cancelled", { taskId });
-      logger.info("ChromiumWorker", "È¡Ïû²É¼¯ÈÎÎñ", { taskId });
+      logger.info("ChromiumWorker", "È¡ï¿½ï¿½ï¿½É¼ï¿½ï¿½ï¿½ï¿½ï¿½", { taskId });
       return true;
     }
     return false;
@@ -596,7 +596,7 @@ export class ChromiumCollectWorker extends EventEmitter {
 
   private async rateLimitGuard(): Promise<void> {
     if (this.isPaused) {
-      throw new Error("²É¼¯¶ÓÁÐÒÑÔÝÍ££¨·ç¿Ø´¥·¢£©£¬ÇëÊÖ¶¯»Ö¸´");
+      throw new Error("ï¿½É¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½Ø´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½ï¿½Ö¸ï¿½");
     }
 
     const baseMin = 2000;
@@ -636,7 +636,7 @@ export class ChromiumCollectWorker extends EventEmitter {
 
     if (this.consecutiveRiskCount >= 3 || riskType === "ip_blocked") {
       this.pauseQueue();
-      logger.warn("ChromiumWorker", "·ç¿Ø´ïµ½ÁÙ½çãÐÖµ£¬ÔÝÍ£²É¼¯¶ÓÁÐ", { riskType, consecutiveCount: this.consecutiveRiskCount, backoffMultiplier: this.backoffMultiplier });
+      logger.warn("ChromiumWorker", "ï¿½ï¿½Ø´ïµ½ï¿½Ù½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½Í£ï¿½É¼ï¿½ï¿½ï¿½ï¿½ï¿½", { riskType, consecutiveCount: this.consecutiveRiskCount, backoffMultiplier: this.backoffMultiplier });
       this.emit("risk:critical", {
         riskType,
         consecutiveCount: this.consecutiveRiskCount,
@@ -729,7 +729,7 @@ export class ChromiumCollectWorker extends EventEmitter {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       crashRecovery.updateSnapshotStatus(task.id, "failed", undefined, errorMessage);
-      this.emit("task:failed", { taskId: task.id, error: errorMessage });
+      this.emit("task:failed", { taskId: task.id, targetId: task.targetId, error: errorMessage });
     } finally {
       crashRecovery.stopPeriodicCheckpoint(task.id);
       this.destroyView(task.id);
@@ -746,7 +746,7 @@ export class ChromiumCollectWorker extends EventEmitter {
   ): Promise<void> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error(`²É¼¯³¬Ê±: ${task.targetType}/${task.targetId}`));
+        reject(new Error(`ï¿½É¼ï¿½ï¿½ï¿½Ê±: ${task.targetType}/${task.targetId}`));
       }, XHS_COLLECT_CONFIG.timeout);
 
       let settled = false;
@@ -825,11 +825,11 @@ export class ChromiumCollectWorker extends EventEmitter {
       });
 
       view.webContents.on("did-fail-load", (_event, errorCode, errorDesc) => {
-        settle(() => reject(new Error(`Ò³Ãæ¼ÓÔØÊ§°Ü: ${errorCode} ${errorDesc}`)));
+        settle(() => reject(new Error(`Ò³ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½: ${errorCode} ${errorDesc}`)));
       });
 
       view.webContents.on("render-process-gone", () => {
-        settle(() => reject(new Error("äÖÈ¾½ø³Ì±ÀÀ£")));
+        settle(() => reject(new Error("ï¿½ï¿½È¾ï¿½ï¿½ï¿½Ì±ï¿½ï¿½ï¿½")));
       });
 
       view.webContents.loadURL(url);
@@ -847,7 +847,7 @@ export class ChromiumCollectWorker extends EventEmitter {
           return {
             riskType: "redirect",
             riskLevel: "medium",
-            detail: `·ç¿Ø¼ì²â: Ò³Ãæ±»ÖØ¶¨Ïòµ½${pattern}Ò³Ãæ`,
+            detail: `ï¿½ï¿½Ø¼ï¿½ï¿½: Ò³ï¿½æ±»ï¿½Ø¶ï¿½ï¿½ï¿½${pattern}Ò³ï¿½ï¿½`,
           };
         }
       }
@@ -872,7 +872,7 @@ export class ChromiumCollectWorker extends EventEmitter {
         return {
           riskType: "captcha",
           riskLevel: "high",
-          detail: `·ç¿Ø¼ì²â: ·¢ÏÖÑéÖ¤ÂëÔªËØ (${captchaDetected.selector})`,
+          detail: `ï¿½ï¿½Ø¼ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤ï¿½ï¿½Ôªï¿½ï¿½ (${captchaDetected.selector})`,
         };
       }
 
@@ -903,14 +903,14 @@ export class ChromiumCollectWorker extends EventEmitter {
           return {
             riskType: "behavior_detected",
             riskLevel: "high",
-            detail: "·ç¿Ø¼ì²â: ¼ì²âµ½×Ô¶¯»¯ä¯ÀÀÆ÷ÌØÕ÷",
+            detail: "ï¿½ï¿½Ø¼ï¿½ï¿½: ï¿½ï¿½âµ½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½",
           };
         }
         if (behaviorResult.detectedScripts && behaviorResult.detectedScripts.length >= 2) {
           return {
             riskType: "behavior_detected",
             riskLevel: "low",
-            detail: `·ç¿Ø¼ì²â: ·¢ÏÖ·´ÅÀ½Å±¾ (${behaviorResult.detectedScripts.join(", ")})`,
+            detail: `ï¿½ï¿½Ø¼ï¿½ï¿½: ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½Å±ï¿½ (${behaviorResult.detectedScripts.join(", ")})`,
           };
         }
       }
@@ -922,7 +922,7 @@ export class ChromiumCollectWorker extends EventEmitter {
         return {
           riskType: "login_required",
           riskLevel: "high",
-          detail: "·ç¿Ø¼ì²â: Ò³Ãæ³öÏÖµÇÂ¼±íµ¥£¬¿ÉÄÜÐèÒªÏÈµÇÂ¼Ð¡ºìÊé",
+          detail: "ï¿½ï¿½Ø¼ï¿½ï¿½: Ò³ï¿½ï¿½ï¿½ï¿½Öµï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Èµï¿½Â¼Ð¡ï¿½ï¿½ï¿½ï¿½",
         };
       }
 
@@ -936,15 +936,15 @@ export class ChromiumCollectWorker extends EventEmitter {
       for (const keyword of RISK_KEYWORDS) {
         if (combined.includes(keyword.toLowerCase())) {
           let riskType = "rate_limit";
-          if (["ÑéÖ¤Âë", "captcha", "verify", "°²È«ÑéÖ¤", "»¬¶¯ÑéÖ¤", "Í¼ÐÎÑéÖ¤", "ÈË»úÑéÖ¤"].includes(keyword)) {
+          if (["ï¿½ï¿½Ö¤ï¿½ï¿½", "captcha", "verify", "ï¿½ï¿½È«ï¿½ï¿½Ö¤", "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤", "Í¼ï¿½ï¿½ï¿½ï¿½Ö¤", "ï¿½Ë»ï¿½ï¿½ï¿½Ö¤"].includes(keyword)) {
             riskType = "captcha";
-          } else if (["·â½û", "blocked", "forbidden", "403"].includes(keyword)) {
+          } else if (["ï¿½ï¿½ï¿½", "blocked", "forbidden", "403"].includes(keyword)) {
             riskType = "ip_blocked";
           }
           return {
             riskType,
             riskLevel: RISK_LEVEL_MAP[riskType] || "medium",
-            detail: `·ç¿Ø¼ì²â: ·¢ÏÖ¹Ø¼ü´Ê"${keyword}"`,
+            detail: `ï¿½ï¿½Ø¼ï¿½ï¿½: ï¿½ï¿½ï¿½Ö¹Ø¼ï¿½ï¿½ï¿½"${keyword}"`,
           };
         }
       }
