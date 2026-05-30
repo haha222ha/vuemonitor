@@ -362,7 +362,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("products:list", async (_event, params?: { page?: number; pageSize?: number; platform?: string }) => {
     const comm = getCommunication();
-    if (!comm.isConnected()) return { data: { items: [], total: 0 } };
+    if (!comm.hasApiSession()) return { data: { items: [], total: 0 } };
     const page = params?.page || 1;
     const pageSize = params?.pageSize || 20;
     const platform = params?.platform;
@@ -373,14 +373,14 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("products:compare", async (_event, params: { productIds: string[] }) => {
     const comm = getCommunication();
-    if (!comm.isConnected()) return { data: null };
+    if (!comm.hasApiSession()) return { data: null };
     const ids = params.productIds.join("&product_ids=");
     return comm.request("POST", `/api/v1/products/compare?product_ids=${ids}`);
   });
 
   ipcMain.handle("discovery:search", async (_event, params: { keyword: string; page?: number; page_size?: number; min_price?: number; max_price?: number; min_sold?: number; sort_by?: string; sort_order?: string }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       return comm.request("POST", "/api/v1/discovery/search", params);
     }
     return { code: 0, data: { items: [], total: 0, page: params.page || 1, page_size: params.page_size || 20 } };
@@ -388,7 +388,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("discovery:stores", async (_event, params: { keyword: string; page?: number; page_size?: number }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       return comm.request("POST", "/api/v1/discovery/stores", params);
     }
     return { code: 0, data: { items: [], total: 0, page: params.page || 1, page_size: params.page_size || 20 } };
@@ -396,7 +396,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("discovery:store-goods", async (_event, storeId: string, page?: number, pageSize?: number) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       return comm.request("GET", `/api/v1/discovery/stores/${storeId}/goods?page=${page || 1}&page_size=${pageSize || 50}`);
     }
     return { code: 0, data: { items: [], total: 0 } };
@@ -404,7 +404,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("discovery:hot-goods", async (_event, params?: { page?: number; page_size?: number; category?: string }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       const query: string[] = [];
       if (params?.page) query.push(`page=${params.page}`);
       if (params?.page_size) query.push(`page_size=${params.page_size}`);
@@ -417,7 +417,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("discovery:keywords", async (_event, params?: { page?: number; page_size?: number }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       const query: string[] = [];
       if (params?.page) query.push(`page=${params.page}`);
       if (params?.page_size) query.push(`page_size=${params.page_size}`);
@@ -429,30 +429,69 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("discovery:quota", async () => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       return comm.request("GET", "/api/v1/discovery/quota");
     }
-    return { code: 0, data: { used_today: 0, remaining: 5, db_stats: { total_goods: 0, total_stores: 0, total_keywords: 0 } } };
+    return { code: 0, data: { used_today: 0, remaining: 50, db_stats: { total_goods: 0, total_stores: 0, total_keywords: 0 } } };
   });
 
   ipcMain.handle("discovery:add-to-monitor", async (_event, params: { ref_id: string; product_name?: string; mode?: string }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
-      return comm.request("POST", "/api/v1/discovery/add-to-monitor", params);
+    if (comm.hasApiSession()) {
+      const response = await comm.request("POST", "/api/v1/discovery/add-to-monitor", params) as {
+        code?: number;
+        message?: string;
+        data?: {
+          platform_product_id?: string;
+          platform_product_ids?: string[];
+          product_name?: string;
+          product_id?: string;
+        };
+      };
+      if ((response?.code ?? 1) === 0 && response.data) {
+        const storage = getStorage();
+        const ids =
+          response.data.mode === "store" && response.data.platform_product_ids?.length
+            ? response.data.platform_product_ids
+            : response.data.platform_product_id
+              ? [response.data.platform_product_id]
+              : [];
+        for (const goodsId of ids) {
+          const existing = storage.query(
+            "SELECT id FROM products WHERE platform = ? AND platform_product_id = ? AND is_active = 1",
+            ["xhs", goodsId],
+          ) as Record<string, unknown>[];
+          if (existing.length > 0) continue;
+          storage.insertProduct({
+            platform: "xhs",
+            platform_product_id: goodsId,
+            product_name: params.product_name || response.data.product_name || `XHS商品 ${goodsId.slice(0, 8)}`,
+          });
+        }
+        if (ids.length > 0) {
+          const { dataMart } = require("../collect/data-mart");
+          dataMart.invalidateCache();
+        }
+      }
+      return response;
     }
     const storage = getStorage();
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
+    const goodsId = String(params.ref_id || "").replace(/^goods:/, "").trim();
+    if (!goodsId) {
+      return { code: 1, message: "无效的商品引用" };
+    }
     storage.run(
       "INSERT OR IGNORE INTO products (id, platform, platform_product_id, product_name, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, 1, ?, ?)",
-      ["xhs", params.ref_id, params.ref_id, params.product_name || `XHS商品 ${params.ref_id.slice(0, 8)}`, now, now]
+      [id, "xhs", goodsId, params.product_name || `XHS商品 ${goodsId.slice(0, 8)}`, now, now]
     );
-    return { code: 0, data: { added: true, id } };
+    return { code: 0, data: { added: true, id, product_id: id } };
   });
 
   ipcMain.handle("discovery:rising-goods", async (_event, params?: { page?: number; page_size?: number; category?: string }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       const query: string[] = [];
       if (params?.page) query.push(`page=${params.page}`);
       if (params?.page_size) query.push(`page_size=${params.page_size}`);
@@ -465,7 +504,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("discovery:new-goods", async (_event, params?: { page?: number; page_size?: number; category?: string }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       const query: string[] = [];
       if (params?.page) query.push(`page=${params.page}`);
       if (params?.page_size) query.push(`page_size=${params.page_size}`);
@@ -478,7 +517,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("discovery:top-sold-goods", async (_event, params?: { page?: number; page_size?: number; min_sold?: number }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       const query: string[] = [];
       if (params?.page) query.push(`page=${params.page}`);
       if (params?.page_size) query.push(`page_size=${params.page_size}`);
@@ -491,7 +530,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("category:list", async () => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       try {
         return await comm.request("GET", "/api/v1/categories");
       } catch { /* fallback to local */ }
@@ -518,7 +557,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("category:create", async (_event, params: { name: string; icon?: string; color?: string; sort_order?: number; parent_id?: string }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       try {
         return await comm.request("POST", "/api/v1/categories", params);
       } catch { /* fallback to local */ }
@@ -535,7 +574,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("category:update", async (_event, params: { id: string; name?: string; icon?: string; color?: string; sort_order?: number; parent_id?: string; is_active?: boolean }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       try {
         return await comm.request("PUT", `/api/v1/categories/${params.id}`, params);
       } catch { /* fallback to local */ }
@@ -559,7 +598,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("category:delete", async (_event, params: { id: string }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       try {
         return await comm.request("DELETE", `/api/v1/categories/${params.id}`);
       } catch { /* fallback to local */ }
@@ -572,7 +611,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("category:reorder", async (_event, params: { order: string[] }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       try {
         return await comm.request("POST", "/api/v1/categories/reorder", params.order);
       } catch { /* fallback to local */ }
@@ -586,7 +625,7 @@ export function registerServiceHandlers(): void {
 
   ipcMain.handle("category:assign-product", async (_event, params: { product_id: string; category_id: string | null }) => {
     const comm = getCommunication();
-    if (comm.isConnected()) {
+    if (comm.hasApiSession()) {
       try {
         return await comm.request("PATCH", `/api/v1/products/${params.product_id}`, { category_id: params.category_id });
       } catch { /* fallback to local */ }

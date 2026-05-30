@@ -218,6 +218,7 @@
               </template>
               <p class="add-quota-note__desc">
                 {{ discoveryQuota?.quota_hint || '按账号与当前 IP 合计计次：免费每日 20 次，Pro 每日 200 次。' }}
+                每次点击「搜索」计 1 次，加入监控另计 1 次；输入关键词不会自动搜索。
               </p>
             </el-alert>
             <div class="add-search__bar">
@@ -225,7 +226,6 @@
                 v-model="discoveryKeyword"
                 placeholder="搜索商品标题或店铺名称..."
                 clearable
-                @input="debouncedSearchDiscovery"
                 @keyup.enter="searchDiscovery"
               >
                 <template #prefix>

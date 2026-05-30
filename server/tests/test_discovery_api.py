@@ -450,6 +450,7 @@ class TestDiscoveryAddToMonitor:
         data = response.json()
         assert data["code"] == 0
         assert data["data"]["mode"] == "goods"
+        assert data["data"]["platform_product_id"] == "goods_001"
         assert "product_id" in data["data"]
         assert data["data"]["quota"]["used_today"] >= 1
 

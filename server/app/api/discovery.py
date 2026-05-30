@@ -524,6 +524,7 @@ async def add_to_monitor(
             "data": {
                 "added_count": len(added),
                 "mode": "store",
+                "platform_product_ids": added,
                 "quota": quota,
                 "quota_hint": DISCOVERY_QUOTA_HINT,
             },
@@ -577,6 +578,8 @@ async def add_to_monitor(
         "code": 0,
         "data": {
             "product_id": str(product.id),
+            "platform_product_id": goods_id,
+            "product_name": product_name,
             "mode": "goods",
             "quota": quota,
             "quota_hint": DISCOVERY_QUOTA_HINT,

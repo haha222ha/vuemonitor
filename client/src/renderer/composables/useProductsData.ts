@@ -43,6 +43,7 @@ export function useProductsData() {
   const discoveryLoading = ref(false);
   const discoveryHasSearched = ref(false);
   const discoveryQuota = ref<DiscoveryQuotaState | null>(null);
+  let discoverySearchInFlight = false;
   const showCollect = ref(false);
   const showSchedule = ref(false);
   const addFormRef = ref<FormInstance>();
@@ -222,6 +223,9 @@ export function useProductsData() {
 
   async function searchDiscovery() {
     if (!discoveryKeyword.value.trim()) return;
+    if (discoverySearchInFlight) return;
+    cancelDebouncedSearchDiscovery();
+    discoverySearchInFlight = true;
     discoveryLoading.value = true;
     discoveryHasSearched.value = true;
     const payload = {
@@ -274,6 +278,7 @@ export function useProductsData() {
       ElMessage.error(`搜索失败: ${err instanceof Error ? err.message : String(err)}`);
     } finally {
       discoveryLoading.value = false;
+      discoverySearchInFlight = false;
     }
   }
 
@@ -301,6 +306,41 @@ export function useProductsData() {
       return;
     }
     try {
+      if (window.electronAPI?.invoke) {
+        const result = await window.electronAPI.invoke("discovery:add-to-monitor", {
+          ref_id: refId,
+          product_name: item.title,
+          mode: "goods",
+        }) as {
+          code?: number;
+          message?: string;
+          data?: { platform_product_id?: string; product_name?: string; quota?: Record<string, unknown> };
+          detail?: Record<string, unknown>;
+        };
+        if (result?.code === 42021) {
+          applyDiscoveryQuotaPayload(result.detail);
+          ElMessage.warning(result.message || "今日「搜索添加」次数已用完");
+          return;
+        }
+        if ((result?.code ?? 1) === 0) {
+          applyDiscoveryQuotaPayload(result.data);
+          ElMessage.success("已加入监控");
+          await productStore.fetchProducts();
+          const goodsId = result.data?.platform_product_id;
+          if (goodsId) {
+            await collectSingle({
+              platform: "xhs",
+              platform_product_id: goodsId,
+              product_name: result.data?.product_name || item.title,
+              targetType: "goods",
+            });
+          }
+          return;
+        }
+        ElMessage.warning(result?.message || "加入监控失败，请稍后重试");
+        return;
+      }
+
       try {
         const { data } = await api.post("/discovery/add-to-monitor", {
           ref_id: refId,
@@ -319,7 +359,6 @@ export function useProductsData() {
           return;
         }
         ElMessage.warning(data?.message || "加入监控失败");
-        return;
       } catch (err: unknown) {
         const ax = err as { response?: { data?: { code?: number; message?: string; detail?: Record<string, unknown> } } };
         if (ax.response?.data?.code === 42021) {
@@ -327,25 +366,8 @@ export function useProductsData() {
           ElMessage.warning(ax.response.data.message || "今日「搜索添加」次数已用完");
           return;
         }
-        // network/api 失败时走 IPC 兜底
+        throw err;
       }
-
-      if (window.electronAPI?.invoke) {
-        const result = await window.electronAPI.invoke("discovery:add-to-monitor", {
-          ref_id: refId,
-          product_name: item.title,
-          mode: "goods",
-        }) as { code?: number; message?: string };
-        if ((result?.code ?? 1) === 0) {
-          ElMessage.success("已加入监控");
-          await productStore.fetchProducts();
-          return;
-        }
-        ElMessage.warning(result?.message || "加入监控失败，请稍后重试");
-        return;
-      }
-
-      ElMessage.error("添加失败：当前环境无法访问发现库服务");
     } catch (err) {
       ElMessage.error(`添加失败: ${err instanceof Error ? err.message : String(err)}`);
     }
