@@ -74,6 +74,9 @@ if [ -d "$ROOT/deploy/downloads" ]; then
   mkdir -p "$ROOT/web-user/dist/downloads"
   cp -f "$ROOT/deploy/downloads/"*.exe "$ROOT/web-user/dist/downloads/" 2>/dev/null || true
   cp -f "$ROOT/deploy/downloads/"*.yml "$ROOT/web-user/dist/downloads/" 2>/dev/null || true
+  cp -f "$ROOT/deploy/downloads/productanalyzer-version.json" "$ROOT/web-user/dist/downloads/" 2>/dev/null || true
+  cp -f "$ROOT/deploy/downloads/ProductAnalyzer_latest.zip" "$ROOT/web-user/dist/downloads/" 2>/dev/null || true
+  cp -f "$ROOT/deploy/downloads/ProductAnalyzer_"*.zip "$ROOT/web-user/dist/downloads/" 2>/dev/null || true
   ok "downloads 静态文件已同步到 web-user/dist/downloads"
 fi
 

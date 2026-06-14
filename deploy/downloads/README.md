@@ -3,6 +3,8 @@
 将 Windows 安装包放到此目录后，用户可通过：
 
 - `https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe`
+- `https://xhs365.cn/downloads/productanalyzer-version.json`（ProductAnalyzer 会员工具版本清单）
+- `https://xhs365.cn/downloads/ProductAnalyzer_latest.zip`（ProductAnalyzer zip，需 scp 上传，勿进 git）
 
 ## 开发机构建
 
