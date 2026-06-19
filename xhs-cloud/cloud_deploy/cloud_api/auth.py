@@ -83,5 +83,10 @@ def login_member(username: str, password: str) -> dict:
     user = db.authenticate(username, password)
     if not user:
         raise HTTPException(status_code=401, detail="用户名或密码错误，或会员已过期")
+    profile = db.get_member_profile(user["id"]) or user
     token = create_token(user)
-    return {"access_token": token, "token_type": "bearer", "expires_at": user["expires_at"]}
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "membership": profile,
+    }

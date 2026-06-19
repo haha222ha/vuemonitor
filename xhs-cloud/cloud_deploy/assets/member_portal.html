@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>选品报告会员中心</title>
+<style>
+:root{--bg:#f5f5f7;--surface:#fff;--text:#1d1d1f;--text2:#6e6e73;--accent:#0071e3;--red:#ff3b30;--orange:#ff9500;--green:#34c759;--line:rgba(0,0,0,.08);--radius:12px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.wrap{max-width:900px;margin:0 auto;padding:24px 16px 60px}
+h1{font-size:26px;font-weight:700;margin-bottom:4px}
+.sub{color:var(--text2);font-size:14px;margin-bottom:24px}
+.card{background:var(--surface);border-radius:var(--radius);padding:20px;margin-bottom:16px;border:1px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab{padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;background:#e8e8ed;color:var(--text2)}
+.tab.active{background:var(--accent);color:#fff}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:12px;color:var(--text2);margin-bottom:4px}
+.field input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;font-size:15px}
+.btn{display:inline-block;padding:10px 18px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--accent)}
+.alert{padding:12px 14px;border-radius:8px;font-size:13px;margin-bottom:16px}
+.alert-warn{background:#fff4e5;color:#8a6100;border:1px solid #ffd699}
+.alert-error{background:#ffebe9;color:#c41e00;border:1px solid #ffc9c4}
+.alert-ok{background:#e8f8ee;color:#1a7f37;border:1px solid #b8e6c8}
+.profile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px}
+.profile-item{background:#f9f9fb;padding:12px;border-radius:8px}
+.profile-item .v{font-size:20px;font-weight:700}
+.profile-item .l{font-size:11px;color:var(--text2);margin-top:2px}
+.seg{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.seg button{padding:6px 14px;border-radius:16px;font-size:12px;border:1px solid var(--line);background:var(--surface);cursor:pointer}
+.seg button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px 8px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--text2);font-weight:500;font-size:12px}
+.empty{text-align:center;padding:32px;color:var(--text2);font-size:14px}
+.hidden{display:none!important}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>选品报告会员中心</h1>
+      <p class="sub">登录后可下载全部历史日报 / 周报 / 月报（zip 含 HTML + data.js）</p>
+    </div>
+    <button class="btn btn-ghost hidden" id="btnLogout" onclick="logout()">退出</button>
+  </div>
+
+  <div id="authView">
+    <div class="tabs">
+      <div class="tab active" data-tab="login" onclick="switchTab('login')">登录</div>
+      <div class="tab" data-tab="register" onclick="switchTab('register')">授权码开通</div>
+    </div>
+    <div class="card" id="panelLogin">
+      <div class="field"><label>用户名</label><input id="loginUser" autocomplete="username"></div>
+      <div class="field"><label>密码</label><input id="loginPass" type="password" autocomplete="current-password"></div>
+      <button class="btn btn-primary" onclick="doLogin()">登录</button>
+    </div>
+    <div class="card hidden" id="panelRegister">
+      <div class="field"><label>授权码</label><input id="regCode" placeholder="XHS-XXXX-XXXX-XXXX"></div>
+      <div class="field"><label>用户名（新建账号）</label><input id="regUser"></div>
+      <div class="field"><label>密码（至少 6 位）</label><input id="regPass" type="password"></div>
+      <button class="btn btn-primary" onclick="doRegister()">开通并登录</button>
+    </div>
+    <div id="authMsg"></div>
+  </div>
+
+  <div id="dashView" class="hidden">
+    <div id="expiryBanner"></div>
+    <div class="card">
+      <strong>会员信息</strong>
+      <div class="profile-grid" id="profileGrid"></div>
+      <div style="margin-top:16px">
+        <div class="field"><label>授权码续费</label><input id="renewCode" placeholder="输入新授权码延长会员"></div>
+        <button class="btn btn-primary" onclick="doRenew()">续费</button>
+      </div>
+    </div>
+    <div class="card">
+      <strong>报告库</strong>
+      <p style="font-size:12px;color:var(--text2);margin:8px 0 12px">有效期内可下载全部已发布报告（含历史往期）</p>
+      <div class="seg" id="typeSeg">
+        <button class="active" data-type="daily" onclick="setType('daily')">日报</button>
+        <button data-type="weekly" onclick="setType('weekly')">周报</button>
+        <button data-type="monthly" onclick="setType('monthly')">月报</button>
+      </div>
+      <div id="reportTable"></div>
+    </div>
+    <div id="dashMsg"></div>
+  </div>
+</div>
+<script>
+const TOKEN_KEY = 'xhs_member_token';
+let library = { daily: [], weekly: [], monthly: [] };
+let currentType = 'daily';
+
+function api(path, opts = {}) {
+  const headers = { ...(opts.headers || {}) };
+  if (opts.auth) {
+    const t = localStorage.getItem(TOKEN_KEY);
+    if (t) headers['Authorization'] = 'Bearer ' + t;
+  }
+  return fetch(path, { ...opts, headers }).then(async r => {
+    const text = await r.text();
+    let data = {};
+    try { data = text ? JSON.parse(text) : {}; } catch (_) {}
+    if (!r.ok) throw new Error(data.detail || r.statusText || '请求失败');
+    return data;
+  });
+}
+
+function showMsg(el, text, kind) {
+  el.innerHTML = text ? `<div class="alert alert-${kind}">${text}</div>` : '';
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.getElementById('panelLogin').classList.toggle('hidden', name !== 'login');
+  document.getElementById('panelRegister').classList.toggle('hidden', name !== 'register');
+}
+
+function fmtSize(n) {
+  if (!n) return '-';
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+  return (n / 1048576).toFixed(1) + ' MB';
+}
+
+function renderProfile(m) {
+  const grid = document.getElementById('profileGrid');
+  grid.innerHTML = `
+    <div class="profile-item"><div class="v">${m.username || '-'}</div><div class="l">用户名</div></div>
+    <div class="profile-item"><div class="v">${m.plan_label || m.plan_code || '-'}</div><div class="l">套餐</div></div>
+    <div class="profile-item"><div class="v">${m.days_remaining ?? '-'}</div><div class="l">剩余天数</div></div>
+    <div class="profile-item"><div class="v" style="font-size:14px">${m.expires_at || '-'}</div><div class="l">到期时间</div></div>
+  `;
+  const banner = document.getElementById('expiryBanner');
+  if (m.expiry_warning) {
+    const kind = m.days_remaining <= 7 ? 'warn' : 'ok';
+    banner.innerHTML = `<div class="alert alert-${kind}">${m.expiry_warning}</div>`;
+  } else {
+    banner.innerHTML = '';
+  }
+}
+
+function archiveTypeFor(t) {
+  if (t === 'weekly') return 'member_weekly_zip';
+  if (t === 'monthly') return 'member_monthly_zip';
+  return 'member_daily_zip';
+}
+
+function renderReports() {
+  const items = library[currentType] || [];
+  const el = document.getElementById('reportTable');
+  if (!items.length) {
+    el.innerHTML = '<div class="empty">暂无报告，请等待系统生成或入库</div>';
+    return;
+  }
+  const at = archiveTypeFor(currentType);
+  let html = '<table><thead><tr><th>日期</th><th>说明</th><th>条数</th><th>大小</th><th></th></tr></thead><tbody>';
+  items.forEach(it => {
+    html += `<tr>
+      <td>${it.report_date}</td>
+      <td>${it.summary || it.file_name || '-'}</td>
+      <td>${it.row_count ?? '-'}</td>
+      <td>${fmtSize(it.file_size_bytes)}</td>
+      <td><button class="btn btn-primary" style="padding:6px 12px;font-size:12px" onclick="downloadReport('${it.report_date}','${at}')">下载</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function setType(t) {
+  currentType = t;
+  document.querySelectorAll('#typeSeg button').forEach(b => b.classList.toggle('active', b.dataset.type === t));
+  renderReports();
+}
+
+async function downloadReport(date, archiveType) {
+  const dashMsg = document.getElementById('dashMsg');
+  try {
+    const t = localStorage.getItem(TOKEN_KEY);
+    const r = await fetch(`/api/v1/member/reports/${date}/download?archive_type=${encodeURIComponent(archiveType)}`, {
+      headers: { Authorization: 'Bearer ' + t }
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.detail || '下载失败');
+    }
+    const blob = await r.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = date + '.zip';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showMsg(dashMsg, '下载已开始：解压后用浏览器打开 index_with_gr.html 查看报告', 'ok');
+  } catch (e) {
+    showMsg(dashMsg, e.message, 'error');
+  }
+}
+
+async function loadDashboard() {
+  const data = await api('/api/v1/member/library', { auth: true });
+  renderProfile(data.membership || {});
+  library = data.library || { daily: [], weekly: [], monthly: [] };
+  renderReports();
+  document.getElementById('authView').classList.add('hidden');
+  document.getElementById('dashView').classList.remove('hidden');
+  document.getElementById('btnLogout').classList.remove('hidden');
+}
+
+function logout() {
+  localStorage.removeItem(TOKEN_KEY);
+  location.reload();
+}
+
+async function doLogin() {
+  const authMsg = document.getElementById('authMsg');
+  try {
+    const body = {
+      username: document.getElementById('loginUser').value.trim(),
+      password: document.getElementById('loginPass').value
+    };
+    const res = await api('/api/v1/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    localStorage.setItem(TOKEN_KEY, res.access_token);
+    await loadDashboard();
+    showMsg(authMsg, '', 'ok');
+  } catch (e) {
+    showMsg(authMsg, e.message, 'error');
+  }
+}
+
+async function doRegister() {
+  const authMsg = document.getElementById('authMsg');
+  try {
+    const body = {
+      auth_code: document.getElementById('regCode').value.trim(),
+      username: document.getElementById('regUser').value.trim(),
+      password: document.getElementById('regPass').value
+    };
+    const res = await api('/api/v1/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    localStorage.setItem(TOKEN_KEY, res.access_token);
+    await loadDashboard();
+    showMsg(authMsg, '', 'ok');
+  } catch (e) {
+    showMsg(authMsg, e.message, 'error');
+  }
+}
+
+async function doRenew() {
+  const dashMsg = document.getElementById('dashMsg');
+  try {
+    const res = await api('/api/v1/auth/activate', {
+      method: 'POST',
+      auth: true,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ auth_code: document.getElementById('renewCode').value.trim() })
+    });
+    renderProfile(res.membership || {});
+    document.getElementById('renewCode').value = '';
+    showMsg(dashMsg, res.message || '续费成功', 'ok');
+  } catch (e) {
+    showMsg(dashMsg, e.message, 'error');
+  }
+}
+
+(async function init() {
+  const t = localStorage.getItem(TOKEN_KEY);
+  if (!t) return;
+  try {
+    await loadDashboard();
+  } catch (_) {
+    localStorage.removeItem(TOKEN_KEY);
+  }
+})();
+</script>
+</body>
+</html>

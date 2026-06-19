@@ -49,6 +49,25 @@ def init_db() -> None:
                     expires_at TIMESTAMPTZ NOT NULL,
                     status VARCHAR(16) DEFAULT 'active'
                 );
+                CREATE TABLE IF NOT EXISTS auth_codes (
+                    id SERIAL PRIMARY KEY,
+                    code VARCHAR(32) UNIQUE NOT NULL,
+                    plan_code VARCHAR(32) NOT NULL DEFAULT 'monthly',
+                    duration_days INT NOT NULL DEFAULT 30,
+                    max_activations INT NOT NULL DEFAULT 1,
+                    current_activations INT NOT NULL DEFAULT 0,
+                    status VARCHAR(16) NOT NULL DEFAULT 'unused',
+                    note TEXT,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    expires_at TIMESTAMPTZ
+                );
+                CREATE TABLE IF NOT EXISTS auth_code_activations (
+                    id SERIAL PRIMARY KEY,
+                    auth_code_id INT NOT NULL REFERENCES auth_codes(id),
+                    user_id INT NOT NULL REFERENCES users(id),
+                    activated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    UNIQUE(auth_code_id, user_id)
+                );
                 CREATE TABLE IF NOT EXISTS report_archives (
                     report_date DATE NOT NULL,
                     archive_type VARCHAR(32) NOT NULL,
@@ -267,7 +286,7 @@ def get_active_member(user_id: int) -> dict | None:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
             c.execute("SET search_path TO xhs_monitor, public")
             c.execute(
-                """SELECT u.id, u.username, m.expires_at, m.status
+                """SELECT u.id, u.username, m.expires_at, m.status, m.plan_code
                    FROM users u JOIN memberships m ON m.user_id=u.id
                    WHERE u.id=%s ORDER BY m.id DESC LIMIT 1""",
                 (user_id,),
@@ -285,6 +304,10 @@ def get_active_member(user_id: int) -> dict | None:
                 "id": row["id"],
                 "username": row["username"],
                 "expires_at": row["expires_at"].strftime("%Y-%m-%d %H:%M:%S"),
+                "plan_code": row.get("plan_code") or "monthly",
+                "days_remaining": max(
+                    0, (row["expires_at"] - datetime.now()).days
+                ),
             }
     finally:
         conn.close()
@@ -421,9 +444,258 @@ def upsert_report_archive(
                     file_size,
                     sha256,
                     row_count,
-                    json.dumps(meta, ensure_ascii=False),
-                ),
-            )
         conn.commit()
     finally:
         conn.close()
+
+
+PLAN_LABELS = {
+    "weekly": "周会员",
+    "monthly": "月度会员",
+    "yearly": "年度会员",
+    "admin": "管理员",
+}
+
+
+def _normalize_code(code: str) -> str:
+    return code.strip().upper().replace(" ", "").replace("-", "")
+
+
+def _gen_auth_code() -> str:
+    return f"XHS-{secrets.token_hex(2).upper()}-{secrets.token_hex(2).upper()}-{secrets.token_hex(2).upper()}"
+
+
+def generate_auth_codes(
+    count: int = 1,
+    plan_code: str = "monthly",
+    duration_days: int = 30,
+    max_activations: int = 1,
+    note: str = "",
+) -> list[str]:
+    conn = _conn()
+    codes = []
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            for _ in range(max(1, count)):
+                code = _gen_auth_code()
+                c.execute(
+                    """INSERT INTO auth_codes
+                       (code, plan_code, duration_days, max_activations, note)
+                       VALUES (%s,%s,%s,%s,%s)""",
+                    (code, plan_code, duration_days, max_activations, note or None),
+                )
+                codes.append(code)
+        conn.commit()
+        return codes
+    finally:
+        conn.close()
+
+
+def list_auth_codes(limit: int = 100) -> list[dict]:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """SELECT code, plan_code, duration_days, max_activations,
+                          current_activations, status, note, created_at, expires_at
+                   FROM auth_codes ORDER BY id DESC LIMIT %s""",
+                (limit,),
+            )
+            rows = []
+            for r in c.fetchall():
+                rows.append(
+                    {
+                        "code": r["code"],
+                        "plan_code": r["plan_code"],
+                        "plan_label": PLAN_LABELS.get(r["plan_code"], r["plan_code"]),
+                        "duration_days": r["duration_days"],
+                        "max_activations": r["max_activations"],
+                        "current_activations": r["current_activations"],
+                        "status": r["status"],
+                        "note": r["note"] or "",
+                        "created_at": r["created_at"].isoformat() if r["created_at"] else "",
+                        "expires_at": r["expires_at"].isoformat() if r["expires_at"] else "",
+                    }
+                )
+            return rows
+    finally:
+        conn.close()
+
+
+def _fetch_auth_code(c, code: str) -> dict | None:
+    norm = _normalize_code(code)
+    c.execute(
+        """SELECT id, code, plan_code, duration_days, max_activations,
+                  current_activations, status, expires_at
+           FROM auth_codes
+           WHERE REPLACE(REPLACE(UPPER(code), '-', ''), ' ', '') = %s""",
+        (norm,),
+    )
+    return c.fetchone()
+
+
+def _validate_auth_code_row(row: dict | None) -> dict:
+    if not row:
+        raise ValueError("授权码不存在")
+    if row["status"] == "revoked":
+        raise ValueError("授权码已被吊销")
+    if row["current_activations"] >= row["max_activations"]:
+        raise ValueError("授权码已达最大激活次数")
+    if row["expires_at"] and row["expires_at"] < datetime.now():
+        raise ValueError("授权码已过期")
+    return row
+
+
+def _extend_membership(c, user_id: int, plan_code: str, duration_days: int) -> datetime:
+    c.execute(
+        """SELECT expires_at FROM memberships
+           WHERE user_id=%s AND status='active' ORDER BY expires_at DESC LIMIT 1""",
+        (user_id,),
+    )
+    row = c.fetchone()
+    now = datetime.now()
+    base = now
+    if row and row[0] and row[0] > now:
+        base = row[0]
+    expires = base + timedelta(days=duration_days)
+    c.execute(
+        """INSERT INTO memberships (user_id, plan_code, activated_at, expires_at, status)
+           VALUES (%s,%s,NOW(),%s,'active')""",
+        (user_id, plan_code, expires),
+    )
+    return expires
+
+
+def register_with_auth_code(username: str, password: str, code: str) -> dict:
+    username = (username or "").strip()
+    if len(username) < 3:
+        raise ValueError("用户名至少 3 个字符")
+    if len(password or "") < 6:
+        raise ValueError("密码至少 6 位")
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute("SELECT id FROM users WHERE username=%s", (username,))
+            if c.fetchone():
+                raise ValueError("用户名已存在，请直接登录后使用授权码续费")
+            row = _validate_auth_code_row(_fetch_auth_code(c, code))
+            c.execute(
+                "INSERT INTO users (username, password_hash) VALUES (%s,%s) RETURNING id",
+                (username, _hash_password(password)),
+            )
+            uid = c.fetchone()["id"]
+            expires = _extend_membership(c, uid, row["plan_code"], row["duration_days"])
+            c.execute(
+                "INSERT INTO auth_code_activations (auth_code_id, user_id) VALUES (%s,%s)",
+                (row["id"], uid),
+            )
+            c.execute(
+                "UPDATE auth_codes SET current_activations=current_activations+1, status='active' WHERE id=%s",
+                (row["id"],),
+            )
+        conn.commit()
+        profile = get_member_profile(uid)
+        if profile:
+            return profile
+        return {
+            "id": uid,
+            "username": username,
+            "expires_at": expires.strftime("%Y-%m-%d %H:%M:%S"),
+            "plan_code": row["plan_code"],
+            "days_remaining": max(0, (expires - datetime.now()).days),
+            "is_active": True,
+        }
+    finally:
+        conn.close()
+
+
+def renew_with_auth_code(user_id: int, code: str) -> dict:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            row = _validate_auth_code_row(_fetch_auth_code(c, code))
+            c.execute(
+                "SELECT 1 FROM auth_code_activations WHERE auth_code_id=%s AND user_id=%s",
+                (row["id"], user_id),
+            )
+            if c.fetchone():
+                raise ValueError("您已使用过此授权码")
+            _extend_membership(c, user_id, row["plan_code"], row["duration_days"])
+            c.execute(
+                "INSERT INTO auth_code_activations (auth_code_id, user_id) VALUES (%s,%s)",
+                (row["id"], user_id),
+            )
+            c.execute(
+                "UPDATE auth_codes SET current_activations=current_activations+1, status='active' WHERE id=%s",
+                (row["id"],),
+            )
+        conn.commit()
+        return get_member_profile(user_id) or {}
+    finally:
+        conn.close()
+
+
+def get_member_profile(user_id: int) -> dict | None:
+    member = get_active_member(user_id)
+    if not member:
+        conn = _conn()
+        try:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+                c.execute("SET search_path TO xhs_monitor, public")
+                c.execute("SELECT username FROM users WHERE id=%s", (user_id,))
+                u = c.fetchone()
+                if not u:
+                    return None
+                c.execute(
+                    """SELECT plan_code, expires_at, status FROM memberships
+                       WHERE user_id=%s ORDER BY id DESC LIMIT 1""",
+                    (user_id,),
+                )
+                m = c.fetchone()
+                if not m:
+                    return None
+                days = max(0, (m["expires_at"] - datetime.now()).days)
+                return {
+                    "id": user_id,
+                    "username": u["username"],
+                    "plan_code": m["plan_code"],
+                    "plan_label": PLAN_LABELS.get(m["plan_code"], m["plan_code"]),
+                    "expires_at": m["expires_at"].strftime("%Y-%m-%d %H:%M:%S"),
+                    "status": m["status"],
+                    "days_remaining": days,
+                    "is_active": False,
+                    "expiry_warning": "会员已过期，请使用新授权码续费",
+                }
+        finally:
+            conn.close()
+    member["plan_label"] = PLAN_LABELS.get(
+        member.get("plan_code", ""), member.get("plan_code", "")
+    )
+    member["is_active"] = True
+    member["status"] = "active"
+    days = member.get("days_remaining", 0)
+    if days <= 0:
+        member["expiry_warning"] = "会员今日到期，请尽快续费"
+    elif days <= 7:
+        member["expiry_warning"] = f"会员将在 {days} 天后到期"
+    else:
+        member["expiry_warning"] = ""
+    return member
+
+
+def list_report_library() -> dict:
+    from cloud_deploy.reporting.constants import ARCHIVE_DAILY, ARCHIVE_MONTHLY, ARCHIVE_WEEKLY
+
+    daily = list_archives(ARCHIVE_DAILY)
+    weekly = list_archives(ARCHIVE_WEEKLY)
+    monthly = list_archives(ARCHIVE_MONTHLY)
+    return {
+        "daily": daily,
+        "weekly": weekly,
+        "monthly": monthly,
+        "total_count": len(daily) + len(weekly) + len(monthly),
+    }
