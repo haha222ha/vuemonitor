@@ -42,6 +42,15 @@ if [[ -f "$XHS_ENV" ]]; then
   EXISTING_ADMIN_PASS="$(grep -E '^XHS_CLOUD_ADMIN_PASS=' "$XHS_ENV" | cut -d= -f2- || true)"
 fi
 
+_is_placeholder() {
+  local v="${1:-}"
+  [[ -z "$v" || "$v" == change-me* || "$v" == CHANGE_ME* ]]
+}
+
+if _is_placeholder "$EXISTING_SYNC"; then EXISTING_SYNC=""; fi
+if _is_placeholder "$EXISTING_JWT"; then EXISTING_JWT=""; fi
+if _is_placeholder "$EXISTING_ADMIN_PASS"; then EXISTING_ADMIN_PASS=""; fi
+
 SYNC_KEY="${EXISTING_SYNC:-$(gen_secret)}"
 JWT_SECRET="${EXISTING_JWT:-$(gen_secret)}"
 ADMIN_PASS="${EXISTING_ADMIN_PASS:-$(python3 -c "import secrets; print(secrets.token_urlsafe(12))")}"
@@ -77,6 +86,8 @@ echo "可选会员页链接："
 echo "XHS_CLOUD_MEMBER_PORTAL_URL=http://你的公网IP:8080/member"
 echo ""
 echo "下一步："
+echo "  cd $XHS_ROOT && bash cloud_deploy/scripts/host-update.sh"
+echo "  sudo systemctl enable --now xhs-cloud-api"
+echo "  curl http://127.0.0.1:8080/api/v1/health"
 echo "  1. 上传爬虫到 /opt/xhs/crawler（含 xhs_full_sold_daemon.py + xhs_full_sold_fetch.py）"
 echo "  2. bash $XHS_ROOT/cloud_deploy/scripts/enable_pure_online.sh"
-echo "  3. journalctl -u xhs-daemon -f   # 应看到 [FULL-SOLD-DAEMON] ⑥补缺挂机"
