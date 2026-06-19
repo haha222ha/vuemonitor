@@ -1,0 +1,16 @@
+[Unit]
+Description=XHS Full Sold Daemon (Web HTTP)
+After=network.target
+
+[Service]
+Type=simple
+User=admin
+WorkingDirectory=/opt/xhs/crawler
+EnvironmentFile=/opt/xhs/.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/opt/xhs/venv/bin/python /opt/xhs/crawler/cloud_deploy/scripts/run_daemon.py
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target

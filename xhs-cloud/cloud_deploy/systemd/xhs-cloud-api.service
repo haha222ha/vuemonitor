@@ -1,0 +1,19 @@
+[Unit]
+Description=XHS Monitor Cloud API (选品独立服务)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=admin
+WorkingDirectory=/opt/xhs-cloud
+EnvironmentFile=-/opt/xhs-cloud/.env
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONPATH=/opt/xhs-cloud
+ExecStart=/opt/xhs-cloud/venv/bin/python -m cloud_deploy.cloud_api.main
+Restart=on-failure
+RestartSec=5
+MemoryMax=256M
+
+[Install]
+WantedBy=multi-user.target

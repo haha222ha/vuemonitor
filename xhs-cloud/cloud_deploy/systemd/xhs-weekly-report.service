@@ -1,0 +1,10 @@
+[Unit]
+Description=XHS Weekly Report (placeholder: run daily pipeline then extend)
+After=network.target
+
+[Service]
+Type=oneshot
+User=admin
+WorkingDirectory=/opt/xhs/crawler
+EnvironmentFile=/opt/xhs/.env
+ExecStart=/opt/xhs/venv/bin/python /opt/xhs/crawler/cloud_deploy/scripts/run_daily_pipeline.py --skip-gen

@@ -1,0 +1,11 @@
+{
+  "shop_engine": "api",
+  "web_detail_concurrency": 2,
+  "web_cooldown_seconds": 120,
+  "batch_size": 400,
+  "skip_today": true,
+  "low_v1d_only": false,
+  "auto_fallback": true,
+  "min_success_rate": 0.08,
+  "seed_batch_size": 50000
+}
