@@ -6,11 +6,19 @@
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 
-$git = Get-Command git -ErrorAction SilentlyContinue
-if (-not $git) {
+$gitCmd = $null
+$gitExe = Get-Command git -ErrorAction SilentlyContinue
+if ($gitExe) { $gitCmd = $gitExe.Source }
+if (-not $gitCmd) {
+    foreach ($p in @("D:\PortableGit\cmd\git.exe", "C:\Tools\PortableGit\cmd\git.exe")) {
+        if (Test-Path $p) { $gitCmd = $p; break }
+    }
+}
+if (-not $gitCmd) {
     Write-Host "未找到 git，请先安装 Git for Windows: https://git-scm.com/download/win"
     exit 1
 }
+function git { & $gitCmd @args }
 
 & git status -sb
 & git add xhs-cloud/ scripts/push-xhs-cloud.ps1 scripts/reopen-git-login.bat
