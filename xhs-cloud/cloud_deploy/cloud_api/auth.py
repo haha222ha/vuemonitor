@@ -21,8 +21,10 @@ def _b64url(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).decode().rstrip("=")
 
 
-def create_token(user: dict, ttl_hours: int = 72) -> str:
+def create_token(user: dict, ttl_hours: int | None = None) -> str:
     s = get_settings()
+    if ttl_hours is None:
+        ttl_hours = s.xhs_cloud_jwt_ttl_days * 24
     header = {"alg": "HS256", "typ": "JWT"}
     payload = {
         "sub": str(user["id"]),

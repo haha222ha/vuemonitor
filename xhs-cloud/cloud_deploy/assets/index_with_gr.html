@@ -163,6 +163,38 @@ td.na{color:#6e7681}
 .report-footer ul{margin:0;padding-left:18px}
 .report-footer li{margin-bottom:6px}
 .report-footer .fd-ver{font-size:10px;color:#6e7681;margin-top:10px}
+@media (max-width:900px){
+  .cg{grid-template-columns:1fr}
+  .guide-grid,.guide-grid-3{grid-template-columns:1fr}
+  .guide-grade{grid-template-columns:1fr}
+  .adv-grid{grid-template-columns:1fr}
+}
+@media (max-width:768px){
+  body{padding:12px}
+  h1{font-size:clamp(20px,5vw,26px)}
+  .sub{font-size:13px;margin-bottom:20px}
+  .s{padding:14px;margin-bottom:14px}
+  .st{font-size:16px}
+  .sg{grid-template-columns:repeat(2,1fr);gap:8px}
+  .sc .v{font-size:18px}
+  .sb input{width:100%;max-width:100%}
+  .tab-nav{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;display:flex}
+  .tab-nav button{padding:10px 16px;font-size:13px;white-space:nowrap;flex-shrink:0}
+  .tc{max-width:140px}
+  .kc{max-width:80px}
+  th,td{padding:6px 4px;font-size:11px}
+  .tw{-webkit-overflow-scrolling:touch}
+  .pager{flex-wrap:wrap}
+  .preset-bar,.tag-bar,.view-bar{gap:4px}
+  .preset-btn,.tag-btn,.view-btn{padding:8px 12px;font-size:12px}
+  .tc-wrap{max-height:60vh}
+}
+@media (max-width:480px){
+  .sg{grid-template-columns:1fr 1fr}
+  .sc{padding:10px 8px}
+  .ins{padding:8px 10px}
+  .export-btn{margin-left:0;margin-top:8px;width:100%}
+}
 </style>
 </head>
 <body>

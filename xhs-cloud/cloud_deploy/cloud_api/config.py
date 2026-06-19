@@ -18,6 +18,7 @@ class Settings:
     xhs_cloud_jwt_secret: str
     xhs_cloud_admin_user: str
     xhs_cloud_admin_pass: str
+    xhs_cloud_jwt_ttl_days: int = 30
     xhs_database_url: str = ""
     xhs_db_path: str = ""
 
@@ -41,6 +42,7 @@ def get_settings() -> Settings:
         xhs_cloud_jwt_secret=os.environ.get("XHS_CLOUD_JWT_SECRET", "change-me"),
         xhs_cloud_admin_user=os.environ.get("XHS_CLOUD_ADMIN_USER", "admin"),
         xhs_cloud_admin_pass=os.environ.get("XHS_CLOUD_ADMIN_PASS", "change-me"),
+        xhs_cloud_jwt_ttl_days=int(os.environ.get("XHS_CLOUD_JWT_TTL_DAYS", "30")),
         xhs_database_url=os.environ.get("XHS_DATABASE_URL", ""),
         xhs_db_path=os.environ.get("XHS_DB_PATH", ""),
     )
