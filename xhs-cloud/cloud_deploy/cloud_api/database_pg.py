@@ -444,6 +444,9 @@ def upsert_report_archive(
                     file_size,
                     sha256,
                     row_count,
+                    json.dumps(meta, ensure_ascii=False),
+                ),
+            )
         conn.commit()
     finally:
         conn.close()
