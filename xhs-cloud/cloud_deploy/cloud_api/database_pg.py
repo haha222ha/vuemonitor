@@ -161,6 +161,28 @@ def init_db() -> None:
                     last_backfill_at TIMESTAMPTZ,
                     updated_at TIMESTAMPTZ DEFAULT NOW()
                 );
+                CREATE TABLE IF NOT EXISTS goods_sold_snapshots (
+                    goods_id VARCHAR(32) NOT NULL,
+                    snapshot_time TIMESTAMPTZ NOT NULL,
+                    sold_num INT,
+                    data_source VARCHAR(32) DEFAULT 'local_sync',
+                    PRIMARY KEY (goods_id, snapshot_time)
+                );
+                CREATE TABLE IF NOT EXISTS monitor_rules (
+                    id SERIAL PRIMARY KEY,
+                    name VARCHAR(128),
+                    enabled BOOLEAN DEFAULT TRUE,
+                    rule_json JSONB NOT NULL,
+                    created_at TIMESTAMPTZ DEFAULT NOW()
+                );
+                CREATE TABLE IF NOT EXISTS monitor_alerts (
+                    id BIGSERIAL PRIMARY KEY,
+                    goods_id VARCHAR(32),
+                    rule_id INT REFERENCES monitor_rules(id),
+                    alert_type VARCHAR(64),
+                    payload_json JSONB,
+                    created_at TIMESTAMPTZ DEFAULT NOW()
+                );
                 CREATE TABLE IF NOT EXISTS sync_checkpoints (
                     client_id VARCHAR(64) PRIMARY KEY,
                     last_report_date DATE,
@@ -173,11 +195,32 @@ def init_db() -> None:
                 CREATE INDEX IF NOT EXISTS idx_rdi_goods ON report_daily_items(goods_id, report_date DESC);
                 CREATE INDEX IF NOT EXISTS idx_monitor_active ON monitor_goods(monitor_status, last_v1d DESC);
                 CREATE INDEX IF NOT EXISTS idx_monitor_v1d ON monitor_goods(last_v1d DESC) WHERE last_v1d > 0;
+                CREATE INDEX IF NOT EXISTS idx_gss_time ON goods_sold_snapshots(snapshot_time);
+                CREATE INDEX IF NOT EXISTS idx_gss_goods ON goods_sold_snapshots(goods_id, snapshot_time DESC);
+                CREATE INDEX IF NOT EXISTS idx_ma_goods ON monitor_alerts(goods_id, created_at DESC);
                 """
             )
+            _seed_default_rules(c)
         conn.commit()
     finally:
         conn.close()
+
+
+def _seed_default_rules(c) -> None:
+    c.execute("SELECT COUNT(*) FROM monitor_rules")
+    if c.fetchone()[0] > 0:
+        return
+    defaults = [
+        ("R01_burst_pool", {"id": "R01", "when": {"last_v1d_gte": 50, "pool_not": "BURST"}, "action": {"set_pool": "BURST", "priority_boost": 100}}),
+        ("R02_idle_zero", {"id": "R02", "when": {"zero_v1d_days_gte": 7}, "action": {"set_status": "idle"}}),
+        ("R03_drop_alert", {"id": "R03", "when": {"actual_v1d_drop_pct_gte": 80}, "action": {"alert_type": "drop"}}),
+        ("R04_delisted", {"id": "R04", "when": {"scan_status": "frozen"}, "action": {"set_status": "delisted", "stop_scan": True}}),
+    ]
+    for name, rule in defaults:
+        c.execute(
+            "INSERT INTO monitor_rules (name, enabled, rule_json) VALUES (%s, TRUE, %s)",
+            (name, json.dumps(rule, ensure_ascii=False)),
+        )
 
 
 def _hash_password(password: str, salt: str | None = None) -> str:
@@ -232,7 +275,11 @@ def get_active_member(user_id: int) -> dict | None:
             row = c.fetchone()
             if not row or row["status"] != "active":
                 return None
-            if row["expires_at"] < datetime.now():
+            c.execute(
+                "SELECT 1 FROM memberships WHERE user_id=%s AND expires_at > NOW()",
+                (user_id,),
+            )
+            if not c.fetchone():
                 return None
             return {
                 "id": row["id"],
@@ -257,7 +304,13 @@ def authenticate(username: str, password: str) -> dict | None:
                 (u["id"],),
             )
             m = c.fetchone()
-            if not m or m["status"] != "active" or m["expires_at"] < datetime.now():
+            if not m or m["status"] != "active":
+                return None
+            c.execute(
+                "SELECT 1 FROM memberships WHERE user_id=%s AND expires_at > NOW()",
+                (u["id"],),
+            )
+            if not c.fetchone():
                 return None
             return {
                 "id": u["id"],

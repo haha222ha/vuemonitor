@@ -6,9 +6,21 @@ import os
 import sys
 
 
+def detect_cloud_root() -> str:
+    env = os.environ.get("XHS_CLOUD_ROOT", "").strip()
+    if env and os.path.isdir(env):
+        return env
+    here = os.path.dirname(os.path.abspath(__file__))
+    candidate = os.path.dirname(os.path.dirname(here))
+    if os.path.isdir(os.path.join(candidate, "cloud_deploy")):
+        return candidate
+    return env or "/opt/xhs-cloud"
+
+
 def load_dotenv(path: str | None = None) -> None:
     if path is None:
-        root = os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud")
+        root = detect_cloud_root()
+        os.environ.setdefault("XHS_CLOUD_ROOT", root)
         path = os.environ.get("XHS_ENV_FILE", os.path.join(root, ".env"))
     if not path or not os.path.isfile(path):
         return
@@ -23,7 +35,8 @@ def load_dotenv(path: str | None = None) -> None:
 
 
 def setup_python_path() -> None:
-    root = os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud")
+    root = detect_cloud_root()
+    os.environ.setdefault("XHS_CLOUD_ROOT", root)
     if root and root not in sys.path and os.path.isdir(root):
         sys.path.insert(0, root)
     # 可选：仅 sold_history 回补时只读挂载本地主库，不参与日常

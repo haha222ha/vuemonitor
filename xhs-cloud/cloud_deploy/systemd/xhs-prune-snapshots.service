@@ -1,5 +1,5 @@
 [Unit]
-Description=XHS Weekly Report (PG aggregate → zip)
+Description=Prune goods_sold_snapshots older than 90 days
 After=network.target postgresql.service
 
 [Service]
@@ -9,7 +9,7 @@ WorkingDirectory=/opt/xhs-cloud
 EnvironmentFile=-/opt/xhs-cloud/.env
 Environment=PYTHONUNBUFFERED=1
 Environment=PYTHONPATH=/opt/xhs-cloud
-ExecStart=/opt/xhs-cloud/venv/bin/python /opt/xhs-cloud/cloud_deploy/scripts/run_full_pipeline.py weekly
+ExecStart=/opt/xhs-cloud/venv/bin/python /opt/xhs-cloud/cloud_deploy/scripts/prune_sold_snapshots.py
 
 [Install]
 WantedBy=multi-user.target

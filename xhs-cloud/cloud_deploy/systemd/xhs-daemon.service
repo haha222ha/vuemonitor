@@ -1,16 +1,19 @@
 [Unit]
-Description=XHS Full Sold Daemon (Web HTTP)
-After=network.target
+Description=XHS Cloud Monitor Daemon (PG scan, optional)
+After=network.target postgresql.service
 
 [Service]
 Type=simple
 User=admin
-WorkingDirectory=/opt/xhs/crawler
-EnvironmentFile=/opt/xhs/.env
+WorkingDirectory=/opt/xhs-cloud
+EnvironmentFile=-/opt/xhs-cloud/.env
 Environment=PYTHONUNBUFFERED=1
-ExecStart=/opt/xhs/venv/bin/python /opt/xhs/crawler/cloud_deploy/scripts/run_daemon.py
-Restart=always
-RestartSec=15
+Environment=PYTHONPATH=/opt/xhs-cloud
+# 需配置 XHS_CRAWLER_ROOT 指向爬虫仓库
+ExecStart=/opt/xhs-cloud/venv/bin/python /opt/xhs-cloud/cloud_deploy/scripts/run_daemon.py
+Restart=on-failure
+RestartSec=30
+MemoryMax=512M
 
 [Install]
 WantedBy=multi-user.target

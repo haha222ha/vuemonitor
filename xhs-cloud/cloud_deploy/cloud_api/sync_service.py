@@ -9,8 +9,9 @@
 from __future__ import annotations
 
 import json
+import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 import psycopg2.extras
@@ -27,13 +28,20 @@ REPORT_COLUMNS = [
 COL = {name: i for i, name in enumerate(REPORT_COLUMNS)}
 
 
+def _parse_report_payload(text: str) -> dict:
+    """兼容 gen_report 产出：末尾可有/无分号。"""
+    m = re.search(r"var\s+REPORT_DATA\s*=\s*(\{.*\})\s*;?\s*$", text, re.S)
+    if not m:
+        m = re.search(r"var\s+REPORT_DATA\s*=\s*(\{.*\})", text, re.S)
+    if not m:
+        raise RuntimeError("无法解析 REPORT_DATA JSON")
+    return json.loads(m.group(1))
+
+
 def parse_data_js(data_js_path: str) -> tuple[str, dict, list]:
     with open(data_js_path, "r", encoding="utf-8") as f:
         text = f.read()
-    m = re.search(r"var\s+REPORT_DATA\s*=\s*(\{.*\})\s*;\s*$", text, re.S)
-    if not m:
-        raise RuntimeError(f"无法解析 data.js: {data_js_path}")
-    payload = json.loads(m.group(1))
+    payload = _parse_report_payload(text)
     meta = payload.get("meta") or {}
     report_date = str(meta.get("date") or datetime.now().strftime("%Y-%m-%d"))[:10]
     items = payload.get("items") or []
@@ -209,6 +217,12 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
                 daily_rows,
                 page_size=500,
             )
+            synced_gids = [r[1] for r in daily_rows]
+            c.execute(
+                """DELETE FROM report_daily_items
+                   WHERE report_date=%s AND NOT (goods_id = ANY(%s))""",
+                (report_date, synced_gids),
+            )
 
         if metrics_rows:
             psycopg2.extras.execute_values(
@@ -251,7 +265,8 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
                        peak_v1d=GREATEST(monitor_goods.peak_v1d, EXCLUDED.peak_v1d),
                        monitor_status=CASE
                            WHEN monitor_goods.monitor_status='delisted' THEN 'delisted'
-                           ELSE 'active' END,
+                           WHEN EXCLUDED.last_v1d > 0 OR EXCLUDED.last_actual_v1d > 0 THEN 'active'
+                           ELSE monitor_goods.monitor_status END,
                        updated_at=NOW()""",
                 monitor_rows,
                 template="(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'active',NOW(),'daily_report',NOW())",
@@ -287,11 +302,14 @@ def apply_sold_history_batch(conn, rows: list[dict]) -> int:
     tuples = []
     goods_ids = set()
     for r in rows:
-        gid = str(r["goods_id"])
+        gid = str(r.get("goods_id") or "").strip()
+        snap = r.get("snapshot_date")
+        if not gid or not snap:
+            continue
         tuples.append(
             (
                 gid,
-                r["snapshot_date"],
+                snap,
                 int(r.get("sold_num") or 0),
                 r.get("deal_price"),
                 int(r.get("delta") or 0),
@@ -299,6 +317,9 @@ def apply_sold_history_batch(conn, rows: list[dict]) -> int:
             )
         )
         goods_ids.add(gid)
+
+    if not tuples:
+        return 0
 
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
@@ -327,3 +348,148 @@ def apply_sold_history_batch(conn, rows: list[dict]) -> int:
             )
     conn.commit()
     return len(tuples)
+
+
+def snapshot_retention_days() -> int:
+    return int(os.environ.get("XHS_SNAPSHOT_RETENTION_DAYS", "90"))
+
+
+def apply_sold_snapshots_batch(conn, rows: list[dict]) -> int:
+    """批量写入 sold_snapshots → goods_sold_snapshots（仅保留 retention 窗口内）。"""
+    if not rows:
+        return 0
+    cutoff = datetime.now() - timedelta(days=snapshot_retention_days())
+    tuples = []
+    goods_ids = set()
+    for r in rows:
+        snap_raw = r.get("snapshot_time") or r.get("snapshot_at") or ""
+        if not snap_raw:
+            continue
+        snap = str(snap_raw).replace(" ", "T")[:19]
+        try:
+            snap_dt = datetime.fromisoformat(snap)
+        except ValueError:
+            continue
+        if snap_dt < cutoff:
+            continue
+        gid = str(r["goods_id"])
+        tuples.append(
+            (
+                gid,
+                snap_dt,
+                int(r.get("sold_num") or 0),
+                r.get("data_source") or "local_sync",
+            )
+        )
+        goods_ids.add(gid)
+
+    if not tuples:
+        return 0
+
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        psycopg2.extras.execute_values(
+            c,
+            """INSERT INTO goods_sold_snapshots (
+                   goods_id, snapshot_time, sold_num, data_source
+               ) VALUES %s
+               ON CONFLICT (goods_id, snapshot_time) DO UPDATE SET
+                   sold_num=EXCLUDED.sold_num,
+                   data_source=EXCLUDED.data_source""",
+            tuples,
+            page_size=1000,
+        )
+        for gid in goods_ids:
+            c.execute(
+                """UPDATE goods_sync_state SET
+                       sold_snapshots_row_count = (
+                           SELECT COUNT(*) FROM goods_sold_snapshots WHERE goods_id=%s
+                       ),
+                       updated_at=NOW()
+                   WHERE goods_id=%s""",
+                (gid, gid),
+            )
+    conn.commit()
+    return len(tuples)
+
+
+def prune_sold_snapshots(conn, retention_days: int | None = None) -> int:
+    days = retention_days if retention_days is not None else snapshot_retention_days()
+    cutoff = datetime.now() - timedelta(days=days)
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute("DELETE FROM goods_sold_snapshots WHERE snapshot_time < %s", (cutoff,))
+        deleted = c.rowcount
+    conn.commit()
+    return deleted
+
+
+def record_cloud_scan(
+    conn,
+    goods_id: str,
+    sold_num: int,
+    data_source: str = "cloud_scan",
+    snapshot_time: datetime | None = None,
+) -> dict:
+    """云扫描单点写入 snapshots + 更新 monitor_goods + 当日 sold_daily。"""
+    now = snapshot_time or datetime.now()
+    today = now.date().isoformat()
+    yesterday = (now.date() - timedelta(days=1)).isoformat()
+    gid = str(goods_id)
+    sold_num = int(sold_num)
+
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            """INSERT INTO goods_sold_snapshots (goods_id, snapshot_time, sold_num, data_source)
+               VALUES (%s,%s,%s,%s)
+               ON CONFLICT (goods_id, snapshot_time) DO UPDATE SET
+                   sold_num=EXCLUDED.sold_num, data_source=EXCLUDED.data_source""",
+            (gid, now, sold_num, data_source),
+        )
+        c.execute(
+            """SELECT sold_num, delta FROM goods_sold_daily
+               WHERE goods_id=%s AND snapshot_date=%s""",
+            (gid, today),
+        )
+        existing = c.fetchone()
+        if existing:
+            start_sold = int(existing[0] or 0) - int(existing[1] or 0)
+            delta = max(0, sold_num - start_sold)
+        else:
+            c.execute(
+                """SELECT sold_num FROM goods_sold_daily
+                   WHERE goods_id=%s AND snapshot_date=%s""",
+                (gid, yesterday),
+            )
+            prev_row = c.fetchone()
+            prev_sold = int(prev_row[0] or 0) if prev_row else 0
+            delta = max(0, sold_num - prev_sold)
+
+        c.execute(
+            """INSERT INTO goods_sold_daily (goods_id, snapshot_date, sold_num, delta, source)
+               VALUES (%s,%s,%s,%s,%s)
+               ON CONFLICT (goods_id, snapshot_date) DO UPDATE SET
+                   sold_num=EXCLUDED.sold_num,
+                   delta=EXCLUDED.delta,
+                   source=EXCLUDED.source""",
+            (gid, today, sold_num, delta, data_source),
+        )
+        c.execute(
+            """UPDATE monitor_goods SET
+                   last_sold=%s,
+                   last_actual_v1d=%s,
+                   last_v1d=%s,
+                   updated_at=NOW()
+               WHERE goods_id=%s AND monitor_status IN ('active','idle')""",
+            (sold_num, float(delta), float(delta), gid),
+        )
+        c.execute(
+            """INSERT INTO goods_metrics_daily (goods_id, metric_date, v1d, actual_v1d, gr, burst, pool)
+               SELECT goods_id, %s, %s, %s, 0, 0, pool FROM monitor_goods WHERE goods_id=%s
+               ON CONFLICT (goods_id, metric_date) DO UPDATE SET
+                   v1d=EXCLUDED.v1d, actual_v1d=EXCLUDED.actual_v1d""",
+            (today, float(delta), float(delta), gid),
+        )
+    conn.commit()
+    return {"goods_id": gid, "sold_num": sold_num, "delta": delta, "snapshot_time": now.isoformat()}

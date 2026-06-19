@@ -68,6 +68,15 @@ def _fetch_sold_history(main_db: str, goods_ids: list[str]) -> list[dict]:
     return rows
 
 
+def _count_local_history(main_db: str, goods_id: str) -> int:
+    conn = sqlite3.connect(f"file:{main_db}?mode=ro", uri=True, timeout=60)
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM sold_history WHERE goods_id=?", (goods_id,))
+    n = int(c.fetchone()[0])
+    conn.close()
+    return n
+
+
 def _mark_done(conn, goods_ids: list[str]) -> None:
     if not goods_ids:
         return
@@ -101,7 +110,12 @@ def backfill_sold_history(main_db: str, batch_goods: int = 50) -> dict:
                 break
             rows = _fetch_sold_history(main_db, goods_ids)
             n = apply_sold_history_batch(pg, rows)
-            _mark_done(pg, goods_ids)
+            if rows:
+                _mark_done(pg, goods_ids)
+            else:
+                empty = [g for g in goods_ids if _count_local_history(main_db, g) == 0]
+                if empty:
+                    _mark_done(pg, empty)
             total_rows += n
             total_goods += len(goods_ids)
             _log(f"已回补 {len(goods_ids)} 商品 / {n} 行 sold_history")

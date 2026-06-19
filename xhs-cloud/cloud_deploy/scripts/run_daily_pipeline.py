@@ -34,13 +34,12 @@ def _log(msg: str) -> None:
 
 
 def _parse_meta_from_data_js(data_js_path: str) -> dict:
+    from cloud_deploy.cloud_api.sync_service import _parse_report_payload
+
     with open(data_js_path, "r", encoding="utf-8") as f:
         text = f.read()
-    m = re.search(r"var\s+REPORT_DATA\s*=\s*(\{.*\})\s*;\s*$", text, re.S)
-    if not m:
-        return {}
     try:
-        return json.loads(m.group(1)).get("meta") or {}
+        return _parse_report_payload(text).get("meta") or {}
     except Exception:
         return {}
 
@@ -118,14 +117,11 @@ def run_ingest(report_dir: str = "") -> dict:
 
         pg_result = sync_report_to_pg(data_js)
         _log(f"Step4: sync PG {pg_result}")
-        if pg_result.get("need_sold_history_backfill_count", 0) > 0 and s.xhs_db_path:
-            if os.path.isfile(s.xhs_db_path):
-                from cloud_deploy.scripts.backfill_sold_history_pg import backfill_sold_history
 
-                bf = backfill_sold_history(s.xhs_db_path, batch_goods=30)
-                _log(f"Step5: sold_history backfill {bf}")
-            else:
-                _log("Step5: skip sold_history（未挂载 XHS_DB_PATH，请用 API 推送 sold-history）")
+        from cloud_deploy.scripts.sync_pipeline_hooks import run_post_report_pg_steps
+
+        post = run_post_report_pg_steps(s, _log)
+        _log(f"Step5+: post hooks {post}")
     else:
         _log("Step4: skip PG（未配置 XHS_DATABASE_URL）")
 

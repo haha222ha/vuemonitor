@@ -47,6 +47,12 @@ class SoldHistorySyncBody(BaseModel):
     final_batch: bool = False
 
 
+class SoldSnapshotsSyncBody(BaseModel):
+    batch_id: str = ""
+    rows: list[dict]
+    final_batch: bool = False
+
+
 @app.get("/api/v1/health")
 def health():
     return {"status": "ok"}
@@ -89,6 +95,7 @@ def sync_status(_: None = Depends(verify_sync_key)):
     archives = db.list_archives()
     pool_size = 0
     pending_backfill = 0
+    pending_snapshots = 0
     if os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         try:
             from cloud_deploy.cloud_api.database_pg import _conn
@@ -102,6 +109,10 @@ def sync_status(_: None = Depends(verify_sync_key)):
                     "SELECT COUNT(*) FROM goods_sync_state WHERE sold_daily_backfill_done=FALSE"
                 )
                 pending_backfill = c.fetchone()[0]
+                c.execute(
+                    "SELECT COUNT(*) FROM goods_sync_state WHERE sold_snapshots_backfill_done=FALSE"
+                )
+                pending_snapshots = c.fetchone()[0]
             conn.close()
         except Exception:
             pass
@@ -110,6 +121,7 @@ def sync_status(_: None = Depends(verify_sync_key)):
         "latest": archives[0] if archives else None,
         "monitor_pool_active": pool_size,
         "sold_history_pending_backfill": pending_backfill,
+        "sold_snapshots_pending_backfill": pending_snapshots,
     }
 
 
@@ -140,6 +152,38 @@ def sync_sold_history(body: SoldHistorySyncBody, _: None = Depends(verify_sync_k
     try:
         n = apply_sold_history_batch(conn, body.rows)
         return {"batch_id": body.batch_id, "rows_upserted": n, "final_batch": body.final_batch}
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/sold-snapshots")
+def sync_sold_snapshots(body: SoldSnapshotsSyncBody, _: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.sync_service import apply_sold_snapshots_batch
+
+    init_db()
+    conn = _conn()
+    try:
+        n = apply_sold_snapshots_batch(conn, body.rows)
+        return {"batch_id": body.batch_id, "rows_upserted": n, "final_batch": body.final_batch}
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/prune-snapshots")
+def sync_prune_snapshots(_: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.sync_service import prune_sold_snapshots
+
+    init_db()
+    conn = _conn()
+    try:
+        deleted = prune_sold_snapshots(conn)
+        return {"deleted_rows": deleted}
     finally:
         conn.close()
 

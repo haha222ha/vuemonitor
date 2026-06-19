@@ -1,0 +1,53 @@
+# 本地联调：PG + 可选 API（不启动 vuemonitor）
+# 用法:
+#   cd xhs-cloud
+#   copy cloud_deploy\.env.example .env.dev
+#   docker compose -f docker-compose.dev.yml up -d
+#   docker compose -f docker-compose.dev.yml exec postgres psql -U postgres -d vuemonitor -f /docker-entrypoint-initdb.d/init_xhs_monitor.sql
+#
+# Windows 本地跑流水线:
+#   set XHS_CLOUD_ROOT=%CD%
+#   set XHS_ENV_FILE=%CD%\.env.dev
+#   set XHS_DATABASE_URL=postgresql://xhs_monitor_user:devpass@127.0.0.1:5433/vuemonitor
+#   python cloud_deploy/scripts/run_full_pipeline.py import --root D:\reports
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: xhs-cloud-pg-dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: devpass
+      POSTGRES_DB: vuemonitor
+    ports:
+      - "5433:5432"
+    volumes:
+      - xhs_pg_dev_data:/var/lib/postgresql/data
+      - ./cloud_deploy/database/init_xhs_monitor.sql:/docker-entrypoint-initdb.d/02_xhs_monitor.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d vuemonitor"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # 可选：本地起 API（需先配置 .env.dev）
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile_inline: |
+  #       FROM python:3.11-slim
+  #       WORKDIR /app
+  #       COPY cloud_deploy/requirements-cloud.txt .
+  #       RUN pip install -r requirements-cloud.txt
+  #       COPY . .
+  #       ENV XHS_CLOUD_ROOT=/app PYTHONPATH=/app
+  #   env_file: .env.dev
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   ports:
+  #     - "8080:8080"
+  #   command: python -m cloud_deploy.cloud_api.main
+
+volumes:
+  xhs_pg_dev_data:

@@ -13,16 +13,10 @@ if (-not $git) {
 }
 
 & git status -sb
-& git add xhs-cloud/
+& git add xhs-cloud/ scripts/push-xhs-cloud.ps1 scripts/reopen-git-login.bat
 & git status -sb
 
-$msg = @"
-add xhs-cloud: 选品监控独立子系统（PG schema xhs_monitor，不改动 server）
-
-- FastAPI 会员/同步 API :8080
-- data.js 入库 + sold_history 回补
-- systemd/nginx 部署脚本
-"@
+$msg = "add xhs-cloud: 选品监控独立子系统（PG xhs_monitor schema、文档、部署脚本）"
 
 & git commit -m $msg
 & git push -u origin main

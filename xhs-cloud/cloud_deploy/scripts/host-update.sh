@@ -94,6 +94,12 @@ if systemctl is-enabled xhs-ingest-report.timer &>/dev/null; then
   sudo systemctl restart xhs-ingest-report.timer || true
 fi
 
+for t in xhs-daily-report xhs-weekly-report xhs-monthly-report xhs-prune-snapshots; do
+  if systemctl is-enabled "${t}.timer" &>/dev/null; then
+    sudo systemctl restart "${t}.timer" || true
+  fi
+done
+
 log "健康检查"
 sleep 2
 PORT="${XHS_CLOUD_PORT:-8080}"

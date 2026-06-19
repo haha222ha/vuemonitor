@@ -1,11 +1,15 @@
 [Unit]
-Description=XHS Daily Report Pipeline
-After=network.target
+Description=XHS Cloud Daily Report (PG → data.js → zip)
+After=network.target postgresql.service
 
 [Service]
 Type=oneshot
 User=admin
-WorkingDirectory=/opt/xhs/crawler
-EnvironmentFile=/opt/xhs/.env
+WorkingDirectory=/opt/xhs-cloud
+EnvironmentFile=-/opt/xhs-cloud/.env
 Environment=PYTHONUNBUFFERED=1
-ExecStart=/opt/xhs/venv/bin/python /opt/xhs/crawler/cloud_deploy/scripts/run_daily_pipeline.py
+Environment=PYTHONPATH=/opt/xhs-cloud
+ExecStart=/opt/xhs-cloud/venv/bin/python /opt/xhs-cloud/cloud_deploy/scripts/run_full_pipeline.py full
+
+[Install]
+WantedBy=multi-user.target

@@ -50,12 +50,15 @@ fi
 echo "==> 数据目录"
 mkdir -p "$XHS_ROOT/data/incoming" "$XHS_ROOT/data/report_archives"
 
-echo "==> systemd（仅 API + 入库 timer，不含 daemon）"
-cp "$XHS_ROOT/cloud_deploy/systemd/xhs-cloud-api.service" /etc/systemd/system/
-cp "$XHS_ROOT/cloud_deploy/systemd/xhs-ingest-report.service" /etc/systemd/system/
-cp "$XHS_ROOT/cloud_deploy/systemd/xhs-ingest-report.timer" /etc/systemd/system/
+echo "==> systemd"
+cp "$XHS_ROOT/cloud_deploy/systemd/"*.service /etc/systemd/system/
+cp "$XHS_ROOT/cloud_deploy/systemd/"*.timer /etc/systemd/system/
 systemctl daemon-reload
-systemctl enable xhs-cloud-api.service xhs-ingest-report.timer
+systemctl enable xhs-cloud-api.service xhs-prune-snapshots.timer
+# 纯线上全自动（推荐）:
+# systemctl enable xhs-daily-report.timer xhs-daemon.service
+# 混合模式（本地 gen_report + scp）:
+# systemctl enable xhs-ingest-report.timer
 
 echo "==> 完成。下一步:"
 echo "  1. sudo -u postgres psql -d vuemonitor -f $XHS_ROOT/cloud_deploy/database/init_xhs_monitor.sql"
