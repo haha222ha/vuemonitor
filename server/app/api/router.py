@@ -14,6 +14,7 @@ from app.api.dashboard import router as dashboard_router
 from app.api.discovery import router as discovery_router
 from app.api.feature import router as feature_router
 from app.api.gdpr import router as gdpr_router
+from app.api.xhs_cloud import router as xhs_cloud_router
 from app.api.intelligence.router import intel_router
 from app.api.license import router as license_router
 from app.api.monitor import router as monitor_router
@@ -62,6 +63,7 @@ api_router.include_router(aipic_generate_router)
 api_router.include_router(aipic_user_router)
 api_router.include_router(aipic_admin_router)
 api_router.include_router(intel_router)
+api_router.include_router(xhs_cloud_router)
 
 
 @api_router.get("/health", tags=["health"])

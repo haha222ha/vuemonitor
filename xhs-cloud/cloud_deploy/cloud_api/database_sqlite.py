@@ -310,15 +310,21 @@ def generate_auth_codes(
     return codes
 
 
-def list_auth_codes(limit: int = 100) -> list[dict]:
+def list_auth_codes(limit: int = 100, status: str | None = None) -> list[dict]:
     conn = _conn()
     c = conn.cursor()
-    c.execute(
+    sql = (
         """SELECT code, plan_code, duration_days, max_activations,
                   current_activations, status, note, created_at, expires_at
-           FROM auth_codes ORDER BY id DESC LIMIT ?""",
-        (limit,),
+           FROM auth_codes"""
     )
+    params: list = []
+    if status:
+        sql += " WHERE status = ?"
+        params.append(status)
+    sql += " ORDER BY id DESC LIMIT ?"
+    params.append(limit)
+    c.execute(sql, params)
     rows = []
     for r in c.fetchall():
         rows.append(
@@ -337,6 +343,46 @@ def list_auth_codes(limit: int = 100) -> list[dict]:
         )
     conn.close()
     return rows
+
+
+def get_admin_stats() -> dict:
+    conn = _conn()
+    c = conn.cursor()
+    c.execute("SELECT COUNT(*) FROM users")
+    total_members = int(c.fetchone()[0])
+    c.execute(
+        """SELECT COUNT(DISTINCT u.id)
+           FROM users u
+           JOIN memberships m ON m.user_id = u.id
+           WHERE m.expires_at > datetime('now')"""
+    )
+    active_members = int(c.fetchone()[0])
+    c.execute("SELECT status, COUNT(*) FROM auth_codes GROUP BY status")
+    code_by_status = {r[0]: int(r[1]) for r in c.fetchall()}
+    c.execute(
+        """SELECT report_date, file_name
+           FROM report_archives
+           WHERE archive_type = 'member_daily_zip' AND status = 'published'
+           ORDER BY report_date DESC LIMIT 1"""
+    )
+    latest = c.fetchone()
+    c.execute(
+        """SELECT COUNT(*) FROM report_archives
+           WHERE archive_type = 'member_daily_zip' AND status = 'published'"""
+    )
+    archive_count = int(c.fetchone()[0])
+    conn.close()
+    return {
+        "total_members": total_members,
+        "active_members": active_members,
+        "auth_codes_unused": code_by_status.get("unused", 0),
+        "auth_codes_active": code_by_status.get("active", 0),
+        "auth_codes_revoked": code_by_status.get("revoked", 0),
+        "auth_codes_total": sum(code_by_status.values()),
+        "latest_report_date": latest[0] if latest else None,
+        "latest_report_file": latest[1] if latest else None,
+        "archive_count": archive_count,
+    }
 
 
 def _fetch_auth_code(c, code: str):

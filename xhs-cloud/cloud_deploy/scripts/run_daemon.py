@@ -1,5 +1,10 @@
 # -*- coding: utf-8
-"""云端监控守护入口（PG 写入，不调用 xhs_full_sold_daemon）。"""
+"""云端监控守护入口。
+
+模式（XHS_DAEMON_MODE）:
+  full_sold  — ⑥补缺挂机（默认，对齐主面板，写 PG）
+  lite       — 简化版 cloud_daemon（仅 fetch + record_cloud_scan）
+"""
 from __future__ import annotations
 
 import json
@@ -28,20 +33,19 @@ def _load_config() -> dict:
     cfg["web_detail_concurrency"] = int(
         os.environ.get("XHS_DAEMON_CONCURRENCY", cfg.get("web_detail_concurrency", 2))
     )
-    cfg["batch_size"] = int(os.environ.get("XHS_DAEMON_BATCH_SIZE", cfg.get("batch_size", 20)))
+    cfg["batch_size"] = int(os.environ.get("XHS_DAEMON_BATCH_SIZE", cfg.get("batch_size", 400)))
     cfg["web_cooldown_seconds"] = int(
         os.environ.get("XHS_DAEMON_COOLDOWN_SEC", cfg.get("web_cooldown_seconds", 120))
     )
+    cfg["shop_engine"] = os.environ.get("XHS_DAEMON_ENGINE", cfg.get("shop_engine", "api"))
     return cfg
 
 
-def main():
-    bootstrap()
+def _run_lite(cfg: dict) -> None:
     from cloud_deploy.daemon.cloud_daemon import start_cloud_daemon
 
-    cfg = _load_config()
     daemon = start_cloud_daemon(cfg, print)
-    print(f"[xhs-daemon] cloud PG 模式: {cfg}", flush=True)
+    print(f"[xhs-daemon] lite 模式: {cfg}", flush=True)
 
     def _on_sig(_sig, _frame):
         print("[xhs-daemon] 停止", flush=True)
@@ -52,6 +56,18 @@ def main():
     signal.signal(signal.SIGTERM, _on_sig)
     while True:
         time.sleep(60)
+
+
+def main():
+    bootstrap()
+    mode = os.environ.get("XHS_DAEMON_MODE", "full_sold").strip().lower()
+    cfg = _load_config()
+    if mode == "lite":
+        _run_lite(cfg)
+    else:
+        from cloud_deploy.daemon.crawler_bridge import run_full_sold_daemon_loop
+
+        run_full_sold_daemon_loop(cfg)
 
 
 if __name__ == "__main__":

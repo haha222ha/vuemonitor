@@ -492,17 +492,23 @@ def generate_auth_codes(
         conn.close()
 
 
-def list_auth_codes(limit: int = 100) -> list[dict]:
+def list_auth_codes(limit: int = 100, status: str | None = None) -> list[dict]:
     conn = _conn()
     try:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
             c.execute("SET search_path TO xhs_monitor, public")
-            c.execute(
+            sql = (
                 """SELECT code, plan_code, duration_days, max_activations,
                           current_activations, status, note, created_at, expires_at
-                   FROM auth_codes ORDER BY id DESC LIMIT %s""",
-                (limit,),
+                   FROM auth_codes"""
             )
+            params: list = []
+            if status:
+                sql += " WHERE status = %s"
+                params.append(status)
+            sql += " ORDER BY id DESC LIMIT %s"
+            params.append(limit)
+            c.execute(sql, params)
             rows = []
             for r in c.fetchall():
                 rows.append(
@@ -520,6 +526,51 @@ def list_auth_codes(limit: int = 100) -> list[dict]:
                     }
                 )
             return rows
+    finally:
+        conn.close()
+
+
+def get_admin_stats() -> dict:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute("SELECT COUNT(*) AS n FROM users")
+            total_members = int(c.fetchone()["n"])
+            c.execute(
+                """SELECT COUNT(DISTINCT u.id) AS n
+                   FROM users u
+                   JOIN memberships m ON m.user_id = u.id
+                   WHERE m.expires_at > NOW()"""
+            )
+            active_members = int(c.fetchone()["n"])
+            c.execute("SELECT status, COUNT(*) AS n FROM auth_codes GROUP BY status")
+            code_by_status = {r["status"]: int(r["n"]) for r in c.fetchall()}
+            c.execute(
+                """SELECT report_date, file_name, created_at
+                   FROM report_archives
+                   WHERE archive_type = 'member_daily_zip' AND status = 'published'
+                   ORDER BY report_date DESC LIMIT 1"""
+            )
+            latest = c.fetchone()
+            c.execute(
+                """SELECT COUNT(*) AS n FROM report_archives
+                   WHERE archive_type = 'member_daily_zip' AND status = 'published'"""
+            )
+            archive_count = int(c.fetchone()["n"])
+            return {
+                "total_members": total_members,
+                "active_members": active_members,
+                "auth_codes_unused": code_by_status.get("unused", 0),
+                "auth_codes_active": code_by_status.get("active", 0),
+                "auth_codes_revoked": code_by_status.get("revoked", 0),
+                "auth_codes_total": sum(code_by_status.values()),
+                "latest_report_date": (
+                    latest["report_date"].isoformat() if latest and latest.get("report_date") else None
+                ),
+                "latest_report_file": latest["file_name"] if latest else None,
+                "archive_count": archive_count,
+            }
     finally:
         conn.close()
 

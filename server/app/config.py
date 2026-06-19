@@ -81,6 +81,10 @@ class Settings(BaseSettings):
 
     INTEL_SYNC_API_KEY: str = ""
 
+    XHS_CLOUD_API_URL: str = "http://127.0.0.1:8080"
+    XHS_CLOUD_SYNC_KEY: str = ""
+    XHS_CLOUD_MEMBER_PORTAL_URL: str = ""
+
     SMTP_HOST: str = ""
     SMTP_PORT: int = 587
     SMTP_USER: str = ""

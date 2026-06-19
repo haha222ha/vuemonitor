@@ -7,6 +7,7 @@
         <el-menu-item index="/users">用户管理</el-menu-item>
         <el-menu-item index="/licenses">主系统授权码</el-menu-item>
         <el-menu-item index="/intel-codes">情报授权码</el-menu-item>
+        <el-menu-item index="/pick-member">选品会员</el-menu-item>
         <el-menu-item index="/collect">采集管理</el-menu-item>
         <el-menu-item index="/proxies">代理池管理</el-menu-item>
         <el-menu-item index="/risk-events">风控事件</el-menu-item>

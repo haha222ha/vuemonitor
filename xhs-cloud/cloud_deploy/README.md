@@ -59,14 +59,32 @@ xhs-cloud-api :8080 → 会员下载 zip（html + data.js）
 
 ## 3. 服务器首次安装
 
+**推荐（免手填 nano）：**
+
 ```bash
 git clone https://github.com/haha222ha/vuemonitor.git /opt/vuemonitor
 sudo bash /opt/vuemonitor/xhs-cloud/cloud_deploy/install.sh /opt/vuemonitor/xhs-cloud
 sudo -u postgres psql -d vuemonitor -f /opt/xhs-cloud/cloud_deploy/database/init_xhs_monitor.sql
-nano /opt/xhs-cloud/.env
+bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/bootstrap_from_vuemonitor.sh
+# 按脚本提示把 XHS_CLOUD_SYNC_KEY 写入 /opt/vuemonitor/server/.env
+cd /opt/xhs-cloud && bash cloud_deploy/scripts/host-update.sh
 sudo systemctl start xhs-cloud-api
 sudo systemctl enable xhs-ingest-report.timer
 ```
+
+**日常管理（可视化）：** 登录 `admin.xhs365.cn` → 侧边栏 **选品会员** → 生成授权码 / 查看状态 / 复制会员链接。
+
+**纯线上全自动（推荐）：**
+
+```bash
+# 1. 上传爬虫（一次性，从 Windows）
+scp -r "D:/jiekoufenxi/小红书多设备爬虫/"* admin@你的IP:/opt/xhs/crawler/
+
+# 2. 服务器启用
+bash /opt/xhs-cloud/cloud_deploy/scripts/enable_pure_online.sh
+```
+
+手动配置 `.env` 仍可用 `bootstrap_from_vuemonitor.sh`（免 nano）。
 
 ---
 

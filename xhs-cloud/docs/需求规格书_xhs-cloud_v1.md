@@ -108,7 +108,30 @@ PG xhs_monitor（report_daily_items / goods_sold_daily）
   → import_historical_reports.py 批量导入本地 全量*
 ```
 
-**已实现（P2/P3/P4）：** `goods_sold_snapshots` 90 天滚动 + 回补/增量同步 + `cloud_daemon` PG 扫描 + `monitor_rules` 规则引擎。
+**已实现（P2/P3/P4）：** `goods_sold_snapshots` 90 天滚动 + 回补/增量同步 + **⑥补缺挂机（`FullSoldSyncDaemon` → PG）** + `monitor_rules` 规则引擎。
+
+### 4.3 纯线上采集（⑥ 补缺挂机 · 已对接）
+
+与本地主面板 `小红书多设备爬虫_完整版.py` → **「⑥补缺挂机」** 同一套逻辑，云端通过 `crawler_bridge.py` 注入 PG 写入：
+
+```text
+xhs_full_sold_daemon.FullSoldSyncDaemon   ← 主面板同款调度器
+  ├─ xhs_full_sold_fetch.fetch_sold_detail  引擎链 api→api2→mobile_http→playwright
+  ├─ pg_full_sold_queue                     补缺队列（seed 自 monitor_goods）
+  └─ pg_sold_sync_write.sync_sold_to_pg     对齐 sync_sold_to_main_db 写入口径
+       → goods_sold_snapshots + goods_sold_daily + monitor_goods
+
+systemd: xhs-daemon.service (XHS_DAEMON_MODE=full_sold)
+定时: xhs-daily-report 19:30 → 周报周日 22:00 → 月报每月1日 06:00
+```
+
+| 本地 SQLite 行为 | 云端 PG 等价 |
+|------------------|--------------|
+| `sold_snapshots` | `goods_sold_snapshots` |
+| `sold_history` 当日行 | `goods_sold_daily` |
+| `goods.sold_num` 上行更新 | `monitor_goods.last_sold` |
+| `xhs_full_sold_queue.db` | `full_sold_queue` 表 |
+| 风控冷却 30/60/90/120 分 | 同款（内存 + 日志 stub） |
 
 ---
 
@@ -212,7 +235,7 @@ PG xhs_monitor（report_daily_items / goods_sold_daily）
 | P1 | 本地 docker-compose PG 联调 | ✅ |
 | P2 | sold_snapshots 90 天 + 清理 Job | ✅ |
 | P2 | 增量 sold_history 同步 | ✅ |
-| P3 | cloud_daemon 云扫描写 PG | ✅（可选，2G 默认不 enable） |
+| P3 | **⑥补缺挂机** 云扫描写 PG（FullSoldSyncDaemon + bridge） | ✅ |
 | P4 | 规则引擎 + monitor_alerts | ✅ 轻量版 |
 | P5 | sold_snapshots 全历史 / 规则告警通道 | ⏳ |
 

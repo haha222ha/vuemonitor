@@ -176,8 +176,49 @@ def admin_generate_codes(body: GenerateCodesBody, _: None = Depends(verify_sync_
 
 
 @app.get("/api/v1/admin/auth-codes")
-def admin_list_codes(_: None = Depends(verify_sync_key), limit: int = 50):
-    return {"items": db.list_auth_codes(limit=limit)}
+def admin_list_codes(
+    _: None = Depends(verify_sync_key),
+    limit: int = 100,
+    status: str | None = None,
+):
+    return {"items": db.list_auth_codes(limit=limit, status=status or None)}
+
+
+@app.get("/api/v1/admin/stats")
+def admin_stats(_: None = Depends(verify_sync_key)):
+    stats = db.get_admin_stats()
+    archives = db.list_archives()
+    pool_size = 0
+    pending_backfill = 0
+    pending_snapshots = 0
+    if os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        try:
+            from cloud_deploy.cloud_api.database_pg import _conn
+
+            conn = _conn()
+            with conn.cursor() as c:
+                c.execute("SET search_path TO xhs_monitor, public")
+                c.execute("SELECT COUNT(*) FROM monitor_goods WHERE monitor_status='active'")
+                pool_size = c.fetchone()[0]
+                c.execute(
+                    "SELECT COUNT(*) FROM goods_sync_state WHERE sold_daily_backfill_done=FALSE"
+                )
+                pending_backfill = c.fetchone()[0]
+                c.execute(
+                    "SELECT COUNT(*) FROM goods_sync_state WHERE sold_snapshots_backfill_done=FALSE"
+                )
+                pending_snapshots = c.fetchone()[0]
+            conn.close()
+        except Exception:
+            pass
+    return {
+        **stats,
+        "archive_count_sync": len(archives),
+        "latest_archive": archives[0] if archives else None,
+        "monitor_pool_active": pool_size,
+        "sold_history_pending_backfill": pending_backfill,
+        "sold_snapshots_pending_backfill": pending_snapshots,
+    }
 
 
 @app.get("/api/v1/sync/status")
