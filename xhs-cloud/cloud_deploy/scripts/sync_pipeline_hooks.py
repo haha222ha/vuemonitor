@@ -38,9 +38,13 @@ def run_post_report_pg_steps(settings=None, log_fn: Callable[[str], None] | None
 
     from cloud_deploy.scripts.apply_monitor_rules import run as apply_rules
 
-    rules = apply_rules()
-    out["rules"] = rules
-    log(f"post: rules {rules}")
+    try:
+        rules = apply_rules()
+        out["rules"] = rules
+        log(f"post: rules {rules}")
+    except Exception as exc:
+        out["rules"] = {"error": str(exc), "skipped": "deadlock_or_transient"}
+        log(f"post: rules skipped ({exc})")
 
     from cloud_deploy.cloud_api.retention_policy import snapshot_prune_enabled
 

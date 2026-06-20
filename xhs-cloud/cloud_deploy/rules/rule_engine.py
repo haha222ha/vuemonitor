@@ -100,9 +100,11 @@ def _apply_action(conn, goods_id: str, rule_id: int, action: dict, ctx: dict) ->
 
 
 def evaluate_rules(conn, goods_id: str | None = None, extra_ctx: dict | None = None) -> dict:
-    """评估 monitor_rules，可选限定单 goods_id。"""
+    """评估 monitor_rules，可选限定单 goods_id。全池时分批 commit 降低与 daemon 死锁。"""
     applied = 0
     alerts = 0
+    batch_size = 200 if not goods_id else 0
+
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
         c.execute("SELECT id, name, rule_json FROM monitor_rules WHERE enabled=TRUE ORDER BY id")
@@ -118,47 +120,69 @@ def evaluate_rules(conn, goods_id: str | None = None, extra_ctx: dict | None = N
         else:
             c.execute(
                 """SELECT goods_id, pool, monitor_status, last_v1d, last_actual_v1d
-                   FROM monitor_goods WHERE monitor_status IN ('active','idle')"""
+                   FROM monitor_goods WHERE monitor_status IN ('active','idle')
+                   ORDER BY goods_id"""
             )
             goods_rows = c.fetchall()
 
     extra_ctx = extra_ctx or {}
-    for gid, pool, status, last_v1d, last_actual in goods_rows:
-        ctx = {
-            "goods_id": gid,
-            "pool": pool,
-            "status": status,
-            "last_v1d": float(last_v1d or 0),
-            "last_actual_v1d": float(last_actual or 0),
-            **(extra_ctx if gid == goods_id or not goods_id else {}),
-        }
-        for rule_id, _name, rule_json in rules:
-            rule = rule_json if isinstance(rule_json, dict) else json.loads(rule_json)
-            when = rule.get("when") or {}
-            action = rule.get("action") or {}
-            if not action:
-                continue
 
-            matched = True
-            if th := when.get("last_v1d_gte"):
-                matched = matched and ctx["last_v1d"] >= float(th)
-            if pool_not := when.get("pool_not"):
-                matched = matched and (pool or "") != pool_not
-            if when.get("zero_v1d_days_gte"):
-                matched = matched and _zero_v1d_streak(conn, gid, int(when["zero_v1d_days_gte"]))
-            if when.get("actual_v1d_drop_pct_gte"):
-                drop = _actual_drop_pct(conn, gid)
-                matched = matched and drop >= float(when["actual_v1d_drop_pct_gte"])
-                ctx["drop_pct"] = drop
-            if scan_status := when.get("scan_status"):
-                matched = matched and ctx.get("scan_status") == scan_status
+    def _eval_batch(batch: list) -> tuple[int, int]:
+        nonlocal applied, alerts
+        b_applied = b_alerts = 0
+        for gid, pool, status, last_v1d, last_actual in batch:
+            ctx = {
+                "goods_id": gid,
+                "pool": pool,
+                "status": status,
+                "last_v1d": float(last_v1d or 0),
+                "last_actual_v1d": float(last_actual or 0),
+                **(extra_ctx if gid == goods_id or not goods_id else {}),
+            }
+            for rule_id, _name, rule_json in rules:
+                rule = rule_json if isinstance(rule_json, dict) else json.loads(rule_json)
+                when = rule.get("when") or {}
+                action = rule.get("action") or {}
+                if not action:
+                    continue
 
-            if matched:
-                ev = _apply_action(conn, gid, rule_id, action, ctx)
-                if ev:
-                    applied += 1
-                    if any(e.startswith("alert:") for e in ev):
-                        alerts += 1
+                matched = True
+                if th := when.get("last_v1d_gte"):
+                    matched = matched and ctx["last_v1d"] >= float(th)
+                if pool_not := when.get("pool_not"):
+                    matched = matched and (pool or "") != pool_not
+                if when.get("zero_v1d_days_gte"):
+                    matched = matched and _zero_v1d_streak(conn, gid, int(when["zero_v1d_days_gte"]))
+                if when.get("actual_v1d_drop_pct_gte"):
+                    drop = _actual_drop_pct(conn, gid)
+                    matched = matched and drop >= float(when["actual_v1d_drop_pct_gte"])
+                    ctx["drop_pct"] = drop
+                if scan_status := when.get("scan_status"):
+                    matched = matched and ctx.get("scan_status") == scan_status
 
-    conn.commit()
-    return {"rules_evaluated": len(rules), "goods_checked": len(goods_rows), "actions_applied": applied, "alerts": alerts}
+                if matched:
+                    ev = _apply_action(conn, gid, rule_id, action, ctx)
+                    if ev:
+                        b_applied += 1
+                        if any(e.startswith("alert:") for e in ev):
+                            b_alerts += 1
+        conn.commit()
+        return b_applied, b_alerts
+
+    if batch_size and len(goods_rows) > batch_size:
+        for i in range(0, len(goods_rows), batch_size):
+            chunk = goods_rows[i : i + batch_size]
+            a, al = _eval_batch(chunk)
+            applied += a
+            alerts += al
+    else:
+        a, al = _eval_batch(goods_rows)
+        applied += a
+        alerts += al
+
+    return {
+        "rules_evaluated": len(rules),
+        "goods_checked": len(goods_rows),
+        "actions_applied": applied,
+        "alerts": alerts,
+    }
