@@ -30,9 +30,9 @@ class CloudMonitorDaemon:
         self._running = False
         self._round = 0
         self._risk_until = 0.0
-        self.batch_size = max(50, min(int(self.config.get("batch_size", 200)), 500))
-        self.concurrency = max(1, min(4, int(self.config.get("web_detail_concurrency", 2))))
-        self.cooldown = max(0, int(self.config.get("web_cooldown_seconds", 60)))
+        self.batch_size = max(50, min(int(self.config.get("batch_size", 1000)), 1500))
+        self.concurrency = max(1, min(5, int(self.config.get("web_detail_concurrency", 3))))
+        self.cooldown = max(0, int(self.config.get("web_cooldown_seconds", 30)))
         self.min_success_rate = float(self.config.get("min_success_rate", 0.08) or 0.08)
         self.auto_fallback = bool(self.config.get("auto_fallback", True))
 

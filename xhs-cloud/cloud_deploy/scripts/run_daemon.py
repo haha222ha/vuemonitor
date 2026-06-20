@@ -32,15 +32,15 @@ def _load_config() -> dict:
         with open(cfg_path, "r", encoding="utf-8") as f:
             cfg = json.load(f)
     cfg["web_detail_concurrency"] = int(
-        os.environ.get("XHS_DAEMON_CONCURRENCY", cfg.get("web_detail_concurrency", 2))
+        os.environ.get("XHS_DAEMON_CONCURRENCY", cfg.get("web_detail_concurrency", 3))
     )
-    cfg["batch_size"] = int(os.environ.get("XHS_DAEMON_BATCH_SIZE", cfg.get("batch_size", 200)))
+    cfg["batch_size"] = int(os.environ.get("XHS_DAEMON_BATCH_SIZE", cfg.get("batch_size", 1000)))
     cfg["shop_engine"] = os.environ.get("XHS_DAEMON_ENGINE", cfg.get("shop_engine", "api"))
     cfg["seed_batch_size"] = int(
         os.environ.get("XHS_DAEMON_SEED_BATCH_SIZE", cfg.get("seed_batch_size", 0))
     )
     cfg["web_cooldown_seconds"] = int(
-        os.environ.get("XHS_DAEMON_COOLDOWN_SEC", cfg.get("web_cooldown_seconds", 60))
+        os.environ.get("XHS_DAEMON_COOLDOWN_SEC", cfg.get("web_cooldown_seconds", 30))
     )
     if not os.environ.get("XHS_ENABLE_PLAYWRIGHT"):
         if cfg.get("enable_playwright"):
