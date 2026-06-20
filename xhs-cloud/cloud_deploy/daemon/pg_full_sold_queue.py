@@ -5,11 +5,14 @@ PG 版 ⑥ 补缺队列 — 对齐 xhs_full_sold_queue_db，数据源为 monitor
 from __future__ import annotations
 
 import logging
+import os
 from datetime import date, datetime
 
 from cloud_deploy.cloud_api.database_pg import _conn, init_db
 
 _logger = logging.getLogger(__name__)
+
+DEFAULT_SMALL_POOL_THRESHOLD = 50_000
 
 QUEUE_DDL = """
 CREATE TABLE IF NOT EXISTS full_sold_queue (
@@ -41,6 +44,67 @@ def _ensure_queue_table(c) -> None:
         s = stmt.strip()
         if s:
             c.execute(s)
+
+
+def _eligible_monitor_sql(low_v1d_only: bool, skip_today: bool) -> tuple[str, str]:
+    v1d_filter = " AND COALESCE(m.last_v1d,0) <= 0" if low_v1d_only else ""
+    skip_sql = ""
+    if skip_today:
+        skip_sql = """
+          AND NOT EXISTS (
+            SELECT 1 FROM goods_sold_snapshots s
+            WHERE s.goods_id = m.goods_id
+              AND s.snapshot_time::date = CURRENT_DATE
+          )
+        """
+    return v1d_filter, skip_sql
+
+
+def count_eligible_monitor(
+    low_v1d_only=False,
+    skip_today=True,
+    min_sold=1,
+) -> int:
+    init_db()
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            _ensure_queue_table(c)
+            v1d_filter, skip_sql = _eligible_monitor_sql(low_v1d_only, skip_today)
+            c.execute(
+                f"""SELECT COUNT(*) FROM monitor_goods m
+                    WHERE m.monitor_status IN ('active','idle')
+                      AND COALESCE(m.last_sold,0) >= %s
+                      {v1d_filter}
+                      {skip_sql}""",
+                (int(min_sold or 1),),
+            )
+            return int(c.fetchone()[0] or 0)
+    finally:
+        conn.close()
+
+
+def _resolve_seed_limit(limit: int, eligible: int) -> int:
+    """小监控池一次性全量 seed；大库才按 limit 分批。"""
+    mode = os.environ.get("XHS_PG_SEED_MODE", "auto").strip().lower()
+    batch_limit = int(limit or 0)
+    threshold = int(os.environ.get("XHS_PG_SMALL_POOL_THRESHOLD", DEFAULT_SMALL_POOL_THRESHOLD))
+    if mode == "full":
+        return 0
+    if mode == "batch":
+        return batch_limit
+    if eligible <= threshold:
+        return 0
+    return batch_limit
+
+
+def _count_pending(c, qd: str) -> int:
+    c.execute(
+        """SELECT COUNT(*) FROM full_sold_queue
+           WHERE queue_date=%s AND last_sync_at IS NULL AND frozen_at IS NULL""",
+        (qd,),
+    )
+    return int(c.fetchone()[0] or 0)
 
 
 def queue_stats(queue_date=None, queue_db=None):
@@ -100,25 +164,45 @@ def seed_full_sold_queue(
             c.execute("DELETE FROM full_sold_queue WHERE queue_date < %s", (qd,))
             c.execute("SELECT COUNT(*) FROM full_sold_queue WHERE queue_date=%s", (qd,))
             existing = int(c.fetchone()[0] or 0)
-            batch_limit = int(limit or 0)
-            if batch_limit > 0 and existing >= batch_limit:
-                log(f"补缺队列已有 {existing:,} 条，跳过 seed")
+            pending = _count_pending(c, qd)
+            v1d_filter, skip_sql = _eligible_monitor_sql(low_v1d_only, skip_today)
+            c.execute(
+                f"""SELECT COUNT(*) FROM monitor_goods m
+                    WHERE m.monitor_status IN ('active','idle')
+                      AND COALESCE(m.last_sold,0) >= %s
+                      {v1d_filter}
+                      {skip_sql}""",
+                (int(min_sold or 1),),
+            )
+            eligible = int(c.fetchone()[0] or 0)
+            batch_limit = _resolve_seed_limit(limit, eligible)
+
+            if batch_limit == 0:
+                log_msg = f"PG 小池模式: monitor 候选 {eligible:,} 条，全量 seed"
+            elif batch_limit > 0:
+                log_msg = f"PG 分批模式: 候选 {eligible:,} 条，本批上限 {batch_limit:,}"
+            else:
+                log_msg = f"PG seed: 候选 {eligible:,} 条"
+
+            # 队列已满批上限但无 pending，且 monitor 仍有候选 → 清空重 seed（修复空转）
+            if existing > 0 and pending == 0 and eligible > 0:
+                log(
+                    f"队列 {existing:,} 条均已处理完，monitor 仍有 {eligible:,} 候选，清空今日队列重新 seed"
+                )
+                c.execute("DELETE FROM full_sold_queue WHERE queue_date=%s", (qd,))
+                existing = 0
+            elif batch_limit > 0 and existing >= batch_limit and pending > 0:
+                log(f"补缺队列已有 {existing:,} 条 (>=批次上限 {batch_limit:,})，待扫 {pending:,}，跳过 seed")
                 return existing
-            if batch_limit == 0 and existing > 0:
-                log(f"补缺队列已有今日 {existing:,} 条，跳过 seed")
+            elif batch_limit == 0 and existing > 0 and pending > 0:
+                log(f"补缺队列已有今日 {existing:,} 条，待扫 {pending:,}，跳过 seed")
+                return existing
+            elif eligible == 0:
+                log("monitor 无候选商品，跳过 seed")
                 return existing
 
-            v1d_filter = " AND COALESCE(m.last_v1d,0) <= 0" if low_v1d_only else ""
-            skip_sql = ""
-            if skip_today:
-                skip_sql = """
-                  AND NOT EXISTS (
-                    SELECT 1 FROM goods_sold_snapshots s
-                    WHERE s.goods_id = m.goods_id
-                      AND s.snapshot_time::date = CURRENT_DATE
-                  )
-                """
             limit_sql = f" LIMIT {batch_limit}" if batch_limit > 0 else ""
+            log(log_msg)
 
             c.execute(
                 f"""INSERT INTO full_sold_queue
@@ -158,8 +242,9 @@ def seed_full_sold_queue(
             inserted = c.rowcount if c.rowcount >= 0 else 0
             c.execute("SELECT COUNT(*) FROM full_sold_queue WHERE queue_date=%s", (qd,))
             total = int(c.fetchone()[0] or 0)
+            pending_after = _count_pending(c, qd)
         conn.commit()
-        log(f"PG 补缺队列 seed: 本次+{inserted:,} 累计 {total:,} 条")
+        log(f"PG 补缺队列 seed: 本次+{inserted:,} 累计 {total:,} 条，待扫 {pending_after:,}")
         return total
     finally:
         conn.close()
@@ -174,11 +259,17 @@ def ensure_queue_seeded(
     log_func=None,
     seed_limit=0,
 ):
-    pending = count_pending()
-    if pending >= min_pending:
+    stats = queue_stats()
+    pending = stats["pending"]
+    eligible = count_eligible_monitor(
+        low_v1d_only=low_v1d_only,
+        skip_today=skip_today,
+    )
+    eff_min_pending = min_pending if eligible >= min_pending else max(1, min(eligible, 10))
+    if pending >= eff_min_pending:
         return pending, False
     log = log_func or (lambda _m: None)
-    log(f"补缺队列待扫 {pending} 条，开始 seed...")
+    log(f"补缺队列待扫 {pending} 条（monitor 候选 {eligible}），开始 seed...")
     seed_full_sold_queue(
         low_v1d_only=low_v1d_only,
         skip_today=skip_today,

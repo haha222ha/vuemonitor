@@ -34,10 +34,13 @@ def _load_config() -> dict:
         os.environ.get("XHS_DAEMON_CONCURRENCY", cfg.get("web_detail_concurrency", 2))
     )
     cfg["batch_size"] = int(os.environ.get("XHS_DAEMON_BATCH_SIZE", cfg.get("batch_size", 400)))
-    cfg["web_cooldown_seconds"] = int(
-        os.environ.get("XHS_DAEMON_COOLDOWN_SEC", cfg.get("web_cooldown_seconds", 120))
-    )
     cfg["shop_engine"] = os.environ.get("XHS_DAEMON_ENGINE", cfg.get("shop_engine", "api"))
+    cfg["seed_batch_size"] = int(
+        os.environ.get("XHS_DAEMON_SEED_BATCH_SIZE", cfg.get("seed_batch_size", 0))
+    )
+    cfg["web_cooldown_seconds"] = int(
+        os.environ.get("XHS_DAEMON_COOLDOWN_SEC", cfg.get("web_cooldown_seconds", 0))
+    )
     return cfg
 
 

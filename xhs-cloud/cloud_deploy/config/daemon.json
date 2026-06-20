@@ -7,5 +7,7 @@
   "low_v1d_only": false,
   "auto_fallback": true,
   "min_success_rate": 0.08,
-  "seed_batch_size": 50000
+  "seed_batch_size": 0,
+  "queue_sort": "monitor_first",
+  "sold_tier_min": 10
 }

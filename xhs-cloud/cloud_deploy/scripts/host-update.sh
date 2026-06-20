@@ -56,11 +56,25 @@ fi
 "$ROOT/venv/bin/pip" install -q -U pip
 "$ROOT/venv/bin/pip" install -q -r "$ROOT/cloud_deploy/requirements-cloud.txt"
 
-log "PG schema（若已配置 XHS_DATABASE_URL）"
 set -a
 # shellcheck disable=SC1090
 source "$ENV_FILE"
 set +a
+
+log "爬虫运行时（git 内置 ⑥补缺 daemon，约 180KB）"
+CRAWLER_SRC="$ROOT/cloud_deploy/crawler_runtime"
+CRAWLER_DST="${XHS_CRAWLER_ROOT:-/opt/xhs/crawler}"
+if [ -d "$CRAWLER_SRC" ] && [ -f "$CRAWLER_SRC/xhs_full_sold_daemon.py" ]; then
+  sudo mkdir -p "$CRAWLER_DST"
+  rsync -a "$CRAWLER_SRC/" "$CRAWLER_DST/" --exclude 'crawl_data/*' --exclude '*.db' --exclude '*.db-*'
+  sudo mkdir -p "$CRAWLER_DST/crawl_data"
+  sudo chown -R "${SUDO_USER:-$USER}:${SUDO_USER:-$USER}" "$CRAWLER_DST" 2>/dev/null || true
+  ok "已同步 crawler → $CRAWLER_DST"
+else
+  warn "未找到 $CRAWLER_SRC，跳过爬虫同步（可手动 scp 或设置 XHS_CRAWLER_ROOT）"
+fi
+
+log "PG schema（若已配置 XHS_DATABASE_URL）"
 if [[ "${XHS_DATABASE_URL:-}" == postgres* ]]; then
   "$ROOT/venv/bin/python" - <<'PY' || warn "PG init 失败，请检查 XHS_DATABASE_URL"
 import os, sys
@@ -88,6 +102,11 @@ if systemctl is-enabled xhs-cloud-api.service &>/dev/null; then
   sudo systemctl restart xhs-cloud-api.service
 else
   warn "xhs-cloud-api 未 enable，跳过 restart"
+fi
+
+if systemctl is-enabled xhs-daemon.service &>/dev/null; then
+  log "重启 xhs-daemon"
+  sudo systemctl restart xhs-daemon.service || true
 fi
 
 if systemctl is-enabled xhs-ingest-report.timer &>/dev/null; then

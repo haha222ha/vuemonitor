@@ -4,6 +4,8 @@ data/
 .env
 __pycache__/
 *.pyc
+crawler_runtime/crawl_data/*
+!crawler_runtime/crawl_data/.gitkeep
 *.db
 *.db-wal
 *.db-shm

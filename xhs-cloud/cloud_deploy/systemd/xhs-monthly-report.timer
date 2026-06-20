@@ -1,8 +1,8 @@
 [Unit]
-Description=Monthly report pipeline (1st day 06:00)
+Description=Monthly report pipeline (1st day 17:00)
 
 [Timer]
-OnCalendar=*-*-01 06:00:00
+OnCalendar=*-*-01 17:00:00
 Persistent=true
 
 [Install]

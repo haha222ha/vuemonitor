@@ -83,8 +83,18 @@ def init_db() -> None:
         );
         """
     )
+    _migrate_legacy_columns(c)
     conn.commit()
     conn.close()
+
+
+def _migrate_legacy_columns(c) -> None:
+    c.execute("PRAGMA table_info(report_archives)")
+    cols = {row[1] for row in c.fetchall()}
+    if "status" not in cols:
+        c.execute("ALTER TABLE report_archives ADD COLUMN status TEXT DEFAULT 'published'")
+    if "published_at" not in cols:
+        c.execute("ALTER TABLE report_archives ADD COLUMN published_at TEXT")
 
 
 def _hash_password(password: str, salt: str | None = None) -> str:

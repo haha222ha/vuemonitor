@@ -1,8 +1,8 @@
 [Unit]
-Description=Weekly report pipeline (Sunday)
+Description=Weekly report pipeline (Sunday 17:00)
 
 [Timer]
-OnCalendar=Sun *-*-* 22:00:00
+OnCalendar=Sun *-*-* 17:00:00
 Persistent=true
 
 [Install]

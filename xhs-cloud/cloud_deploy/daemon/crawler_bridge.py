@@ -20,19 +20,45 @@ _logger = logging.getLogger(__name__)
 
 def _setup_crawler_path() -> str:
     crawler = os.environ.get("XHS_CRAWLER_ROOT", "/opt/xhs/crawler").strip()
-    if crawler and os.path.isdir(crawler) and crawler not in sys.path:
+    if not crawler or not os.path.isdir(crawler):
+        raise RuntimeError(
+            f"爬虫目录不存在: {crawler!r}。"
+            "请在 /opt/xhs-cloud/.env 设置 XHS_CRAWLER_ROOT，并上传爬虫（含 xhs_full_sold_daemon.py）。"
+        )
+    if crawler not in sys.path:
         sys.path.insert(0, crawler)
+    missing = [
+        name
+        for name in (
+            "xhs_full_sold_queue_db.py",
+            "xhs_full_sold_daemon.py",
+            "xhs_full_sold_fetch.py",
+            "xhs_web_sold_sync_write.py",
+        )
+        if not os.path.isfile(os.path.join(crawler, name))
+    ]
+    if missing:
+        raise RuntimeError(
+            f"爬虫目录 {crawler} 缺少文件: {', '.join(missing)}。"
+            "请从 Windows 上传完整爬虫到该目录后再 systemctl restart xhs-daemon。"
+        )
     return crawler
 
 
 def install_pg_bridge() -> None:
     """在 import FullSoldSyncDaemon 之前调用。"""
-    _setup_crawler_path()
+    crawler = _setup_crawler_path()
 
     from cloud_deploy.daemon import pg_full_sold_queue as pg_queue
     from cloud_deploy.daemon.pg_sold_sync_write import recalc_velocity_after_sync, sync_sold_to_pg
 
-    import xhs_full_sold_queue_db as qmod
+    try:
+        import xhs_full_sold_queue_db as qmod
+    except ModuleNotFoundError as e:
+        raise RuntimeError(
+            f"无法 import xhs_full_sold_queue_db（XHS_CRAWLER_ROOT={crawler}）。"
+            "请确认爬虫已上传到服务器。"
+        ) from e
 
     qmod.seed_full_sold_queue = pg_queue.seed_full_sold_queue
     qmod.ensure_queue_seeded = pg_queue.ensure_queue_seeded

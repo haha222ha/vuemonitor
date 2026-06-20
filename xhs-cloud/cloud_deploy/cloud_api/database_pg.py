@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import secrets
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import psycopg2
 import psycopg2.extras
@@ -16,6 +16,20 @@ import psycopg2.extras
 from cloud_deploy.cloud_api.config import get_settings
 
 psycopg2.extras.register_uuid()
+
+
+def _now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _as_utc(dt: datetime) -> datetime:
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def _days_until(dt: datetime) -> int:
+    return max(0, (_as_utc(dt) - _now()).days)
 
 
 def _conn():
@@ -210,6 +224,22 @@ def init_db() -> None:
                     meta_json JSONB,
                     updated_at TIMESTAMPTZ DEFAULT NOW()
                 );
+                CREATE TABLE IF NOT EXISTS full_sold_queue (
+                    goods_id VARCHAR(32) PRIMARY KEY,
+                    title TEXT DEFAULT '',
+                    sold_num INT DEFAULT 0,
+                    velocity_1d NUMERIC(12,2) DEFAULT 0,
+                    pool VARCHAR(16) DEFAULT 'WATCH',
+                    last_seen TIMESTAMPTZ,
+                    queue_date DATE NOT NULL,
+                    last_sync_at TIMESTAMPTZ,
+                    sync_fail_count INT DEFAULT 0,
+                    frozen_at TIMESTAMPTZ,
+                    freeze_code INT DEFAULT 0,
+                    seeded_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                );
+                CREATE INDEX IF NOT EXISTS idx_fsq_pending
+                    ON full_sold_queue (queue_date, last_sync_at, frozen_at, velocity_1d);
                 CREATE INDEX IF NOT EXISTS idx_rdi_date_v1d ON report_daily_items(report_date, v1d DESC);
                 CREATE INDEX IF NOT EXISTS idx_rdi_goods ON report_daily_items(goods_id, report_date DESC);
                 CREATE INDEX IF NOT EXISTS idx_monitor_active ON monitor_goods(monitor_status, last_v1d DESC);
@@ -219,10 +249,21 @@ def init_db() -> None:
                 CREATE INDEX IF NOT EXISTS idx_ma_goods ON monitor_alerts(goods_id, created_at DESC);
                 """
             )
+            _migrate_legacy_columns(c)
             _seed_default_rules(c)
         conn.commit()
     finally:
         conn.close()
+
+
+def _migrate_legacy_columns(c) -> None:
+    """旧库可能缺 status/published_at 列，补全以免 admin/stats 500。"""
+    c.execute(
+        "ALTER TABLE report_archives ADD COLUMN IF NOT EXISTS status VARCHAR(16) DEFAULT 'published'"
+    )
+    c.execute(
+        "ALTER TABLE report_archives ADD COLUMN IF NOT EXISTS published_at TIMESTAMPTZ"
+    )
 
 
 def _seed_default_rules(c) -> None:
@@ -269,7 +310,7 @@ def ensure_admin() -> None:
                     (s.xhs_cloud_admin_user, _hash_password(s.xhs_cloud_admin_pass)),
                 )
                 uid = c.fetchone()["id"]
-                exp = datetime.now() + timedelta(days=3650)
+                exp = _now() + timedelta(days=3650)
                 c.execute(
                     """INSERT INTO memberships (user_id, plan_code, activated_at, expires_at, status)
                        VALUES (%s,'admin',NOW(),%s,'active')""",
@@ -305,9 +346,7 @@ def get_active_member(user_id: int) -> dict | None:
                 "username": row["username"],
                 "expires_at": row["expires_at"].strftime("%Y-%m-%d %H:%M:%S"),
                 "plan_code": row.get("plan_code") or "monthly",
-                "days_remaining": max(
-                    0, (row["expires_at"] - datetime.now()).days
-                ),
+                "days_remaining": _days_until(row["expires_at"]),
             }
     finally:
         conn.close()
@@ -550,7 +589,7 @@ def get_admin_stats() -> dict:
             c.execute("SELECT status, COUNT(*) AS n FROM auth_codes GROUP BY status")
             code_by_status = {r["status"]: int(r["n"]) for r in c.fetchall()}
             c.execute(
-                """SELECT report_date, file_name, created_at
+                """SELECT report_date, file_name
                    FROM report_archives
                    WHERE archive_type = 'member_daily_zip' AND status = 'published'
                    ORDER BY report_date DESC LIMIT 1"""
@@ -597,7 +636,7 @@ def _validate_auth_code_row(row: dict | None) -> dict:
         raise ValueError("授权码已被吊销")
     if row["current_activations"] >= row["max_activations"]:
         raise ValueError("授权码已达最大激活次数")
-    if row["expires_at"] and row["expires_at"] < datetime.now():
+    if row["expires_at"] and _as_utc(row["expires_at"]) < _now():
         raise ValueError("授权码已过期")
     return row
 
@@ -609,10 +648,10 @@ def _extend_membership(c, user_id: int, plan_code: str, duration_days: int) -> d
         (user_id,),
     )
     row = c.fetchone()
-    now = datetime.now()
+    now = _now()
     base = now
-    if row and row[0] and row[0] > now:
-        base = row[0]
+    if row and row[0] and _as_utc(row[0]) > now:
+        base = _as_utc(row[0])
     expires = base + timedelta(days=duration_days)
     c.execute(
         """INSERT INTO memberships (user_id, plan_code, activated_at, expires_at, status)
@@ -659,7 +698,7 @@ def register_with_auth_code(username: str, password: str, code: str) -> dict:
             "username": username,
             "expires_at": expires.strftime("%Y-%m-%d %H:%M:%S"),
             "plan_code": row["plan_code"],
-            "days_remaining": max(0, (expires - datetime.now()).days),
+            "days_remaining": _days_until(expires),
             "is_active": True,
         }
     finally:
@@ -712,7 +751,7 @@ def get_member_profile(user_id: int) -> dict | None:
                 m = c.fetchone()
                 if not m:
                     return None
-                days = max(0, (m["expires_at"] - datetime.now()).days)
+                days = _days_until(m["expires_at"])
                 return {
                     "id": user_id,
                     "username": u["username"],

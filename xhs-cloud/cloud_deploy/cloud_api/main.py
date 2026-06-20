@@ -98,7 +98,12 @@ def register(body: RegisterBody):
         profile = db.register_with_auth_code(body.username, body.password, body.auth_code)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
-    token = create_token(profile)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"开通失败: {e}") from e
+    try:
+        token = create_token(profile)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"登录令牌生成失败: {e}") from e
     return {
         "access_token": token,
         "token_type": "bearer",
@@ -181,13 +186,20 @@ def admin_list_codes(
     limit: int = 100,
     status: str | None = None,
 ):
-    return {"items": db.list_auth_codes(limit=limit, status=status or None)}
+    try:
+        items = db.list_auth_codes(limit=limit, status=status or None)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
+    return {"items": items}
 
 
 @app.get("/api/v1/admin/stats")
 def admin_stats(_: None = Depends(verify_sync_key)):
-    stats = db.get_admin_stats()
-    archives = db.list_archives()
+    try:
+        stats = db.get_admin_stats()
+        archives = db.list_archives()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
     pool_size = 0
     pending_backfill = 0
     pending_snapshots = 0
