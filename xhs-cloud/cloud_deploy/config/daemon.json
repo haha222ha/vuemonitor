@@ -4,7 +4,7 @@
   "web_detail_concurrency": 2,
   "web_cooldown_seconds": 120,
   "batch_size": 400,
-  "skip_today": false,
+  "skip_today": true,
   "min_sold": 0,
   "low_v1d_only": false,
   "auto_fallback": true,

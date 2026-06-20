@@ -48,8 +48,8 @@ def _load_config() -> dict:
         full_pool = bool(cfg.get("full_pool"))
     if full_pool:
         cfg["full_pool"] = True
-        cfg["skip_today"] = False
         cfg["min_sold"] = 0
+        cfg.setdefault("skip_today", True)
         os.environ.setdefault("XHS_PG_SEED_MODE", "full")
     if "XHS_DAEMON_SKIP_TODAY" in os.environ:
         cfg["skip_today"] = os.environ["XHS_DAEMON_SKIP_TODAY"].strip().lower() in (
