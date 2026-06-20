@@ -302,7 +302,7 @@ async function downloadReport(date, archiveType) {
     a.click();
     a.remove();
     URL.revokeObjectURL(a.href);
-    showMsg(dashMsg, '下载已开始：解压后用浏览器打开 index_with_gr.html（已支持手机自适应）', 'ok');
+    showMsg(dashMsg, '下载已开始：解压后请右键 index_with_gr.html，选择「打开方式」→ Google Chrome 打开（已支持手机自适应）', 'ok');
   } catch (e) {
     showMsg(dashMsg, e.message, 'error');
   }

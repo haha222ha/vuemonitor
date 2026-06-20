@@ -38,7 +38,7 @@ def pack_report_dir(report_dir: str, zip_path: str | None = None) -> dict:
             f.write(
                 "选品报告离线包\n"
                 f"生成时间: {datetime.now():%Y-%m-%d %H:%M:%S}\n"
-                "解压后请用浏览器打开 index_with_gr.html\n"
+                "解压后请右键 index_with_gr.html，选择「打开方式」→ Google Chrome 打开\n"
                 "数据为系统估算参考，非平台官方数据。禁止转售与违规用途。\n"
             )
 

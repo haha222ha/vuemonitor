@@ -117,7 +117,10 @@ def write_report_dir(
 
     readme = os.path.join(output_dir, "README.txt")
     with open(readme, "w", encoding="utf-8") as f:
-        f.write(payload["meta"].get("disclaimer", "") + "\n解压后打开 index_with_gr.html\n")
+        f.write(
+            payload["meta"].get("disclaimer", "")
+            + "\n解压后请右键 index_with_gr.html，选择「打开方式」→ Google Chrome 打开\n"
+        )
     return output_dir
 
 
