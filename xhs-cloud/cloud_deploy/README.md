@@ -27,9 +27,9 @@ bash /opt/xhs-cloud/cloud_deploy/tests/run_e2e.sh
 | 月报 | `run_full_pipeline.py monthly` / `xhs-monthly-report.timer` | 上月聚合 → `月报YYYYMM/` |
 | 历史冷启动 | `import_historical_reports.py` | 批量导入本地 `全量*` 目录 |
 | sold_history 回补 | `backfill_sold_history_pg.py` | 本地 SQLite → `goods_sold_daily` |
-| sold_snapshots 90d | `backfill_sold_snapshots_pg.py` | 日内快照仅近 90 天 |
+| sold_snapshots | `backfill_sold_snapshots_pg.py` | 日内快照，默认永久保留 |
 | 增量日照 | `sync_incremental_sold_daily.py` | 已在池商品新日期 |
-| 快照清理 | `prune_sold_snapshots.py` + timer | 每日删除超 90 天 |
+| 快照清理 | `prune_sold_snapshots.py` + timer | 仅当 `RETENTION_DAYS>0` 时启用 |
 | 规则引擎 | `rules/rule_engine.py` | pool/status/告警 |
 | 云扫描守护 | `daemon/cloud_daemon.py` | 写 PG（需 XHS_CRAWLER_ROOT） |
 | 会员 API | `xhs-cloud-api.service` | 登录、402 封禁、zip 下载 |

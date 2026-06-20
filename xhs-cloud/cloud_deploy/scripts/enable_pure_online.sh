@@ -89,17 +89,27 @@ log "启用纯线上服务"
 UNITS=(
   xhs-cloud-api.service
   xhs-daemon.service
+  xhs-daemon-watchdog.timer
   xhs-daily-report.timer
   xhs-weekly-report.timer
   xhs-monthly-report.timer
-  xhs-prune-snapshots.timer
 )
+PRUNE_UNITS=()
+if [[ "${XHS_SNAPSHOT_RETENTION_DAYS:-0}" =~ ^[1-9][0-9]*$ ]] \
+   && [[ "${XHS_ENABLE_SNAPSHOT_PRUNE:-auto}" != "0" ]] \
+   && [[ "${XHS_ENABLE_SNAPSHOT_PRUNE:-auto}" != "false" ]]; then
+  UNITS+=(xhs-prune-snapshots.timer)
+  PRUNE_UNITS+=(xhs-prune-snapshots)
+else
+  warn "快照永久保留（XHS_SNAPSHOT_RETENTION_DAYS=0），不启用 xhs-prune-snapshots.timer"
+  sudo systemctl disable --now xhs-prune-snapshots.timer 2>/dev/null || true
+fi
 for u in "${UNITS[@]}"; do
   sudo systemctl enable "$u"
 done
 sudo systemctl restart xhs-cloud-api.service
 sudo systemctl restart xhs-daemon.service || warn "xhs-daemon 启动失败，检查 journalctl -u xhs-daemon"
-for t in xhs-daily-report xhs-weekly-report xhs-monthly-report xhs-prune-snapshots; do
+for t in xhs-daemon-watchdog xhs-daily-report xhs-weekly-report xhs-monthly-report "${PRUNE_UNITS[@]}"; do
   sudo systemctl restart "${t}.timer" || true
 done
 ok "systemd 已配置"
@@ -120,7 +130,7 @@ echo "  24h  xhs-daemon (⑥补缺挂机) → API 多引擎扫池，写 PG"
 echo "  17:00 xhs-daily-report → PG 生成日报 + zip（每天）"
 echo "  周日 17:00             → 周报 zip"
 echo "  每月1日 17:00          → 月报 zip"
-echo "  03:30 xhs-prune        → 清理 90 天快照"
+echo "  03:30 xhs-prune        → 仅当 XHS_SNAPSHOT_RETENTION_DAYS>0 时清理快照"
 echo ""
 echo "  会员下载: https://monitor.xhs365.cn/member"
 echo ""

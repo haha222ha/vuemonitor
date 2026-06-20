@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""监控池 sold_snapshots → PG goods_sold_snapshots（仅近 90 天）。"""
+"""监控池 sold_snapshots → PG goods_sold_snapshots（retention=0 时全量导入）。"""
 from __future__ import annotations
 
 import argparse
@@ -15,7 +15,8 @@ if CLOUD_ROOT not in sys.path:
 
 from cloud_deploy.cloud_api.config import get_settings
 from cloud_deploy.cloud_api.database_pg import _conn, init_db
-from cloud_deploy.cloud_api.sync_service import apply_sold_snapshots_batch, snapshot_retention_days
+from cloud_deploy.cloud_api.retention_policy import snapshot_retention_days
+from cloud_deploy.cloud_api.sync_service import apply_sold_snapshots_batch
 
 
 def _log(msg: str) -> None:

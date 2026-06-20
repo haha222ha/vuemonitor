@@ -28,9 +28,18 @@ def main() -> int:
             c.execute(
                 """SELECT COUNT(*) FROM monitor_goods
                    WHERE monitor_status IN ('active','idle')
+                     AND last_scan_status='ok'
                      AND last_scan_at::date = CURRENT_DATE"""
             )
             scanned_today = int(c.fetchone()[0] or 0)
+            c.execute(
+                """SELECT last_scan_status, COUNT(*)
+                   FROM monitor_goods
+                   WHERE monitor_status IN ('active','idle')
+                     AND updated_at::date = CURRENT_DATE
+                   GROUP BY 1 ORDER BY 2 DESC"""
+            )
+            status_rows = c.fetchall()
             c.execute(
                 """SELECT run_at, batch_size, ok, fail, risk, frozen, wall_ms, note
                    FROM daemon_scan_stats ORDER BY id DESC LIMIT 5"""
@@ -41,8 +50,11 @@ def main() -> int:
 
     pct = (scanned_today / pool * 100) if pool else 0.0
     print(f"监控池 active/idle: {pool:,}")
-    print(f"今日已扫:           {scanned_today:,} ({pct:.2f}%)")
+    print(f"今日成功(ok)已扫:   {scanned_today:,} ({pct:.2f}%)")
     print(f"待扫(约):           {max(0, pool - scanned_today):,}")
+    if status_rows:
+        parts = [f"{st or 'null'}={n:,}" for st, n in status_rows]
+        print(f"今日状态分布:       {', '.join(parts)}")
     print("")
     print("最近 5 批:")
     if not rows:

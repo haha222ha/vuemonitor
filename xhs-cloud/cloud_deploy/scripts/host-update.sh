@@ -113,11 +113,20 @@ if systemctl is-enabled xhs-ingest-report.timer &>/dev/null; then
   sudo systemctl restart xhs-ingest-report.timer || true
 fi
 
-for t in xhs-daily-report xhs-weekly-report xhs-monthly-report xhs-prune-snapshots; do
+for t in xhs-daemon-watchdog xhs-daily-report xhs-weekly-report xhs-monthly-report xhs-prune-snapshots; do
   if systemctl is-enabled "${t}.timer" &>/dev/null; then
     sudo systemctl restart "${t}.timer" || true
   fi
 done
+
+if [[ "${XHS_SNAPSHOT_RETENTION_DAYS:-0}" == "0" ]] \
+   || [[ "${XHS_ENABLE_SNAPSHOT_PRUNE:-auto}" == "0" ]] \
+   || [[ "${XHS_ENABLE_SNAPSHOT_PRUNE:-auto}" == "false" ]]; then
+  if systemctl is-enabled xhs-prune-snapshots.timer &>/dev/null; then
+    warn "关闭 xhs-prune-snapshots.timer（快照永久保留）"
+    sudo systemctl disable --now xhs-prune-snapshots.timer || true
+  fi
+fi
 
 log "健康检查"
 sleep 2

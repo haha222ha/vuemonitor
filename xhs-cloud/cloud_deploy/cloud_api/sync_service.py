@@ -16,6 +16,8 @@ from typing import Any
 
 import psycopg2.extras
 
+from cloud_deploy.cloud_api.retention_policy import snapshot_retention_days
+
 # 与 gen_report.COLUMNS 一致
 REPORT_COLUMNS = [
     "goods_id", "title", "price", "sold", "v1h", "v6h", "actual_v1d", "v1d",
@@ -351,15 +353,12 @@ def apply_sold_history_batch(conn, rows: list[dict]) -> int:
     return len(tuples)
 
 
-def snapshot_retention_days() -> int:
-    return int(os.environ.get("XHS_SNAPSHOT_RETENTION_DAYS", "90"))
-
-
 def apply_sold_snapshots_batch(conn, rows: list[dict]) -> int:
-    """批量写入 sold_snapshots → goods_sold_snapshots（仅保留 retention 窗口内）。"""
+    """批量写入 sold_snapshots → goods_sold_snapshots（retention=0 时全量保留）。"""
     if not rows:
         return 0
-    cutoff = datetime.now() - timedelta(days=snapshot_retention_days())
+    days = snapshot_retention_days()
+    cutoff = None if days <= 0 else datetime.now() - timedelta(days=days)
     tuples = []
     goods_ids = set()
     for r in rows:
@@ -371,7 +370,7 @@ def apply_sold_snapshots_batch(conn, rows: list[dict]) -> int:
             snap_dt = datetime.fromisoformat(snap)
         except ValueError:
             continue
-        if snap_dt < cutoff:
+        if cutoff is not None and snap_dt < cutoff:
             continue
         gid = str(r["goods_id"])
         tuples.append(
@@ -416,6 +415,8 @@ def apply_sold_snapshots_batch(conn, rows: list[dict]) -> int:
 
 def prune_sold_snapshots(conn, retention_days: int | None = None) -> int:
     days = retention_days if retention_days is not None else snapshot_retention_days()
+    if days <= 0:
+        return 0
     cutoff = datetime.now() - timedelta(days=days)
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
@@ -503,20 +504,28 @@ def mark_scan_result(
     engine: str = "",
     message: str = "",
 ) -> None:
-    """记录单次扫描结果（成功/失败/风控），供 cloud_daemon 覆盖统计。"""
+    """记录单次扫描结果。仅 ok/frozen 更新 last_scan_at（失败不占用今日 skip 名额）。"""
     del message
     gid = str(goods_id)
     st = str(status or "fail")[:16]
     eng = str(engine or "")[:32]
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
-        c.execute(
-            """UPDATE monitor_goods SET
-                   last_scan_at=NOW(), last_scan_status=%s,
-                   last_scan_engine=%s, updated_at=NOW()
-               WHERE goods_id=%s""",
-            (st, eng, gid),
-        )
+        if st in ("ok", "frozen"):
+            c.execute(
+                """UPDATE monitor_goods SET
+                       last_scan_at=NOW(), last_scan_status=%s,
+                       last_scan_engine=%s, updated_at=NOW()
+                   WHERE goods_id=%s""",
+                (st, eng, gid),
+            )
+        else:
+            c.execute(
+                """UPDATE monitor_goods SET
+                       last_scan_status=%s, last_scan_engine=%s, updated_at=NOW()
+                   WHERE goods_id=%s""",
+                (st, eng, gid),
+            )
     conn.commit()
 
 

@@ -44,22 +44,37 @@ class CloudMonitorDaemon:
     def _pick_batch(self) -> list[dict]:
         from cloud_deploy.cloud_api.database_pg import _conn, init_db
 
+        skip_today = bool(self.config.get("skip_today", True))
         init_db()
         conn = _conn()
         try:
             with conn.cursor() as c:
                 c.execute("SET search_path TO xhs_monitor, public")
-                c.execute(
-                    """SELECT goods_id, title, last_v1d, last_sold, tier, pool, priority_score
-                       FROM monitor_goods
-                       WHERE monitor_status IN ('active', 'idle')
-                       ORDER BY
-                         (last_scan_at IS NULL OR last_scan_at::date < CURRENT_DATE) DESC,
-                         priority_score DESC NULLS LAST,
-                         last_v1d DESC NULLS LAST
-                       LIMIT %s""",
-                    (self.batch_size,),
-                )
+                if skip_today:
+                    c.execute(
+                        """SELECT goods_id, title, last_v1d, last_sold, tier, pool, priority_score
+                           FROM monitor_goods
+                           WHERE monitor_status IN ('active', 'idle')
+                           ORDER BY
+                             NOT (
+                               last_scan_status = 'ok'
+                               AND last_scan_at IS NOT NULL
+                               AND last_scan_at::date = CURRENT_DATE
+                             ) DESC,
+                             priority_score DESC NULLS LAST,
+                             last_v1d DESC NULLS LAST
+                           LIMIT %s""",
+                        (self.batch_size,),
+                    )
+                else:
+                    c.execute(
+                        """SELECT goods_id, title, last_v1d, last_sold, tier, pool, priority_score
+                           FROM monitor_goods
+                           WHERE monitor_status IN ('active', 'idle')
+                           ORDER BY priority_score DESC NULLS LAST, last_v1d DESC NULLS LAST
+                           LIMIT %s""",
+                        (self.batch_size,),
+                    )
                 cols = (
                     "goods_id",
                     "title",
@@ -229,11 +244,33 @@ class CloudMonitorDaemon:
         except Exception as exc:
             self.log(f"[cloud-daemon] stats 写入失败: {exc}")
 
-        if self._should_cooldown(ok, fail, risk):
+        dp_dead = (
+            ok == 0
+            and fail >= max(50, self.batch_size // 2)
+            and wall_ms < 20000
+            and risk == 0
+        )
+        if dp_dead:
+            self._recover_drissionpage(wall_ms)
+        elif self._should_cooldown(ok, fail, risk):
             extra = min(600, max(120, self.cooldown * 3))
             self._wait_risk_cooldown(extra)
 
         return result
+
+    def _recover_drissionpage(self, wall_ms: int) -> None:
+        """整批秒失败时重建 dp（长跑僵死自愈，无需人工 restart）。"""
+        fast_fail = wall_ms < 20000
+        if not fast_fail:
+            return
+        try:
+            from xhs_full_sold_fetch import reset_drissionpage, warmup_drissionpage
+
+            self.log("[cloud-daemon] 检测到 dp 僵死，自动重建浏览器 ...")
+            reset_drissionpage(log_func=self.log)
+            warmup_drissionpage(log_func=self.log)
+        except Exception as exc:
+            self.log(f"[cloud-daemon] dp 自动重建失败: {exc}")
 
     def start(self) -> None:
         if self._running:

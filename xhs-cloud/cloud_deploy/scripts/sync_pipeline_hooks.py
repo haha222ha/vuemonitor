@@ -42,9 +42,15 @@ def run_post_report_pg_steps(settings=None, log_fn: Callable[[str], None] | None
     out["rules"] = rules
     log(f"post: rules {rules}")
 
-    from cloud_deploy.scripts.prune_sold_snapshots import prune
+    from cloud_deploy.cloud_api.retention_policy import snapshot_prune_enabled
 
-    out["prune_snapshots"] = prune()
-    log(f"post: prune {out['prune_snapshots']}")
+    if snapshot_prune_enabled():
+        from cloud_deploy.scripts.prune_sold_snapshots import prune
+
+        out["prune_snapshots"] = prune()
+        log(f"post: prune {out['prune_snapshots']}")
+    else:
+        out["prune_snapshots"] = {"deleted_rows": 0, "skipped": "retention_disabled"}
+        log("post: prune skipped (snapshot retention disabled)")
 
     return out

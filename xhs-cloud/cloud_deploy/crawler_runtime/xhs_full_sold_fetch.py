@@ -411,6 +411,20 @@ def _ensure_dp_page_unlocked():
     return _dp_page
 
 
+def reset_drissionpage(log_func=None) -> None:
+    """关闭僵死的 Chromium 实例，下一轮 fetch 会重新拉起。"""
+    global _dp_page
+    log = log_func or _logger.info
+    with _dp_lock:
+        if _dp_page is not None:
+            try:
+                _dp_page.quit()
+            except Exception:
+                pass
+            _dp_page = None
+        log("[dp] 已重置浏览器实例")
+
+
 def warmup_drissionpage(log_func=None) -> bool:
     log = log_func or _logger.info
     with _dp_lock:

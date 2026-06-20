@@ -320,13 +320,24 @@ def sync_prune_snapshots(_: None = Depends(verify_sync_key)):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.retention_policy import (
+        retention_policy_summary,
+        snapshot_prune_enabled,
+    )
     from cloud_deploy.cloud_api.sync_service import prune_sold_snapshots
+
+    if not snapshot_prune_enabled():
+        return {
+            "deleted_rows": 0,
+            "skipped": "retention_disabled",
+            **retention_policy_summary(),
+        }
 
     init_db()
     conn = _conn()
     try:
         deleted = prune_sold_snapshots(conn)
-        return {"deleted_rows": deleted}
+        return {"deleted_rows": deleted, **retention_policy_summary()}
     finally:
         conn.close()
 

@@ -1,5 +1,5 @@
 [Unit]
-Description=Prune goods_sold_snapshots older than 90 days
+Description=Prune goods_sold_snapshots (only when XHS_SNAPSHOT_RETENTION_DAYS>0)
 After=network.target postgresql.service
 
 [Service]

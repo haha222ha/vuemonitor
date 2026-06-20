@@ -1,5 +1,5 @@
 # -*- coding: utf-8
-"""清理 PG goods_sold_snapshots 超 retention 窗口的数据。"""
+"""清理 PG goods_sold_snapshots 超 retention 窗口的数据（retention=0 时跳过）。"""
 from __future__ import annotations
 
 import argparse
@@ -16,13 +16,28 @@ def prune(retention_days: int | None = None) -> dict:
     from cloud_deploy.scripts.bootstrap_env import bootstrap
 
     bootstrap()
+    from cloud_deploy.cloud_api.retention_policy import (
+        retention_policy_summary,
+        snapshot_prune_enabled,
+        snapshot_retention_days,
+    )
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
-    from cloud_deploy.cloud_api.sync_service import prune_sold_snapshots, snapshot_retention_days
+    from cloud_deploy.cloud_api.sync_service import prune_sold_snapshots
+
+    days = retention_days if retention_days is not None else snapshot_retention_days()
+    if days <= 0 or not snapshot_prune_enabled():
+        result = {
+            "deleted_rows": 0,
+            "retention_days": days,
+            "skipped": "retention_disabled",
+            **retention_policy_summary(),
+        }
+        print(f"[prune-snapshots] {result}", flush=True)
+        return result
 
     init_db()
     conn = _conn()
     try:
-        days = retention_days if retention_days is not None else snapshot_retention_days()
         deleted = prune_sold_snapshots(conn, days)
     finally:
         conn.close()
