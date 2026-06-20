@@ -8,24 +8,52 @@ import sys
 ROOT = os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud")
 sys.path.insert(0, ROOT)
 
-from cloud_deploy.scripts.bootstrap_env import bootstrap
 
-bootstrap()
+def main() -> int:
+    try:
+        from cloud_deploy.scripts.bootstrap_env import bootstrap
 
-from cloud_deploy.cloud_api.database_pg import _conn, init_db
-from cloud_deploy.daemon import pg_full_sold_queue as q
+        bootstrap()
 
-init_db()
-conn = _conn()
-with conn.cursor() as c:
-    c.execute("SET search_path TO xhs_monitor, public")
-    c.execute(
-        "SELECT COUNT(*) FROM monitor_goods WHERE monitor_status IN ('active','idle')"
-    )
-    mg = c.fetchone()[0]
-conn.close()
-st = q.queue_stats()
-print(
-    f"monitor_goods={mg} queue_total={st['total']} "
-    f"pending={st['pending']} synced={st['synced']}"
-)
+        from cloud_deploy.cloud_api.database_pg import _conn
+
+        conn = _conn()
+        try:
+            with conn.cursor() as c:
+                c.execute("SET search_path TO xhs_monitor, public")
+                c.execute(
+                    "SELECT COUNT(*) FROM monitor_goods "
+                    "WHERE monitor_status IN ('active','idle')"
+                )
+                mg = int(c.fetchone()[0] or 0)
+                c.execute(
+                    "SELECT COUNT(*) FROM full_sold_queue WHERE queue_date=CURRENT_DATE"
+                )
+                total = int(c.fetchone()[0] or 0)
+                c.execute(
+                    """SELECT COUNT(*) FROM full_sold_queue
+                       WHERE queue_date=CURRENT_DATE
+                         AND last_sync_at IS NULL AND frozen_at IS NULL"""
+                )
+                pending = int(c.fetchone()[0] or 0)
+                c.execute(
+                    """SELECT COUNT(*) FROM full_sold_queue
+                       WHERE queue_date=CURRENT_DATE AND frozen_at IS NOT NULL"""
+                )
+                frozen = int(c.fetchone()[0] or 0)
+        finally:
+            conn.close()
+
+        synced = max(0, total - pending - frozen)
+        print(
+            f"monitor_goods={mg} queue_total={total} "
+            f"pending={pending} synced={synced}"
+        )
+        return 0
+    except Exception as exc:
+        print(f"FAIL {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

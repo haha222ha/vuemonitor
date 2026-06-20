@@ -27,6 +27,7 @@ set -a
 # shellcheck disable=SC1090
 source "$ENV_FILE"
 set +a
+export PYTHONPATH="$ROOT"
 
 CRAWLER="${XHS_CRAWLER_ROOT:-/opt/xhs/crawler}"
 echo -e "  ${CYAN}[爬虫目录]${NC} $CRAWLER"
@@ -83,15 +84,16 @@ fi
 
 echo ""
 echo -e "  ${CYAN}[PG 监控池 / 补缺队列]${NC}"
-PG=$("$ROOT/venv/bin/python" "$ROOT/cloud_deploy/scripts/verify_pg_pool.py" 2>&1) || PG="FAIL"
-if [[ "$PG" == FAIL* ]]; then
-  fail "PG 查询失败"
+PG_OUT=$("$ROOT/venv/bin/python" "$ROOT/cloud_deploy/scripts/verify_pg_pool.py" 2>&1) || PG_RC=$?
+PG_RC=${PG_RC:-0}
+if [[ "${PG_RC:-0}" -ne 0 ]] || [[ "$PG_OUT" == FAIL* ]]; then
+  fail "PG 查询失败${PG_OUT:+: $PG_OUT}"
 else
-  ok "$PG"
-  if echo "$PG" | grep -q "monitor_goods=0"; then
+  ok "$PG_OUT"
+  if echo "$PG_OUT" | grep -q "monitor_goods=0"; then
     warn "monitor_goods 为空，需先 import_monitor_pool"
   fi
-  if echo "$PG" | grep -q "pending=0" && ! echo "$PG" | grep -q "monitor_goods=0"; then
+  if echo "$PG_OUT" | grep -q "pending=0" && ! echo "$PG_OUT" | grep -q "monitor_goods=0"; then
     warn "队列 pending=0 — 若 daemon 空转，请确认 seed_batch_size=0 并已清空 full_sold_queue"
   fi
 fi
