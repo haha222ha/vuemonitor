@@ -157,11 +157,11 @@ def init_db() -> None:
                     shelf_time TIMESTAMPTZ,
                     shop_sales INT,
                     shop_fans INT,
-                    shop_fsr NUMERIC(8,4),
-                    goods_fsr NUMERIC(8,4),
+                    shop_fsr NUMERIC(12,4),
+                    goods_fsr NUMERIC(12,4),
                     behavior VARCHAR(128),
                     is_virtual BOOLEAN,
-                    base_hours NUMERIC(8,2),
+                    base_hours NUMERIC(12,2),
                     base_at TIMESTAMPTZ,
                     anomaly VARCHAR(64),
                     PRIMARY KEY (report_date, goods_id)
@@ -264,6 +264,20 @@ def _migrate_legacy_columns(c) -> None:
     c.execute(
         "ALTER TABLE report_archives ADD COLUMN IF NOT EXISTS published_at TIMESTAMPTZ"
     )
+    # gen_report 的 shop_fsr/goods_fsr 可达 10^5+，旧表 NUMERIC(8,4) 会 overflow
+    for col, typ in (
+        ("shop_fsr", "NUMERIC(12,4)"),
+        ("goods_fsr", "NUMERIC(12,4)"),
+        ("base_hours", "NUMERIC(12,2)"),
+    ):
+        c.execute(
+            f"""
+            DO $$ BEGIN
+                ALTER TABLE report_daily_items ALTER COLUMN {col} TYPE {typ};
+            EXCEPTION WHEN others THEN NULL;
+            END $$;
+            """
+        )
 
 
 def _seed_default_rules(c) -> None:
