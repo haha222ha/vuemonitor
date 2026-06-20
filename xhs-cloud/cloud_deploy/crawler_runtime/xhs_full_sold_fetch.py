@@ -2,16 +2,16 @@
 """
 数据源⑥ 多引擎商品详情拉取 + 风控降级链。
 
-引擎顺序: api → api2 → mobile_http → playwright
-- api: curl_cffi 指纹（原 xhs_web_fallback）
-- api2: 极简指纹 / 直连（ApiV2 风格）
-- mobile_http: urllib 移动端 UA（部分风控下仍可通）
-- playwright: 浏览器拦截 edith/detail（DOM/H5 路径）
+云端默认链: api → drissionpage（XHS_ENABLE_PLAYWRIGHT=1 时追加 playwright）
+- api: curl_cffi 指纹（shop_collectors）
+- drissionpage: 单例 Chromium 页面内 fetch JSON（2G 推荐高爆品）
+- playwright: 可选，默认关闭
 """
 from __future__ import annotations
 
 import json
 import logging
+import os
 import random
 import threading
 import time
@@ -19,10 +19,25 @@ import urllib.request
 
 _logger = logging.getLogger(__name__)
 
-ENGINE_CHAIN = ("api", "api2", "mobile_http", "playwright")
-
 _pw_lock = threading.Lock()
 _pw_context = None
+_dp_lock = threading.Lock()
+_dp_page = None
+_DP_PROFILE_ID = 77
+
+
+def cloud_engine_chain() -> tuple[str, ...]:
+    base = ("api", "drissionpage")
+    if os.environ.get("XHS_ENABLE_PLAYWRIGHT", "0").strip().lower() in ("1", "true", "yes"):
+        return base + ("playwright",)
+    return base
+
+
+def get_engine_chain() -> tuple[str, ...]:
+    return cloud_engine_chain()
+
+
+ENGINE_CHAIN = cloud_engine_chain()
 
 
 def _normalize_for_sync(raw, goods_id, engine):
@@ -295,7 +310,121 @@ def _fetch_via_playwright(goods_id):
 
 
 def _fetch_via_drissionpage(goods_id):
-    return _fetch_via_mobile_http(goods_id)
+    url = _detail_url(goods_id)
+    page = _ensure_dp_page_unlocked()
+    if not page:
+        return None, "fail", {
+            "engine": "drissionpage",
+            "risk": False,
+            "message": "DrissionPage 未就绪",
+        }
+    referer = f"https://www.xiaohongshu.com/goods-detail/{goods_id}"
+    try:
+        js = """
+        const url = arguments[0];
+        const referer = arguments[1];
+        return fetch(url, {
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Referer': referer
+            }
+        }).then(r => r.text());
+        """
+        body = page.run_js(js, url, referer)
+        if not body:
+            return None, "fail", {"engine": "drissionpage", "risk": False, "message": "empty"}
+        if isinstance(body, dict):
+            data = body
+            body_text = json.dumps(body, ensure_ascii=False)
+        else:
+            body_text = str(body)
+            data = json.loads(body_text)
+        from shop_collectors import _api_check_risk_control
+
+        is_risk, risk_msg = _api_check_risk_control(body_text, 200)
+        if is_risk:
+            return None, "risk", {"engine": "drissionpage", "risk": True, "message": risk_msg}
+        _, payload_st, payload_meta = _check_api_payload(data, "drissionpage")
+        if payload_st in ("frozen", "risk", "fail"):
+            return None, payload_st, payload_meta
+        detail = _parse_json_detail(data, goods_id, "drissionpage")
+        if not detail or not detail.get("shop_id"):
+            return None, "fail", {
+                "engine": "drissionpage",
+                "risk": False,
+                "message": "parse_fail_or_no_store",
+            }
+        return detail, "ok", {"engine": "drissionpage", "risk": False, "message": ""}
+    except Exception as exc:
+        _logger.debug("drissionpage fetch %s: %s", goods_id, exc)
+        return None, "fail", {"engine": "drissionpage", "risk": False, "message": str(exc)}
+
+
+def _dp_user_data_dir() -> str:
+    try:
+        from xhs_paths import dp_user_data_dir
+
+        return dp_user_data_dir(_DP_PROFILE_ID)
+    except ImportError:
+        root = os.environ.get("XHS_CRAWLER_ROOT", os.path.dirname(os.path.abspath(__file__)))
+        path = os.path.join(root, "crawl_data", f"dp_profile_{_DP_PROFILE_ID}")
+        os.makedirs(path, exist_ok=True)
+        return path
+
+
+def _ensure_dp_page_unlocked():
+    global _dp_page
+    if _dp_page is not None:
+        return _dp_page
+    try:
+        from DrissionPage import ChromiumOptions, ChromiumPage
+    except ImportError:
+        _logger.warning("DrissionPage 未安装，drissionpage 引擎不可用")
+        return None
+
+    co = ChromiumOptions()
+    co.set_user_data_path(_dp_user_data_dir())
+    co.set_argument("--no-sandbox")
+    co.set_argument("--disable-gpu")
+    co.set_argument("--disable-dev-shm-usage")
+    co.headless(True)
+    for env_key in ("CHROME_PATH", "CHROMIUM_PATH"):
+        bp = os.environ.get(env_key, "").strip()
+        if bp and os.path.isfile(bp):
+            co.set_browser_path(bp)
+            break
+    else:
+        for candidate in (
+            "/usr/bin/chromium-browser",
+            "/usr/bin/chromium",
+            "/usr/bin/google-chrome",
+        ):
+            if os.path.isfile(candidate):
+                co.set_browser_path(candidate)
+                break
+    try:
+        _dp_page = ChromiumPage(co)
+    except Exception as exc:
+        _logger.warning("DrissionPage 启动失败: %s", exc)
+        return None
+    return _dp_page
+
+
+def warmup_drissionpage(log_func=None) -> bool:
+    log = log_func or _logger.info
+    with _dp_lock:
+        page = _ensure_dp_page_unlocked()
+        if not page:
+            log("[dp] DrissionPage 不可用（pip install DrissionPage / apt chromium）")
+            return False
+        try:
+            page.get("https://www.xiaohongshu.com/", timeout=30)
+            log("[dp] 预热完成")
+            return True
+        except Exception as exc:
+            log(f"[dp] 预热失败: {exc}")
+            return False
 
 
 _ENGINE_FN = {
@@ -315,10 +444,10 @@ def fetch_sold_detail(goods_id, engine="api", fallback_chain=None, auto_fallback
     if fallback_chain:
         chain = tuple(fallback_chain)
     elif auto_fallback:
-        chain = ENGINE_CHAIN
-        if engine and engine in ENGINE_CHAIN:
-            idx = ENGINE_CHAIN.index(engine)
-            chain = ENGINE_CHAIN[idx:]
+        chain = get_engine_chain()
+        if engine and engine in chain:
+            idx = chain.index(engine)
+            chain = chain[idx:]
     else:
         chain = (engine or "api",)
 
@@ -331,7 +460,16 @@ def fetch_sold_detail(goods_id, engine="api", fallback_chain=None, auto_fallback
         if not fn:
             continue
         tried.append(eng)
-        detail, status, meta = fn(goods_id)
+
+        def _call_engine():
+            return fn(goods_id)
+
+        if eng in ("drissionpage", "playwright"):
+            lock = _dp_lock if eng == "drissionpage" else _pw_lock
+            with lock:
+                detail, status, meta = _call_engine()
+        else:
+            detail, status, meta = _call_engine()
         meta = dict(meta or {})
         meta["engine"] = eng
         meta["tried"] = list(tried)
@@ -361,7 +499,7 @@ def probe_engines(goods_id, log_func=None, min_ok=1):
     """多引擎探测，返回可用引擎列表。"""
     log = log_func or (lambda _m: None)
     alive = []
-    for eng in ENGINE_CHAIN:
+    for eng in get_engine_chain():
         t0 = time.time()
         detail, status, meta = fetch_sold_detail(
             goods_id, engine=eng, fallback_chain=(eng,), auto_fallback=False
@@ -384,7 +522,7 @@ def probe_engines_multi(goods_ids, log_func=None, need_consecutive=2):
     if not ids:
         return []
     log = log_func or (lambda _m: None)
-    for eng in ENGINE_CHAIN:
+    for eng in get_engine_chain():
         wins = 0
         for gid in ids:
             detail, status, meta = fetch_sold_detail(

@@ -2,8 +2,9 @@
 """云端监控守护入口。
 
 模式（XHS_DAEMON_MODE）:
-  full_sold  — ⑥补缺挂机（默认，对齐主面板，写 PG）
-  lite       — 简化版 cloud_daemon（仅 fetch + record_cloud_scan）
+  cloud      — 香港云 PG 扫描（默认，分层 api/dp，见 CLOUD_CRAWLER_SPEC）
+  full_sold  — ⑥补缺挂机 + full_sold_queue（旧路径）
+  lite       — 简化 cloud_daemon 后台线程
 """
 from __future__ import annotations
 
@@ -33,14 +34,19 @@ def _load_config() -> dict:
     cfg["web_detail_concurrency"] = int(
         os.environ.get("XHS_DAEMON_CONCURRENCY", cfg.get("web_detail_concurrency", 2))
     )
-    cfg["batch_size"] = int(os.environ.get("XHS_DAEMON_BATCH_SIZE", cfg.get("batch_size", 400)))
+    cfg["batch_size"] = int(os.environ.get("XHS_DAEMON_BATCH_SIZE", cfg.get("batch_size", 200)))
     cfg["shop_engine"] = os.environ.get("XHS_DAEMON_ENGINE", cfg.get("shop_engine", "api"))
     cfg["seed_batch_size"] = int(
         os.environ.get("XHS_DAEMON_SEED_BATCH_SIZE", cfg.get("seed_batch_size", 0))
     )
     cfg["web_cooldown_seconds"] = int(
-        os.environ.get("XHS_DAEMON_COOLDOWN_SEC", cfg.get("web_cooldown_seconds", 0))
+        os.environ.get("XHS_DAEMON_COOLDOWN_SEC", cfg.get("web_cooldown_seconds", 60))
     )
+    if not os.environ.get("XHS_ENABLE_PLAYWRIGHT"):
+        if cfg.get("enable_playwright"):
+            os.environ["XHS_ENABLE_PLAYWRIGHT"] = "1"
+        else:
+            os.environ.setdefault("XHS_ENABLE_PLAYWRIGHT", "0")
     env_full = os.environ.get("XHS_DAEMON_FULL_POOL", "").strip().lower()
     if env_full:
         full_pool = env_full in ("1", "true", "yes")
@@ -83,14 +89,18 @@ def _run_lite(cfg: dict) -> None:
 
 def main():
     bootstrap()
-    mode = os.environ.get("XHS_DAEMON_MODE", "full_sold").strip().lower()
+    mode = os.environ.get("XHS_DAEMON_MODE", "cloud").strip().lower()
     cfg = _load_config()
     if mode == "lite":
         _run_lite(cfg)
-    else:
+    elif mode == "full_sold":
         from cloud_deploy.daemon.crawler_bridge import run_full_sold_daemon_loop
 
         run_full_sold_daemon_loop(cfg)
+    else:
+        from cloud_deploy.daemon.cloud_daemon import run_cloud_daemon_main
+
+        run_cloud_daemon_main(cfg)
 
 
 if __name__ == "__main__":

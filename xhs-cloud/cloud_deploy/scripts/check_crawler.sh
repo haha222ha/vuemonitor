@@ -20,7 +20,7 @@ if [[ ! -d "$CRAWLER" ]]; then
 fi
 
 MISS=0
-for f in xhs_full_sold_daemon.py xhs_full_sold_fetch.py xhs_full_sold_queue_db.py xhs_web_sold_sync_write.py shop_collectors.py; do
+for f in xhs_full_sold_daemon.py xhs_full_sold_fetch.py xhs_full_sold_queue_db.py xhs_web_sold_sync_write.py shop_collectors.py xhs_paths.py; do
   if [[ -f "$CRAWLER/$f" ]]; then
     echo "✓ $f"
   else

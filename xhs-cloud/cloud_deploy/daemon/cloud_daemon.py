@@ -1,14 +1,10 @@
 # -*- coding: utf-8
 """
-云端监控扫描守护（写 PG，不调用 xhs_full_sold_daemon）。
+香港云主机 PG 监控扫描守护（cloud_daemon）。
 
-需配置 XHS_CRAWLER_ROOT 指向爬虫仓库以复用 fetch_sold_detail。
-2G 机器默认不 enable systemd；本地挂机可开。
-
-环境:
-  XHS_CRAWLER_ROOT=/path/to/爬虫
-  XHS_DAEMON_BATCH_SIZE=20
-  XHS_DAEMON_COOLDOWN_SEC=120
+- 直接从 monitor_goods 取批（今日未扫优先）
+- 分层引擎：高爆 → drissionpage，低销 → api，失败自动降级
+- 写 PG：goods_sold_snapshots / goods_sold_daily + last_scan_*
 """
 from __future__ import annotations
 
@@ -17,11 +13,11 @@ import signal
 import sys
 import threading
 import time
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-CLOUD_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+CLOUD_ROOT = os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud")
 if CLOUD_ROOT not in sys.path:
     sys.path.insert(0, CLOUD_ROOT)
 
@@ -32,36 +28,103 @@ class CloudMonitorDaemon:
         self.log = log_func or print
         self._stop = threading.Event()
         self._running = False
-        self.batch_size = int(self.config.get("batch_size", 20))
-        self.concurrency = int(self.config.get("web_detail_concurrency", 2))
-        self.cooldown = int(self.config.get("web_cooldown_seconds", 120))
-        self.engine = self.config.get("shop_engine", "api")
+        self._round = 0
+        self._risk_until = 0.0
+        self.batch_size = max(50, min(int(self.config.get("batch_size", 200)), 500))
+        self.concurrency = max(1, min(4, int(self.config.get("web_detail_concurrency", 2))))
+        self.cooldown = max(0, int(self.config.get("web_cooldown_seconds", 60)))
+        self.min_success_rate = float(self.config.get("min_success_rate", 0.08) or 0.08)
+        self.auto_fallback = bool(self.config.get("auto_fallback", True))
 
-    def _fetch_one(self, goods_id: str) -> tuple[str, str, int | None]:
-        fetcher = _load_fetcher()
-        if not fetcher:
-            return goods_id, "no_fetcher", None
-        try:
-            raw, status, _meta = fetcher(goods_id, engine=self.engine)
-            if status == "frozen":
-                return goods_id, "frozen", None
-            if not raw:
-                return goods_id, "fail", None
-            sold = int(raw.get("real_sales") or raw.get("product_sales") or 0)
-            return goods_id, "ok", sold
-        except Exception as e:
-            return goods_id, f"err:{e}", None
+    def _setup_crawler_path(self) -> None:
+        crawler = os.environ.get("XHS_CRAWLER_ROOT", "").strip()
+        if crawler and os.path.isdir(crawler) and crawler not in sys.path:
+            sys.path.insert(0, crawler)
 
-    def _write_pg(self, goods_id: str, status: str, sold: int | None) -> None:
+    def _pick_batch(self) -> list[dict]:
         from cloud_deploy.cloud_api.database_pg import _conn, init_db
-        from cloud_deploy.cloud_api.sync_service import record_cloud_scan
-        from cloud_deploy.rules.rule_engine import evaluate_rules
 
         init_db()
         conn = _conn()
         try:
+            with conn.cursor() as c:
+                c.execute("SET search_path TO xhs_monitor, public")
+                c.execute(
+                    """SELECT goods_id, title, last_v1d, last_sold, tier, pool, priority_score
+                       FROM monitor_goods
+                       WHERE monitor_status IN ('active', 'idle')
+                       ORDER BY
+                         (last_scan_at IS NULL OR last_scan_at::date < CURRENT_DATE) DESC,
+                         priority_score DESC NULLS LAST,
+                         last_v1d DESC NULLS LAST
+                       LIMIT %s""",
+                    (self.batch_size,),
+                )
+                cols = (
+                    "goods_id",
+                    "title",
+                    "last_v1d",
+                    "last_sold",
+                    "tier",
+                    "pool",
+                    "priority_score",
+                )
+                return [dict(zip(cols, row)) for row in c.fetchall()]
+        finally:
+            conn.close()
+
+    def _fetch_goods(self, goods: dict) -> tuple[dict, str, int | None, dict]:
+        from cloud_deploy.daemon.cloud_engine import build_fallback_chain, pick_start_engine
+
+        gid = str(goods["goods_id"])
+        start = pick_start_engine(goods, self.config)
+        chain = build_fallback_chain(start, self.config) if self.auto_fallback else (start,)
+
+        fetcher = _load_fetcher()
+        if not fetcher:
+            return goods, "no_fetcher", None, {"won_engine": "", "message": "fetcher missing"}
+
+        try:
+            detail, status, meta = fetcher(
+                gid,
+                engine=start,
+                fallback_chain=chain,
+                auto_fallback=self.auto_fallback,
+            )
+        except Exception as exc:
+            return goods, "fail", None, {"won_engine": start, "message": str(exc)}
+
+        meta = dict(meta or {})
+        if status == "ok" and detail:
+            sold = int(detail.get("real_sales") or detail.get("product_sales") or 0)
+            return goods, "ok", sold, meta
+        if status == "frozen":
+            return goods, "frozen", None, meta
+        if status == "risk":
+            return goods, "risk", None, meta
+        if status == "no_store":
+            return goods, "frozen", None, meta
+        return goods, "fail", None, meta
+
+    def _write_result(
+        self,
+        goods_id: str,
+        status: str,
+        sold: int | None,
+        meta: dict,
+    ) -> None:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+        from cloud_deploy.cloud_api.sync_service import mark_scan_result, record_cloud_scan
+        from cloud_deploy.rules.rule_engine import evaluate_rules
+
+        engine = str(meta.get("won_engine") or meta.get("engine") or "")[:32]
+        init_db()
+        conn = _conn()
+        try:
             if status == "ok" and sold is not None:
-                record_cloud_scan(conn, goods_id, sold, data_source="cloud_daemon")
+                ds = f"cloud_{engine}" if engine else "cloud_scan"
+                record_cloud_scan(conn, goods_id, sold, data_source=ds)
+                mark_scan_result(conn, goods_id, "ok", engine=engine)
                 evaluate_rules(conn, goods_id)
             elif status == "frozen":
                 with conn.cursor() as c:
@@ -71,68 +134,137 @@ class CloudMonitorDaemon:
                         (goods_id,),
                     )
                 conn.commit()
+                mark_scan_result(conn, goods_id, "frozen", engine=engine)
                 evaluate_rules(conn, goods_id, extra_ctx={"scan_status": "frozen"})
             else:
-                conn.rollback()
+                mark_scan_result(conn, goods_id, status, engine=engine)
         finally:
             conn.close()
 
-    def _pick_batch(self) -> list[str]:
-        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    def _should_cooldown(self, ok: int, fail: int, risk: int) -> bool:
+        total = ok + fail + risk
+        if total <= 0:
+            return False
+        if ok == 0 and total >= 10:
+            return True
+        rate = ok / total
+        return rate < self.min_success_rate and total >= max(20, self.batch_size // 4)
 
-        init_db()
-        conn = _conn()
-        try:
-            with conn.cursor() as c:
-                c.execute("SET search_path TO xhs_monitor, public")
-                c.execute(
-                    """SELECT goods_id FROM monitor_goods
-                       WHERE monitor_status='active'
-                       ORDER BY priority_score DESC, last_v1d DESC
-                       LIMIT %s""",
-                    (self.batch_size,),
-                )
-                return [r[0] for r in c.fetchall()]
-        finally:
-            conn.close()
+    def _wait_risk_cooldown(self, seconds: int) -> bool:
+        self._risk_until = time.time() + seconds
+        self.log(f"[cloud-daemon] 风控冷却 {seconds}s ...")
+        for _ in range(seconds):
+            if self._stop.is_set():
+                return False
+            time.sleep(1)
+        self._risk_until = 0.0
+        return True
 
     def run_once(self) -> dict:
+        t0 = time.time()
         batch = self._pick_batch()
         if not batch:
             self.log("[cloud-daemon] 监控池为空，跳过")
-            return {"batch": 0, "ok": 0}
+            return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
 
-        ok = fail = frozen = 0
+        ok = fail = risk = frozen = 0
+        engine_hits: Counter[str] = Counter()
+
         with ThreadPoolExecutor(max_workers=self.concurrency) as ex:
-            futures = {ex.submit(self._fetch_one, gid): gid for gid in batch}
+            futures = {ex.submit(self._fetch_goods, row): row for row in batch}
             for fut in as_completed(futures):
-                gid, status, sold = fut.result()
-                self._write_pg(gid, status, sold)
+                if self._stop.is_set():
+                    break
+                goods, status, sold, meta = fut.result()
+                gid = str(goods["goods_id"])
+                self._write_result(gid, status, sold, meta)
+                won = str(meta.get("won_engine") or meta.get("engine") or "unknown")
                 if status == "ok":
                     ok += 1
+                    engine_hits[won] += 1
                 elif status == "frozen":
                     frozen += 1
+                elif status == "risk":
+                    risk += 1
                 else:
                     fail += 1
-        result = {"batch": len(batch), "ok": ok, "fail": fail, "frozen": frozen}
-        self.log(f"[cloud-daemon] {datetime.now():%H:%M:%S} {result}")
+
+        wall_ms = int((time.time() - t0) * 1000)
+        self._round += 1
+        eng_note = dict(engine_hits)
+        note = f"R{self._round} engines={eng_note}"
+        result = {
+            "batch": len(batch),
+            "ok": ok,
+            "fail": fail,
+            "risk": risk,
+            "frozen": frozen,
+            "wall_ms": wall_ms,
+            "engines": eng_note,
+        }
+        self.log(
+            f"[cloud-daemon] R{self._round} 批={len(batch)} ok={ok} fail={fail} "
+            f"risk={risk} frozen={frozen} {wall_ms}ms 引擎={eng_note}"
+        )
+
+        try:
+            from cloud_deploy.cloud_api.database_pg import _conn, init_db
+            from cloud_deploy.cloud_api.sync_service import record_daemon_batch_stats
+
+            init_db()
+            conn = _conn()
+            try:
+                record_daemon_batch_stats(
+                    conn,
+                    len(batch),
+                    ok,
+                    fail,
+                    risk,
+                    frozen,
+                    wall_ms,
+                    note,
+                )
+            finally:
+                conn.close()
+        except Exception as exc:
+            self.log(f"[cloud-daemon] stats 写入失败: {exc}")
+
+        if self._should_cooldown(ok, fail, risk):
+            extra = min(600, max(120, self.cooldown * 3))
+            self._wait_risk_cooldown(extra)
+
         return result
 
-    def start(self):
+    def start(self) -> None:
         if self._running:
             return
         self._running = True
         self._stop.clear()
-        self.log(f"[cloud-daemon] 启动 batch={self.batch_size} conc={self.concurrency}")
+        self._setup_crawler_path()
+        self.log(
+            f"[cloud-daemon] 启动 batch={self.batch_size} conc={self.concurrency} "
+            f"cooldown={self.cooldown}s"
+        )
+
+        try:
+            from xhs_full_sold_fetch import warmup_drissionpage
+
+            warmup_drissionpage(log_func=self.log)
+        except Exception as exc:
+            self.log(f"[cloud-daemon] dp 预热跳过: {exc}")
 
         while not self._stop.is_set():
+            if time.time() < self._risk_until:
+                time.sleep(1)
+                continue
             self.run_once()
             for _ in range(self.cooldown):
                 if self._stop.wait(1):
                     break
         self._running = False
+        self.log("[cloud-daemon] 已停止")
 
-    def stop(self):
+    def stop(self) -> None:
         self._stop.set()
 
 
@@ -148,7 +280,21 @@ def _load_fetcher():
         return None
 
 
+def run_cloud_daemon_main(config: dict | None = None) -> None:
+    daemon = CloudMonitorDaemon(config, print)
+
+    def _on_sig(_sig, _frame):
+        print("[cloud-daemon] 收到停止信号", flush=True)
+        daemon.stop()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, _on_sig)
+    signal.signal(signal.SIGTERM, _on_sig)
+    daemon.start()
+
+
 def start_cloud_daemon(config: dict | None = None, log_func=None) -> CloudMonitorDaemon:
+    """兼容 lite 模式：后台线程。"""
     daemon = CloudMonitorDaemon(config, log_func)
     thread = threading.Thread(target=daemon.start, daemon=True, name="CloudMonitorDaemon")
     thread.start()

@@ -1,5 +1,5 @@
 [Unit]
-Description=XHS Cloud Monitor Daemon (PG scan, optional)
+Description=XHS Cloud Monitor Daemon (PG scan, 2G optimized)
 After=network.target postgresql.service
 
 [Service]
@@ -9,11 +9,15 @@ WorkingDirectory=/opt/xhs-cloud
 EnvironmentFile=-/opt/xhs-cloud/.env
 Environment=PYTHONUNBUFFERED=1
 Environment=PYTHONPATH=/opt/xhs-cloud
-# 需配置 XHS_CRAWLER_ROOT 指向爬虫仓库
+Environment=XHS_DAEMON_MODE=cloud
+Environment=XHS_ENABLE_PLAYWRIGHT=0
+Environment=XHS_DAEMON_BATCH_SIZE=200
+Environment=XHS_DAEMON_CONCURRENCY=2
+Environment=XHS_DAEMON_COOLDOWN_SEC=60
 ExecStart=/opt/xhs-cloud/venv/bin/python /opt/xhs-cloud/cloud_deploy/scripts/run_daemon.py
 Restart=on-failure
 RestartSec=30
-MemoryMax=512M
+MemoryMax=900M
 
 [Install]
 WantedBy=multi-user.target

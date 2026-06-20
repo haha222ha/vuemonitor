@@ -26,7 +26,8 @@ $files = @(
     "xhs_sold_sanity.py",
     "xhs_goods_risk_registry.py",
     "xhs_db_idle.py",
-    "shop_collectors.py"
+    "shop_collectors.py",
+    "xhs_paths.py"
 )
 
 if (-not (Test-Path $Source)) {

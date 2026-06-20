@@ -494,3 +494,48 @@ def record_cloud_scan(
         )
     conn.commit()
     return {"goods_id": gid, "sold_num": sold_num, "delta": delta, "snapshot_time": now.isoformat()}
+
+
+def mark_scan_result(
+    conn,
+    goods_id: str,
+    status: str,
+    engine: str = "",
+    message: str = "",
+) -> None:
+    """记录单次扫描结果（成功/失败/风控），供 cloud_daemon 覆盖统计。"""
+    del message
+    gid = str(goods_id)
+    st = str(status or "fail")[:16]
+    eng = str(engine or "")[:32]
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            """UPDATE monitor_goods SET
+                   last_scan_at=NOW(), last_scan_status=%s,
+                   last_scan_engine=%s, updated_at=NOW()
+               WHERE goods_id=%s""",
+            (st, eng, gid),
+        )
+    conn.commit()
+
+
+def record_daemon_batch_stats(
+    conn,
+    batch_size: int,
+    ok: int,
+    fail: int,
+    risk: int,
+    frozen: int,
+    wall_ms: int,
+    note: str = "",
+) -> None:
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            """INSERT INTO daemon_scan_stats
+               (batch_size, ok, fail, risk, frozen, wall_ms, note)
+               VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+            (batch_size, ok, fail, risk, frozen, wall_ms, (note or "")[:512]),
+        )
+    conn.commit()
