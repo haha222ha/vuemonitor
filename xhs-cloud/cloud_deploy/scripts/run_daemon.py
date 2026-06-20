@@ -41,6 +41,26 @@ def _load_config() -> dict:
     cfg["web_cooldown_seconds"] = int(
         os.environ.get("XHS_DAEMON_COOLDOWN_SEC", cfg.get("web_cooldown_seconds", 0))
     )
+    env_full = os.environ.get("XHS_DAEMON_FULL_POOL", "").strip().lower()
+    if env_full:
+        full_pool = env_full in ("1", "true", "yes")
+    else:
+        full_pool = bool(cfg.get("full_pool"))
+    if full_pool:
+        cfg["full_pool"] = True
+        cfg["skip_today"] = False
+        cfg["min_sold"] = 0
+        os.environ.setdefault("XHS_PG_SEED_MODE", "full")
+    if "XHS_DAEMON_SKIP_TODAY" in os.environ:
+        cfg["skip_today"] = os.environ["XHS_DAEMON_SKIP_TODAY"].strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+    if "XHS_DAEMON_MIN_SOLD" in os.environ:
+        cfg["min_sold"] = int(os.environ["XHS_DAEMON_MIN_SOLD"])
+    elif "min_sold" in cfg:
+        cfg["min_sold"] = int(cfg["min_sold"])
     return cfg
 
 

@@ -383,6 +383,7 @@ class FullSoldSyncDaemon:
         concurrency = max(1, min(10, int(self.config.get("web_detail_concurrency", 5))))
         skip_today = bool(self.config.get("skip_today", True))
         low_v1d_only = bool(self.config.get("low_v1d_only", False))
+        min_sold = int(self.config.get("min_sold", 1))
         seed_batch_size = int(self.config.get("seed_batch_size", 0) or 0)
 
         with self._lock:
@@ -392,6 +393,7 @@ class FullSoldSyncDaemon:
         ensure_queue_seeded(
             low_v1d_only=low_v1d_only,
             skip_today=skip_today,
+            min_sold=min_sold,
             min_pending=50,
             log_func=lambda m: self._log(m, web=True),
             seed_limit=seed_batch_size,
@@ -675,6 +677,7 @@ class FullSoldSyncDaemon:
                 seed_full_sold_queue(
                     low_v1d_only=bool(self.config.get("low_v1d_only", False)),
                     skip_today=bool(self.config.get("skip_today", True)),
+                    min_sold=int(self.config.get("min_sold", 1)),
                     log_func=lambda m: self._log(m, web=True),
                     limit=int(self.config.get("seed_batch_size", 0) or 0),
                 )
