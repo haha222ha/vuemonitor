@@ -9,6 +9,13 @@
 set -euo pipefail
 
 ROOT="/opt/xhs-cloud"
+ENV_FILE="${XHS_ENV_FILE:-$ROOT/.env}"
+[[ -f "$ENV_FILE" ]] || { echo "缺少 $ENV_FILE"; exit 1; }
+set -a
+# shellcheck disable=SC1090
+source "$ENV_FILE"
+set +a
+
 VUE_ROOT="${VUE_MONITOR_ROOT:-/opt/vuemonitor}"
 GIT_PACK="$VUE_ROOT/xhs-cloud/server_sync_pack"
 BATCH="${XHS_IMPORT_BATCH:-$GIT_PACK}"

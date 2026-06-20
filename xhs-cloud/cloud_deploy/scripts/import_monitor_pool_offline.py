@@ -21,6 +21,7 @@ CLOUD_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
 if CLOUD_ROOT not in sys.path:
     sys.path.insert(0, CLOUD_ROOT)
 
+from cloud_deploy.scripts.bootstrap_env import bootstrap
 from cloud_deploy.cloud_api.database_pg import _conn, init_db
 from cloud_deploy.cloud_api.sync_service import (
     apply_sold_history_batch,
@@ -75,6 +76,7 @@ def _mark_snapshots_done(conn, goods_ids: list[str]) -> None:
 
 
 def import_monitor_pool_pack(pack_dir: str, batch_rows: int = 5000) -> dict:
+    bootstrap()
     hist_dir = os.path.join(pack_dir, "sold_history")
     snap_dir = os.path.join(pack_dir, "sold_snapshots")
     manifest_path = os.path.join(pack_dir, "export_manifest.json")
