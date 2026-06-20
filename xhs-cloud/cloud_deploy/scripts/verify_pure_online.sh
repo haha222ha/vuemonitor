@@ -83,24 +83,7 @@ fi
 
 echo ""
 echo -e "  ${CYAN}[PG 监控池 / 补缺队列]${NC}"
-PG=$("$ROOT/venv/bin/python" - <<'PY' 2>&1 || echo "FAIL")
-import os, sys
-sys.path.insert(0, os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud"))
-from cloud_deploy.scripts.bootstrap_env import bootstrap
-bootstrap()
-from cloud_deploy.cloud_api.database_pg import _conn, init_db
-from cloud_deploy.daemon import pg_full_sold_queue as q
-init_db()
-conn = _conn()
-with conn.cursor() as c:
-    c.execute("SET search_path TO xhs_monitor, public")
-    c.execute("SELECT COUNT(*) FROM monitor_goods WHERE monitor_status IN ('active','idle')")
-    mg = c.fetchone()[0]
-conn.close()
-st = q.queue_stats()
-print(f"monitor_goods={mg} queue_total={st['total']} pending={st['pending']} synced={st['synced']}")
-PY
-)
+PG=$("$ROOT/venv/bin/python" "$ROOT/cloud_deploy/scripts/verify_pg_pool.py" 2>&1) || PG="FAIL"
 if [[ "$PG" == FAIL* ]]; then
   fail "PG 查询失败"
 else
