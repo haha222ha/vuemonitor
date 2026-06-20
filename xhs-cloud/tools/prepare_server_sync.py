@@ -20,8 +20,10 @@ from datetime import datetime
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SOURCE = Path(r"C:\Users\Administrator\Desktop\每日选品全量数据")
-DEFAULT_DB = Path(r"D:\jiekoufenxi\小红书多设备爬虫\crawl_data\xhs_burst_monitor.db")
+DEFAULT_SOURCE = Path(r"d:\vuemonitor\xhs-cloud\server_sync_pack\historical_reports")
+DEFAULT_DB = Path(r"D:\0619xhs备份\jiekoufenxi\小红书多设备爬虫\crawl_data\xhs_burst_monitor.db")
+if not DEFAULT_DB.is_file():
+    DEFAULT_DB = Path(r"D:\jiekoufenxi\小红书多设备爬虫\crawl_data\xhs_burst_monitor.db")
 OUT_ROOT = ROOT / "server_sync_pack"
 HIST_DIR = OUT_ROOT / "historical_reports"
 POOL_DIR = OUT_ROOT / "monitor_pool"

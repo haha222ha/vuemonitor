@@ -28,8 +28,10 @@ if str(ROOT) not in sys.path:
 
 from cloud_deploy.cloud_api.sync_service import _field, _num, parse_data_js
 
-DEFAULT_SOURCE = Path(r"C:\Users\Administrator\Desktop\每日选品全量数据")
-DEFAULT_DB = Path(r"D:\jiekoufenxi\小红书多设备爬虫\crawl_data\xhs_burst_monitor.db")
+DEFAULT_SOURCE = Path(r"d:\vuemonitor\xhs-cloud\server_sync_pack\historical_reports")
+DEFAULT_DB = Path(r"D:\0619xhs备份\jiekoufenxi\小红书多设备爬虫\crawl_data\xhs_burst_monitor.db")
+if not DEFAULT_DB.is_file():
+    DEFAULT_DB = Path(r"D:\jiekoufenxi\小红书多设备爬虫\crawl_data\xhs_burst_monitor.db")
 DEFAULT_OUT = ROOT / "server_sync_pack" / "monitor_pool"
 
 
