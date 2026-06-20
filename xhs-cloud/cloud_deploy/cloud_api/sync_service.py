@@ -279,6 +279,7 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
                    VALUES %s
                    ON CONFLICT (goods_id) DO NOTHING""",
                 [(gid, False) for gid in need_backfill],
+                template="(%s, %s, NOW())",
                 page_size=500,
             )
 
