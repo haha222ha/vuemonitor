@@ -246,8 +246,7 @@ class CloudMonitorDaemon:
 
         dp_dead = (
             ok == 0
-            and fail >= max(50, self.batch_size // 2)
-            and wall_ms < 20000
+            and fail >= max(50, int(len(batch) * 0.9))
             and risk == 0
         )
         if dp_dead:
@@ -259,14 +258,13 @@ class CloudMonitorDaemon:
         return result
 
     def _recover_drissionpage(self, wall_ms: int) -> None:
-        """整批秒失败时重建 dp（长跑僵死自愈，无需人工 restart）。"""
-        fast_fail = wall_ms < 20000
-        if not fast_fail:
-            return
+        """整批失败时重建 dp（长跑僵死自愈，无需人工 restart）。"""
         try:
             from xhs_full_sold_fetch import reset_drissionpage, warmup_drissionpage
 
-            self.log("[cloud-daemon] 检测到 dp 僵死，自动重建浏览器 ...")
+            self.log(
+                f"[cloud-daemon] 检测到整批失败 ({wall_ms}ms)，自动重建浏览器 ..."
+            )
             reset_drissionpage(log_func=self.log)
             warmup_drissionpage(log_func=self.log)
         except Exception as exc:
