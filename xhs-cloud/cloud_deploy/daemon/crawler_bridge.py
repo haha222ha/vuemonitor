@@ -34,6 +34,7 @@ def _setup_crawler_path() -> str:
             "xhs_full_sold_daemon.py",
             "xhs_full_sold_fetch.py",
             "xhs_web_sold_sync_write.py",
+            "shop_collectors.py",
         )
         if not os.path.isfile(os.path.join(crawler, name))
     ]

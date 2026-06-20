@@ -37,13 +37,32 @@ else
   fail "目录不存在 — 请上传爬虫到 $CRAWLER"
 fi
 
-for f in xhs_full_sold_daemon.py xhs_full_sold_fetch.py xhs_full_sold_queue_db.py xhs_web_sold_sync_write.py; do
+for f in xhs_full_sold_daemon.py xhs_full_sold_fetch.py xhs_full_sold_queue_db.py xhs_web_sold_sync_write.py shop_collectors.py; do
   if [[ -f "$CRAWLER/$f" ]]; then
     ok "$f"
   else
     fail "缺少 $f"
   fi
 done
+
+echo ""
+echo -e "  ${CYAN}[shop_collectors 导入]${NC}"
+SC=$("$ROOT/venv/bin/python" - <<PY 2>&1 || true
+import os, sys
+crawler = os.environ.get("XHS_CRAWLER_ROOT", "${CRAWLER}")
+sys.path.insert(0, crawler)
+try:
+    from shop_collectors import _api_check_risk_control, HAS_CURL_CFFI
+    print("OK", "curl_cffi" if HAS_CURL_CFFI else "requests-only")
+except Exception as e:
+    print("FAIL", e)
+PY
+)
+if [[ "$SC" == OK* ]]; then
+  ok "shop_collectors OK (${SC#OK })"
+else
+  fail "shop_collectors 不可用: $SC"
+fi
 
 echo ""
 echo -e "  ${CYAN}[Python 模块加载]${NC}"
