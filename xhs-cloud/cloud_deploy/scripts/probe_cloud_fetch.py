@@ -104,7 +104,16 @@ def main() -> int:
     sold = (detail or {}).get("real_sales", 0) if status == "ok" else 0
     print(f"\n自动降级链(从dp): status={status} sold={sold}")
     print(f"meta={meta}")
-    return 0 if status == "ok" else 3
+
+    from cloud_deploy.daemon.cloud_engine import build_fallback_chain
+
+    chain = build_fallback_chain("drissionpage", {})
+    detail2, status2, meta2 = fetch_sold_detail(
+        goods_id, engine="drissionpage", fallback_chain=chain, auto_fallback=True
+    )
+    sold2 = (detail2 or {}).get("real_sales", 0) if status2 == "ok" else 0
+    print(f"\n显式链 {chain}: status={status2} sold={sold2} tried={(meta2 or {}).get('tried')}")
+    return 0 if status2 == "ok" else 3
 
 
 if __name__ == "__main__":

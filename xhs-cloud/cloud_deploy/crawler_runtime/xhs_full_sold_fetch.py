@@ -522,6 +522,20 @@ _ENGINE_FN = {
 }
 
 
+def _rotate_engine_chain(chain: tuple[str, ...], start_engine: str) -> tuple[str, ...]:
+    if start_engine not in chain:
+        return (start_engine,) + chain
+    idx = chain.index(start_engine)
+    ordered = chain[idx:] + chain[:idx]
+    seen: set[str] = set()
+    out: list[str] = []
+    for eng in ordered:
+        if eng not in seen:
+            seen.add(eng)
+            out.append(eng)
+    return tuple(out)
+
+
 def fetch_sold_detail(goods_id, engine="api", fallback_chain=None, auto_fallback=True):
     """
     拉取商品详情。auto_fallback=True 时遇 risk/fail 自动尝试下一引擎。
@@ -530,10 +544,9 @@ def fetch_sold_detail(goods_id, engine="api", fallback_chain=None, auto_fallback
     if fallback_chain:
         chain = tuple(fallback_chain)
     elif auto_fallback:
-        chain = get_engine_chain()
-        if engine and engine in chain:
-            idx = chain.index(engine)
-            chain = chain[idx:]
+        base = get_engine_chain()
+        start = engine or (base[0] if base else "api")
+        chain = _rotate_engine_chain(base, start)
     else:
         chain = (engine or "api",)
 

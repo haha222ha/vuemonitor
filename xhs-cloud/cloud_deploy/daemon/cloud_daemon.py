@@ -35,11 +35,44 @@ class CloudMonitorDaemon:
         self.cooldown = max(0, int(self.config.get("web_cooldown_seconds", 30)))
         self.min_success_rate = float(self.config.get("min_success_rate", 0.08) or 0.08)
         self.auto_fallback = bool(self.config.get("auto_fallback", True))
+        self._api_only_until = 0.0
+        self._maybe_force_api_only_on_start()
 
     def _setup_crawler_path(self) -> None:
         crawler = os.environ.get("XHS_CRAWLER_ROOT", "").strip()
         if crawler and os.path.isdir(crawler) and crawler not in sys.path:
             sys.path.insert(0, crawler)
+
+    def _maybe_force_api_only_on_start(self) -> None:
+        """最近多批全失败时，启动后直接 api 优先（probe 已证明 api 可用）。"""
+        try:
+            from cloud_deploy.cloud_api.database_pg import _conn
+
+            conn = _conn()
+            try:
+                with conn.cursor() as c:
+                    c.execute("SET search_path TO xhs_monitor, public")
+                    c.execute("SELECT ok, fail FROM daemon_scan_stats ORDER BY id DESC LIMIT 2")
+                    rows = c.fetchall()
+            finally:
+                conn.close()
+            if len(rows) >= 2 and all(
+                int(r[0] or 0) < max(10, int(r[1] or 0) // 100) for r in rows
+            ):
+                mins = int(self.config.get("api_only_minutes", 30) or 30)
+                self._api_only_until = time.time() + mins * 60
+                self.log(f"[cloud-daemon] 最近批次 dp 无效，{mins}min 内改 api 优先")
+        except Exception:
+            pass
+
+    def _resolve_start_engine(self, goods: dict) -> str:
+        from cloud_deploy.daemon.cloud_engine import pick_start_engine
+
+        if time.time() < self._api_only_until:
+            return "api"
+        if os.environ.get("XHS_DAEMON_API_ONLY", "").strip().lower() in ("1", "true", "yes"):
+            return "api"
+        return pick_start_engine(goods, self.config)
 
     def _pick_batch(self) -> list[dict]:
         from cloud_deploy.cloud_api.database_pg import _conn, init_db
@@ -86,10 +119,10 @@ class CloudMonitorDaemon:
             conn.close()
 
     def _fetch_goods(self, goods: dict) -> tuple[dict, str, int | None, dict]:
-        from cloud_deploy.daemon.cloud_engine import build_fallback_chain, pick_start_engine
+        from cloud_deploy.daemon.cloud_engine import build_fallback_chain
 
         gid = str(goods["goods_id"])
-        start = pick_start_engine(goods, self.config)
+        start = self._resolve_start_engine(goods)
         chain = build_fallback_chain(start, self.config) if self.auto_fallback else (start,)
 
         fetcher = _load_fetcher()
@@ -251,6 +284,13 @@ class CloudMonitorDaemon:
         )
         if dp_dead:
             self._recover_drissionpage(wall_ms)
+        elif batch_total >= 100 and success_rate < 0.01:
+            mins = int(self.config.get("api_only_minutes", 30) or 30)
+            self._api_only_until = time.time() + mins * 60
+            self.log(
+                f"[cloud-daemon] 本批成功率 {success_rate:.1%}，"
+                f"接下来 {mins}min 改 api 优先（跳过 dp 限流）"
+            )
         elif self._should_cooldown(ok, fail, risk):
             extra = min(600, max(120, self.cooldown * 3))
             self._wait_risk_cooldown(extra)
