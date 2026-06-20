@@ -247,6 +247,16 @@ function archiveTypeFor(t) {
   return 'member_daily_zip';
 }
 
+function reportLabel(it) {
+  const date = String(it.report_date || '').slice(0, 10);
+  const mmdd = date.replace(/-/g, '').slice(4);
+  const fn = (it.file_name || '').replace(/\.zip$/i, '');
+  if (/^(全量|周报|月报)/.test(fn)) return fn;
+  if (it.archive_type === 'member_weekly_zip') return '周报' + mmdd;
+  if (it.archive_type === 'member_monthly_zip') return '月报' + date.slice(0, 7).replace(/-/g, '');
+  return '全量' + mmdd;
+}
+
 function renderReports() {
   const items = library[currentType] || [];
   const el = document.getElementById('reportTable');
@@ -259,7 +269,7 @@ function renderReports() {
   let cards = '<div class="report-cards">';
   items.forEach(it => {
     const date = esc(it.report_date);
-    const summary = esc(it.summary || it.file_name || '-');
+    const summary = esc(it.summary || reportLabel(it));
     const rows = it.row_count ?? '-';
     const size = fmtSize(it.file_size_bytes);
     table += `<tr>

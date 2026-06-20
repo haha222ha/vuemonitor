@@ -180,6 +180,22 @@ def authenticate(username: str, password: str) -> dict | None:
     return {"id": u["id"], "username": u["username"], "expires_at": m["expires_at"]}
 
 
+def archive_display_label(
+    report_date: str, archive_type: str = "member_daily_zip", file_name: str = ""
+) -> str:
+    date = str(report_date)[:10]
+    mmdd = date.replace("-", "")[4:]
+    if file_name:
+        base = file_name.rsplit(".", 1)[0]
+        if base.startswith(("全量", "周报", "月报")):
+            return base
+    if archive_type == "member_weekly_zip":
+        return f"周报{mmdd}"
+    if archive_type == "member_monthly_zip":
+        return f"月报{date[:7].replace('-', '')}"
+    return f"全量{mmdd}"
+
+
 def list_archives(archive_type: str = "member_daily_zip") -> list[dict]:
     conn = _conn()
     c = conn.cursor()
@@ -205,7 +221,9 @@ def list_archives(archive_type: str = "member_daily_zip") -> list[dict]:
                 "file_name": r["file_name"],
                 "file_size_bytes": r["file_size_bytes"],
                 "row_count": r["row_count"],
-                "summary": meta.get("filter_label") or meta.get("scope_label") or "",
+                "summary": archive_display_label(
+                    r["report_date"], r["archive_type"], r["file_name"] or ""
+                ),
                 "published_at": r["published_at"],
             }
         )
