@@ -14,9 +14,8 @@ def main() -> int:
     from cloud_deploy.scripts.bootstrap_env import bootstrap
 
     bootstrap()
-    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.database_pg import _conn
 
-    init_db()
     conn = _conn()
     try:
         with conn.cursor() as c:
