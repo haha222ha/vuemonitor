@@ -1,0 +1,37 @@
+{
+  "prepared_at": "2026-06-20 09:29:22",
+  "main_db": "D:\\jiekoufenxi\\小红书多设备爬虫\\crawl_data\\xhs_burst_monitor.db",
+  "output_root": "D:\\vuemonitor\\xhs-cloud\\server_sync_pack",
+  "pool_rule": "v1d > 0 OR actual_v1d > 0",
+  "historical_reports": {
+    "total_reports": 5,
+    "total_data_js_mb": 84.34,
+    "reports": [
+      {
+        "dir_name": "全量0615",
+        "data_js_mb": 23.93
+      },
+      {
+        "dir_name": "全量0616",
+        "data_js_mb": 23.93
+      },
+      {
+        "dir_name": "全量0617",
+        "data_js_mb": 5.34
+      },
+      {
+        "dir_name": "全量0618",
+        "data_js_mb": 16.82
+      },
+      {
+        "dir_name": "全量0619",
+        "data_js_mb": 14.32
+      }
+    ]
+  },
+  "monitor_pool": {
+    "monitor_goods_count": 152459,
+    "sold_history_rows": 458290,
+    "sold_history_files": 5
+  }
+}

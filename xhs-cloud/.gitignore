@@ -6,4 +6,7 @@ __pycache__/
 *.db
 *.db-wal
 *.db-shm
-server_sync_pack/
+# server_sync_pack 通过 git push/pull 同步到主机（勿 scp）
+server_sync_pack/*.tar.gz
+server_sync_pack/scp_upload.ps1
+server_sync_pack/README.md

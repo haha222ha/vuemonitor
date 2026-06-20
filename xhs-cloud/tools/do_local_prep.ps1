@@ -77,11 +77,9 @@ Write-Host "DONE" -ForegroundColor Green
 Write-Host "  goods: $($exp.monitor_goods_count)"
 Write-Host "  tar:   $Tar ($sizeMB MB)"
 Write-Host ""
-Write-Host "SERVER (you run):" -ForegroundColor Cyan
-Write-Host "  scp $Tar admin@${EcsHost}:/tmp/"
-Write-Host "  ssh admin@${EcsHost}"
-Write-Host "  sudo mkdir -p /opt/xhs-cloud/data/import_batch"
-Write-Host "  sudo tar -xzf /tmp/xhs-import-batch.tar.gz -C /opt/xhs-cloud/data/import_batch"
+Write-Host "SERVER (git pull then import):" -ForegroundColor Cyan
+Write-Host "  cd /opt/vuemonitor && git pull"
+Write-Host "  rsync -a /opt/vuemonitor/xhs-cloud/cloud_deploy/ /opt/xhs-cloud/cloud_deploy/ --delete"
 Write-Host "  bash /opt/xhs-cloud/cloud_deploy/scripts/server_import.sh"
 
 if ($Upload) {

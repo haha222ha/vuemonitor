@@ -1,16 +1,20 @@
 #!/bin/bash
 # 服务器一次性导入（上传 server_sync_pack 后执行）
 #
-# 用法（数据在 import_batch 下）:
+# 用法（git pull 后，数据在 /opt/vuemonitor/xhs-cloud/server_sync_pack）:
+#   cd /opt/vuemonitor && git pull
+#   rsync -a /opt/vuemonitor/xhs-cloud/cloud_deploy/ /opt/xhs-cloud/cloud_deploy/ --delete
 #   bash /opt/xhs-cloud/cloud_deploy/scripts/server_import.sh
-#
-# 或数据刚 scp 到 import_batch:
-#   bash /opt/xhs-cloud/data/import_batch/server_import.sh
 #
 set -euo pipefail
 
 ROOT="/opt/xhs-cloud"
-BATCH="${XHS_IMPORT_BATCH:-$ROOT/data/import_batch}"
+VUE_ROOT="${VUE_MONITOR_ROOT:-/opt/vuemonitor}"
+GIT_PACK="$VUE_ROOT/xhs-cloud/server_sync_pack"
+BATCH="${XHS_IMPORT_BATCH:-$GIT_PACK}"
+if [[ ! -d "$BATCH/historical_reports" && -d "$ROOT/data/import_batch/historical_reports" ]]; then
+  BATCH="$ROOT/data/import_batch"
+fi
 export PYTHONPATH="$ROOT"
 
 echo ""

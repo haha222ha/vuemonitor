@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>选品工作台</title>
+<style>
+:root{
+  --bg:#f5f5f7;--surface:#fff;--surface2:#fbfbfd;
+  --text:#1d1d1f;--text2:#6e6e73;--text3:#86868b;
+  --line:rgba(0,0,0,.08);--accent:#0071e3;--accent-soft:#0071e314;
+  --green:#34c759;--orange:#ff9500;--red:#ff3b30;--purple:#bf5af2;
+  --shadow:0 4px 24px rgba(0,0,0,.06);--shadow-sm:0 1px 3px rgba(0,0,0,.06);
+  --radius:16px;--radius-sm:10px;--nav-h:52px;
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+a{color:var(--accent);text-decoration:none}
+.hidden{display:none!important}
+
+.topnav{
+  position:sticky;top:0;z-index:100;height:var(--nav-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 max(20px,calc(50% - 620px));gap:16px;
+  background:rgba(251,251,253,.78);backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid var(--line);
+}
+.brand{font-size:17px;font-weight:600;letter-spacing:-.02em}
+.brand small{display:block;font-size:11px;font-weight:400;color:var(--text3);margin-top:1px}
+.nav-actions{display:flex;align-items:center;gap:8px}
+.btn{
+  font-size:13px;font-weight:500;padding:8px 14px;border-radius:980px;
+  transition:background .2s,color .2s;
+}
+.btn-ghost{color:var(--accent)}.btn-ghost:hover{background:var(--accent-soft)}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{filter:brightness(1.05)}
+.btn-secondary{background:var(--surface);border:1px solid var(--line);color:var(--text)}
+.btn-secondary:hover{background:#f0f0f2}
+
+.wrap{max-width:1240px;margin:0 auto;padding:24px 20px 80px}
+
+.hero{margin-bottom:28px}
+.hero h1{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.1;margin-bottom:6px}
+.hero p{font-size:15px;color:var(--text2);line-height:1.5;max-width:640px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+@media(max-width:720px){.stats{grid-template-columns:1fr}}
+.stat{
+  background:var(--surface);border-radius:var(--radius);padding:18px 20px;
+  box-shadow:var(--shadow-sm);border:1px solid var(--line);
+}
+.stat .v{font-size:28px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat .l{font-size:12px;color:var(--text3);margin-top:4px}
+
+.segmented{
+  display:inline-flex;background:#e8e8ed;padding:3px;border-radius:980px;margin-bottom:20px;
+}
+.segmented button{
+  padding:8px 18px;font-size:13px;font-weight:500;color:var(--text2);
+  border-radius:980px;transition:all .25s;
+}
+.segmented button.active{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+.toolbar{
+  display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px;
+}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-wrap input{
+  width:100%;padding:10px 14px 10px 36px;font-size:15px;border-radius:var(--radius-sm);
+  border:1px solid var(--line);background:var(--surface);outline:none;
+}
+.search-wrap input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.4}
+
+.view-toggle{display:flex;gap:4px;background:#e8e8ed;padding:3px;border-radius:980px}
+.view-toggle button{padding:6px 12px;font-size:12px;border-radius:980px;color:var(--text2)}
+.view-toggle button.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow-sm)}
+
+.preset-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.preset-card{
+  text-align:left;padding:14px 16px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;
+}
+.preset-card:hover{border-color:rgba(0,113,227,.35);transform:translateY(-1px)}
+.preset-card.active{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent)}
+.preset-card .name{font-size:14px;font-weight:600;margin-bottom:2px}
+.preset-card .desc{font-size:11px;color:var(--text3);line-height:1.35;margin-bottom:8px}
+.preset-card .cnt{font-size:20px;font-weight:700;font-variant-numeric:tabular-nums}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center}
+.chip{
+  font-size:12px;padding:6px 12px;border-radius:980px;border:1px solid var(--line);
+  background:var(--surface);color:var(--text2);transition:all .2s;
+}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip .x{margin-left:6px;opacity:.8}
+
+.result-bar{
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  margin-bottom:14px;font-size:13px;color:var(--text2);
+}
+.result-bar strong{color:var(--text);font-weight:600}
+
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.goods-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px;cursor:pointer;transition:transform .2s,box-shadow .2s;
+  display:flex;flex-direction:column;gap:10px;min-height:168px;
+}
+.goods-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.goods-card.starred{border-color:var(--orange);box-shadow:0 0 0 1px rgba(255,149,0,.25)}
+.card-title{font-size:15px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text3)}
+.card-meta b{color:var(--text);font-weight:600}
+.card-metrics{display:flex;gap:16px;margin-top:auto;padding-top:8px;border-top:1px solid var(--line)}
+.metric .mv{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.metric .mv.up{color:var(--green)}
+.metric .ml{font-size:10px;color:var(--text3);margin-top:2px}
+.card-foot{display:flex;justify-content:space-between;align-items:center}
+.pool-pill{font-size:11px;font-weight:600;padding:3px 8px;border-radius:980px}
+.pool-BURST{background:#ff3b3018;color:var(--red)}
+.pool-ACCEL{background:#ff950018;color:var(--orange)}
+.pool-WATCH{background:#8e8e9318;color:var(--text2)}
+.pool-NEW{background:#34c75918;color:var(--green)}
+.fsr-good{color:var(--green);font-weight:600}
+.card-actions{display:flex;gap:6px}
+.icon-btn{
+  width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:#f0f0f2;font-size:14px;transition:background .2s;
+}
+.icon-btn:hover{background:#e5e5ea}
+.icon-btn.on{background:#fff3e0}
+
+.table-wrap{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--shadow-sm);
+}
+.table-scroll{overflow-x:auto;max-height:70vh;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{
+  position:sticky;top:0;z-index:2;text-align:left;padding:12px 14px;font-weight:600;
+  font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text3);
+  background:rgba(251,251,253,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+  cursor:pointer;white-space:nowrap;user-select:none;
+}
+td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tbody tr{cursor:pointer;transition:background .15s}
+tbody tr:hover{background:#f5f5f7}
+.t-title{max-width:280px;font-weight:500;line-height:1.35}
+.t-num{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+
+.pager{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;flex-wrap:wrap}
+.pager button,.pager select{
+  font-size:13px;padding:8px 14px;border-radius:var(--radius-sm);
+  border:1px solid var(--line);background:var(--surface);
+}
+.pager button:disabled{opacity:.4;cursor:default}
+.pager span{font-size:13px;color:var(--text2)}
+
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:200;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.overlay.open{opacity:1;pointer-events:auto}
+
+.sheet{
+  position:fixed;z-index:201;background:var(--surface);
+  transition:transform .35s cubic-bezier(.32,.72,0,1);
+  display:flex;flex-direction:column;
+}
+.sheet-right{top:0;right:0;width:min(420px,100vw);height:100%;transform:translateX(100%);box-shadow:-8px 0 40px rgba(0,0,0,.12)}
+.sheet-right.open{transform:translateX(0)}
+.sheet-head{padding:20px 20px 12px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.sheet-head h2{font-size:20px;font-weight:700;line-height:1.3;letter-spacing:-.02em}
+.sheet-close{width:30px;height:30px;border-radius:50%;background:#f0f0f2;font-size:18px;line-height:1}
+.sheet-body{padding:16px 20px 32px;overflow-y:auto;flex:1}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.detail-cell{background:#f5f5f7;border-radius:var(--radius-sm);padding:12px}
+.detail-cell .dk{font-size:11px;color:var(--text3);margin-bottom:4px}
+.detail-cell .dv{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.detail-row{font-size:13px;line-height:1.6;color:var(--text2);margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.detail-row b{color:var(--text);display:inline-block;min-width:88px}
+
+.filter-section{margin-bottom:20px}
+.filter-section h3{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text)}
+.range-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.range-row input[type=range]{flex:1;accent-color:var(--accent)}
+.range-row input[type=number]{
+  width:72px;padding:8px;border:1px solid var(--line);border-radius:8px;font-size:13px;
+}
+.filter-pills{display:flex;flex-wrap:wrap;gap:8px}
+.filter-pill{
+  padding:8px 14px;border-radius:980px;font-size:13px;border:1px solid var(--line);background:#f5f5f7;
+}
+.filter-pill.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.filter-foot{padding:16px 20px;border-top:1px solid var(--line);display:flex;gap:10px}
+
+.empty{padding:48px 24px;text-align:center;color:var(--text3)}
+.empty h3{font-size:17px;color:var(--text);margin-bottom:8px;font-weight:600}
+
+.footer{
+  margin-top:48px;padding:24px;background:var(--surface);border-radius:var(--radius);
+  border:1px solid var(--line);font-size:12px;line-height:1.7;color:var(--text3);
+}
+.footer h3{font-size:13px;color:var(--text);margin-bottom:8px;font-weight:600}
+
+.loading{
+  position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);z-index:999;font-size:15px;color:var(--text2);
+}
+</style>
+</head>
+<body>
+<div class="loading" id="loading">正在加载 data.js …</div>
+
+<nav class="topnav">
+  <div class="brand">选品工作台<small id="nav-date">数据日报</small></div>
+  <div class="nav-actions">
+    <button class="btn btn-ghost" id="btn-adv" type="button">筛选</button>
+    <button class="btn btn-secondary" id="btn-export" type="button">导出当前</button>
+  </div>
+</nav>
+
+<main class="wrap hidden" id="app">
+  <section class="hero">
+    <h1 id="hero-title">选品数据</h1>
+    <p id="hero-desc">按视图筛选浏览，点击商品查看详情。数据仅供参考，请自行核实。</p>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <div class="segmented" id="tab-seg">
+    <button type="button" data-tab="virtual" class="active">虚拟</button>
+    <button type="button" data-tab="physical">实体</button>
+    <button type="button" data-tab="watchlist">我的清单</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="search" id="search" placeholder="搜索商品、店铺或 ID" autocomplete="off">
+    </div>
+    <div class="view-toggle" id="view-toggle">
+      <button type="button" data-view="cards" class="active">卡片</button>
+      <button type="button" data-view="table">列表</button>
+    </div>
+  </div>
+
+  <div class="preset-grid" id="presets"></div>
+  <div class="chips" id="tag-chips"></div>
+
+  <div class="result-bar">
+    <span>当前结果 <strong id="result-count">0</strong> 条</span>
+    <button class="btn btn-ghost" type="button" id="btn-clear">清除条件</button>
+  </div>
+
+  <div id="content-cards" class="card-grid"></div>
+  <div id="content-table" class="table-wrap hidden">
+    <div class="table-scroll">
+      <table><thead><tr id="thead"></tr></thead><tbody id="tbody"></tbody></table>
+    </div>
+  </div>
+  <div class="pager" id="pager"></div>
+
+  <footer class="footer" id="footer"></footer>
+</main>
+
+<div class="overlay" id="overlay"></div>
+<aside class="sheet sheet-right" id="sheet-detail">
+  <div class="sheet-head">
+    <h2 id="detail-title">—</h2>
+    <button class="sheet-close" type="button" data-close="detail">&times;</button>
+  </div>
+  <div class="sheet-body" id="detail-body"></div>
+</aside>
+<aside class="sheet sheet-right" id="sheet-filter">
+  <div class="sheet-head">
+    <h2>筛选条件</h2>
+    <button class="sheet-close" type="button" data-close="filter">&times;</button>
+  </div>
+  <div class="sheet-body">
+    <div class="filter-section">
+      <h3>真实增量 ≥</h3>
+      <div class="range-row">
+        <input type="range" id="f-actual" min="0" max="100" step="1" value="0">
+        <input type="number" id="f-actual-n" min="0" step="1" value="0">
+      </div>
+    </div>
+    <div class="filter-section">
+      <h3>商品粉销比 ≤（低粉高销）</h3>
+      <div class="range-row">
+        <input type="range" id="f-fsr" min="0" max="100" step="1" value="100">
+        <input type="number" id="f-fsr-n" min="0" max="1" step="0.01" value="1">
+      </div>
+    </div>
+    <div class="filter-section">
+      <h3>价格区间</h3>
+      <div class="range-row">
+        <input type="number" id="f-price-min" placeholder="最低" min="0" step="0.1">
+        <span>—</span>
+        <input type="number" id="f-price-max" placeholder="最高" min="0" step="0.1">
+      </div>
+    </div>
+    <div class="filter-section">
+      <h3>销量区间</h3>
+      <div class="range-row">
+        <input type="number" id="f-sold-min" placeholder="最低" min="0">
+        <span>—</span>
+        <input type="number" id="f-sold-max" placeholder="最高" min="0">
+      </div>
+    </div>
+    <div class="filter-section">
+      <h3>分层</h3>
+      <div class="filter-pills" id="f-pools">
+        <button type="button" class="filter-pill" data-pool="BURST">BURST</button>
+        <button type="button" class="filter-pill" data-pool="ACCEL">ACCEL</button>
+        <button type="button" class="filter-pill" data-pool="WATCH">WATCH</button>
+        <button type="button" class="filter-pill" data-pool="NEW">NEW</button>
+      </div>
+    </div>
+    <div class="filter-section">
+      <label style="font-size:13px;display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="f-no-anomaly"> 排除异常数据
+      </label>
+    </div>
+  </div>
+  <div class="filter-foot">
+    <button class="btn btn-secondary" type="button" id="f-reset" style="flex:1">重置</button>
+    <button class="btn btn-primary" type="button" id="f-apply" style="flex:1">完成</button>
+  </div>
+</aside>
+
+<script src="data.js"></script>
+<script>
+(function(){
+'use strict';
+
+var POOL_C={NEW:'#34c759',WATCH:'#8e8e93',ACCEL:'#ff9500',BURST:'#ff3b30'};
+var WATCH_KEY='xhs_watchlist_v1';
+var VIEW_KEY='xhs_apple_view_v1';
+
+var state={
+  tab:'virtual',view:'cards',preset:'low_fans',search:'',page:0,pageSize:48,
+  tags:[],sortKey:'actualV1d',sortDesc:true,
+  adv:{actualMin:0,fsrMax:null,priceMin:null,priceMax:null,soldMin:null,soldMax:null,pools:[],noAnomaly:true}
+};
+
+var PRESETS={
+  all:{name:'全部',desc:'当前赛道全部商品',test:function(){return true;}},
+  low_fans:{name:'低粉高销',desc:'粉销比≤0.02 · 有真实动销',test:function(i){
+    if(i.anomaly)return false;var f=i.goodsFsr;
+    if(f===null||isNaN(f)||f>0.02)return false;
+    return i.sold>=30&&(i.actualV1d||0)>=1;
+  }},
+  momentum:{name:'强动销',desc:'BURST/ACCEL · 增量≥10',test:function(i){
+    return ['BURST','ACCEL'].indexOf(i.pool)>=0&&(i.actualV1d||0)>=10&&!i.anomaly;
+  }},
+  blue:{name:'蓝海候选',desc:'销量适中 · 低粉 · 在涨',test:function(i){
+    if(i.anomaly||i.sold>5000||i.sold<50)return false;
+    var f=i.goodsFsr;return f!==null&&!isNaN(f)&&f<=0.05&&(i.actualV1d||0)>=5&&(i.actualGr||0)>=5;
+  }},
+  price_band:{name:'价格带',desc:'虚拟9.9-59 / 实体30-150',test:function(i,tab){
+    if(tab==='virtual')return i.price>=9.9&&i.price<=59&&(i.actualV1d||0)>=1;
+    return i.price>=30&&i.price<=150&&(i.actualV1d||0)>=5;
+  }}
+};
+
+var TAGS={
+  low_fans:{label:'低粉高销',test:function(i){var f=i.goodsFsr;return f!==null&&!isNaN(f)&&f<=0.02&&i.sold>=30;}},
+  strong:{label:'强动销',test:function(i){return(i.actualV1d||0)>=10;}},
+  new_pool:{label:'新品',test:function(i){return i.pool==='NEW';}},
+  no_anomaly:{label:'无异常',test:function(i){return!i.anomaly;}}
+};
+
+var VIRTUAL=[],PHYSICAL=[],IDX={};
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+function fmt(n){return (n||0).toLocaleString('zh-CN');}
+function fmtFsr(v){if(v===null||v===undefined||isNaN(v))return '—';return v<0.01?v.toFixed(4):v.toFixed(3);}
+
+function buildItem(r){
+  var v1d=parseFloat(r[IDX.v1d])||0;
+  var sold=parseInt(r[IDX.sold],10)||0;
+  var actual=parseFloat(r[IDX.actual_v1d]);if(isNaN(actual))actual=0;
+  var gfs=parseFloat(r[IDX.goods_fsr]);if(isNaN(gfs))gfs=null;
+  var sfs=parseFloat(r[IDX.shop_fsr]);if(isNaN(sfs))sfs=null;
+  var estVsr=parseFloat(r[IDX.vsr]);if(isNaN(estVsr))estVsr=sold>0?v1d/sold:0;
+  var avsr=parseFloat(r[IDX.actual_vsr]);if(isNaN(avsr)&&actual>0&&sold>0)avsr=actual/sold;
+  return{
+    gid:r[IDX.goods_id]||'',title:r[IDX.title]||'',price:parseFloat(r[IDX.price])||0,sold:sold,
+    v1h:parseFloat(r[IDX.v1h])||0,v6h:parseFloat(r[IDX.v6h])||0,actualV1d:actual,v1d:v1d,
+    actualGr:parseFloat(r[IDX.actual_gr])||0,gr:parseFloat(r[IDX.gr])||0,
+    goodsFsr:gfs,shopFsr:sfs,acc:parseFloat(r[IDX.acc])||0,burst:parseFloat(r[IDX.burst])||0,
+    pool:r[IDX.pool]||'WATCH',storeName:r[IDX.store_name]||'',storeId:r[IDX.store_id]||'',
+    behavior:r[IDX.behavior]||'',firstSeen:r[IDX.first_seen]||'',
+    baseHours:parseFloat(r[IDX.base_hours])||0,isVirtual:parseInt(r[IDX.is_virtual],10)===1,
+    anomaly:parseInt(r[IDX.anomaly],10)===1,estVsrPct:estVsr*100,
+    actualVsrPct:avsr!==null&&!isNaN(avsr)?avsr*100:null
+  };
+}
+
+function getWatchlist(){
+  try{return JSON.parse(localStorage.getItem(WATCH_KEY)||'[]');}catch(e){return[];}
+}
+function isStarred(gid){return getWatchlist().indexOf(gid)>=0;}
+function toggleStar(gid,e){
+  if(e)e.stopPropagation();
+  var list=getWatchlist(),i=list.indexOf(gid);
+  if(i>=0)list.splice(i,1);else list.push(gid);
+  localStorage.setItem(WATCH_KEY,JSON.stringify(list));
+  render();
+}
+
+function getPool(tab){
+  if(tab==='virtual')return VIRTUAL;
+  if(tab==='physical')return PHYSICAL;
+  var ids=getWatchlist(),all=VIRTUAL.concat(PHYSICAL),map={};
+  all.forEach(function(i){map[i.gid]=i;});
+  return ids.map(function(id){return map[id];}).filter(Boolean);
+}
+
+function matchesAdv(i){
+  var a=state.adv;
+  if(a.noAnomaly&&i.anomaly)return false;
+  if(a.actualMin&&(i.actualV1d||0)<a.actualMin)return false;
+  if(a.fsrMax!==null&&a.fsrMax!==undefined){
+    if(i.goodsFsr===null||isNaN(i.goodsFsr)||i.goodsFsr>a.fsrMax)return false;
+  }
+  if(a.priceMin!==null&&i.price<a.priceMin)return false;
+  if(a.priceMax!==null&&i.price>a.priceMax)return false;
+  if(a.soldMin!==null&&i.sold<a.soldMin)return false;
+  if(a.soldMax!==null&&i.sold>a.soldMax)return false;
+  if(a.pools.length&&a.pools.indexOf(i.pool)<0)return false;
+  return true;
+}
+
+function filterItems(items){
+  var preset=PRESETS[state.preset]||PRESETS.all;
+  var q=state.search.toLowerCase().trim();
+  return items.filter(function(i){
+    if(!preset.test(i,state.tab))return false;
+    for(var t=0;t<state.tags.length;t++){if(!TAGS[state.tags[t]].test(i))return false;}
+    if(!matchesAdv(i))return false;
+    if(q&&(i.title+i.storeName+i.gid).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  }).sort(function(a,b){
+    var k=state.sortKey,va=a[k],vb=b[k];
+    if(va===null||va===undefined||isNaN(va))va=-1;
+    if(vb===null||vb===undefined||isNaN(vb))vb=-1;
+    if(typeof va==='number')return state.sortDesc?vb-va:va-vb;
+    va=String(va);vb=String(vb);
+    return state.sortDesc?vb.localeCompare(va):va.localeCompare(vb);
+  });
+}
+
+function countPreset(key,items){
+  var p=PRESETS[key];if(!p)return 0;
+  return items.filter(function(i){return p.test(i,state.tab);}).length;
+}
+
+function renderPresets(){
+  var items=getPool(state.tab);
+  var html='';
+  Object.keys(PRESETS).forEach(function(k){
+    var p=PRESETS[k],cnt=countPreset(k,items),act=state.preset===k?' active':'';
+    html+='<button type="button" class="preset-card'+act+'" data-preset="'+k+'">'+
+      '<div class="name">'+p.name+'</div><div class="desc">'+p.desc+'</div>'+
+      '<div class="cnt">'+fmt(cnt)+'</div></button>';
+  });
+  document.getElementById('presets').innerHTML=html;
+}
+
+function renderTagChips(){
+  var html='';
+  Object.keys(TAGS).forEach(function(k){
+    var on=state.tags.indexOf(k)>=0?' on':'';
+    html+='<button type="button" class="chip'+on+'" data-tag="'+k+'">'+TAGS[k].label+'</button>';
+  });
+  state.tags.forEach(function(k){
+    html+='<span class="chip on" data-rm="'+k+'">'+TAGS[k].label+' <span class="x">×</span></span>';
+  });
+  document.getElementById('tag-chips').innerHTML=html;
+}
+
+function renderCards(list){
+  var start=state.page*state.pageSize,end=Math.min(start+state.pageSize,list.length);
+  var slice=list.slice(start,end),html='';
+  if(!slice.length){
+    html='<div class="empty" style="grid-column:1/-1"><h3>没有匹配的商品</h3><p>试试放宽筛选或切换视图</p></div>';
+  }else slice.forEach(function(i){
+    var star=isStarred(i.gid)?' starred':'',starBtn=isStarred(i.gid)?' on':'';
+    html+='<article class="goods-card'+star+'" data-gid="'+esc(i.gid)+'">'+
+      '<div class="card-title" title="'+esc(i.title)+'">'+esc(i.title)+'</div>'+
+      '<div class="card-meta"><span>¥'+i.price.toFixed(2)+'</span><span>销量 <b>'+fmt(i.sold)+'</b></span><span>'+esc(i.storeName)+'</span></div>'+
+      '<div class="card-metrics">'+
+        '<div class="metric"><div class="mv up">'+(i.actualV1d||0).toFixed(0)+'</div><div class="ml">真实增量</div></div>'+
+        '<div class="metric"><div class="mv">'+fmtFsr(i.goodsFsr)+'</div><div class="ml">粉销比</div></div>'+
+        '<div class="metric"><div class="mv">'+(i.actualGr||0).toFixed(1)+'%</div><div class="ml">日增速</div></div>'+
+      '</div>'+
+      '<div class="card-foot">'+
+        '<span class="pool-pill pool-'+i.pool+'">'+i.pool+'</span>'+
+        '<div class="card-actions">'+
+          '<button type="button" class="icon-btn'+starBtn+'" data-star="'+esc(i.gid)+'" title="加入清单">★</button>'+
+        '</div></div></article>';
+  });
+  document.getElementById('content-cards').innerHTML=html;
+  document.getElementById('content-cards').classList.toggle('hidden',state.view!=='cards');
+}
+
+var TABLE_COLS=[
+  {k:'title',l:'商品',sort:false},{k:'price',l:'价格'},{k:'sold',l:'销量'},
+  {k:'actualV1d',l:'真实增量'},{k:'goodsFsr',l:'粉销比'},{k:'actualGr',l:'日增速'},{k:'pool',l:'分层'}
+];
+
+function renderTable(list){
+  var thead=document.getElementById('thead'),tbody=document.getElementById('tbody');
+  thead.innerHTML=TABLE_COLS.map(function(c){
+    var ar=state.sortKey===c.k?(state.sortDesc?' ↓':' ↑'):'';
+    return c.sort===false?'<th>'+c.l+'</th>':'<th data-sort="'+c.k+'">'+c.l+ar+'</th>';
+  }).join('');
+  var start=state.page*state.pageSize,end=Math.min(start+state.pageSize,list.length);
+  var slice=list.slice(start,end);
+  if(!slice.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">没有匹配的商品</td></tr>';
+  }else{
+    tbody.innerHTML=slice.map(function(i){
+      var fsr=fmtFsr(i.goodsFsr),fsrCls=i.goodsFsr!==null&&i.goodsFsr<=0.02?' class="fsr-good"':'';
+      return '<tr data-gid="'+esc(i.gid)+'">'+
+        '<td class="t-title">'+esc(i.title.length>36?i.title.slice(0,36)+'…':i.title)+'</td>'+
+        '<td class="t-num">¥'+i.price.toFixed(2)+'</td><td class="t-num">'+fmt(i.sold)+'</td>'+
+        '<td class="t-num" style="color:var(--green);font-weight:600">'+(i.actualV1d||0).toFixed(0)+'</td>'+
+        '<td class="t-num"'+fsrCls+'>'+fsr+'</td>'+
+        '<td class="t-num">'+(i.actualGr||0).toFixed(1)+'%</td>'+
+        '<td><span class="pool-pill pool-'+i.pool+'">'+i.pool+'</span></td></tr>';
+    }).join('');
+  }
+  document.getElementById('content-table').classList.toggle('hidden',state.view!=='table');
+}
+
+function renderPager(total){
+  var pages=Math.ceil(total/state.pageSize)||1;
+  document.getElementById('pager').innerHTML=
+    '<button type="button" id="pg-prev"'+(state.page<=0?' disabled':'')+'>上一页</button>'+
+    '<span>'+(total?state.page*state.pageSize+1:0)+'–'+Math.min((state.page+1)*state.pageSize,total)+' / '+fmt(total)+'</span>'+
+    '<button type="button" id="pg-next"'+(state.page>=pages-1?' disabled':'')+'>下一页</button>'+
+    '<select id="pg-size"><option value="24">24</option><option value="48" selected>48</option><option value="96">96</option></select>';
+  document.getElementById('pg-size').value=String(state.pageSize);
+}
+
+function openDetail(gid){
+  var all=VIRTUAL.concat(PHYSICAL),item=null;
+  for(var i=0;i<all.length;i++){if(all[i].gid===gid){item=all[i];break;}}
+  if(!item)return;
+  document.getElementById('detail-title').textContent=item.title;
+  document.getElementById('detail-body').innerHTML=
+    '<div class="detail-grid">'+
+      cell('真实增量',(item.actualV1d||0).toFixed(1))+
+      cell('预估日增量',item.v1d.toFixed(1))+
+      cell('销量',fmt(item.sold))+
+      cell('价格','¥'+item.price.toFixed(2))+
+      cell('粉销比',fmtFsr(item.goodsFsr))+
+      cell('日增速',(item.actualGr||0).toFixed(2)+'%')+
+      cell('6h增量',item.v6h.toFixed(1))+
+      cell('爆发分',item.burst.toFixed(1))+
+    '</div>'+
+    row('店铺',item.storeName)+row('商品ID',item.gid)+row('行为',item.behavior||'—')+
+    row('首次发现',item.firstSeen||'—')+row('基准间隔',item.baseHours.toFixed(1)+'h')+
+    '<button class="btn btn-primary" style="width:100%;margin-top:12px" type="button" id="detail-star">'+
+    (isStarred(item.gid)?'从清单移除':'加入我的清单')+'</button>'+
+    '<p style="font-size:11px;color:var(--text3);margin-top:12px">数据仅供参考，不构成任何经营建议。</p>';
+  document.getElementById('detail-star').onclick=function(){toggleStar(item.gid);openDetail(gid);};
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('sheet-detail').classList.add('open');
+}
+function cell(k,v){return '<div class="detail-cell"><div class="dk">'+k+'</div><div class="dv">'+v+'</div></div>';}
+function row(k,v){return '<div class="detail-row"><b>'+k+'</b>'+esc(v)+'</div>';}
+
+function closeSheets(){
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('sheet-detail').classList.remove('open');
+  document.getElementById('sheet-filter').classList.remove('open');
+}
+
+function render(){
+  renderPresets();renderTagChips();
+  var list=filterItems(getPool(state.tab));
+  document.getElementById('result-count').textContent=fmt(list.length);
+  if(state.view==='cards')renderCards(list);else renderTable(list);
+  renderPager(list.length);
+  try{localStorage.setItem(VIEW_KEY,JSON.stringify({tab:state.tab,preset:state.preset,view:state.view,tags:state.tags}));}catch(e){}
+}
+
+function exportCSV(){
+  var list=filterItems(getPool(state.tab));
+  var cols=['goods_id','title','price','sold','actualV1d','v1d','goodsFsr','actualGr','pool','storeName'];
+  var lines=[cols.join(',')];
+  list.forEach(function(i){
+    lines.push(cols.map(function(c){
+      var v=i[c];if(c==='title'||c==='storeName')v='"'+String(v).replace(/"/g,'""')+'"';
+      return v;
+    }).join(','));
+  });
+  var blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='选品清单_'+state.tab+'_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+function init(){
+  if(typeof REPORT_DATA==='undefined'){document.getElementById('loading').textContent='未找到 data.js';return;}
+  var D=REPORT_DATA,m=D.meta||{};
+  D.columns.forEach(function(c,i){IDX[c]=i;});
+  D.items.forEach(function(r){
+    var o=buildItem(r);
+    if(o.isVirtual)VIRTUAL.push(o);else PHYSICAL.push(o);
+  });
+
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('nav-date').textContent=(m.date||'')+' · 仅供参考';
+  document.getElementById('hero-title').textContent='选品工作台';
+  document.getElementById('hero-desc').textContent=(m.filter_label||'')+' · 生成于 '+(m.time||'');
+  document.getElementById('stats').innerHTML=
+    stat(fmt(m.virtual_v1d||VIRTUAL.length),'虚拟动销')+
+    stat(fmt(m.physical_v1d||PHYSICAL.length),'实体动销')+
+    stat(fmt(getWatchlist().length),'我的清单');
+  var disc=(m.disclaimer&&m.disclaimer.lines)||[];
+  document.getElementById('footer').innerHTML='<h3>免责声明</h3><ul>'+
+    disc.slice(0,4).map(function(l){return '<li>'+esc(l)+'</li>';}).join('')+'</ul>';
+
+  try{
+    var saved=JSON.parse(localStorage.getItem(VIEW_KEY)||'{}');
+    if(saved.tab)state.tab=saved.tab;
+    if(saved.preset)state.preset=saved.preset;
+    if(saved.view)state.view=saved.view;
+    if(saved.tags)state.tags=saved.tags;
+  }catch(e){}
+
+  document.querySelectorAll('#tab-seg button').forEach(function(b){
+    b.classList.toggle('active',b.dataset.tab===state.tab);
+    b.onclick=function(){
+      state.tab=b.dataset.tab;state.page=0;
+      document.querySelectorAll('#tab-seg button').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');
+      if(state.tab==='watchlist'){document.getElementById('presets').classList.add('hidden');}
+      else{document.getElementById('presets').classList.remove('hidden');}
+      render();
+    };
+  });
+  document.querySelectorAll('#view-toggle button').forEach(function(b){
+    b.classList.toggle('active',b.dataset.view===state.view);
+    b.onclick=function(){
+      state.view=b.dataset.view;state.page=0;
+      document.querySelectorAll('#view-toggle button').forEach(function(x){x.classList.remove('active');});
+      b.classList.add('active');render();
+    };
+  });
+
+  document.getElementById('search').oninput=function(){state.search=this.value;state.page=0;render();};
+  document.getElementById('presets').onclick=function(e){
+    var c=e.target.closest('[data-preset]');if(!c)return;
+    state.preset=c.dataset.preset;state.page=0;render();
+  };
+  document.getElementById('tag-chips').onclick=function(e){
+    var add=e.target.closest('[data-tag]'),rm=e.target.closest('[data-rm]');
+    if(add){var k=add.dataset.tag,i=state.tags.indexOf(k);
+      if(i>=0)state.tags.splice(i,1);else state.tags.push(k);
+      state.page=0;render();
+    }else if(rm){state.tags.splice(state.tags.indexOf(rm.dataset.rm),1);state.page=0;render();}
+  };
+  document.getElementById('btn-clear').onclick=function(){
+    state.preset='all';state.tags=[];state.search='';state.adv={actualMin:0,fsrMax:null,priceMin:null,priceMax:null,soldMin:null,soldMax:null,pools:[],noAnomaly:true};
+    document.getElementById('search').value='';state.page=0;render();
+  };
+  document.getElementById('btn-adv').onclick=function(){
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('sheet-filter').classList.add('open');
+  };
+  document.getElementById('btn-export').onclick=exportCSV;
+  document.getElementById('overlay').onclick=closeSheets;
+  document.querySelectorAll('[data-close]').forEach(function(b){b.onclick=closeSheets;});
+  document.getElementById('f-apply').onclick=function(){
+    state.adv.actualMin=parseFloat(document.getElementById('f-actual-n').value)||0;
+    state.adv.fsrMax=parseFloat(document.getElementById('f-fsr-n').value);
+    if(isNaN(state.adv.fsrMax))state.adv.fsrMax=null;
+    state.adv.priceMin=parseNum(document.getElementById('f-price-min').value);
+    state.adv.priceMax=parseNum(document.getElementById('f-price-max').value);
+    state.adv.soldMin=parseNum(document.getElementById('f-sold-min').value);
+    state.adv.soldMax=parseNum(document.getElementById('f-sold-max').value);
+    state.adv.noAnomaly=document.getElementById('f-no-anomaly').checked;
+    state.adv.pools=[];document.querySelectorAll('#f-pools .filter-pill.on').forEach(function(p){state.adv.pools.push(p.dataset.pool);});
+    state.page=0;closeSheets();render();
+  };
+  document.getElementById('f-reset').onclick=function(){document.getElementById('btn-clear').click();closeSheets();};
+  document.querySelectorAll('#f-pools .filter-pill').forEach(function(p){
+    p.onclick=function(){p.classList.toggle('on');};
+  });
+  function parseNum(v){if(v===''||v===null)return null;var n=parseFloat(v);return isNaN(n)?null:n;}
+  document.getElementById('f-actual').oninput=function(){document.getElementById('f-actual-n').value=this.value;};
+  document.getElementById('f-actual-n').oninput=function(){document.getElementById('f-actual').value=Math.min(100,this.value||0);};
+  document.getElementById('content-cards').onclick=function(e){
+    if(e.target.closest('[data-star]')){toggleStar(e.target.closest('[data-star]').dataset.star,e);return;}
+    var c=e.target.closest('[data-gid]');if(c)openDetail(c.dataset.gid);
+  };
+  document.getElementById('content-table').onclick=function(e){
+    var th=e.target.closest('[data-sort]');
+    if(th){state.sortKey=th.dataset.sort;state.sortDesc=!state.sortDesc;render();return;}
+    var tr=e.target.closest('[data-gid]');if(tr)openDetail(tr.dataset.gid);
+  };
+  document.getElementById('pager').onclick=function(e){
+    if(e.target.id==='pg-prev'){state.page=Math.max(0,state.page-1);render();}
+    if(e.target.id==='pg-next'){state.page++;render();}
+  };
+  document.getElementById('pager').onchange=function(e){
+    if(e.target.id==='pg-size'){state.pageSize=+e.target.value;state.page=0;render();}
+  };
+
+  if(state.tab==='watchlist')document.getElementById('presets').classList.add('hidden');
+  render();
+}
+function stat(v,l){return '<div class="stat"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>';}
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+else init();
+})();
+</script>
+</body>
+</html>

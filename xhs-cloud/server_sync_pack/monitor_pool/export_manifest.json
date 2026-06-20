@@ -1,0 +1,77 @@
+{
+  "exported_at": "2026-06-20 09:37:44",
+  "source_root": "d:\\vuemonitor\\xhs-cloud\\server_sync_pack\\historical_reports",
+  "main_db": "D:\\0619xhs备份\\jiekoufenxi\\小红书多设备爬虫\\crawl_data\\xhs_burst_monitor.db",
+  "pool_rule": "v1d > 0 OR actual_v1d > 0",
+  "monitor_goods_count": 152453,
+  "reports": [
+    {
+      "report_date": "2026-06-15",
+      "dir_name": "全量0615",
+      "items_total": 93052,
+      "monitor_pool_rows": 93032,
+      "data_js_mb": 23.93
+    },
+    {
+      "report_date": "2026-06-16",
+      "dir_name": "全量0616",
+      "items_total": 93052,
+      "monitor_pool_rows": 93032,
+      "data_js_mb": 23.93
+    },
+    {
+      "report_date": "2026-06-17",
+      "dir_name": "全量0617",
+      "items_total": 19412,
+      "monitor_pool_rows": 19412,
+      "data_js_mb": 5.34
+    },
+    {
+      "report_date": "2026-06-18",
+      "dir_name": "全量0618",
+      "items_total": 53110,
+      "monitor_pool_rows": 53110,
+      "data_js_mb": 16.82
+    },
+    {
+      "report_date": "2026-06-19",
+      "dir_name": "全量0619",
+      "items_total": 43538,
+      "monitor_pool_rows": 43538,
+      "data_js_mb": 14.32
+    }
+  ],
+  "sold_history": {
+    "goods_queried": 152453,
+    "goods_with_history": 152238,
+    "total_rows": 458255,
+    "files": [
+      {
+        "file": "part-0001.jsonl.gz",
+        "rows": 100000,
+        "mb": 0.97
+      },
+      {
+        "file": "part-0002.jsonl.gz",
+        "rows": 100000,
+        "mb": 0.92
+      },
+      {
+        "file": "part-0003.jsonl.gz",
+        "rows": 100000,
+        "mb": 0.9
+      },
+      {
+        "file": "part-0004.jsonl.gz",
+        "rows": 100000,
+        "mb": 0.86
+      },
+      {
+        "file": "part-0005.jsonl.gz",
+        "rows": 58255,
+        "mb": 0.53
+      }
+    ]
+  },
+  "sold_snapshots": null
+}
