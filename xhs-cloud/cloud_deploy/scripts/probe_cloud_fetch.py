@@ -79,7 +79,7 @@ def main() -> int:
     if cookie_str:
         print(f"cookie: 已加载 ({len(cookie_str)} 字符, web_session={'web_session=' in cookie_str})")
     else:
-        print("cookie: 未配置（XHS_COOKIE / crawl_data/xhs_cookie.txt）← 可能是 ok=0 原因")
+        print("cookie: 未配置（公开 H5 不需要；dp 预热自动拿匿名 cookie）")
 
     try:
         from xhs_full_sold_fetch import fetch_sold_detail, get_engine_chain, probe_engines, warmup_drissionpage

@@ -31,8 +31,17 @@ def pick_start_engine(goods: dict, config: dict) -> str:
 
 
 def build_fallback_chain(start_engine: str, config: dict) -> tuple[str, ...]:
+    """先试 start_engine，再试链上其余引擎（dp 失败须能降级 api）。"""
     del config
     chain = cloud_engine_chain()
-    if start_engine in chain:
-        return chain[chain.index(start_engine) :]
-    return (start_engine,) + chain
+    if start_engine not in chain:
+        return (start_engine,) + chain
+    idx = chain.index(start_engine)
+    ordered = chain[idx:] + chain[:idx]
+    seen: set[str] = set()
+    out: list[str] = []
+    for eng in ordered:
+        if eng not in seen:
+            seen.add(eng)
+            out.append(eng)
+    return tuple(out)

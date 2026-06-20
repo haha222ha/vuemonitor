@@ -331,9 +331,25 @@ def _fetch_via_drissionpage(goods_id):
             }
         }).then(r => r.text());
         """
-        body = page.run_js(js, url, referer)
-        if not body:
-            return None, "fail", {"engine": "drissionpage", "risk": False, "message": "empty"}
+        body = None
+        last_err = ""
+        for attempt in range(3):
+            try:
+                body = page.run_js(js, url, referer)
+                text = str(body or "")
+                if body and "page is refreshed" not in text.lower():
+                    break
+                last_err = text or "empty"
+            except Exception as exc:
+                last_err = str(exc)
+            if attempt < 2:
+                time.sleep(1.0 + attempt * 0.5)
+        if not body or "page is refreshed" in str(body).lower():
+            return None, "fail", {
+                "engine": "drissionpage",
+                "risk": False,
+                "message": last_err or "empty",
+            }
         if isinstance(body, dict):
             data = body
             body_text = json.dumps(body, ensure_ascii=False)
