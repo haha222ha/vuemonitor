@@ -263,9 +263,9 @@ class CloudMonitorDaemon:
             from xhs_full_sold_fetch import reset_drissionpage, warmup_drissionpage
 
             self.log(
-                f"[cloud-daemon] 检测到整批失败 ({wall_ms}ms)，自动重建浏览器 ..."
+                f"[cloud-daemon] 检测到整批失败 ({wall_ms}ms)，清除 profile 并重建浏览器 ..."
             )
-            reset_drissionpage(log_func=self.log)
+            reset_drissionpage(log_func=self.log, clear_profile=True)
             warmup_drissionpage(log_func=self.log)
         except Exception as exc:
             self.log(f"[cloud-daemon] dp 自动重建失败: {exc}")

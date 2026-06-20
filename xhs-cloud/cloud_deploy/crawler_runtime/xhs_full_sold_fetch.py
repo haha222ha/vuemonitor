@@ -411,8 +411,8 @@ def _ensure_dp_page_unlocked():
     return _dp_page
 
 
-def reset_drissionpage(log_func=None) -> None:
-    """关闭僵死的 Chromium 实例，下一轮 fetch 会重新拉起。"""
+def reset_drissionpage(log_func=None, clear_profile: bool = False) -> None:
+    """关闭 Chromium；clear_profile=True 时删除 user_data，下次预热重新拿匿名 cookie。"""
     global _dp_page
     log = log_func or _logger.info
     with _dp_lock:
@@ -422,7 +422,17 @@ def reset_drissionpage(log_func=None) -> None:
             except Exception:
                 pass
             _dp_page = None
-        log("[dp] 已重置浏览器实例")
+        if clear_profile:
+            import shutil
+
+            profile = _dp_user_data_dir()
+            try:
+                shutil.rmtree(profile, ignore_errors=True)
+                log(f"[dp] 已清除浏览器 profile（{profile}），下次预热重新访问 xhs 拿 cookie）")
+            except Exception as exc:
+                log(f"[dp] 清除 profile 失败: {exc}")
+        else:
+            log("[dp] 已重置浏览器实例")
 
 
 def _inject_dp_cookies(page, log_func=None) -> None:
