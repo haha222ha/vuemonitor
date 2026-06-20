@@ -159,7 +159,7 @@ def init_db() -> None:
                     shop_fans INT,
                     shop_fsr NUMERIC(12,4),
                     goods_fsr NUMERIC(12,4),
-                    behavior VARCHAR(128),
+                    behavior TEXT,
                     is_virtual BOOLEAN,
                     base_hours NUMERIC(12,2),
                     base_at TIMESTAMPTZ,
@@ -269,6 +269,7 @@ def _migrate_legacy_columns(c) -> None:
         ("shop_fsr", "NUMERIC(12,4)"),
         ("goods_fsr", "NUMERIC(12,4)"),
         ("base_hours", "NUMERIC(12,2)"),
+        ("behavior", "TEXT"),
     ):
         c.execute(
             f"""
