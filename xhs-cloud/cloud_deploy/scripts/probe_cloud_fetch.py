@@ -52,6 +52,10 @@ def main() -> int:
             c.execute(
                 """SELECT goods_id FROM monitor_goods
                    WHERE monitor_status IN ('active','idle')
+                     AND (
+                       last_scan_at IS NULL
+                       OR last_scan_at::date < CURRENT_DATE
+                     )
                    ORDER BY last_v1d DESC NULLS LAST LIMIT 1"""
             )
             row = c.fetchone()
@@ -63,21 +67,42 @@ def main() -> int:
         print("监控池为空")
         return 1
 
-    print(f"\n=== 探测商品 {goods_id} ===")
+    print(f"\n=== 探测商品 {goods_id}（今日未尝试） ===")
     print(f"XHS_CRAWLER_ROOT={crawler}")
+
     try:
-        from xhs_full_sold_fetch import fetch_sold_detail, probe_engines, warmup_drissionpage
+        from xhs_web_fallback_module import load_cookie_str
+    except ImportError:
+        load_cookie_str = lambda: os.environ.get("XHS_COOKIE", "").strip()  # noqa: E731
+
+    cookie_str = load_cookie_str()
+    if cookie_str:
+        print(f"cookie: 已加载 ({len(cookie_str)} 字符, web_session={'web_session=' in cookie_str})")
+    else:
+        print("cookie: 未配置（XHS_COOKIE / crawl_data/xhs_cookie.txt）← 可能是 ok=0 原因")
+
+    try:
+        from xhs_full_sold_fetch import fetch_sold_detail, get_engine_chain, probe_engines, warmup_drissionpage
     except ImportError as exc:
         print(f"✗ 无法导入 xhs_full_sold_fetch: {exc}")
         return 2
 
     warmup_drissionpage(print)
+    print("\n--- 单引擎探测 ---")
+    for eng in get_engine_chain():
+        detail, status, meta = fetch_sold_detail(
+            goods_id, engine=eng, fallback_chain=(eng,), auto_fallback=False
+        )
+        sold = (detail or {}).get("real_sales", 0) if status == "ok" else 0
+        msg = (meta or {}).get("message", "")
+        print(f"  {eng}: status={status} sold={sold} msg={msg[:120]}")
+
     alive = probe_engines(goods_id, log_func=print, min_ok=1)
     print(f"\n可用引擎: {alive or '(无)'}")
 
-    detail, status, meta = fetch_sold_detail(goods_id, engine="api", auto_fallback=True)
+    detail, status, meta = fetch_sold_detail(goods_id, engine="drissionpage", auto_fallback=True)
     sold = (detail or {}).get("real_sales", 0) if status == "ok" else 0
-    print(f"\n自动降级链: status={status} sold={sold}")
+    print(f"\n自动降级链(从dp): status={status} sold={sold}")
     print(f"meta={meta}")
     return 0 if status == "ok" else 3
 

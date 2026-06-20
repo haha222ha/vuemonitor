@@ -425,6 +425,44 @@ def reset_drissionpage(log_func=None) -> None:
         log("[dp] 已重置浏览器实例")
 
 
+def _inject_dp_cookies(page, log_func=None) -> None:
+    """将 XHS_COOKIE 注入 DrissionPage（需先打开 xiaohongshu.com）。"""
+    log = log_func or _logger.info
+    try:
+        from xhs_web_fallback_module import load_cookie_str
+    except ImportError:
+        return
+    cookie_str = load_cookie_str()
+    if not cookie_str:
+        return
+    injected = 0
+    for item in cookie_str.split(";"):
+        item = item.strip()
+        if "=" not in item:
+            continue
+        name, value = item.split("=", 1)
+        name, value = name.strip(), value.strip()
+        if not name:
+            continue
+        try:
+            page.set.cookies({"name": name, "value": value, "domain": ".xiaohongshu.com", "path": "/"})
+            injected += 1
+        except Exception:
+            try:
+                page.run_cdp(
+                    "Network.setCookie",
+                    name=name,
+                    value=value,
+                    domain=".xiaohongshu.com",
+                    path="/",
+                )
+                injected += 1
+            except Exception:
+                pass
+    if injected:
+        log(f"[dp] 已注入 {injected} 个 cookie")
+
+
 def warmup_drissionpage(log_func=None) -> bool:
     log = log_func or _logger.info
     with _dp_lock:
@@ -434,6 +472,14 @@ def warmup_drissionpage(log_func=None) -> bool:
             return False
         try:
             page.get("https://www.xiaohongshu.com/", timeout=30)
+            try:
+                from xhs_web_fallback_module import load_cookie_str
+
+                if load_cookie_str():
+                    _inject_dp_cookies(page, log)
+                    page.get("https://www.xiaohongshu.com/", timeout=30)
+            except ImportError:
+                pass
             log("[dp] 预热完成")
             return True
         except Exception as exc:

@@ -14,6 +14,24 @@ _logger = logging.getLogger(__name__)
 _thread_local = threading.local()
 
 
+def load_cookie_str() -> str:
+    """从 XHS_COOKIE / XHS_COOKIE_FILE / crawl_data/xhs_cookie.txt 读取 cookie。"""
+    s = os.environ.get("XHS_COOKIE", "").strip()
+    if s:
+        return s
+    for path in (
+        os.environ.get("XHS_COOKIE_FILE", "").strip(),
+        os.path.join(DATA_DIR, "xhs_cookie.txt"),
+    ):
+        if path and os.path.isfile(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    return f.read().strip()
+            except OSError as exc:
+                _logger.warning("读取 cookie 文件失败 %s: %s", path, exc)
+    return ""
+
+
 def _db_conn():
     conn = sqlite3.connect(DB_PATH, timeout=30)
     conn.execute('PRAGMA journal_mode=WAL')
@@ -31,8 +49,9 @@ def _get_collector():
         collector = GoodsDetailCollector(config={}, log_func=None)
         headers, fp_profile = _generate_fingerprint()
         impersonate = fp_profile.get('impersonate') if hasattr(fp_profile, 'get') else None
+        cookie_str = load_cookie_str()
         session = _create_session(
-            proxy_str=None, cookie_str='', impersonate=impersonate, fp_profile=fp_profile
+            proxy_str=None, cookie_str=cookie_str, impersonate=impersonate, fp_profile=fp_profile
         )
         _thread_local.collector = collector
         _thread_local.session = session
