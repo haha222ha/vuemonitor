@@ -577,11 +577,11 @@ return h;
 }
 document.getElementById('guide').innerHTML=renderGuide();
 
-var ch=D.charts;
+var ch=D.charts||{};
 var hiGr=0,hiV1d=0,lowP=0;
-for(var k in ch.gr){if(['20-50%','50-100%','>100%'].indexOf(k)>=0)hiGr+=ch.gr[k];}
-for(var k in ch.v1d){if(['20-50','50-100','>100'].indexOf(k)>=0)hiV1d+=ch.v1d[k];}
-lowP=ch.price['0-30']+ch.price['30-50'];
+if(ch.gr){for(var k in ch.gr){if(['20-50%','50-100%','>100%'].indexOf(k)>=0)hiGr+=ch.gr[k];}}
+if(ch.v1d){for(var k in ch.v1d){if(['20-50','50-100','>100'].indexOf(k)>=0)hiV1d+=ch.v1d[k];}}
+if(ch.price){lowP=(ch.price['0-30']||0)+(ch.price['30-50']||0);}
 
 document.getElementById('insights').innerHTML=[
 ['日增量口径',(m.metric_note||'真实增量=上次有效快照差值(4h~14d)；预估日增量=真实增量×min(24/间隔h,1.5)')+'。入选：'+(m.filter_label||'日增量>5')],
@@ -592,9 +592,10 @@ document.getElementById('insights').innerHTML=[
 ].map(function(x){return '<div class="ins"><div class="it">'+x[0]+'</div><div class="ix">'+x[1]+'</div></div>';}).join('');
 
 function barC(d,c){
+if(!d) return '<div class="na">暂无</div>';
 var mx=0;for(var k in d){if(d[k]>mx)mx=d[k];}
 var h='';
-for(var k in d){h+='<div class="br"><span class="bl">'+k+'</span><div class="bt"><div class="bf" style="width:'+(d[k]/mx*100)+'%;background:'+c+'"></div></div><span class="bv">'+d[k]+'</span></div>';}
+for(var k in d){h+='<div class="br"><span class="bl">'+k+'</span><div class="bt"><div class="bf" style="width:'+(mx?d[k]/mx*100:0)+'%;background:'+c+'"></div></div><span class="bv">'+d[k]+'</span></div>';}
 return h;
 }
 
@@ -611,24 +612,29 @@ return dist;
 }
 
 document.getElementById('charts').innerHTML=[
-['价格分布',ch.price,'#58a6ff'],
-['销量分布',ch.sold,'#00d4aa'],
-['预估日增量分布',ch.v1d,'#ff4757'],
-['实际日增速分布',ch.gr,'#00d4aa'],
-['实际增销比分布',ch.vsr,'#00d4aa'],
+['价格分布',ch.price||{},'#58a6ff'],
+['销量分布',ch.sold||{},'#00d4aa'],
+['预估日增量分布',ch.v1d||{},'#ff4757'],
+['实际日增速分布',ch.gr||{},'#00d4aa'],
+['实际增销比分布',ch.vsr||{},'#00d4aa'],
 ['预估增销比分布',buildVsrEstChart(),'#a371f7']
 ].map(function(x){return '<div class="cb"><div class="ct">'+x[0]+'</div>'+barC(x[1],x[2])+'</div>';}).join('');
 
-document.getElementById('keywords').innerHTML=D.top_keywords.map(function(x){return '<span class="tag '+(x[1]>D.meta.count*0.02?'hot':'')+'">'+x[0]+' ('+x[1]+')</span>';}).join('');
-document.getElementById('stores').innerHTML=D.top_stores.map(function(x){return '<span class="tag '+(x[1]>3?'hot':'')+'">'+x[0]+' ('+x[1]+')</span>';}).join('');
+document.getElementById('keywords').innerHTML=(D.top_keywords||[]).map(function(x){return '<span class="tag '+(x[1]>D.meta.count*0.02?'hot':'')+'">'+x[0]+' ('+x[1]+')</span>';}).join('');
+document.getElementById('stores').innerHTML=(D.top_stores||[]).map(function(x){return '<span class="tag '+(x[1]>3?'hot':'')+'">'+x[0]+' ('+x[1]+')</span>';}).join('');
 
 (function renderDisclaimer(){
 var d=m.disclaimer;
 if(!d){return;}
-var h='<h2>'+(d.title||'免责声明与使用须知')+'</h2><ul>';
+var h='<h2>'+(d.title||'免责声明与使用须知')+'</h2>';
+if(typeof d==='string'){
+h+='<p style="line-height:1.7;color:#8b949e">'+esc(d)+'</p>';
+}else{
+h+='<ul>';
 (d.lines||[]).forEach(function(line){h+='<li>'+line+'</li>';});
 h+='</ul>';
-if(d.version){h+='<div class="fd-ver">声明版本: '+d.version+' · 生成时间: '+m.time+'</div>';}
+}
+if(typeof d!=='string'&&d.version){h+='<div class="fd-ver">声明版本: '+d.version+' · 生成时间: '+m.time+'</div>';}
 document.getElementById('report-footer').innerHTML=h;
 })();
 

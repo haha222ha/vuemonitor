@@ -17,6 +17,7 @@ from cloud_deploy.reporting.constants import (
     REPORT_COLUMNS,
     REPORT_DISCLAIMER,
 )
+from cloud_deploy.reporting.report_charts import build_charts_and_tops
 
 
 def _agg(items: list) -> dict:
@@ -53,6 +54,14 @@ def build_report_payload(
     avg_v1d = round(sum(item[7] for item in items) / len(items), 1) if items else 0
     actual_values = [item[6] for item in items if item[6] > 0]
     avg_actual_v1d = round(sum(actual_values) / len(actual_values), 1) if actual_values else 0
+    gr_values = [item[8] for item in items if item[8] > 0]
+    avg_actual_gr = round(sum(gr_values) / len(gr_values), 2) if gr_values else 0
+    vsr_values = [item[10] for item in items if item[10] > 0]
+    avg_actual_vsr = round(sum(vsr_values) / len(vsr_values), 4) if vsr_values else 0
+    vsr_est_values = [item[11] for item in items if item[11] > 0]
+    avg_vsr = round(sum(vsr_est_values) / len(vsr_est_values), 4) if vsr_est_values else 0
+    anomaly_count = sum(1 for item in items if len(item) > 27 and int(item[27] or 0) == 1)
+    charts, top_keywords, top_stores = build_charts_and_tops(items)
 
     filter_label = scope_label or (
         f"实体 v1d>{min_v1d}/真实>={min_actual}；"
@@ -78,6 +87,14 @@ def build_report_payload(
         "median_price": median_price,
         "avg_v1d": avg_v1d,
         "avg_actual_v1d": avg_actual_v1d,
+        "avg_gr": avg_actual_gr,
+        "avg_actual_gr": avg_actual_gr,
+        "avg_vsr": avg_vsr,
+        "avg_actual_vsr": avg_actual_vsr,
+        "anomaly_count": anomaly_count,
+        "metric_mode": "cloud_pg",
+        "metric_note": "云端 PG 生成：真实增量主要来自 goods_sold_daily 日差或 report_daily_items",
+        "deduped": True,
         "source": source,
         "disclaimer": REPORT_DISCLAIMER,
         "pool_new": agg["pool_map"].get("NEW", 0),
@@ -89,9 +106,9 @@ def build_report_payload(
         "meta": meta,
         "columns": REPORT_COLUMNS,
         "items": items,
-        "charts": {},
-        "top_keywords": [],
-        "top_stores": [],
+        "charts": charts,
+        "top_keywords": top_keywords,
+        "top_stores": top_stores,
     }
 
 
