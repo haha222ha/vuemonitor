@@ -504,28 +504,20 @@ def mark_scan_result(
     engine: str = "",
     message: str = "",
 ) -> None:
-    """记录单次扫描结果。仅 ok/frozen 更新 last_scan_at（失败不占用今日 skip 名额）。"""
+    """记录单次扫描结果（任何状态均更新 last_scan_at，避免 fail 商品同批反复重扫）。"""
     del message
     gid = str(goods_id)
     st = str(status or "fail")[:16]
     eng = str(engine or "")[:32]
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
-        if st in ("ok", "frozen"):
-            c.execute(
-                """UPDATE monitor_goods SET
-                       last_scan_at=NOW(), last_scan_status=%s,
-                       last_scan_engine=%s, updated_at=NOW()
-                   WHERE goods_id=%s""",
-                (st, eng, gid),
-            )
-        else:
-            c.execute(
-                """UPDATE monitor_goods SET
-                       last_scan_status=%s, last_scan_engine=%s, updated_at=NOW()
-                   WHERE goods_id=%s""",
-                (st, eng, gid),
-            )
+        c.execute(
+            """UPDATE monitor_goods SET
+                   last_scan_at=NOW(), last_scan_status=%s,
+                   last_scan_engine=%s, updated_at=NOW()
+               WHERE goods_id=%s""",
+            (st, eng, gid),
+        )
     conn.commit()
 
 

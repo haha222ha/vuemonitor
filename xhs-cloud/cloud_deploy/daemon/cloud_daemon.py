@@ -55,14 +55,11 @@ class CloudMonitorDaemon:
                         """SELECT goods_id, title, last_v1d, last_sold, tier, pool, priority_score
                            FROM monitor_goods
                            WHERE monitor_status IN ('active', 'idle')
-                           ORDER BY
-                             NOT (
-                               last_scan_status = 'ok'
-                               AND last_scan_at IS NOT NULL
-                               AND last_scan_at::date = CURRENT_DATE
-                             ) DESC,
-                             priority_score DESC NULLS LAST,
-                             last_v1d DESC NULLS LAST
+                             AND (
+                               last_scan_at IS NULL
+                               OR last_scan_at::date < CURRENT_DATE
+                             )
+                           ORDER BY priority_score DESC NULLS LAST, last_v1d DESC NULLS LAST
                            LIMIT %s""",
                         (self.batch_size,),
                     )
@@ -244,10 +241,13 @@ class CloudMonitorDaemon:
         except Exception as exc:
             self.log(f"[cloud-daemon] stats 写入失败: {exc}")
 
+        batch_total = len(batch)
+        success_rate = (ok / batch_total) if batch_total else 0.0
         dp_dead = (
-            ok == 0
-            and fail >= max(50, int(len(batch) * 0.9))
+            batch_total >= 50
             and risk == 0
+            and fail >= int(batch_total * 0.9)
+            and success_rate < 0.01
         )
         if dp_dead:
             self._recover_drissionpage(wall_ms)

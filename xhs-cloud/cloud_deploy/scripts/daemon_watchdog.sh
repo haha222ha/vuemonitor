@@ -25,7 +25,14 @@ try:
         rows = c.fetchall()
 finally:
     conn.close()
-if len(rows) == 3 and all(r[0] == 0 and r[1] >= 100 for r in rows):
+
+def _batch_dead(ok, fail):
+    total = ok + fail
+    if total < 100:
+        return False
+    return ok < max(10, int(total * 0.01)) and fail >= int(total * 0.9)
+
+if len(rows) == 3 and all(_batch_dead(r[0], r[1]) for r in rows):
     print("RESTART")
 else:
     print("OK")
