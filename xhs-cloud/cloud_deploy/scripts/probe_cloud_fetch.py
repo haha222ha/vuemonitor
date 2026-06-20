@@ -17,9 +17,8 @@ def main() -> int:
     if crawler and os.path.isdir(crawler) and crawler not in sys.path:
         sys.path.insert(0, crawler)
 
-    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.database_pg import _conn
 
-    init_db()
     conn = _conn()
     goods_id = None
     try:
