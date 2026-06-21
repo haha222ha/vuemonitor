@@ -14,6 +14,7 @@ bootstrap()
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 
 from cloud_deploy.cloud_api import database as db
@@ -21,6 +22,7 @@ from cloud_deploy.cloud_api.auth import (
     current_member,
     create_token,
     login_member,
+    security,
     verify_agent_access,
     verify_sync_key,
 )
