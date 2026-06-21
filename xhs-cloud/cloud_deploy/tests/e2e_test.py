@@ -142,11 +142,14 @@ def test_unit_logic() -> None:
 
     item_ok = [
         "g1", "标题A", 10.0, 100,
+        0.0, 0.0,
         6.0, 7.0,
-        0.0, 0.0, 0.0,
-        0.0, "WATCH", "", "", "",
-        0, 0, None, None, "",
-        0, 0,
+        0.0, 0.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        "WATCH", "", "", "",
+        "", 0, 0, 0.0, 0.0,
+        "", 0, 0.0, "", 0,
     ]
     assert_true(passes_threshold(item_ok), "passes_threshold normal item")
     item_dirty = list(item_ok)
@@ -162,10 +165,10 @@ def test_unit_logic() -> None:
     assert_true(len(dup2) == 1, "dedup drops empty title like gen_report")
 
     r_delta = sold_row_to_item({"goods_id": "g1", "sold_num": 100, "delta": 12}, None)
-    assert_true(r_delta and r_delta[4] == 12.0, "sold_row delta fallback")
+    assert_true(r_delta and r_delta[6] == 12.0, "sold_row delta fallback")
 
     r_prev = sold_row_to_item({"goods_id": "g1", "sold_num": 100, "delta": 0}, 88)
-    assert_true(r_prev and r_prev[4] == 12.0, "sold_row prev day diff")
+    assert_true(r_prev and r_prev[6] == 12.0, "sold_row prev day diff")
 
     r_skip = sold_row_to_item({"goods_id": "g1", "sold_num": 100, "delta": 0}, None)
     assert_true(r_skip is None, "sold_row skip no baseline")
@@ -184,10 +187,10 @@ def test_unit_logic() -> None:
 
     # threshold boundary: v1d must be > 5 not >=
     border = list(item_ok)
-    border[5] = 5.0
-    border[4] = 4.0
+    border[7] = 5.0
+    border[6] = 4.0
     assert_true(not passes_threshold(border), "v1d=5 not pass (need >5)")
-    border[4] = 5.0
+    border[6] = 5.0
     assert_true(passes_threshold(border), "actual>=5 pass")
 
 

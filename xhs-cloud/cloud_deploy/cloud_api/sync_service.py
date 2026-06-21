@@ -17,17 +17,7 @@ from typing import Any
 import psycopg2.extras
 
 from cloud_deploy.cloud_api.retention_policy import snapshot_retention_days
-
-# 与 gen_report.COLUMNS 一致
-REPORT_COLUMNS = [
-    "goods_id", "title", "price", "sold", "v1h", "v6h", "actual_v1d", "v1d",
-    "actual_gr", "gr", "actual_vsr", "vsr", "acc", "burst",
-    "pool", "first_seen", "store_id", "store_name", "shelf_time",
-    "shop_sales", "shop_fans", "shop_fsr", "goods_fsr",
-    "behavior", "is_virtual", "base_hours", "base_at", "anomaly",
-]
-
-COL = {name: i for i, name in enumerate(REPORT_COLUMNS)}
+from cloud_deploy.reporting.constants import COL, REPORT_COLUMNS
 
 
 def _parse_report_payload(text: str) -> dict:

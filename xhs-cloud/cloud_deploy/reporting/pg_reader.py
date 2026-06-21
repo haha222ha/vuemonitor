@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""PG 读取与报告行转换（输出 21 列，与桌面 gen_report 对齐）。"""
+"""PG 读取与报告行转换（输出 28 列，与桌面报告 data.js 对齐）。"""
 from __future__ import annotations
 
 from datetime import date, timedelta
@@ -10,6 +10,7 @@ from cloud_deploy.reporting.constants import (
     DEFAULT_MIN_ACTUAL_VIRTUAL,
     DEFAULT_MIN_V1D,
     DEFAULT_MIN_V1D_VIRTUAL,
+    REPORT_COLUMNS,
     item_at,
 )
 
@@ -21,18 +22,54 @@ def thresholds_for(is_virtual: bool, min_v1d=DEFAULT_MIN_V1D, min_actual=DEFAULT
     return min_v1d, min_actual
 
 
-def passes_threshold(item: list, min_v1d=DEFAULT_MIN_V1D, min_actual=DEFAULT_MIN_ACTUAL,
-                     min_v1d_virtual=DEFAULT_MIN_V1D_VIRTUAL, min_actual_virtual=DEFAULT_MIN_ACTUAL_VIRTUAL) -> bool:
-    is_v = bool(item_at(item, "is_virtual"))
-    v1d = float(item_at(item, "v1d", 0) or 0)
-    actual = float(item_at(item, "actual_v1d", 0) or 0)
-    sold = float(item_at(item, "sold", 0) or 0)
+def passes_threshold_values(
+    *,
+    is_virtual: bool,
+    v1d: float,
+    actual_v1d: float,
+    sold: float,
+    min_v1d=DEFAULT_MIN_V1D,
+    min_actual=DEFAULT_MIN_ACTUAL,
+    min_v1d_virtual=DEFAULT_MIN_V1D_VIRTUAL,
+    min_actual_virtual=DEFAULT_MIN_ACTUAL_VIRTUAL,
+) -> bool:
     if sold > 200000:
         return False
-    if v1d > 50000 or actual > 50000:
+    if v1d > 50000 or actual_v1d > 50000:
         return False
-    th_v1d, th_actual = thresholds_for(is_v, min_v1d, min_actual, min_v1d_virtual, min_actual_virtual)
-    return v1d > th_v1d or actual >= th_actual
+    th_v1d, th_actual = thresholds_for(
+        is_virtual, min_v1d, min_actual, min_v1d_virtual, min_actual_virtual
+    )
+    return v1d > th_v1d or actual_v1d >= th_actual
+
+
+def passes_threshold_row(row: dict, min_v1d=DEFAULT_MIN_V1D, min_actual=DEFAULT_MIN_ACTUAL,
+                         min_v1d_virtual=DEFAULT_MIN_V1D_VIRTUAL,
+                         min_actual_virtual=DEFAULT_MIN_ACTUAL_VIRTUAL) -> bool:
+    return passes_threshold_values(
+        is_virtual=bool(row.get("is_virtual")),
+        v1d=_f(row.get("v1d")),
+        actual_v1d=_f(row.get("actual_v1d")),
+        sold=_f(row.get("sold")),
+        min_v1d=min_v1d,
+        min_actual=min_actual,
+        min_v1d_virtual=min_v1d_virtual,
+        min_actual_virtual=min_actual_virtual,
+    )
+
+
+def passes_threshold(item: list, min_v1d=DEFAULT_MIN_V1D, min_actual=DEFAULT_MIN_ACTUAL,
+                     min_v1d_virtual=DEFAULT_MIN_V1D_VIRTUAL, min_actual_virtual=DEFAULT_MIN_ACTUAL_VIRTUAL) -> bool:
+    return passes_threshold_values(
+        is_virtual=bool(item_at(item, "is_virtual")),
+        v1d=float(item_at(item, "v1d", 0) or 0),
+        actual_v1d=float(item_at(item, "actual_v1d", 0) or 0),
+        sold=float(item_at(item, "sold", 0) or 0),
+        min_v1d=min_v1d,
+        min_actual=min_actual,
+        min_v1d_virtual=min_v1d_virtual,
+        min_actual_virtual=min_actual_virtual,
+    )
 
 
 def dedup_by_title(items: list) -> list:
@@ -74,6 +111,21 @@ def _i(v, default=0):
         return default
 
 
+def _fmt_ts(v) -> str:
+    if v is None or v == "":
+        return ""
+    s = str(v).strip()
+    return s[:19] if len(s) >= 10 else s
+
+
+def _norm_anomaly(v) -> int:
+    if v in (None, "", 0, "0", False):
+        return 0
+    if str(v).strip().lower() in ("0", "false", "no"):
+        return 0
+    return 1
+
+
 def calc_fan_sales_ratios(shop_fans: int, shop_sales: int, sold: int) -> tuple[float | None, float | None]:
     fans = _i(shop_fans)
     shop_sales_n = _i(shop_sales)
@@ -83,63 +135,10 @@ def calc_fan_sales_ratios(shop_fans: int, shop_sales: int, sold: int) -> tuple[f
     return shop_fsr, goods_fsr
 
 
-def _item_row(
-    *,
-    goods_id: str,
-    title: str,
-    price: float,
-    sold: int,
-    actual_v1d: float,
-    v1d: float,
-    actual_gr: float,
-    actual_vsr: float,
-    vsr: float,
-    burst: float,
-    pool: str,
-    first_seen: str,
-    store_id: str,
-    store_name: str,
-    shop_sales: int,
-    shop_fans: int,
-    shop_fsr: float | None,
-    goods_fsr: float | None,
-    behavior: str,
-    is_virtual: bool,
-    anomaly: Any,
-) -> list:
-    return [
-        goods_id,
-        title,
-        price,
-        sold,
-        actual_v1d,
-        v1d,
-        actual_gr,
-        actual_vsr,
-        vsr,
-        burst,
-        pool,
-        first_seen,
-        store_id,
-        store_name,
-        shop_sales,
-        shop_fans,
-        shop_fsr,
-        goods_fsr,
-        behavior,
-        1 if is_virtual else 0,
-        anomaly or 0,
-    ]
-
-
-def db_row_to_item(row: dict) -> list:
-    """report_daily_items 行 → 21 列 items 数组。"""
-    sold = _i(row.get("sold"))
+def row_to_report_item(row: dict) -> list:
+    """report_daily_items 行或等价 dict → 28 列 items 数组。"""
+    sold = _i(row.get("sold") if row.get("sold") is not None else row.get("sold_num"))
     actual_v1d = _f(row.get("actual_v1d"))
-    v1d = _f(row.get("v1d"))
-    actual_gr = _f(row.get("actual_gr"))
-    actual_vsr = _f(row.get("actual_vsr")) or (round(actual_v1d / sold, 4) if sold > 0 else 0)
-    vsr = _f(row.get("vsr"))
     shop_sales = _i(row.get("shop_sales"))
     shop_fans = _i(row.get("shop_fans"))
     shop_fsr = row.get("shop_fsr")
@@ -150,29 +149,58 @@ def db_row_to_item(row: dict) -> list:
             shop_fsr = calc_shop
         if goods_fsr is None:
             goods_fsr = calc_goods
-    return _item_row(
-        goods_id=row.get("goods_id") or "",
-        title=row.get("title") or "",
-        price=_f(row.get("price")),
-        sold=sold,
-        actual_v1d=actual_v1d,
-        v1d=v1d,
-        actual_gr=actual_gr,
-        actual_vsr=actual_vsr,
-        vsr=vsr,
-        burst=_f(row.get("burst")),
-        pool=row.get("pool") or "",
-        first_seen=str(row.get("first_seen") or "")[:19],
-        store_id=row.get("store_id") or "",
-        store_name=row.get("store_name") or "",
-        shop_sales=shop_sales,
-        shop_fans=shop_fans,
-        shop_fsr=_f(shop_fsr) if shop_fsr is not None else None,
-        goods_fsr=_f(goods_fsr) if goods_fsr is not None else None,
-        behavior=row.get("behavior") or "",
-        is_virtual=bool(row.get("is_virtual")),
-        anomaly=row.get("anomaly") or 0,
-    )
+
+    v1d = _f(row.get("v1d"))
+    if v1d <= 0 and actual_v1d > 0:
+        v1d = actual_v1d
+    actual_gr = _f(row.get("actual_gr"))
+    gr = _f(row.get("gr"))
+    if gr <= 0 and actual_gr > 0:
+        gr = actual_gr
+    actual_vsr = _f(row.get("actual_vsr")) or (round(actual_v1d / sold, 4) if sold > 0 else 0)
+    vsr = _f(row.get("vsr"))
+    if vsr <= 0 and v1d > 0 and sold > 0:
+        vsr = round(v1d / sold, 4)
+    elif vsr <= 0 and actual_vsr > 0:
+        vsr = actual_vsr
+
+    base_hours = row.get("base_hours")
+    values = {
+        "goods_id": row.get("goods_id") or "",
+        "title": row.get("title") or "",
+        "price": _f(row.get("price") if row.get("price") is not None else row.get("deal_price")),
+        "sold": sold,
+        "v1h": _f(row.get("v1h")),
+        "v6h": _f(row.get("v6h")),
+        "actual_v1d": actual_v1d,
+        "v1d": v1d,
+        "actual_gr": actual_gr,
+        "gr": gr,
+        "actual_vsr": actual_vsr,
+        "vsr": vsr,
+        "acc": _f(row.get("acc")),
+        "burst": _f(row.get("burst")),
+        "pool": row.get("pool") or "WATCH",
+        "first_seen": _fmt_ts(row.get("first_seen")),
+        "store_id": row.get("store_id") or "",
+        "store_name": row.get("store_name") or "",
+        "shelf_time": _fmt_ts(row.get("shelf_time")),
+        "shop_sales": shop_sales,
+        "shop_fans": shop_fans,
+        "shop_fsr": _f(shop_fsr) if shop_fsr is not None else 0.0,
+        "goods_fsr": _f(goods_fsr) if goods_fsr is not None else 0.0,
+        "behavior": row.get("behavior") or "",
+        "is_virtual": 1 if row.get("is_virtual") else 0,
+        "base_hours": _f(base_hours) if base_hours not in (None, "") else 0.0,
+        "base_at": _fmt_ts(row.get("base_at")),
+        "anomaly": _norm_anomaly(row.get("anomaly")),
+    }
+    return [values[k] for k in REPORT_COLUMNS]
+
+
+def db_row_to_item(row: dict) -> list:
+    """report_daily_items 行 → 28 列 items 数组。"""
+    return row_to_report_item(row)
 
 
 def _pick_str(*vals: Any) -> str:
@@ -205,11 +233,12 @@ def _pick_int(*vals: Any) -> int:
 
 
 def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
-    """由 monitor_goods + goods_sold_daily (+ 可选 report_daily_items 补齐) 构造 21 列 item。"""
+    """由 monitor_goods + goods_sold_daily (+ 可选 report_daily_items 补齐) 构造报告 item。"""
     sold = _i(row.get("sold_num"))
     delta = _i(row.get("delta"))
     gm_actual = _f(row.get("gm_actual_v1d"))
     gm_v1d = _f(row.get("gm_v1d"))
+    gm_gr = _f(row.get("gm_gr"))
     rdi_actual = _f(row.get("rdi_actual_v1d"))
     rdi_v1d = _f(row.get("rdi_v1d"))
 
@@ -235,6 +264,7 @@ def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
     v1d = rdi_v1d if rdi_v1d > 0 else (gm_v1d if gm_v1d > 0 else actual_v1d)
     sold_base = max(prev_sold or 0, 1) if (prev_sold or 0) > 0 else max(sold - int(actual_v1d), 1)
     actual_gr = _f(row.get("rdi_actual_gr")) or round(actual_v1d / sold_base * 100, 2)
+    gr = _f(row.get("rdi_gr")) or gm_gr or actual_gr
     actual_vsr = _f(row.get("rdi_actual_vsr")) or (round(actual_v1d / sold, 4) if sold > 0 else 0)
     vsr = _f(row.get("rdi_vsr")) or (round(v1d / sold, 4) if sold > 0 and v1d != actual_v1d else actual_vsr)
     price = _f(row.get("deal_price") or row.get("rdi_price"))
@@ -249,38 +279,37 @@ def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
     if is_virtual is None:
         is_virtual = row.get("rdi_is_virtual")
 
-    shop_fsr = row.get("rdi_shop_fsr")
-    goods_fsr = row.get("rdi_goods_fsr")
-    if shop_fsr is None or goods_fsr is None:
-        calc_shop, calc_goods = calc_fan_sales_ratios(shop_fans, shop_sales, sold)
-        if shop_fsr is None:
-            shop_fsr = calc_shop
-        if goods_fsr is None:
-            goods_fsr = calc_goods
-
-    return _item_row(
-        goods_id=row.get("goods_id") or "",
-        title=title,
-        price=price,
-        sold=sold,
-        actual_v1d=round(actual_v1d, 1),
-        v1d=round(v1d, 1),
-        actual_gr=actual_gr,
-        actual_vsr=actual_vsr,
-        vsr=vsr,
-        burst=_f(row.get("rdi_burst")),
-        pool=pool,
-        first_seen=_pick_first_seen(row),
-        store_id=store_id,
-        store_name=store_name,
-        shop_sales=shop_sales,
-        shop_fans=shop_fans,
-        shop_fsr=_f(shop_fsr) if shop_fsr is not None else None,
-        goods_fsr=_f(goods_fsr) if goods_fsr is not None else None,
-        behavior=behavior,
-        is_virtual=bool(is_virtual),
-        anomaly=row.get("rdi_anomaly") or 0,
-    )
+    merged = {
+        "goods_id": row.get("goods_id") or "",
+        "title": title,
+        "price": price,
+        "sold": sold,
+        "v1h": row.get("rdi_v1h"),
+        "v6h": row.get("rdi_v6h"),
+        "actual_v1d": round(actual_v1d, 1),
+        "v1d": round(v1d, 1),
+        "actual_gr": actual_gr,
+        "gr": gr,
+        "actual_vsr": actual_vsr,
+        "vsr": vsr,
+        "acc": row.get("rdi_acc"),
+        "burst": row.get("rdi_burst"),
+        "pool": pool,
+        "first_seen": _pick_first_seen(row),
+        "store_id": store_id,
+        "store_name": store_name,
+        "shelf_time": row.get("rdi_shelf_time"),
+        "shop_sales": shop_sales,
+        "shop_fans": shop_fans,
+        "shop_fsr": row.get("rdi_shop_fsr"),
+        "goods_fsr": row.get("rdi_goods_fsr"),
+        "behavior": behavior,
+        "is_virtual": is_virtual,
+        "base_hours": row.get("rdi_base_hours"),
+        "base_at": row.get("rdi_base_at"),
+        "anomaly": row.get("rdi_anomaly") or 0,
+    }
+    return row_to_report_item(merged)
 
 
 def fetch_pool_stats(conn) -> dict:
@@ -406,7 +435,10 @@ def fetch_items_from_sold_daily(conn, report_date: str) -> list:
         prev_raw = r.get("prev_sold")
         prev_sold = _i(prev_raw) if prev_raw is not None else None
         item = sold_row_to_item(r, prev_sold)
-        if item and (float(item_at(item, "actual_v1d", 0) or 0) > 0 or float(item_at(item, "v1d", 0) or 0) > 0):
+        if item and (
+            float(item_at(item, "actual_v1d", 0) or 0) > 0
+            or float(item_at(item, "v1d", 0) or 0) > 0
+        ):
             items.append(item)
     items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
     return items

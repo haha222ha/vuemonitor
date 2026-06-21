@@ -17,6 +17,7 @@ from cloud_deploy.reporting.constants import (
     FIELD_GUIDE,
     REPORT_COLUMNS,
     REPORT_DISCLAIMER,
+    SELECTION_GUIDE,
     item_at,
 )
 from cloud_deploy.reporting.report_charts import build_charts_and_tops
@@ -66,6 +67,8 @@ def build_report_payload(
     avg_actual_gr = round(sum(gr_values) / len(gr_values), 2) if gr_values else 0
     vsr_values = [float(item_at(item, "actual_vsr", 0) or 0) for item in items if float(item_at(item, "actual_vsr", 0) or 0) > 0]
     avg_actual_vsr = round(sum(vsr_values) / len(vsr_values), 4) if vsr_values else 0
+    est_gr_values = [float(item_at(item, "gr", 0) or 0) for item in items if float(item_at(item, "gr", 0) or 0) > 0]
+    avg_gr = round(sum(est_gr_values) / len(est_gr_values), 2) if est_gr_values else 0
     vsr_est_values = [float(item_at(item, "vsr", 0) or 0) for item in items if float(item_at(item, "vsr", 0) or 0) > 0]
     avg_vsr = round(sum(vsr_est_values) / len(vsr_est_values), 4) if vsr_est_values else 0
     anomaly_count = sum(1 for item in items if int(item_at(item, "anomaly", 0) or 0) == 1)
@@ -95,13 +98,13 @@ def build_report_payload(
         "median_price": median_price,
         "avg_v1d": avg_v1d,
         "avg_actual_v1d": avg_actual_v1d,
-        "avg_gr": avg_actual_gr,
+        "avg_gr": avg_gr,
         "avg_actual_gr": avg_actual_gr,
         "avg_vsr": avg_vsr,
         "avg_actual_vsr": avg_actual_vsr,
         "anomaly_count": anomaly_count,
         "metric_mode": "cloud_pg",
-        "metric_note": "云端 PG 数据源；列与 snapshot_phase1 对齐；真实增量优先",
+        "metric_note": "云端 PG 生成；真实增量优先来自 goods_sold_daily 日差分或 report_daily_items",
         "deduped": True,
         "source": source,
         "disclaimer": REPORT_DISCLAIMER,
@@ -122,6 +125,7 @@ def build_report_payload(
         "top_keywords": top_keywords,
         "top_stores": top_stores,
         "field_guide": FIELD_GUIDE,
+        "selection_guide": SELECTION_GUIDE,
     }
 
 
@@ -165,9 +169,12 @@ def write_report_dir(
                     "<script src=data.js></script></body></html>")
 
     readme = os.path.join(output_dir, "README.txt")
+    disc = payload["meta"].get("disclaimer", "")
+    if isinstance(disc, dict):
+        disc = "\n".join(disc.get("lines") or [])
     with open(readme, "w", encoding="utf-8") as f:
         f.write(
-            payload["meta"].get("disclaimer", "")
+            str(disc)
             + "\n解压后请右键 index_with_gr.html，选择「打开方式」→ Google Chrome 打开\n"
             + f"报告包文件: data.js, {', '.join(REPORT_BUNDLE_FILES)}\n"
             + "（gen_report.py 为本地生成脚本，不包含在会员 zip 中）\n"
