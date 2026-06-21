@@ -104,6 +104,60 @@ def _worker_init_multi(crawler: str, cloud_root: str) -> None:
     _setup_crawler(crawler, cloud_root)
 
 
+def _fetch_timeout_sec() -> int:
+    return max(20, int(os.environ.get("XHS_LOCAL_AGENT_FETCH_TIMEOUT", "60")))
+
+
+def _call_with_timeout(fn, timeout_sec: int | None = None):
+    from concurrent.futures import ThreadPoolExecutor
+    from concurrent.futures import TimeoutError as FutTimeout
+
+    timeout_sec = timeout_sec or _fetch_timeout_sec()
+    with ThreadPoolExecutor(max_workers=1) as ex:
+        fut = ex.submit(fn)
+        try:
+            return fut.result(timeout=timeout_sec)
+        except FutTimeout as exc:
+            raise TimeoutError(f"采集超时>{timeout_sec}s") from exc
+
+
+def _scan_wait_loop(futs: dict, log, item_timeout: int) -> list[dict]:
+    """带心跳的 as_completed 等待。"""
+    results: list[dict] = []
+    total = len(futs)
+    stop_hb = threading.Event()
+
+    def heartbeat() -> None:
+        while not stop_hb.wait(20):
+            left = total - len(results)
+            if left > 0:
+                log(f"仍在等待 {left}/{total} 条（浏览器兜底较慢，超时会自动跳过）...")
+
+    hb = threading.Thread(target=heartbeat, daemon=True)
+    hb.start()
+    try:
+        for fut in as_completed(futs):
+            gid = futs[fut]
+            try:
+                row = fut.result(timeout=item_timeout)
+            except Exception as exc:
+                row = {
+                    "goods_id": gid,
+                    "status": "fail",
+                    "sold": None,
+                    "message": str(exc)[:200],
+                    "engine": "",
+                    "ms": 0,
+                    "detail": {},
+                }
+            results.append(row)
+            ok_so_far = sum(1 for r in results if r.get("status") == "ok")
+            log(f"采集进度 {len(results)}/{total} ok={ok_so_far}")
+    finally:
+        stop_hb.set()
+    return results
+
+
 def _worker_fetch_multi(payload: tuple[str, str, str]) -> dict:
     goods_id, crawler, cloud_root = payload
     os.environ["_RISK_AGENT_CLOUD_ROOT"] = cloud_root
@@ -113,11 +167,13 @@ def _worker_fetch_multi(payload: tuple[str, str, str]) -> dict:
     t0 = time.time()
     gid = str(goods_id)
     try:
-        detail, status, meta = fetch_sold_detail(
-            gid,
-            engine="playwright",
-            fallback_chain=("playwright",),
-            auto_fallback=False,
+        detail, status, meta = _call_with_timeout(
+            lambda: fetch_sold_detail(
+                gid,
+                engine="playwright",
+                fallback_chain=("playwright",),
+                auto_fallback=False,
+            )
         )
     except Exception as exc:
         return {
@@ -138,7 +194,9 @@ def _fetch_single_tab(args: tuple) -> dict:
     gid = str(goods_id)
     try:
         context = _get_shared_context(crawler, cloud_root)
-        detail, status, meta = _playwright_with_context(context, gid)
+        detail, status, meta = _call_with_timeout(
+            lambda: _playwright_with_context(context, gid)
+        )
     except Exception as exc:
         return {
             "goods_id": gid,
@@ -159,13 +217,30 @@ def _fetch_api_then_browser(args: tuple) -> dict:
 
     t0 = time.time()
     gid = str(goods_id)
+    api_only = os.environ.get("XHS_LOCAL_AGENT_COMPARE_D_API_ONLY", "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+    )
     try:
-        detail, status, meta = fetch_sold_detail(
-            gid,
-            engine="api",
-            fallback_chain=("api", "playwright"),
-            auto_fallback=True,
-        )
+        if api_only:
+            detail, status, meta = _call_with_timeout(
+                lambda: fetch_sold_detail(
+                    gid,
+                    engine="api",
+                    fallback_chain=("api",),
+                    auto_fallback=False,
+                )
+            )
+        else:
+            detail, status, meta = _call_with_timeout(
+                lambda: fetch_sold_detail(
+                    gid,
+                    engine="api",
+                    fallback_chain=("api", "playwright"),
+                    auto_fallback=True,
+                )
+            )
     except Exception as exc:
         return {
             "goods_id": gid,
@@ -192,7 +267,7 @@ def scan_batch(
     concurrency = max(1, min(10, int(concurrency)))
     results: list[dict] = []
 
-    item_timeout = max(60, int(os.environ.get("XHS_LOCAL_AGENT_ITEM_TIMEOUT", "120")))
+    item_timeout = max(45, int(os.environ.get("XHS_LOCAL_AGENT_ITEM_TIMEOUT", "90")))
 
     if mode == MODE_MULTI_BROWSER:
         log(f"模式=A 多浏览器 并发={concurrency}")
@@ -203,75 +278,21 @@ def scan_batch(
             initargs=(crawler, cloud_root),
         ) as pool:
             futs = {pool.submit(_worker_fetch_multi, w): w[0] for w in work}
-            done = 0
-            for fut in as_completed(futs):
-                gid = futs[fut]
-                try:
-                    row = fut.result(timeout=item_timeout)
-                except Exception as exc:
-                    row = {
-                        "goods_id": gid,
-                        "status": "fail",
-                        "sold": None,
-                        "message": str(exc)[:200],
-                        "engine": "playwright",
-                        "ms": 0,
-                        "detail": {},
-                    }
-                results.append(row)
-                done += 1
-                ok_so_far = sum(1 for r in results if r.get("status") == "ok")
-                log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
+            results = _scan_wait_loop(futs, log, item_timeout)
 
     elif mode == MODE_SINGLE_BROWSER:
         log(f"模式=C 单浏览器多标签 并发={concurrency}")
         work = [(gid, crawler, cloud_root) for gid in work_ids]
         with ThreadPoolExecutor(max_workers=concurrency) as pool:
             futs = {pool.submit(_fetch_single_tab, w): w[0] for w in work}
-            done = 0
-            for fut in as_completed(futs):
-                gid = futs[fut]
-                try:
-                    row = fut.result(timeout=item_timeout)
-                except Exception as exc:
-                    row = {
-                        "goods_id": gid,
-                        "status": "fail",
-                        "sold": None,
-                        "message": str(exc)[:200],
-                        "engine": "playwright",
-                        "ms": 0,
-                        "detail": {},
-                    }
-                results.append(row)
-                done += 1
-                ok_so_far = sum(1 for r in results if r.get("status") == "ok")
-                log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
+            results = _scan_wait_loop(futs, log, item_timeout)
 
     elif mode == MODE_API_THEN_BROWSER:
         log(f"模式=D API优先+浏览器 并发={concurrency}")
         work = [(gid, crawler, cloud_root) for gid in work_ids]
         with ThreadPoolExecutor(max_workers=concurrency) as pool:
             futs = {pool.submit(_fetch_api_then_browser, w): w[0] for w in work}
-            done = 0
-            for fut in as_completed(futs):
-                gid = futs[fut]
-                try:
-                    row = fut.result(timeout=item_timeout)
-                except Exception as exc:
-                    row = {
-                        "goods_id": gid,
-                        "status": "fail",
-                        "sold": None,
-                        "message": str(exc)[:200],
-                        "engine": "api",
-                        "ms": 0,
-                        "detail": {},
-                    }
-                results.append(row)
-                done += 1
-                ok_so_far = sum(1 for r in results if r.get("status") == "ok")
-                log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
+            results = _scan_wait_loop(futs, log, item_timeout)
     else:
         raise ValueError(f"未知模式: {mode}")
 
@@ -312,7 +333,10 @@ def compare_modes(
     modes = modes or [MODE_API_THEN_BROWSER, MODE_SINGLE_BROWSER, MODE_MULTI_BROWSER]
     compare_n = max(3, min(len(items), int(os.environ.get("XHS_LOCAL_AGENT_COMPARE_N", "9"))))
     subset = items[:compare_n]
-    log(f"对比测试: {compare_n} 条 × {len(modes)} 种模式")
+    os.environ.setdefault("XHS_LOCAL_AGENT_FETCH_TIMEOUT", "45")
+    os.environ.setdefault("XHS_LOCAL_AGENT_ITEM_TIMEOUT", "90")
+    os.environ.setdefault("XHS_LOCAL_AGENT_COMPARE_D_API_ONLY", "1")
+    log(f"对比测试: {compare_n} 条 × {len(modes)} 种模式（D模式对比时仅测API，正式跑含浏览器兜底）")
 
     reports: list[dict] = []
     for mode in modes:
