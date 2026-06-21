@@ -65,12 +65,19 @@ class CloudMonitorDaemon:
         except Exception:
             pass
 
+    def _uses_api_only(self) -> bool:
+        if time.time() < self._api_only_until:
+            return True
+        return os.environ.get("XHS_DAEMON_API_ONLY", "").strip().lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+
     def _resolve_start_engine(self, goods: dict) -> str:
         from cloud_deploy.daemon.cloud_engine import pick_start_engine
 
-        if time.time() < self._api_only_until:
-            return "api"
-        if os.environ.get("XHS_DAEMON_API_ONLY", "").strip().lower() in ("1", "true", "yes"):
+        if self._uses_api_only():
             return "api"
         return pick_start_engine(goods, self.config)
 
@@ -123,7 +130,12 @@ class CloudMonitorDaemon:
 
         gid = str(goods["goods_id"])
         start = self._resolve_start_engine(goods)
-        chain = build_fallback_chain(start, self.config) if self.auto_fallback else (start,)
+        if self._uses_api_only():
+            chain = ("api",)
+        elif self.auto_fallback:
+            chain = build_fallback_chain(start, self.config)
+        else:
+            chain = (start,)
 
         fetcher = _load_fetcher()
         if not fetcher:
