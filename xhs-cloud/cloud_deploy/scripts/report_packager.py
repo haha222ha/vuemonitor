@@ -27,7 +27,7 @@ def pack_report_dir(report_dir: str, zip_path: str | None = None) -> dict:
     if not zip_path:
         zip_path = os.path.join(parent, f"{base}.zip")
 
-    required = ("data.js", "index_with_gr.html", "index_vue.html", "gen_report.py")
+    required = ("data.js", "index_with_gr.html", "index_vue.html")
     for name in required:
         if not os.path.isfile(os.path.join(report_dir, name)):
             raise FileNotFoundError(f"缺少 {name} in {report_dir}")

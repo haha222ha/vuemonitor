@@ -128,7 +128,6 @@ def build_report_payload(
 REPORT_BUNDLE_FILES = (
     "index_with_gr.html",
     "index_vue.html",
-    "gen_report.py",
 )
 
 
@@ -171,6 +170,7 @@ def write_report_dir(
             payload["meta"].get("disclaimer", "")
             + "\n解压后请右键 index_with_gr.html，选择「打开方式」→ Google Chrome 打开\n"
             + f"报告包文件: data.js, {', '.join(REPORT_BUNDLE_FILES)}\n"
+            + "（gen_report.py 为本地生成脚本，不包含在会员 zip 中）\n"
         )
     return output_dir
 
