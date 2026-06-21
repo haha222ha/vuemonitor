@@ -12,7 +12,8 @@ r"""
   XHS_ENABLE_PLAYWRIGHT=1
   XHS_LOCAL_AGENT_ID=home-pc-1          # 可选，标识本机
   XHS_LOCAL_AGENT_BATCH=80              # 每轮拉取条数
-  XHS_LOCAL_AGENT_CONCURRENCY=5         # Playwright 进程并发
+  XHS_LOCAL_AGENT_CONCURRENCY=5         # Playwright 进程/标签并发
+  XHS_LOCAL_AGENT_MODE=multi_browser    # multi_browser | single_browser | api_then_browser
   XHS_LOCAL_AGENT_IDLE_SEC=300          # 无工单时休眠秒数
   XHS_LOCAL_AGENT_COOLDOWN_SEC=15       # 每轮上传后冷却
   XHS_LOCAL_AGENT_LOG_DIR=%LOCALAPPDATA%\xhs-local-agent
@@ -21,6 +22,7 @@ r"""
   python tools/local_risk_agent.py run          # 前台运行（调试）
   python tools/local_risk_agent.py run-once   # 跑一轮后退出
   python tools/local_risk_agent.py status     # 检查 API 连通与待处理 risk 数
+  python tools/local_risk_agent.py compare    # 三种模式对比测试（不上传）
 
 Windows 静默安装（开机自启）:
   powershell -ExecutionPolicy Bypass -File tools/install_local_risk_agent.ps1
@@ -32,16 +34,26 @@ import os
 import sys
 import time
 import uuid
-from concurrent.futures import ProcessPoolExecutor, as_completed
 from datetime import date
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from local_risk_agent_modes import (
+    MODE_API_THEN_BROWSER,
+    MODE_LABELS,
+    MODE_MULTI_BROWSER,
+    MODE_SINGLE_BROWSER,
+    compare_modes,
+    scan_batch,
+)
+
 _TOOLS = os.path.dirname(os.path.abspath(__file__))
 _XHS_ROOT = os.environ.get("XHS_CLOUD_PKG_ROOT", os.path.dirname(_TOOLS))
 if _XHS_ROOT not in sys.path:
     sys.path.insert(0, _XHS_ROOT)
+if _TOOLS not in sys.path:
+    sys.path.insert(0, _TOOLS)
 
 CLOUD_ROOT = os.path.join(_XHS_ROOT, "cloud_deploy")
 CRAWLER_DEFAULT = os.path.join(_XHS_ROOT, "cloud_deploy", "crawler_runtime")
@@ -130,76 +142,31 @@ def upload_results(rows: list[dict], batch_id: str, scan_date: str) -> dict:
     )
 
 
-def _worker_init(crawler: str, cloud_root: str) -> None:
-    if cloud_root not in sys.path:
-        sys.path.insert(0, cloud_root)
-    if crawler and os.path.isdir(crawler) and crawler not in sys.path:
-        sys.path.insert(0, crawler)
-    os.environ["XHS_ENABLE_PLAYWRIGHT"] = "1"
-
-
-def _worker_fetch(payload: tuple[str, str]) -> dict:
-    goods_id, crawler = payload
-    cloud_root = os.environ.get("_RISK_AGENT_CLOUD_ROOT", _XHS_ROOT)
-    _worker_init(crawler, cloud_root)
-    from cloud_deploy.cloud_api.agent_service import slim_detail
-
-    from xhs_full_sold_fetch import fetch_sold_detail
-
-    t0 = time.time()
-    gid = str(goods_id)
-    try:
-        detail, status, meta = fetch_sold_detail(
-            gid,
-            engine="playwright",
-            fallback_chain=("playwright",),
-            auto_fallback=False,
-        )
-    except Exception as exc:
-        return {
-            "goods_id": gid,
-            "status": "fail",
-            "sold": None,
-            "message": str(exc)[:200],
-            "engine": "playwright",
-            "ms": int((time.time() - t0) * 1000),
-            "detail": {},
-        }
-    meta = dict(meta or {})
-    sold = None
-    detail_out = None
-    if status == "ok" and detail:
-        sold = int(detail.get("real_sales") or detail.get("product_sales") or 0)
-        detail_out = slim_detail(detail)
-    return {
-        "goods_id": gid,
-        "status": status,
-        "sold": sold,
-        "message": str(meta.get("message") or "")[:200],
-        "engine": str(meta.get("won_engine") or meta.get("engine") or "playwright"),
-        "ms": int((time.time() - t0) * 1000),
-        "detail": detail_out or {},
+def _agent_mode() -> str:
+    mode = os.environ.get("XHS_LOCAL_AGENT_MODE", MODE_MULTI_BROWSER).strip().lower()
+    aliases = {
+        "a": MODE_MULTI_BROWSER,
+        "multi": MODE_MULTI_BROWSER,
+        "c": MODE_SINGLE_BROWSER,
+        "single": MODE_SINGLE_BROWSER,
+        "tabs": MODE_SINGLE_BROWSER,
+        "d": MODE_API_THEN_BROWSER,
+        "api": MODE_API_THEN_BROWSER,
+        "api_pw": MODE_API_THEN_BROWSER,
     }
+    return aliases.get(mode, mode)
 
 
-def scan_batch(items: list[dict], concurrency: int, crawler: str) -> list[dict]:
-    os.environ["_RISK_AGENT_CLOUD_ROOT"] = _XHS_ROOT
-    work = [(str(i["goods_id"]), crawler) for i in items]
-    results: list[dict] = []
-    with ProcessPoolExecutor(
-        max_workers=max(1, concurrency),
-        initializer=_worker_init,
-        initargs=(crawler, _XHS_ROOT),
-    ) as pool:
-        futs = {pool.submit(_worker_fetch, w): w[0] for w in work}
-        done = 0
-        for fut in as_completed(futs):
-            results.append(fut.result())
-            done += 1
-            if done % max(1, len(work) // 10) == 0 or done == len(work):
-                ok_so_far = sum(1 for r in results if r.get("status") == "ok")
-                _log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
-    return results
+def _load_env_file() -> None:
+    env_file = os.environ.get("XHS_LOCAL_AGENT_ENV", "").strip()
+    if not env_file:
+        default_env = Path(__file__).resolve().parent / "local_agent.env"
+        if default_env.is_file():
+            env_file = str(default_env)
+    if env_file and os.path.isfile(env_file):
+        from cloud_deploy.scripts.bootstrap_env import bootstrap
+
+        bootstrap(env_file)
 
 
 def run_once() -> dict:
@@ -215,9 +182,17 @@ def run_once() -> dict:
         _log(f"无 risk 工单 pending={pending if pending is not None else '?'}")
         return {"pending_risk": pending or 0, "scanned": 0, "ok": 0}
 
-    _log(f"开始采集 {len(items)} 条 pending={pending if pending is not None else '?'} 并发={concurrency}")
+    mode = _agent_mode()
+    if mode not in MODE_LABELS:
+        _log(f"未知模式 {mode}，回退 multi_browser")
+        mode = MODE_MULTI_BROWSER
+
+    _log(
+        f"开始采集 {len(items)} 条 mode={mode} "
+        f"({MODE_LABELS.get(mode, mode)}) 并发={concurrency}"
+    )
     t0 = time.time()
-    results = scan_batch(items, concurrency, crawler)
+    results = scan_batch(items, concurrency, crawler, _XHS_ROOT, mode, log_fn=_log)
     ok = sum(1 for r in results if r.get("status") == "ok")
     _log(f"采集完成 ok={ok}/{len(results)} 耗时={time.time()-t0:.1f}s 上传中...")
 
@@ -225,6 +200,7 @@ def run_once() -> dict:
     _log(f"上传完成 {up}")
     summary = {
         "pending_risk": pending if pending is not None else 0,
+        "mode": mode,
         "scanned": len(results),
         "ok": ok,
         "upload": up,
@@ -241,7 +217,7 @@ def run_once() -> dict:
 def run_daemon() -> None:
     idle_sec = max(30, int(os.environ.get("XHS_LOCAL_AGENT_IDLE_SEC", "300")))
     cooldown = max(0, int(os.environ.get("XHS_LOCAL_AGENT_COOLDOWN_SEC", "15")))
-    _log(f"Agent 启动 id={_agent_id()} api={_api_base()}")
+    _log(f"Agent 启动 id={_agent_id()} mode={_agent_mode()} api={_api_base()}")
     while True:
         try:
             summary = run_once()
@@ -266,6 +242,26 @@ def cmd_status() -> None:
         raise SystemExit(1) from exc
 
 
+def cmd_compare() -> None:
+    batch_size = max(10, min(100, int(os.environ.get("XHS_LOCAL_AGENT_BATCH", "80"))))
+    concurrency = max(1, min(10, int(os.environ.get("XHS_LOCAL_AGENT_CONCURRENCY", "5"))))
+    crawler = os.environ.get("XHS_CRAWLER_ROOT", CRAWLER_DEFAULT).strip()
+    scan_date = date.today().isoformat()
+
+    wl = fetch_worklist(batch_size, scan_date, include_pending=False)
+    items = wl.get("items") or []
+    if not items:
+        print("无 risk 工单可对比")
+        raise SystemExit(1)
+
+    print(f"对比模式: 每模式最多 {os.environ.get('XHS_LOCAL_AGENT_COMPARE_N', '15')} 条")
+    reports = compare_modes(items, concurrency, crawler, _XHS_ROOT, log_fn=_log)
+    out = _log_dir() / "mode_compare.json"
+    out.write_text(json.dumps(reports, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(json.dumps(reports, ensure_ascii=False, indent=2))
+    print(f"\n报告已保存: {out}")
+
+
 def main():
     import argparse
 
@@ -274,22 +270,17 @@ def main():
     sub.add_parser("run", help="守护循环")
     sub.add_parser("run-once", help="跑一轮")
     sub.add_parser("status", help="检查 API 与待处理数")
+    sub.add_parser("compare", help="A/C/D 三模式对比（不上传）")
     args = ap.parse_args()
 
-    env_file = os.environ.get("XHS_LOCAL_AGENT_ENV", "").strip()
-    if not env_file:
-        default_env = Path(__file__).resolve().parent / "local_agent.env"
-        if default_env.is_file():
-            env_file = str(default_env)
-    if env_file and os.path.isfile(env_file):
-        from cloud_deploy.scripts.bootstrap_env import bootstrap
-
-        bootstrap(env_file)
+    _load_env_file()
 
     if args.cmd == "run":
         run_daemon()
     elif args.cmd == "run-once":
         run_once()
+    elif args.cmd == "compare":
+        cmd_compare()
     else:
         cmd_status()
 

@@ -34,6 +34,7 @@ def _load_env() -> dict[str, str]:
         "XHS_LOCAL_AGENT_ID": os.environ.get("COMPUTERNAME", "home-pc"),
         "XHS_LOCAL_AGENT_BATCH": "80",
         "XHS_LOCAL_AGENT_CONCURRENCY": "5",
+        "XHS_LOCAL_AGENT_MODE": "multi_browser",
         "XHS_LOCAL_AGENT_IDLE_SEC": "300",
         "XHS_LOCAL_AGENT_COOLDOWN_SEC": "15",
     }
@@ -55,6 +56,7 @@ def _save_env(values: dict[str, str]) -> None:
         f"XHS_LOCAL_AGENT_ID={values['agent_id']}",
         f"XHS_LOCAL_AGENT_BATCH={values['batch']}",
         f"XHS_LOCAL_AGENT_CONCURRENCY={values['concurrency']}",
+        f"XHS_LOCAL_AGENT_MODE={values['mode']}",
         f"XHS_LOCAL_AGENT_IDLE_SEC={values['idle_sec']}",
         f"XHS_LOCAL_AGENT_COOLDOWN_SEC={values['cooldown_sec']}",
     ]
@@ -106,6 +108,7 @@ class AgentConfigApp(tk.Tk):
         self.var_agent_id = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_ID", "home-pc"))
         self.var_batch = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_BATCH", "80"))
         self.var_concurrency = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_CONCURRENCY", "5"))
+        self.var_mode = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_MODE", "multi_browser"))
         self.var_idle = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_IDLE_SEC", "300"))
         self.var_cooldown = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_COOLDOWN_SEC", "15"))
         self.var_show_key = tk.BooleanVar(value=False)
@@ -136,8 +139,25 @@ class AgentConfigApp(tk.Tk):
         ttk.Entry(opt, textvariable=self.var_batch, width=8).grid(row=0, column=3, sticky=tk.W, padx=8, pady=4)
         ttk.Label(opt, text="并发数(1-10)").grid(row=1, column=0, sticky=tk.W, padx=8, pady=4)
         ttk.Entry(opt, textvariable=self.var_concurrency, width=8).grid(row=1, column=1, sticky=tk.W, padx=8, pady=4)
-        ttk.Label(opt, text="空闲等待(秒)").grid(row=1, column=2, sticky=tk.W, padx=8, pady=4)
-        ttk.Entry(opt, textvariable=self.var_idle, width=8).grid(row=1, column=3, sticky=tk.W, padx=8, pady=4)
+        ttk.Label(opt, text="采集模式").grid(row=1, column=2, sticky=tk.W, padx=8, pady=4)
+        ttk.Combobox(
+            opt,
+            textvariable=self.var_mode,
+            width=22,
+            state="readonly",
+            values=[
+                "multi_browser",
+                "single_browser",
+                "api_then_browser",
+            ],
+        ).grid(row=1, column=3, sticky=tk.W, padx=8, pady=4)
+        ttk.Label(opt, text="A=多浏览器 C=单浏览器多标签 D=API优先", foreground="#666").grid(
+            row=2, column=0, columnspan=4, sticky=tk.W, padx=8, pady=2
+        )
+        ttk.Label(opt, text="空闲等待(秒)").grid(row=3, column=0, sticky=tk.W, padx=8, pady=4)
+        ttk.Entry(opt, textvariable=self.var_idle, width=8).grid(row=3, column=1, sticky=tk.W, padx=8, pady=4)
+        ttk.Label(opt, text="冷却(秒)").grid(row=3, column=2, sticky=tk.W, padx=8, pady=4)
+        ttk.Entry(opt, textvariable=self.var_cooldown, width=8).grid(row=3, column=3, sticky=tk.W, padx=8, pady=4)
 
         btns = ttk.Frame(self)
         btns.pack(fill=tk.X, pady=(0, 8))
@@ -145,6 +165,7 @@ class AgentConfigApp(tk.Tk):
         ttk.Button(btns, text="② 安装浏览器", command=self.on_install_browser).pack(side=tk.LEFT, padx=4)
         ttk.Button(btns, text="③ 保存并开机自启", command=self.on_install).pack(side=tk.LEFT, padx=4)
         ttk.Button(btns, text="试跑一轮", command=self.on_run_once).pack(side=tk.LEFT, padx=4)
+        ttk.Button(btns, text="三模式对比", command=self.on_compare).pack(side=tk.LEFT, padx=4)
         ttk.Button(btns, text="打开日志", command=self.on_open_log).pack(side=tk.LEFT, padx=4)
 
         log_frm = ttk.LabelFrame(self, text="运行日志")
@@ -168,6 +189,7 @@ class AgentConfigApp(tk.Tk):
             "agent_id": self.var_agent_id.get().strip() or "home-pc",
             "batch": self.var_batch.get().strip() or "80",
             "concurrency": self.var_concurrency.get().strip() or "5",
+            "mode": self.var_mode.get().strip() or "multi_browser",
             "idle_sec": self.var_idle.get().strip() or "300",
             "cooldown_sec": self.var_cooldown.get().strip() or "15",
         }
@@ -300,6 +322,41 @@ class AgentConfigApp(tk.Tk):
             self.after(0, lambda: messagebox.showinfo("完成", "试跑一轮结束"))
 
         self._worker("试跑一轮", job)
+
+    def on_compare(self) -> None:
+        v = self._validate()
+        if not v:
+            return
+        _save_env(v)
+
+        def job() -> None:
+            repo = Path(__file__).resolve().parent.parent
+            env = {
+                "XHS_CLOUD_API_URL": v["api_url"],
+                "XHS_LOCAL_AGENT_KEY": v["agent_key"],
+                "XHS_LOCAL_AGENT_FOREGROUND": "1",
+                "XHS_LOCAL_AGENT_MODE": v["mode"],
+                "PYTHONPATH": str(repo),
+            }
+            import subprocess as sp
+
+            p = sp.run(
+                [sys.executable, "tools/local_risk_agent.py", "compare"],
+                cwd=str(repo),
+                env={**os.environ, **env},
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+            )
+            out = (p.stdout or "") + (p.stderr or "")
+            self._log(out.strip() or "(无输出)")
+            if p.returncode != 0:
+                raise RuntimeError("对比测试失败")
+            self.after(0, lambda: messagebox.showinfo("完成", "对比报告见日志和 mode_compare.json"))
+
+        self._worker("三模式对比测试", job)
+
 
     def on_open_log(self) -> None:
         LOG_DIR.mkdir(parents=True, exist_ok=True)
