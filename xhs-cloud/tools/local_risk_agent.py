@@ -90,21 +90,30 @@ def _api_request(method: str, path: str, body: dict | None = None, timeout: int 
         data = json.dumps(body, ensure_ascii=False).encode("utf-8")
         headers["Content-Type"] = "application/json"
     req = Request(url, data=data, headers=headers, method=method)
-    try:
-        with urlopen(req, timeout=timeout) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except HTTPError as e:
-        detail = e.read().decode(errors="replace")
-        raise RuntimeError(f"HTTP {e.code}: {detail}") from e
-    except URLError as e:
-        raise RuntimeError(f"网络错误: {e}") from e
+    last_err: Exception | None = None
+    for attempt in range(3):
+        try:
+            with urlopen(req, timeout=timeout) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+        except HTTPError as e:
+            detail = e.read().decode(errors="replace")
+            raise RuntimeError(f"HTTP {e.code}: {detail}") from e
+        except (TimeoutError, URLError) as e:
+            last_err = e
+            if attempt < 2:
+                _log(f"请求超时，{5 * (attempt + 1)}s 后重试 ({attempt + 1}/3)...")
+                time.sleep(5 * (attempt + 1))
+                continue
+    raise RuntimeError(f"网络超时: {last_err}") from last_err
 
 
-def fetch_worklist(limit: int, scan_date: str = "") -> dict:
+def fetch_worklist(limit: int, scan_date: str = "", include_pending: bool = False) -> dict:
     q = f"?limit={int(limit)}"
     if scan_date:
         q += f"&scan_date={scan_date}"
-    return _api_request("GET", f"/api/v1/agent/risk-worklist{q}")
+    if include_pending:
+        q += "&include_pending=1"
+    return _api_request("GET", f"/api/v1/agent/risk-worklist{q}", timeout=180)
 
 
 def upload_results(rows: list[dict], batch_id: str, scan_date: str) -> dict:
@@ -183,8 +192,13 @@ def scan_batch(items: list[dict], concurrency: int, crawler: str) -> list[dict]:
         initargs=(crawler, _XHS_ROOT),
     ) as pool:
         futs = {pool.submit(_worker_fetch, w): w[0] for w in work}
+        done = 0
         for fut in as_completed(futs):
             results.append(fut.result())
+            done += 1
+            if done % max(1, len(work) // 10) == 0 or done == len(work):
+                ok_so_far = sum(1 for r in results if r.get("status") == "ok")
+                _log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
     return results
 
 
@@ -194,14 +208,14 @@ def run_once() -> dict:
     crawler = os.environ.get("XHS_CRAWLER_ROOT", CRAWLER_DEFAULT).strip()
     scan_date = date.today().isoformat()
 
-    wl = fetch_worklist(batch_size, scan_date)
+    wl = fetch_worklist(batch_size, scan_date, include_pending=False)
     items = wl.get("items") or []
-    pending = int(wl.get("pending_risk") or 0)
+    pending = wl.get("pending_risk")
     if not items:
-        _log(f"无 risk 工单 pending={pending}")
-        return {"pending_risk": pending, "scanned": 0, "ok": 0}
+        _log(f"无 risk 工单 pending={pending if pending is not None else '?'}")
+        return {"pending_risk": pending or 0, "scanned": 0, "ok": 0}
 
-    _log(f"开始采集 {len(items)} 条 pending={pending} 并发={concurrency}")
+    _log(f"开始采集 {len(items)} 条 pending={pending if pending is not None else '?'} 并发={concurrency}")
     t0 = time.time()
     results = scan_batch(items, concurrency, crawler)
     ok = sum(1 for r in results if r.get("status") == "ok")
@@ -210,7 +224,7 @@ def run_once() -> dict:
     up = upload_results(results, str(uuid.uuid4()), scan_date)
     _log(f"上传完成 {up}")
     summary = {
-        "pending_risk": pending,
+        "pending_risk": pending if pending is not None else 0,
         "scanned": len(results),
         "ok": ok,
         "upload": up,
@@ -245,7 +259,7 @@ def run_daemon() -> None:
 
 def cmd_status() -> None:
     try:
-        wl = fetch_worklist(1)
+        wl = fetch_worklist(1, include_pending=True)
         print(json.dumps({"api": _api_base(), "agent_id": _agent_id(), **wl}, ensure_ascii=False, indent=2))
     except Exception as exc:
         print(f"连接失败: {exc}", file=sys.stderr)
@@ -262,7 +276,11 @@ def main():
     sub.add_parser("status", help="检查 API 与待处理数")
     args = ap.parse_args()
 
-    env_file = os.environ.get("XHS_LOCAL_AGENT_ENV", "")
+    env_file = os.environ.get("XHS_LOCAL_AGENT_ENV", "").strip()
+    if not env_file:
+        default_env = Path(__file__).resolve().parent / "local_agent.env"
+        if default_env.is_file():
+            env_file = str(default_env)
     if env_file and os.path.isfile(env_file):
         from cloud_deploy.scripts.bootstrap_env import bootstrap
 

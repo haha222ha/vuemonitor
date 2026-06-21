@@ -101,6 +101,7 @@ class AgentScanUploadBody(BaseModel):
 def agent_risk_worklist(
     limit: int = 100,
     scan_date: str = "",
+    include_pending: int = 0,
     _: None = Depends(verify_agent_access),
 ):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
@@ -115,7 +116,7 @@ def agent_risk_worklist(
     init_db()
     conn = _conn()
     try:
-        return list_risk_worklist(conn, day, limit)
+        return list_risk_worklist(conn, day, limit, include_pending=bool(include_pending))
     finally:
         conn.close()
 

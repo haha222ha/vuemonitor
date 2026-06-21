@@ -62,7 +62,7 @@ def _save_env(values: dict[str, str]) -> None:
 
 
 def _api_test(api_url: str, agent_key: str) -> dict:
-    url = f"{api_url.rstrip('/')}/api/v1/agent/risk-worklist?limit=1"
+    url = f"{api_url.rstrip('/')}/api/v1/agent/risk-worklist?limit=1&include_pending=1"
     req = urllib.request.Request(
         url,
         headers={"X-Agent-Key": agent_key, "User-Agent": "xhs-local-agent-gui/1.0"},
@@ -211,8 +211,14 @@ class AgentConfigApp(tk.Tk):
                 body = e.read().decode(errors="replace")
                 if e.code == 404:
                     raise RuntimeError(
-                        f"HTTP 404: 接口不存在。请把 API 地址改成 https://monitor.xhs365.cn\n"
-                        f"（xhs365.cn 是主站，不是采集 API）"
+                        "API 地址错误：请用 https://monitor.xhs365.cn\n"
+                        "（不要用 xhs365.cn）"
+                    ) from e
+                if e.code == 401:
+                    raise RuntimeError(
+                        "Agent Key 无效：请到服务器执行\n"
+                        "  grep XHS_LOCAL_AGENT_KEY /opt/xhs-cloud/.env\n"
+                        "复制完整密钥粘贴到本窗口（不要有空格）"
                     ) from e
                 raise RuntimeError(f"HTTP {e.code}: {body}") from e
 
@@ -271,6 +277,11 @@ class AgentConfigApp(tk.Tk):
         self._worker("保存并安装", job)
 
     def on_run_once(self) -> None:
+        if not messagebox.askyesno(
+            "提示",
+            "后台任务已在自动采集时，不必再点试跑。\n仍要手动试跑一轮？",
+        ):
+            return
         v = self._validate()
         if not v:
             return

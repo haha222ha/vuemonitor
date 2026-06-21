@@ -8,26 +8,31 @@ from datetime import date
 from cloud_deploy.cloud_api.sync_service import mark_scan_result, record_cloud_scan
 
 
-def list_risk_worklist(conn, scan_date: str, limit: int) -> dict:
+def list_risk_worklist(conn, scan_date: str, limit: int, include_pending: bool = False) -> dict:
+    day_start = scan_date
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
-        c.execute(
-            """SELECT COUNT(*) FROM monitor_goods
-               WHERE monitor_status IN ('active', 'idle')
-                 AND last_scan_status = 'risk'
-                 AND last_scan_at::date = %s::date""",
-            (scan_date,),
-        )
-        pending = int(c.fetchone()[0] or 0)
+        pending = None
+        if include_pending:
+            c.execute(
+                """SELECT COUNT(*) FROM monitor_goods
+                   WHERE monitor_status IN ('active', 'idle')
+                     AND last_scan_status = 'risk'
+                     AND last_scan_at >= %s::date
+                     AND last_scan_at < (%s::date + INTERVAL '1 day')""",
+                (day_start, day_start),
+            )
+            pending = int(c.fetchone()[0] or 0)
         c.execute(
             """SELECT goods_id, title
                FROM monitor_goods
                WHERE monitor_status IN ('active', 'idle')
                  AND last_scan_status = 'risk'
-                 AND last_scan_at::date = %s::date
-               ORDER BY priority_score DESC NULLS LAST, last_v1d DESC NULLS LAST
+                 AND last_scan_at >= %s::date
+                 AND last_scan_at < (%s::date + INTERVAL '1 day')
+               ORDER BY priority_score DESC NULLS LAST
                LIMIT %s""",
-            (scan_date, limit),
+            (day_start, day_start, limit),
         )
         items = [{"goods_id": str(r[0]), "title": r[1] or ""} for r in c.fetchall()]
     return {
