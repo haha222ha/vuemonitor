@@ -78,12 +78,17 @@ def generate_daily_report(
         conn.close()
 
     raw = len(items)
+    _log(f"筛选阈值 (v1d>{min_v1d} 或 actual>={min_actual})...")
     items = [it for it in items if passes_threshold(it, min_v1d, min_actual, min_v1d_virtual, min_actual_virtual)]
+    _log(f"阈值后: {len(items)} 行 (raw={raw})")
     if dedup:
+        _log("同标题去重...")
         items = dedup_by_title(items)
+        _log(f"去重后: {len(items)} 行")
 
     report_root = os.environ.get("XHS_REPORT_OUTPUT_DIR", os.path.join(s.xhs_data_dir, "reports"))
     out_dir = resolve_output_dir(report_root, report_date, "daily")
+    _log(f"组装 data.js（约 {len(items)} 条，charts 统计中，请稍候）...")
     payload = build_report_payload(
         items,
         report_date,
@@ -96,6 +101,7 @@ def generate_daily_report(
         pool_stats=pool_stats,
     )
     payload["meta"]["count_raw"] = raw
+    _log(f"写入目录 {out_dir} ...")
     write_report_dir(out_dir, payload, _report_assets_dir())
     _log(f"输出: {out_dir} items={len(items)} (raw={raw}) bundle=data.js+index_with_gr.html+index_vue.html+gen_report.py")
     return {"report_date": report_date, "output_dir": out_dir, "count": len(items), "raw": raw}
