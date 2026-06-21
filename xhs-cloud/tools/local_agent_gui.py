@@ -29,7 +29,7 @@ def _log(widget: scrolledtext.ScrolledText, msg: str) -> None:
 
 def _load_env() -> dict[str, str]:
     data = {
-        "XHS_CLOUD_API_URL": "https://xhs365.cn",
+        "XHS_CLOUD_API_URL": "https://monitor.xhs365.cn",
         "XHS_LOCAL_AGENT_KEY": "",
         "XHS_LOCAL_AGENT_ID": os.environ.get("COMPUTERNAME", "home-pc"),
         "XHS_LOCAL_AGENT_BATCH": "80",
@@ -101,7 +101,7 @@ class AgentConfigApp(tk.Tk):
         self.configure(padx=12, pady=10)
 
         saved = _load_env()
-        self.var_api = tk.StringVar(value=saved.get("XHS_CLOUD_API_URL", "https://xhs365.cn"))
+        self.var_api = tk.StringVar(value=saved.get("XHS_CLOUD_API_URL", "https://monitor.xhs365.cn"))
         self.var_key = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_KEY", ""))
         self.var_agent_id = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_ID", "home-pc"))
         self.var_batch = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_BATCH", "80"))
@@ -209,6 +209,11 @@ class AgentConfigApp(tk.Tk):
                 self.after(0, lambda: messagebox.showinfo("成功", f"连接正常\n待补采 risk: {pending} 条"))
             except urllib.error.HTTPError as e:
                 body = e.read().decode(errors="replace")
+                if e.code == 404:
+                    raise RuntimeError(
+                        f"HTTP 404: 接口不存在。请把 API 地址改成 https://monitor.xhs365.cn\n"
+                        f"（xhs365.cn 是主站，不是采集 API）"
+                    ) from e
                 raise RuntimeError(f"HTTP {e.code}: {body}") from e
 
         self._worker("测试连接", job)

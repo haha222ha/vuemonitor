@@ -6,7 +6,7 @@ r"""
 无需开放 PG 5432；通过云端 API（X-Agent-Key 鉴权）拉取 risk 列表并上传结果。
 
 环境变量（本地 .env 或 install 脚本写入）:
-  XHS_CLOUD_API_URL=https://xhs365.cn
+  XHS_CLOUD_API_URL=https://monitor.xhs365.cn
   XHS_LOCAL_AGENT_KEY=与服务器 .env 一致的长随机串
   XHS_CRAWLER_ROOT=D:\vuemonitor\xhs-cloud\cloud_deploy\crawler_runtime
   XHS_ENABLE_PLAYWRIGHT=1

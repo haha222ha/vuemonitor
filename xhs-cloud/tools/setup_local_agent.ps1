@@ -10,7 +10,7 @@
      powershell -ExecutionPolicy Bypass -File tools\setup_local_agent.ps1
 #>
 param(
-    [string]$ApiUrl = "https://xhs365.cn",
+    [string]$ApiUrl = "https://monitor.xhs365.cn",
     [string]$AgentKey = ""
 )
 
