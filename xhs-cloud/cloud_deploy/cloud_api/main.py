@@ -221,9 +221,16 @@ def member_library(user: dict = Depends(current_member)):
 def download_report(
     report_date: str,
     archive_type: str = "member_daily_zip",
+    access_token: str = "",
     request: Request = None,
-    user: dict = Depends(current_member),
+    cred: HTTPAuthorizationCredentials | None = Depends(security),
 ):
+    from cloud_deploy.cloud_api.auth import member_from_token
+
+    token = (cred.credentials if cred else None) or (access_token or "").strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="需要登录")
+    user = member_from_token(token)
     path = db.get_archive_path(report_date, archive_type)
     if not path or not os.path.isfile(path):
         raise HTTPException(status_code=404, detail="报告不存在")

@@ -102,7 +102,11 @@ def current_member(
 ) -> dict:
     if not cred:
         raise HTTPException(status_code=401, detail="需要登录")
-    payload = decode_token(cred.credentials)
+    return member_from_token(cred.credentials)
+
+
+def member_from_token(token: str) -> dict:
+    payload = decode_token(token)
     uid = int(payload["sub"])
     user = db.get_active_member(uid)
     if not user:

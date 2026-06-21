@@ -294,10 +294,10 @@ function renderReports() {
     const size = fmtSize(it.file_size_bytes);
     table += `<tr>
       <td>${date}</td><td>${summary}</td><td>${rows}</td><td>${size}</td>
-      <td><button class="btn btn-primary" style="padding:8px 14px;font-size:13px;min-height:36px" onclick="downloadReport('${date}','${at}')">下载</button></td>
+      <td><button class="btn btn-primary" style="padding:8px 14px;font-size:13px;min-height:36px" onclick="downloadReport('${date}','${at}', this)">下载</button></td>
     </tr>`;
     cards += `<div class="report-card">
-      <div class="rc-top"><span class="rc-date">${date}</span><button class="btn btn-primary" style="min-height:36px;padding:8px 16px;font-size:13px" onclick="downloadReport('${date}','${at}')">下载</button></div>
+      <div class="rc-top"><span class="rc-date">${date}</span><button class="btn btn-primary" style="min-height:36px;padding:8px 16px;font-size:13px" onclick="downloadReport('${date}','${at}', this)">下载</button></div>
       <div class="rc-meta">${summary}<br>条数 ${rows} · ${size}</div>
     </div>`;
   });
@@ -313,28 +313,38 @@ function setType(t) {
   renderReports();
 }
 
-async function downloadReport(date, archiveType) {
+async function downloadReport(date, archiveType, btnEl) {
   const dashMsg = document.getElementById('dashMsg');
+  const btn = btnEl || (typeof event !== 'undefined' && event.target);
+  const t = loadStored(STORAGE.token);
+  if (!t) {
+    showMsg(dashMsg, '请先登录', 'error');
+    return;
+  }
+  const label = btn && btn.tagName === 'BUTTON' ? btn.textContent : '';
+  if (btn && btn.tagName === 'BUTTON') {
+    btn.disabled = true;
+    btn.textContent = '下载中…';
+  }
+  showMsg(dashMsg, '正在下载（大报告约 10MB+，请稍候 1～2 分钟，勿重复点击）', 'ok');
+  const url = `/api/v1/member/reports/${encodeURIComponent(date)}/download?archive_type=${encodeURIComponent(archiveType)}&access_token=${encodeURIComponent(t)}`;
   try {
-    const t = loadStored(STORAGE.token);
-    const r = await fetch(`/api/v1/member/reports/${encodeURIComponent(date)}/download?archive_type=${encodeURIComponent(archiveType)}`, {
-      headers: { Authorization: 'Bearer ' + t }
-    });
-    if (!r.ok) {
-      const err = await r.json().catch(() => ({}));
-      throw new Error(err.detail || '下载失败');
-    }
-    const blob = await r.blob();
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = date + '.zip';
+    a.href = url;
+    a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
     a.remove();
-    URL.revokeObjectURL(a.href);
-    showMsg(dashMsg, '下载已开始：解压后请右键 index_with_gr.html，选择「打开方式」→ Google Chrome 打开（已支持手机自适应）', 'ok');
+    setTimeout(() => showMsg(dashMsg, '下载已开始；解压后右键 index_with_gr.html → Chrome 打开', 'ok'), 1500);
   } catch (e) {
-    showMsg(dashMsg, e.message, 'error');
+    showMsg(dashMsg, e.message || '下载失败', 'error');
+  } finally {
+    if (btn && btn.tagName === 'BUTTON') {
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = label || '下载';
+      }, 5000);
+    }
   }
 }
 
