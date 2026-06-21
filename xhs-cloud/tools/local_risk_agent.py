@@ -71,8 +71,10 @@ def _log_dir() -> Path:
 def _log(msg: str) -> None:
     line = f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] {msg}"
     try:
-        with open(_log_dir() / "agent.log", "a", encoding="utf-8") as f:
+        p = _log_dir() / "agent.log"
+        with open(p, "a", encoding="utf-8") as f:
             f.write(line + "\n")
+            f.flush()
     except OSError:
         pass
     if os.environ.get("XHS_LOCAL_AGENT_FOREGROUND", "").strip().lower() in ("1", "true", "yes"):

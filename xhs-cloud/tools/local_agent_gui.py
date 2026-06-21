@@ -8,6 +8,7 @@ import os
 import subprocess
 import sys
 import threading
+import time
 import tkinter as tk
 import urllib.error
 import urllib.request
@@ -199,6 +200,7 @@ class AgentConfigApp(tk.Tk):
         self.notebook.add(tab_cfg, text="配置")
         self.notebook.add(tab_run, text="运行日志")
         self.notebook.add(tab_cmp, text="模式对比报告")
+        self.notebook.bind("<<NotebookTabChanged>>", self._on_tab_changed)
 
         self._build_config_tab(tab_cfg)
         self._build_runtime_log_tab(tab_run)
@@ -254,6 +256,8 @@ class AgentConfigApp(tk.Tk):
         ttk.Checkbutton(bar, text="每3秒自动刷新", variable=self.var_auto_refresh).pack(side=tk.LEFT, padx=12)
         ttk.Button(bar, text="立即刷新", command=self._refresh_agent_log).pack(side=tk.LEFT, padx=4)
         ttk.Button(bar, text="打开日志目录", command=self.on_open_log).pack(side=tk.LEFT, padx=4)
+        self.lbl_run_status = ttk.Label(bar, text="", foreground="#0066cc")
+        self.lbl_run_status.pack(side=tk.RIGHT, padx=4)
 
         self.agent_log_box = scrolledtext.ScrolledText(
             parent, height=28, state=tk.DISABLED, font=("Consolas", 9), wrap=tk.WORD
@@ -290,6 +294,13 @@ class AgentConfigApp(tk.Tk):
     def _log_op(self, msg: str) -> None:
         _append_log(self.log_box, msg)
 
+    def _on_tab_changed(self, _event=None) -> None:
+        idx = self.notebook.index(self.notebook.select())
+        if idx == 1:
+            self._refresh_agent_log(incremental=False)
+        elif idx == 2:
+            self._refresh_compare_view()
+
     def _schedule_poll(self) -> None:
         if self.var_auto_refresh.get():
             self._refresh_agent_log(incremental=True)
@@ -320,6 +331,8 @@ class AgentConfigApp(tk.Tk):
                 extra = _format_last_run()
                 _set_log_text(self.agent_log_box, text + extra)
                 self._agent_log_pos = size
+                n = len(text.splitlines()) if text else 0
+                self.lbl_run_status.configure(text=f"共 {n} 行 | 更新 {time.strftime('%H:%M:%S')}")
         except OSError as exc:
             if not incremental:
                 _set_log_text(self.agent_log_box, f"读取失败: {exc}")
@@ -420,15 +433,38 @@ class AgentConfigApp(tk.Tk):
 
         def job() -> None:
             env = {
+                **os.environ,
                 "XHS_CLOUD_API_URL": v["api_url"],
                 "XHS_LOCAL_AGENT_KEY": v["agent_key"],
                 "XHS_LOCAL_AGENT_FOREGROUND": "1",
+                "XHS_LOCAL_AGENT_LOG_DIR": str(LOG_DIR),
+                "XHS_LOCAL_AGENT_COMPARE_N": "9",
                 "PYTHONPATH": str(REPO_ROOT),
             }
-            code, out = _run_cmd([sys.executable, "tools/local_risk_agent.py", "compare"], env=env)
-            self._log_op(out or "(对比完成)")
+            self._log_op("对比开始（D→C→A，每模式 9 条，请切到「运行日志」查看）")
+            self.after(0, lambda: self.notebook.select(1))
+            proc = subprocess.Popen(
+                [sys.executable, "tools/local_risk_agent.py", "compare"],
+                cwd=str(REPO_ROOT),
+                env=env,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                bufsize=1,
+            )
+            assert proc.stdout is not None
+            for line in proc.stdout:
+                line = line.rstrip()
+                if line:
+                    self.after(0, lambda s=line: self._log_op(s))
+                self.after(0, lambda: self._refresh_agent_log(incremental=False))
+            code = proc.wait()
+            self.after(0, lambda: self._refresh_agent_log(incremental=False))
+            self.after(0, lambda: self._refresh_compare_view())
             if code != 0:
-                raise RuntimeError("对比测试失败")
+                raise RuntimeError(f"对比退出码 {code}")
 
         def on_ok() -> None:
             self._refresh_compare_view()

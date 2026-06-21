@@ -192,6 +192,8 @@ def scan_batch(
     concurrency = max(1, min(10, int(concurrency)))
     results: list[dict] = []
 
+    item_timeout = max(60, int(os.environ.get("XHS_LOCAL_AGENT_ITEM_TIMEOUT", "120")))
+
     if mode == MODE_MULTI_BROWSER:
         log(f"模式=A 多浏览器 并发={concurrency}")
         work = [(gid, crawler, cloud_root) for gid in work_ids]
@@ -203,11 +205,23 @@ def scan_batch(
             futs = {pool.submit(_worker_fetch_multi, w): w[0] for w in work}
             done = 0
             for fut in as_completed(futs):
-                results.append(fut.result())
+                gid = futs[fut]
+                try:
+                    row = fut.result(timeout=item_timeout)
+                except Exception as exc:
+                    row = {
+                        "goods_id": gid,
+                        "status": "fail",
+                        "sold": None,
+                        "message": str(exc)[:200],
+                        "engine": "playwright",
+                        "ms": 0,
+                        "detail": {},
+                    }
+                results.append(row)
                 done += 1
-                if done % max(1, len(work) // 10) == 0 or done == len(work):
-                    ok_so_far = sum(1 for r in results if r.get("status") == "ok")
-                    log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
+                ok_so_far = sum(1 for r in results if r.get("status") == "ok")
+                log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
 
     elif mode == MODE_SINGLE_BROWSER:
         log(f"模式=C 单浏览器多标签 并发={concurrency}")
@@ -216,11 +230,23 @@ def scan_batch(
             futs = {pool.submit(_fetch_single_tab, w): w[0] for w in work}
             done = 0
             for fut in as_completed(futs):
-                results.append(fut.result())
+                gid = futs[fut]
+                try:
+                    row = fut.result(timeout=item_timeout)
+                except Exception as exc:
+                    row = {
+                        "goods_id": gid,
+                        "status": "fail",
+                        "sold": None,
+                        "message": str(exc)[:200],
+                        "engine": "playwright",
+                        "ms": 0,
+                        "detail": {},
+                    }
+                results.append(row)
                 done += 1
-                if done % max(1, len(work) // 10) == 0 or done == len(work):
-                    ok_so_far = sum(1 for r in results if r.get("status") == "ok")
-                    log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
+                ok_so_far = sum(1 for r in results if r.get("status") == "ok")
+                log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
 
     elif mode == MODE_API_THEN_BROWSER:
         log(f"模式=D API优先+浏览器 并发={concurrency}")
@@ -229,11 +255,23 @@ def scan_batch(
             futs = {pool.submit(_fetch_api_then_browser, w): w[0] for w in work}
             done = 0
             for fut in as_completed(futs):
-                results.append(fut.result())
+                gid = futs[fut]
+                try:
+                    row = fut.result(timeout=item_timeout)
+                except Exception as exc:
+                    row = {
+                        "goods_id": gid,
+                        "status": "fail",
+                        "sold": None,
+                        "message": str(exc)[:200],
+                        "engine": "api",
+                        "ms": 0,
+                        "detail": {},
+                    }
+                results.append(row)
                 done += 1
-                if done % max(1, len(work) // 10) == 0 or done == len(work):
-                    ok_so_far = sum(1 for r in results if r.get("status") == "ok")
-                    log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
+                ok_so_far = sum(1 for r in results if r.get("status") == "ok")
+                log(f"采集进度 {done}/{len(work)} ok={ok_so_far}")
     else:
         raise ValueError(f"未知模式: {mode}")
 
@@ -271,9 +309,8 @@ def compare_modes(
 ) -> list[dict]:
     """同一批商品用多种模式各跑一遍（仅测试，不上传）。"""
     log = log_fn or (lambda _m: None)
-    modes = modes or [MODE_MULTI_BROWSER, MODE_SINGLE_BROWSER, MODE_API_THEN_BROWSER]
-    # 对比时每种模式用较小子集，避免三倍耗时
-    compare_n = max(3, min(len(items), int(os.environ.get("XHS_LOCAL_AGENT_COMPARE_N", "15"))))
+    modes = modes or [MODE_API_THEN_BROWSER, MODE_SINGLE_BROWSER, MODE_MULTI_BROWSER]
+    compare_n = max(3, min(len(items), int(os.environ.get("XHS_LOCAL_AGENT_COMPARE_N", "9"))))
     subset = items[:compare_n]
     log(f"对比测试: {compare_n} 条 × {len(modes)} 种模式")
 
