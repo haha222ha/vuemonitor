@@ -39,7 +39,7 @@ def run_generate(report_date: str = "", source: str = "auto") -> dict:
 
     gen = generate_daily_report(report_date=report_date, source=source)
     s = get_settings()
-    reg = pack_register_sync(gen["output_dir"], ARCHIVE_DAILY, s.xhs_report_archive_dir, sync_pg=True)
+    reg = pack_register_sync(gen["output_dir"], ARCHIVE_DAILY, s.xhs_report_archive_dir, sync_pg=False)
     return {**gen, **reg}
 
 

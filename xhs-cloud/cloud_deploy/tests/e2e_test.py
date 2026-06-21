@@ -166,6 +166,18 @@ def test_unit_logic() -> None:
     r_skip = sold_row_to_item({"goods_id": "g1", "sold_num": 100, "delta": 0}, None)
     assert_true(r_skip is None, "sold_row skip no baseline")
 
+    r_price = sold_row_to_item(
+        {"goods_id": "g1", "sold_num": 100, "delta": 12, "deal_price": 29.9, "title": "t"},
+        None,
+    )
+    assert_true(r_price and r_price[2] == 29.9, "sold_row deal_price")
+
+    from cloud_deploy.reporting.data_js_builder import build_report_payload
+
+    payload = build_report_payload([], "2026-06-21", pool_stats={"active_goods": 100, "total_goods": 200})
+    assert_true(payload.get("field_guide"), "field_guide in payload")
+    assert_true(payload["meta"].get("active_goods") == 100, "active_goods meta")
+
     # threshold boundary: v1d must be > 5 not >=
     border = list(item_ok)
     border[7] = 5.0

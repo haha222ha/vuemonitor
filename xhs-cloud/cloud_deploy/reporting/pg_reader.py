@@ -126,7 +126,7 @@ def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
     return [
         row.get("goods_id") or "",
         row.get("title") or "",
-        0.0,
+        _f(row.get("deal_price") or row.get("price")),
         sold,
         0.0,
         0.0,
@@ -139,7 +139,7 @@ def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
         0.0,
         0.0,
         row.get("pool") or "WATCH",
-        "",
+        str(row.get("first_tracked_at") or row.get("first_seen") or "")[:19],
         row.get("store_id") or "",
         row.get("store_name") or "",
         "",
@@ -153,6 +153,18 @@ def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
         "",
         0,
     ]
+
+
+def fetch_pool_stats(conn) -> dict:
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            "SELECT COUNT(*) FROM monitor_goods WHERE monitor_status IN ('active','idle')"
+        )
+        active = int(c.fetchone()[0] or 0)
+        c.execute("SELECT COUNT(*) FROM monitor_goods")
+        total = int(c.fetchone()[0] or 0)
+    return {"active_goods": active, "total_goods": total}
 
 
 def fetch_items_from_daily_table(conn, report_date: str) -> list:
@@ -176,12 +188,13 @@ def fetch_items_from_sold_daily(conn, report_date: str) -> list:
         c.execute(
             """
             SELECT m.goods_id, m.title, m.is_virtual, m.pool, m.store_id, m.store_name,
-                   sd.sold_num, sd.delta,
+                   m.first_tracked_at,
+                   sd.sold_num, sd.delta, sd.deal_price,
                    sp.sold_num AS prev_sold
             FROM monitor_goods m
             JOIN goods_sold_daily sd ON sd.goods_id = m.goods_id AND sd.snapshot_date = %s
             LEFT JOIN goods_sold_daily sp ON sp.goods_id = m.goods_id AND sp.snapshot_date = %s
-            WHERE m.monitor_status = 'active'
+            WHERE m.monitor_status IN ('active', 'idle')
             """,
             (report_date, prev),
         )

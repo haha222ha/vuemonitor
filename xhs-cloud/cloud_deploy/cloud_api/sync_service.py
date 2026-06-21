@@ -432,6 +432,8 @@ def record_cloud_scan(
     sold_num: int,
     data_source: str = "cloud_scan",
     snapshot_time: datetime | None = None,
+    deal_price: float | None = None,
+    detail: dict | None = None,
 ) -> dict:
     """云扫描单点写入 snapshots + 更新 monitor_goods + 当日 sold_daily。"""
     now = snapshot_time or datetime.now()
@@ -439,9 +441,39 @@ def record_cloud_scan(
     yesterday = (now.date() - timedelta(days=1)).isoformat()
     gid = str(goods_id)
     sold_num = int(sold_num)
+    detail = dict(detail or {})
+    price_val = deal_price
+    if price_val is None:
+        try:
+            price_val = float(
+                detail.get("deal_price")
+                or detail.get("product_price")
+                or 0
+            )
+        except (TypeError, ValueError):
+            price_val = 0.0
+    else:
+        try:
+            price_val = float(price_val)
+        except (TypeError, ValueError):
+            price_val = 0.0
 
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
+        if detail:
+            title = str(detail.get("product_name") or detail.get("title") or "")
+            store_id = str(detail.get("shop_id") or detail.get("store_id") or "")
+            store_name = str(detail.get("shop_name") or detail.get("store_name") or "")
+            if title or store_id or store_name:
+                c.execute(
+                    """UPDATE monitor_goods SET
+                           title=COALESCE(NULLIF(title,''), %s),
+                           store_id=COALESCE(NULLIF(store_id,''), %s),
+                           store_name=COALESCE(NULLIF(store_name,''), %s),
+                           updated_at=NOW()
+                       WHERE goods_id=%s""",
+                    (title, store_id, store_name, gid),
+                )
         c.execute(
             """INSERT INTO goods_sold_snapshots (goods_id, snapshot_time, sold_num, data_source)
                VALUES (%s,%s,%s,%s)
@@ -458,6 +490,7 @@ def record_cloud_scan(
         if existing:
             start_sold = int(existing[0] or 0) - int(existing[1] or 0)
             delta = max(0, sold_num - start_sold)
+            sold_base = start_sold
         else:
             c.execute(
                 """SELECT sold_num FROM goods_sold_daily
@@ -467,15 +500,19 @@ def record_cloud_scan(
             prev_row = c.fetchone()
             prev_sold = int(prev_row[0] or 0) if prev_row else 0
             delta = max(0, sold_num - prev_sold)
+            sold_base = prev_sold
+
+        gr_val = round(float(delta) / sold_base * 100, 4) if sold_base > 0 else 0.0
 
         c.execute(
-            """INSERT INTO goods_sold_daily (goods_id, snapshot_date, sold_num, delta, source)
-               VALUES (%s,%s,%s,%s,%s)
+            """INSERT INTO goods_sold_daily (goods_id, snapshot_date, sold_num, deal_price, delta, source)
+               VALUES (%s,%s,%s,%s,%s,%s)
                ON CONFLICT (goods_id, snapshot_date) DO UPDATE SET
                    sold_num=EXCLUDED.sold_num,
+                   deal_price=CASE WHEN EXCLUDED.deal_price > 0 THEN EXCLUDED.deal_price ELSE goods_sold_daily.deal_price END,
                    delta=EXCLUDED.delta,
                    source=EXCLUDED.source""",
-            (gid, today, sold_num, delta, data_source),
+            (gid, today, sold_num, price_val if price_val > 0 else None, delta, data_source),
         )
         c.execute(
             """UPDATE monitor_goods SET
@@ -488,10 +525,10 @@ def record_cloud_scan(
         )
         c.execute(
             """INSERT INTO goods_metrics_daily (goods_id, metric_date, v1d, actual_v1d, gr, burst, pool)
-               SELECT goods_id, %s, %s, %s, 0, 0, pool FROM monitor_goods WHERE goods_id=%s
+               SELECT goods_id, %s, %s, %s, %s, 0, pool FROM monitor_goods WHERE goods_id=%s
                ON CONFLICT (goods_id, metric_date) DO UPDATE SET
-                   v1d=EXCLUDED.v1d, actual_v1d=EXCLUDED.actual_v1d""",
-            (today, float(delta), float(delta), gid),
+                   v1d=EXCLUDED.v1d, actual_v1d=EXCLUDED.actual_v1d, gr=EXCLUDED.gr""",
+            (today, float(delta), float(delta), gr_val, gid),
         )
     conn.commit()
     return {"goods_id": gid, "sold_num": sold_num, "delta": delta, "snapshot_time": now.isoformat()}

@@ -57,6 +57,7 @@ def generate_daily_report(
         dedup_by_title,
         fetch_items_from_daily_table,
         fetch_items_from_sold_daily,
+        fetch_pool_stats,
         passes_threshold,
     )
 
@@ -67,14 +68,16 @@ def generate_daily_report(
     report_date = report_date or datetime.now().strftime("%Y-%m-%d")
     init_db()
     conn = _conn()
+    pool_stats = {}
     try:
+        pool_stats = fetch_pool_stats(conn)
         items = []
-        if source in ("auto", "sold_daily"):
-            items = fetch_items_from_sold_daily(conn, report_date)
-            _log(f"sold_daily: {len(items)} 行")
-        if (not items and source in ("auto", "pg_items")) or source == "pg_items":
+        if source in ("auto", "pg_items"):
             items = fetch_items_from_daily_table(conn, report_date)
             _log(f"pg_items: {len(items)} 行")
+        if (not items and source in ("auto", "sold_daily")) or source == "sold_daily":
+            items = fetch_items_from_sold_daily(conn, report_date)
+            _log(f"sold_daily: {len(items)} 行")
     finally:
         conn.close()
 
@@ -94,6 +97,7 @@ def generate_daily_report(
         min_v1d_virtual=min_v1d_virtual,
         min_actual_virtual=min_actual_virtual,
         source="cloud_gen_report",
+        pool_stats=pool_stats,
     )
     payload["meta"]["count_raw"] = raw
     write_report_dir(out_dir, payload, _html_template())

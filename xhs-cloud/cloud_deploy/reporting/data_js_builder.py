@@ -6,7 +6,7 @@ import json
 import os
 import shutil
 from collections import Counter
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from cloud_deploy.reporting.constants import (
@@ -14,6 +14,7 @@ from cloud_deploy.reporting.constants import (
     DEFAULT_MIN_ACTUAL_VIRTUAL,
     DEFAULT_MIN_V1D,
     DEFAULT_MIN_V1D_VIRTUAL,
+    FIELD_GUIDE,
     REPORT_COLUMNS,
     REPORT_DISCLAIMER,
 )
@@ -45,8 +46,14 @@ def build_report_payload(
     source: str = "cloud_gen_report",
     period_start: str = "",
     period_end: str = "",
+    pool_stats: dict | None = None,
 ) -> dict[str, Any]:
     now = datetime.now()
+    pool_stats = pool_stats or {}
+    try:
+        yesterday_date = (date.fromisoformat(report_date) - timedelta(days=1)).isoformat()
+    except ValueError:
+        yesterday_date = ""
     agg = _agg(items)
     prices = sorted([item[2] for item in items if item[2] > 0])
     median_price = round(prices[len(prices) // 2], 1) if prices else 0
@@ -101,6 +108,10 @@ def build_report_payload(
         "pool_watch": agg["pool_map"].get("WATCH", 0),
         "pool_accel": agg["pool_map"].get("ACCEL", 0),
         "pool_burst": agg["pool_map"].get("BURST", 0),
+        "active_goods": int(pool_stats.get("active_goods") or 0),
+        "total_goods": int(pool_stats.get("total_goods") or 0),
+        "yesterday_date": yesterday_date,
+        "method": "cloud_pg",
     }
     return {
         "meta": meta,
@@ -109,6 +120,7 @@ def build_report_payload(
         "charts": charts,
         "top_keywords": top_keywords,
         "top_stores": top_stores,
+        "field_guide": FIELD_GUIDE,
     }
 
 

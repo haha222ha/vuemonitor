@@ -48,6 +48,8 @@ def _normalize_for_sync(raw, goods_id, engine):
         out = dict(raw)
         out["goods_id"] = goods_id
         out["data_source"] = out.get("data_source") or f"web_full_{engine}"
+        if not out.get("deal_price") and out.get("product_price"):
+            out["deal_price"] = out["product_price"]
         return out
     sales = raw.get("product_sales")
     if sales is None:
@@ -60,6 +62,8 @@ def _normalize_for_sync(raw, goods_id, engine):
         "fans_count": int(raw.get("store_followers") or raw.get("fans_count") or 0),
         "shop_total_sales": int(raw.get("store_sales") or raw.get("shop_total_sales") or 0),
         "product_name": str(raw.get("product_name") or raw.get("title") or ""),
+        "product_price": float(raw.get("product_price") or raw.get("deal_price") or 0),
+        "deal_price": float(raw.get("product_price") or raw.get("deal_price") or 0),
         "shop_score": str(raw.get("shop_score") or ""),
         "ship_from": str(raw.get("shipping_from") or raw.get("ship_from") or ""),
         "category_tag": str(raw.get("category_tag") or ""),

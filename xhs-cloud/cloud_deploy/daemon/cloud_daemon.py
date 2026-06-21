@@ -142,6 +142,13 @@ class CloudMonitorDaemon:
         meta = dict(meta or {})
         if status == "ok" and detail:
             sold = int(detail.get("real_sales") or detail.get("product_sales") or 0)
+            meta["detail"] = detail
+            try:
+                meta["deal_price"] = float(
+                    detail.get("deal_price") or detail.get("product_price") or 0
+                )
+            except (TypeError, ValueError):
+                meta["deal_price"] = 0.0
             return goods, "ok", sold, meta
         if status == "frozen":
             return goods, "frozen", None, meta
@@ -168,7 +175,14 @@ class CloudMonitorDaemon:
         try:
             if status == "ok" and sold is not None:
                 ds = f"cloud_{engine}" if engine else "cloud_scan"
-                record_cloud_scan(conn, goods_id, sold, data_source=ds)
+                record_cloud_scan(
+                    conn,
+                    goods_id,
+                    sold,
+                    data_source=ds,
+                    deal_price=meta.get("deal_price"),
+                    detail=meta.get("detail"),
+                )
                 mark_scan_result(conn, goods_id, "ok", engine=engine)
                 evaluate_rules(conn, goods_id)
             elif status == "frozen":
