@@ -194,6 +194,9 @@ def _pick_first_seen(row: dict) -> str:
             return s[:19]
     ft = row.get("first_tracked_at")
     return str(ft)[:19] if ft else ""
+
+
+def _pick_int(*vals: Any) -> int:
     for v in vals:
         n = _i(v, 0)
         if n > 0:
