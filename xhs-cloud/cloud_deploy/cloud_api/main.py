@@ -17,7 +17,13 @@ from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import BaseModel, Field
 
 from cloud_deploy.cloud_api import database as db
-from cloud_deploy.cloud_api.auth import current_member, create_token, login_member, verify_sync_key
+from cloud_deploy.cloud_api.auth import (
+    current_member,
+    create_token,
+    login_member,
+    verify_agent_access,
+    verify_sync_key,
+)
 from cloud_deploy.cloud_api.config import get_settings
 
 _ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
@@ -71,6 +77,72 @@ class SoldSnapshotsSyncBody(BaseModel):
     batch_id: str = ""
     rows: list[dict]
     final_batch: bool = False
+
+
+class AgentScanRow(BaseModel):
+    goods_id: str
+    status: str
+    sold: int | None = None
+    engine: str = "playwright"
+    message: str = ""
+    ms: int = 0
+    deal_price: float | None = None
+    detail: dict = Field(default_factory=dict)
+
+
+class AgentScanUploadBody(BaseModel):
+    batch_id: str = ""
+    agent_id: str = ""
+    scan_date: str = ""
+    rows: list[AgentScanRow] = Field(default_factory=list)
+
+
+@app.get("/api/v1/agent/risk-worklist")
+def agent_risk_worklist(
+    limit: int = 100,
+    scan_date: str = "",
+    _: None = Depends(verify_agent_access),
+):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from datetime import date
+
+    from cloud_deploy.cloud_api.agent_service import list_risk_worklist
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+
+    limit = max(1, min(int(limit), 500))
+    day = (scan_date or date.today().isoformat())[:10]
+    init_db()
+    conn = _conn()
+    try:
+        return list_risk_worklist(conn, day, limit)
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/agent/scan-results")
+def agent_scan_results(body: AgentScanUploadBody, _: None = Depends(verify_agent_access)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    if not body.rows:
+        raise HTTPException(status_code=400, detail="rows 为空")
+    if len(body.rows) > 500:
+        raise HTTPException(status_code=400, detail="单批最多 500 条")
+    from cloud_deploy.cloud_api.agent_service import apply_local_scan_batch
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+
+    init_db()
+    conn = _conn()
+    try:
+        payload = [r.model_dump() for r in body.rows]
+        return apply_local_scan_batch(
+            conn,
+            payload,
+            agent_id=body.agent_id,
+            batch_id=body.batch_id,
+        )
+    finally:
+        conn.close()
 
 
 @app.get("/", response_class=HTMLResponse)

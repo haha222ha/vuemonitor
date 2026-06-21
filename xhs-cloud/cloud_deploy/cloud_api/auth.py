@@ -68,6 +68,35 @@ def verify_sync_key(x_sync_key: str | None = Header(default=None, alias="X-Sync-
         raise HTTPException(status_code=401, detail="Sync Key 无效")
 
 
+def _client_ip(request: Request) -> str:
+    forwarded = (request.headers.get("X-Forwarded-For") or "").split(",")[0].strip()
+    if forwarded:
+        return forwarded
+    if request.client:
+        return request.client.host or ""
+    return ""
+
+
+def verify_agent_access(
+    request: Request,
+    x_agent_key: str | None = Header(default=None, alias="X-Agent-Key"),
+) -> None:
+    """本地采集 Agent 专用鉴权（与会员 Sync Key 分离，可配 IP 白名单）。"""
+    s = get_settings()
+    expected = (s.xhs_local_agent_key or s.xhs_cloud_sync_key or "").strip()
+    if not expected:
+        raise HTTPException(status_code=503, detail="未配置 XHS_LOCAL_AGENT_KEY")
+    if not x_agent_key or not hmac.compare_digest(x_agent_key, expected):
+        raise HTTPException(status_code=401, detail="Agent Key 无效")
+    allowlist = (s.xhs_agent_ip_allowlist or "").strip()
+    if not allowlist:
+        return
+    ip = _client_ip(request)
+    allowed = {x.strip() for x in allowlist.split(",") if x.strip()}
+    if ip not in allowed:
+        raise HTTPException(status_code=403, detail="IP 未授权")
+
+
 def current_member(
     cred: HTTPAuthorizationCredentials | None = Depends(security),
 ) -> dict:

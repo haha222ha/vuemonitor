@@ -21,6 +21,8 @@ class Settings:
     xhs_cloud_jwt_ttl_days: int = 30
     xhs_database_url: str = ""
     xhs_db_path: str = ""
+    xhs_local_agent_key: str = ""
+    xhs_agent_ip_allowlist: str = ""
 
 
 def get_settings() -> Settings:
@@ -45,4 +47,6 @@ def get_settings() -> Settings:
         xhs_cloud_jwt_ttl_days=int(os.environ.get("XHS_CLOUD_JWT_TTL_DAYS", "30")),
         xhs_database_url=os.environ.get("XHS_DATABASE_URL", ""),
         xhs_db_path=os.environ.get("XHS_DB_PATH", ""),
+        xhs_local_agent_key=os.environ.get("XHS_LOCAL_AGENT_KEY", ""),
+        xhs_agent_ip_allowlist=os.environ.get("XHS_AGENT_IP_ALLOWLIST", ""),
     )
