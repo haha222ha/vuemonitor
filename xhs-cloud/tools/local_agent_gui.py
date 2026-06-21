@@ -44,11 +44,12 @@ def _load_env() -> dict[str, str]:
         "XHS_CLOUD_API_URL": "https://monitor.xhs365.cn",
         "XHS_LOCAL_AGENT_KEY": "",
         "XHS_LOCAL_AGENT_ID": os.environ.get("COMPUTERNAME", "home-pc"),
-        "XHS_LOCAL_AGENT_BATCH": "80",
-        "XHS_LOCAL_AGENT_CONCURRENCY": "5",
-        "XHS_LOCAL_AGENT_MODE": "api_then_browser",
+        "XHS_LOCAL_AGENT_BATCH": "800",
+        "XHS_LOCAL_AGENT_CONCURRENCY": "10",
+        "XHS_LOCAL_AGENT_MODE": "api_only",
         "XHS_LOCAL_AGENT_IDLE_SEC": "300",
         "XHS_LOCAL_AGENT_COOLDOWN_SEC": "15",
+        "XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC": "3600",
     }
     if ENV_FILE.is_file():
         for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
@@ -71,6 +72,7 @@ def _save_env(values: dict[str, str]) -> None:
         f"XHS_LOCAL_AGENT_MODE={values['mode']}",
         f"XHS_LOCAL_AGENT_IDLE_SEC={values['idle_sec']}",
         f"XHS_LOCAL_AGENT_COOLDOWN_SEC={values['cooldown_sec']}",
+        f"XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC={values['cycle_cooldown_sec']}",
     ]
     ENV_FILE.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -89,9 +91,9 @@ def _read_tail(path: Path, max_lines: int = 200) -> str:
 
 def _format_compare_report(rows: list) -> str:
     if not rows:
-        return "（暂无对比数据，请先点「三模式对比」）"
+        return "（暂无对比数据，请先点「模式对比」）"
     lines = [
-        "三模式对比报告",
+        "采集模式对比报告",
         "=" * 72,
         f"{'模式':<22} {'成功':>6} {'成功率':>8} {'耗时s':>8} {'均耗ms':>8}  引擎分布",
         "-" * 72,
@@ -227,11 +229,14 @@ class AgentConfigApp(tk.Tk):
         self.var_api = tk.StringVar(value=saved.get("XHS_CLOUD_API_URL", "https://monitor.xhs365.cn"))
         self.var_key = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_KEY", ""))
         self.var_agent_id = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_ID", "home-pc"))
-        self.var_batch = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_BATCH", "80"))
-        self.var_concurrency = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_CONCURRENCY", "5"))
-        self.var_mode = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_MODE", "api_then_browser"))
+        self.var_batch = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_BATCH", "800"))
+        self.var_concurrency = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_CONCURRENCY", "10"))
+        self.var_mode = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_MODE", "api_only"))
         self.var_idle = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_IDLE_SEC", "300"))
         self.var_cooldown = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_COOLDOWN_SEC", "15"))
+        self.var_cycle_cooldown = tk.StringVar(
+            value=saved.get("XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC", "3600")
+        )
         self.var_show_key = tk.BooleanVar(value=False)
         self.var_auto_refresh = tk.BooleanVar(value=True)
         self._agent_log_pos = 0
@@ -283,9 +288,18 @@ class AgentConfigApp(tk.Tk):
             textvariable=self.var_mode,
             width=18,
             state="readonly",
-            values=["multi_browser", "single_browser", "api_then_browser"],
+            values=["api_only", "multi_browser", "single_browser", "api_then_browser"],
         ).grid(row=0, column=5, padx=4)
-        ttk.Label(opt, text="A多浏览器 C单浏览器 D API优先", foreground="#666").grid(row=1, column=0, columnspan=6, sticky=tk.W, padx=4)
+        ttk.Label(opt, text="E仅API(推荐) A多浏览器 C单浏览器 D API+浏览器", foreground="#666").grid(row=1, column=0, columnspan=6, sticky=tk.W, padx=4)
+        ttk.Label(opt, text="批间冷却s").grid(row=2, column=0, padx=4, pady=2)
+        ttk.Entry(opt, textvariable=self.var_cooldown, width=6).grid(row=2, column=1, padx=4, pady=2)
+        ttk.Label(opt, text="整轮冷却s").grid(row=2, column=2, padx=4, pady=2)
+        ttk.Entry(opt, textvariable=self.var_cycle_cooldown, width=6).grid(row=2, column=3, padx=4, pady=2)
+        ttk.Label(opt, text="无工单s").grid(row=2, column=4, padx=4, pady=2)
+        ttk.Entry(opt, textvariable=self.var_idle, width=6).grid(row=2, column=5, padx=4, pady=2)
+        ttk.Label(opt, text="整轮=扫完当日 risk 池后休眠(默认3600=1h)", foreground="#666").grid(
+            row=3, column=0, columnspan=6, sticky=tk.W, padx=4
+        )
 
         btns = ttk.Frame(parent)
         btns.pack(fill=tk.X, pady=(0, 6))
@@ -293,7 +307,7 @@ class AgentConfigApp(tk.Tk):
             ("①测试连接", self.on_test),
             ("②安装浏览器", self.on_install_browser),
             ("③保存并自启", self.on_install),
-            ("三模式对比", self.on_compare),
+            ("模式对比", self.on_compare),
         ]:
             ttk.Button(btns, text=text, command=cmd).pack(side=tk.LEFT, padx=3)
         tk.Button(
@@ -340,7 +354,7 @@ class AgentConfigApp(tk.Tk):
         bar.pack(fill=tk.X, pady=(0, 4))
         ttk.Label(bar, text=f"文件: {COMPARE_JSON}").pack(side=tk.LEFT)
         ttk.Button(bar, text="刷新报告", command=self._refresh_compare_view).pack(side=tk.LEFT, padx=8)
-        ttk.Button(bar, text="运行三模式对比", command=self.on_compare).pack(side=tk.LEFT, padx=4)
+        ttk.Button(bar, text="运行模式对比", command=self.on_compare).pack(side=tk.LEFT, padx=4)
 
         self.compare_box = scrolledtext.ScrolledText(
             parent, height=28, state=tk.DISABLED, font=("Consolas", 9), wrap=tk.WORD
@@ -355,11 +369,12 @@ class AgentConfigApp(tk.Tk):
             "api_url": self.var_api.get().strip(),
             "agent_key": self.var_key.get().strip(),
             "agent_id": self.var_agent_id.get().strip() or "home-pc",
-            "batch": self.var_batch.get().strip() or "80",
-            "concurrency": self.var_concurrency.get().strip() or "5",
-            "mode": self.var_mode.get().strip() or "multi_browser",
+            "batch": self.var_batch.get().strip() or "800",
+            "concurrency": self.var_concurrency.get().strip() or "10",
+            "mode": self.var_mode.get().strip() or "api_only",
             "idle_sec": self.var_idle.get().strip() or "300",
             "cooldown_sec": self.var_cooldown.get().strip() or "15",
+            "cycle_cooldown_sec": self.var_cycle_cooldown.get().strip() or "3600",
         }
 
     def _log_op(self, msg: str) -> None:
@@ -546,7 +561,7 @@ class AgentConfigApp(tk.Tk):
             self.notebook.select(2)
             messagebox.showinfo("完成", "对比报告已更新，见「模式对比报告」页")
 
-        self._worker("三模式对比", job, on_ok=on_ok)
+        self._worker("模式对比", job, on_ok=on_ok)
 
     def on_stop(self) -> None:
         if not messagebox.askyesno(

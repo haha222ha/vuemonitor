@@ -111,7 +111,7 @@ def agent_risk_worklist(
     from cloud_deploy.cloud_api.agent_service import list_risk_worklist
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
 
-    limit = max(1, min(int(limit), 500))
+    limit = max(1, min(int(limit), 1000))
     day = (scan_date or date.today().isoformat())[:10]
     init_db()
     conn = _conn()
