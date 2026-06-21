@@ -168,6 +168,7 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
         metrics_rows.append((gid, report_date, v1d, actual_v1d, row[11], row[15], row[16]))
 
         if qualifies_monitor_pool(item, col_map):
+            fs = _field(item, "first_seen", col_map=col_map) or None
             monitor_rows.append(
                 (
                     gid,
@@ -181,6 +182,7 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
                     row[18],
                     row[19],
                     max(v1d, actual_v1d),
+                    fs,
                 )
             )
 
@@ -270,7 +272,7 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
                 """INSERT INTO monitor_goods (
                        goods_id, title, is_virtual, pool, last_v1d, last_actual_v1d,
                        last_sold, last_report_date, store_id, store_name, peak_v1d,
-                       monitor_status, first_tracked_at, source, updated_at
+                       monitor_status, first_tracked_at, first_seen, source, updated_at
                    ) VALUES %s
                    ON CONFLICT (goods_id) DO UPDATE SET
                        title=EXCLUDED.title,
@@ -283,13 +285,14 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
                        store_id=EXCLUDED.store_id,
                        store_name=EXCLUDED.store_name,
                        peak_v1d=GREATEST(monitor_goods.peak_v1d, EXCLUDED.peak_v1d),
+                       first_seen=COALESCE(monitor_goods.first_seen, EXCLUDED.first_seen),
                        monitor_status=CASE
                            WHEN monitor_goods.monitor_status='delisted' THEN 'delisted'
                            WHEN EXCLUDED.last_v1d > 0 OR EXCLUDED.last_actual_v1d > 0 THEN 'active'
                            ELSE monitor_goods.monitor_status END,
                        updated_at=NOW()""",
                 monitor_rows,
-                template="(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'active',NOW(),'daily_report',NOW())",
+                template="(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'active',NOW(),%s,'daily_report',NOW())",
                 page_size=500,
             )
 

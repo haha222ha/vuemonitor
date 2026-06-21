@@ -183,7 +183,17 @@ def _pick_str(*vals: Any) -> str:
     return ""
 
 
-def _pick_int(*vals: Any) -> int:
+def _pick_first_seen(row: dict) -> str:
+    """真实首次发现：优先历史 report / monitor_goods.first_seen，勿用入云时间 first_tracked_at。"""
+    for key in ("mg_first_seen", "rdi_first_seen_min", "rdi_first_seen"):
+        v = row.get(key)
+        if v is None or v == "":
+            continue
+        s = str(v).strip()
+        if len(s) >= 10:
+            return s[:19]
+    ft = row.get("first_tracked_at")
+    return str(ft)[:19] if ft else ""
     for v in vals:
         n = _i(v, 0)
         if n > 0:
@@ -257,7 +267,7 @@ def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
         vsr=vsr,
         burst=_f(row.get("rdi_burst")),
         pool=pool,
-        first_seen=str(row.get("first_tracked_at") or row.get("rdi_first_seen") or "")[:19],
+        first_seen=_pick_first_seen(row),
         store_id=store_id,
         store_name=store_name,
         shop_sales=shop_sales,
@@ -306,6 +316,17 @@ def _monitor_goods_has_shop_cols(conn) -> bool:
         return c.fetchone() is not None
 
 
+def _monitor_goods_has_first_seen(conn) -> bool:
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            """SELECT 1 FROM information_schema.columns
+               WHERE table_schema='xhs_monitor' AND table_name='monitor_goods'
+                 AND column_name='first_seen' LIMIT 1"""
+        )
+        return c.fetchone() is not None
+
+
 def fetch_items_from_sold_daily(conn, report_date: str) -> list:
     d = date.fromisoformat(report_date)
     prev = (d - timedelta(days=1)).isoformat()
@@ -314,13 +335,22 @@ def fetch_items_from_sold_daily(conn, report_date: str) -> list:
         if _monitor_goods_has_shop_cols(conn)
         else "NULL::int AS mg_shop_sales, NULL::int AS mg_shop_fans,"
     )
+    mg_fs = (
+        "m.first_seen AS mg_first_seen,"
+        if _monitor_goods_has_first_seen(conn)
+        else "NULL::timestamptz AS mg_first_seen,"
+    )
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
         c.execute(
             f"""
             SELECT m.goods_id, m.title, m.is_virtual, m.pool, m.store_id, m.store_name,
                    m.first_tracked_at,
+                   {mg_fs}
                    {mg_shop}
+                   (SELECT MIN(r.first_seen)
+                    FROM report_daily_items r
+                    WHERE r.goods_id = m.goods_id AND r.first_seen IS NOT NULL) AS rdi_first_seen_min,
                    sd.sold_num, sd.delta, sd.deal_price,
                    sp.sold_num AS prev_sold,
                    gm.actual_v1d AS gm_actual_v1d, gm.v1d AS gm_v1d, gm.gr AS gm_gr,
