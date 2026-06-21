@@ -19,15 +19,11 @@ def _log(msg: str) -> None:
     print(f"[period-report] {msg}", flush=True)
 
 
-def _html_template() -> str:
-    for p in (
-        os.environ.get("XHS_HTML_TEMPLATE", ""),
-        os.path.join(CLOUD_ROOT, "cloud_deploy", "assets", "index_with_gr.html"),
-        r"C:\Users\Administrator\Desktop\每日选品全量数据\index_with_gr.html",
-    ):
-        if p and os.path.isfile(p):
-            return p
-    return ""
+def _report_assets_dir() -> str:
+    custom = os.environ.get("XHS_REPORT_ASSETS_DIR", "").strip()
+    if custom and os.path.isdir(custom):
+        return custom
+    return os.path.join(CLOUD_ROOT, "cloud_deploy", "assets")
 
 
 def _week_range(end: date | None = None) -> tuple[str, str]:
@@ -98,7 +94,7 @@ def generate_period_report(scope: str, end_date: str = "") -> dict:
         period_start=start,
         period_end=end_s,
     )
-    write_report_dir(out_dir, payload, _html_template())
+    write_report_dir(out_dir, payload, _report_assets_dir())
     _log(f"{label} → {out_dir} ({len(items)} 条)")
 
     from cloud_deploy.scripts.pipeline_common import pack_register_sync

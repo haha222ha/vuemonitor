@@ -17,6 +17,7 @@ from cloud_deploy.reporting.constants import (
     FIELD_GUIDE,
     REPORT_COLUMNS,
     REPORT_DISCLAIMER,
+    item_at,
 )
 from cloud_deploy.reporting.report_charts import build_charts_and_tops
 
@@ -25,11 +26,11 @@ def _agg(items: list) -> dict:
     physical = virtual = 0
     pool_map: Counter = Counter()
     for item in items:
-        if item[24] == 1:
+        if item_at(item, "is_virtual") == 1:
             virtual += 1
-        elif item[24] == 0:
+        elif item_at(item, "is_virtual") == 0:
             physical += 1
-        pool_map[item[14] or "WATCH"] += 1
+        pool_map[item_at(item, "pool", "WATCH") or "WATCH"] += 1
     return {"physical_v1d": physical, "virtual_v1d": virtual, "pool_map": dict(pool_map)}
 
 
@@ -55,19 +56,19 @@ def build_report_payload(
     except ValueError:
         yesterday_date = ""
     agg = _agg(items)
-    prices = sorted([item[2] for item in items if item[2] > 0])
+    prices = sorted([float(item_at(item, "price", 0) or 0) for item in items if float(item_at(item, "price", 0) or 0) > 0])
     median_price = round(prices[len(prices) // 2], 1) if prices else 0
     avg_price = round(sum(prices) / len(prices), 1) if prices else 0
-    avg_v1d = round(sum(item[7] for item in items) / len(items), 1) if items else 0
-    actual_values = [item[6] for item in items if item[6] > 0]
+    avg_v1d = round(sum(float(item_at(item, "v1d", 0) or 0) for item in items) / len(items), 1) if items else 0
+    actual_values = [float(item_at(item, "actual_v1d", 0) or 0) for item in items if float(item_at(item, "actual_v1d", 0) or 0) > 0]
     avg_actual_v1d = round(sum(actual_values) / len(actual_values), 1) if actual_values else 0
-    gr_values = [item[8] for item in items if item[8] > 0]
+    gr_values = [float(item_at(item, "actual_gr", 0) or 0) for item in items if float(item_at(item, "actual_gr", 0) or 0) > 0]
     avg_actual_gr = round(sum(gr_values) / len(gr_values), 2) if gr_values else 0
-    vsr_values = [item[10] for item in items if item[10] > 0]
+    vsr_values = [float(item_at(item, "actual_vsr", 0) or 0) for item in items if float(item_at(item, "actual_vsr", 0) or 0) > 0]
     avg_actual_vsr = round(sum(vsr_values) / len(vsr_values), 4) if vsr_values else 0
-    vsr_est_values = [item[11] for item in items if item[11] > 0]
+    vsr_est_values = [float(item_at(item, "vsr", 0) or 0) for item in items if float(item_at(item, "vsr", 0) or 0) > 0]
     avg_vsr = round(sum(vsr_est_values) / len(vsr_est_values), 4) if vsr_est_values else 0
-    anomaly_count = sum(1 for item in items if len(item) > 27 and int(item[27] or 0) == 1)
+    anomaly_count = sum(1 for item in items if int(item_at(item, "anomaly", 0) or 0) == 1)
     charts, top_keywords, top_stores = build_charts_and_tops(items)
 
     filter_label = scope_label or (
@@ -100,7 +101,7 @@ def build_report_payload(
         "avg_actual_vsr": avg_actual_vsr,
         "anomaly_count": anomaly_count,
         "metric_mode": "cloud_pg",
-        "metric_note": "云端 PG 生成：真实增量主要来自 goods_sold_daily 日差或 report_daily_items",
+        "metric_note": "云端 PG 数据源；列与 snapshot_phase1 对齐；真实增量优先",
         "deduped": True,
         "source": source,
         "disclaimer": REPORT_DISCLAIMER,
@@ -124,24 +125,44 @@ def build_report_payload(
     }
 
 
+REPORT_BUNDLE_FILES = (
+    "index_with_gr.html",
+    "index_vue.html",
+    "gen_report.py",
+)
+
+
+def resolve_report_assets_dir() -> str:
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "assets"))
+
+
 def write_report_dir(
     output_dir: str,
     payload: dict,
-    html_template: str,
+    assets_dir: str = "",
 ) -> str:
+    assets_dir = assets_dir or resolve_report_assets_dir()
     os.makedirs(output_dir, exist_ok=True)
     js_path = os.path.join(output_dir, "data.js")
     with open(js_path, "w", encoding="utf-8") as f:
         f.write("var REPORT_DATA = " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
         f.write(";\n")
 
-    html_dst = os.path.join(output_dir, "index_with_gr.html")
-    if html_template and os.path.isfile(html_template):
-        shutil.copy2(html_template, html_dst)
-    elif not os.path.isfile(html_dst):
-        with open(html_dst, "w", encoding="utf-8") as f:
+    copied = []
+    missing = []
+    for name in REPORT_BUNDLE_FILES:
+        src = os.path.join(assets_dir, name)
+        dst = os.path.join(output_dir, name)
+        if os.path.isfile(src):
+            shutil.copy2(src, dst)
+            copied.append(name)
+        else:
+            missing.append(name)
+
+    if "index_with_gr.html" in missing and not os.path.isfile(os.path.join(output_dir, "index_with_gr.html")):
+        with open(os.path.join(output_dir, "index_with_gr.html"), "w", encoding="utf-8") as f:
             f.write("<!DOCTYPE html><html><head><meta charset=utf-8><title>选品报告</title></head>"
-                    "<body><p>请配置 XHS_HTML_TEMPLATE 指向 index_with_gr.html</p>"
+                    "<body><p>请配置报告模板目录（cloud_deploy/assets）</p>"
                     "<script src=data.js></script></body></html>")
 
     readme = os.path.join(output_dir, "README.txt")
@@ -149,6 +170,7 @@ def write_report_dir(
         f.write(
             payload["meta"].get("disclaimer", "")
             + "\n解压后请右键 index_with_gr.html，选择「打开方式」→ Google Chrome 打开\n"
+            + f"报告包文件: data.js, {', '.join(REPORT_BUNDLE_FILES)}\n"
         )
     return output_dir
 

@@ -27,15 +27,11 @@ def _log(msg: str) -> None:
     print(f"[cloud-gen-report] {msg}", flush=True)
 
 
-def _html_template() -> str:
-    for p in (
-        os.environ.get("XHS_HTML_TEMPLATE", ""),
-        os.path.join(CLOUD_ROOT, "cloud_deploy", "assets", "index_with_gr.html"),
-        r"C:\Users\Administrator\Desktop\每日选品全量数据\index_with_gr.html",
-    ):
-        if p and os.path.isfile(p):
-            return p
-    return ""
+def _report_assets_dir() -> str:
+    custom = os.environ.get("XHS_REPORT_ASSETS_DIR", "").strip()
+    if custom and os.path.isdir(custom):
+        return custom
+    return os.path.join(CLOUD_ROOT, "cloud_deploy", "assets")
 
 
 def generate_daily_report(
@@ -100,8 +96,8 @@ def generate_daily_report(
         pool_stats=pool_stats,
     )
     payload["meta"]["count_raw"] = raw
-    write_report_dir(out_dir, payload, _html_template())
-    _log(f"输出: {out_dir} items={len(items)} (raw={raw})")
+    write_report_dir(out_dir, payload, _report_assets_dir())
+    _log(f"输出: {out_dir} items={len(items)} (raw={raw}) bundle=data.js+index_with_gr.html+index_vue.html+gen_report.py")
     return {"report_date": report_date, "output_dir": out_dir, "count": len(items), "raw": raw}
 
 

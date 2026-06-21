@@ -141,8 +141,12 @@ def test_unit_logic() -> None:
     from cloud_deploy.reporting.constants import DEFAULT_MIN_V1D, DEFAULT_MIN_ACTUAL
 
     item_ok = [
-        "g1", "标题A", 10.0, 100, 0, 0, 6.0, 7.0, 0, 0, 0, 0, 0, 0,
-        "WATCH", "", "", "", "", 0, 0, 0.0, 0.0, "", 0, 24.0, "", 0,
+        "g1", "标题A", 10.0, 100,
+        6.0, 7.0,
+        0.0, 0.0, 0.0,
+        0.0, "WATCH", "", "", "",
+        0, 0, None, None, "",
+        0, 0,
     ]
     assert_true(passes_threshold(item_ok), "passes_threshold normal item")
     item_dirty = list(item_ok)
@@ -158,10 +162,10 @@ def test_unit_logic() -> None:
     assert_true(len(dup2) == 1, "dedup drops empty title like gen_report")
 
     r_delta = sold_row_to_item({"goods_id": "g1", "sold_num": 100, "delta": 12}, None)
-    assert_true(r_delta and r_delta[6] == 12.0, "sold_row delta fallback")
+    assert_true(r_delta and r_delta[4] == 12.0, "sold_row delta fallback")
 
     r_prev = sold_row_to_item({"goods_id": "g1", "sold_num": 100, "delta": 0}, 88)
-    assert_true(r_prev and r_prev[6] == 12.0, "sold_row prev day diff")
+    assert_true(r_prev and r_prev[4] == 12.0, "sold_row prev day diff")
 
     r_skip = sold_row_to_item({"goods_id": "g1", "sold_num": 100, "delta": 0}, None)
     assert_true(r_skip is None, "sold_row skip no baseline")
@@ -180,10 +184,10 @@ def test_unit_logic() -> None:
 
     # threshold boundary: v1d must be > 5 not >=
     border = list(item_ok)
-    border[7] = 5.0
-    border[6] = 4.0
+    border[5] = 5.0
+    border[4] = 4.0
     assert_true(not passes_threshold(border), "v1d=5 not pass (need >5)")
-    border[6] = 5.0
+    border[4] = 5.0
     assert_true(passes_threshold(border), "actual>=5 pass")
 
 
@@ -331,7 +335,7 @@ def test_pg_reader(work: Path) -> None:
     conn = _conn()
     try:
         item_none = sold_row_to_item({"sold_num": 100, "delta": 8, "goods_id": "x"}, None)
-        assert_true(item_none is not None and item_none[6] == 8.0, "sold_row uses delta when no prev")
+        assert_true(item_none is not None and item_none[4] == 8.0, "sold_row uses delta when no prev")
 
         item_bad = sold_row_to_item({"sold_num": 100, "delta": 0, "goods_id": "x"}, None)
         assert_true(item_bad is None, "sold_row skip when no prev and delta=0")

@@ -146,7 +146,13 @@ td.na{color:#6e7681}
 .adv-toggle:hover{border-color:#58a6ff}
 .adv-panel{display:none;background:#161b22;border:1px solid #30363d;border-radius:8px;padding:14px;margin-bottom:12px}
 .adv-panel.open{display:block}
-.adv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:12px}
+.adv-hint{font-size:11px;color:#8b949e;margin:0 0 12px;line-height:1.5}
+.adv-section{margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #21262d}
+.adv-section:last-of-type{border-bottom:none}
+.adv-section-title{font-size:12px;color:#58a6ff;font-weight:bold;margin-bottom:8px}
+.adv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:4px}
+.adv-checks{display:flex;flex-wrap:wrap;gap:12px 16px;margin:10px 0 12px;font-size:11px;color:#c9d1d9}
+.adv-checks label{cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .adv-field label{display:block;font-size:11px;color:#8b949e;margin-bottom:4px}
 .adv-field input[type=number],.adv-field input[type=text]{width:100%;background:#21262d;border:1px solid #30363d;color:#c9d1d9;padding:6px 8px;border-radius:4px;font-size:12px;box-sizing:border-box}
 .adv-field input:focus{outline:none;border-color:#58a6ff}
@@ -163,38 +169,6 @@ td.na{color:#6e7681}
 .report-footer ul{margin:0;padding-left:18px}
 .report-footer li{margin-bottom:6px}
 .report-footer .fd-ver{font-size:10px;color:#6e7681;margin-top:10px}
-@media (max-width:900px){
-  .cg{grid-template-columns:1fr}
-  .guide-grid,.guide-grid-3{grid-template-columns:1fr}
-  .guide-grade{grid-template-columns:1fr}
-  .adv-grid{grid-template-columns:1fr}
-}
-@media (max-width:768px){
-  body{padding:12px}
-  h1{font-size:clamp(20px,5vw,26px)}
-  .sub{font-size:13px;margin-bottom:20px}
-  .s{padding:14px;margin-bottom:14px}
-  .st{font-size:16px}
-  .sg{grid-template-columns:repeat(2,1fr);gap:8px}
-  .sc .v{font-size:18px}
-  .sb input{width:100%;max-width:100%}
-  .tab-nav{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap;display:flex}
-  .tab-nav button{padding:10px 16px;font-size:13px;white-space:nowrap;flex-shrink:0}
-  .tc{max-width:140px}
-  .kc{max-width:80px}
-  th,td{padding:6px 4px;font-size:11px}
-  .tw{-webkit-overflow-scrolling:touch}
-  .pager{flex-wrap:wrap}
-  .preset-bar,.tag-bar,.view-bar{gap:4px}
-  .preset-btn,.tag-btn,.view-btn{padding:8px 12px;font-size:12px}
-  .tc-wrap{max-height:60vh}
-}
-@media (max-width:480px){
-  .sg{grid-template-columns:1fr 1fr}
-  .sc{padding:10px 8px}
-  .ins{padding:8px 10px}
-  .export-btn{margin-left:0;margin-top:8px;width:100%}
-}
 </style>
 </head>
 <body>
@@ -228,35 +202,11 @@ td.na{color:#6e7681}
 <button class="preset-btn" data-preset="s" onclick="applyPreset('virtual','s',this)">S级强推</button>
 <button class="preset-btn" data-preset="a" onclick="applyPreset('virtual','a',this)">A级跟进</button>
 <button class="preset-btn" data-preset="virtual_run" onclick="applyPreset('virtual','virtual_run',this)">虚拟走量</button>
+<button class="preset-btn" data-preset="low_fsr" onclick="applyPreset('virtual','low_fsr',this)">低粉高销</button>
 <button class="preset-btn" data-preset="new_watch" onclick="applyPreset('virtual','new_watch',this)">新品观察</button>
 </div>
-<button class="adv-toggle" onclick="toggleAdvanced('virtual')">自定义筛选 ▼</button>
-<div class="adv-panel" id="adv-virtual">
-<div class="adv-grid">
-<div class="adv-field"><label>价格下限 (元)</label><input type="number" id="af-v-priceMin" placeholder="不限" min="0" step="0.1"></div>
-<div class="adv-field"><label>价格上限 (元)</label><input type="number" id="af-v-priceMax" placeholder="不限" min="0" step="0.1"></div>
-<div class="adv-field"><label>销量下限</label><input type="number" id="af-v-soldMin" placeholder="不限" min="0"></div>
-<div class="adv-field"><label>销量上限</label><input type="number" id="af-v-soldMax" placeholder="不限" min="0"></div>
-<div class="adv-field"><label>实际增量 ≥</label><input type="number" id="af-v-actualMin" placeholder="不限" min="0" step="0.1"></div>
-<div class="adv-field"><label>预估日增量 ≥</label><input type="number" id="af-v-v1dMin" placeholder="不限" min="0" step="0.1"></div>
-<div class="adv-field"><label>实际日增速 ≥ (%)</label><input type="number" id="af-v-actualGrMin" placeholder="不限" min="0" step="0.1"></div>
-<div class="adv-field"><label>关键词包含</label><input type="text" id="af-v-includeKw" placeholder="多个用空格分隔"></div>
-<div class="adv-field"><label>关键词排除</label><input type="text" id="af-v-excludeKw" placeholder="多个用空格分隔"></div>
-</div>
-<div class="adv-field" style="margin-bottom:10px"><label>分层 (多选)</label>
-<div class="adv-pools" id="af-v-pools">
-<label><input type="checkbox" value="BURST"> BURST</label>
-<label><input type="checkbox" value="ACCEL"> ACCEL</label>
-<label><input type="checkbox" value="WATCH"> WATCH</label>
-<label><input type="checkbox" value="NEW"> NEW</label>
-</div></div>
-<label style="font-size:11px;color:#c9d1d9;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:12px">
-<input type="checkbox" id="af-v-noAnomaly"> 排除标黄异常行</label>
-<div class="adv-actions">
-<button class="adv-apply" onclick="applyAdvanced('virtual')">应用筛选</button>
-<button class="adv-reset" onclick="resetFilters('virtual')">重置全部</button>
-</div>
-</div>
+<button class="adv-toggle" onclick="toggleAdvanced('virtual')">多条件筛选 ▼</button>
+<div class="adv-panel" id="adv-virtual"></div>
 <div class="filter-status" id="fb-virtual"><span class="fs-label">筛选结果：</span><span class="fs-count" id="fc-virtual"></span><span class="fs-tags" id="ft-virtual"></span><button class="fs-clear" onclick="resetFilters('virtual')">清除筛选</button></div>
 <div class="sb">
 <input type="text" id="si-virtual" placeholder="搜索虚拟商品/店铺/商品ID..." oninput="debounceFilter('virtual')">
@@ -280,35 +230,11 @@ td.na{color:#6e7681}
 <button class="preset-btn" data-preset="s" onclick="applyPreset('physical','s',this)">S级强推</button>
 <button class="preset-btn" data-preset="a" onclick="applyPreset('physical','a',this)">A级跟进</button>
 <button class="preset-btn" data-preset="physical_profit" onclick="applyPreset('physical','physical_profit',this)">实体利润带</button>
+<button class="preset-btn" data-preset="low_fsr" onclick="applyPreset('physical','low_fsr',this)">低粉高销</button>
 <button class="preset-btn" data-preset="new_watch" onclick="applyPreset('physical','new_watch',this)">新品观察</button>
 </div>
-<button class="adv-toggle" onclick="toggleAdvanced('physical')">自定义筛选 ▼</button>
-<div class="adv-panel" id="adv-physical">
-<div class="adv-grid">
-<div class="adv-field"><label>价格下限 (元)</label><input type="number" id="af-p-priceMin" placeholder="不限" min="0" step="0.1"></div>
-<div class="adv-field"><label>价格上限 (元)</label><input type="number" id="af-p-priceMax" placeholder="不限" min="0" step="0.1"></div>
-<div class="adv-field"><label>销量下限</label><input type="number" id="af-p-soldMin" placeholder="不限" min="0"></div>
-<div class="adv-field"><label>销量上限</label><input type="number" id="af-p-soldMax" placeholder="不限" min="0"></div>
-<div class="adv-field"><label>实际增量 ≥</label><input type="number" id="af-p-actualMin" placeholder="不限" min="0" step="0.1"></div>
-<div class="adv-field"><label>预估日增量 ≥</label><input type="number" id="af-p-v1dMin" placeholder="不限" min="0" step="0.1"></div>
-<div class="adv-field"><label>实际日增速 ≥ (%)</label><input type="number" id="af-p-actualGrMin" placeholder="不限" min="0" step="0.1"></div>
-<div class="adv-field"><label>关键词包含</label><input type="text" id="af-p-includeKw" placeholder="多个用空格分隔"></div>
-<div class="adv-field"><label>关键词排除</label><input type="text" id="af-p-excludeKw" placeholder="多个用空格分隔"></div>
-</div>
-<div class="adv-field" style="margin-bottom:10px"><label>分层 (多选)</label>
-<div class="adv-pools" id="af-p-pools">
-<label><input type="checkbox" value="BURST"> BURST</label>
-<label><input type="checkbox" value="ACCEL"> ACCEL</label>
-<label><input type="checkbox" value="WATCH"> WATCH</label>
-<label><input type="checkbox" value="NEW"> NEW</label>
-</div></div>
-<label style="font-size:11px;color:#c9d1d9;cursor:pointer;display:inline-flex;align-items:center;gap:6px;margin-bottom:12px">
-<input type="checkbox" id="af-p-noAnomaly"> 排除标黄异常行</label>
-<div class="adv-actions">
-<button class="adv-apply" onclick="applyAdvanced('physical')">应用筛选</button>
-<button class="adv-reset" onclick="resetFilters('physical')">重置全部</button>
-</div>
-</div>
+<button class="adv-toggle" onclick="toggleAdvanced('physical')">多条件筛选 ▼</button>
+<div class="adv-panel" id="adv-physical"></div>
 <div class="filter-status" id="fb-physical"><span class="fs-label">筛选结果：</span><span class="fs-count" id="fc-physical"></span><span class="fs-tags" id="ft-physical"></span><button class="fs-clear" onclick="resetFilters('physical')">清除筛选</button></div>
 <div class="sb">
 <input type="text" id="si-physical" placeholder="搜索实体商品/店铺/商品ID..." oninput="debounceFilter('physical')">
@@ -372,11 +298,6 @@ if(isNaN(actualV1d)) actualV1d=0;
 var actualGrRaw=typeof IDX.actual_gr!=='undefined'?r[IDX.actual_gr]:null;
 var actualGr=(actualGrRaw===null||actualGrRaw===undefined||actualGrRaw==='')?0:parseFloat(actualGrRaw);
 if(isNaN(actualGr)) actualGr=0;
-var baseHoursRaw=typeof IDX.base_hours!=='undefined'?r[IDX.base_hours]:null;
-var baseHours=(baseHoursRaw===null||baseHoursRaw===undefined||baseHoursRaw==='')?0:parseFloat(baseHoursRaw);
-if(isNaN(baseHours)) baseHours=0;
-var baseAt=typeof IDX.base_at!=='undefined'?(r[IDX.base_at]||''):'';
-var grSnap=parseFloat(r[IDX.gr])||0;
 var estVsr=typeof IDX.vsr!=='undefined'?(parseFloat(r[IDX.vsr])||0):(sold>0?v1d/sold:0);
 var actualVsrRaw=typeof IDX.actual_vsr!=='undefined'?r[IDX.actual_vsr]:null;
 var actualVsr=(actualVsrRaw===null||actualVsrRaw===undefined||actualVsrRaw==='')?null:parseFloat(actualVsrRaw);
@@ -389,25 +310,18 @@ gid:r[IDX.goods_id]||'',
 title:r[IDX.title]||'',
 price:r[IDX.price],
 sold:sold,
-v1h:parseFloat(r[IDX.v1h])||0,
-v6h:parseFloat(r[IDX.v6h])||0,
 actualV1d:actualV1d,
 v1d:v1d,
 actualGr:actualGr,
-gr:grSnap,
-baseHours:baseHours,
-baseAt:baseAt,
 actualVsr:actualVsr,
 actualVsrPct:actualVsrPct,
 estVsr:estVsr,
 estVsrPct:estVsrPct,
-acc:parseFloat(r[IDX.acc])||0,
 burst:parseFloat(r[IDX.burst])||0,
 pool:r[IDX.pool]||'',
 firstSeen:r[IDX.first_seen]||'',
 storeId:r[IDX.store_id]||'',
 storeName:r[IDX.store_name]||'',
-shelfTime:r[IDX.shelf_time]||'',
 shopSales:r[IDX.shop_sales]||'',
 shopFans:r[IDX.shop_fans]||'',
 shopFsr:(typeof IDX.shop_fsr!=='undefined'&&r[IDX.shop_fsr]!==null&&r[IDX.shop_fsr]!=='')?parseFloat(r[IDX.shop_fsr]):null,
@@ -437,7 +351,7 @@ else PHYSICAL_ITEMS.push(obj);
 function initSort(arr,col,desc){
 arr.sort(function(a,b){
 var va=a[col],vb=b[col];
-if(col==='actualV1d'||col==='actualGr'||col==='actualVsrPct'||col==='baseHours'||col==='shopFsr'||col==='goodsFsr'){
+if(col==='actualV1d'||col==='actualGr'||col==='actualVsrPct'||col==='shopFsr'||col==='goodsFsr'){
 va=(va===null||va===undefined||isNaN(va))?-1:va;
 vb=(vb===null||vb===undefined||isNaN(vb))?-1:vb;
 }
@@ -577,11 +491,11 @@ return h;
 }
 document.getElementById('guide').innerHTML=renderGuide();
 
-var ch=D.charts||{};
+var ch=D.charts;
 var hiGr=0,hiV1d=0,lowP=0;
-if(ch.gr){for(var k in ch.gr){if(['20-50%','50-100%','>100%'].indexOf(k)>=0)hiGr+=ch.gr[k];}}
-if(ch.v1d){for(var k in ch.v1d){if(['20-50','50-100','>100'].indexOf(k)>=0)hiV1d+=ch.v1d[k];}}
-if(ch.price){lowP=(ch.price['0-30']||0)+(ch.price['30-50']||0);}
+for(var k in ch.gr){if(['20-50%','50-100%','>100%'].indexOf(k)>=0)hiGr+=ch.gr[k];}
+for(var k in ch.v1d){if(['20-50','50-100','>100'].indexOf(k)>=0)hiV1d+=ch.v1d[k];}
+lowP=ch.price['0-30']+ch.price['30-50'];
 
 document.getElementById('insights').innerHTML=[
 ['日增量口径',(m.metric_note||'真实增量=上次有效快照差值(4h~14d)；预估日增量=真实增量×min(24/间隔h,1.5)')+'。入选：'+(m.filter_label||'日增量>5')],
@@ -592,10 +506,9 @@ document.getElementById('insights').innerHTML=[
 ].map(function(x){return '<div class="ins"><div class="it">'+x[0]+'</div><div class="ix">'+x[1]+'</div></div>';}).join('');
 
 function barC(d,c){
-if(!d) return '<div class="na">暂无</div>';
 var mx=0;for(var k in d){if(d[k]>mx)mx=d[k];}
 var h='';
-for(var k in d){h+='<div class="br"><span class="bl">'+k+'</span><div class="bt"><div class="bf" style="width:'+(mx?d[k]/mx*100:0)+'%;background:'+c+'"></div></div><span class="bv">'+d[k]+'</span></div>';}
+for(var k in d){h+='<div class="br"><span class="bl">'+k+'</span><div class="bt"><div class="bf" style="width:'+(d[k]/mx*100)+'%;background:'+c+'"></div></div><span class="bv">'+d[k]+'</span></div>';}
 return h;
 }
 
@@ -612,29 +525,24 @@ return dist;
 }
 
 document.getElementById('charts').innerHTML=[
-['价格分布',ch.price||{},'#58a6ff'],
-['销量分布',ch.sold||{},'#00d4aa'],
-['预估日增量分布',ch.v1d||{},'#ff4757'],
-['实际日增速分布',ch.gr||{},'#00d4aa'],
-['实际增销比分布',ch.vsr||{},'#00d4aa'],
+['价格分布',ch.price,'#58a6ff'],
+['销量分布',ch.sold,'#00d4aa'],
+['预估日增量分布',ch.v1d,'#ff4757'],
+['实际日增速分布',ch.gr,'#00d4aa'],
+['实际增销比分布',ch.vsr,'#00d4aa'],
 ['预估增销比分布',buildVsrEstChart(),'#a371f7']
 ].map(function(x){return '<div class="cb"><div class="ct">'+x[0]+'</div>'+barC(x[1],x[2])+'</div>';}).join('');
 
-document.getElementById('keywords').innerHTML=(D.top_keywords||[]).map(function(x){return '<span class="tag '+(x[1]>D.meta.count*0.02?'hot':'')+'">'+x[0]+' ('+x[1]+')</span>';}).join('');
-document.getElementById('stores').innerHTML=(D.top_stores||[]).map(function(x){return '<span class="tag '+(x[1]>3?'hot':'')+'">'+x[0]+' ('+x[1]+')</span>';}).join('');
+document.getElementById('keywords').innerHTML=D.top_keywords.map(function(x){return '<span class="tag '+(x[1]>D.meta.count*0.02?'hot':'')+'">'+x[0]+' ('+x[1]+')</span>';}).join('');
+document.getElementById('stores').innerHTML=D.top_stores.map(function(x){return '<span class="tag '+(x[1]>3?'hot':'')+'">'+x[0]+' ('+x[1]+')</span>';}).join('');
 
 (function renderDisclaimer(){
 var d=m.disclaimer;
 if(!d){return;}
-var h='<h2>'+(d.title||'免责声明与使用须知')+'</h2>';
-if(typeof d==='string'){
-h+='<p style="line-height:1.7;color:#8b949e">'+esc(d)+'</p>';
-}else{
-h+='<ul>';
+var h='<h2>'+(d.title||'免责声明与使用须知')+'</h2><ul>';
 (d.lines||[]).forEach(function(line){h+='<li>'+line+'</li>';});
 h+='</ul>';
-}
-if(typeof d!=='string'&&d.version){h+='<div class="fd-ver">声明版本: '+d.version+' · 生成时间: '+m.time+'</div>';}
+if(d.version){h+='<div class="fd-ver">声明版本: '+d.version+' · 生成时间: '+m.time+'</div>';}
 document.getElementById('report-footer').innerHTML=h;
 })();
 
@@ -647,34 +555,60 @@ var cls=(goodCut!==false&&v<=0.05)?' fsr-good':'';
 return '<span class="'+cls.trim()+'">'+txt+'</span>';
 }
 
+/* 表格列顺序 = 选品决策优先级（左→右，见 SELECTION_GUIDE.priority_fields） */
 var HEADERS=[
 {key:'idx',label:'#',w:40,sort:false},
 {key:'gid',label:'商品ID',w:80,sort:true},
 {key:'title',label:'商品名称',w:240,sort:true,cls:'tc'},
+{key:'actualV1d',label:'真实增量',w:70,sort:true,cls:'n hl',fmt:function(v){return (v||0).toFixed(1);}},
+{key:'actualGr',label:'真实日增速',w:75,sort:true,cls:'n hl',fmt:function(v){return (v||0).toFixed(2)+'%';}},
+{key:'actualVsrPct',label:'真实增销比',w:75,sort:true,cls:'n hl',fmt:function(v){return (v===null||v===undefined||isNaN(v)||v<=0)?'<span class="na">0.00%</span>':v.toFixed(2)+'%';}},
+{key:'goodsFsr',label:'商品粉销比',w:78,sort:true,cls:'n hl',fmt:function(v){return fmtFsr(v,true);}},
+{key:'shopFsr',label:'店铺粉销比',w:78,sort:true,cls:'n hl',fmt:function(v){return fmtFsr(v,true);}},
+{key:'pool',label:'分层',w:55,sort:true},
+{key:'v1d',label:'预估日增量',w:75,sort:true,cls:'n',fmt:function(v,item){var cls=item&&item.anomaly?' anomaly-cell':'';return '<span class="'+cls.trim()+'">'+v.toFixed(1)+'</span>';}},
+{key:'estVsrPct',label:'预估增销比',w:75,sort:true,cls:'n hl2',fmt:function(v,item){var cls=item&&item.anomaly?' anomaly-cell':'';return '<span class="'+cls.trim()+'">'+v.toFixed(2)+'%'+'</span>';}},
+{key:'burst',label:'爆发分',w:60,sort:true,cls:'n',fmt:function(v){return v.toFixed(1);}},
 {key:'price',label:'价格',w:65,sort:true,cls:'n',fmt:function(v){return '\u00a5'+v;}},
 {key:'sold',label:'销量',w:70,sort:true,cls:'n',fmt:function(v){return fmtNum(v);}},
-{key:'v1h',label:'1h增量',w:65,sort:true,cls:'n',fmt:function(v){return v.toFixed(1);}},
-{key:'v6h',label:'6h增量',w:65,sort:true,cls:'n',fmt:function(v){return v.toFixed(1);}},
-{key:'actualV1d',label:'真实增量',w:70,sort:true,cls:'n hl',fmt:function(v){return (v||0).toFixed(1);}},
-{key:'v1d',label:'预估日增量',w:75,sort:true,cls:'n',fmt:function(v,item){var cls=item&&item.anomaly?' anomaly-cell':'';return '<span class="'+cls.trim()+'">'+v.toFixed(1)+'</span>';}},
-{key:'actualGr',label:'真实日增速',w:75,sort:true,cls:'n hl',fmt:function(v){return (v||0).toFixed(2)+'%';}},
-{key:'gr',label:'快照日增速',w:75,sort:true,cls:'n',fmt:function(v){return (v||0).toFixed(2)+'%';}},
-{key:'actualVsrPct',label:'真实增销比',w:75,sort:true,cls:'n hl',fmt:function(v){return (v===null||v===undefined||isNaN(v)||v<=0)?'<span class="na">0.00%</span>':v.toFixed(2)+'%';}},
-{key:'baseHours',label:'基准间隔h',w:72,sort:true,cls:'n',fmt:function(v,item){var t=(v||0).toFixed(1)+'h';if(v>72)return '<span style="color:#ffa502" title="'+(item.baseAt||'')+'">'+t+'</span>';return t;}},
-{key:'estVsrPct',label:'预估增销比',w:75,sort:true,cls:'n hl2',fmt:function(v,item){var cls=item&&item.anomaly?' anomaly-cell':'';return '<span class="'+cls.trim()+'">'+v.toFixed(2)+'%'+'</span>';}},
-{key:'acc',label:'加速度',w:60,sort:true,cls:'n',fmt:function(v){return v.toFixed(3);}},
-{key:'burst',label:'爆发分',w:60,sort:true,cls:'n',fmt:function(v){return v.toFixed(1);}},
-{key:'pool',label:'分层',w:55,sort:true},
 {key:'storeName',label:'店铺名称',w:120,sort:true,cls:'kc'},
-{key:'storeId',label:'店铺ID',w:80,sort:true},
 {key:'shopSales',label:'店铺销量',w:80,sort:true},
 {key:'shopFans',label:'店铺粉丝',w:80,sort:true},
-{key:'shopFsr',label:'店铺粉销比',w:78,sort:true,cls:'n hl',fmt:function(v){return fmtFsr(v,true);}},
-{key:'goodsFsr',label:'商品粉销比',w:78,sort:true,cls:'n hl',fmt:function(v){return fmtFsr(v,true);}},
+{key:'storeId',label:'店铺ID',w:80,sort:true},
 {key:'behavior',label:'行为数据',w:160,sort:true,cls:'tc'},
-{key:'firstSeen',label:'首次发现',w:80,sort:true},
-{key:'shelfTime',label:'上架时间',w:90,sort:true}
+{key:'firstSeen',label:'首次发现',w:80,sort:true}
 ];
+
+function buildRowCells(item,rowNum){
+var pool=item.pool;
+var pc=POOL_C[pool]||'#888';
+var title=item.title.length>40?item.title.substring(0,40)+'...':item.title;
+var storeName=item.storeName.length>16?item.storeName.substring(0,16)+'...':item.storeName;
+var behavior=item.behavior.length>30?item.behavior.substring(0,30)+'...':item.behavior;
+var byKey={
+idx:rowNum,
+gid:esc(item.gid),
+title:'<span title="'+esc(item.title)+'">'+esc(title)+'</span>',
+actualV1d:item.actualV1d,
+actualGr:item.actualGr,
+actualVsrPct:item.actualVsrPct,
+goodsFsr:item.goodsFsr,
+shopFsr:item.shopFsr,
+pool:'<span style="color:'+pc+';font-weight:bold">'+pool+'</span>',
+v1d:item.v1d,
+estVsrPct:item.estVsrPct||0,
+burst:item.burst,
+price:item.price,
+sold:item.sold,
+storeName:'<span title="'+esc(item.storeName)+'">'+esc(storeName)+'</span>',
+storeId:esc(item.storeId),
+shopSales:esc(item.shopSales),
+shopFans:esc(item.shopFans),
+behavior:'<span title="'+esc(item.behavior)+'">'+esc(behavior)+'</span>',
+firstSeen:esc(item.firstSeen)
+};
+return HEADERS.map(function(h){return byKey[h.key];});
+}
 
 var TABS={
 physical:{items:PHYSICAL_ITEMS,filtered:null,sortCol:'actualV1d',sortDesc:true,page:0,pageSize:100,activePreset:'all',adv:{},filterTags:[]},
@@ -704,15 +638,116 @@ physical_profit:{label:'实体利润带',test:function(item){
 return item.price>=30&&item.price<=150&&(item.actualV1d||0)>=10;
 }},
 new_watch:{label:'新品观察',test:function(item){
-return item.pool==='NEW'||item.v6h>=5;
-}}
+return item.pool==='NEW';
+}},
+low_fsr:{label:'低粉高销',test:function(){return true;},adv:{actualMin:5,goodsFsrMax:0.05,actualGrMin:8}}
 };
+
+var ADV_SECTIONS=[
+{title:'动销三角',fields:[
+{key:'actualMin',label:'真实增量 ≥',type:'number',step:0.1,min:0},
+{key:'actualMax',label:'真实增量 ≤',type:'number',step:0.1,min:0},
+{key:'actualGrMin',label:'真实日增速 ≥ (%)',type:'number',step:0.1,min:0},
+{key:'actualVsrMin',label:'真实增销比 ≥ (%)',type:'number',step:0.1,min:0}
+]},
+{title:'低粉高销',fields:[
+{key:'goodsFsrMax',label:'商品粉销比 ≤',type:'number',step:0.001,min:0},
+{key:'shopFsrMax',label:'店铺粉销比 ≤',type:'number',step:0.001,min:0}
+]},
+{title:'趋势 / 分层 / 爆发',fields:[
+{key:'burstMin',label:'爆发分 ≥',type:'number',step:0.1,min:0}
+]},
+{title:'预估参考',fields:[
+{key:'v1dMin',label:'预估日增量 ≥',type:'number',step:0.1,min:0},
+{key:'estVsrMin',label:'预估增销比 ≥ (%)',type:'number',step:0.1,min:0}
+]},
+{title:'价格 / 销量',fields:[
+{key:'priceMin',label:'价格 ≥ (元)',type:'number',step:0.1,min:0},
+{key:'priceMax',label:'价格 ≤ (元)',type:'number',step:0.1,min:0},
+{key:'soldMin',label:'销量 ≥',type:'number',step:1,min:0},
+{key:'soldMax',label:'销量 ≤',type:'number',step:1,min:0}
+]},
+{title:'关键词 / 店铺',fields:[
+{key:'includeKw',label:'标题/行为 包含',type:'text',placeholder:'多个词空格分隔，AND'},
+{key:'excludeKw',label:'标题/行为 排除',type:'text',placeholder:'多个词空格分隔'},
+{key:'storeKw',label:'店铺名 包含',type:'text',placeholder:'店铺关键词'}
+]}
+];
+
+var ADV_CHECKS=[
+{key:'noAnomaly',label:'排除标黄异常行'}
+];
+
+var ADV_NUM_KEYS=['actualMin','actualMax','actualGrMin','actualVsrMin','goodsFsrMax','shopFsrMax','burstMin','v1dMin','estVsrMin','priceMin','priceMax','soldMin','soldMax'];
+var ADV_TEXT_KEYS=['includeKw','excludeKw','storeKw'];
+var ADV_BOOL_KEYS=['noAnomaly'];
 
 var FILTER_DEBOUNCE={};
 var TAB_PREFIX={virtual:'v',physical:'p'};
 
 function defaultAdv(){
-return{priceMin:null,priceMax:null,soldMin:null,soldMax:null,actualMin:null,v1dMin:null,actualGrMin:null,pools:null,includeKw:'',excludeKw:'',noAnomaly:false};
+var o={pools:null};
+ADV_NUM_KEYS.forEach(function(k){o[k]=null;});
+ADV_TEXT_KEYS.forEach(function(k){o[k]='';});
+ADV_BOOL_KEYS.forEach(function(k){o[k]=false;});
+return o;
+}
+
+function mountAdvPanel(tab){
+var panel=document.getElementById('adv-'+tab);
+if(!panel||panel.getAttribute('data-mounted')) return;
+var p=TAB_PREFIX[tab];
+var html='<p class="adv-hint">以下条件<strong style="color:#c9d1d9">同时满足（AND）</strong>；分层多选为 OR；留空表示不限。</p>';
+ADV_SECTIONS.forEach(function(sec){
+html+='<div class="adv-section"><div class="adv-section-title">'+sec.title+'</div><div class="adv-grid">';
+sec.fields.forEach(function(f){
+html+='<div class="adv-field"><label>'+f.label+'</label>';
+if(f.type==='text'){
+html+='<input type="text" id="af-'+p+'-'+f.key+'" placeholder="'+(f.placeholder||'不限')+'">';
+}else{
+html+='<input type="number" id="af-'+p+'-'+f.key+'" placeholder="不限" min="'+(f.min||0)+'" step="'+(f.step||1)+'">';
+}
+html+='</div>';
+});
+html+='</div></div>';
+});
+html+='<div class="adv-section"><div class="adv-section-title">分层 pool（多选 OR）</div><div class="adv-pools" id="af-'+p+'-pools">';
+['BURST','ACCEL','WATCH','NEW'].forEach(function(pl){
+html+='<label><input type="checkbox" value="'+pl+'"> '+pl+'</label>';
+});
+html+='</div></div><div class="adv-checks">';
+ADV_CHECKS.forEach(function(c){
+html+='<label><input type="checkbox" id="af-'+p+'-'+c.key+'"> '+c.label+'</label>';
+});
+html+='</div><div class="adv-actions">';
+html+='<button class="adv-apply" type="button" onclick="applyAdvanced(\''+tab+'\')">应用筛选</button>';
+html+='<button class="adv-reset" type="button" onclick="resetFilters(\''+tab+'\')">重置全部</button>';
+html+='</div>';
+panel.innerHTML=html;
+panel.setAttribute('data-mounted','1');
+}
+
+function fillAdvForm(tab,adv){
+var p=TAB_PREFIX[tab];
+ADV_NUM_KEYS.forEach(function(k){
+var el=document.getElementById('af-'+p+'-'+k);
+if(el) el.value=(adv[k]!==null&&adv[k]!==undefined)?adv[k]:'';
+});
+ADV_TEXT_KEYS.forEach(function(k){
+var el=document.getElementById('af-'+p+'-'+k);
+if(el) el.value=adv[k]||'';
+});
+ADV_BOOL_KEYS.forEach(function(k){
+var el=document.getElementById('af-'+p+'-'+k);
+if(el) el.checked=!!adv[k];
+});
+document.querySelectorAll('#af-'+p+'-pools input').forEach(function(cb){
+cb.checked=adv.pools&&adv.pools.indexOf(cb.value)>=0;
+});
+}
+
+function clearAdvForm(tab){
+fillAdvForm(tab,defaultAdv());
 }
 
 function parseNum(v){
@@ -725,19 +760,18 @@ function readAdvancedForm(tab){
 var p=TAB_PREFIX[tab];
 var pools=[];
 document.querySelectorAll('#af-'+p+'-pools input:checked').forEach(function(cb){pools.push(cb.value);});
-TABS[tab].adv={
-priceMin:parseNum(document.getElementById('af-'+p+'-priceMin').value),
-priceMax:parseNum(document.getElementById('af-'+p+'-priceMax').value),
-soldMin:parseNum(document.getElementById('af-'+p+'-soldMin').value),
-soldMax:parseNum(document.getElementById('af-'+p+'-soldMax').value),
-actualMin:parseNum(document.getElementById('af-'+p+'-actualMin').value),
-v1dMin:parseNum(document.getElementById('af-'+p+'-v1dMin').value),
-actualGrMin:parseNum(document.getElementById('af-'+p+'-actualGrMin').value),
-pools:pools.length?pools:null,
-includeKw:document.getElementById('af-'+p+'-includeKw').value.trim().toLowerCase(),
-excludeKw:document.getElementById('af-'+p+'-excludeKw').value.trim().toLowerCase(),
-noAnomaly:document.getElementById('af-'+p+'-noAnomaly').checked
-};
+var adv=defaultAdv();
+ADV_NUM_KEYS.forEach(function(k){
+adv[k]=parseNum(document.getElementById('af-'+p+'-'+k).value);
+});
+ADV_TEXT_KEYS.forEach(function(k){
+adv[k]=document.getElementById('af-'+p+'-'+k).value.trim().toLowerCase();
+});
+ADV_BOOL_KEYS.forEach(function(k){
+adv[k]=document.getElementById('af-'+p+'-'+k).checked;
+});
+adv.pools=pools.length?pools:null;
+TABS[tab].adv=adv;
 }
 
 function kwMatch(text,kwStr){
@@ -746,38 +780,46 @@ var kws=kwStr.split(/\s+/).filter(Boolean);
 return kws.every(function(kw){return text.indexOf(kw)>=0;});
 }
 
+function numGte(val,min){
+if(min===null) return true;
+if(val===null||val===undefined||isNaN(val)) return false;
+return val>=min;
+}
+function numLte(val,max){
+if(max===null) return true;
+if(val===null||val===undefined||isNaN(val)) return false;
+return val<=max;
+}
+
 function matchesAdvanced(item,adv){
-if(adv.priceMin!==null&&item.price<adv.priceMin) return false;
-if(adv.priceMax!==null&&item.price>adv.priceMax) return false;
-if(adv.soldMin!==null&&item.sold<adv.soldMin) return false;
-if(adv.soldMax!==null&&item.sold>adv.soldMax) return false;
-if(adv.actualMin!==null){
-var a=item.actualV1d;
-if(a===null||a===undefined||isNaN(a)||a<adv.actualMin) return false;
-}
-if(adv.v1dMin!==null&&item.v1d<adv.v1dMin) return false;
-if(adv.actualGrMin!==null){
-var g=item.actualGr;
-if(g===null||g===undefined||isNaN(g)||g<adv.actualGrMin) return false;
-}
+if(!numGte(item.price,adv.priceMin)||!numLte(item.price,adv.priceMax)) return false;
+if(!numGte(item.sold,adv.soldMin)||!numLte(item.sold,adv.soldMax)) return false;
+if(!numGte(item.actualV1d,adv.actualMin)||!numLte(item.actualV1d,adv.actualMax)) return false;
+if(!numGte(item.actualGr,adv.actualGrMin)) return false;
+if(!numGte(item.actualVsrPct,adv.actualVsrMin)) return false;
+if(!numLte(item.goodsFsr,adv.goodsFsrMax)) return false;
+if(!numLte(item.shopFsr,adv.shopFsrMax)) return false;
+if(!numGte(item.v1d,adv.v1dMin)) return false;
+if(!numGte(item.estVsrPct,adv.estVsrMin)) return false;
+if(!numGte(item.burst,adv.burstMin)) return false;
 if(adv.pools&&adv.pools.length&&adv.pools.indexOf(item.pool)<0) return false;
-var blob=(item.title+' '+item.storeName+' '+item.behavior).toLowerCase();
+var blob=(item.title+' '+item.behavior).toLowerCase();
 if(adv.includeKw&&!kwMatch(blob,adv.includeKw)) return false;
 if(adv.excludeKw){
 var ex=adv.excludeKw.split(/\s+/).filter(Boolean);
 for(var i=0;i<ex.length;i++){if(blob.indexOf(ex[i])>=0) return false;}
 }
+if(adv.storeKw&&item.storeName.toLowerCase().indexOf(adv.storeKw)<0) return false;
 if(adv.noAnomaly&&item.anomaly) return false;
 return true;
 }
 
 function hasAdvancedActive(adv){
 if(!adv) return false;
-if(adv.priceMin!==null||adv.priceMax!==null||adv.soldMin!==null||adv.soldMax!==null) return true;
-if(adv.actualMin!==null||adv.v1dMin!==null||adv.actualGrMin!==null) return true;
+for(var i=0;i<ADV_NUM_KEYS.length;i++){if(adv[ADV_NUM_KEYS[i]]!==null) return true;}
+for(var j=0;j<ADV_TEXT_KEYS.length;j++){if(adv[ADV_TEXT_KEYS[j]]) return true;}
+for(var k=0;k<ADV_BOOL_KEYS.length;k++){if(adv[ADV_BOOL_KEYS[k]]) return true;}
 if(adv.pools&&adv.pools.length) return true;
-if(adv.includeKw||adv.excludeKw) return true;
-if(adv.noAnomaly) return true;
 return false;
 }
 
@@ -786,16 +828,24 @@ var t=TABS[tab];
 var tags=[];
 if(t.activePreset&&t.activePreset!=='all'&&PRESETS[t.activePreset]) tags.push(PRESETS[t.activePreset].label);
 var adv=t.adv||{};
+if(adv.actualMin!==null||adv.actualMax!==null){
+tags.push('真实增量'+(adv.actualMin!==null?'>='+adv.actualMin:'')+(adv.actualMax!==null?(adv.actualMin!==null?' ':'')+'<='+adv.actualMax:''));
+}
+if(adv.actualGrMin!==null) tags.push('真实日增速≥'+adv.actualGrMin+'%');
+if(adv.actualVsrMin!==null) tags.push('真实增销比≥'+adv.actualVsrMin+'%');
+if(adv.goodsFsrMax!==null) tags.push('商品粉销比≤'+adv.goodsFsrMax);
+if(adv.shopFsrMax!==null) tags.push('店铺粉销比≤'+adv.shopFsrMax);
+if(adv.burstMin!==null) tags.push('爆发分≥'+adv.burstMin);
+if(adv.v1dMin!==null) tags.push('预估日增量≥'+adv.v1dMin);
+if(adv.estVsrMin!==null) tags.push('预估增销比≥'+adv.estVsrMin+'%');
 if(adv.priceMin!==null||adv.priceMax!==null){
 tags.push('价格'+(adv.priceMin!==null?adv.priceMin:'0')+'-'+(adv.priceMax!==null?adv.priceMax:'∞'));
 }
 if(adv.soldMin!==null||adv.soldMax!==null) tags.push('销量区间');
-if(adv.actualMin!==null) tags.push('实际增量≥'+adv.actualMin);
-if(adv.v1dMin!==null) tags.push('预估日增量≥'+adv.v1dMin);
-if(adv.actualGrMin!==null) tags.push('实际日增速≥'+adv.actualGrMin+'%');
 if(adv.pools&&adv.pools.length) tags.push('分层:'+adv.pools.join('/'));
 if(adv.includeKw) tags.push('含:'+adv.includeKw);
 if(adv.excludeKw) tags.push('排除:'+adv.excludeKw);
+if(adv.storeKw) tags.push('店铺:'+adv.storeKw);
 if(adv.noAnomaly) tags.push('排除异常');
 var q=document.getElementById('si-'+tab).value.trim();
 if(q) tags.push('搜索:'+q);
@@ -841,46 +891,14 @@ if(pageData.length===0){
 html='<tr><td colspan="'+HEADERS.length+'" style="text-align:center;padding:24px;color:#8b949e">无符合条件的商品，请放宽筛选条件或点击「清除筛选」</td></tr>';
 }else for(var i=0;i<pageData.length;i++){
 var item=pageData[i];
-var pool=item.pool;
-var pc=POOL_C[pool]||'#888';
-var title=item.title.length>40?item.title.substring(0,40)+'...':item.title;
-var storeName=item.storeName.length>16?item.storeName.substring(0,16)+'...':item.storeName;
-var behavior=item.behavior.length>30?item.behavior.substring(0,30)+'...':item.behavior;
-
-var cells=[
-start+i+1,
-esc(item.gid),
-'<span title="'+esc(item.title)+'">'+esc(title)+'</span>',
-item.price,
-item.sold,
-item.v1h,
-item.v6h,
-item.actualV1d,
-item.v1d,
-item.actualGr,
-item.gr,
-item.actualVsrPct,
-item.baseHours,
-item.estVsrPct||0,
-item.acc,
-item.burst,
-'<span style="color:'+pc+';font-weight:bold">'+pool+'</span>',
-'<span title="'+esc(item.storeName)+'">'+esc(storeName)+'</span>',
-esc(item.storeId),
-esc(item.shopSales),
-esc(item.shopFans),
-item.shopFsr,
-item.goodsFsr,
-'<span title="'+esc(item.behavior)+'">'+esc(behavior)+'</span>',
-esc(item.firstSeen),
-esc(item.shelfTime)
-];
+var cells=buildRowCells(item,start+i+1);
 
 html+='<tr'+(item.anomaly?' class="anomaly-row"':'')+'>';
-for(var ci=0;ci<cells.length;ci++){
+for(var ci=0;ci<HEADERS.length;ci++){
 var h=HEADERS[ci];
 var cls=h.cls||'';
-var val=ci>0?(h.fmt?h.fmt(cells[ci],item):cells[ci]):cells[ci];
+var raw=cells[ci];
+var val=ci>0&&h.fmt?h.fmt(raw,item):raw;
 html+='<td class="'+cls+'">'+val+'</td>';
 }
 html+='</tr>';
@@ -923,7 +941,7 @@ if(t.sortCol===col){t.sortDesc=!t.sortDesc;}else{t.sortCol=col;t.sortDesc=true;}
 var items=getFiltered(tab);
 items.sort(function(a,b){
 var va=a[col],vb=b[col];
-if(col==='actualV1d'||col==='actualGr'||col==='actualVsrPct'||col==='baseHours'||col==='shopFsr'||col==='goodsFsr'){
+if(col==='actualV1d'||col==='actualGr'||col==='actualVsrPct'||col==='shopFsr'||col==='goodsFsr'){
 va=(va===null||va===undefined||isNaN(va))?-1:va;
 vb=(vb===null||vb===undefined||isNaN(vb))?-1:vb;
 }
@@ -993,13 +1011,13 @@ window.applyPreset=function(tab,id,btn){
 document.querySelectorAll('#preset-'+tab+' .preset-btn').forEach(function(b){b.classList.remove('active');});
 btn.classList.add('active');
 TABS[tab].activePreset=id;
-var p=TAB_PREFIX[tab];
+clearAdvForm(tab);
 TABS[tab].adv=defaultAdv();
-['priceMin','priceMax','soldMin','soldMax','actualMin','v1dMin','actualGrMin','includeKw','excludeKw'].forEach(function(f){
-document.getElementById('af-'+p+'-'+f).value='';
-});
-document.getElementById('af-'+p+'-noAnomaly').checked=false;
-document.querySelectorAll('#af-'+p+'-pools input').forEach(function(cb){cb.checked=false;});
+var preset=PRESETS[id];
+if(preset&&preset.adv){
+Object.keys(preset.adv).forEach(function(k){TABS[tab].adv[k]=preset.adv[k];});
+fillAdvForm(tab,TABS[tab].adv);
+}
 document.querySelectorAll('#pf-'+tab+' button').forEach(function(b,i){b.classList.toggle('a',i===0);});
 doFilter(tab);
 };
@@ -1008,7 +1026,7 @@ window.toggleAdvanced=function(tab){
 var el=document.getElementById('adv-'+tab);
 var open=el.classList.toggle('open');
 document.querySelectorAll('#panel-'+tab+' .adv-toggle').forEach(function(b){
-b.textContent=open?'自定义筛选 ▲':'自定义筛选 ▼';
+b.textContent=open?'多条件筛选 ▲':'多条件筛选 ▼';
 });
 };
 
@@ -1028,15 +1046,10 @@ doFilter(tab);
 };
 
 window.resetFilters=function(tab){
-var p=TAB_PREFIX[tab];
 TABS[tab].activePreset='all';
 TABS[tab].adv=defaultAdv();
 document.getElementById('si-'+tab).value='';
-['priceMin','priceMax','soldMin','soldMax','actualMin','v1dMin','actualGrMin','includeKw','excludeKw'].forEach(function(f){
-document.getElementById('af-'+p+'-'+f).value='';
-});
-document.getElementById('af-'+p+'-noAnomaly').checked=false;
-document.querySelectorAll('#af-'+p+'-pools input').forEach(function(cb){cb.checked=false;});
+clearAdvForm(tab);
 document.querySelectorAll('#preset-'+tab+' .preset-btn').forEach(function(b){
 b.classList.toggle('active',b.getAttribute('data-preset')==='all');
 });
@@ -1050,38 +1063,32 @@ window.filterVirtual=function(){ doFilter('virtual'); };
 window.exportCSV=function(tab){
 var items=getFiltered(tab);
 var typeName=tab==='physical'?'实体':tab==='virtual'?'虚拟':'全部';
-var header='商品ID,商品名称,价格,销量,1h增量,6h增量,真实增量,预估日增量,真实日增速,快照日增速,真实增销比,预估增销比,基准间隔h,基准时间,加速度,爆发分,分层,店铺名称,店铺ID,店铺销量,店铺粉丝,店铺粉销比,商品粉销比,行为数据,首次发现,上架时间,数据异常,类型';
+var exportCols=[
+{h:'商品ID',v:function(i){return '"'+i.gid+'"';}},
+{h:'商品名称',v:function(i){return '"'+i.title.replace(/"/g,'""')+'"';}},
+{h:'真实增量',v:function(i){return (i.actualV1d||0).toFixed(1);}},
+{h:'真实日增速',v:function(i){return (i.actualGr||0).toFixed(2)+'%';}},
+{h:'真实增销比',v:function(i){return (i.actualVsrPct===null||isNaN(i.actualVsrPct)||i.actualVsrPct<=0?'0.00%':i.actualVsrPct.toFixed(2)+'%');}},
+{h:'商品粉销比',v:function(i){return (i.goodsFsr===null||isNaN(i.goodsFsr)?'':i.goodsFsr);}},
+{h:'店铺粉销比',v:function(i){return (i.shopFsr===null||isNaN(i.shopFsr)?'':i.shopFsr);}},
+{h:'分层',v:function(i){return i.pool;}},
+{h:'预估日增量',v:function(i){return i.v1d.toFixed(1);}},
+{h:'预估增销比',v:function(i){return i.estVsrPct.toFixed(2)+'%';}},
+{h:'爆发分',v:function(i){return i.burst.toFixed(1);}},
+{h:'价格',v:function(i){return i.price;}},
+{h:'销量',v:function(i){return i.sold;}},
+{h:'店铺名称',v:function(i){return '"'+i.storeName.replace(/"/g,'""')+'"';}},
+{h:'店铺销量',v:function(i){return '"'+i.shopSales+'"';}},
+{h:'店铺粉丝',v:function(i){return '"'+i.shopFans+'"';}},
+{h:'店铺ID',v:function(i){return '"'+i.storeId+'"';}},
+{h:'行为数据',v:function(i){return '"'+i.behavior.replace(/"/g,'""')+'"';}},
+{h:'首次发现',v:function(i){return '"'+i.firstSeen+'"';}},
+{h:'数据异常',v:function(i){return i.anomaly?'是':'否';}},
+{h:'类型',v:function(i){return i.isVirtual?'虚拟':'实体';}}
+];
+var header=exportCols.map(function(c){return c.h;}).join(',');
 var body=items.map(function(item){
-return [
-'"'+item.gid+'"',
-'"'+item.title.replace(/"/g,'""')+'"',
-item.price,
-item.sold,
-item.v1h.toFixed(1),
-item.v6h.toFixed(1),
-(item.actualV1d||0).toFixed(1),
-item.v1d.toFixed(1),
-(item.actualGr||0).toFixed(2)+'%',
-(item.gr||0).toFixed(2)+'%',
-(item.actualVsrPct===null||isNaN(item.actualVsrPct)||item.actualVsrPct<=0?'0.00%':item.actualVsrPct.toFixed(2)+'%'),
-item.estVsrPct.toFixed(2)+'%',
-(item.baseHours||0).toFixed(1),
-'"'+(item.baseAt||'')+'"',
-item.acc.toFixed(3),
-item.burst.toFixed(1),
-item.pool,
-'"'+item.storeName.replace(/"/g,'""')+'"',
-'"'+item.storeId+'"',
-'"'+item.shopSales+'"',
-'"'+item.shopFans+'"',
-(item.shopFsr===null||isNaN(item.shopFsr)?'':item.shopFsr),
-(item.goodsFsr===null||isNaN(item.goodsFsr)?'':item.goodsFsr),
-'"'+item.behavior.replace(/"/g,'""')+'"',
-'"'+item.firstSeen+'"',
-'"'+item.shelfTime+'"',
-item.anomaly?'是':'否',
-item.isVirtual?'虚拟':'实体'
-].join(',');
+return exportCols.map(function(c){return c.v(item);}).join(',');
 }).join('\n');
 var blob=new Blob(['\uFEFF'+header+'\n'+body],{type:'text/csv;charset=utf-8'});
 var url=URL.createObjectURL(blob);
@@ -1232,6 +1239,8 @@ RISK_STATE.filtered=RISK_ITEMS.slice();renderRiskBody();renderRiskShops();
 
 TABS.virtual.adv=defaultAdv();
 TABS.physical.adv=defaultAdv();
+mountAdvPanel('virtual');
+mountAdvPanel('physical');
 renderTab('virtual');
 renderTab('physical');
 doFilter('virtual');

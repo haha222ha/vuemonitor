@@ -44,16 +44,28 @@ def parse_data_js(data_js_path: str) -> tuple[str, dict, list]:
     with open(data_js_path, "r", encoding="utf-8") as f:
         text = f.read()
     payload = _parse_report_payload(text)
-    meta = payload.get("meta") or {}
+    meta = dict(payload.get("meta") or {})
+    columns = payload.get("columns")
+    if isinstance(columns, list) and columns and "columns" not in meta:
+        meta["columns"] = columns
     report_date = str(meta.get("date") or datetime.now().strftime("%Y-%m-%d"))[:10]
     items = payload.get("items") or []
     return report_date, meta, items
 
 
-def _field(item: Any, key: str, default=None):
+def _col_map_from_meta(meta: dict | None) -> dict[str, int]:
+    """兼容新版 gen_report（21 列 snapshot_phase1）与旧版 28 列。"""
+    cols = (meta or {}).get("columns")
+    if isinstance(cols, list) and len(cols) >= 5:
+        return {str(name): i for i, name in enumerate(cols)}
+    return COL
+
+
+def _field(item: Any, key: str, default=None, col_map: dict[str, int] | None = None):
     if isinstance(item, dict):
         return item.get(key, default)
-    idx = COL.get(key)
+    cmap = col_map or COL
+    idx = cmap.get(key)
     if idx is None or not isinstance(item, (list, tuple)) or idx >= len(item):
         return default
     return item[idx]
@@ -85,47 +97,52 @@ def _bool(v) -> bool:
     return False
 
 
-def item_to_daily_row(report_date: str, rank_no: int, item: Any) -> tuple | None:
-    gid = str(_field(item, "goods_id", "") or "").strip()
+def item_to_daily_row(
+    report_date: str,
+    rank_no: int,
+    item: Any,
+    col_map: dict[str, int] | None = None,
+) -> tuple | None:
+    gid = str(_field(item, "goods_id", "", col_map) or "").strip()
     if not gid:
         return None
     return (
         report_date,
         gid,
         rank_no,
-        _field(item, "title") or "",
-        _num(_field(item, "price")),
-        _int(_field(item, "sold")),
-        _num(_field(item, "v1h")),
-        _num(_field(item, "v6h")),
-        _num(_field(item, "actual_v1d")),
-        _num(_field(item, "v1d")),
-        _num(_field(item, "actual_gr")),
-        _num(_field(item, "gr")),
-        _num(_field(item, "actual_vsr")),
-        _num(_field(item, "vsr")),
-        _num(_field(item, "acc")),
-        _num(_field(item, "burst")),
-        _field(item, "pool") or "",
-        _field(item, "first_seen") or None,
-        _field(item, "store_id") or "",
-        _field(item, "store_name") or "",
-        _field(item, "shelf_time") or None,
-        _int(_field(item, "shop_sales")),
-        _int(_field(item, "shop_fans")),
-        _num(_field(item, "shop_fsr")),
-        _num(_field(item, "goods_fsr")),
-        _field(item, "behavior") or "",
-        _bool(_field(item, "is_virtual")),
-        _num(_field(item, "base_hours")),
-        _field(item, "base_at") or None,
-        str(_field(item, "anomaly") or ""),
+        _field(item, "title", col_map=col_map) or "",
+        _num(_field(item, "price", col_map=col_map)),
+        _int(_field(item, "sold", col_map=col_map)),
+        _num(_field(item, "v1h", col_map=col_map)),
+        _num(_field(item, "v6h", col_map=col_map)),
+        _num(_field(item, "actual_v1d", col_map=col_map)),
+        _num(_field(item, "v1d", col_map=col_map)),
+        _num(_field(item, "actual_gr", col_map=col_map)),
+        _num(_field(item, "gr", col_map=col_map)),
+        _num(_field(item, "actual_vsr", col_map=col_map)),
+        _num(_field(item, "vsr", col_map=col_map)),
+        _num(_field(item, "acc", col_map=col_map)),
+        _num(_field(item, "burst", col_map=col_map)),
+        _field(item, "pool", col_map=col_map) or "",
+        _field(item, "first_seen", col_map=col_map) or None,
+        _field(item, "store_id", col_map=col_map) or "",
+        _field(item, "store_name", col_map=col_map) or "",
+        _field(item, "shelf_time", col_map=col_map) or None,
+        _int(_field(item, "shop_sales", col_map=col_map)),
+        _int(_field(item, "shop_fans", col_map=col_map)),
+        _num(_field(item, "shop_fsr", col_map=col_map)),
+        _num(_field(item, "goods_fsr", col_map=col_map)),
+        _field(item, "behavior", col_map=col_map) or "",
+        _bool(_field(item, "is_virtual", col_map=col_map)),
+        _num(_field(item, "base_hours", col_map=col_map)),
+        _field(item, "base_at", col_map=col_map) or None,
+        str(_field(item, "anomaly", col_map=col_map) or ""),
     )
 
 
-def qualifies_monitor_pool(item: Any) -> bool:
-    v1d = _num(_field(item, "v1d"))
-    actual = _num(_field(item, "actual_v1d"))
+def qualifies_monitor_pool(item: Any, col_map: dict[str, int] | None = None) -> bool:
+    v1d = _num(_field(item, "v1d", col_map=col_map))
+    actual = _num(_field(item, "actual_v1d", col_map=col_map))
     return v1d > 0 or actual > 0
 
 
@@ -138,9 +155,10 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
     monitor_rows = []
     metrics_rows = []
     need_backfill: list[str] = []
+    col_map = _col_map_from_meta(meta)
 
     for rank, item in enumerate(items, start=1):
-        row = item_to_daily_row(report_date, rank, item)
+        row = item_to_daily_row(report_date, rank, item, col_map)
         if not row:
             continue
         daily_rows.append(row)
@@ -149,7 +167,7 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
         actual_v1d = row[8]
         metrics_rows.append((gid, report_date, v1d, actual_v1d, row[11], row[15], row[16]))
 
-        if qualifies_monitor_pool(item):
+        if qualifies_monitor_pool(item, col_map):
             monitor_rows.append(
                 (
                     gid,
@@ -426,6 +444,53 @@ def prune_sold_snapshots(conn, retention_days: int | None = None) -> int:
     return deleted
 
 
+def _int_detail(v, default: int = 0) -> int:
+    if v is None or v == "":
+        return default
+    try:
+        return int(float(v))
+    except (TypeError, ValueError):
+        return default
+
+
+def apply_monitor_goods_detail(c, goods_id: str, detail: dict | None) -> None:
+    """用采集详情刷新 monitor_goods 标题/店铺/粉丝/店铺销量（有值则覆盖为最新）。"""
+    if not detail:
+        return
+    title = str(detail.get("product_name") or detail.get("title") or "").strip()
+    store_id = str(detail.get("shop_id") or detail.get("store_id") or "").strip()
+    store_name = str(detail.get("shop_name") or detail.get("store_name") or "").strip()
+    shop_fans = _int_detail(detail.get("fans_count"))
+    shop_sales = _int_detail(detail.get("shop_total_sales"))
+    if not any((title, store_id, store_name, shop_fans, shop_sales)):
+        return
+    gid = str(goods_id)
+    c.execute("SET search_path TO xhs_monitor, public")
+    c.execute(
+        """UPDATE monitor_goods SET
+               title=CASE WHEN %s<>'' THEN %s ELSE title END,
+               store_id=CASE WHEN %s<>'' THEN %s ELSE store_id END,
+               store_name=CASE WHEN %s<>'' THEN %s ELSE store_name END,
+               shop_fans=CASE WHEN %s>0 THEN %s ELSE shop_fans END,
+               shop_sales=CASE WHEN %s>0 THEN %s ELSE shop_sales END,
+               updated_at=NOW()
+           WHERE goods_id=%s""",
+        (
+            title,
+            title,
+            store_id,
+            store_id,
+            store_name,
+            store_name,
+            shop_fans,
+            shop_fans,
+            shop_sales,
+            shop_sales,
+            gid,
+        ),
+    )
+
+
 def record_cloud_scan(
     conn,
     goods_id: str,
@@ -461,19 +526,7 @@ def record_cloud_scan(
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
         if detail:
-            title = str(detail.get("product_name") or detail.get("title") or "")
-            store_id = str(detail.get("shop_id") or detail.get("store_id") or "")
-            store_name = str(detail.get("shop_name") or detail.get("store_name") or "")
-            if title or store_id or store_name:
-                c.execute(
-                    """UPDATE monitor_goods SET
-                           title=COALESCE(NULLIF(title,''), %s),
-                           store_id=COALESCE(NULLIF(store_id,''), %s),
-                           store_name=COALESCE(NULLIF(store_name,''), %s),
-                           updated_at=NOW()
-                       WHERE goods_id=%s""",
-                    (title, store_id, store_name, gid),
-                )
+            apply_monitor_goods_detail(c, gid, detail)
         c.execute(
             """INSERT INTO goods_sold_snapshots (goods_id, snapshot_time, sold_num, data_source)
                VALUES (%s,%s,%s,%s)
