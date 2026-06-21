@@ -46,7 +46,7 @@ def _load_env() -> dict[str, str]:
         "XHS_LOCAL_AGENT_ID": os.environ.get("COMPUTERNAME", "home-pc"),
         "XHS_LOCAL_AGENT_BATCH": "80",
         "XHS_LOCAL_AGENT_CONCURRENCY": "5",
-        "XHS_LOCAL_AGENT_MODE": "multi_browser",
+        "XHS_LOCAL_AGENT_MODE": "api_then_browser",
         "XHS_LOCAL_AGENT_IDLE_SEC": "300",
         "XHS_LOCAL_AGENT_COOLDOWN_SEC": "15",
     }
@@ -163,6 +163,58 @@ def _run_cmd(cmd: list[str], env: dict | None = None) -> tuple[int, str]:
     return p.returncode, out.strip()
 
 
+def _stop_agent_workers(compare_proc: subprocess.Popen | None = None) -> list[str]:
+    """停止计划任务、对比子进程、local_risk_agent 相关 Python 进程。"""
+    notes: list[str] = []
+
+    if compare_proc is not None and compare_proc.poll() is None:
+        try:
+            compare_proc.terminate()
+            compare_proc.wait(timeout=5)
+            notes.append("已停止对比测试进程")
+        except Exception:
+            try:
+                compare_proc.kill()
+                notes.append("已强制结束对比测试")
+            except Exception as exc:
+                notes.append(f"结束对比进程失败: {exc}")
+
+    subprocess.run(["schtasks", "/End", "/TN", TASK_NAME], capture_output=True)
+    notes.append("已停止计划任务（不再自动重启本轮）")
+
+    killed = 0
+    try:
+        ps = (
+            "Get-CimInstance Win32_Process | "
+            "Where-Object { $_.CommandLine -and $_.CommandLine -match 'local_risk_agent' } | "
+            "ForEach-Object { $_.ProcessId }"
+        )
+        out = subprocess.check_output(
+            ["powershell", "-NoProfile", "-Command", ps],
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
+        for pid in out.strip().split():
+            if not pid.isdigit():
+                continue
+            r = subprocess.run(["taskkill", "/F", "/PID", pid], capture_output=True)
+            if r.returncode == 0:
+                killed += 1
+    except Exception as exc:
+        notes.append(f"清理进程时异常: {exc}")
+    else:
+        notes.append(f"已结束采集进程 {killed} 个")
+
+    try:
+        with open(AGENT_LOG, "a", encoding="utf-8") as f:
+            f.write(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] [GUI] 用户手动停止采集\n")
+    except OSError:
+        pass
+
+    return notes
+
+
 class AgentConfigApp(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
@@ -177,12 +229,13 @@ class AgentConfigApp(tk.Tk):
         self.var_agent_id = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_ID", "home-pc"))
         self.var_batch = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_BATCH", "80"))
         self.var_concurrency = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_CONCURRENCY", "5"))
-        self.var_mode = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_MODE", "multi_browser"))
+        self.var_mode = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_MODE", "api_then_browser"))
         self.var_idle = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_IDLE_SEC", "300"))
         self.var_cooldown = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_COOLDOWN_SEC", "15"))
         self.var_show_key = tk.BooleanVar(value=False)
         self.var_auto_refresh = tk.BooleanVar(value=True)
         self._agent_log_pos = 0
+        self._compare_proc: subprocess.Popen | None = None
 
         self._build_ui()
         self._log_op("就绪。配置好后点「测试连接」；后台日志在「运行日志」页自动刷新。")
@@ -243,6 +296,15 @@ class AgentConfigApp(tk.Tk):
             ("三模式对比", self.on_compare),
         ]:
             ttk.Button(btns, text=text, command=cmd).pack(side=tk.LEFT, padx=3)
+        tk.Button(
+            btns,
+            text="■ 停止采集",
+            command=self.on_stop,
+            fg="#b00020",
+            activeforeground="#b00020",
+            relief=tk.GROOVE,
+            padx=8,
+        ).pack(side=tk.LEFT, padx=8)
 
         op_frm = ttk.LabelFrame(parent, text="本窗口操作日志")
         op_frm.pack(fill=tk.BOTH, expand=True)
@@ -256,6 +318,15 @@ class AgentConfigApp(tk.Tk):
         ttk.Checkbutton(bar, text="每3秒自动刷新", variable=self.var_auto_refresh).pack(side=tk.LEFT, padx=12)
         ttk.Button(bar, text="立即刷新", command=self._refresh_agent_log).pack(side=tk.LEFT, padx=4)
         ttk.Button(bar, text="打开日志目录", command=self.on_open_log).pack(side=tk.LEFT, padx=4)
+        tk.Button(
+            bar,
+            text="■ 停止采集",
+            command=self.on_stop,
+            fg="#b00020",
+            activeforeground="#b00020",
+            relief=tk.GROOVE,
+            padx=6,
+        ).pack(side=tk.LEFT, padx=4)
         self.lbl_run_status = ttk.Label(bar, text="", foreground="#0066cc")
         self.lbl_run_status.pack(side=tk.RIGHT, padx=4)
 
@@ -454,13 +525,17 @@ class AgentConfigApp(tk.Tk):
                 errors="replace",
                 bufsize=1,
             )
+            self._compare_proc = proc
             assert proc.stdout is not None
-            for line in proc.stdout:
-                line = line.rstrip()
-                if line:
-                    self.after(0, lambda s=line: self._log_op(s))
-                self.after(0, lambda: self._refresh_agent_log(incremental=False))
-            code = proc.wait()
+            try:
+                for line in proc.stdout:
+                    line = line.rstrip()
+                    if line:
+                        self.after(0, lambda s=line: self._log_op(s))
+                    self.after(0, lambda: self._refresh_agent_log(incremental=False))
+                code = proc.wait()
+            finally:
+                self._compare_proc = None
             self.after(0, lambda: self._refresh_agent_log(incremental=False))
             self.after(0, lambda: self._refresh_compare_view())
             if code != 0:
@@ -472,6 +547,29 @@ class AgentConfigApp(tk.Tk):
             messagebox.showinfo("完成", "对比报告已更新，见「模式对比报告」页")
 
         self._worker("三模式对比", job, on_ok=on_ok)
+
+    def on_stop(self) -> None:
+        if not messagebox.askyesno(
+            "停止采集",
+            "将停止：\n"
+            "· 后台采集任务\n"
+            "· 正在跑的对比测试\n"
+            "· 相关 Python/浏览器进程\n\n"
+            "（计划任务仍保留，下次可点「保存并自启」再开）\n"
+            "确定停止？",
+        ):
+            return
+
+        def job() -> None:
+            notes = _stop_agent_workers(self._compare_proc)
+            for n in notes:
+                self._log_op(n)
+            self.after(0, lambda: self._refresh_agent_log(incremental=False))
+
+        def on_ok() -> None:
+            messagebox.showinfo("已停止", "采集已停止。\n要再开：改好配置后点「③保存并自启」")
+
+        self._worker("停止采集", job, on_ok=on_ok)
 
     def on_open_log(self) -> None:
         LOG_DIR.mkdir(parents=True, exist_ok=True)
