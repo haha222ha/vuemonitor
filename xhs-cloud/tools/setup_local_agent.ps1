@@ -49,7 +49,7 @@ $EnvFile = Join-Path $RepoRoot "tools\local_agent.env"
     "XHS_LOCAL_AGENT_KEY=$AgentKey"
     "XHS_LOCAL_AGENT_ID=$env:COMPUTERNAME"
     "XHS_LOCAL_AGENT_BATCH=800"
-    "XHS_LOCAL_AGENT_CONCURRENCY=10"
+    "XHS_LOCAL_AGENT_CONCURRENCY=3"
     "XHS_LOCAL_AGENT_IDLE_SEC=300"
     "XHS_LOCAL_AGENT_COOLDOWN_SEC=15"
 ) | Set-Content -Path $EnvFile -Encoding UTF8

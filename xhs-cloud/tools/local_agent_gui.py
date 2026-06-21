@@ -45,7 +45,7 @@ def _load_env() -> dict[str, str]:
         "XHS_LOCAL_AGENT_KEY": "",
         "XHS_LOCAL_AGENT_ID": os.environ.get("COMPUTERNAME", "home-pc"),
         "XHS_LOCAL_AGENT_BATCH": "800",
-        "XHS_LOCAL_AGENT_CONCURRENCY": "10",
+        "XHS_LOCAL_AGENT_CONCURRENCY": "3",
         "XHS_LOCAL_AGENT_MODE": "api_only",
         "XHS_LOCAL_AGENT_IDLE_SEC": "300",
         "XHS_LOCAL_AGENT_COOLDOWN_SEC": "15",
@@ -230,7 +230,7 @@ class AgentConfigApp(tk.Tk):
         self.var_key = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_KEY", ""))
         self.var_agent_id = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_ID", "home-pc"))
         self.var_batch = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_BATCH", "800"))
-        self.var_concurrency = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_CONCURRENCY", "10"))
+        self.var_concurrency = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_CONCURRENCY", "3"))
         self.var_mode = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_MODE", "api_only"))
         self.var_idle = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_IDLE_SEC", "300"))
         self.var_cooldown = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_COOLDOWN_SEC", "15"))
@@ -370,7 +370,7 @@ class AgentConfigApp(tk.Tk):
             "agent_key": self.var_key.get().strip(),
             "agent_id": self.var_agent_id.get().strip() or "home-pc",
             "batch": self.var_batch.get().strip() or "800",
-            "concurrency": self.var_concurrency.get().strip() or "10",
+            "concurrency": self.var_concurrency.get().strip() or "3",
             "mode": self.var_mode.get().strip() or "api_only",
             "idle_sec": self.var_idle.get().strip() or "300",
             "cooldown_sec": self.var_cooldown.get().strip() or "15",
