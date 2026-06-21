@@ -134,7 +134,7 @@ class AgentConfigApp(tk.Tk):
         ttk.Entry(opt, textvariable=self.var_agent_id, width=20).grid(row=0, column=1, sticky=tk.W, padx=8, pady=4)
         ttk.Label(opt, text="每批条数").grid(row=0, column=2, sticky=tk.W, padx=8, pady=4)
         ttk.Entry(opt, textvariable=self.var_batch, width=8).grid(row=0, column=3, sticky=tk.W, padx=8, pady=4)
-        ttk.Label(opt, text="并发数").grid(row=1, column=0, sticky=tk.W, padx=8, pady=4)
+        ttk.Label(opt, text="并发数(1-10)").grid(row=1, column=0, sticky=tk.W, padx=8, pady=4)
         ttk.Entry(opt, textvariable=self.var_concurrency, width=8).grid(row=1, column=1, sticky=tk.W, padx=8, pady=4)
         ttk.Label(opt, text="空闲等待(秒)").grid(row=1, column=2, sticky=tk.W, padx=8, pady=4)
         ttk.Entry(opt, textvariable=self.var_idle, width=8).grid(row=1, column=3, sticky=tk.W, padx=8, pady=4)

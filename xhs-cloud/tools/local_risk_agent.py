@@ -204,7 +204,7 @@ def scan_batch(items: list[dict], concurrency: int, crawler: str) -> list[dict]:
 
 def run_once() -> dict:
     batch_size = max(10, min(500, int(os.environ.get("XHS_LOCAL_AGENT_BATCH", "80"))))
-    concurrency = max(1, min(8, int(os.environ.get("XHS_LOCAL_AGENT_CONCURRENCY", "5"))))
+    concurrency = max(1, min(10, int(os.environ.get("XHS_LOCAL_AGENT_CONCURRENCY", "5"))))
     crawler = os.environ.get("XHS_CRAWLER_ROOT", CRAWLER_DEFAULT).strip()
     scan_date = date.today().isoformat()
 
