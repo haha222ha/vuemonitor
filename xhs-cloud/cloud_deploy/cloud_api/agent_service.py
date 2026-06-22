@@ -3,41 +3,45 @@
 from __future__ import annotations
 
 from collections import Counter
-from datetime import date
 
+from cloud_deploy.cloud_api.scan_claim import count_claimable_risk, pick_and_claim_risk
 from cloud_deploy.cloud_api.sync_service import mark_scan_result, record_cloud_scan
 
+DEFAULT_MIN_AGE_HOURS = 2.0
+DEFAULT_CLAIM_TTL_MINUTES = 25
 
-def list_risk_worklist(conn, scan_date: str, limit: int, include_pending: bool = False) -> dict:
-    day_start = scan_date
-    with conn.cursor() as c:
-        c.execute("SET search_path TO xhs_monitor, public")
-        pending = None
-        if include_pending:
-            c.execute(
-                """SELECT COUNT(*) FROM monitor_goods
-                   WHERE monitor_status IN ('active', 'idle')
-                     AND last_scan_status = 'risk'
-                     AND last_scan_at >= %s::date
-                     AND last_scan_at < (%s::date + INTERVAL '1 day')""",
-                (day_start, day_start),
-            )
-            pending = int(c.fetchone()[0] or 0)
-        c.execute(
-            """SELECT goods_id, title
-               FROM monitor_goods
-               WHERE monitor_status IN ('active', 'idle')
-                 AND last_scan_status = 'risk'
-                 AND last_scan_at >= %s::date
-                 AND last_scan_at < (%s::date + INTERVAL '1 day')
-               ORDER BY priority_score DESC NULLS LAST
-               LIMIT %s""",
-            (day_start, day_start, limit),
+
+def list_risk_worklist(
+    conn,
+    scan_date: str,
+    limit: int,
+    include_pending: bool = False,
+    *,
+    agent_id: str = "",
+    min_age_hours: float = DEFAULT_MIN_AGE_HOURS,
+    claim_ttl_minutes: int = DEFAULT_CLAIM_TTL_MINUTES,
+) -> dict:
+    claimer = f"agent:{agent_id}" if agent_id else "agent:unknown"
+    pending = None
+    if include_pending:
+        pending = count_claimable_risk(
+            conn, scan_date, claimer, min_age_hours=min_age_hours
         )
-        items = [{"goods_id": str(r[0]), "title": r[1] or ""} for r in c.fetchall()]
+    rows = pick_and_claim_risk(
+        conn,
+        scan_date,
+        limit,
+        claimer,
+        min_age_hours=min_age_hours,
+        claim_ttl_minutes=claim_ttl_minutes,
+    )
+    items = [{"goods_id": str(r["goods_id"]), "title": r.get("title") or ""} for r in rows]
     return {
         "scan_date": scan_date,
         "pending_risk": pending,
+        "claim_ttl_minutes": claim_ttl_minutes,
+        "min_age_hours": min_age_hours,
+        "agent_id": agent_id or claimer,
         "items": items,
     }
 
@@ -56,6 +60,8 @@ def slim_detail(detail: dict | None) -> dict:
         "store_name",
         "real_sales",
         "product_sales",
+        "fans_count",
+        "shop_total_sales",
     )
     return {k: detail[k] for k in keys if k in detail and detail[k] not in (None, "")}
 
@@ -121,22 +127,12 @@ def apply_local_scan_batch(
             conn,
             len(rows),
             outcomes.get("ok", 0),
-            outcomes.get("fail", 0) + outcomes.get("error", 0),
+            outcomes.get("fail", 0),
             outcomes.get("risk", 0),
             outcomes.get("frozen", 0),
             0,
-            note[:512],
+            note,
         )
     except Exception:
         pass
-    return {
-        "batch_id": batch_id,
-        "agent_id": agent_id,
-        "received": len(rows),
-        "ok": outcomes.get("ok", 0),
-        "risk": outcomes.get("risk", 0),
-        "fail": outcomes.get("fail", 0),
-        "frozen": outcomes.get("frozen", 0),
-        "error": outcomes.get("error", 0),
-        "scan_date": date.today().isoformat(),
-    }
+    return dict(outcomes)

@@ -104,13 +104,18 @@ def agent_risk_worklist(
     limit: int = 100,
     scan_date: str = "",
     include_pending: int = 0,
+    agent_id: str = "",
+    min_age_hours: float = 2.0,
     _: None = Depends(verify_agent_access),
 ):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from datetime import date
 
-    from cloud_deploy.cloud_api.agent_service import list_risk_worklist
+    from cloud_deploy.cloud_api.agent_service import (
+        DEFAULT_CLAIM_TTL_MINUTES,
+        list_risk_worklist,
+    )
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
 
     limit = max(1, min(int(limit), 1000))
@@ -118,7 +123,15 @@ def agent_risk_worklist(
     init_db()
     conn = _conn()
     try:
-        return list_risk_worklist(conn, day, limit, include_pending=bool(include_pending))
+        return list_risk_worklist(
+            conn,
+            day,
+            limit,
+            include_pending=bool(include_pending),
+            agent_id=agent_id.strip(),
+            min_age_hours=max(0.0, float(min_age_hours)),
+            claim_ttl_minutes=DEFAULT_CLAIM_TTL_MINUTES,
+        )
     finally:
         conn.close()
 

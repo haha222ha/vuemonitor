@@ -52,6 +52,9 @@ $EnvFile = Join-Path $RepoRoot "tools\local_agent.env"
     "XHS_LOCAL_AGENT_CONCURRENCY=3"
     "XHS_LOCAL_AGENT_IDLE_SEC=300"
     "XHS_LOCAL_AGENT_COOLDOWN_SEC=15"
+    "XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC=7200"
+    "XHS_LOCAL_AGENT_MIN_AGE_HOURS=2"
+    "XHS_LOCAL_AGENT_MODE=api_then_browser"
 ) | Set-Content -Path $EnvFile -Encoding UTF8
 
 Write-Host "[4/5] 测试连接..." -ForegroundColor Yellow

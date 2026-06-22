@@ -597,7 +597,9 @@ def mark_scan_result(
         c.execute(
             """UPDATE monitor_goods SET
                    last_scan_at=NOW(), last_scan_status=%s,
-                   last_scan_engine=%s, updated_at=NOW()
+                   last_scan_engine=%s,
+                   scan_claim_by=NULL, scan_claim_until=NULL,
+                   updated_at=NOW()
                WHERE goods_id=%s""",
             (st, eng, gid),
         )

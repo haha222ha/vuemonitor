@@ -291,6 +291,8 @@ def _migrate_legacy_columns(c) -> None:
     c.execute("ALTER TABLE monitor_goods ADD COLUMN IF NOT EXISTS shop_sales INT")
     c.execute("ALTER TABLE monitor_goods ADD COLUMN IF NOT EXISTS shop_fans INT")
     c.execute("ALTER TABLE monitor_goods ADD COLUMN IF NOT EXISTS first_seen TIMESTAMPTZ")
+    c.execute("ALTER TABLE monitor_goods ADD COLUMN IF NOT EXISTS scan_claim_by VARCHAR(64)")
+    c.execute("ALTER TABLE monitor_goods ADD COLUMN IF NOT EXISTS scan_claim_until TIMESTAMPTZ")
     c.execute(
         """
         CREATE INDEX IF NOT EXISTS idx_monitor_scan_pending

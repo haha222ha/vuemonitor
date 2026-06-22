@@ -139,11 +139,14 @@ def _upload_timeout(row_count: int) -> int:
 
 
 def fetch_worklist(limit: int, scan_date: str = "", include_pending: bool = False) -> dict:
-    q = f"?limit={int(limit)}"
+    q = f"?limit={int(limit)}&agent_id={_agent_id()}"
     if scan_date:
         q += f"&scan_date={scan_date}"
     if include_pending:
         q += "&include_pending=1"
+    min_age = os.environ.get("XHS_LOCAL_AGENT_MIN_AGE_HOURS", "2").strip()
+    if min_age:
+        q += f"&min_age_hours={min_age}"
     return _api_request("GET", f"/api/v1/agent/risk-worklist{q}", timeout=180)
 
 

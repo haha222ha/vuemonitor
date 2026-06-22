@@ -30,6 +30,7 @@ class CloudMonitorDaemon:
         self._running = False
         self._round = 0
         self._risk_until = 0.0
+        self._risk_round_until = 0.0
         self.batch_size = max(50, min(int(self.config.get("batch_size", 1000)), 1500))
         self.concurrency = max(1, min(5, int(self.config.get("web_detail_concurrency", 3))))
         self.cooldown = max(0, int(self.config.get("web_cooldown_seconds", 30)))
@@ -37,6 +38,73 @@ class CloudMonitorDaemon:
         self.auto_fallback = bool(self.config.get("auto_fallback", True))
         self._api_only_until = 0.0
         self._maybe_force_api_only_on_start()
+
+    def _risk_cfg(self) -> dict:
+        raw = self.config.get("risk_rescan") or {}
+        if not isinstance(raw, dict):
+            raw = {}
+        enabled = raw.get("enabled", True)
+        if isinstance(enabled, str):
+            enabled = enabled.strip().lower() in ("1", "true", "yes")
+        return {
+            "enabled": bool(enabled),
+            "min_age_hours": float(raw.get("min_age_hours", 2) or 2),
+            "batch_size": max(
+                50,
+                min(int(raw.get("batch_size", 500) or 500), 1000),
+            ),
+            "round_cooldown_seconds": max(
+                300, int(raw.get("round_cooldown_seconds", 7200) or 7200)
+            ),
+            "claim_ttl_minutes": max(
+                5, min(int(raw.get("claim_ttl_minutes", 25) or 25), 120)
+            ),
+        }
+
+    def _risk_rescan_enabled(self) -> bool:
+        return bool(self._risk_cfg()["enabled"])
+
+    def _count_full_pool_pending(self) -> int:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+
+        if not bool(self.config.get("skip_today", True)):
+            return 1
+        init_db()
+        conn = _conn()
+        try:
+            with conn.cursor() as c:
+                c.execute("SET search_path TO xhs_monitor, public")
+                c.execute(
+                    """SELECT COUNT(*) FROM monitor_goods
+                       WHERE monitor_status IN ('active', 'idle')
+                         AND (
+                           last_scan_at IS NULL
+                           OR last_scan_at::date < CURRENT_DATE
+                         )"""
+                )
+                return int(c.fetchone()[0] or 0)
+        finally:
+            conn.close()
+
+    def _pick_risk_batch(self) -> list[dict]:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+        from cloud_deploy.cloud_api.scan_claim import pick_and_claim_risk
+
+        cfg = self._risk_cfg()
+        init_db()
+        conn = _conn()
+        try:
+            today = datetime.now().strftime("%Y-%m-%d")
+            return pick_and_claim_risk(
+                conn,
+                today,
+                cfg["batch_size"],
+                "cloud-daemon",
+                min_age_hours=cfg["min_age_hours"],
+                claim_ttl_minutes=cfg["claim_ttl_minutes"],
+            )
+        finally:
+            conn.close()
 
     def _setup_crawler_path(self) -> None:
         crawler = os.environ.get("XHS_CRAWLER_ROOT", "").strip()
@@ -233,7 +301,37 @@ class CloudMonitorDaemon:
 
     def run_once(self) -> dict:
         t0 = time.time()
+        batch_mode = "full"
         batch = self._pick_batch()
+        risk_cfg = self._risk_cfg()
+
+        if not batch and self._risk_rescan_enabled():
+            pending_full = self._count_full_pool_pending()
+            if pending_full > 0:
+                self.log(
+                    f"[cloud-daemon] 全池扫描进行中(待扫≈{pending_full})，risk 补扫暂缓"
+                )
+                return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
+            now = time.time()
+            if now < self._risk_round_until:
+                remain = int(self._risk_round_until - now)
+                self.log(f"[cloud-daemon] risk 整轮冷却 {remain}s，跳过")
+                return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
+            batch = self._pick_risk_batch()
+            batch_mode = "risk"
+            if not batch:
+                self._risk_round_until = time.time() + risk_cfg["round_cooldown_seconds"]
+                hrs = risk_cfg["round_cooldown_seconds"] // 3600
+                self.log(
+                    f"[cloud-daemon] 无可补扫 risk(距上次≥{risk_cfg['min_age_hours']}h)，"
+                    f"整轮冷却 {hrs}h"
+                )
+                return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
+            self.log(
+                f"[cloud-daemon] risk 补扫 本批={len(batch)} "
+                f"(距上次≥{risk_cfg['min_age_hours']}h)"
+            )
+
         if not batch:
             self.log("[cloud-daemon] 监控池为空，跳过")
             return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
@@ -263,7 +361,8 @@ class CloudMonitorDaemon:
         wall_ms = int((time.time() - t0) * 1000)
         self._round += 1
         eng_note = dict(engine_hits)
-        note = f"R{self._round} engines={eng_note}"
+        prefix = "riskR" if batch_mode == "risk" else "R"
+        note = f"{prefix}{self._round} engines={eng_note}"
         result = {
             "batch": len(batch),
             "ok": ok,
@@ -274,7 +373,7 @@ class CloudMonitorDaemon:
             "engines": eng_note,
         }
         self.log(
-            f"[cloud-daemon] R{self._round} 批={len(batch)} ok={ok} fail={fail} "
+            f"[cloud-daemon] {prefix}{self._round} 批={len(batch)} ok={ok} fail={fail} "
             f"risk={risk} frozen={frozen} {wall_ms}ms 引擎={eng_note}"
         )
 
@@ -344,7 +443,7 @@ class CloudMonitorDaemon:
         self._setup_crawler_path()
         self.log(
             f"[cloud-daemon] 启动 batch={self.batch_size} conc={self.concurrency} "
-            f"cooldown={self.cooldown}s"
+            f"cooldown={self.cooldown}s risk_rescan={self._risk_rescan_enabled()}"
         )
 
         try:

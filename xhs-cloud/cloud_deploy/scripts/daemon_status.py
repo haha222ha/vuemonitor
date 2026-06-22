@@ -39,6 +39,16 @@ def main() -> int:
             )
             attempted_today = int(c.fetchone()[0] or 0)
             c.execute(
+                """SELECT COUNT(*) FROM monitor_goods
+                   WHERE monitor_status IN ('active','idle')
+                     AND last_scan_status = 'risk'
+                     AND last_scan_at >= CURRENT_DATE
+                     AND last_scan_at < CURRENT_DATE + INTERVAL '1 day'
+                     AND last_scan_at < NOW() - INTERVAL '2 hours'
+                     AND (scan_claim_until IS NULL OR scan_claim_until < NOW())"""
+            )
+            risk_rescan_ready = int(c.fetchone()[0] or 0)
+            c.execute(
                 """SELECT last_scan_status, COUNT(*)
                    FROM monitor_goods
                    WHERE monitor_status IN ('active','idle')
@@ -59,6 +69,7 @@ def main() -> int:
     print(f"今日成功(ok)已扫:   {scanned_today:,} ({pct:.2f}%)")
     print(f"今日已尝试(含fail): {attempted_today:,}")
     print(f"待扫(约):           {max(0, pool - attempted_today):,}")
+    print(f"risk可补扫(≥2h):    {risk_rescan_ready:,}")
     if status_rows:
         parts = [f"{st or 'null'}={n:,}" for st, n in status_rows]
         print(f"今日状态分布:       {', '.join(parts)}")

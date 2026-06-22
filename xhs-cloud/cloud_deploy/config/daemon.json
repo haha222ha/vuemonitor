@@ -12,6 +12,13 @@
   "full_pool": true,
   "skip_today": true,
   "min_sold": 0,
+  "risk_rescan": {
+    "enabled": true,
+    "min_age_hours": 2,
+    "batch_size": 500,
+    "round_cooldown_seconds": 7200,
+    "claim_ttl_minutes": 25
+  },
   "seed_batch_size": 0,
   "queue_sort": "monitor_first",
   "sold_tier_min": 10
