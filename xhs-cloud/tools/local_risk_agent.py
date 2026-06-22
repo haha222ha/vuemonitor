@@ -142,11 +142,16 @@ def fetch_worklist(limit: int, scan_date: str = "", include_pending: bool = Fals
     q = f"?limit={int(limit)}&agent_id={_agent_id()}"
     if scan_date:
         q += f"&scan_date={scan_date}"
-    if include_pending:
-        q += "&include_pending=1"
     min_age = os.environ.get("XHS_LOCAL_AGENT_MIN_AGE_HOURS", "2").strip()
     if min_age:
         q += f"&min_age_hours={min_age}"
+    if include_pending:
+        try:
+            return _api_request("GET", f"/api/v1/agent/risk-worklist{q}&include_pending=1", timeout=180)
+        except RuntimeError as exc:
+            if "500" not in str(exc):
+                raise
+            _log(f"拉 pending 失败({exc})，降级为仅拉工单")
     return _api_request("GET", f"/api/v1/agent/risk-worklist{q}", timeout=180)
 
 
