@@ -137,6 +137,55 @@ def pick_and_claim_risk(
     return rows
 
 
+def pick_and_claim_pool(
+    conn,
+    limit: int,
+    claimer: str,
+    *,
+    claim_ttl_minutes: int = DEFAULT_CLAIM_TTL_MINUTES,
+) -> list[dict]:
+    """认领并返回下一批全池商品（与本地 Agent 的 risk claim 互不冲突）。"""
+    ensure_scan_claim_columns(conn)
+    limit = max(1, min(int(limit), 1500))
+    claimer = str(claimer or "unknown")[:64]
+    ttl = max(5, min(int(claim_ttl_minutes), 120))
+
+    sql = f"""
+        WITH picked AS (
+            SELECT m.goods_id
+            FROM monitor_goods m
+            WHERE m.monitor_status IN ('active', 'idle')
+              AND {_claimable_sql("m")}
+            ORDER BY m.priority_score DESC NULLS LAST,
+                     m.last_scan_at ASC NULLS FIRST
+            LIMIT %s
+            FOR UPDATE SKIP LOCKED
+        )
+        UPDATE monitor_goods m
+        SET scan_claim_by = %s,
+            scan_claim_until = NOW() + (%s * INTERVAL '1 minute'),
+            updated_at = NOW()
+        FROM picked p
+        WHERE m.goods_id = p.goods_id
+        RETURNING m.goods_id, m.title, m.last_v1d, m.last_sold, m.tier, m.pool, m.priority_score
+    """
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(sql, (claimer, limit, claimer, ttl))
+        cols = (
+            "goods_id",
+            "title",
+            "last_v1d",
+            "last_sold",
+            "tier",
+            "pool",
+            "priority_score",
+        )
+        rows = [dict(zip(cols, row)) for row in c.fetchall()]
+    conn.commit()
+    return rows
+
+
 def clear_scan_claim(conn, goods_id: str) -> None:
     gid = str(goods_id or "").strip()
     if not gid:

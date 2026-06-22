@@ -12,6 +12,11 @@
   "full_pool": true,
   "skip_today": true,
   "min_sold": 0,
+  "pool_cycle": {
+    "enabled": true,
+    "pause_hours": 5,
+    "claim_ttl_minutes": 25
+  },
   "risk_rescan": {
     "enabled": true,
     "min_age_hours": 2,

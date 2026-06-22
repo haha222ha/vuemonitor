@@ -31,6 +31,9 @@ class CloudMonitorDaemon:
         self._round = 0
         self._risk_until = 0.0
         self._risk_round_until = 0.0
+        self._full_round_until = 0.0
+        self._phase = "daily"
+        self._scan_date = ""
         self._last_cooldown = max(0, int(self.config.get("web_cooldown_seconds", 30)))
         self.batch_size = max(50, min(int(self.config.get("batch_size", 1000)), 1500))
         self.concurrency = max(1, min(5, int(self.config.get("web_detail_concurrency", 3))))
@@ -65,7 +68,27 @@ class CloudMonitorDaemon:
             ),
         }
 
+    def _pool_cycle_cfg(self) -> dict:
+        raw = self.config.get("pool_cycle") or {}
+        if not isinstance(raw, dict):
+            raw = {}
+        enabled = raw.get("enabled", True)
+        if isinstance(enabled, str):
+            enabled = enabled.strip().lower() in ("1", "true", "yes")
+        return {
+            "enabled": bool(enabled),
+            "pause_hours": max(1.0, float(raw.get("pause_hours", 5) or 5)),
+            "claim_ttl_minutes": max(
+                5, min(int(raw.get("claim_ttl_minutes", 25) or 25), 120)
+            ),
+        }
+
+    def _pool_cycle_enabled(self) -> bool:
+        return bool(self._pool_cycle_cfg()["enabled"])
+
     def _risk_rescan_enabled(self) -> bool:
+        if self._pool_cycle_enabled():
+            return False
         return bool(self._risk_cfg()["enabled"])
 
     def _count_full_pool_pending(self) -> int:
@@ -90,6 +113,23 @@ class CloudMonitorDaemon:
         finally:
             conn.close()
 
+    def _pick_cycle_batch(self) -> list[dict]:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+        from cloud_deploy.cloud_api.scan_claim import pick_and_claim_pool
+
+        cfg = self._pool_cycle_cfg()
+        init_db()
+        conn = _conn()
+        try:
+            return pick_and_claim_pool(
+                conn,
+                self.batch_size,
+                "cloud-daemon",
+                claim_ttl_minutes=cfg["claim_ttl_minutes"],
+            )
+        finally:
+            conn.close()
+
     def _pick_risk_batch(self) -> list[dict]:
         from cloud_deploy.cloud_api.database_pg import _conn, init_db
         from cloud_deploy.cloud_api.scan_claim import pick_and_claim_risk
@@ -109,6 +149,112 @@ class CloudMonitorDaemon:
             )
         finally:
             conn.close()
+
+    def _rollover_scan_day(self) -> None:
+        today = datetime.now().strftime("%Y-%m-%d")
+        if self._scan_date != today:
+            self._scan_date = today
+            self._phase = "daily"
+            self._full_round_until = 0.0
+            self._risk_round_until = 0.0
+
+    def _log_pause_remain(self) -> None:
+        remain = int(self._full_round_until - time.time())
+        hrs, rem = divmod(max(0, remain), 3600)
+        mins, secs = divmod(rem, 60)
+        if hrs:
+            eta = f"{hrs}h{mins}m"
+        elif mins:
+            eta = f"{mins}m{secs}s"
+        else:
+            eta = f"{secs}s"
+        nxt = "risk 补扫" if self._phase == "pause" else "下一轮"
+        self.log(f"[cloud-daemon] 轮间休息 {eta}，之后 {nxt}")
+
+    def _schedule_pool_pause(self, reason: str) -> None:
+        hrs = self._pool_cycle_cfg()["pause_hours"]
+        self._full_round_until = time.time() + int(hrs * 3600)
+        self._phase = "pause"
+        risk_cfg = self._risk_cfg()
+        self.log(
+            f"[cloud-daemon] {reason}，休息 {hrs:g}h 后 risk 补扫 "
+            f"(batch={risk_cfg['batch_size']} cd={risk_cfg['batch_cooldown_seconds']}s)"
+        )
+
+    def _run_pool_cycle_once(self) -> tuple[list[dict], str]:
+        """大循环: 首轮全池 → 休5h → risk200/60s → risk休2h → 全池1000/30s → 休5h → …"""
+        now = time.time()
+        risk_cfg = self._risk_cfg()
+
+        if self._phase == "pause":
+            if now < self._full_round_until:
+                self._log_pause_remain()
+                self._last_cooldown = self.cooldown
+                return [], "full"
+            self._phase = "risk"
+            self.log("[cloud-daemon] 休息结束，进入 risk 补扫")
+
+        if self._phase == "risk_cooldown":
+            if now < self._risk_round_until:
+                remain = int(self._risk_round_until - now)
+                self.log(f"[cloud-daemon] risk 整轮冷却 {remain}s，跳过")
+                self._last_cooldown = self.cooldown
+                return [], "risk"
+            self._phase = "cycle_full"
+            self.log(
+                f"[cloud-daemon] risk 冷却结束，进入全池循环 "
+                f"(batch={self.batch_size} cd={self.cooldown}s)"
+            )
+
+        if self._phase == "daily":
+            batch = self._pick_batch()
+            if batch:
+                return batch, "full"
+            if self._count_full_pool_pending() > 0:
+                self.log(
+                    f"[cloud-daemon] 待扫≈{self._count_full_pool_pending()} "
+                    f"本批为空，{self.cooldown}s 后重试"
+                )
+                self._last_cooldown = self.cooldown
+                return [], "full"
+            self._schedule_pool_pause("今日首轮全池扫描完成")
+            self._last_cooldown = self.cooldown
+            return [], "full"
+
+        if self._phase == "risk":
+            batch = self._pick_risk_batch()
+            if batch:
+                self.log(
+                    f"[cloud-daemon] risk 补扫 本批={len(batch)} "
+                    f"(距上次≥{risk_cfg['min_age_hours']}h)"
+                )
+                return batch, "risk"
+            hrs = risk_cfg["round_cooldown_seconds"] // 3600
+            self._risk_round_until = now + risk_cfg["round_cooldown_seconds"]
+            self._phase = "risk_cooldown"
+            self.log(
+                f"[cloud-daemon] risk 补扫完成，整轮冷却 {hrs}h "
+                f"后全池循环 batch={self.batch_size}"
+            )
+            self._last_cooldown = risk_cfg["batch_cooldown_seconds"]
+            return [], "risk"
+
+        if self._phase == "cycle_full":
+            batch = self._pick_cycle_batch()
+            if batch:
+                self.log(
+                    f"[cloud-daemon] 全池循环补扫 本批={len(batch)} "
+                    f"(claim 避让家庭 Agent)"
+                )
+                return batch, "cycle"
+            self._schedule_pool_pause("本轮全池循环扫描完成")
+            self._last_cooldown = self.cooldown
+            return [], "cycle"
+
+        self.log(f"[cloud-daemon] 未知阶段 {self._phase!r}，重置为 daily")
+        self._phase = "daily"
+        self._last_cooldown = self.cooldown
+        return [], "full"
 
     def _setup_crawler_path(self) -> None:
         crawler = os.environ.get("XHS_CRAWLER_ROOT", "").strip()
@@ -305,39 +451,45 @@ class CloudMonitorDaemon:
 
     def run_once(self) -> dict:
         t0 = time.time()
+        self._rollover_scan_day()
+        batch: list[dict] = []
         batch_mode = "full"
-        batch = self._pick_batch()
-        risk_cfg = self._risk_cfg()
 
-        if not batch and self._risk_rescan_enabled():
-            pending_full = self._count_full_pool_pending()
-            if pending_full > 0:
+        if self._pool_cycle_enabled():
+            batch, batch_mode = self._run_pool_cycle_once()
+        else:
+            batch = self._pick_batch()
+            if not batch and self._risk_cfg()["enabled"]:
+                risk_cfg = self._risk_cfg()
+                pending_full = self._count_full_pool_pending()
+                if pending_full > 0:
+                    self.log(
+                        f"[cloud-daemon] 全池扫描进行中(待扫≈{pending_full})，risk 补扫暂缓"
+                    )
+                    return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
+                now = time.time()
+                if now < self._risk_round_until:
+                    remain = int(self._risk_round_until - now)
+                    self.log(f"[cloud-daemon] risk 整轮冷却 {remain}s，跳过")
+                    return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
+                batch = self._pick_risk_batch()
+                batch_mode = "risk"
+                if not batch:
+                    self._risk_round_until = time.time() + risk_cfg["round_cooldown_seconds"]
+                    hrs = risk_cfg["round_cooldown_seconds"] // 3600
+                    self.log(
+                        f"[cloud-daemon] 无可补扫 risk(距上次≥{risk_cfg['min_age_hours']}h)，"
+                        f"整轮冷却 {hrs}h"
+                    )
+                    return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
                 self.log(
-                    f"[cloud-daemon] 全池扫描进行中(待扫≈{pending_full})，risk 补扫暂缓"
+                    f"[cloud-daemon] risk 补扫 本批={len(batch)} "
+                    f"(距上次≥{risk_cfg['min_age_hours']}h)"
                 )
-                return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
-            now = time.time()
-            if now < self._risk_round_until:
-                remain = int(self._risk_round_until - now)
-                self.log(f"[cloud-daemon] risk 整轮冷却 {remain}s，跳过")
-                return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
-            batch = self._pick_risk_batch()
-            batch_mode = "risk"
-            if not batch:
-                self._risk_round_until = time.time() + risk_cfg["round_cooldown_seconds"]
-                hrs = risk_cfg["round_cooldown_seconds"] // 3600
-                self.log(
-                    f"[cloud-daemon] 无可补扫 risk(距上次≥{risk_cfg['min_age_hours']}h)，"
-                    f"整轮冷却 {hrs}h"
-                )
-                return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
-            self.log(
-                f"[cloud-daemon] risk 补扫 本批={len(batch)} "
-                f"(距上次≥{risk_cfg['min_age_hours']}h)"
-            )
 
         if not batch:
-            self.log("[cloud-daemon] 监控池为空，跳过")
+            if not self._pool_cycle_enabled():
+                self.log("[cloud-daemon] 监控池为空，跳过")
             return {"batch": 0, "ok": 0, "fail": 0, "risk": 0, "frozen": 0}
 
         ok = fail = risk = frozen = 0
@@ -365,7 +517,7 @@ class CloudMonitorDaemon:
         wall_ms = int((time.time() - t0) * 1000)
         self._round += 1
         eng_note = dict(engine_hits)
-        prefix = "riskR" if batch_mode == "risk" else "R"
+        prefix = "riskR" if batch_mode == "risk" else ("C" if batch_mode == "cycle" else "R")
         note = f"{prefix}{self._round} engines={eng_note}"
         result = {
             "batch": len(batch),
@@ -452,15 +604,18 @@ class CloudMonitorDaemon:
         self._running = True
         self._stop.clear()
         self._setup_crawler_path()
-        risk_note = ""
-        if self._risk_rescan_enabled():
+        cycle_note = ""
+        if self._pool_cycle_enabled():
+            pc = self._pool_cycle_cfg()
             rc = self._risk_cfg()
-            risk_note = (
-                f" risk_batch={rc['batch_size']} risk_cd={rc['batch_cooldown_seconds']}s"
+            cycle_note = (
+                f" phase={self._phase} pause={pc['pause_hours']}h "
+                f"risk={rc['batch_size']}/{rc['batch_cooldown_seconds']}s "
+                f"full={self.batch_size}/{self.cooldown}s"
             )
         self.log(
             f"[cloud-daemon] 启动 batch={self.batch_size} conc={self.concurrency} "
-            f"cooldown={self.cooldown}s risk_rescan={self._risk_rescan_enabled()}{risk_note}"
+            f"cooldown={self.cooldown}s pool_cycle={self._pool_cycle_enabled()}{cycle_note}"
         )
 
         try:
