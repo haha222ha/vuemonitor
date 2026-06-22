@@ -31,6 +31,7 @@ class CloudMonitorDaemon:
         self._round = 0
         self._risk_until = 0.0
         self._risk_round_until = 0.0
+        self._last_cooldown = max(0, int(self.config.get("web_cooldown_seconds", 30)))
         self.batch_size = max(50, min(int(self.config.get("batch_size", 1000)), 1500))
         self.concurrency = max(1, min(5, int(self.config.get("web_detail_concurrency", 3))))
         self.cooldown = max(0, int(self.config.get("web_cooldown_seconds", 30)))
@@ -51,7 +52,10 @@ class CloudMonitorDaemon:
             "min_age_hours": float(raw.get("min_age_hours", 2) or 2),
             "batch_size": max(
                 50,
-                min(int(raw.get("batch_size", 500) or 500), 1000),
+                min(int(raw.get("batch_size", 200) or 200), 1000),
+            ),
+            "batch_cooldown_seconds": max(
+                10, int(raw.get("batch_cooldown_seconds", 60) or 60)
             ),
             "round_cooldown_seconds": max(
                 300, int(raw.get("round_cooldown_seconds", 7200) or 7200)
@@ -401,6 +405,12 @@ class CloudMonitorDaemon:
 
         batch_total = len(batch)
         success_rate = (ok / batch_total) if batch_total else 0.0
+
+        if batch_mode == "risk":
+            risk_cfg = self._risk_cfg()
+            self._last_cooldown = risk_cfg["batch_cooldown_seconds"]
+            return result
+
         dp_dead = (
             batch_total >= 50
             and risk == 0
@@ -420,6 +430,7 @@ class CloudMonitorDaemon:
             extra = min(600, max(120, self.cooldown * 3))
             self._wait_risk_cooldown(extra)
 
+        self._last_cooldown = self.cooldown
         return result
 
     def _recover_drissionpage(self, wall_ms: int) -> None:
@@ -441,9 +452,15 @@ class CloudMonitorDaemon:
         self._running = True
         self._stop.clear()
         self._setup_crawler_path()
+        risk_note = ""
+        if self._risk_rescan_enabled():
+            rc = self._risk_cfg()
+            risk_note = (
+                f" risk_batch={rc['batch_size']} risk_cd={rc['batch_cooldown_seconds']}s"
+            )
         self.log(
             f"[cloud-daemon] 启动 batch={self.batch_size} conc={self.concurrency} "
-            f"cooldown={self.cooldown}s risk_rescan={self._risk_rescan_enabled()}"
+            f"cooldown={self.cooldown}s risk_rescan={self._risk_rescan_enabled()}{risk_note}"
         )
 
         try:
@@ -458,7 +475,8 @@ class CloudMonitorDaemon:
                 time.sleep(1)
                 continue
             self.run_once()
-            for _ in range(self.cooldown):
+            cd = max(0, int(self._last_cooldown or self.cooldown))
+            for _ in range(cd):
                 if self._stop.wait(1):
                     break
         self._running = False
