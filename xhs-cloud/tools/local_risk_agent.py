@@ -51,11 +51,20 @@ from local_risk_agent_modes import (
 )
 
 _TOOLS = os.path.dirname(os.path.abspath(__file__))
-_XHS_ROOT = os.environ.get("XHS_CLOUD_PKG_ROOT", os.path.dirname(_TOOLS))
-if _XHS_ROOT not in sys.path:
-    sys.path.insert(0, _XHS_ROOT)
 if _TOOLS not in sys.path:
     sys.path.insert(0, _TOOLS)
+
+try:
+    from portable_paths import apply_runtime_paths, config_file as _portable_config_file
+
+    _XHS_ROOT = str(apply_runtime_paths())
+except ImportError:
+    _XHS_ROOT = os.environ.get("XHS_CLOUD_PKG_ROOT", os.path.dirname(_TOOLS))
+    if _XHS_ROOT not in sys.path:
+        sys.path.insert(0, _XHS_ROOT)
+
+if _XHS_ROOT not in sys.path:
+    sys.path.insert(0, _XHS_ROOT)
 
 CLOUD_ROOT = os.path.join(_XHS_ROOT, "cloud_deploy")
 CRAWLER_DEFAULT = os.path.join(_XHS_ROOT, "cloud_deploy", "crawler_runtime")
@@ -203,6 +212,11 @@ def _agent_mode() -> str:
 
 def _load_env_file() -> None:
     env_file = os.environ.get("XHS_LOCAL_AGENT_ENV", "").strip()
+    if not env_file:
+        try:
+            env_file = str(_portable_config_file())
+        except NameError:
+            env_file = ""
     if not env_file:
         default_env = Path(__file__).resolve().parent / "local_agent.env"
         if default_env.is_file():
