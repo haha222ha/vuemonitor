@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""cloud_daemon 采集状态（队列覆盖 / 最近批次 / 今日扫描率）。"""
+"""cloud_daemon 采集状态（队列覆盖 / 最近批次 / 今日扫描率）。
+
+服务器请用 venv 运行（系统 python3 无 psycopg2）:
+  /opt/xhs-cloud/venv/bin/python cloud_deploy/scripts/daemon_status.py
+本脚本在检测到 venv 时会自动切换解释器。
+"""
 from __future__ import annotations
 
 import json
@@ -10,7 +15,23 @@ ROOT = os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud")
 sys.path.insert(0, ROOT)
 
 
+def _reexec_venv_if_needed() -> None:
+    vpy = os.path.join(ROOT, "venv", "bin", "python")
+    if not os.path.isfile(vpy):
+        return
+    try:
+        if os.path.samefile(sys.executable, vpy):
+            return
+    except (OSError, ValueError):
+        if os.path.normcase(os.path.abspath(sys.executable)) == os.path.normcase(
+            os.path.abspath(vpy)
+        ):
+            return
+    os.execv(vpy, [vpy, *sys.argv])
+
+
 def main() -> int:
+    _reexec_venv_if_needed()
     from cloud_deploy.scripts.bootstrap_env import bootstrap
 
     bootstrap()

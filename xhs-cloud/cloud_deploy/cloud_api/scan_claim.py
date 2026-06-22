@@ -5,6 +5,10 @@ from __future__ import annotations
 DEFAULT_CLAIM_TTL_MINUTES = 25
 
 
+def _hours_ago_sql(column: str) -> str:
+    return f" AND {column} < NOW() - (%s * INTERVAL '1 hour')"
+
+
 def ensure_scan_claim_columns(conn) -> None:
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
@@ -27,7 +31,7 @@ def count_today_risk(conn, scan_date: str, *, min_age_hours: float = 0) -> int:
     params: list = [scan_date, scan_date]
     age_sql = ""
     if min_age_hours > 0:
-        age_sql = " AND last_scan_at < NOW() - make_interval(hours => %s)"
+        age_sql = _hours_ago_sql("last_scan_at")
         params.append(float(min_age_hours))
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
@@ -54,7 +58,7 @@ def count_claimable_risk(
     params: list = [scan_date, scan_date]
     age_sql = ""
     if min_age_hours > 0:
-        age_sql = " AND last_scan_at < NOW() - make_interval(hours => %s)"
+        age_sql = _hours_ago_sql("last_scan_at")
         params.append(float(min_age_hours))
     params.append(str(claimer or "unknown")[:64])
     with conn.cursor() as c:
@@ -90,7 +94,7 @@ def pick_and_claim_risk(
     params: list = [scan_date, scan_date]
     age_sql = ""
     if min_age_hours > 0:
-        age_sql = " AND m.last_scan_at < NOW() - make_interval(hours => %s)"
+        age_sql = _hours_ago_sql("m.last_scan_at")
         params.append(float(min_age_hours))
     params.extend([claimer, limit, claimer, ttl])
 
@@ -110,7 +114,7 @@ def pick_and_claim_risk(
         )
         UPDATE monitor_goods m
         SET scan_claim_by = %s,
-            scan_claim_until = NOW() + make_interval(mins => %s),
+            scan_claim_until = NOW() + (%s * INTERVAL '1 minute'),
             updated_at = NOW()
         FROM picked p
         WHERE m.goods_id = p.goods_id
