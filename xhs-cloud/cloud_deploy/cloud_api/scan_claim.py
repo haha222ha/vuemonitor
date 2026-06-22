@@ -17,12 +17,12 @@ def ensure_scan_claim_columns(conn) -> None:
     conn.commit()
 
 
-def _claimable_sql(alias: str = "m") -> str:
-    a = alias
+def _claimable_sql(alias: str = "") -> str:
+    p = f"{alias}." if alias else ""
     return f"""(
-        {a}.scan_claim_until IS NULL
-        OR {a}.scan_claim_until < NOW()
-        OR {a}.scan_claim_by = %s
+        {p}scan_claim_until IS NULL
+        OR {p}scan_claim_until < NOW()
+        OR {p}scan_claim_by = %s
     )"""
 
 

@@ -151,18 +151,32 @@ def fetch_worklist(limit: int, scan_date: str = "", include_pending: bool = Fals
 
 
 def upload_results(rows: list[dict], batch_id: str, scan_date: str) -> dict:
-    timeout = _upload_timeout(len(rows))
-    return _api_request(
-        "POST",
-        "/api/v1/agent/scan-results",
-        {
-            "batch_id": batch_id,
-            "agent_id": _agent_id(),
-            "scan_date": scan_date,
-            "rows": rows,
-        },
-        timeout=timeout,
-    )
+    if not rows:
+        return {"received": 0, "ok": 0, "risk": 0, "fail": 0, "frozen": 0, "error": 0}
+    chunk_size = max(1, min(500, int(os.environ.get("XHS_LOCAL_AGENT_UPLOAD_CHUNK", "500"))))
+    merged: dict = {"received": 0, "ok": 0, "risk": 0, "fail": 0, "frozen": 0, "error": 0, "skip": 0}
+    chunks = [rows[i : i + chunk_size] for i in range(0, len(rows), chunk_size)]
+    for idx, chunk in enumerate(chunks):
+        timeout = _upload_timeout(len(chunk))
+        part_id = batch_id if len(chunks) == 1 else f"{batch_id}-{idx + 1}"
+        part = _api_request(
+            "POST",
+            "/api/v1/agent/scan-results",
+            {
+                "batch_id": part_id,
+                "agent_id": _agent_id(),
+                "scan_date": scan_date,
+                "rows": chunk,
+            },
+            timeout=timeout,
+        )
+        for key in ("received", "ok", "risk", "fail", "frozen", "error", "skip"):
+            merged[key] = int(merged.get(key, 0) or 0) + int(part.get(key, 0) or 0)
+        merged["batch_id"] = batch_id
+        merged["agent_id"] = _agent_id()
+        merged["scan_date"] = scan_date
+        merged["parts"] = len(chunks)
+    return merged
 
 
 def _agent_mode() -> str:
