@@ -18,7 +18,7 @@
     "claim_ttl_minutes": 25
   },
   "risk_rescan": {
-    "enabled": true,
+    "enabled": false,
     "min_age_hours": 2,
     "batch_size": 200,
     "batch_cooldown_seconds": 60,

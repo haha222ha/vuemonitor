@@ -168,41 +168,30 @@ class CloudMonitorDaemon:
             eta = f"{mins}m{secs}s"
         else:
             eta = f"{secs}s"
-        nxt = "risk 补扫" if self._phase == "pause" else "下一轮"
+        nxt = "全池补扫" if self._phase == "pause" else "下一轮"
         self.log(f"[cloud-daemon] 轮间休息 {eta}，之后 {nxt}")
 
     def _schedule_pool_pause(self, reason: str) -> None:
         hrs = self._pool_cycle_cfg()["pause_hours"]
         self._full_round_until = time.time() + int(hrs * 3600)
         self._phase = "pause"
-        risk_cfg = self._risk_cfg()
         self.log(
-            f"[cloud-daemon] {reason}，休息 {hrs:g}h 后 risk 补扫 "
-            f"(batch={risk_cfg['batch_size']} cd={risk_cfg['batch_cooldown_seconds']}s)"
+            f"[cloud-daemon] {reason}，休息 {hrs:g}h 后继续全池 "
+            f"(batch={self.batch_size} cd={self.cooldown}s)"
         )
 
     def _run_pool_cycle_once(self) -> tuple[list[dict], str]:
-        """大循环: 首轮全池 → 休5h → risk200/60s → risk休2h → 全池1000/30s → 休5h → …"""
+        """大循环: 首轮全池 → 休5h → 全池1000/30s → 休5h → 全池 → …（risk 由家庭 Agent）"""
         now = time.time()
-        risk_cfg = self._risk_cfg()
 
         if self._phase == "pause":
             if now < self._full_round_until:
                 self._log_pause_remain()
                 self._last_cooldown = self.cooldown
                 return [], "full"
-            self._phase = "risk"
-            self.log("[cloud-daemon] 休息结束，进入 risk 补扫")
-
-        if self._phase == "risk_cooldown":
-            if now < self._risk_round_until:
-                remain = int(self._risk_round_until - now)
-                self.log(f"[cloud-daemon] risk 整轮冷却 {remain}s，跳过")
-                self._last_cooldown = self.cooldown
-                return [], "risk"
             self._phase = "cycle_full"
             self.log(
-                f"[cloud-daemon] risk 冷却结束，进入全池循环 "
+                f"[cloud-daemon] 休息结束，进入全池补扫 "
                 f"(batch={self.batch_size} cd={self.cooldown}s)"
             )
 
@@ -221,33 +210,15 @@ class CloudMonitorDaemon:
             self._last_cooldown = self.cooldown
             return [], "full"
 
-        if self._phase == "risk":
-            batch = self._pick_risk_batch()
-            if batch:
-                self.log(
-                    f"[cloud-daemon] risk 补扫 本批={len(batch)} "
-                    f"(距上次≥{risk_cfg['min_age_hours']}h)"
-                )
-                return batch, "risk"
-            hrs = risk_cfg["round_cooldown_seconds"] // 3600
-            self._risk_round_until = now + risk_cfg["round_cooldown_seconds"]
-            self._phase = "risk_cooldown"
-            self.log(
-                f"[cloud-daemon] risk 补扫完成，整轮冷却 {hrs}h "
-                f"后全池循环 batch={self.batch_size}"
-            )
-            self._last_cooldown = risk_cfg["batch_cooldown_seconds"]
-            return [], "risk"
-
         if self._phase == "cycle_full":
             batch = self._pick_cycle_batch()
             if batch:
                 self.log(
-                    f"[cloud-daemon] 全池循环补扫 本批={len(batch)} "
+                    f"[cloud-daemon] 全池补扫 本批={len(batch)} "
                     f"(claim 避让家庭 Agent)"
                 )
                 return batch, "cycle"
-            self._schedule_pool_pause("本轮全池循环扫描完成")
+            self._schedule_pool_pause("本轮全池补扫完成")
             self._last_cooldown = self.cooldown
             return [], "cycle"
 
@@ -607,11 +578,9 @@ class CloudMonitorDaemon:
         cycle_note = ""
         if self._pool_cycle_enabled():
             pc = self._pool_cycle_cfg()
-            rc = self._risk_cfg()
             cycle_note = (
                 f" phase={self._phase} pause={pc['pause_hours']}h "
-                f"risk={rc['batch_size']}/{rc['batch_cooldown_seconds']}s "
-                f"full={self.batch_size}/{self.cooldown}s"
+                f"full={self.batch_size}/{self.cooldown}s (risk→家庭Agent)"
             )
         self.log(
             f"[cloud-daemon] 启动 batch={self.batch_size} conc={self.concurrency} "
