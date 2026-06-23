@@ -116,9 +116,11 @@ def _write_config(dest: Path, values: dict[str, str]) -> Path:
         f"XHS_LOCAL_AGENT_KEY={values['agent_key']}",
         f"XHS_LOCAL_AGENT_ID={values['agent_id']}",
         f"XHS_LOCAL_AGENT_BATCH={values['batch']}",
+        f"XHS_LOCAL_AGENT_BATCH_MAX={values.get('batch_max', '250')}",
         f"XHS_LOCAL_AGENT_CONCURRENCY={values['concurrency']}",
         f"XHS_LOCAL_AGENT_MODE={values['mode']}",
         f"XHS_LOCAL_AGENT_IDLE_SEC={values['idle_sec']}",
+        f"XHS_LOCAL_AGENT_EMPTY_POLL_SEC={values.get('empty_poll_sec', '120')}",
         f"XHS_LOCAL_AGENT_COOLDOWN_SEC={values['cooldown_sec']}",
         f"XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC={values['cycle_cooldown_sec']}",
         f"XHS_LOCAL_AGENT_MIN_AGE_HOURS={values['min_age_hours']}",
@@ -327,7 +329,7 @@ class SetupApp(tk.Tk):
         ttk.Entry(frm, textvariable=self.batch, width=52).grid(row=4, column=1, pady=4)
 
         ttk.Label(frm, text="并发数").grid(row=5, column=0, sticky=tk.W, pady=4)
-        self.concurrency = tk.StringVar(value=existing.get("XHS_LOCAL_AGENT_CONCURRENCY", "3"))
+        self.concurrency = tk.StringVar(value=existing.get("XHS_LOCAL_AGENT_CONCURRENCY", "6"))
         ttk.Entry(frm, textvariable=self.concurrency, width=52).grid(row=5, column=1, pady=4)
 
         ttk.Label(frm, text="批间冷却(秒)").grid(row=6, column=0, sticky=tk.W, pady=4)
@@ -380,9 +382,11 @@ class SetupApp(tk.Tk):
             "agent_key": self.agent_key.get().strip(),
             "agent_id": self.agent_id.get().strip(),
             "mode": self.mode.get().strip() or "api_only",
-            "batch": _int_field(self.batch.get(), 80, 10, 500, "每批条数"),
-            "concurrency": _int_field(self.concurrency.get(), 3, 1, 10, "并发数"),
-            "idle_sec": _int_field(self.idle_sec.get(), 300, 30, 3600, "无工单等待"),
+            "batch": _int_field(self.batch.get(), 80, 10, 250, "每批条数"),
+            "batch_max": "250",
+            "concurrency": _int_field(self.concurrency.get(), 6, 1, 10, "并发数"),
+            "idle_sec": _int_field(self.idle_sec.get(), 120, 30, 3600, "无工单等待"),
+            "empty_poll_sec": "120",
             "cooldown_sec": _int_field(self.cooldown_sec.get(), 60, 0, 600, "批间冷却"),
             "cycle_cooldown_sec": "7200",
             "min_age_hours": "2",

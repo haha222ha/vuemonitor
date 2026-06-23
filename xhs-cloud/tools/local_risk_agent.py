@@ -11,12 +11,14 @@ r"""
   XHS_CRAWLER_ROOT=D:\vuemonitor\xhs-cloud\cloud_deploy\crawler_runtime
   XHS_ENABLE_PLAYWRIGHT=1
   XHS_LOCAL_AGENT_ID=home-pc-1          # 可选，标识本机
-  XHS_LOCAL_AGENT_BATCH=800             # 每轮拉取条数（最大 1000，需服务端同步放开 limit）
-  XHS_LOCAL_AGENT_CONCURRENCY=5         # Playwright 进程/标签并发
+  XHS_LOCAL_AGENT_BATCH=80              # 每轮拉取条数（推荐 80，最大见 BATCH_MAX）
+  XHS_LOCAL_AGENT_BATCH_MAX=250         # 单批上限（避免 1000 条整批 fail）
+  XHS_LOCAL_AGENT_CONCURRENCY=6         # api_only 并发（推荐 5-8）
   XHS_LOCAL_AGENT_MODE=api_only         # api_only(E) | multi_browser(A) | single_browser(C) | api_then_browser(D)
-  XHS_LOCAL_AGENT_IDLE_SEC=300          # 无工单时休眠秒数
-  XHS_LOCAL_AGENT_COOLDOWN_SEC=15       # 每批上传后冷却
-  XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC=3600  # 整轮 risk 扫完后冷却（默认1小时）
+  XHS_LOCAL_AGENT_IDLE_SEC=120          # 有 pending 但本批未拉到时的等待
+  XHS_LOCAL_AGENT_EMPTY_POLL_SEC=120    # 无工单时轮询间隔（云端补扫时短轮询）
+  XHS_LOCAL_AGENT_COOLDOWN_SEC=60       # 每批上传后冷却
+  XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC=7200  # 整轮 risk 扫完后冷却（默认2小时）
   XHS_LOCAL_AGENT_LOG_DIR=%LOCALAPPDATA%\xhs-local-agent
 
 用法:
@@ -133,11 +135,107 @@ def _api_request(method: str, path: str, body: dict | None = None, timeout: int 
 
 
 def _batch_cap() -> int:
-    return max(100, min(1000, int(os.environ.get("XHS_LOCAL_AGENT_BATCH_MAX", "1000"))))
+    return max(50, min(500, int(os.environ.get("XHS_LOCAL_AGENT_BATCH_MAX", "250"))))
 
 
-def _batch_size(default: int = 800) -> int:
+def _batch_size(default: int = 80) -> int:
     return max(10, min(_batch_cap(), int(os.environ.get("XHS_LOCAL_AGENT_BATCH", str(default)))))
+
+
+def _concurrency_cap() -> int:
+    return max(1, min(10, int(os.environ.get("XHS_LOCAL_AGENT_CONCURRENCY", "6"))))
+
+
+def _empty_poll_sec() -> int:
+    return max(30, int(os.environ.get("XHS_LOCAL_AGENT_EMPTY_POLL_SEC", "120")))
+
+
+def _adapt_state_path() -> Path:
+    return _log_dir() / "adapt_state.json"
+
+
+def _load_adapt_state() -> dict:
+    try:
+        data = json.loads(_adapt_state_path().read_text(encoding="utf-8"))
+        if isinstance(data, dict):
+            return data
+    except (OSError, json.JSONDecodeError):
+        pass
+    return {"concurrency_penalty": 0}
+
+
+def _save_adapt_state(state: dict) -> None:
+    try:
+        _adapt_state_path().write_text(
+            json.dumps(state, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
+
+
+def _effective_concurrency() -> int:
+    base = _concurrency_cap()
+    penalty = int(_load_adapt_state().get("concurrency_penalty") or 0)
+    return max(1, base - penalty)
+
+
+def _update_adapt_after_batch(scanned: int, upload: dict) -> int:
+    """根据失败率调整下一批冷却；连续高失败则降并发。"""
+    if scanned <= 0:
+        return 0
+    fail = int(upload.get("fail") or 0)
+    fail_rate = fail / scanned
+    state = _load_adapt_state()
+    boost = 0
+    if fail_rate >= 0.5:
+        state["concurrency_penalty"] = min(4, int(state.get("concurrency_penalty") or 0) + 1)
+        _save_adapt_state(state)
+        boost = min(300, 60 + int(fail_rate * 240))
+        _log(
+            f"本批失败率 {fail_rate:.0%}，降并发至 {_effective_concurrency()}，"
+            f"额外冷却 +{boost}s"
+        )
+    elif fail_rate >= 0.25:
+        boost = min(180, 30 + int(fail_rate * 120))
+        _log(f"本批失败率 {fail_rate:.0%}，额外冷却 +{boost}s")
+    elif fail_rate < 0.1 and int(state.get("concurrency_penalty") or 0) > 0:
+        state["concurrency_penalty"] = max(0, int(state["concurrency_penalty"]) - 1)
+        _save_adapt_state(state)
+        _log(f"失败率恢复，并发回升至 {_effective_concurrency()}")
+        return 0
+    _save_adapt_state(state)
+    return boost
+
+
+def _acquire_singleton_lock() -> None:
+    """防止计划任务 + 手动窗口重复启动两个 Agent。"""
+    global _singleton_lock_fp
+    lock_path = _log_dir() / "agent.lock"
+    fp = open(lock_path, "a+", encoding="utf-8")
+    try:
+        if sys.platform == "win32":
+            import msvcrt
+
+            fp.seek(0)
+            fp.write(str(os.getpid()))
+            fp.flush()
+            msvcrt.locking(fp.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+
+            fcntl.flock(fp.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fp.seek(0)
+            fp.truncate()
+            fp.write(str(os.getpid()))
+            fp.flush()
+    except OSError:
+        fp.close()
+        raise SystemExit(
+            "已有 Agent 实例在运行（agent.lock 被占用）。"
+            "请关闭多余窗口或 schtasks /End /TN XHS-Local-Risk-Agent"
+        )
+    _singleton_lock_fp = fp
 
 
 def _upload_timeout(row_count: int) -> int:
@@ -277,7 +375,7 @@ def _sleep_with_log(seconds: int, reason: str) -> None:
 
 def run_once() -> dict:
     batch_size = _batch_size()
-    concurrency = max(1, min(10, int(os.environ.get("XHS_LOCAL_AGENT_CONCURRENCY", "5"))))
+    concurrency = _effective_concurrency()
     crawler = os.environ.get("XHS_CRAWLER_ROOT", CRAWLER_DEFAULT).strip()
     scan_date = date.today().isoformat()
 
@@ -285,7 +383,13 @@ def run_once() -> dict:
     items = wl.get("items") or []
     pending = int(wl.get("pending_risk") or 0)
     if not items:
-        _log(f"无 risk 工单 pending={pending}")
+        if pending > 0:
+            _log(f"本批未拉到工单（pending={pending}，可能被云端 claim），稍后重试")
+        else:
+            _log(
+                f"暂无可认领 risk（pending=0，云端可能正在补扫），"
+                f"{_empty_poll_sec()}s 后再试"
+            )
         return {
             "pending_risk": pending,
             "scanned": 0,
@@ -331,13 +435,16 @@ def run_once() -> dict:
 
 
 def run_daemon() -> None:
-    idle_sec = max(30, int(os.environ.get("XHS_LOCAL_AGENT_IDLE_SEC", "300")))
-    cooldown = max(0, int(os.environ.get("XHS_LOCAL_AGENT_COOLDOWN_SEC", "15")))
-    cycle_cooldown = max(60, int(os.environ.get("XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC", "3600")))
+    _acquire_singleton_lock()
+    idle_sec = max(30, int(os.environ.get("XHS_LOCAL_AGENT_IDLE_SEC", "120")))
+    cooldown = max(0, int(os.environ.get("XHS_LOCAL_AGENT_COOLDOWN_SEC", "60")))
+    cycle_cooldown = max(60, int(os.environ.get("XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC", "7200")))
+    empty_poll = _empty_poll_sec()
     batch_size = _batch_size()
     _log(
         f"Agent 启动 id={_agent_id()} mode={_agent_mode()} api={_api_base()} "
-        f"批间={cooldown}s 整轮={cycle_cooldown}s"
+        f"batch={batch_size} 并发={_effective_concurrency()} "
+        f"批间={cooldown}s 空池轮询={empty_poll}s 整轮={cycle_cooldown}s"
     )
     cycle = _load_cycle_state()
     while True:
@@ -354,12 +461,16 @@ def run_daemon() -> None:
                     _log(f"新轮次开始 pending={pending} 预计约 {max(1, (pending + batch_size - 1) // batch_size)} 批")
 
             if scanned == 0:
+                wait_sec = empty_poll if pending <= 0 else idle_sec
+                reason = "暂无可认领 risk" if pending <= 0 else "本批未拉到工单"
+                _sleep_with_log(wait_sec, reason)
                 if pending <= 0:
-                    _sleep_with_log(cycle_cooldown, "今日 risk 已全部处理")
                     cycle = _reset_cycle_state(0, scan_date)
-                else:
-                    time.sleep(idle_sec)
                 continue
+
+            upload = summary.get("upload") or {}
+            adapt_boost = _update_adapt_after_batch(scanned, upload)
+            batch_cooldown = cooldown + adapt_boost
 
             cycle["batches"] = int(cycle.get("batches") or 0) + 1
             cycle["items"] = int(cycle.get("items") or 0) + scanned
@@ -381,7 +492,8 @@ def run_daemon() -> None:
                 _sleep_with_log(cycle_cooldown, "整轮 risk 采集结束")
                 cycle = _reset_cycle_state(pending, scan_date)
             else:
-                time.sleep(cooldown)
+                if batch_cooldown > 0:
+                    time.sleep(batch_cooldown)
         except KeyboardInterrupt:
             _log("收到退出信号")
             break

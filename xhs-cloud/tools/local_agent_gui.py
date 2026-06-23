@@ -44,12 +44,14 @@ def _load_env() -> dict[str, str]:
         "XHS_CLOUD_API_URL": "https://monitor.xhs365.cn",
         "XHS_LOCAL_AGENT_KEY": "",
         "XHS_LOCAL_AGENT_ID": os.environ.get("COMPUTERNAME", "home-pc"),
-        "XHS_LOCAL_AGENT_BATCH": "800",
-        "XHS_LOCAL_AGENT_CONCURRENCY": "3",
+        "XHS_LOCAL_AGENT_BATCH": "80",
+        "XHS_LOCAL_AGENT_BATCH_MAX": "250",
+        "XHS_LOCAL_AGENT_CONCURRENCY": "6",
         "XHS_LOCAL_AGENT_MODE": "api_only",
-        "XHS_LOCAL_AGENT_IDLE_SEC": "300",
-        "XHS_LOCAL_AGENT_COOLDOWN_SEC": "15",
-        "XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC": "3600",
+        "XHS_LOCAL_AGENT_IDLE_SEC": "120",
+        "XHS_LOCAL_AGENT_EMPTY_POLL_SEC": "120",
+        "XHS_LOCAL_AGENT_COOLDOWN_SEC": "60",
+        "XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC": "7200",
     }
     if ENV_FILE.is_file():
         for line in ENV_FILE.read_text(encoding="utf-8").splitlines():
@@ -68,9 +70,11 @@ def _save_env(values: dict[str, str]) -> None:
         f"XHS_LOCAL_AGENT_KEY={values['agent_key']}",
         f"XHS_LOCAL_AGENT_ID={values['agent_id']}",
         f"XHS_LOCAL_AGENT_BATCH={values['batch']}",
+        f"XHS_LOCAL_AGENT_BATCH_MAX={values.get('batch_max', '250')}",
         f"XHS_LOCAL_AGENT_CONCURRENCY={values['concurrency']}",
         f"XHS_LOCAL_AGENT_MODE={values['mode']}",
         f"XHS_LOCAL_AGENT_IDLE_SEC={values['idle_sec']}",
+        f"XHS_LOCAL_AGENT_EMPTY_POLL_SEC={values.get('empty_poll_sec', '120')}",
         f"XHS_LOCAL_AGENT_COOLDOWN_SEC={values['cooldown_sec']}",
         f"XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC={values['cycle_cooldown_sec']}",
     ]
@@ -229,13 +233,13 @@ class AgentConfigApp(tk.Tk):
         self.var_api = tk.StringVar(value=saved.get("XHS_CLOUD_API_URL", "https://monitor.xhs365.cn"))
         self.var_key = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_KEY", ""))
         self.var_agent_id = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_ID", "home-pc"))
-        self.var_batch = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_BATCH", "800"))
-        self.var_concurrency = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_CONCURRENCY", "3"))
+        self.var_batch = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_BATCH", "80"))
+        self.var_concurrency = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_CONCURRENCY", "6"))
         self.var_mode = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_MODE", "api_only"))
-        self.var_idle = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_IDLE_SEC", "300"))
-        self.var_cooldown = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_COOLDOWN_SEC", "15"))
+        self.var_idle = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_IDLE_SEC", "120"))
+        self.var_cooldown = tk.StringVar(value=saved.get("XHS_LOCAL_AGENT_COOLDOWN_SEC", "60"))
         self.var_cycle_cooldown = tk.StringVar(
-            value=saved.get("XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC", "3600")
+            value=saved.get("XHS_LOCAL_AGENT_CYCLE_COOLDOWN_SEC", "7200")
         )
         self.var_show_key = tk.BooleanVar(value=False)
         self.var_auto_refresh = tk.BooleanVar(value=True)
