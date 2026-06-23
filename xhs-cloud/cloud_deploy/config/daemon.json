@@ -1,7 +1,7 @@
 {
   "shop_engine": "api",
   "web_detail_concurrency": 3,
-  "web_cooldown_seconds": 30,
+  "web_cooldown_seconds": 60,
   "batch_size": 1000,
   "auto_fallback": true,
   "min_success_rate": 0.08,
