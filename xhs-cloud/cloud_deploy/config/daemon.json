@@ -14,7 +14,7 @@
   "min_sold": 0,
   "pool_cycle": {
     "enabled": true,
-    "pause_hours": 5,
+    "pause_hours": 12,
     "claim_ttl_minutes": 25
   },
   "risk_rescan": {

@@ -278,7 +278,7 @@ class CloudMonitorDaemon:
         )
 
     def _run_pool_cycle_once(self) -> tuple[list[dict], str]:
-        """大循环: 首轮全池 → 休5h → risk全池1000/30s → 休5h → …"""
+        """大循环: 首轮全池 → 休 pause_hours → risk全池1000/30s → 休 pause_hours → …"""
         risk_cfg = self._risk_cfg()
 
         for _ in range(4):
