@@ -13,7 +13,7 @@ Environment=XHS_DAEMON_MODE=cloud
 Environment=XHS_ENABLE_PLAYWRIGHT=0
 Environment=XHS_DAEMON_BATCH_SIZE=1000
 Environment=XHS_DAEMON_CONCURRENCY=3
-Environment=XHS_DAEMON_COOLDOWN_SEC=30
+Environment=XHS_DAEMON_COOLDOWN_SEC=60
 ExecStart=/opt/xhs-cloud/venv/bin/python /opt/xhs-cloud/cloud_deploy/scripts/run_daemon.py
 Restart=on-failure
 RestartSec=30
