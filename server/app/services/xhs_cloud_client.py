@@ -88,6 +88,12 @@ class XhsCloudClient:
     async def generate_codes(self, payload: dict) -> dict:
         return await self._request("POST", "/api/v1/admin/auth-codes", json=payload)
 
+    async def revoke_code(self, code: str) -> dict:
+        from urllib.parse import quote
+
+        safe = quote(code.strip(), safe="")
+        return await self._request("POST", f"/api/v1/admin/auth-codes/{safe}/revoke")
+
 
 def get_xhs_cloud_client() -> XhsCloudClient:
     return XhsCloudClient()

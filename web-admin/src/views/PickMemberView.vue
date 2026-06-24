@@ -87,26 +87,56 @@
     </div>
 
     <el-table :data="store.codes" stripe v-loading="store.loading">
-      <el-table-column prop="code" label="授权码" min-width="220">
+      <el-table-column prop="code" label="授权码" min-width="200" fixed="left">
         <template #default="{ row }">
           <span class="code-cell">{{ row.code }}</span>
           <el-button link type="primary" size="small" @click="copyOne(row.code)">复制</el-button>
         </template>
       </el-table-column>
-      <el-table-column prop="plan_code" label="套餐" width="110">
+      <el-table-column prop="plan_code" label="套餐" width="100">
         <template #default="{ row }">{{ planLabel(row.plan_code) }}</template>
       </el-table-column>
-      <el-table-column prop="duration_days" label="天数" width="70" />
-      <el-table-column label="激活/上限" width="90">
+      <el-table-column prop="duration_days" label="天数" width="60" />
+      <el-table-column label="激活/上限" width="85">
         <template #default="{ row }">{{ row.current_activations }}/{{ row.max_activations }}</template>
       </el-table-column>
-      <el-table-column prop="status" label="状态" width="90">
+      <el-table-column prop="status" label="状态" width="85">
         <template #default="{ row }">
           <el-tag :type="statusType(row.status)">{{ statusLabel(row.status) }}</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="note" label="备注" min-width="120" show-overflow-tooltip />
-      <el-table-column prop="created_at" label="创建时间" width="170" />
+      <el-table-column prop="activated_usernames" label="激活账号" min-width="110" show-overflow-tooltip>
+        <template #default="{ row }">{{ row.activated_usernames || "—" }}</template>
+      </el-table-column>
+      <el-table-column prop="first_activated_at" label="激活时间" width="165">
+        <template #default="{ row }">{{ formatTime(row.first_activated_at) }}</template>
+      </el-table-column>
+      <el-table-column prop="membership_expires_at" label="到期时间" width="165">
+        <template #default="{ row }">{{ formatTime(row.membership_expires_at) }}</template>
+      </el-table-column>
+      <el-table-column label="剩余天数" width="85">
+        <template #default="{ row }">
+          <span v-if="row.days_remaining != null" :class="daysClass(row.days_remaining)">
+            {{ row.days_remaining }} 天
+          </span>
+          <span v-else>—</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="note" label="备注" min-width="100" show-overflow-tooltip />
+      <el-table-column prop="created_at" label="创建时间" width="165">
+        <template #default="{ row }">{{ formatTime(row.created_at) }}</template>
+      </el-table-column>
+      <el-table-column label="操作" width="80" fixed="right">
+        <template #default="{ row }">
+          <el-button
+            v-if="row.status !== 'revoked'"
+            type="danger"
+            text
+            size="small"
+            @click="revoke(row.code)"
+          >吊销</el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <el-dialog v-model="showCreate" title="生成选品会员授权码" width="440px" @closed="generatedCodes = []">
@@ -151,7 +181,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from "vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
 import { useMemberCloudStore } from "../stores/memberCloud";
 
@@ -192,6 +222,32 @@ function statusType(status: string) {
   if (status === "unused") return "success";
   if (status === "active") return "primary";
   return "danger";
+}
+
+function formatTime(value?: string) {
+  if (!value) return "—";
+  return value.replace("T", " ").slice(0, 19);
+}
+
+function daysClass(days: number) {
+  if (days <= 0) return "days-expired";
+  if (days <= 7) return "days-warn";
+  return "";
+}
+
+async function revoke(code: string) {
+  try {
+    await ElMessageBox.confirm(
+      `确定吊销授权码 ${code}？\n未使用的码将无法再激活；已激活会员的到期时间不受影响。`,
+      "吊销确认",
+      { type: "warning", confirmButtonText: "吊销", cancelButtonText: "取消" },
+    );
+    await store.revokeCode(code);
+    ElMessage.success("已吊销");
+    refreshAll();
+  } catch (e) {
+    if (e !== "cancel") ElMessage.error("吊销失败");
+  }
 }
 
 async function fetchCodes() {
@@ -243,7 +299,7 @@ onMounted(refreshAll);
 </script>
 
 <style scoped>
-.pick-member-page { max-width: 1200px; }
+.pick-member-page { max-width: 1400px; }
 .page-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
 .page-head h2 { margin: 0; }
 .head-actions { display: flex; gap: 8px; }
@@ -257,4 +313,6 @@ onMounted(refreshAll);
 .codes-box { margin-top: 12px; }
 .codes-head { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
 .form-hint { font-size: 12px; color: #909399; margin-top: 4px; }
+.days-warn { color: #e6a23c; font-weight: 600; }
+.days-expired { color: #f56c6c; font-weight: 600; }
 </style>

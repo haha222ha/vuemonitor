@@ -288,6 +288,16 @@ def admin_list_codes(
     return {"items": items}
 
 
+@app.post("/api/v1/admin/auth-codes/{code}/revoke")
+def admin_revoke_code(code: str, _: None = Depends(verify_sync_key)):
+    try:
+        return db.revoke_auth_code(code)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
+
+
 @app.get("/api/v1/admin/stats")
 def admin_stats(_: None = Depends(verify_sync_key)):
     try:

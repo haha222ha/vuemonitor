@@ -611,21 +611,44 @@ def list_auth_codes(limit: int = 100, status: str | None = None) -> list[dict]:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
             c.execute("SET search_path TO xhs_monitor, public")
             sql = (
-                """SELECT code, plan_code, duration_days, max_activations,
-                          current_activations, status, note, created_at, expires_at
-                   FROM auth_codes"""
+                """SELECT ac.id, ac.code, ac.plan_code, ac.duration_days, ac.max_activations,
+                          ac.current_activations, ac.status, ac.note, ac.created_at, ac.expires_at,
+                          act.first_activated_at,
+                          act.activated_usernames,
+                          mem.membership_expires_at
+                   FROM auth_codes ac
+                   LEFT JOIN (
+                       SELECT aca.auth_code_id,
+                              MIN(aca.activated_at) AS first_activated_at,
+                              STRING_AGG(u.username, ', ' ORDER BY aca.activated_at) AS activated_usernames
+                       FROM auth_code_activations aca
+                       JOIN users u ON u.id = aca.user_id
+                       GROUP BY aca.auth_code_id
+                   ) act ON act.auth_code_id = ac.id
+                   LEFT JOIN (
+                       SELECT aca.auth_code_id,
+                              MAX(m.expires_at) AS membership_expires_at
+                       FROM auth_code_activations aca
+                       JOIN memberships m ON m.user_id = aca.user_id
+                       GROUP BY aca.auth_code_id
+                   ) mem ON mem.auth_code_id = ac.id"""
             )
             params: list = []
             if status:
-                sql += " WHERE status = %s"
+                sql += " WHERE ac.status = %s"
                 params.append(status)
-            sql += " ORDER BY id DESC LIMIT %s"
+            sql += " ORDER BY ac.id DESC LIMIT %s"
             params.append(limit)
             c.execute(sql, params)
             rows = []
             for r in c.fetchall():
+                membership_expires = r["membership_expires_at"]
+                days_remaining = None
+                if membership_expires:
+                    days_remaining = _days_until(membership_expires)
                 rows.append(
                     {
+                        "id": r["id"],
                         "code": r["code"],
                         "plan_code": r["plan_code"],
                         "plan_label": PLAN_LABELS.get(r["plan_code"], r["plan_code"]),
@@ -636,9 +659,34 @@ def list_auth_codes(limit: int = 100, status: str | None = None) -> list[dict]:
                         "note": r["note"] or "",
                         "created_at": r["created_at"].isoformat() if r["created_at"] else "",
                         "expires_at": r["expires_at"].isoformat() if r["expires_at"] else "",
+                        "first_activated_at": (
+                            r["first_activated_at"].isoformat() if r["first_activated_at"] else ""
+                        ),
+                        "activated_usernames": r["activated_usernames"] or "",
+                        "membership_expires_at": (
+                            membership_expires.isoformat() if membership_expires else ""
+                        ),
+                        "days_remaining": days_remaining,
                     }
                 )
             return rows
+    finally:
+        conn.close()
+
+
+def revoke_auth_code(code: str) -> dict:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            row = _fetch_auth_code(c, code)
+            if not row:
+                raise ValueError("授权码不存在")
+            if row["status"] == "revoked":
+                raise ValueError("授权码已被吊销")
+            c.execute("UPDATE auth_codes SET status='revoked' WHERE id=%s", (row["id"],))
+        conn.commit()
+        return {"code": row["code"], "status": "revoked"}
     finally:
         conn.close()
 

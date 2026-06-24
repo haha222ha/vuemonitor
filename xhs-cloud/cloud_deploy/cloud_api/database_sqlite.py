@@ -342,21 +342,51 @@ def list_auth_codes(limit: int = 100, status: str | None = None) -> list[dict]:
     conn = _conn()
     c = conn.cursor()
     sql = (
-        """SELECT code, plan_code, duration_days, max_activations,
-                  current_activations, status, note, created_at, expires_at
-           FROM auth_codes"""
+        """SELECT ac.id, ac.code, ac.plan_code, ac.duration_days, ac.max_activations,
+                  ac.current_activations, ac.status, ac.note, ac.created_at, ac.expires_at,
+                  act.first_activated_at,
+                  act.activated_usernames,
+                  mem.membership_expires_at
+           FROM auth_codes ac
+           LEFT JOIN (
+               SELECT aca.auth_code_id,
+                      MIN(aca.activated_at) AS first_activated_at,
+                      GROUP_CONCAT(u.username, ', ') AS activated_usernames
+               FROM auth_code_activations aca
+               JOIN users u ON u.id = aca.user_id
+               GROUP BY aca.auth_code_id
+           ) act ON act.auth_code_id = ac.id
+           LEFT JOIN (
+               SELECT aca.auth_code_id,
+                      MAX(m.expires_at) AS membership_expires_at
+               FROM auth_code_activations aca
+               JOIN memberships m ON m.user_id = aca.user_id
+               GROUP BY aca.auth_code_id
+           ) mem ON mem.auth_code_id = ac.id"""
     )
     params: list = []
     if status:
-        sql += " WHERE status = ?"
+        sql += " WHERE ac.status = ?"
         params.append(status)
-    sql += " ORDER BY id DESC LIMIT ?"
+    sql += " ORDER BY ac.id DESC LIMIT ?"
     params.append(limit)
     c.execute(sql, params)
     rows = []
+    now = datetime.now()
     for r in c.fetchall():
+        membership_expires = r["membership_expires_at"] or ""
+        days_remaining = None
+        if membership_expires:
+            try:
+                exp_dt = datetime.fromisoformat(membership_expires.replace("Z", "+00:00"))
+                if exp_dt.tzinfo:
+                    exp_dt = exp_dt.replace(tzinfo=None)
+                days_remaining = max(0, (exp_dt - now).days)
+            except ValueError:
+                days_remaining = None
         rows.append(
             {
+                "id": r["id"],
                 "code": r["code"],
                 "plan_code": r["plan_code"],
                 "plan_label": PLAN_LABELS.get(r["plan_code"], r["plan_code"]),
@@ -367,10 +397,36 @@ def list_auth_codes(limit: int = 100, status: str | None = None) -> list[dict]:
                 "note": r["note"] or "",
                 "created_at": r["created_at"] or "",
                 "expires_at": r["expires_at"] or "",
+                "first_activated_at": r["first_activated_at"] or "",
+                "activated_usernames": r["activated_usernames"] or "",
+                "membership_expires_at": membership_expires,
+                "days_remaining": days_remaining,
             }
         )
     conn.close()
     return rows
+
+
+def revoke_auth_code(code: str) -> dict:
+    conn = _conn()
+    c = conn.cursor()
+    norm = _normalize_code(code)
+    c.execute(
+        """SELECT id, code, status FROM auth_codes
+           WHERE REPLACE(REPLACE(UPPER(code), '-', ''), ' ', '') = ?""",
+        (norm,),
+    )
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        raise ValueError("授权码不存在")
+    if row["status"] == "revoked":
+        conn.close()
+        raise ValueError("授权码已被吊销")
+    c.execute("UPDATE auth_codes SET status='revoked' WHERE id=?", (row["id"],))
+    conn.commit()
+    conn.close()
+    return {"code": row["code"], "status": "revoked"}
 
 
 def get_admin_stats() -> dict:

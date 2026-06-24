@@ -3,6 +3,7 @@ import { ref } from "vue";
 import api from "../utils/api";
 
 export interface MemberAuthCode {
+  id?: number;
   code: string;
   plan_code: string;
   plan_label?: string;
@@ -13,6 +14,10 @@ export interface MemberAuthCode {
   note: string;
   created_at: string;
   expires_at: string;
+  first_activated_at?: string;
+  activated_usernames?: string;
+  membership_expires_at?: string;
+  days_remaining?: number | null;
 }
 
 export interface MemberCloudStatus {
@@ -82,5 +87,9 @@ export const useMemberCloudStore = defineStore("memberCloud", () => {
     return data as { codes: { code: string; plan_code: string; duration_days: number }[]; count: number };
   }
 
-  return { codes, total, loading, status, statusLoading, fetchStatus, fetchCodes, generateCodes };
+  async function revokeCode(code: string) {
+    await api.post(`/xhs-cloud/admin/codes/${encodeURIComponent(code)}/revoke`);
+  }
+
+  return { codes, total, loading, status, statusLoading, fetchStatus, fetchCodes, generateCodes, revokeCode };
 });

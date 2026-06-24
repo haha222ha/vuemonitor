@@ -112,3 +112,17 @@ async def generate_member_codes(
             "duration_days": duration,
         },
     }
+
+
+@router.post("/codes/{code}/revoke")
+async def revoke_member_code(
+    code: str,
+    admin: AdminUser,
+    client: XhsCloudClient = Depends(get_xhs_cloud_client),
+):
+    del admin
+    try:
+        result = await client.revoke_code(code)
+    except XhsCloudNotConfigured as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    return {"code": 0, "data": result}
