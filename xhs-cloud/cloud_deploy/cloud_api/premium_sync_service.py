@@ -249,17 +249,67 @@ def apply_snapshots_backfill(conn, goods_id: str, goods_daily: list, store_daily
     return {"goods_daily": g_n, "store_daily": s_n}
 
 
-def apply_premium_catalog(conn, local_ids: list[str], since_date: str = "") -> dict:
+def apply_premium_catalog(
+    conn,
+    local_ids: list[str],
+    since_date: str = "",
+    page: int = 0,
+    page_size: int = 5000,
+) -> dict:
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
         c.execute("SELECT goods_id FROM premium_goods WHERE lifecycle < 3")
         cloud_ids = {str(r[0]) for r in c.fetchall()}
     local_set = {str(x) for x in local_ids if x}
+    cloud_only_all = sorted(cloud_ids - local_set)
+    local_only_all = sorted(local_set - cloud_ids)
+    overlap = len(local_set & cloud_ids)
+    ps = max(1, int(page_size))
+    pg = max(0, int(page))
+    start = pg * ps
+    end = start + ps
     return {
-        "cloud_only": sorted(cloud_ids - local_set)[:5000],
-        "local_only": sorted(local_set - cloud_ids)[:5000],
+        "cloud_total": len(cloud_ids),
+        "local_total": len(local_set),
+        "overlap": overlap,
+        "cloud_only_count": len(cloud_only_all),
+        "local_only_count": len(local_only_all),
+        "cloud_only": cloud_only_all[start:end],
+        "local_only": local_only_all[start:end],
+        "page": pg,
+        "page_size": ps,
         "since_date": since_date,
     }
+
+
+_FETCH_COLS = (
+    "goods_id", "title", "tier", "lifecycle", "primary_keyword", "store_id", "store_name",
+    "deal_price", "sold_num", "velocity_1d", "actual_velocity_1d", "burst_score",
+    "report_count", "first_report_date", "last_report_date", "scan_priority",
+    "shop_fans", "shop_sales", "shop_fans_delta_1d", "streak_sold_up_days",
+    "last_app_scan", "last_metric_scan", "last_scan_engine", "updated_at",
+)
+
+
+def fetch_premium_goods_by_ids(conn, goods_ids: list[str]) -> list[dict]:
+    ids = [str(g).strip() for g in goods_ids if g and len(str(g)) >= 5]
+    if not ids:
+        return []
+    out: list[dict] = []
+    cols = ", ".join(_FETCH_COLS)
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        for i in range(0, len(ids), 500):
+            chunk = ids[i : i + 500]
+            ph = ", ".join("%s" for _ in chunk)
+            c.execute(
+                f"SELECT {cols} FROM premium_goods WHERE goods_id IN ({ph}) AND lifecycle < 3",
+                chunk,
+            )
+            names = [d[0] for d in c.description]
+            for row in c.fetchall():
+                out.append({names[j]: row[j] for j in range(len(names))})
+    return out
 
 
 def apply_premium_goods_batch(conn, rows: list[dict]) -> int:

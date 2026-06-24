@@ -97,6 +97,12 @@ class PremiumSnapshotsBackfillBody(BaseModel):
 class PremiumCatalogBody(BaseModel):
     local_ids: list[str] = Field(default_factory=list)
     since_date: str = ""
+    page: int = 0
+    page_size: int = 5000
+
+
+class PremiumFetchBody(BaseModel):
+    goods_ids: list[str] = Field(default_factory=list)
 
 
 class PremiumBatchSyncBody(BaseModel):
@@ -539,7 +545,30 @@ def sync_premium_catalog(body: PremiumCatalogBody, _: None = Depends(verify_sync
     init_db()
     conn = _conn()
     try:
-        return apply_premium_catalog(conn, body.local_ids, since_date=body.since_date)
+        return apply_premium_catalog(
+            conn,
+            body.local_ids,
+            since_date=body.since_date,
+            page=body.page,
+            page_size=body.page_size,
+        )
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/premium-fetch")
+def sync_premium_fetch(body: PremiumFetchBody, _: None = Depends(verify_sync_key)):
+    """按 goods_id 拉取云精品行（本地缺的 cloud_only 商品）。"""
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.premium_sync_service import fetch_premium_goods_by_ids
+
+    init_db()
+    conn = _conn()
+    try:
+        rows = fetch_premium_goods_by_ids(conn, body.goods_ids[:2000])
+        return {"rows": rows, "count": len(rows)}
     finally:
         conn.close()
 
