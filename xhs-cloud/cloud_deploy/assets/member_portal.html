@@ -69,6 +69,21 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
 .notice-card ul{margin:0;padding-left:18px;font-size:13px;color:var(--text2);line-height:1.75}
 .notice-card li{margin-bottom:4px}
 .notice-card .notice-tip{margin-top:12px;padding-top:12px;border-top:1px dashed #c5d9f5;font-size:12px;color:var(--text2);line-height:1.6}
+.month-groups{display:flex;flex-direction:column;gap:10px}
+.month-group{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.month-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;cursor:pointer;background:#f9f9fb;-webkit-tap-highlight-color:transparent;user-select:none}
+.month-header:hover{background:#f0f0f5}
+.month-header .mh-left{display:flex;align-items:center;gap:8px;min-width:0}
+.month-header .mh-title{font-size:15px;font-weight:600}
+.month-header .mh-badge{font-size:12px;color:var(--text2);background:#e8e8ed;padding:2px 8px;border-radius:10px;white-space:nowrap}
+.month-header .mh-chevron{font-size:12px;color:var(--text2);transition:transform .2s;flex-shrink:0}
+.month-group.expanded .mh-chevron{transform:rotate(90deg)}
+.month-body{display:none;border-top:1px solid var(--line)}
+.month-group.expanded .month-body{display:block}
+.month-body .report-table-wrap table{margin:0}
+.month-body .report-cards{padding:10px 10px 4px}
+.month-body tbody tr:last-child td{border-bottom:none}
+.month-current .month-header{background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border-left:3px solid var(--accent)}
 </style>
 </head>
 <body>
@@ -129,7 +144,7 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
     </div>
     <div class="card">
       <div class="section-title">报告库</div>
-      <p style="font-size:13px;color:var(--text2);margin:8px 0 14px">有效期内可下载全部已发布报告（含历史往期）</p>
+      <p style="font-size:13px;color:var(--text2);margin:8px 0 14px">有效期内可下载全部已发布报告（含历史往期）。按<strong>月份</strong>分组，<strong>本月默认展开</strong>，往期点击月份可展开/折叠。</p>
       <div class="seg" id="typeSeg">
         <button class="active" data-type="daily" onclick="setType('daily')">日报</button>
         <button data-type="weekly" onclick="setType('weekly')">周报</button>
@@ -151,6 +166,54 @@ const STORAGE = {
 
 let library = { daily: [], weekly: [], monthly: [] };
 let currentType = 'daily';
+let monthExpandState = {};
+
+function currentMonthKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+
+function monthKeyFromItem(it) {
+  const date = String(it.report_date || '').slice(0, 10);
+  if (date.length >= 7) return date.slice(0, 7);
+  const fn = it.file_name || '';
+  const m = fn.match(/(20\d{2})[-/]?(\d{2})/);
+  if (m) return m[1] + '-' + m[2];
+  return 'unknown';
+}
+
+function formatMonthLabel(key) {
+  if (key === 'unknown') return '其他';
+  const parts = key.split('-');
+  return parts[0] + '年' + parseInt(parts[1], 10) + '月';
+}
+
+function groupReportsByMonth(items) {
+  const map = {};
+  items.forEach(it => {
+    const k = monthKeyFromItem(it);
+    if (!map[k]) map[k] = [];
+    map[k].push(it);
+  });
+  return Object.keys(map)
+    .sort((a, b) => b.localeCompare(a))
+    .map(month => ({
+      month,
+      items: map[month].sort((a, b) => String(b.report_date).localeCompare(String(a.report_date))),
+    }));
+}
+
+function isMonthExpanded(month) {
+  if (Object.prototype.hasOwnProperty.call(monthExpandState, month)) {
+    return monthExpandState[month];
+  }
+  return month === currentMonthKey();
+}
+
+function toggleMonth(month) {
+  monthExpandState[month] = !isMonthExpanded(month);
+  renderReports();
+}
 
 function loadStored(key) {
   try { return localStorage.getItem(key); } catch (_) { return null; }
@@ -277,6 +340,29 @@ function reportLabel(it) {
   return '全量' + mmdd;
 }
 
+function renderReportRows(items, at) {
+  let table = '<div class="report-table-wrap"><table><thead><tr><th>日期</th><th>说明</th><th>条数</th><th>大小</th><th></th></tr></thead><tbody>';
+  let cards = '<div class="report-cards">';
+  items.forEach(it => {
+    const date = esc(it.report_date);
+    const summary = esc(it.summary || reportLabel(it));
+    const rows = it.row_count ?? '-';
+    const size = fmtSize(it.file_size_bytes);
+    const safeDate = String(it.report_date || '').replace(/'/g, '');
+    table += `<tr>
+      <td>${date}</td><td>${summary}</td><td>${rows}</td><td>${size}</td>
+      <td><button class="btn btn-primary" style="padding:8px 14px;font-size:13px;min-height:36px" onclick="downloadReport('${safeDate}','${at}', this)">下载</button></td>
+    </tr>`;
+    cards += `<div class="report-card">
+      <div class="rc-top"><span class="rc-date">${date}</span><button class="btn btn-primary" style="min-height:36px;padding:8px 16px;font-size:13px" onclick="downloadReport('${safeDate}','${at}', this)">下载</button></div>
+      <div class="rc-meta">${summary}<br>条数 ${rows} · ${size}</div>
+    </div>`;
+  });
+  table += '</tbody></table></div>';
+  cards += '</div>';
+  return table + cards;
+}
+
 function renderReports() {
   const items = library[currentType] || [];
   const el = document.getElementById('reportTable');
@@ -285,29 +371,32 @@ function renderReports() {
     return;
   }
   const at = archiveTypeFor(currentType);
-  let table = '<div class="report-table-wrap"><table><thead><tr><th>日期</th><th>说明</th><th>条数</th><th>大小</th><th></th></tr></thead><tbody>';
-  let cards = '<div class="report-cards">';
-  items.forEach(it => {
-    const date = esc(it.report_date);
-    const summary = esc(it.summary || reportLabel(it));
-    const rows = it.row_count ?? '-';
-    const size = fmtSize(it.file_size_bytes);
-    table += `<tr>
-      <td>${date}</td><td>${summary}</td><td>${rows}</td><td>${size}</td>
-      <td><button class="btn btn-primary" style="padding:8px 14px;font-size:13px;min-height:36px" onclick="downloadReport('${date}','${at}', this)">下载</button></td>
-    </tr>`;
-    cards += `<div class="report-card">
-      <div class="rc-top"><span class="rc-date">${date}</span><button class="btn btn-primary" style="min-height:36px;padding:8px 16px;font-size:13px" onclick="downloadReport('${date}','${at}', this)">下载</button></div>
-      <div class="rc-meta">${summary}<br>条数 ${rows} · ${size}</div>
+  const groups = groupReportsByMonth(items);
+  const cur = currentMonthKey();
+  const typeLabel = currentType === 'daily' ? '份日报' : currentType === 'weekly' ? '份周报' : '份月报';
+  let html = '<div class="month-groups">';
+  groups.forEach(g => {
+    const expanded = isMonthExpanded(g.month);
+    const cls = ['month-group', expanded ? 'expanded' : '', g.month === cur ? 'month-current' : ''].filter(Boolean).join(' ');
+    html += `<div class="${cls}">
+      <div class="month-header" onclick="toggleMonth('${g.month}')" role="button" aria-expanded="${expanded}">
+        <div class="mh-left">
+          <span class="mh-chevron">▶</span>
+          <span class="mh-title">${esc(formatMonthLabel(g.month))}</span>
+          ${g.month === cur ? '<span class="mh-badge" style="background:#dbeafe;color:#0071e3">本月</span>' : ''}
+        </div>
+        <span class="mh-badge">${g.items.length} ${typeLabel}</span>
+      </div>
+      <div class="month-body">${renderReportRows(g.items, at)}</div>
     </div>`;
   });
-  table += '</tbody></table></div>';
-  cards += '</div>';
-  el.innerHTML = table + cards;
+  html += '</div>';
+  el.innerHTML = html;
 }
 
 function setType(t) {
   currentType = t;
+  monthExpandState = {};
   saveStored(STORAGE.reportType, t);
   document.querySelectorAll('#typeSeg button').forEach(b => b.classList.toggle('active', b.dataset.type === t));
   renderReports();
