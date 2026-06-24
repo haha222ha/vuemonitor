@@ -251,6 +251,12 @@ def init_db() -> None:
             )
             _migrate_legacy_columns(c)
             _seed_default_rules(c)
+            try:
+                from cloud_deploy.cloud_api.premium_schema_pg import init_premium_pg_schema
+
+                init_premium_pg_schema(conn)
+            except Exception:
+                pass
         conn.commit()
     finally:
         conn.close()

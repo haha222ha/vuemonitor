@@ -81,6 +81,30 @@ class SoldSnapshotsSyncBody(BaseModel):
     final_batch: bool = False
 
 
+class PremiumUpsertBody(BaseModel):
+    client_id: str = ""
+    sync_version: int = 0
+    rows: list[dict]
+
+
+class PremiumSnapshotsBackfillBody(BaseModel):
+    client_id: str = ""
+    goods_id: str
+    goods_daily: list[dict] = Field(default_factory=list)
+    store_daily: list[dict] = Field(default_factory=list)
+
+
+class PremiumCatalogBody(BaseModel):
+    local_ids: list[str] = Field(default_factory=list)
+    since_date: str = ""
+
+
+class PremiumBatchSyncBody(BaseModel):
+    batch_id: str = ""
+    rows: list[dict]
+    final_batch: bool = False
+
+
 class AgentScanRow(BaseModel):
     goods_id: str
     status: str
@@ -443,6 +467,79 @@ def sync_prune_snapshots(_: None = Depends(verify_sync_key)):
     try:
         deleted = prune_sold_snapshots(conn)
         return {"deleted_rows": deleted, **retention_policy_summary()}
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/premium-upsert")
+def sync_premium_upsert(body: PremiumUpsertBody, _: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.premium_sync_service import apply_premium_upsert
+
+    init_db()
+    conn = _conn()
+    try:
+        result = apply_premium_upsert(conn, body.rows, client_id=body.client_id)
+        conn.commit()
+        return result
+    finally:
+        conn.close()
+
+
+@app.get("/api/v1/sync/premium-changes")
+def sync_premium_changes(
+    since: int = 0,
+    limit: int = 500,
+    _: None = Depends(verify_sync_key),
+):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.premium_sync_service import get_premium_changes
+
+    init_db()
+    conn = _conn()
+    try:
+        return get_premium_changes(conn, since=since, limit=limit)
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/premium-snapshots-backfill")
+def sync_premium_snapshots_backfill(
+    body: PremiumSnapshotsBackfillBody,
+    _: None = Depends(verify_sync_key),
+):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.premium_sync_service import apply_snapshots_backfill
+
+    init_db()
+    conn = _conn()
+    try:
+        result = apply_snapshots_backfill(
+            conn, body.goods_id, body.goods_daily, body.store_daily
+        )
+        conn.commit()
+        return result
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/premium-catalog")
+def sync_premium_catalog(body: PremiumCatalogBody, _: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.premium_sync_service import apply_premium_catalog
+
+    init_db()
+    conn = _conn()
+    try:
+        return apply_premium_catalog(conn, body.local_ids, since_date=body.since_date)
     finally:
         conn.close()
 
