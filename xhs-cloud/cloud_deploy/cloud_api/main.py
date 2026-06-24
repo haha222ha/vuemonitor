@@ -30,7 +30,7 @@ from cloud_deploy.cloud_api.config import get_settings
 
 _ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
 
-app = FastAPI(title="XHS 閫夊搧浜戞湇鍔?, version="1.1.0")
+app = FastAPI(title="XHS 选品云服务", version="1.1.0")
 
 
 @app.on_event("startup")
@@ -145,7 +145,7 @@ def agent_risk_worklist(
     _: None = Depends(verify_agent_access),
 ):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from datetime import date
 
     from cloud_deploy.cloud_api.agent_service import (
@@ -175,11 +175,11 @@ def agent_risk_worklist(
 @app.post("/api/v1/agent/scan-results")
 def agent_scan_results(body: AgentScanUploadBody, _: None = Depends(verify_agent_access)):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     if not body.rows:
-        raise HTTPException(status_code=400, detail="rows 涓虹┖")
+        raise HTTPException(status_code=400, detail="rows 为空")
     if len(body.rows) > 500:
-        raise HTTPException(status_code=400, detail="鍗曟壒鏈€澶?500 鏉?)
+        raise HTTPException(status_code=400, detail="单批最多 500 条")
     from cloud_deploy.cloud_api.agent_service import apply_local_scan_batch
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
 
@@ -202,7 +202,7 @@ def agent_scan_results(body: AgentScanUploadBody, _: None = Depends(verify_agent
 def member_portal_page():
     path = os.path.join(_ASSETS, "member_portal.html")
     if not os.path.isfile(path):
-        raise HTTPException(status_code=404, detail="浼氬憳鐪嬫澘鏈儴缃?)
+        raise HTTPException(status_code=404, detail="会员看板未部署")
     return FileResponse(path, media_type="text/html; charset=utf-8")
 
 
@@ -223,11 +223,11 @@ def register(body: RegisterBody):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"寮€閫氬け璐? {e}") from e
+        raise HTTPException(status_code=500, detail=f"开通失败: {e}") from e
     try:
         token = create_token(profile)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"鐧诲綍浠ょ墝鐢熸垚澶辫触: {e}") from e
+        raise HTTPException(status_code=500, detail=f"登录令牌生成失败: {e}") from e
     return {
         "access_token": token,
         "token_type": "bearer",
@@ -241,14 +241,14 @@ def activate_code(body: ActivateBody, user: dict = Depends(current_member)):
         profile = db.renew_with_auth_code(user["id"], body.auth_code)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
-    return {"membership": profile, "message": "缁垂鎴愬姛"}
+    return {"membership": profile, "message": "续费成功"}
 
 
 @app.get("/api/v1/member/profile")
 def member_profile(user: dict = Depends(current_member)):
     profile = db.get_member_profile(user["id"])
     if not profile:
-        raise HTTPException(status_code=404, detail="鐢ㄦ埛涓嶅瓨鍦?)
+        raise HTTPException(status_code=404, detail="用户不存在")
     return profile
 
 
@@ -262,7 +262,7 @@ def member_reports(
 
 @app.get("/api/v1/member/library")
 def member_library(user: dict = Depends(current_member)):
-    """鍏ㄩ儴鍘嗗彶鎶ュ憡搴擄紙鏃ユ姤 + 鍛ㄦ姤 + 鏈堟姤锛夈€?""
+    """全部历史报告库（日报 + 周报 + 月报）。"""
     library = db.list_report_library()
     profile = db.get_member_profile(user["id"])
     return {"membership": profile, "library": library}
@@ -280,11 +280,11 @@ def download_report(
 
     token = (cred.credentials if cred else None) or (access_token or "").strip()
     if not token:
-        raise HTTPException(status_code=401, detail="闇€瑕佺櫥褰?)
+        raise HTTPException(status_code=401, detail="需要登录")
     user = member_from_token(token)
     path = db.get_archive_path(report_date, archive_type)
     if not path or not os.path.isfile(path):
-        raise HTTPException(status_code=404, detail="鎶ュ憡涓嶅瓨鍦?)
+        raise HTTPException(status_code=404, detail="报告不存在")
     ip = request.client.host if request and request.client else ""
     db.log_download(user["id"], report_date, archive_type, ip)
     return FileResponse(
@@ -320,7 +320,7 @@ def admin_list_codes(
     try:
         items = db.list_auth_codes(limit=limit, status=status or None)
     except Exception as e:
-        raise HTTPException(status_code=503, detail=f"鏁版嵁搴撴湭灏辩华: {e}") from e
+        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
     return {"items": items}
 
 
@@ -331,7 +331,7 @@ def admin_revoke_code(code: str, _: None = Depends(verify_sync_key)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        raise HTTPException(status_code=503, detail=f"鏁版嵁搴撴湭灏辩华: {e}") from e
+        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
 
 
 @app.get("/api/v1/admin/stats")
@@ -340,7 +340,7 @@ def admin_stats(_: None = Depends(verify_sync_key)):
         stats = db.get_admin_stats()
         archives = db.list_archives()
     except Exception as e:
-        raise HTTPException(status_code=503, detail=f"鏁版嵁搴撴湭灏辩华: {e}") from e
+        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
     pool_size = 0
     pending_backfill = 0
     pending_snapshots = 0
@@ -412,7 +412,7 @@ def sync_status(_: None = Depends(verify_sync_key)):
 @app.post("/api/v1/sync/daily-report")
 def sync_daily_report(body: DailyReportSyncBody, _: None = Depends(verify_sync_key)):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
     from cloud_deploy.cloud_api.sync_service import apply_daily_report
 
@@ -427,7 +427,7 @@ def sync_daily_report(body: DailyReportSyncBody, _: None = Depends(verify_sync_k
 @app.post("/api/v1/sync/sold-history")
 def sync_sold_history(body: SoldHistorySyncBody, _: None = Depends(verify_sync_key)):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
     from cloud_deploy.cloud_api.sync_service import apply_sold_history_batch
 
@@ -443,7 +443,7 @@ def sync_sold_history(body: SoldHistorySyncBody, _: None = Depends(verify_sync_k
 @app.post("/api/v1/sync/sold-snapshots")
 def sync_sold_snapshots(body: SoldSnapshotsSyncBody, _: None = Depends(verify_sync_key)):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
     from cloud_deploy.cloud_api.sync_service import apply_sold_snapshots_batch
 
@@ -459,7 +459,7 @@ def sync_sold_snapshots(body: SoldSnapshotsSyncBody, _: None = Depends(verify_sy
 @app.post("/api/v1/sync/prune-snapshots")
 def sync_prune_snapshots(_: None = Depends(verify_sync_key)):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
     from cloud_deploy.cloud_api.retention_policy import (
         retention_policy_summary,
@@ -486,7 +486,7 @@ def sync_prune_snapshots(_: None = Depends(verify_sync_key)):
 @app.post("/api/v1/sync/premium-upsert")
 def sync_premium_upsert(body: PremiumUpsertBody, _: None = Depends(verify_sync_key)):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
     from cloud_deploy.cloud_api.premium_sync_service import apply_premium_upsert
 
@@ -507,7 +507,7 @@ def sync_premium_changes(
     _: None = Depends(verify_sync_key),
 ):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
     from cloud_deploy.cloud_api.premium_sync_service import get_premium_changes
 
@@ -525,7 +525,7 @@ def sync_premium_snapshots_backfill(
     _: None = Depends(verify_sync_key),
 ):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
     from cloud_deploy.cloud_api.premium_sync_service import apply_snapshots_backfill
 
@@ -544,7 +544,7 @@ def sync_premium_snapshots_backfill(
 @app.post("/api/v1/sync/premium-catalog")
 def sync_premium_catalog(body: PremiumCatalogBody, _: None = Depends(verify_sync_key)):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
     from cloud_deploy.cloud_api.premium_sync_service import apply_premium_catalog
 
@@ -564,9 +564,9 @@ def sync_premium_catalog(body: PremiumCatalogBody, _: None = Depends(verify_sync
 
 @app.post("/api/v1/sync/premium-fetch")
 def sync_premium_fetch(body: PremiumFetchBody, _: None = Depends(verify_sync_key)):
-    """鎸?goods_id 鎷夊彇浜戠簿鍝佽锛堟湰鍦扮己鐨?cloud_only 鍟嗗搧锛夈€?""
+    """按 goods_id 拉取云精品行（本地缺的 cloud_only 商品）。"""
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="鏈厤缃?XHS_DATABASE_URL")
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
     from cloud_deploy.cloud_api.premium_sync_service import fetch_premium_goods_by_ids
 
