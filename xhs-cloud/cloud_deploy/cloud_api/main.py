@@ -13,24 +13,14 @@ from cloud_deploy.scripts.bootstrap_env import bootstrap
 bootstrap()
 
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 from cloud_deploy.cloud_api import database as db
-from cloud_deploy.cloud_api.auth import (
-    current_member,
-    create_token,
-    login_member,
-    security,
-    verify_agent_access,
-    verify_sync_key,
-)
+from cloud_deploy.cloud_api.auth import current_member, login_member, verify_sync_key
 from cloud_deploy.cloud_api.config import get_settings
 
-_ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
-
-app = FastAPI(title="XHS 选品云服务", version="1.1.0")
+app = FastAPI(title="XHS 选品云服务", version="1.0.0")
 
 
 @app.on_event("startup")
@@ -42,24 +32,6 @@ def _startup():
 class LoginBody(BaseModel):
     username: str
     password: str
-
-
-class RegisterBody(BaseModel):
-    username: str = Field(..., min_length=3, max_length=64)
-    password: str = Field(..., min_length=6, max_length=128)
-    auth_code: str = Field(..., min_length=8, max_length=64)
-
-
-class ActivateBody(BaseModel):
-    auth_code: str = Field(..., min_length=8, max_length=64)
-
-
-class GenerateCodesBody(BaseModel):
-    count: int = Field(default=1, ge=1, le=100)
-    plan_code: str = "monthly"
-    duration_days: int = Field(default=30, ge=1, le=3650)
-    max_activations: int = Field(default=1, ge=1, le=1000)
-    note: str = ""
 
 
 class DailyReportSyncBody(BaseModel):
@@ -76,6 +48,12 @@ class SoldHistorySyncBody(BaseModel):
 
 
 class SoldSnapshotsSyncBody(BaseModel):
+    batch_id: str = ""
+    rows: list[dict]
+    final_batch: bool = False
+
+
+class PremiumBatchSyncBody(BaseModel):
     batch_id: str = ""
     rows: list[dict]
     final_batch: bool = False
@@ -105,99 +83,10 @@ class PremiumFetchBody(BaseModel):
     goods_ids: list[str] = Field(default_factory=list)
 
 
-class PremiumBatchSyncBody(BaseModel):
-    batch_id: str = ""
-    rows: list[dict]
-    final_batch: bool = False
-
-
-class AgentScanRow(BaseModel):
-    goods_id: str
-    status: str
-    sold: int | None = None
-    engine: str = "playwright"
-    message: str = ""
-    ms: int = 0
-    deal_price: float | None = None
-    detail: dict = Field(default_factory=dict)
-
-
-class AgentScanUploadBody(BaseModel):
-    batch_id: str = ""
-    agent_id: str = ""
-    scan_date: str = ""
-    rows: list[AgentScanRow] = Field(default_factory=list)
-
-
-@app.get("/api/v1/agent/risk-worklist")
-def agent_risk_worklist(
-    limit: int = 100,
-    scan_date: str = "",
-    include_pending: int = 0,
-    agent_id: str = "",
-    min_age_hours: float = 2.0,
-    _: None = Depends(verify_agent_access),
-):
-    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
-    from datetime import date
-
-    from cloud_deploy.cloud_api.agent_service import (
-        DEFAULT_CLAIM_TTL_MINUTES,
-        list_risk_worklist,
-    )
-    from cloud_deploy.cloud_api.database_pg import _conn, init_db
-
-    limit = max(1, min(int(limit), 1000))
-    day = (scan_date or date.today().isoformat())[:10]
-    init_db()
-    conn = _conn()
-    try:
-        return list_risk_worklist(
-            conn,
-            day,
-            limit,
-            include_pending=bool(include_pending),
-            agent_id=agent_id.strip(),
-            min_age_hours=max(0.0, float(min_age_hours)),
-            claim_ttl_minutes=DEFAULT_CLAIM_TTL_MINUTES,
-        )
-    finally:
-        conn.close()
-
-
-@app.post("/api/v1/agent/scan-results")
-def agent_scan_results(body: AgentScanUploadBody, _: None = Depends(verify_agent_access)):
-    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
-    if not body.rows:
-        raise HTTPException(status_code=400, detail="rows 为空")
-    if len(body.rows) > 500:
-        raise HTTPException(status_code=400, detail="单批最多 500 条")
-    from cloud_deploy.cloud_api.agent_service import apply_local_scan_batch
-    from cloud_deploy.cloud_api.database_pg import _conn, init_db
-
-    init_db()
-    conn = _conn()
-    try:
-        payload = [r.model_dump() for r in body.rows]
-        return apply_local_scan_batch(
-            conn,
-            payload,
-            agent_id=body.agent_id,
-            batch_id=body.batch_id,
-        )
-    finally:
-        conn.close()
-
-
-@app.get("/", response_class=HTMLResponse)
-@app.get("/member", response_class=HTMLResponse)
-def member_portal_page():
-    path = os.path.join(_ASSETS, "member_portal.html")
-    if not os.path.isfile(path):
-        raise HTTPException(status_code=404, detail="会员看板未部署")
-    return FileResponse(path, media_type="text/html; charset=utf-8")
+class PremiumDailyFetchBody(BaseModel):
+    goods_ids: list[str] = Field(default_factory=list)
+    since_date: str = ""
+    max_rows: int = 25000
 
 
 @app.get("/api/v1/health")
@@ -210,42 +99,6 @@ def login(body: LoginBody):
     return login_member(body.username, body.password)
 
 
-@app.post("/api/v1/auth/register")
-def register(body: RegisterBody):
-    try:
-        profile = db.register_with_auth_code(body.username, body.password, body.auth_code)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"开通失败: {e}") from e
-    try:
-        token = create_token(profile)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"登录令牌生成失败: {e}") from e
-    return {
-        "access_token": token,
-        "token_type": "bearer",
-        "membership": profile,
-    }
-
-
-@app.post("/api/v1/auth/activate")
-def activate_code(body: ActivateBody, user: dict = Depends(current_member)):
-    try:
-        profile = db.renew_with_auth_code(user["id"], body.auth_code)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    return {"membership": profile, "message": "续费成功"}
-
-
-@app.get("/api/v1/member/profile")
-def member_profile(user: dict = Depends(current_member)):
-    profile = db.get_member_profile(user["id"])
-    if not profile:
-        raise HTTPException(status_code=404, detail="用户不存在")
-    return profile
-
-
 @app.get("/api/v1/member/reports")
 def member_reports(
     archive_type: str = "member_daily_zip",
@@ -254,28 +107,13 @@ def member_reports(
     return {"items": db.list_archives(archive_type=archive_type), "user": user["username"]}
 
 
-@app.get("/api/v1/member/library")
-def member_library(user: dict = Depends(current_member)):
-    """全部历史报告库（日报 + 周报 + 月报）。"""
-    library = db.list_report_library()
-    profile = db.get_member_profile(user["id"])
-    return {"membership": profile, "library": library}
-
-
 @app.get("/api/v1/member/reports/{report_date}/download")
 def download_report(
     report_date: str,
     archive_type: str = "member_daily_zip",
-    access_token: str = "",
     request: Request = None,
-    cred: HTTPAuthorizationCredentials | None = Depends(security),
+    user: dict = Depends(current_member),
 ):
-    from cloud_deploy.cloud_api.auth import member_from_token
-
-    token = (cred.credentials if cred else None) or (access_token or "").strip()
-    if not token:
-        raise HTTPException(status_code=401, detail="需要登录")
-    user = member_from_token(token)
     path = db.get_archive_path(report_date, archive_type)
     if not path or not os.path.isfile(path):
         raise HTTPException(status_code=404, detail="报告不存在")
@@ -286,86 +124,6 @@ def download_report(
         media_type="application/zip",
         filename=os.path.basename(path),
     )
-
-
-@app.post("/api/v1/admin/auth-codes")
-def admin_generate_codes(body: GenerateCodesBody, _: None = Depends(verify_sync_key)):
-    codes = db.generate_auth_codes(
-        count=body.count,
-        plan_code=body.plan_code,
-        duration_days=body.duration_days,
-        max_activations=body.max_activations,
-        note=body.note,
-    )
-    return {
-        "codes": codes,
-        "plan_code": body.plan_code,
-        "duration_days": body.duration_days,
-        "max_activations": body.max_activations,
-    }
-
-
-@app.get("/api/v1/admin/auth-codes")
-def admin_list_codes(
-    _: None = Depends(verify_sync_key),
-    limit: int = 100,
-    status: str | None = None,
-):
-    try:
-        items = db.list_auth_codes(limit=limit, status=status or None)
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
-    return {"items": items}
-
-
-@app.post("/api/v1/admin/auth-codes/{code}/revoke")
-def admin_revoke_code(code: str, _: None = Depends(verify_sync_key)):
-    try:
-        return db.revoke_auth_code(code)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
-
-
-@app.get("/api/v1/admin/stats")
-def admin_stats(_: None = Depends(verify_sync_key)):
-    try:
-        stats = db.get_admin_stats()
-        archives = db.list_archives()
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
-    pool_size = 0
-    pending_backfill = 0
-    pending_snapshots = 0
-    if os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
-        try:
-            from cloud_deploy.cloud_api.database_pg import _conn
-
-            conn = _conn()
-            with conn.cursor() as c:
-                c.execute("SET search_path TO xhs_monitor, public")
-                c.execute("SELECT COUNT(*) FROM monitor_goods WHERE monitor_status='active'")
-                pool_size = c.fetchone()[0]
-                c.execute(
-                    "SELECT COUNT(*) FROM goods_sync_state WHERE sold_daily_backfill_done=FALSE"
-                )
-                pending_backfill = c.fetchone()[0]
-                c.execute(
-                    "SELECT COUNT(*) FROM goods_sync_state WHERE sold_snapshots_backfill_done=FALSE"
-                )
-                pending_snapshots = c.fetchone()[0]
-            conn.close()
-        except Exception:
-            pass
-    return {
-        **stats,
-        "archive_count_sync": len(archives),
-        "latest_archive": archives[0] if archives else None,
-        "monitor_pool_active": pool_size,
-        "sold_history_pending_backfill": pending_backfill,
-        "sold_snapshots_pending_backfill": pending_snapshots,
-    }
 
 
 @app.get("/api/v1/sync/status")
@@ -455,24 +213,64 @@ def sync_prune_snapshots(_: None = Depends(verify_sync_key)):
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
-    from cloud_deploy.cloud_api.retention_policy import (
-        retention_policy_summary,
-        snapshot_prune_enabled,
-    )
     from cloud_deploy.cloud_api.sync_service import prune_sold_snapshots
-
-    if not snapshot_prune_enabled():
-        return {
-            "deleted_rows": 0,
-            "skipped": "retention_disabled",
-            **retention_policy_summary(),
-        }
 
     init_db()
     conn = _conn()
     try:
         deleted = prune_sold_snapshots(conn)
-        return {"deleted_rows": deleted, **retention_policy_summary()}
+        return {"deleted_rows": deleted}
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/premium-goods")
+def sync_premium_goods(body: PremiumBatchSyncBody, _: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.premium_sync_service import apply_premium_goods_batch
+
+    init_db()
+    conn = _conn()
+    try:
+        n = apply_premium_goods_batch(conn, body.rows)
+        conn.commit()
+        return {"batch_id": body.batch_id, "rows_upserted": n, "final_batch": body.final_batch}
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/premium-goods-daily")
+def sync_premium_goods_daily(body: PremiumBatchSyncBody, _: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.premium_sync_service import apply_premium_goods_daily_batch
+
+    init_db()
+    conn = _conn()
+    try:
+        n = apply_premium_goods_daily_batch(conn, body.rows)
+        conn.commit()
+        return {"batch_id": body.batch_id, "rows_upserted": n, "final_batch": body.final_batch}
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/premium-store-daily")
+def sync_premium_store_daily(body: PremiumBatchSyncBody, _: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.premium_sync_service import apply_premium_store_daily_batch
+
+    init_db()
+    conn = _conn()
+    try:
+        n = apply_premium_store_daily_batch(conn, body.rows)
+        conn.commit()
+        return {"batch_id": body.batch_id, "rows_upserted": n, "final_batch": body.final_batch}
     finally:
         conn.close()
 
@@ -569,6 +367,27 @@ def sync_premium_fetch(body: PremiumFetchBody, _: None = Depends(verify_sync_key
     try:
         rows = fetch_premium_goods_by_ids(conn, body.goods_ids[:2000])
         return {"rows": rows, "count": len(rows)}
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/premium-daily-fetch")
+def sync_premium_daily_fetch(body: PremiumDailyFetchBody, _: None = Depends(verify_sync_key)):
+    """按 goods_id 批量拉取云 premium_goods_daily 日快照。"""
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.premium_sync_service import fetch_premium_goods_daily_by_ids
+
+    init_db()
+    conn = _conn()
+    try:
+        return fetch_premium_goods_daily_by_ids(
+            conn,
+            body.goods_ids[:500],
+            since_date=body.since_date,
+            max_rows=body.max_rows,
+        )
     finally:
         conn.close()
 

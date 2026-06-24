@@ -113,7 +113,6 @@ def apply_premium_upsert(conn, rows: list[dict], client_id: str = "") -> dict:
     cols = _UPSERT_COLS
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
-        batch_version = _next_sync_version(c)
         for raw in rows:
             gid = str(raw.get("goods_id") or "").strip()
             if len(gid) < 5:
@@ -126,8 +125,9 @@ def apply_premium_upsert(conn, rows: list[dict], client_id: str = "") -> dict:
                 names = [d[0] for d in c.description]
                 existing = {names[i]: ex_row[i] for i in range(len(names))}
             merged = merge_premium_row(existing, raw)
-            merged["sync_version"] = batch_version
-            server_version = max(server_version, batch_version)
+            ver = _next_sync_version(c)
+            merged["sync_version"] = ver
+            server_version = max(server_version, ver)
             placeholders = ", ".join("%s" for _ in cols)
             col_sql = ", ".join(cols)
             updates = ", ".join(f"{col}=EXCLUDED.{col}" for col in cols if col != "goods_id")
@@ -289,6 +289,53 @@ _FETCH_COLS = (
     "shop_fans", "shop_sales", "shop_fans_delta_1d", "streak_sold_up_days",
     "last_app_scan", "last_metric_scan", "last_scan_engine", "updated_at",
 )
+
+
+_DAILY_FETCH_COLS = (
+    "goods_id", "snap_date", "sold_num", "deal_price", "delta",
+    "actual_delta", "velocity_1d", "source", "created_at",
+)
+
+
+def fetch_premium_goods_daily_by_ids(
+    conn,
+    goods_ids: list[str],
+    since_date: str = "",
+    max_rows: int = 25000,
+) -> dict:
+    ids = [str(g).strip() for g in goods_ids if g and len(str(g)) >= 5]
+    if not ids:
+        return {"rows": [], "count": 0, "truncated": False}
+    max_rows = max(1, min(int(max_rows), 50000))
+    out: list[dict] = []
+    cols = ", ".join(_DAILY_FETCH_COLS)
+    date_filter = ""
+    params_tail: list = []
+    if since_date:
+        date_filter = " AND snap_date >= %s"
+        params_tail.append(str(since_date)[:10])
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        for i in range(0, len(ids), 500):
+            if len(out) >= max_rows:
+                break
+            chunk = ids[i : i + 500]
+            ph = ", ".join("%s" for _ in chunk)
+            remain = max_rows - len(out)
+            c.execute(
+                f"""
+                SELECT {cols} FROM premium_goods_daily
+                WHERE goods_id IN ({ph}) {date_filter}
+                ORDER BY goods_id, snap_date
+                LIMIT %s
+                """,
+                (*chunk, *params_tail, remain),
+            )
+            names = [d[0] for d in c.description]
+            for row in c.fetchall():
+                out.append({names[j]: row[j] for j in range(len(names))})
+    truncated = len(out) >= max_rows
+    return {"rows": out, "count": len(out), "truncated": truncated}
 
 
 def fetch_premium_goods_by_ids(conn, goods_ids: list[str]) -> list[dict]:
