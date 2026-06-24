@@ -113,6 +113,7 @@ def apply_premium_upsert(conn, rows: list[dict], client_id: str = "") -> dict:
     cols = _UPSERT_COLS
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
+        batch_version = _next_sync_version(c)
         for raw in rows:
             gid = str(raw.get("goods_id") or "").strip()
             if len(gid) < 5:
@@ -125,9 +126,8 @@ def apply_premium_upsert(conn, rows: list[dict], client_id: str = "") -> dict:
                 names = [d[0] for d in c.description]
                 existing = {names[i]: ex_row[i] for i in range(len(names))}
             merged = merge_premium_row(existing, raw)
-            ver = _next_sync_version(c)
-            merged["sync_version"] = ver
-            server_version = max(server_version, ver)
+            merged["sync_version"] = batch_version
+            server_version = max(server_version, batch_version)
             placeholders = ", ".join("%s" for _ in cols)
             col_sql = ", ".join(cols)
             updates = ", ".join(f"{col}=EXCLUDED.{col}" for col in cols if col != "goods_id")
