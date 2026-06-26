@@ -3,10 +3,11 @@
 云端生成日报（读 PG，不依赖 gen_report.py）。
 
 数据源（--source）:
-  auto           premium_goods 为主 ∪ report_daily_items（推荐）
+  auto           当日精品增量 ∪ 当日监控池增量（选品报告，推荐）
+  premium_daily  仅精品库当日增量（同 auto 的精品部分）
+  premium_full   精品全表 LEFT JOIN 当日快照（大数据量慎用）
   pg_items       仅 report_daily_items
-  premium_daily  仅 premium_goods + premium_goods_daily（纯云端精品自算）
-  sold_daily     仅 monitor_goods + goods_sold_daily
+  sold_daily     监控池 + goods_sold_daily（含零增量扫描，incremental 请用 auto）
 
 输出: {XHS_REPORT_OUTPUT_DIR}/全量MMDD/ → data.js + html
 """
@@ -73,13 +74,16 @@ def generate_daily_report(
         items = []
         if source == "auto":
             items = fetch_items_auto(conn, report_date)
-            _log(f"auto(reconcile): {len(items)} 行")
+            _log(f"auto(selection): {len(items)} 行")
         elif source == "pg_items":
             items = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
             _log(f"pg_items: {len(items)} 行")
         elif source == "premium_daily":
-            items = fetch_items_from_premium_daily(conn, report_date)
-            _log(f"premium_daily: {len(items)} 行")
+            items = fetch_items_from_premium_daily(conn, report_date, incremental_only=True)
+            _log(f"premium_daily(incr): {len(items)} 行")
+        elif source == "premium_full":
+            items = fetch_items_from_premium_daily(conn, report_date, incremental_only=False)
+            _log(f"premium_full: {len(items)} 行")
         elif source == "sold_daily":
             items = fetch_items_from_sold_daily(conn, report_date)
             _log(f"sold_daily: {len(items)} 行")
@@ -119,7 +123,7 @@ def generate_daily_report(
 def main():
     ap = argparse.ArgumentParser(description="云端 PG 生成日报")
     ap.add_argument("--date", default="", help="YYYY-MM-DD")
-    ap.add_argument("--source", choices=("auto", "pg_items", "premium_daily", "sold_daily"), default="auto")
+    ap.add_argument("--source", choices=("auto", "pg_items", "premium_daily", "premium_full", "sold_daily"), default="auto")
     ap.add_argument("--no-dedup", action="store_true")
     ap.add_argument("--min-v1d", type=float, default=5)
     ap.add_argument("--min-actual", type=float, default=5)

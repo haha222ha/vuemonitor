@@ -9,7 +9,7 @@ WorkingDirectory=/opt/xhs-cloud
 EnvironmentFile=-/opt/xhs-cloud/.env
 Environment=PYTHONUNBUFFERED=1
 Environment=PYTHONPATH=/opt/xhs-cloud
-Environment=XHS_CLOUD_REPORT_SOURCE=premium_daily
+Environment=XHS_CLOUD_REPORT_SOURCE=auto
 ExecStart=/opt/xhs-cloud/venv/bin/python /opt/xhs-cloud/cloud_deploy/scripts/run_full_pipeline.py full
 
 [Install]

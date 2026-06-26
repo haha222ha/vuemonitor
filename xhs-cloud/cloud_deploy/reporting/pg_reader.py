@@ -491,16 +491,29 @@ def premium_row_to_item(row: dict, *, sold_info: dict | None = None) -> list | N
     return row_to_report_item(merged)
 
 
-def fetch_items_from_premium_daily(conn, report_date: str) -> list:
-    """从 premium_goods + premium_goods_daily 构造报告行（lifecycle<3，actual>0）。"""
+def fetch_items_from_premium_daily(conn, report_date: str, *, incremental_only: bool = True) -> list:
+    """从 premium_goods + premium_goods_daily 构造报告行。
+
+    incremental_only=True（默认）：仅当日有日快照且 actual_delta/delta>0 的精品（选品报告）。
+    incremental_only=False：全表 premium_goods LEFT JOIN 当日快照（历史全量，慎用大数据量）。
+    """
     if not _premium_table_exists(conn):
         return []
     d = date.fromisoformat(report_date)
     prev = (d - timedelta(days=1)).isoformat()
+    join_pgd = "INNER JOIN" if incremental_only else "LEFT JOIN"
+    incr_filter = ""
+    if incremental_only:
+        incr_filter = """
+              AND (
+                COALESCE(pgd.actual_delta, 0) > 0
+                OR COALESCE(pgd.delta, 0) > 0
+              )
+        """
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
         c.execute(
-            """
+            f"""
             SELECT pg.goods_id, pg.title, pg.deal_price, pg.sold_num, pg.velocity_1d,
                    pg.actual_velocity_1d, pg.burst_score, pg.tier, pg.store_id, pg.store_name,
                    pg.shop_fans, pg.shop_sales, pg.is_virtual, pg.first_seen_at, pg.first_report_date,
@@ -508,11 +521,12 @@ def fetch_items_from_premium_daily(conn, report_date: str) -> list:
                    pgd.actual_delta AS pgd_actual_delta, pgd.velocity_1d AS pgd_velocity,
                    pgd_prev.sold_num AS prev_sold
             FROM premium_goods pg
-            LEFT JOIN premium_goods_daily pgd
+            {join_pgd} premium_goods_daily pgd
                    ON pgd.goods_id = pg.goods_id AND pgd.snap_date = %s
             LEFT JOIN premium_goods_daily pgd_prev
                    ON pgd_prev.goods_id = pg.goods_id AND pgd_prev.snap_date = %s
             WHERE pg.lifecycle < 3
+            {incr_filter}
             """,
             (report_date, prev),
         )
@@ -538,8 +552,9 @@ def fetch_items_from_premium_daily(conn, report_date: str) -> list:
                 items.append(item)
 
     items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    mode = "incr" if incremental_only else "full"
     print(
-        f"[pg_reader] premium_daily {report_date}: kept={len(items)} pool={len(rows)} retry={len(retry_rows)}",
+        f"[pg_reader] premium_daily/{mode} {report_date}: kept={len(items)} pool={len(rows)} retry={len(retry_rows)}",
         flush=True,
     )
     return items
@@ -567,21 +582,22 @@ def merge_items_by_goods_id(base: list, extra: list) -> list:
 
 
 def fetch_items_auto(conn, report_date: str) -> list:
-    """auto：premium_goods 为主，report_daily_items 补充（云端自算优先）。"""
-    premium = fetch_items_from_premium_daily(conn, report_date)
-    rdi = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
-    if premium and rdi:
-        merged = merge_items_by_goods_id(premium, rdi)
+    """选品日报：当日精品增量 ∪ 当日监控池增量（同 goods_id 精品 metadata 优先）。"""
+    premium = fetch_items_from_premium_daily(conn, report_date, incremental_only=True)
+    monitor = fetch_items_from_monitor_incremental(conn, report_date)
+    if premium and monitor:
+        merged = merge_items_by_goods_id(premium, monitor)
         print(
-            f"[pg_reader] auto {report_date}: premium={len(premium)} rdi={len(rdi)} merged={len(merged)}",
+            f"[pg_reader] auto {report_date}: premium_incr={len(premium)} "
+            f"monitor_incr={len(monitor)} merged={len(merged)}",
             flush=True,
         )
         return merged
     if premium:
         return premium
-    if rdi:
-        return rdi
-    return fetch_items_from_sold_daily(conn, report_date)
+    if monitor:
+        return monitor
+    return []
 
 
 def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
@@ -704,7 +720,7 @@ def _monitor_goods_has_first_seen(conn) -> bool:
         return c.fetchone() is not None
 
 
-def fetch_items_from_sold_daily(conn, report_date: str) -> list:
+def fetch_items_from_sold_daily(conn, report_date: str, *, incremental_only: bool = False) -> list:
     d = date.fromisoformat(report_date)
     prev = (d - timedelta(days=1)).isoformat()
     mg_shop = (
@@ -717,6 +733,15 @@ def fetch_items_from_sold_daily(conn, report_date: str) -> list:
         if _monitor_goods_has_first_seen(conn)
         else "NULL::timestamptz AS mg_first_seen,"
     )
+    incr_filter = ""
+    if incremental_only:
+        incr_filter = """
+              AND (
+                COALESCE(sd.delta, 0) > 0
+                OR COALESCE(gm.actual_v1d, 0) > 0
+                OR (sp.sold_num IS NOT NULL AND sd.sold_num > sp.sold_num)
+              )
+        """
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
         c.execute(
@@ -770,6 +795,7 @@ def fetch_items_from_sold_daily(conn, report_date: str) -> list:
                 LIMIT 1
             ) rdi ON TRUE
             WHERE m.monitor_status IN ('active', 'idle')
+            {incr_filter}
             """,
             (report_date, prev, report_date),
         )
@@ -783,11 +809,91 @@ def fetch_items_from_sold_daily(conn, report_date: str) -> list:
         if item and float(item_at(item, "actual_v1d", 0) or 0) > 0:
             items.append(item)
     items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    if incremental_only:
+        print(
+            f"[pg_reader] monitor_incr {report_date}: kept={len(items)} scanned={len(rows)}",
+            flush=True,
+        )
     return items
 
 
-def fetch_items_for_period(conn, start_date: str, end_date: str) -> list:
-    """周期内每 goods_id 保留 actual_v1d 最高的一行。"""
+def fetch_items_from_monitor_incremental(conn, report_date: str) -> list:
+    """监控池：仅当日 goods_sold_daily 有正增量的 active/idle 商品。"""
+    return fetch_items_from_sold_daily(conn, report_date, incremental_only=True)
+
+
+def fetch_premium_items_for_period(conn, start_date: str, end_date: str) -> list:
+    """周期内每 goods_id 取 actual_delta 最高的 premium 日快照（对齐日报 premium_daily 逻辑）。"""
+    if not _premium_table_exists(conn):
+        return []
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            """
+            SELECT DISTINCT ON (pg.goods_id)
+                   pg.goods_id, pg.title, pg.deal_price, pg.sold_num, pg.velocity_1d,
+                   pg.actual_velocity_1d, pg.burst_score, pg.tier, pg.store_id, pg.store_name,
+                   pg.shop_fans, pg.shop_sales, pg.is_virtual, pg.first_seen_at, pg.first_report_date,
+                   pgd.snap_date AS peak_snap_date,
+                   pgd.sold_num AS pgd_sold, pgd.delta AS pgd_delta,
+                   pgd.actual_delta AS pgd_actual_delta, pgd.velocity_1d AS pgd_velocity,
+                   pgd_prev.sold_num AS prev_sold
+            FROM premium_goods pg
+            JOIN premium_goods_daily pgd ON pgd.goods_id = pg.goods_id
+            LEFT JOIN premium_goods_daily pgd_prev
+                   ON pgd_prev.goods_id = pg.goods_id
+                  AND pgd_prev.snap_date = pgd.snap_date - 1
+            WHERE pg.lifecycle < 3
+              AND pgd.snap_date >= %s AND pgd.snap_date <= %s
+            ORDER BY pg.goods_id, pgd.actual_delta DESC NULLS LAST,
+                     pgd.velocity_1d DESC NULLS LAST, pgd.snap_date DESC
+            """,
+            (start_date, end_date),
+        )
+        cols = [d[0] for d in c.description]
+        rows = [dict(zip(cols, r)) for r in c.fetchall()]
+
+    items: list = []
+    retry_rows: dict[str, dict] = {}
+    sold_by_snap: dict[str, dict[str, dict]] = {}
+    for raw in rows:
+        snap = str(raw.get("peak_snap_date") or "")
+        gid = str(raw.get("goods_id") or "")
+        sold_info = None
+        if snap and gid:
+            if snap not in sold_by_snap:
+                gids = [
+                    str(r.get("goods_id") or "")
+                    for r in rows
+                    if str(r.get("peak_snap_date") or "") == snap
+                ]
+                sold_by_snap[snap] = _fetch_sold_daily_map(conn, snap, gids)
+            sold_info = sold_by_snap[snap].get(gid)
+        item = premium_row_to_item(raw, sold_info=sold_info)
+        if item:
+            items.append(item)
+        elif gid and _premium_has_metric_signal(raw):
+            retry_rows[gid] = (raw, sold_info)
+
+    for gid, (raw, sold_info) in retry_rows.items():
+        if gid in {str(item_at(it, "goods_id", "") or "") for it in items}:
+            continue
+        item = premium_row_to_item(raw, sold_info=sold_info)
+        if item:
+            items.append(item)
+
+    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    print(
+        f"[pg_reader] premium_period {start_date}~{end_date}: kept={len(items)} pool={len(rows)}",
+        flush=True,
+    )
+    return items
+
+
+def fetch_rdi_items_for_period(
+    conn, start_date: str, end_date: str, *, reconcile_sold: bool = True
+) -> list:
+    """周期内每 goods_id 保留 actual_v1d 最高的一行，并用 goods_sold_daily 校正。"""
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
         c.execute(
@@ -795,12 +901,164 @@ def fetch_items_for_period(conn, start_date: str, end_date: str) -> list:
             SELECT DISTINCT ON (goods_id) *
             FROM report_daily_items
             WHERE report_date >= %s AND report_date <= %s
-            ORDER BY goods_id, actual_v1d DESC, v1d DESC
+            ORDER BY goods_id, actual_v1d DESC, v1d DESC, report_date DESC
             """,
             (start_date, end_date),
         )
         cols = [d[0] for d in c.description]
         rows = [dict(zip(cols, r)) for r in c.fetchall()]
-    items = [db_row_to_item(r) for r in rows]
+    if not rows:
+        return []
+
+    sold_maps: dict[str, dict[str, dict]] = {}
+    if reconcile_sold:
+        by_date: dict[str, list[str]] = {}
+        for raw in rows:
+            rd = str(raw.get("report_date") or "")
+            gid = str(raw.get("goods_id") or "")
+            if rd and gid:
+                by_date.setdefault(rd, []).append(gid)
+        for rd, gids in by_date.items():
+            sold_maps[rd] = _fetch_sold_daily_map(conn, rd, gids)
+
+    items: list = []
+    fixed = dropped = 0
+    for raw in rows:
+        gid = str(raw.get("goods_id") or "")
+        rd = str(raw.get("report_date") or "")
+        if reconcile_sold:
+            reconciled = reconcile_row_metrics(dict(raw), sold_maps.get(rd, {}).get(gid))
+            if reconciled is None:
+                dropped += 1
+                continue
+            if (
+                _f(reconciled.get("actual_v1d")) != _f(raw.get("actual_v1d"))
+                or _f(reconciled.get("v1d")) != _f(raw.get("v1d"))
+            ):
+                fixed += 1
+            items.append(db_row_to_item(reconciled))
+        else:
+            items.append(db_row_to_item(raw))
+
+    if reconcile_sold and (fixed or dropped):
+        print(
+            f"[pg_reader] period_reconcile {start_date}~{end_date}: "
+            f"fixed={fixed} dropped={dropped} kept={len(items)}",
+            flush=True,
+        )
     items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
     return items
+
+
+def fetch_monitor_items_for_period(conn, start_date: str, end_date: str) -> list:
+    """周期内监控池：每 goods_id 取增量最高的一天（仅正增量日）。"""
+    mg_shop = (
+        "m.shop_sales AS mg_shop_sales, m.shop_fans AS mg_shop_fans,"
+        if _monitor_goods_has_shop_cols(conn)
+        else "NULL::int AS mg_shop_sales, NULL::int AS mg_shop_fans,"
+    )
+    mg_fs = (
+        "m.first_seen AS mg_first_seen,"
+        if _monitor_goods_has_first_seen(conn)
+        else "NULL::timestamptz AS mg_first_seen,"
+    )
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            f"""
+            SELECT DISTINCT ON (m.goods_id)
+                   m.goods_id, m.title, m.is_virtual, m.pool, m.store_id, m.store_name,
+                   m.first_tracked_at,
+                   {mg_fs}
+                   {mg_shop}
+                   (SELECT MIN(r.first_seen)
+                    FROM report_daily_items r
+                    WHERE r.goods_id = m.goods_id AND r.first_seen IS NOT NULL) AS rdi_first_seen_min,
+                   sd.sold_num, sd.delta, sd.deal_price,
+                   sp.sold_num AS prev_sold,
+                   gm.actual_v1d AS gm_actual_v1d, gm.v1d AS gm_v1d, gm.gr AS gm_gr,
+                   rdi.title AS rdi_title,
+                   rdi.price AS rdi_price,
+                   rdi.actual_v1d AS rdi_actual_v1d,
+                   rdi.v1d AS rdi_v1d,
+                   rdi.actual_gr AS rdi_actual_gr,
+                   rdi.gr AS rdi_gr,
+                   rdi.actual_vsr AS rdi_actual_vsr,
+                   rdi.vsr AS rdi_vsr,
+                   rdi.v1h AS rdi_v1h,
+                   rdi.v6h AS rdi_v6h,
+                   rdi.acc AS rdi_acc,
+                   rdi.burst AS rdi_burst,
+                   rdi.pool AS rdi_pool,
+                   rdi.first_seen AS rdi_first_seen,
+                   rdi.store_id AS rdi_store_id,
+                   rdi.store_name AS rdi_store_name,
+                   rdi.shelf_time AS rdi_shelf_time,
+                   rdi.shop_sales AS rdi_shop_sales,
+                   rdi.shop_fans AS rdi_shop_fans,
+                   rdi.shop_fsr AS rdi_shop_fsr,
+                   rdi.goods_fsr AS rdi_goods_fsr,
+                   rdi.behavior AS rdi_behavior,
+                   rdi.is_virtual AS rdi_is_virtual,
+                   rdi.base_hours AS rdi_base_hours,
+                   rdi.base_at AS rdi_base_at,
+                   rdi.anomaly AS rdi_anomaly
+            FROM monitor_goods m
+            JOIN goods_sold_daily sd
+              ON sd.goods_id = m.goods_id
+             AND sd.snapshot_date >= %s AND sd.snapshot_date <= %s
+            LEFT JOIN goods_sold_daily sp
+              ON sp.goods_id = m.goods_id AND sp.snapshot_date = sd.snapshot_date - 1
+            LEFT JOIN goods_metrics_daily gm
+              ON gm.goods_id = m.goods_id AND gm.metric_date = sd.snapshot_date
+            LEFT JOIN LATERAL (
+                SELECT *
+                FROM report_daily_items r
+                WHERE r.goods_id = m.goods_id
+                ORDER BY r.report_date DESC
+                LIMIT 1
+            ) rdi ON TRUE
+            WHERE m.monitor_status IN ('active', 'idle')
+              AND (
+                COALESCE(sd.delta, 0) > 0
+                OR COALESCE(gm.actual_v1d, 0) > 0
+                OR (sp.sold_num IS NOT NULL AND sd.sold_num > sp.sold_num)
+              )
+            ORDER BY m.goods_id, sd.delta DESC NULLS LAST, sd.snapshot_date DESC
+            """,
+            (start_date, end_date),
+        )
+        cols = [d[0] for d in c.description]
+        rows = [dict(zip(cols, r)) for r in c.fetchall()]
+    items = []
+    for r in rows:
+        prev_raw = r.get("prev_sold")
+        prev_sold = _i(prev_raw) if prev_raw is not None else None
+        item = sold_row_to_item(r, prev_sold)
+        if item and float(item_at(item, "actual_v1d", 0) or 0) > 0:
+            items.append(item)
+    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    print(
+        f"[pg_reader] monitor_period {start_date}~{end_date}: kept={len(items)} scanned={len(rows)}",
+        flush=True,
+    )
+    return items
+
+
+def fetch_items_for_period(conn, start_date: str, end_date: str) -> list:
+    """周期选品报告：周期内精品增量峰值日 ∪ 监控池增量峰值日（精品 metadata 优先）。"""
+    premium = fetch_premium_items_for_period(conn, start_date, end_date)
+    monitor = fetch_monitor_items_for_period(conn, start_date, end_date)
+    if premium and monitor:
+        merged = merge_items_by_goods_id(premium, monitor)
+        print(
+            f"[pg_reader] period {start_date}~{end_date}: "
+            f"premium_incr={len(premium)} monitor_incr={len(monitor)} merged={len(merged)}",
+            flush=True,
+        )
+        return merged
+    if premium:
+        return premium
+    if monitor:
+        return monitor
+    return []

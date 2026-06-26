@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""检查云端是否具备「精品+日快照」自算报告的数据条件。"""
+"""检查云端是否具备「精品+监控池当日增量」选品报告的数据条件。"""
 from __future__ import annotations
 
 import argparse
@@ -40,30 +40,36 @@ def check(report_date: str) -> dict:
             )
             daily_actual = int(c.fetchone()[0] or 0)
             c.execute(
-                "SELECT COUNT(*) FROM report_daily_items WHERE report_date = %s",
+                """
+                SELECT COUNT(*) FROM goods_sold_daily sd
+                JOIN monitor_goods m ON m.goods_id = sd.goods_id
+                WHERE sd.snapshot_date = %s
+                  AND m.monitor_status IN ('active', 'idle')
+                  AND COALESCE(sd.delta, 0) > 0
+                """,
                 (report_date,),
             )
-            rdi = int(c.fetchone()[0] or 0)
+            monitor_incr = int(c.fetchone()[0] or 0)
     finally:
         conn.close()
-    ok = premium > 0 and (daily_rows > 0 or rdi > 0)
+    ok = daily_actual > 0 or monitor_incr > 0
     return {
         "report_date": report_date,
         "premium_goods": premium,
         "premium_goods_daily_rows": daily_rows,
         "premium_daily_actual_gt0": daily_actual,
-        "report_daily_items": rdi,
-        "cloud_native_ready": ok and daily_actual > 0,
+        "monitor_pool_incr_gt0": monitor_incr,
+        "selection_report_ready": ok,
         "hint": (
-            "可 cloud_gen_report --source premium_daily"
-            if daily_actual > 0
-            else "请在本地执行: cloud_sync_premium.py push-daily / sync-full"
+            "可 cloud_gen_report --source auto"
+            if ok
+            else "精品: 本地 push-daily；监控池: 确认云 daemon 已写入 goods_sold_daily"
         ),
     }
 
 
 def main():
-    ap = argparse.ArgumentParser(description="云端精品报告数据就绪检查")
+    ap = argparse.ArgumentParser(description="云端选品报告（精品+监控池增量）数据就绪检查")
     ap.add_argument("--date", default="", help="YYYY-MM-DD")
     args = ap.parse_args()
     from datetime import datetime

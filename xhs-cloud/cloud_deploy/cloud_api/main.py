@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import os
 import sys
+import zipfile
 
 CRAWLER_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if CRAWLER_ROOT not in sys.path:
@@ -12,7 +13,7 @@ from cloud_deploy.scripts.bootstrap_env import bootstrap
 
 bootstrap()
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
@@ -422,6 +423,32 @@ def sync_daily_report(body: DailyReportSyncBody, _: None = Depends(verify_sync_k
         return apply_daily_report(conn, body.report_date, body.meta, body.items, source=body.source)
     finally:
         conn.close()
+
+
+@app.post("/api/v1/sync/report-upload")
+async def sync_report_upload(
+    file: UploadFile = File(...),
+    _: None = Depends(verify_sync_key),
+):
+    """方案 B：本地 gen_report 打包 zip 上传 → 解压 ingest → 会员可下载。"""
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="缺少上传文件")
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(status_code=400, detail="上传文件为空")
+    max_mb = int(os.environ.get("XHS_REPORT_UPLOAD_MAX_MB", "200") or 200)
+    if len(raw) > max_mb * 1024 * 1024:
+        raise HTTPException(status_code=413, detail=f"文件超过 {max_mb}MB 限制")
+    try:
+        from cloud_deploy.cloud_api.report_upload_service import ingest_report_upload_bytes
+
+        return ingest_report_upload_bytes(raw, filename=file.filename or "report.zip")
+    except zipfile.BadZipFile as e:
+        raise HTTPException(status_code=400, detail=f"无效 zip: {e}") from e
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"ingest 失败: {e}") from e
 
 
 @app.post("/api/v1/sync/sold-history")
