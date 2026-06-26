@@ -104,7 +104,7 @@ def build_report_payload(
         "avg_actual_vsr": avg_actual_vsr,
         "anomaly_count": anomaly_count,
         "metric_mode": "cloud_pg",
-        "metric_note": "云端 PG 生成；真实增量优先来自 goods_sold_daily 日差分或 report_daily_items",
+        "metric_note": "云端 PG 生成；真实增量=goods_sold_daily 日差分（自动校正 v1d≈sold 脏行）",
         "deduped": True,
         "source": source,
         "disclaimer": REPORT_DISCLAIMER,

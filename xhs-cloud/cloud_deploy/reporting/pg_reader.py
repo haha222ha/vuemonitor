@@ -232,6 +232,170 @@ def _pick_int(*vals: Any) -> int:
     return 0
 
 
+def _compute_daily_actual(sold: int, prev_sold: int | None, delta: int) -> float | None:
+    """真实日增量：优先 今日销量 − 昨日销量，其次 PG delta（排除首日 delta≈总销量）。"""
+    if prev_sold is not None:
+        actual = max(0.0, float(sold - prev_sold))
+        if actual > 0:
+            return actual
+    if delta > 0:
+        if prev_sold is None and sold > 0 and float(delta) >= float(sold) * 0.95:
+            return None
+        return float(delta)
+    return None
+
+
+def _v1d_looks_like_sold(v1d: float, sold: int, actual: float) -> bool:
+    """v1d 被误写成累计销量（非日增量）。"""
+    if sold <= 0 or v1d <= 0:
+        return False
+    ratio = abs(v1d - sold) / max(float(sold), 1.0)
+    if ratio >= 0.05:
+        return False
+    if actual <= 0:
+        return True
+    return actual < sold * 0.05
+
+
+def _pick_v1d(actual: float, stored_v1d: float, gm_v1d: float, sold: int) -> float:
+    """预估日增量：拒绝「≈总销量」的脏值，否则回落到真实增量。"""
+    for cand in (stored_v1d, gm_v1d):
+        if cand > 0 and not _v1d_looks_like_sold(cand, sold, actual):
+            return float(cand)
+    return float(actual) if actual > 0 else 0.0
+
+
+def _recompute_derived_rates(row: dict) -> None:
+    sold = _i(row.get("sold"))
+    actual = _f(row.get("actual_v1d"))
+    v1d = _f(row.get("v1d"))
+    if actual > 0:
+        sold_base = max(sold - int(actual), 1) if sold > int(actual) else max(sold, 1)
+        row["actual_gr"] = round(actual / sold_base * 100, 2)
+        row["actual_vsr"] = round(actual / sold, 4) if sold > 0 else 0.0
+    if v1d > 0 and sold > 0:
+        row["vsr"] = round(v1d / sold, 4)
+    if _f(row.get("gr")) <= 0 and _f(row.get("actual_gr")) > 0:
+        row["gr"] = row["actual_gr"]
+
+
+def _fetch_sold_daily_map(conn, report_date: str, goods_ids: list[str]) -> dict[str, dict]:
+    if not goods_ids:
+        return {}
+    d = date.fromisoformat(report_date)
+    prev = (d - timedelta(days=1)).isoformat()
+    out: dict[str, dict] = {}
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        for i in range(0, len(goods_ids), 500):
+            chunk = goods_ids[i : i + 500]
+            ph = ", ".join("%s" for _ in chunk)
+            c.execute(
+                f"""
+                SELECT sd.goods_id, sd.sold_num, sd.delta,
+                       sp.sold_num AS prev_sold,
+                       gm.v1d AS gm_v1d, gm.actual_v1d AS gm_actual_v1d
+                FROM goods_sold_daily sd
+                LEFT JOIN goods_sold_daily sp
+                       ON sp.goods_id = sd.goods_id AND sp.snapshot_date = %s
+                LEFT JOIN goods_metrics_daily gm
+                       ON gm.goods_id = sd.goods_id AND gm.metric_date = %s
+                WHERE sd.snapshot_date = %s AND sd.goods_id IN ({ph})
+                """,
+                (prev, report_date, report_date, *chunk),
+            )
+            cols = [d[0] for d in c.description]
+            for r in c.fetchall():
+                row = dict(zip(cols, r))
+                out[str(row["goods_id"])] = row
+    return out
+
+
+def reconcile_row_metrics(row: dict, sold_info: dict | None) -> dict | None:
+    """
+    用 goods_sold_daily 校正 report_daily_items 中 actual=0 / v1d≈sold 的脏行。
+    无法得到正增量且原行也无有效 actual 时返回 None（不入报告）。
+    """
+    sold = _i(row.get("sold"))
+    actual = _f(row.get("actual_v1d"))
+    v1d = _f(row.get("v1d"))
+    gm_v1d = _f(sold_info.get("gm_v1d") if sold_info else 0)
+    gm_actual = _f(sold_info.get("gm_actual_v1d") if sold_info else 0)
+
+    if sold_info:
+        sd_sold = _i(sold_info.get("sold_num"))
+        prev_raw = sold_info.get("prev_sold")
+        prev_sold = _i(prev_raw) if prev_raw is not None else None
+        delta = _i(sold_info.get("delta"))
+        if sd_sold > 0:
+            sold = sd_sold
+            row["sold"] = sold
+        recalc = _compute_daily_actual(sold, prev_sold, delta)
+        if recalc is not None and recalc > 0:
+            actual = recalc
+        elif actual <= 0 and gm_actual > 0:
+            actual = gm_actual
+        row["actual_v1d"] = actual
+
+    if _v1d_looks_like_sold(v1d, sold, actual) or v1d <= 0:
+        v1d = _pick_v1d(actual, v1d, gm_v1d, sold)
+        row["v1d"] = v1d
+
+    if actual <= 0:
+        return None
+
+    _recompute_derived_rates(row)
+    return row
+
+
+def fetch_items_from_daily_table(conn, report_date: str, *, reconcile_sold: bool = True) -> list:
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            """SELECT * FROM report_daily_items
+               WHERE report_date=%s ORDER BY rank_no ASC, actual_v1d DESC""",
+            (report_date,),
+        )
+        cols = [d[0] for d in c.description]
+        rows = [dict(zip(cols, r)) for r in c.fetchall()]
+    if not rows:
+        return []
+    sold_map: dict[str, dict] = {}
+    if reconcile_sold:
+        sold_map = _fetch_sold_daily_map(conn, report_date, [str(r.get("goods_id") or "") for r in rows])
+    items: list = []
+    fixed = dropped = 0
+    for raw in rows:
+        gid = str(raw.get("goods_id") or "")
+        if reconcile_sold:
+            reconciled = reconcile_row_metrics(dict(raw), sold_map.get(gid))
+            if reconciled is None:
+                dropped += 1
+                continue
+            if (
+                _f(reconciled.get("actual_v1d")) != _f(raw.get("actual_v1d"))
+                or _f(reconciled.get("v1d")) != _f(raw.get("v1d"))
+            ):
+                fixed += 1
+            items.append(db_row_to_item(reconciled))
+        else:
+            items.append(db_row_to_item(raw))
+    if reconcile_sold and (fixed or dropped):
+        print(
+            f"[pg_reader] reconcile {report_date}: fixed={fixed} dropped={dropped} kept={len(items)}",
+            flush=True,
+        )
+    return items
+
+
+def fetch_items_auto(conn, report_date: str) -> list:
+    """auto 模式：report_daily_items + sold_daily 校正；无日报行时回退 sold_daily 全池。"""
+    items = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
+    if items:
+        return items
+    return fetch_items_from_sold_daily(conn, report_date)
+
+
 def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
     """由 monitor_goods + goods_sold_daily (+ 可选 report_daily_items 补齐) 构造报告 item。"""
     sold = _i(row.get("sold_num"))
@@ -261,7 +425,9 @@ def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
     if actual_v1d <= 0:
         return None
 
-    v1d = rdi_v1d if rdi_v1d > 0 else (gm_v1d if gm_v1d > 0 else actual_v1d)
+    v1d = _pick_v1d(actual_v1d, rdi_v1d, gm_v1d, sold)
+    if v1d <= 0:
+        v1d = actual_v1d
     sold_base = max(prev_sold or 0, 1) if (prev_sold or 0) > 0 else max(sold - int(actual_v1d), 1)
     actual_gr = _f(row.get("rdi_actual_gr")) or round(actual_v1d / sold_base * 100, 2)
     gr = _f(row.get("rdi_gr")) or gm_gr or actual_gr
@@ -322,19 +488,6 @@ def fetch_pool_stats(conn) -> dict:
         c.execute("SELECT COUNT(*) FROM monitor_goods")
         total = int(c.fetchone()[0] or 0)
     return {"active_goods": active, "total_goods": total}
-
-
-def fetch_items_from_daily_table(conn, report_date: str) -> list:
-    with conn.cursor() as c:
-        c.execute("SET search_path TO xhs_monitor, public")
-        c.execute(
-            """SELECT * FROM report_daily_items
-               WHERE report_date=%s ORDER BY rank_no ASC, actual_v1d DESC""",
-            (report_date,),
-        )
-        cols = [d[0] for d in c.description]
-        rows = [dict(zip(cols, r)) for r in c.fetchall()]
-    return [db_row_to_item(r) for r in rows]
 
 
 def _monitor_goods_has_shop_cols(conn) -> bool:
@@ -435,10 +588,7 @@ def fetch_items_from_sold_daily(conn, report_date: str) -> list:
         prev_raw = r.get("prev_sold")
         prev_sold = _i(prev_raw) if prev_raw is not None else None
         item = sold_row_to_item(r, prev_sold)
-        if item and (
-            float(item_at(item, "actual_v1d", 0) or 0) > 0
-            or float(item_at(item, "v1d", 0) or 0) > 0
-        ):
+        if item and float(item_at(item, "actual_v1d", 0) or 0) > 0:
             items.append(item)
     items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
     return items

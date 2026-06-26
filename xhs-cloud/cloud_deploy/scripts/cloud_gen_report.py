@@ -51,6 +51,7 @@ def generate_daily_report(
     from cloud_deploy.reporting.data_js_builder import build_report_payload, resolve_output_dir, write_report_dir
     from cloud_deploy.reporting.pg_reader import (
         dedup_by_title,
+        fetch_items_auto,
         fetch_items_from_daily_table,
         fetch_items_from_sold_daily,
         fetch_pool_stats,
@@ -68,10 +69,13 @@ def generate_daily_report(
     try:
         pool_stats = fetch_pool_stats(conn)
         items = []
-        if source in ("auto", "pg_items"):
-            items = fetch_items_from_daily_table(conn, report_date)
+        if source == "auto":
+            items = fetch_items_auto(conn, report_date)
+            _log(f"auto(reconcile): {len(items)} 行")
+        elif source == "pg_items":
+            items = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
             _log(f"pg_items: {len(items)} 行")
-        if (not items and source in ("auto", "sold_daily")) or source == "sold_daily":
+        elif source == "sold_daily":
             items = fetch_items_from_sold_daily(conn, report_date)
             _log(f"sold_daily: {len(items)} 行")
     finally:
