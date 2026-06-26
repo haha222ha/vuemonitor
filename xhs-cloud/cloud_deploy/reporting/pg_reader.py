@@ -492,7 +492,7 @@ def premium_row_to_item(row: dict, *, sold_info: dict | None = None) -> list | N
 
 
 def fetch_items_from_premium_daily(conn, report_date: str) -> list:
-    """从 premium_goods + premium_goods_daily 构造报告行（仅当日有日快照的商品，避免全表 22 万行）。"""
+    """从 premium_goods + premium_goods_daily 构造报告行（lifecycle<3，actual>0）。"""
     if not _premium_table_exists(conn):
         return []
     d = date.fromisoformat(report_date)
@@ -507,13 +507,14 @@ def fetch_items_from_premium_daily(conn, report_date: str) -> list:
                    pgd.sold_num AS pgd_sold, pgd.delta AS pgd_delta,
                    pgd.actual_delta AS pgd_actual_delta, pgd.velocity_1d AS pgd_velocity,
                    pgd_prev.sold_num AS prev_sold
-            FROM premium_goods_daily pgd
-            INNER JOIN premium_goods pg ON pg.goods_id = pgd.goods_id AND pg.lifecycle < 3
+            FROM premium_goods pg
+            LEFT JOIN premium_goods_daily pgd
+                   ON pgd.goods_id = pg.goods_id AND pgd.snap_date = %s
             LEFT JOIN premium_goods_daily pgd_prev
                    ON pgd_prev.goods_id = pg.goods_id AND pgd_prev.snap_date = %s
-            WHERE pgd.snap_date = %s
+            WHERE pg.lifecycle < 3
             """,
-            (prev, report_date),
+            (report_date, prev),
         )
         cols = [d[0] for d in c.description]
         rows = [dict(zip(cols, r)) for r in c.fetchall()]
@@ -538,7 +539,7 @@ def fetch_items_from_premium_daily(conn, report_date: str) -> list:
 
     items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
     print(
-        f"[pg_reader] premium_daily {report_date}: kept={len(items)} daily_rows={len(rows)} retry={len(retry_rows)}",
+        f"[pg_reader] premium_daily {report_date}: kept={len(items)} pool={len(rows)} retry={len(retry_rows)}",
         flush=True,
     )
     return items
