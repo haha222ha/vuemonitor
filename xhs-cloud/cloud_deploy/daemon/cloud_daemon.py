@@ -943,6 +943,13 @@ class CloudMonitorDaemon:
         self._running = True
         self._stop.clear()
         self._setup_crawler_path()
+        try:
+            from cloud_deploy.cloud_api.database_pg import init_db
+
+            init_db()
+        except Exception as exc:
+            self.log(f"[cloud-daemon] PG 初始化失败: {exc}")
+            raise
         cycle_note = ""
         if self._pool_cycle_enabled():
             pc = self._pool_cycle_cfg()

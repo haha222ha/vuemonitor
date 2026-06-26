@@ -8,10 +8,13 @@ from __future__ import annotations
 import hashlib
 import json
 import secrets
+import threading
+import time
 from datetime import datetime, timedelta, timezone
 
 import psycopg2
 import psycopg2.extras
+from psycopg2 import errors as pg_errors
 
 from cloud_deploy.cloud_api.config import get_settings
 
@@ -41,9 +44,38 @@ def _conn():
     return conn
 
 
+_init_db_lock = threading.Lock()
+_init_db_ready = False
+
+
 def init_db() -> None:
-    conn = _conn()
-    try:
+    """初始化 schema（进程内只执行一次，避免并发 ALTER 死锁）。"""
+    global _init_db_ready
+    if _init_db_ready:
+        return
+    with _init_db_lock:
+        if _init_db_ready:
+            return
+        for attempt in range(6):
+            conn = _conn()
+            try:
+                _init_db_on_conn(conn)
+                conn.commit()
+                _init_db_ready = True
+                return
+            except pg_errors.DeadlockDetected:
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
+                if attempt >= 5:
+                    raise
+                time.sleep(0.4 * (attempt + 1))
+            finally:
+                conn.close()
+
+
+def _init_db_on_conn(conn) -> None:
         with conn.cursor() as c:
             c.execute("CREATE SCHEMA IF NOT EXISTS xhs_monitor")
             c.execute("SET search_path TO xhs_monitor, public")
@@ -257,9 +289,6 @@ def init_db() -> None:
                 init_premium_pg_schema(conn)
             except Exception:
                 pass
-        conn.commit()
-    finally:
-        conn.close()
 
 
 def _migrate_legacy_columns(c) -> None:
