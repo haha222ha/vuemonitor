@@ -104,7 +104,7 @@ def build_report_payload(
         "avg_actual_vsr": avg_actual_vsr,
         "anomaly_count": anomaly_count,
         "metric_mode": "cloud_pg",
-        "metric_note": "云端 PG 生成；真实增量=goods_sold_daily 日差分（自动校正 v1d≈sold 脏行）",
+        "metric_note": "云端 PG 生成；数据源=report_daily_items∪premium_goods；真实增量=日快照差分（自动校正 v1d≈sold 脏行）",
         "deduped": True,
         "source": source,
         "disclaimer": REPORT_DISCLAIMER,
@@ -114,6 +114,7 @@ def build_report_payload(
         "pool_burst": agg["pool_map"].get("BURST", 0),
         "active_goods": int(pool_stats.get("active_goods") or 0),
         "total_goods": int(pool_stats.get("total_goods") or 0),
+        "premium_goods": int(pool_stats.get("premium_goods") or 0),
         "yesterday_date": yesterday_date,
         "method": "cloud_pg",
     }

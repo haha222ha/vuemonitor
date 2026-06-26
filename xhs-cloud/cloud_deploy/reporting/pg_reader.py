@@ -388,11 +388,199 @@ def fetch_items_from_daily_table(conn, report_date: str, *, reconcile_sold: bool
     return items
 
 
+def _premium_table_exists(conn) -> bool:
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            """SELECT 1 FROM information_schema.tables
+               WHERE table_schema='xhs_monitor' AND table_name='premium_goods' LIMIT 1"""
+        )
+        return c.fetchone() is not None
+
+
+def _tier_to_pool(tier: str) -> str:
+    t = (tier or "B").strip().upper()
+    return {"S": "BURST", "A": "ACCEL", "B": "WATCH", "C": "NEW"}.get(t, "WATCH")
+
+
+def _premium_has_metric_signal(row: dict) -> bool:
+    return (
+        _f(row.get("pgd_actual_delta")) > 0
+        or _i(row.get("pgd_delta")) > 0
+        or _f(row.get("actual_velocity_1d")) > 0
+        or _f(row.get("velocity_1d")) > 0
+        or row.get("prev_sold") is not None
+    )
+
+
+def premium_row_to_item(row: dict, *, sold_info: dict | None = None) -> list | None:
+    """premium_goods (+ 可选 premium_goods_daily / goods_sold_daily) → 28 列报告行。"""
+    sold = _i(row.get("pgd_sold")) or _i(row.get("sold_num"))
+    prev_raw = row.get("prev_sold")
+    prev_sold = _i(prev_raw) if prev_raw is not None else None
+    delta = _i(row.get("pgd_delta"))
+    actual = _f(row.get("pgd_actual_delta"))
+    stored_v1d = _f(row.get("pgd_velocity")) or _f(row.get("velocity_1d"))
+    gm_v1d = _f(sold_info.get("gm_v1d") if sold_info else 0)
+
+    if sold_info:
+        sd_sold = _i(sold_info.get("sold_num"))
+        if sd_sold > 0:
+            sold = sd_sold
+        sp = sold_info.get("prev_sold")
+        if sp is not None:
+            prev_sold = _i(sp)
+        sd_delta = _i(sold_info.get("delta"))
+        if sd_delta > 0:
+            delta = sd_delta
+
+    recalc = _compute_daily_actual(sold, prev_sold, delta)
+    if recalc is not None and recalc > 0:
+        actual = recalc
+    elif actual <= 0:
+        actual = _f(row.get("actual_velocity_1d"))
+    if actual <= 0 and sold_info:
+        gm_actual = _f(sold_info.get("gm_actual_v1d"))
+        if gm_actual > 0:
+            actual = gm_actual
+    if actual <= 0:
+        return None
+
+    v1d = _pick_v1d(actual, stored_v1d, gm_v1d, sold)
+    if v1d <= 0:
+        v1d = actual
+
+    shop_fans = _i(row.get("shop_fans"))
+    shop_sales = _i(row.get("shop_sales"))
+    shop_fsr, goods_fsr = calc_fan_sales_ratios(shop_fans, shop_sales, sold)
+    sold_base = max((prev_sold or 0), sold - int(actual), 1)
+    actual_gr = round(actual / sold_base * 100, 2)
+    actual_vsr = round(actual / sold, 4) if sold > 0 else 0
+    vsr = round(v1d / sold, 4) if sold > 0 and abs(v1d - actual) > 0.01 else actual_vsr
+
+    merged = {
+        "goods_id": row.get("goods_id") or "",
+        "title": row.get("title") or "",
+        "price": _f(row.get("deal_price")),
+        "sold": sold,
+        "v1h": 0,
+        "v6h": 0,
+        "actual_v1d": round(actual, 1),
+        "v1d": round(v1d, 1),
+        "actual_gr": actual_gr,
+        "gr": actual_gr,
+        "actual_vsr": actual_vsr,
+        "vsr": vsr,
+        "acc": 0,
+        "burst": _f(row.get("burst_score")),
+        "pool": _tier_to_pool(row.get("tier")),
+        "first_seen": _fmt_ts(row.get("first_seen_at") or row.get("first_report_date")),
+        "store_id": row.get("store_id") or "",
+        "store_name": row.get("store_name") or "",
+        "shelf_time": "",
+        "shop_sales": shop_sales,
+        "shop_fans": shop_fans,
+        "shop_fsr": shop_fsr or 0.0,
+        "goods_fsr": goods_fsr or 0.0,
+        "behavior": "",
+        "is_virtual": 1 if row.get("is_virtual") else 0,
+        "base_hours": 0,
+        "base_at": "",
+        "anomaly": 0,
+    }
+    return row_to_report_item(merged)
+
+
+def fetch_items_from_premium_daily(conn, report_date: str) -> list:
+    """从 premium_goods + premium_goods_daily 构造报告行（lifecycle<3，actual>0）。"""
+    if not _premium_table_exists(conn):
+        return []
+    d = date.fromisoformat(report_date)
+    prev = (d - timedelta(days=1)).isoformat()
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            """
+            SELECT pg.goods_id, pg.title, pg.deal_price, pg.sold_num, pg.velocity_1d,
+                   pg.actual_velocity_1d, pg.burst_score, pg.tier, pg.store_id, pg.store_name,
+                   pg.shop_fans, pg.shop_sales, pg.is_virtual, pg.first_seen_at, pg.first_report_date,
+                   pgd.sold_num AS pgd_sold, pgd.delta AS pgd_delta,
+                   pgd.actual_delta AS pgd_actual_delta, pgd.velocity_1d AS pgd_velocity,
+                   pgd_prev.sold_num AS prev_sold
+            FROM premium_goods pg
+            LEFT JOIN premium_goods_daily pgd
+                   ON pgd.goods_id = pg.goods_id AND pgd.snap_date = %s
+            LEFT JOIN premium_goods_daily pgd_prev
+                   ON pgd_prev.goods_id = pg.goods_id AND pgd_prev.snap_date = %s
+            WHERE pg.lifecycle < 3
+            """,
+            (report_date, prev),
+        )
+        cols = [d[0] for d in c.description]
+        rows = [dict(zip(cols, r)) for r in c.fetchall()]
+
+    items: list = []
+    retry_rows: dict[str, dict] = {}
+    for raw in rows:
+        item = premium_row_to_item(raw)
+        if item:
+            items.append(item)
+            continue
+        gid = str(raw.get("goods_id") or "")
+        if gid and _premium_has_metric_signal(raw):
+            retry_rows[gid] = raw
+
+    if retry_rows:
+        sold_map = _fetch_sold_daily_map(conn, report_date, list(retry_rows.keys()))
+        for gid, raw in retry_rows.items():
+            item = premium_row_to_item(raw, sold_info=sold_map.get(gid))
+            if item:
+                items.append(item)
+
+    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    print(
+        f"[pg_reader] premium_daily {report_date}: kept={len(items)} pool={len(rows)} retry={len(retry_rows)}",
+        flush=True,
+    )
+    return items
+
+
+def merge_items_by_goods_id(base: list, extra: list) -> list:
+    """按 goods_id 合并：base 优先，extra 仅补 base 中缺失的商品。"""
+    by_id: dict[str, list] = {}
+    for item in base:
+        gid = str(item_at(item, "goods_id", "") or "")
+        if gid:
+            by_id[gid] = item
+    added = 0
+    for item in extra:
+        gid = str(item_at(item, "goods_id", "") or "")
+        if not gid or gid in by_id:
+            continue
+        by_id[gid] = item
+        added += 1
+    out = list(by_id.values())
+    out.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    if added:
+        print(f"[pg_reader] merge: +{added} premium-only goods (base={len(base)} total={len(out)})", flush=True)
+    return out
+
+
 def fetch_items_auto(conn, report_date: str) -> list:
-    """auto 模式：report_daily_items + sold_daily 校正；无日报行时回退 sold_daily 全池。"""
-    items = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
-    if items:
-        return items
+    """auto：report_daily_items ∪ premium_goods；无日报行时 premium → sold_daily 回退。"""
+    rdi = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
+    premium = fetch_items_from_premium_daily(conn, report_date)
+    if rdi and premium:
+        merged = merge_items_by_goods_id(rdi, premium)
+        print(
+            f"[pg_reader] auto {report_date}: rdi={len(rdi)} premium={len(premium)} merged={len(merged)}",
+            flush=True,
+        )
+        return merged
+    if rdi:
+        return rdi
+    if premium:
+        return premium
     return fetch_items_from_sold_daily(conn, report_date)
 
 
@@ -487,7 +675,11 @@ def fetch_pool_stats(conn) -> dict:
         active = int(c.fetchone()[0] or 0)
         c.execute("SELECT COUNT(*) FROM monitor_goods")
         total = int(c.fetchone()[0] or 0)
-    return {"active_goods": active, "total_goods": total}
+        premium_active = 0
+        if _premium_table_exists(conn):
+            c.execute("SELECT COUNT(*) FROM premium_goods WHERE lifecycle < 3")
+            premium_active = int(c.fetchone()[0] or 0)
+    return {"active_goods": active, "total_goods": total, "premium_goods": premium_active}
 
 
 def _monitor_goods_has_shop_cols(conn) -> bool:

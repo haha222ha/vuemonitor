@@ -3,9 +3,10 @@
 云端生成日报（读 PG，不依赖 gen_report.py）。
 
 数据源（--source）:
-  auto       优先 report_daily_items，无则 goods_sold_daily 计算
-  pg_items   仅 report_daily_items
-  sold_daily 仅 monitor_goods + goods_sold_daily
+  auto           report_daily_items ∪ premium_goods（推荐）
+  pg_items       仅 report_daily_items
+  premium_daily  仅 premium_goods + premium_goods_daily
+  sold_daily     仅 monitor_goods + goods_sold_daily
 
 输出: {XHS_REPORT_OUTPUT_DIR}/全量MMDD/ → data.js + html
 """
@@ -53,6 +54,7 @@ def generate_daily_report(
         dedup_by_title,
         fetch_items_auto,
         fetch_items_from_daily_table,
+        fetch_items_from_premium_daily,
         fetch_items_from_sold_daily,
         fetch_pool_stats,
         passes_threshold,
@@ -75,6 +77,9 @@ def generate_daily_report(
         elif source == "pg_items":
             items = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
             _log(f"pg_items: {len(items)} 行")
+        elif source == "premium_daily":
+            items = fetch_items_from_premium_daily(conn, report_date)
+            _log(f"premium_daily: {len(items)} 行")
         elif source == "sold_daily":
             items = fetch_items_from_sold_daily(conn, report_date)
             _log(f"sold_daily: {len(items)} 行")
@@ -114,7 +119,7 @@ def generate_daily_report(
 def main():
     ap = argparse.ArgumentParser(description="云端 PG 生成日报")
     ap.add_argument("--date", default="", help="YYYY-MM-DD")
-    ap.add_argument("--source", choices=("auto", "pg_items", "sold_daily"), default="auto")
+    ap.add_argument("--source", choices=("auto", "pg_items", "premium_daily", "sold_daily"), default="auto")
     ap.add_argument("--no-dedup", action="store_true")
     ap.add_argument("--min-v1d", type=float, default=5)
     ap.add_argument("--min-actual", type=float, default=5)

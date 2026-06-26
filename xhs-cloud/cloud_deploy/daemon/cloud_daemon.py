@@ -83,7 +83,7 @@ class CloudMonitorDaemon:
         if data.get("scan_date") != today:
             return
         phase = str(data.get("phase") or "daily")
-        if phase in ("daily", "pause", "risk_full"):
+        if phase in ("daily", "pause", "risk_full", "round2", "idle"):
             self._phase = phase
         self._full_round_until = float(data.get("full_round_until") or 0.0)
 
@@ -144,12 +144,22 @@ class CloudMonitorDaemon:
         enabled = raw.get("enabled", True)
         if isinstance(enabled, str):
             enabled = enabled.strip().lower() in ("1", "true", "yes")
+        mode = str(raw.get("mode") or "full_pool").strip().lower()
+        if mode not in ("full_pool", "gap_only"):
+            mode = "full_pool"
+        rounds = max(1, min(int(raw.get("rounds", 2) or 2), 2))
+        enable_risk_round = raw.get("enable_risk_round", False)
+        if isinstance(enable_risk_round, str):
+            enable_risk_round = enable_risk_round.strip().lower() in ("1", "true", "yes")
         return {
             "enabled": bool(enabled),
             "pause_hours": max(1.0, float(raw.get("pause_hours", 5) or 5)),
             "claim_ttl_minutes": max(
                 5, min(int(raw.get("claim_ttl_minutes", 25) or 25), 120)
             ),
+            "mode": mode,
+            "rounds": rounds,
+            "enable_risk_round": bool(enable_risk_round),
         }
 
     def _pool_cycle_enabled(self) -> bool:
@@ -159,6 +169,91 @@ class CloudMonitorDaemon:
         if self._pool_cycle_enabled():
             return False
         return bool(self._risk_cfg()["enabled"])
+
+    def _gap_stale_hours(self, phase: str) -> float:
+        pause_h = self._pool_cycle_cfg()["pause_hours"]
+        if phase == "round2":
+            return pause_h
+        return max(pause_h, 24.0)
+
+    def _count_gap_pending(self, phase: str = "daily") -> int:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+
+        if not self._premium_table_exists():
+            return 0
+        stale_h = self._gap_stale_hours(phase)
+        init_db()
+        conn = _conn()
+        try:
+            with conn.cursor() as c:
+                c.execute("SET search_path TO xhs_monitor, public")
+                c.execute(
+                    """
+                    SELECT COUNT(*) FROM premium_goods
+                    WHERE lifecycle < 3
+                      AND (
+                        last_metric_scan IS NULL OR last_metric_scan = ''
+                        OR to_timestamp(
+                             NULLIF(substr(last_metric_scan, 1, 19), ''),
+                             'YYYY-MM-DD HH24:MI:SS'
+                           ) < NOW() - (%s * INTERVAL '1 hour')
+                      )
+                    """,
+                    (stale_h,),
+                )
+                return int(c.fetchone()[0] or 0)
+        finally:
+            conn.close()
+
+    def _premium_table_exists(self) -> bool:
+        try:
+            from cloud_deploy.cloud_api.database_pg import _conn, init_db
+
+            init_db()
+            conn = _conn()
+            try:
+                with conn.cursor() as c:
+                    c.execute("SET search_path TO xhs_monitor, public")
+                    c.execute(
+                        """SELECT 1 FROM information_schema.tables
+                           WHERE table_schema='xhs_monitor' AND table_name='premium_goods' LIMIT 1"""
+                    )
+                    return c.fetchone() is not None
+            finally:
+                conn.close()
+        except Exception:
+            return False
+
+    def _count_round2_pending(self) -> int:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+
+        pause_h = self._pool_cycle_cfg()["pause_hours"]
+        init_db()
+        conn = _conn()
+        try:
+            with conn.cursor() as c:
+                c.execute("SET search_path TO xhs_monitor, public")
+                c.execute(
+                    """
+                    SELECT COUNT(*) FROM monitor_goods
+                    WHERE monitor_status IN ('active', 'idle')
+                      AND (
+                        last_scan_at IS NULL
+                        OR last_scan_at < NOW() - (%s * INTERVAL '1 hour')
+                      )
+                    """,
+                    (pause_h,),
+                )
+                return int(c.fetchone()[0] or 0)
+        finally:
+            conn.close()
+
+    def _count_round_pending(self, phase: str) -> int:
+        if self._pool_cycle_cfg()["mode"] == "gap_only":
+            return self._count_gap_pending(phase)
+        if phase == "round2":
+            return self._count_round2_pending()
+        return self._count_full_pool_pending()
 
     def _count_full_pool_pending(self) -> int:
         from cloud_deploy.cloud_api.database_pg import _conn, init_db
@@ -253,6 +348,7 @@ class CloudMonitorDaemon:
                 self._cycle_state_path().unlink(missing_ok=True)
             except OSError:
                 pass
+            self.log("[cloud-daemon] 新一天，重置为第1轮采集")
 
     def _log_pause_remain(self) -> None:
         remain = int(self._full_round_until - time.time())
@@ -264,76 +360,148 @@ class CloudMonitorDaemon:
             eta = f"{mins}m{secs}s"
         else:
             eta = f"{secs}s"
-        nxt = "risk全池补扫" if self._phase == "pause" else "下一轮"
+        cfg = self._pool_cycle_cfg()
+        if self._phase == "idle":
+            nxt = "次日第1轮"
+        elif self._phase == "pause":
+            if cfg["enable_risk_round"]:
+                nxt = "risk全池补扫"
+            elif cfg["rounds"] >= 2:
+                nxt = "第2轮采集"
+            else:
+                nxt = "次日第1轮"
+        else:
+            nxt = "下一轮"
         self.log(f"[cloud-daemon] 轮间休息 {eta}，之后 {nxt}")
 
-    def _schedule_pool_pause(self, reason: str) -> None:
-        hrs = self._pool_cycle_cfg()["pause_hours"]
+    def _schedule_pool_pause(self, reason: str, *, after_phase: str) -> None:
+        cfg = self._pool_cycle_cfg()
+        hrs = cfg["pause_hours"]
         self._full_round_until = time.time() + int(hrs * 3600)
         self._phase = "pause"
         self._save_cycle_state()
+        if after_phase == "round1" and cfg["rounds"] >= 2 and not cfg["enable_risk_round"]:
+            nxt = f"第2轮采集 (间隔 {hrs:g}h)"
+        elif after_phase == "round1" and cfg["enable_risk_round"]:
+            nxt = f"risk全池补扫 (间隔 {hrs:g}h)"
+        else:
+            nxt = f"今日采集结束 (间隔 {hrs:g}h)"
         self.log(
-            f"[cloud-daemon] {reason}，休息 {hrs:g}h 后继续 risk全池 "
-            f"(batch={self.batch_size} cd={self.cooldown}s)"
+            f"[cloud-daemon] {reason}，休息 {hrs:g}h 后继续 {nxt} "
+            f"(batch={self.batch_size} cd={self.cooldown}s mode={cfg['mode']})"
         )
 
-    def _run_pool_cycle_once(self) -> tuple[list[dict], str]:
-        """大循环: 首轮全池 → 休 pause_hours → risk全池1000/30s → 休 pause_hours → …"""
-        risk_cfg = self._risk_cfg()
+    def _schedule_day_idle(self, reason: str) -> None:
+        from datetime import timedelta
 
-        for _ in range(4):
+        tomorrow = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(
+            days=1
+        )
+        self._full_round_until = tomorrow.timestamp()
+        self._phase = "idle"
+        self._save_cycle_state()
+        self.log(f"[cloud-daemon] {reason}，今日 2 轮采集已结束，休眠至次日 00:00")
+
+    def _after_pause_phase(self) -> str:
+        cfg = self._pool_cycle_cfg()
+        if cfg["enable_risk_round"]:
+            return "risk_full"
+        if cfg["rounds"] >= 2:
+            return "round2"
+        return "idle"
+
+    def _run_pool_cycle_once(self) -> tuple[list[dict], str]:
+        """大循环: 第1轮 → 休 pause_hours → 第2轮 → 休眠至次日（risk 默认关闭）。"""
+        risk_cfg = self._risk_cfg()
+        cfg = self._pool_cycle_cfg()
+
+        for _ in range(8):
             now = time.time()
+
+            if self._phase == "idle":
+                if self._scan_date != datetime.now().strftime("%Y-%m-%d"):
+                    self._phase = "daily"
+                    self._full_round_until = 0.0
+                    self._save_cycle_state()
+                    continue
+                if now < self._full_round_until:
+                    self._log_pause_remain()
+                    self._last_cooldown = max(300, min(3600, int(self._full_round_until - now)))
+                    return [], "idle"
+                self._phase = "daily"
+                self._full_round_until = 0.0
+                self._save_cycle_state()
+                continue
 
             if self._phase == "pause":
                 if now < self._full_round_until:
                     self._log_pause_remain()
-                    self._last_cooldown = self.cooldown
-                    return [], "full"
-                self._phase = "risk_full"
+                    self._last_cooldown = max(60, min(600, int(self._full_round_until - now)))
+                    return [], "pause"
+                nxt = self._after_pause_phase()
+                self._phase = nxt
                 self._save_cycle_state()
-                self.log(
-                    f"[cloud-daemon] 休息结束，进入 risk全池补扫 "
-                    f"(batch={self.batch_size} cd={self.cooldown}s "
-                    f"≥{risk_cfg['min_age_hours']}h)"
-                )
+                if nxt == "risk_full":
+                    self.log(
+                        f"[cloud-daemon] 休息结束，进入 risk全池补扫 "
+                        f"(batch={self.batch_size} cd={self.cooldown}s "
+                        f"≥{risk_cfg['min_age_hours']}h)"
+                    )
+                elif nxt == "round2":
+                    self.log(
+                        f"[cloud-daemon] 休息结束，进入第2轮采集 "
+                        f"(间隔 {cfg['pause_hours']}h, mode={cfg['mode']})"
+                    )
+                else:
+                    self._schedule_day_idle("单轮模式首轮完成")
                 continue
 
-            if self._phase == "daily":
-                batch = self._pick_batch()
+            if self._phase in ("daily", "round2"):
+                phase = self._phase
+                batch = self._pick_pool_batch(phase)
                 if batch:
-                    return batch, "full"
-                if self._count_full_pool_pending() > 0:
+                    label = "第1轮" if phase == "daily" else "第2轮"
                     self.log(
-                        f"[cloud-daemon] 待扫≈{self._count_full_pool_pending()} "
-                        f"本批为空，{self.cooldown}s 后重试"
+                        f"[cloud-daemon] {label} 本批={len(batch)} "
+                        f"待扫≈{self._count_round_pending(phase)} mode={cfg['mode']}"
+                    )
+                    return batch, phase
+                pending = self._count_round_pending(phase)
+                if pending > 0:
+                    self.log(
+                        f"[cloud-daemon] 待扫≈{pending} 本批为空，{self.cooldown}s 后重试"
                     )
                     self._last_cooldown = self.cooldown
-                    return [], "full"
-                if self._full_round_until > now:
-                    self._phase = "pause"
-                    self._save_cycle_state()
-                    continue
-                if self._full_round_until > 0:
-                    self._phase = "risk_full"
-                    self._save_cycle_state()
-                    self.log(
-                        "[cloud-daemon] 今日首轮此前已完成且休息已过，"
-                        "进入 risk全池补扫"
-                    )
-                    continue
-                if self._today_first_round_done():
-                    self._phase = "risk_full"
-                    self._save_cycle_state()
-                    self.log(
-                        "[cloud-daemon] 检测到今日首轮已完成(重启恢复)，"
-                        "直接进入 risk全池补扫"
-                    )
-                    continue
-                self._schedule_pool_pause("今日首轮全池扫描完成")
+                    return [], phase
+                if phase == "daily":
+                    if self._full_round_until > now:
+                        self._phase = "pause"
+                        self._save_cycle_state()
+                        continue
+                    if self._full_round_until > 0 or self._today_first_round_done():
+                        nxt = self._after_pause_phase()
+                        if nxt == "risk_full":
+                            self._phase = "risk_full"
+                            self._save_cycle_state()
+                            self.log("[cloud-daemon] 重启恢复：进入 risk全池补扫")
+                        elif nxt == "round2":
+                            self._phase = "round2"
+                            self._save_cycle_state()
+                            self.log("[cloud-daemon] 重启恢复：进入第2轮采集")
+                        else:
+                            self._schedule_day_idle("重启恢复：今日首轮已完成")
+                        continue
+                    self._schedule_pool_pause("第1轮采集完成", after_phase="round1")
+                    self._last_cooldown = self.cooldown
+                    return [], phase
+                if cfg["rounds"] >= 2 and not cfg["enable_risk_round"]:
+                    self._schedule_day_idle("第2轮采集完成")
+                else:
+                    self._schedule_pool_pause("本轮采集完成", after_phase="round2")
                 self._last_cooldown = self.cooldown
-                return [], "full"
+                return [], phase
 
-            if self._phase == "risk_full":
+            if self._phase == "risk_full" and cfg["enable_risk_round"]:
                 batch = self._pick_risk_full_batch()
                 if batch:
                     self.log(
@@ -341,17 +509,18 @@ class CloudMonitorDaemon:
                         f"(距上次≥{risk_cfg['min_age_hours']}h claim)"
                     )
                     return batch, "risk_full"
-                self._schedule_pool_pause("本轮 risk全池补扫完成")
+                self._schedule_day_idle("risk全池补扫完成")
                 self._last_cooldown = self.cooldown
                 return [], "risk_full"
 
             self.log(f"[cloud-daemon] 未知阶段 {self._phase!r}，重置为 daily")
             self._phase = "daily"
+            self._full_round_until = 0.0
             self._last_cooldown = self.cooldown
-            return [], "full"
+            return [], "daily"
 
         self._last_cooldown = self.cooldown
-        return [], "full"
+        return [], "daily"
 
     def _setup_crawler_path(self) -> None:
         crawler = os.environ.get("XHS_CRAWLER_ROOT", "").strip()
@@ -396,16 +565,81 @@ class CloudMonitorDaemon:
             return "api"
         return pick_start_engine(goods, self.config)
 
-    def _pick_batch(self) -> list[dict]:
+    def _pick_pool_batch(self, phase: str) -> list[dict]:
+        if self._pool_cycle_cfg()["mode"] == "gap_only":
+            return self._pick_gap_batch(phase)
+        return self._pick_batch(phase)
+
+    def _pick_gap_batch(self, phase: str) -> list[dict]:
         from cloud_deploy.cloud_api.database_pg import _conn, init_db
 
-        skip_today = bool(self.config.get("skip_today", True))
+        if not self._premium_table_exists():
+            return []
+        stale_h = self._gap_stale_hours(phase)
         init_db()
         conn = _conn()
         try:
             with conn.cursor() as c:
                 c.execute("SET search_path TO xhs_monitor, public")
-                if skip_today:
+                c.execute(
+                    """
+                    SELECT goods_id, title,
+                           actual_velocity_1d AS last_v1d,
+                           sold_num AS last_sold,
+                           tier, 'WATCH' AS pool,
+                           scan_priority AS priority_score
+                    FROM premium_goods
+                    WHERE lifecycle < 3
+                      AND (
+                        last_metric_scan IS NULL OR last_metric_scan = ''
+                        OR to_timestamp(
+                             NULLIF(substr(last_metric_scan, 1, 19), ''),
+                             'YYYY-MM-DD HH24:MI:SS'
+                           ) < NOW() - (%s * INTERVAL '1 hour')
+                      )
+                    ORDER BY scan_priority DESC,
+                             last_metric_scan ASC NULLS FIRST
+                    LIMIT %s
+                    """,
+                    (stale_h, self.batch_size),
+                )
+                cols = (
+                    "goods_id",
+                    "title",
+                    "last_v1d",
+                    "last_sold",
+                    "tier",
+                    "pool",
+                    "priority_score",
+                )
+                return [dict(zip(cols, row)) for row in c.fetchall()]
+        finally:
+            conn.close()
+
+    def _pick_batch(self, phase: str = "daily") -> list[dict]:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+
+        skip_today = bool(self.config.get("skip_today", True))
+        pause_h = self._pool_cycle_cfg()["pause_hours"]
+        init_db()
+        conn = _conn()
+        try:
+            with conn.cursor() as c:
+                c.execute("SET search_path TO xhs_monitor, public")
+                if phase == "round2":
+                    c.execute(
+                        """SELECT goods_id, title, last_v1d, last_sold, tier, pool, priority_score
+                           FROM monitor_goods
+                           WHERE monitor_status IN ('active', 'idle')
+                             AND (
+                               last_scan_at IS NULL
+                               OR last_scan_at < NOW() - (%s * INTERVAL '1 hour')
+                             )
+                           ORDER BY priority_score DESC NULLS LAST, last_v1d DESC NULLS LAST
+                           LIMIT %s""",
+                        (pause_h, self.batch_size),
+                    )
+                elif skip_today:
                     c.execute(
                         """SELECT goods_id, title, last_v1d, last_sold, tier, pool, priority_score
                            FROM monitor_goods
@@ -714,7 +948,9 @@ class CloudMonitorDaemon:
             pc = self._pool_cycle_cfg()
             cycle_note = (
                 f" phase={self._phase} pause={pc['pause_hours']}h "
-                f"首轮+ risk全池={self.batch_size}/{self.cooldown}s"
+                f"rounds={pc['rounds']} mode={pc['mode']} "
+                f"risk={'on' if pc['enable_risk_round'] else 'off'} "
+                f"batch={self.batch_size}/{self.cooldown}s"
             )
         self.log(
             f"[cloud-daemon] 启动 batch={self.batch_size} conc={self.concurrency} "
