@@ -31,13 +31,17 @@ def run_ingest(report_dir: str = "") -> dict:
     return _ingest(report_dir=report_dir)
 
 
-def run_generate(report_date: str = "", source: str = "auto") -> dict:
+def _default_report_source() -> str:
+    return (os.environ.get("XHS_CLOUD_REPORT_SOURCE") or "premium_daily").strip() or "premium_daily"
+
+
+def run_generate(report_date: str = "", source: str = "") -> dict:
     from cloud_deploy.cloud_api.config import get_settings
     from cloud_deploy.reporting.constants import ARCHIVE_DAILY
     from cloud_deploy.scripts.cloud_gen_report import generate_daily_report
     from cloud_deploy.scripts.pipeline_common import pack_register_sync
 
-    gen = generate_daily_report(report_date=report_date, source=source)
+    gen = generate_daily_report(report_date=report_date, source=source or _default_report_source())
     s = get_settings()
     reg = pack_register_sync(gen["output_dir"], ARCHIVE_DAILY, s.xhs_report_archive_dir, sync_pg=False)
     return {**gen, **reg}
@@ -61,12 +65,12 @@ def run_import_historical(root: str, pattern: str = "全量*") -> dict:
     return {"imported": len(results), "dirs": [r.get("report_date") for r in results]}
 
 
-def run_full(report_date: str = "", source: str = "auto") -> dict:
+def run_full(report_date: str = "", source: str = "") -> dict:
     """纯线上主路径：云端生成日报 + 后置 PG 步骤。"""
     from cloud_deploy.cloud_api.config import get_settings
     from cloud_deploy.scripts.sync_pipeline_hooks import run_post_report_pg_steps
 
-    result = run_generate(report_date=report_date, source=source)
+    result = run_generate(report_date=report_date, source=source or _default_report_source())
     s = get_settings()
     result["post"] = run_post_report_pg_steps(s, _log)
     return result
@@ -81,7 +85,7 @@ def main():
 
     p_gen = sub.add_parser("generate", help="PG 生成日报")
     p_gen.add_argument("--date", default="")
-    p_gen.add_argument("--source", default="auto")
+    p_gen.add_argument("--source", default="", help="默认读 XHS_CLOUD_REPORT_SOURCE 或 premium_daily")
 
     p_imp = sub.add_parser("import", help="批量历史报告入库")
     p_imp.add_argument("--root", required=True)
@@ -89,7 +93,7 @@ def main():
 
     p_full = sub.add_parser("full", help="纯线上：生成日报+zip+PG+规则+清理")
     p_full.add_argument("--date", default="")
-    p_full.add_argument("--source", default="auto")
+    p_full.add_argument("--source", default="", help="默认 premium_daily（云端精品自算）")
 
     p_week = sub.add_parser("weekly", help="生成周报")
     p_week.add_argument("--end-date", default="")

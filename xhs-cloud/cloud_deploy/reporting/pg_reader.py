@@ -567,20 +567,20 @@ def merge_items_by_goods_id(base: list, extra: list) -> list:
 
 
 def fetch_items_auto(conn, report_date: str) -> list:
-    """auto：report_daily_items ∪ premium_goods；无日报行时 premium → sold_daily 回退。"""
-    rdi = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
+    """auto：premium_goods 为主，report_daily_items 补充（云端自算优先）。"""
     premium = fetch_items_from_premium_daily(conn, report_date)
-    if rdi and premium:
-        merged = merge_items_by_goods_id(rdi, premium)
+    rdi = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
+    if premium and rdi:
+        merged = merge_items_by_goods_id(premium, rdi)
         print(
-            f"[pg_reader] auto {report_date}: rdi={len(rdi)} premium={len(premium)} merged={len(merged)}",
+            f"[pg_reader] auto {report_date}: premium={len(premium)} rdi={len(rdi)} merged={len(merged)}",
             flush=True,
         )
         return merged
-    if rdi:
-        return rdi
     if premium:
         return premium
+    if rdi:
+        return rdi
     return fetch_items_from_sold_daily(conn, report_date)
 
 

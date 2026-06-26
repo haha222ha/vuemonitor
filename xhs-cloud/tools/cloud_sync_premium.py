@@ -6,7 +6,8 @@
   python tools/cloud_sync_premium.py push
   python tools/cloud_sync_premium.py pull
   python tools/cloud_sync_premium.py backfill --pending
-  python tools/cloud_sync_premium.py backfill --goods-id xxx
+  python tools/cloud_sync_premium.py push-daily --since 2026-06-01
+  python tools/cloud_sync_premium.py sync-full --since 2026-06-01
 """
 from __future__ import annotations
 
@@ -315,6 +316,64 @@ def pull_premium_changes(log_func=None) -> dict:
     return {"pulled": n, "latest_version": latest}
 
 
+def push_daily(
+    since_date: str = "",
+    limit: int = 0,
+    batch_size: int = 500,
+    log_func=None,
+) -> dict:
+    """批量推送 premium_goods_daily 日快照到云（历史增量同步）。"""
+    conn = connect()
+    c = conn.cursor()
+    ph = "%s" if premium_backend() == "postgresql" else "?"
+    sql = """
+        SELECT goods_id, snap_date, sold_num, deal_price, delta, actual_delta,
+               velocity_1d, source, created_at
+        FROM premium_goods_daily
+    """
+    params: list = []
+    if since_date:
+        sql += f" WHERE snap_date >= {ph}"
+        params.append(since_date)
+    sql += " ORDER BY snap_date, goods_id"
+    if limit > 0:
+        sql += f" LIMIT {int(limit)}"
+    c.execute(sql, params)
+    rows = [_row_dict(c, r) for r in c.fetchall()]
+    conn.close()
+    if not rows:
+        _log("push-daily: 无待推送日快照", log_func)
+        return {"rows": 0, "upserted": 0}
+    total = 0
+    batches = (len(rows) + batch_size - 1) // batch_size
+    for i in range(0, len(rows), batch_size):
+        chunk = rows[i : i + batch_size]
+        resp = _post_json(
+            "/api/v1/sync/premium-daily-upsert",
+            {
+                "client_id": _client_id(),
+                "batch_id": f"daily-{i // batch_size + 1}",
+                "rows": chunk,
+                "final_batch": (i + batch_size) >= len(rows),
+            },
+        )
+        total += int(resp.get("rows_upserted") or len(chunk))
+        _log(
+            f"push-daily batch {i // batch_size + 1}/{batches}: {len(chunk)} → 累计 {total:,}",
+            log_func,
+        )
+    return {"rows": len(rows), "upserted": total, "since_date": since_date or "all"}
+
+
+def sync_full_to_cloud(since_date: str = "", log_func=None) -> dict:
+    """精品全量上云：当前行 + 日快照 + 历史 backfill（规格书主路径）。"""
+    upsert = push_upsert(log_func=log_func)
+    daily = push_daily(since_date=since_date, log_func=log_func)
+    backfill = backfill_pending(upload_cloud=True, log_func=log_func)
+    pull = pull_premium_changes(log_func=log_func)
+    return {"upsert": upsert, "daily": daily, "backfill": backfill, "pull": pull}
+
+
 def push_all(log_func=None) -> dict:
     upsert = push_upsert(log_func=log_func)
     pull = pull_premium_changes(log_func=log_func)
@@ -329,10 +388,14 @@ def main():
     ap.add_argument("--max-days", type=int, default=90)
     ap.add_argument("--goods-id", default="")
     ap.add_argument("--no-upload", action="store_true")
+    ap.add_argument("--since", default="", help="push-daily/sync-full: 仅推送 snap_date>=该日期")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("push", help="POST premium-upsert")
     sub.add_parser("pull", help="GET premium-changes → 写回本地")
     sub.add_parser("push-all", help="push + pull")
+    p_daily = sub.add_parser("push-daily", help="批量 POST premium_goods_daily")
+    p_daily.add_argument("--batch-size", type=int, default=500)
+    p_sync = sub.add_parser("sync-full", help="push + push-daily + backfill + pull")
     p_bf = sub.add_parser("backfill", help="本地 backfill + 可选上云")
     p_bf.add_argument("--pending", action="store_true")
     args = ap.parse_args()
@@ -343,6 +406,10 @@ def main():
         pull_premium_changes()
     elif args.cmd == "push-all":
         push_all()
+    elif args.cmd == "push-daily":
+        push_daily(since_date=args.since, limit=args.limit, batch_size=args.batch_size)
+    elif args.cmd == "sync-full":
+        sync_full_to_cloud(since_date=args.since)
     elif args.cmd == "backfill":
         if args.goods_id:
             from xhs_db_schema import DB_PATH

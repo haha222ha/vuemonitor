@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 import os
@@ -596,6 +596,32 @@ def sync_premium_daily_fetch(body: PremiumDailyFetchBody, _: None = Depends(veri
             since_date=body.since_date,
             max_rows=body.max_rows,
         )
+    finally:
+        conn.close()
+
+
+@app.post("/api/v1/sync/premium-daily-upsert")
+def sync_premium_daily_upsert(body: PremiumBatchSyncBody, _: None = Depends(verify_sync_key)):
+    """批量推送 premium_goods_daily 日快照（本地历史 → 云 PG）。"""
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    if not body.rows:
+        raise HTTPException(status_code=400, detail="rows 为空")
+    if len(body.rows) > 2000:
+        raise HTTPException(status_code=400, detail="单批最多 2000 行")
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+    from cloud_deploy.cloud_api.premium_sync_service import apply_premium_goods_daily_batch
+
+    init_db()
+    conn = _conn()
+    try:
+        n = apply_premium_goods_daily_batch(conn, body.rows)
+        conn.commit()
+        return {
+            "batch_id": body.batch_id,
+            "rows_upserted": n,
+            "final_batch": body.final_batch,
+        }
     finally:
         conn.close()
 

@@ -3,9 +3,9 @@
 云端生成日报（读 PG，不依赖 gen_report.py）。
 
 数据源（--source）:
-  auto           report_daily_items ∪ premium_goods（推荐）
+  auto           premium_goods 为主 ∪ report_daily_items（推荐）
   pg_items       仅 report_daily_items
-  premium_daily  仅 premium_goods + premium_goods_daily
+  premium_daily  仅 premium_goods + premium_goods_daily（纯云端精品自算）
   sold_daily     仅 monitor_goods + goods_sold_daily
 
 输出: {XHS_REPORT_OUTPUT_DIR}/全量MMDD/ → data.js + html
