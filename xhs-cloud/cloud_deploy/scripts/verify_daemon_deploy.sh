@@ -47,8 +47,9 @@ else
   bad "systemd 仍为旧 cooldown"
 fi
 
-if grep -q 'rounds=.*mode=.*risk=' "$ROOT/cloud_deploy/daemon/cloud_daemon.py" 2>/dev/null; then
-  ok "cloud_daemon.py 为新版本（含 mode/rounds 日志）"
+if grep -q '_pick_gap_batch' "$ROOT/cloud_deploy/daemon/cloud_daemon.py" 2>/dev/null \
+   && grep -q 'enable_risk_round' "$ROOT/cloud_deploy/daemon/cloud_daemon.py" 2>/dev/null; then
+  ok "cloud_daemon.py 为新版本（gap_only + rounds）"
 else
   bad "cloud_daemon.py 仍为旧版 — 请 rsync"
 fi

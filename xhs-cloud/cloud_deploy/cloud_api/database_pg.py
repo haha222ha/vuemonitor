@@ -46,10 +46,11 @@ def _conn():
 
 _init_db_lock = threading.Lock()
 _init_db_ready = False
+_INIT_DB_ADVISORY_LOCK_KEY = 842001
 
 
 def init_db() -> None:
-    """初始化 schema（进程内只执行一次，避免并发 ALTER 死锁）。"""
+    """初始化 schema（进程内只执行一次；跨进程用 PG advisory lock 串行迁移）。"""
     global _init_db_ready
     if _init_db_ready:
         return
@@ -58,7 +59,11 @@ def init_db() -> None:
             return
         for attempt in range(6):
             conn = _conn()
+            locked = False
             try:
+                with conn.cursor() as c:
+                    c.execute("SELECT pg_advisory_lock(%s)", (_INIT_DB_ADVISORY_LOCK_KEY,))
+                locked = True
                 _init_db_on_conn(conn)
                 conn.commit()
                 _init_db_ready = True
@@ -72,6 +77,16 @@ def init_db() -> None:
                     raise
                 time.sleep(0.4 * (attempt + 1))
             finally:
+                if locked:
+                    try:
+                        with conn.cursor() as c:
+                            c.execute("SELECT pg_advisory_unlock(%s)", (_INIT_DB_ADVISORY_LOCK_KEY,))
+                        conn.commit()
+                    except Exception:
+                        try:
+                            conn.rollback()
+                        except Exception:
+                            pass
                 conn.close()
 
 
