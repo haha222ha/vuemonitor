@@ -41,6 +41,7 @@ def _set_log_text(widget: scrolledtext.ScrolledText, text: str) -> None:
 
 def _load_env() -> dict[str, str]:
     data = {
+        "XHS_LOCAL_AGENT_ENABLED": "0",
         "XHS_CLOUD_API_URL": "https://monitor.xhs365.cn",
         "XHS_LOCAL_AGENT_KEY": "",
         "XHS_LOCAL_AGENT_ID": os.environ.get("COMPUTERNAME", "home-pc"),
@@ -66,6 +67,7 @@ def _load_env() -> dict[str, str]:
 def _save_env(values: dict[str, str]) -> None:
     ENV_FILE.parent.mkdir(parents=True, exist_ok=True)
     lines = [
+        f"XHS_LOCAL_AGENT_ENABLED={values.get('agent_enabled', '0')}",
         f"XHS_CLOUD_API_URL={values['api_url']}",
         f"XHS_LOCAL_AGENT_KEY={values['agent_key']}",
         f"XHS_LOCAL_AGENT_ID={values['agent_id']}",
@@ -186,13 +188,14 @@ def _stop_agent_workers(compare_proc: subprocess.Popen | None = None) -> list[st
                 notes.append(f"结束对比进程失败: {exc}")
 
     subprocess.run(["schtasks", "/End", "/TN", TASK_NAME], capture_output=True)
-    notes.append("已停止计划任务（不再自动重启本轮）")
+    subprocess.run(["schtasks", "/Change", "/TN", TASK_NAME, "/DISABLE"], capture_output=True)
+    notes.append("已停止并禁用计划任务")
 
     killed = 0
     try:
         ps = (
             "Get-CimInstance Win32_Process | "
-            "Where-Object { $_.CommandLine -and $_.CommandLine -match 'local_risk_agent' } | "
+            "Where-Object { $_.CommandLine -and $_.CommandLine -match 'local_risk_agent\\.py' } | "
             "ForEach-Object { $_.ProcessId }"
         )
         out = subprocess.check_output(
@@ -310,7 +313,7 @@ class AgentConfigApp(tk.Tk):
         for text, cmd in [
             ("①测试连接", self.on_test),
             ("②安装浏览器", self.on_install_browser),
-            ("③保存并自启", self.on_install),
+            ("③启用自动采集", self.on_install),
             ("模式对比", self.on_compare),
         ]:
             ttk.Button(btns, text=text, command=cmd).pack(side=tk.LEFT, padx=3)
@@ -493,14 +496,29 @@ class AgentConfigApp(tk.Tk):
         v = self._validate()
         if not v:
             return
-        if not messagebox.askyesno("确认", "保存配置并安装开机自启？"):
+        if not messagebox.askyesno(
+            "启用自动采集",
+            "将保存配置并注册开机自启（拉取云端 risk + 后台采集）。\n"
+            "若只想测试连接，请点「测试连接」或「模式对比」。\n\n"
+            "确定启用？",
+        ):
             return
 
         def job() -> None:
+            v["agent_enabled"] = "1"
             _save_env(v)
             ps1 = REPO_ROOT / "tools" / "install_local_risk_agent.ps1"
             code, out = _run_cmd(
-                ["powershell", "-ExecutionPolicy", "Bypass", "-File", str(ps1), "-EnvFile", str(ENV_FILE)]
+                [
+                    "powershell",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-File",
+                    str(ps1),
+                    "-EnvFile",
+                    str(ENV_FILE),
+                    "-EnableScheduledTask",
+                ]
             )
             if code != 0:
                 raise RuntimeError(out or "计划任务安装失败")
@@ -574,12 +592,15 @@ class AgentConfigApp(tk.Tk):
             "· 后台采集任务\n"
             "· 正在跑的对比测试\n"
             "· 相关 Python/浏览器进程\n\n"
-            "（计划任务仍保留，下次可点「保存并自启」再开）\n"
+            "（计划任务将被禁用；要再开请点「③保存并自启」）\n"
             "确定停止？",
         ):
             return
 
         def job() -> None:
+            v = self._values()
+            v["agent_enabled"] = "0"
+            _save_env(v)
             notes = _stop_agent_workers(self._compare_proc)
             for n in notes:
                 self._log_op(n)

@@ -325,6 +325,12 @@ def _load_env_file() -> None:
         bootstrap(env_file)
 
 
+def _agent_enabled() -> bool:
+    """默认关闭；仅当 XHS_LOCAL_AGENT_ENABLED=1 时才拉取云端 risk / 静默采集。"""
+    v = os.environ.get("XHS_LOCAL_AGENT_ENABLED", "0").strip().lower()
+    return v in ("1", "true", "yes", "on", "enabled")
+
+
 def _load_cycle_state() -> dict:
     path = _log_dir() / "cycle_state.json"
     try:
@@ -435,6 +441,9 @@ def run_once() -> dict:
 
 
 def run_daemon() -> None:
+    if not _agent_enabled():
+        _log("Agent 已禁用 (XHS_LOCAL_AGENT_ENABLED=0)，不拉取云端 risk / 不后台采集")
+        return
     _acquire_singleton_lock()
     idle_sec = max(30, int(os.environ.get("XHS_LOCAL_AGENT_IDLE_SEC", "120")))
     cooldown = max(0, int(os.environ.get("XHS_LOCAL_AGENT_COOLDOWN_SEC", "60")))
@@ -543,6 +552,10 @@ def main():
     args = ap.parse_args()
 
     _load_env_file()
+
+    if args.cmd in ("run", "run-once") and not _agent_enabled():
+        _log("Agent 已禁用 (XHS_LOCAL_AGENT_ENABLED=0)")
+        return
 
     if args.cmd == "run":
         run_daemon()

@@ -45,7 +45,8 @@ python -m playwright install chromium
 Write-Host "[3/5] 写配置文件..." -ForegroundColor Yellow
 $EnvFile = Join-Path $RepoRoot "tools\local_agent.env"
 @(
-    "XHS_CLOUD_API_URL=$ApiUrl"
+ "XHS_LOCAL_AGENT_ENABLED=0"
+ "XHS_CLOUD_API_URL=$ApiUrl"
     "XHS_LOCAL_AGENT_KEY=$AgentKey"
     "XHS_LOCAL_AGENT_ID=$env:COMPUTERNAME"
     "XHS_LOCAL_AGENT_BATCH=80"
@@ -66,13 +67,14 @@ $env:XHS_LOCAL_AGENT_FOREGROUND = "1"
 python tools\local_risk_agent.py status
 if ($LASTEXITCODE -ne 0) { throw "连接失败，检查 API 地址和密钥" }
 
-Write-Host "[5/5] 安装开机自启（后台静默）..." -ForegroundColor Yellow
+Write-Host "[5/5] 写入本地配置（默认不自动采集）..." -ForegroundColor Yellow
 & powershell -ExecutionPolicy Bypass -File (Join-Path $RepoRoot "tools\install_local_risk_agent.ps1") -EnvFile $EnvFile
-schtasks /Run /TN "XHS-Local-Risk-Agent" 2>$null
 
 Write-Host ""
 Write-Host "  全部完成！" -ForegroundColor Green
-Write-Host "  - 已后台运行，开机自动启动"
+Write-Host "  - 默认已关闭自动拉取云端 risk / 静默后台采集"
+Write-Host "  - 若要开启：编辑 tools\local_agent.env 设 XHS_LOCAL_AGENT_ENABLED=1"
+Write-Host "    然后: powershell -File tools\install_local_risk_agent.ps1 -EnvFile tools\local_agent.env -EnableScheduledTask"
 Write-Host "  - 日志: $env:LOCALAPPDATA\xhs-local-agent\agent.log"
 Write-Host ""
 Write-Host "  查看日志: Get-Content `"$env:LOCALAPPDATA\xhs-local-agent\agent.log`" -Tail 15" -ForegroundColor Gray
