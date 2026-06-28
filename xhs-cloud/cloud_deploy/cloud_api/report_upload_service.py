@@ -7,7 +7,15 @@ import shutil
 import tempfile
 import zipfile
 
-from cloud_deploy.reporting.constants import ARCHIVE_DAILY
+from cloud_deploy.reporting.constants import ARCHIVE_DAILY, ARCHIVE_MONTHLY, ARCHIVE_WEEKLY
+
+
+def _archive_type_for_folder(folder_name: str) -> str:
+    if folder_name.startswith("周报"):
+        return ARCHIVE_WEEKLY
+    if folder_name.startswith("月报"):
+        return ARCHIVE_MONTHLY
+    return ARCHIVE_DAILY
 
 
 def _report_sync_pg_enabled() -> bool:
@@ -47,9 +55,11 @@ def ingest_report_zip_file(zip_path: str) -> dict:
 
     s = get_settings()
     report_dir = extract_report_zip(zip_path, s.xhs_report_incoming_dir)
+    folder = os.path.basename(report_dir.rstrip("/\\"))
+    archive_type = _archive_type_for_folder(folder)
     result = pack_register_sync(
         report_dir,
-        ARCHIVE_DAILY,
+        archive_type,
         s.xhs_report_archive_dir,
         sync_pg=_report_sync_pg_enabled(),
     )

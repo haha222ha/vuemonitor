@@ -98,6 +98,11 @@ class PremiumSnapshotsBackfillBody(BaseModel):
 class PremiumCatalogBody(BaseModel):
     local_ids: list[str] = Field(default_factory=list)
     since_date: str = ""
+
+
+class PeriodReportTriggerBody(BaseModel):
+    scope: str = Field(..., pattern="^(weekly|monthly)$")
+    end_date: str = ""
     page: int = 0
     page_size: int = 5000
 
@@ -377,7 +382,12 @@ def admin_stats(_: None = Depends(verify_sync_key)):
 
 @app.get("/api/v1/sync/status")
 def sync_status(_: None = Depends(verify_sync_key)):
-    archives = db.list_archives()
+    from cloud_deploy.reporting.constants import ARCHIVE_DAILY, ARCHIVE_MONTHLY, ARCHIVE_WEEKLY
+
+    daily_archives = db.list_archives(archive_type=ARCHIVE_DAILY)
+    weekly_archives = db.list_archives(archive_type=ARCHIVE_WEEKLY)
+    monthly_archives = db.list_archives(archive_type=ARCHIVE_MONTHLY)
+    archives = daily_archives
     pool_size = 0
     pending_backfill = 0
     pending_snapshots = 0
@@ -403,10 +413,40 @@ def sync_status(_: None = Depends(verify_sync_key)):
             pass
     return {
         "archive_count": len(archives),
-        "latest": archives[0] if archives else None,
+        "latest": daily_archives[0] if daily_archives else None,
+        "library": {
+            "daily": daily_archives[:5],
+            "weekly": weekly_archives[:5],
+            "monthly": monthly_archives[:5],
+        },
+        "latest_weekly": weekly_archives[0] if weekly_archives else None,
+        "latest_monthly": monthly_archives[0] if monthly_archives else None,
         "monitor_pool_active": pool_size,
         "sold_history_pending_backfill": pending_backfill,
         "sold_snapshots_pending_backfill": pending_snapshots,
+    }
+
+
+@app.post("/api/v1/sync/trigger-period-report")
+def sync_trigger_period_report(body: PeriodReportTriggerBody, _: None = Depends(verify_sync_key)):
+    """本地编排触发云端周报/月报（PG 聚合 → 同日报 HTML 模板 → zip 登记）。"""
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.scripts.cloud_period_report import generate_period_report
+
+    try:
+        result = generate_period_report(body.scope, body.end_date)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) from e
+    latest = result.get("report_date") or result.get("end_date") or ""
+    return {
+        "ok": True,
+        "scope": body.scope,
+        "report_date": latest,
+        "row_count": result.get("row_count"),
+        "file_name": result.get("file_name"),
+        "output_dir": result.get("output_dir"),
+        "archive_type": result.get("archive_type"),
     }
 
 

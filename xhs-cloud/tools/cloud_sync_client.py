@@ -210,6 +210,30 @@ def push_after_report(
     return result
 
 
+def trigger_period_report(scope: str, end_date: str = "", log_func=None) -> dict:
+    """触发云端周报/月报生成（需云 API 已部署 trigger-period-report）。"""
+    log = log_func or _log
+    api = _api_base()
+    sync_key = _sync_key()
+    if not api or not sync_key:
+        raise RuntimeError("XHS_CLOUD_API_URL / XHS_CLOUD_SYNC_KEY 未配置")
+    body = json.dumps({"scope": scope, "end_date": end_date}, ensure_ascii=False).encode("utf-8")
+    req = urllib.request.Request(
+        f"{api}/api/v1/sync/trigger-period-report",
+        data=body,
+        headers=_http_headers({"Content-Type": "application/json", "X-Sync-Key": sync_key}),
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=900) as resp:
+            result = json.loads(resp.read().decode())
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode(errors="replace")
+        raise RuntimeError(f"触发 {scope} 失败 HTTP {e.code}: {detail}") from e
+    log(f"{scope} 报告已生成: date={result.get('report_date')} rows={result.get('row_count')}")
+    return result
+
+
 def main():
     ap = argparse.ArgumentParser(description="选品报告上云")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -229,6 +253,10 @@ def main():
     p_all.add_argument("--data-js", required=True)
     p_all.add_argument("--no-backfill", action="store_true")
     p_all.add_argument("--no-snapshots", action="store_true")
+
+    p_period = sub.add_parser("trigger-period", help="触发云端周报/月报")
+    p_period.add_argument("scope", choices=("weekly", "monthly"))
+    p_period.add_argument("--end-date", default="")
 
     args = ap.parse_args()
     if args.cmd == "upload-bundle":
@@ -252,6 +280,8 @@ def main():
             backfill_sold=not args.no_backfill,
             backfill_snapshots=not args.no_snapshots,
         )
+    elif args.cmd == "trigger-period":
+        print(json.dumps(trigger_period_report(args.scope, args.end_date), ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":
