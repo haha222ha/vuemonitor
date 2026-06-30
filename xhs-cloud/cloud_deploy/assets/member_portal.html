@@ -84,6 +84,15 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
 .month-body .report-cards{padding:10px 10px 4px}
 .month-body tbody tr:last-child td{border-bottom:none}
 .month-current .month-header{background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border-left:3px solid var(--accent)}
+.batch-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding:12px 14px;margin-bottom:14px;background:#f9f9fb;border:1px solid var(--line);border-radius:10px}
+.batch-bar.hidden{display:none!important}
+.batch-bar .selected-count{font-size:13px;color:var(--text2);flex:1;min-width:120px}
+.batch-bar .btn{padding:8px 16px;min-height:38px;font-size:14px}
+.report-check{width:18px;height:18px;cursor:pointer;accent-color:var(--accent);flex-shrink:0}
+th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-right:4px}
+.month-header .month-check{display:inline-flex;align-items:center;margin-right:2px}
+.report-card .rc-top{align-items:center}
+.report-card .rc-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -150,6 +159,14 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
         <button data-type="weekly" onclick="setType('weekly')">周报</button>
         <button data-type="monthly" onclick="setType('monthly')">月报</button>
       </div>
+      <div id="batchBar" class="batch-bar hidden">
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:14px;cursor:pointer">
+          <input type="checkbox" class="report-check" id="selectAllCb" onchange="toggleSelectAll(this.checked)"> 全选
+        </label>
+        <span class="selected-count" id="selectedCount">已选 0 份</span>
+        <button class="btn btn-primary" id="btnBatchDownload" onclick="downloadBatch()" disabled>打包下载</button>
+        <button class="btn btn-ghost" onclick="clearSelection()">取消选择</button>
+      </div>
       <div id="reportTable"></div>
     </div>
     <div id="dashMsg"></div>
@@ -167,6 +184,112 @@ const STORAGE = {
 let library = { daily: [], weekly: [], monthly: [] };
 let currentType = 'daily';
 let monthExpandState = {};
+let selectedReports = new Set();
+
+function reportKey(date, archiveType) {
+  return archiveType + ':' + String(date || '').slice(0, 10);
+}
+
+function currentArchiveType() {
+  return archiveTypeFor(currentType);
+}
+
+function selectedCountForType() {
+  const at = currentArchiveType();
+  let n = 0;
+  selectedReports.forEach(k => { if (k.startsWith(at + ':')) n++; });
+  return n;
+}
+
+function updateBatchToolbar() {
+  const bar = document.getElementById('batchBar');
+  const items = library[currentType] || [];
+  if (!items.length) {
+    bar.classList.add('hidden');
+    return;
+  }
+  bar.classList.remove('hidden');
+  const n = selectedCountForType();
+  document.getElementById('selectedCount').textContent = '已选 ' + n + ' 份';
+  document.getElementById('btnBatchDownload').disabled = n === 0;
+  const allCb = document.getElementById('selectAllCb');
+  if (allCb) {
+    const at = currentArchiveType();
+    const total = items.length;
+    const checked = items.filter(it => selectedReports.has(reportKey(it.report_date, at))).length;
+    allCb.checked = total > 0 && checked === total;
+    allCb.indeterminate = checked > 0 && checked < total;
+  }
+}
+
+function toggleReport(date, archiveType, checked) {
+  const key = reportKey(date, archiveType);
+  if (checked) selectedReports.add(key);
+  else selectedReports.delete(key);
+  updateBatchToolbar();
+  syncMonthCheckboxes();
+}
+
+function toggleSelectAll(checked) {
+  const at = currentArchiveType();
+  (library[currentType] || []).forEach(it => {
+    const key = reportKey(it.report_date, at);
+    if (checked) selectedReports.add(key);
+    else selectedReports.delete(key);
+  });
+  document.querySelectorAll('input.report-item-check').forEach(cb => { cb.checked = checked; });
+  syncMonthCheckboxes();
+  updateBatchToolbar();
+}
+
+function toggleSelectMonth(month, checked) {
+  const at = currentArchiveType();
+  (library[currentType] || []).forEach(it => {
+    if (monthKeyFromItem(it) !== month) return;
+    const key = reportKey(it.report_date, at);
+    if (checked) selectedReports.add(key);
+    else selectedReports.delete(key);
+  });
+  syncCheckboxDom();
+  updateBatchToolbar();
+}
+
+function clearSelection() {
+  const at = currentArchiveType();
+  [...selectedReports].forEach(k => {
+    if (k.startsWith(at + ':')) selectedReports.delete(k);
+  });
+  syncCheckboxDom();
+  updateBatchToolbar();
+}
+
+function syncCheckboxDom() {
+  const at = currentArchiveType();
+  document.querySelectorAll('input.report-item-check').forEach(cb => {
+    cb.checked = selectedReports.has(reportKey(cb.dataset.date, at));
+  });
+  syncMonthCheckboxes();
+}
+
+function syncMonthCheckboxes() {
+  const at = currentArchiveType();
+  document.querySelectorAll('input.month-select-cb').forEach(cb => {
+    const month = cb.dataset.month;
+    const items = (library[currentType] || []).filter(it => monthKeyFromItem(it) === month);
+    const checked = items.length > 0 && items.every(it => selectedReports.has(reportKey(it.report_date, at)));
+    cb.checked = checked;
+    cb.indeterminate = !checked && items.some(it => selectedReports.has(reportKey(it.report_date, at)));
+  });
+}
+
+function isMonthAllSelected(items, at) {
+  return items.length > 0 && items.every(it => selectedReports.has(reportKey(it.report_date, at)));
+}
+
+function isMonthPartialSelected(items, at) {
+  const any = items.some(it => selectedReports.has(reportKey(it.report_date, at)));
+  return any && !isMonthAllSelected(items, at);
+}
 
 function currentMonthKey() {
   const d = new Date();
@@ -340,27 +463,40 @@ function reportLabel(it) {
   return '全量' + mmdd;
 }
 
-function renderReportRows(items, at) {
-  let table = '<div class="report-table-wrap"><table><thead><tr><th>日期</th><th>说明</th><th>条数</th><th>大小</th><th></th></tr></thead><tbody>';
+function renderReportRows(items, at, month) {
+  let table = '<div class="report-table-wrap"><table><thead><tr><th class="check-col"></th><th>日期</th><th>说明</th><th>条数</th><th>大小</th><th></th></tr></thead><tbody>';
   let cards = '<div class="report-cards">';
+  const monthAll = isMonthAllSelected(items, at);
+  const monthPartial = isMonthPartialSelected(items, at);
   items.forEach(it => {
     const date = esc(it.report_date);
     const summary = esc(it.summary || reportLabel(it));
     const rows = it.row_count ?? '-';
     const size = fmtSize(it.file_size_bytes);
     const safeDate = String(it.report_date || '').replace(/'/g, '');
+    const checked = selectedReports.has(reportKey(it.report_date, at));
+    const checkCell = `<td class="check-col"><input type="checkbox" class="report-check report-item-check" data-date="${safeDate}" ${checked ? 'checked' : ''} onchange="toggleReport('${safeDate}','${at}', this.checked)"></td>`;
     table += `<tr>
+      ${checkCell}
       <td>${date}</td><td>${summary}</td><td>${rows}</td><td>${size}</td>
       <td><button class="btn btn-primary" style="padding:8px 14px;font-size:13px;min-height:36px" onclick="downloadReport('${safeDate}','${at}', this)">下载</button></td>
     </tr>`;
     cards += `<div class="report-card">
-      <div class="rc-top"><span class="rc-date">${date}</span><button class="btn btn-primary" style="min-height:36px;padding:8px 16px;font-size:13px" onclick="downloadReport('${safeDate}','${at}', this)">下载</button></div>
+      <div class="rc-top">
+        <label style="display:flex;align-items:flex-start;gap:8px;min-width:0;flex:1">
+          <input type="checkbox" class="report-check report-item-check" data-date="${safeDate}" ${checked ? 'checked' : ''} onchange="toggleReport('${safeDate}','${at}', this.checked)">
+          <span class="rc-date">${date}</span>
+        </label>
+        <div class="rc-actions">
+          <button class="btn btn-primary" style="min-height:36px;padding:8px 16px;font-size:13px" onclick="downloadReport('${safeDate}','${at}', this)">下载</button>
+        </div>
+      </div>
       <div class="rc-meta">${summary}<br>条数 ${rows} · ${size}</div>
     </div>`;
   });
   table += '</tbody></table></div>';
   cards += '</div>';
-  return table + cards;
+  return { table, cards, monthAll, monthPartial };
 }
 
 function renderReports() {
@@ -368,6 +504,7 @@ function renderReports() {
   const el = document.getElementById('reportTable');
   if (!items.length) {
     el.innerHTML = '<div class="empty">暂无报告。日报每天 17:00 更新，周报周日 17:00，月报每月 1 日 17:00（北京时间）</div>';
+    updateBatchToolbar();
     return;
   }
   const at = archiveTypeFor(currentType);
@@ -378,25 +515,34 @@ function renderReports() {
   groups.forEach(g => {
     const expanded = isMonthExpanded(g.month);
     const cls = ['month-group', expanded ? 'expanded' : '', g.month === cur ? 'month-current' : ''].filter(Boolean).join(' ');
+    const rowsHtml = renderReportRows(g.items, at, g.month);
+    const monthChecked = rowsHtml.monthAll ? 'checked' : '';
+    const monthInd = rowsHtml.monthPartial ? ' data-indeterminate="1"' : '';
     html += `<div class="${cls}">
       <div class="month-header" onclick="toggleMonth('${g.month}')" role="button" aria-expanded="${expanded}">
         <div class="mh-left">
+          <label class="month-check" onclick="event.stopPropagation()">
+            <input type="checkbox" class="report-check month-select-cb" data-month="${g.month}" ${monthChecked}${monthInd} onchange="toggleSelectMonth('${g.month}', this.checked)">
+          </label>
           <span class="mh-chevron">▶</span>
           <span class="mh-title">${esc(formatMonthLabel(g.month))}</span>
           ${g.month === cur ? '<span class="mh-badge" style="background:#dbeafe;color:#0071e3">本月</span>' : ''}
         </div>
         <span class="mh-badge">${g.items.length} ${typeLabel}</span>
       </div>
-      <div class="month-body">${renderReportRows(g.items, at)}</div>
+      <div class="month-body">${rowsHtml.table}${rowsHtml.cards}</div>
     </div>`;
   });
   html += '</div>';
   el.innerHTML = html;
+  document.querySelectorAll('input.month-select-cb[data-indeterminate="1"]').forEach(cb => { cb.indeterminate = true; });
+  updateBatchToolbar();
 }
 
 function setType(t) {
   currentType = t;
   monthExpandState = {};
+  selectedReports.clear();
   saveStored(STORAGE.reportType, t);
   document.querySelectorAll('#typeSeg button').forEach(b => b.classList.toggle('active', b.dataset.type === t));
   renderReports();
@@ -434,6 +580,65 @@ async function downloadReport(date, archiveType, btnEl) {
         btn.textContent = label || '下载';
       }, 5000);
     }
+  }
+}
+
+async function downloadBatch() {
+  const dashMsg = document.getElementById('dashMsg');
+  const t = loadStored(STORAGE.token);
+  if (!t) {
+    showMsg(dashMsg, '请先登录', 'error');
+    return;
+  }
+  const at = currentArchiveType();
+  const dates = [];
+  selectedReports.forEach(k => {
+    if (k.startsWith(at + ':')) dates.push(k.slice(at.length + 1));
+  });
+  if (!dates.length) {
+    showMsg(dashMsg, '请先勾选要下载的报告', 'warn');
+    return;
+  }
+  const btn = document.getElementById('btnBatchDownload');
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '打包中…';
+  showMsg(dashMsg, `正在打包 ${dates.length} 份报告（体积较大时请耐心等待 1～3 分钟）`, 'ok');
+  try {
+    const res = await fetch('/api/v1/member/reports/batch-download', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + t,
+      },
+      body: JSON.stringify({ archive_type: at, report_dates: dates }),
+    });
+    if (!res.ok) {
+      const text = await res.text();
+      let data = {};
+      try { data = text ? JSON.parse(text) : {}; } catch (_) {}
+      throw new Error(formatApiError(data, res.statusText) || '打包下载失败');
+    }
+    const blob = await res.blob();
+    let filename = `reports_batch_${dates.length}.zip`;
+    const cd = res.headers.get('Content-Disposition') || '';
+    const m = cd.match(/filename\*?=(?:UTF-8''|")?([^";\n]+)/i);
+    if (m) filename = decodeURIComponent(m[1].replace(/"/g, '').trim());
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    showMsg(dashMsg, `打包下载已开始（共 ${dates.length} 份）；解压后得到各日 zip，再解压单个 zip 用 Chrome 打开 HTML`, 'ok');
+  } catch (e) {
+    showMsg(dashMsg, e.message || '打包下载失败', 'error');
+  } finally {
+    btn.textContent = label;
+    updateBatchToolbar();
   }
 }
 

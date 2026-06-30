@@ -3,7 +3,9 @@ from __future__ import annotations
 
 import os
 import sys
+import tempfile
 import zipfile
+from datetime import datetime
 
 CRAWLER_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 if CRAWLER_ROOT not in sys.path:
@@ -17,6 +19,7 @@ from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
+from starlette.background import BackgroundTask
 
 from cloud_deploy.cloud_api import database as db
 from cloud_deploy.cloud_api.auth import (
@@ -53,6 +56,16 @@ class RegisterBody(BaseModel):
 
 class ActivateBody(BaseModel):
     auth_code: str = Field(..., min_length=8, max_length=64)
+
+
+class BatchDownloadBody(BaseModel):
+    archive_type: str = "member_daily_zip"
+    report_dates: list[str] = Field(..., min_length=1, max_length=50)
+
+
+_MEMBER_ARCHIVE_TYPES = frozenset(
+    {"member_daily_zip", "member_weekly_zip", "member_monthly_zip"}
+)
 
 
 class GenerateCodesBody(BaseModel):
@@ -297,6 +310,82 @@ def download_report(
         path,
         media_type="application/zip",
         filename=os.path.basename(path),
+    )
+
+
+def _remove_temp_file(path: str) -> None:
+    try:
+        os.remove(path)
+    except OSError:
+        pass
+
+
+@app.post("/api/v1/member/reports/batch-download")
+def batch_download_reports(
+    body: BatchDownloadBody,
+    request: Request = None,
+    user: dict = Depends(current_member),
+):
+    """将会员选中的多份报告 zip 再打包为一个 zip 下载。"""
+    if body.archive_type not in _MEMBER_ARCHIVE_TYPES:
+        raise HTTPException(status_code=400, detail="无效的报告类型")
+
+    seen: set[str] = set()
+    ordered_dates: list[str] = []
+    for raw in body.report_dates:
+        date = str(raw).strip()[:10]
+        if not date or date in seen:
+            continue
+        seen.add(date)
+        ordered_dates.append(date)
+
+    if not ordered_dates:
+        raise HTTPException(status_code=400, detail="未选择有效报告")
+
+    entries: list[tuple[str, str]] = []
+    missing: list[str] = []
+    ip = request.client.host if request and request.client else ""
+    for date in ordered_dates:
+        path = db.get_archive_path(date, body.archive_type)
+        if not path or not os.path.isfile(path):
+            missing.append(date)
+            continue
+        entries.append((date, path))
+
+    if missing:
+        raise HTTPException(
+            status_code=404,
+            detail=f"以下报告不存在: {', '.join(missing)}",
+        )
+    if not entries:
+        raise HTTPException(status_code=404, detail="没有可下载的报告")
+
+    fd, tmp_path = tempfile.mkstemp(suffix=".zip", prefix="member_batch_")
+    os.close(fd)
+    used_names: set[str] = set()
+    try:
+        with zipfile.ZipFile(tmp_path, "w", zipfile.ZIP_DEFLATED) as zout:
+            for date, path in entries:
+                base = os.path.basename(path)
+                arcname = base
+                if arcname in used_names:
+                    stem, ext = os.path.splitext(base)
+                    arcname = f"{stem}_{date}{ext or '.zip'}"
+                used_names.add(arcname)
+                zout.write(path, arcname=arcname)
+                db.log_download(user["id"], date, body.archive_type, ip)
+    except Exception:
+        _remove_temp_file(tmp_path)
+        raise
+
+    type_short = body.archive_type.replace("member_", "").replace("_zip", "")
+    stamp = datetime.now().strftime("%Y%m%d")
+    out_name = f"reports_{type_short}_{len(entries)}份_{stamp}.zip"
+    return FileResponse(
+        tmp_path,
+        media_type="application/zip",
+        filename=out_name,
+        background=BackgroundTask(_remove_temp_file, tmp_path),
     )
 
 
