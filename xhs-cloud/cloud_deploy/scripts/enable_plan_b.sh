@@ -7,7 +7,7 @@ set -euo pipefail
 ROOT="${XHS_CLOUD_ROOT:-/opt/xhs-cloud}"
 ENV_FILE="${XHS_ENV_FILE:-$ROOT/.env}"
 
-echo "=== 方案 B：云分发模式（本地 18:00 上传报告）==="
+echo "=== 方案 B：云分发模式（本地 17:00 上传报告）==="
 
 for unit in xhs-daily-report.timer xhs-daily-report.service xhs-ingest-report.timer xhs-ingest-report.service \
   xhs-weekly-report.timer xhs-weekly-report.service xhs-monthly-report.timer xhs-monthly-report.service; do
@@ -28,7 +28,7 @@ sudo systemctl enable --now xhs-cloud-api.service 2>/dev/null || true
 
 echo ""
 echo "完成。"
-echo "  • 本地主程序 18:00 自动 gen_report + upload-bundle"
+echo "  • 本地主程序 17:00 自动 gen_report + upload-bundle"
 echo "  • 云不再自算日/周/月报 timer（已关，由本地编排 API 触发）"
 echo "  • 会员 portal 下载本地推送的 zip"
 echo ""
