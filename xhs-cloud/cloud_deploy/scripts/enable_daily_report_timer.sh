@@ -1,10 +1,10 @@
 #!/bin/bash
-# 混合模式：启用云端 17:00 日报 timer（本地 16:30 推 PG，云端打 zip）
+# 混合模式：启用云端 18:00 日报 timer（本地 17:30 推 PG，云端打 zip）
 # 用法: sudo bash cloud_deploy/scripts/enable_daily_report_timer.sh
 
 set -euo pipefail
 
-echo "启用 xhs-daily-report.timer (17:00 PG→zip) …"
+echo "启用 xhs-daily-report.timer (18:00 PG→zip) …"
 systemctl enable xhs-daily-report.timer
 systemctl start xhs-daily-report.timer
 

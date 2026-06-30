@@ -148,9 +148,9 @@ cd /opt/xhs-cloud && bash cloud_deploy/scripts/host-update.sh
 | Timer | 时间 | 作用 |
 |-------|------|------|
 | `xhs-ingest-report.timer` | 每日 20:00 | scp 报告入库 |
-| `xhs-daily-report.timer` | 每日 17:00 | PG 云端生成日报 |
-| `xhs-weekly-report.timer` | 周日 17:00 | 周报 |
-| `xhs-monthly-report.timer` | 每月 1 日 17:00 | 月报 |
+| `xhs-daily-report.timer` | 每日 18:00 | PG 云端生成日报 |
+| `xhs-weekly-report.timer` | 周日 18:00 | 周报 |
+| `xhs-monthly-report.timer` | 每月 1 日 18:00 | 月报 |
 
 本地 gen_report 模式只需 enable `xhs-ingest-report.timer`。
 

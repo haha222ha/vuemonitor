@@ -109,10 +109,10 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   <div class="card notice-card">
     <div class="notice-title">📋 报告更新说明</div>
     <ul>
-      <li><strong>日报</strong>：每天 <strong>17:00</strong>（北京时间）自动生成，一般 17:00～17:10 内可下载</li>
-      <li><strong>周报</strong>：每周日 <strong>17:00</strong> 生成（汇总当周数据）</li>
-      <li><strong>月报</strong>：每月 <strong>1 日 17:00</strong> 生成（汇总上月数据）</li>
-      <li>当日 17:00 前若列表暂无「今天」的日报，属正常情况，请稍后再来</li>
+      <li><strong>日报</strong>：每天 <strong>18:00</strong>（北京时间）自动生成，一般 18:00～18:10 内可下载</li>
+      <li><strong>周报</strong>：每周日 <strong>18:00</strong> 生成（汇总当周数据）</li>
+      <li><strong>月报</strong>：每月 <strong>1 日 18:00</strong> 生成（汇总上月数据）</li>
+      <li>当日 18:00 前若列表暂无「今天」的日报，属正常情况，请稍后再来</li>
       <li>报告含<strong>实体 + 虚拟</strong>商品：实体门槛 v1d&gt;5，虚拟门槛 v1d&gt;1（同一份 zip）</li>
     </ul>
     <div class="notice-tip">
@@ -503,7 +503,7 @@ function renderReports() {
   const items = library[currentType] || [];
   const el = document.getElementById('reportTable');
   if (!items.length) {
-    el.innerHTML = '<div class="empty">暂无报告。日报每天 17:00 更新，周报周日 17:00，月报每月 1 日 17:00（北京时间）</div>';
+    el.innerHTML = '<div class="empty">暂无报告。日报每天 18:00 更新，周报周日 18:00，月报每月 1 日 18:00（北京时间）</div>';
     updateBatchToolbar();
     return;
   }
