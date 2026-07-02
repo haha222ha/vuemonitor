@@ -12,6 +12,14 @@ from cloud_deploy.scripts.report_packager import pack_report_dir
 
 
 def parse_meta_from_data_js(data_js_path: str) -> dict:
+    """读取 meta；大 bundle 优先轻量正则，避免 json.loads 整文件 OOM。"""
+    with open(data_js_path, "r", encoding="utf-8") as f:
+        head = f.read(65536)
+    m_date = re.search(r'"date"\s*:\s*"(\d{4}-\d{2}-\d{2})"', head)
+    m_count = re.search(r'"count"\s*:\s*(\d+)', head)
+    if m_date and m_count:
+        return _meta_from_head_regex(head)
+
     from cloud_deploy.cloud_api.sync_service import _parse_report_payload
 
     with open(data_js_path, "r", encoding="utf-8") as f:
@@ -20,6 +28,24 @@ def parse_meta_from_data_js(data_js_path: str) -> dict:
         return _parse_report_payload(text).get("meta") or {}
     except Exception:
         return {}
+
+
+def _meta_from_head_regex(head: str) -> dict:
+    meta: dict = {}
+    m_date = re.search(r'"date"\s*:\s*"(\d{4}-\d{2}-\d{2})"', head)
+    if m_date:
+        meta["date"] = m_date.group(1)
+    m_count = re.search(r'"count"\s*:\s*(\d+)', head)
+    if m_count:
+        meta["count"] = int(m_count.group(1))
+    for key in ("report_kind", "filter_label"):
+        m = re.search(rf'"{key}"\s*:\s*"([^"]*)"', head)
+        if m:
+            meta[key] = m.group(1)
+    m_bundle = re.search(r'"bundle"\s*:\s*(true|false)', head, re.I)
+    if m_bundle:
+        meta["bundle"] = m_bundle.group(1).lower() == "true"
+    return meta
 
 
 def pack_register_sync(
