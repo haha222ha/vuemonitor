@@ -48,7 +48,7 @@ def extract_report_zip(zip_path: str, incoming_dir: str) -> str:
     return report_dir
 
 
-def ingest_report_zip_file(zip_path: str) -> dict:
+def ingest_report_zip_file(zip_path: str, *, force: bool = False) -> dict:
     """上传的 zip → 解压 → pack_register_sync（默认不写 PG 明细，仅登记 zip）。"""
     from cloud_deploy.cloud_api.config import get_settings
     from cloud_deploy.scripts.pipeline_common import pack_register_sync
@@ -62,19 +62,20 @@ def ingest_report_zip_file(zip_path: str) -> dict:
         archive_type,
         s.xhs_report_archive_dir,
         sync_pg=_report_sync_pg_enabled(),
+        force=force,
     )
     result["report_dir"] = report_dir
     result["mode"] = "plan_b_upload"
     return result
 
 
-def ingest_report_upload_bytes(data: bytes, filename: str = "report.zip") -> dict:
+def ingest_report_upload_bytes(data: bytes, filename: str = "report.zip", *, force: bool = False) -> dict:
     suffix = ".zip" if not filename.lower().endswith(".zip") else ""
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix or ".zip") as tmp:
         tmp.write(data)
         tmp_path = tmp.name
     try:
-        return ingest_report_zip_file(tmp_path)
+        return ingest_report_zip_file(tmp_path, force=force)
     finally:
         try:
             os.remove(tmp_path)

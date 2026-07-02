@@ -556,10 +556,13 @@ def sync_daily_report(body: DailyReportSyncBody, _: None = Depends(verify_sync_k
 
 @app.post("/api/v1/sync/report-upload")
 async def sync_report_upload(
+    request: Request,
     file: UploadFile = File(...),
     _: None = Depends(verify_sync_key),
 ):
     """方案 B：本地 gen_report 打包 zip 上传 → 解压 ingest → 会员可下载。"""
+    from cloud_deploy.cloud_api.ingest_guard import ingest_force_enabled
+
     if not file.filename:
         raise HTTPException(status_code=400, detail="缺少上传文件")
     raw = await file.read()
@@ -568,10 +571,11 @@ async def sync_report_upload(
     max_mb = int(os.environ.get("XHS_REPORT_UPLOAD_MAX_MB", "200") or 200)
     if len(raw) > max_mb * 1024 * 1024:
         raise HTTPException(status_code=413, detail=f"文件超过 {max_mb}MB 限制")
+    force = ingest_force_enabled(header_value=request.headers.get("X-Upload-Force", ""))
     try:
         from cloud_deploy.cloud_api.report_upload_service import ingest_report_upload_bytes
 
-        return ingest_report_upload_bytes(raw, filename=file.filename or "report.zip")
+        return ingest_report_upload_bytes(raw, filename=file.filename or "report.zip", force=force)
     except zipfile.BadZipFile as e:
         raise HTTPException(status_code=400, detail=f"无效 zip: {e}") from e
     except ValueError as e:

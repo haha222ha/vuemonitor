@@ -53,12 +53,33 @@ def pack_register_sync(
     archive_type: str,
     archive_dir: str,
     sync_pg: bool = True,
+    *,
+    force: bool = False,
 ) -> dict:
     from cloud_deploy.cloud_api import database
     from cloud_deploy.cloud_api.config import get_settings
+    from cloud_deploy.cloud_api.ingest_guard import (
+        existing_published_row_count,
+        ingest_force_enabled,
+        min_ingest_row_count,
+        validate_ingest_row_count,
+    )
 
     database.init_db()
     s = get_settings()
+
+    data_js = os.path.join(report_dir, "data.js")
+    meta = parse_meta_from_data_js(data_js) if os.path.isfile(data_js) else {}
+    row_count = int(meta.get("count") or 0)
+    report_date = str(meta.get("date") or datetime.now().strftime("%Y-%m-%d"))[:10]
+    effective_force = force or ingest_force_enabled()
+    existing_rows = existing_published_row_count(report_date, archive_type)
+    validate_ingest_row_count(
+        row_count,
+        report_date,
+        force=effective_force,
+        existing_row_count=existing_rows,
+    )
 
     pack_info = pack_report_dir(report_dir)
     os.makedirs(archive_dir, exist_ok=True)
@@ -66,10 +87,7 @@ def pack_register_sync(
     if os.path.abspath(pack_info["zip_path"]) != os.path.abspath(dest_zip):
         shutil.copy2(pack_info["zip_path"], dest_zip)
 
-    data_js = os.path.join(report_dir, "data.js")
-    meta = parse_meta_from_data_js(data_js) if os.path.isfile(data_js) else {}
     meta["_sha256"] = pack_info["sha256"]
-    report_date = str(meta.get("date") or datetime.now().strftime("%Y-%m-%d"))[:10]
 
     st = os.stat(dest_zip)
     database.upsert_report_archive(
@@ -95,4 +113,9 @@ def pack_register_sync(
         "zip": dest_zip,
         "meta_count": meta.get("count"),
         "pg": pg_result,
+        "ingest_guard": {
+            "min_rows": min_ingest_row_count(),
+            "existing_row_count": existing_rows,
+            "forced": effective_force,
+        },
     }
