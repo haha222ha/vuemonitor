@@ -124,4 +124,30 @@ def login_member(username: str, password: str) -> dict:
         "access_token": token,
         "token_type": "bearer",
         "membership": profile,
+        "login_method": "password",
     }
+
+
+def login_member_by_code(auth_code: str) -> dict:
+    try:
+        profile = db.login_with_auth_code(auth_code)
+    except ValueError as e:
+        raise HTTPException(status_code=401, detail=str(e)) from e
+    token = create_token({"id": profile["id"], "username": profile["username"]})
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "membership": profile,
+        "login_method": "auth_code",
+    }
+
+
+def change_member_password(
+    user_id: int,
+    new_password: str,
+    current_password: str | None = None,
+) -> None:
+    try:
+        db.change_password(user_id, new_password, current_password=current_password)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e

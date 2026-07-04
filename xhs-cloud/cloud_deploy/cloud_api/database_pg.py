@@ -874,6 +874,60 @@ def register_with_auth_code(username: str, password: str, code: str) -> dict:
         conn.close()
 
 
+def login_with_auth_code(code: str) -> dict:
+    code = (code or "").strip()
+    if len(code) < 8:
+        raise ValueError("授权码格式不正确")
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            row = _fetch_auth_code(c, code)
+            if not row:
+                raise ValueError("授权码不存在")
+            c.execute(
+                """SELECT u.id, u.username
+                   FROM auth_code_activations aca
+                   JOIN users u ON u.id = aca.user_id
+                   WHERE aca.auth_code_id=%s
+                   ORDER BY aca.activated_at DESC, aca.id DESC
+                   LIMIT 1""",
+                (row["id"],),
+            )
+            user = c.fetchone()
+            if user:
+                profile = get_member_profile(user["id"])
+                if not profile:
+                    raise ValueError("账号数据异常，请联系管理员")
+                return profile
+            _validate_auth_code_row(row)
+            raise ValueError("授权码尚未开通，请使用「授权码开通」完成首次注册")
+    finally:
+        conn.close()
+
+
+def change_password(user_id: int, new_password: str, current_password: str | None = None) -> None:
+    if len(new_password or "") < 6:
+        raise ValueError("新密码至少 6 位")
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute("SELECT password_hash FROM users WHERE id=%s", (user_id,))
+            row = c.fetchone()
+            if not row:
+                raise ValueError("用户不存在")
+            if current_password and not _verify_password(current_password, row["password_hash"]):
+                raise ValueError("当前密码不正确")
+            c.execute(
+                "UPDATE users SET password_hash=%s WHERE id=%s",
+                (_hash_password(new_password), user_id),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+
+
 def renew_with_auth_code(user_id: int, code: str) -> dict:
     conn = _conn()
     try:

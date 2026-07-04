@@ -127,9 +127,20 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div class="tab" data-tab="register" onclick="switchTab('register')">授权码开通</div>
     </div>
     <div class="card" id="panelLogin">
-      <div class="field"><label>用户名</label><input id="loginUser" autocomplete="username" enterkeyhint="next"></div>
-      <div class="field"><label>密码</label><input id="loginPass" type="password" autocomplete="current-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <button class="btn btn-primary btn-block" onclick="doLogin()">登录</button>
+      <div class="seg" id="loginModeSeg" style="margin-bottom:16px">
+        <button type="button" class="active" data-mode="password" onclick="switchLoginMode('password')">账号密码</button>
+        <button type="button" data-mode="code" onclick="switchLoginMode('code')">授权码登录</button>
+      </div>
+      <div id="panelLoginPassword">
+        <div class="field"><label>用户名</label><input id="loginUser" autocomplete="username" enterkeyhint="next"></div>
+        <div class="field"><label>密码</label><input id="loginPass" type="password" autocomplete="current-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn btn-primary btn-block" onclick="doLogin()">登录</button>
+      </div>
+      <div id="panelLoginCode" class="hidden">
+        <div class="field"><label>授权码</label><input id="loginCode" placeholder="XHS-XXXX-XXXX-XXXX" autocomplete="off" enterkeyhint="go" onkeydown="if(event.key==='Enter')doLoginCode()"></div>
+        <button class="btn btn-primary btn-block" onclick="doLoginCode()">授权码登录</button>
+        <p style="font-size:12px;color:var(--text2);margin-top:12px">私发给您的授权码可直接登录，无需记住用户名密码。首次使用请切换到「授权码开通」注册。</p>
+      </div>
     </div>
     <div class="card hidden" id="panelRegister">
       <div class="field"><label>授权码</label><input id="regCode" placeholder="XHS-XXXX-XXXX-XXXX" autocomplete="off"></div>
@@ -149,6 +160,13 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div class="renew-box">
         <div class="field"><label>授权码续费</label><input id="renewCode" placeholder="输入新授权码延长会员" autocomplete="off"></div>
         <button class="btn btn-primary btn-block" onclick="doRenew()">续费</button>
+      </div>
+      <div class="renew-box">
+        <div class="section-title" style="margin-bottom:10px">修改密码</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">设置或修改登录密码后，下次可用「账号密码」登录。若忘记密码，仍可用授权码登录。</p>
+        <div class="field"><label>当前密码（可选）</label><input id="pwdCurrent" type="password" autocomplete="current-password" placeholder="记得旧密码时填写，忘记可留空"></div>
+        <div class="field"><label>新密码（至少 6 位）</label><input id="pwdNew" type="password" autocomplete="new-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doChangePassword()"></div>
+        <button class="btn btn-primary btn-block" onclick="doChangePassword()">保存新密码</button>
       </div>
     </div>
     <div class="card">
@@ -401,9 +419,17 @@ function showMsg(el, text, kind) {
 }
 
 function switchTab(name) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('#authView > .tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
   document.getElementById('panelLogin').classList.toggle('hidden', name !== 'login');
   document.getElementById('panelRegister').classList.toggle('hidden', name !== 'register');
+}
+
+function switchLoginMode(mode) {
+  document.querySelectorAll('#loginModeSeg button').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === mode);
+  });
+  document.getElementById('panelLoginPassword').classList.toggle('hidden', mode !== 'password');
+  document.getElementById('panelLoginCode').classList.toggle('hidden', mode !== 'code');
 }
 
 function fmtSize(n) {
@@ -693,6 +719,44 @@ async function doLogin() {
   }
 }
 
+async function doLoginCode() {
+  const authMsg = document.getElementById('authMsg');
+  const auth_code = document.getElementById('loginCode').value.trim();
+  try {
+    const res = await api('/api/v1/auth/login-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ auth_code })
+    });
+    const username = (res.membership && res.membership.username) || '';
+    saveSession(res.access_token, res.membership, username);
+    document.getElementById('loginCode').value = '';
+    await loadDashboard(false);
+    showMsg(authMsg, '', 'ok');
+  } catch (e) {
+    showMsg(authMsg, e.message, 'error');
+  }
+}
+
+async function doChangePassword() {
+  const dashMsg = document.getElementById('dashMsg');
+  const new_password = document.getElementById('pwdNew').value;
+  const current_password = document.getElementById('pwdCurrent').value;
+  try {
+    const res = await api('/api/v1/member/change-password', {
+      method: 'POST',
+      auth: true,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ new_password, current_password })
+    });
+    document.getElementById('pwdCurrent').value = '';
+    document.getElementById('pwdNew').value = '';
+    showMsg(dashMsg, res.message || '密码已更新', 'ok');
+  } catch (e) {
+    showMsg(dashMsg, e.message, 'error');
+  }
+}
+
 async function doRegister() {
   const authMsg = document.getElementById('authMsg');
   const username = document.getElementById('regUser').value.trim();
@@ -739,7 +803,7 @@ async function doRenew() {
 
   if (activated && cached && !token) {
     const authMsg = document.getElementById('authMsg');
-    showMsg(authMsg, `欢迎回来 ${cached.username || ''}，登录状态已过期，请输入密码重新登录（用户名已记住）`, 'warn');
+    showMsg(authMsg, `欢迎回来 ${cached.username || ''}，登录状态已过期。可用密码登录，或直接输入授权码登录`, 'warn');
     switchTab('login');
     return;
   }
@@ -753,7 +817,8 @@ async function doRenew() {
     const authMsg = document.getElementById('authMsg');
     if (cached) {
       renderProfile({ ...cached, is_active: false, expiry_warning: '登录已过期，请重新输入密码' });
-      showMsg(authMsg, '会话已过期，用户名已保留，请重新登录', 'warn');
+      showMsg(authMsg, '会话已过期，可用密码或授权码重新登录', 'warn');
+      switchLoginMode('code');
     }
   }
 })();

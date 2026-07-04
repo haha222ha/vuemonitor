@@ -23,9 +23,11 @@ from starlette.background import BackgroundTask
 
 from cloud_deploy.cloud_api import database as db
 from cloud_deploy.cloud_api.auth import (
+    change_member_password,
     current_member,
     create_token,
     login_member,
+    login_member_by_code,
     security,
     verify_agent_access,
     verify_sync_key,
@@ -46,6 +48,15 @@ def _startup():
 class LoginBody(BaseModel):
     username: str
     password: str
+
+
+class LoginCodeBody(BaseModel):
+    auth_code: str = Field(..., min_length=8, max_length=64)
+
+
+class ChangePasswordBody(BaseModel):
+    new_password: str = Field(..., min_length=6, max_length=128)
+    current_password: str = Field(default="")
 
 
 class RegisterBody(BaseModel):
@@ -235,6 +246,11 @@ def login(body: LoginBody):
     return login_member(body.username, body.password)
 
 
+@app.post("/api/v1/auth/login-code")
+def login_with_code(body: LoginCodeBody):
+    return login_member_by_code(body.auth_code)
+
+
 @app.post("/api/v1/auth/register")
 def register(body: RegisterBody):
     try:
@@ -269,6 +285,13 @@ def member_profile(user: dict = Depends(current_member)):
     if not profile:
         raise HTTPException(status_code=404, detail="用户不存在")
     return profile
+
+
+@app.post("/api/v1/member/change-password")
+def member_change_password(body: ChangePasswordBody, user: dict = Depends(current_member)):
+    current = body.current_password.strip() or None
+    change_member_password(user["id"], body.new_password, current_password=current)
+    return {"message": "密码已更新，下次可使用新密码登录"}
 
 
 @app.get("/api/v1/member/reports")
