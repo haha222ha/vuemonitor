@@ -312,6 +312,59 @@ def fetch_premium_goods_by_ids(conn, goods_ids: list[str]) -> list[dict]:
     return out
 
 
+_DAILY_FETCH_COLS = (
+    "goods_id",
+    "snap_date",
+    "sold_num",
+    "deal_price",
+    "delta",
+    "actual_delta",
+    "velocity_1d",
+    "source",
+    "created_at",
+)
+
+
+def fetch_premium_goods_daily_by_ids(
+    conn,
+    goods_ids: list[str],
+    since_date: str = "",
+    max_rows: int = 25000,
+) -> dict:
+    """按 goods_id 批量拉取 premium_goods_daily 日快照（云 → 本地 pull）。"""
+    ids = [str(g).strip() for g in goods_ids if g and len(str(g)) >= 5]
+    if not ids:
+        return {"rows": [], "count": 0, "since_date": since_date, "max_rows": max_rows}
+    cap = max(1, min(int(max_rows or 25000), 50000))
+    since = (since_date or "").strip()[:10]
+    col_sql = ", ".join(_DAILY_FETCH_COLS)
+    out: list[dict] = []
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        for i in range(0, len(ids), 500):
+            if len(out) >= cap:
+                break
+            chunk = ids[i : i + 500]
+            ph = ", ".join("%s" for _ in chunk)
+            params: list = list(chunk)
+            sql = f"SELECT {col_sql} FROM premium_goods_daily WHERE goods_id IN ({ph})"
+            if since:
+                sql += " AND snap_date >= %s"
+                params.append(since)
+            sql += " ORDER BY goods_id, snap_date ASC LIMIT %s"
+            params.append(cap - len(out))
+            c.execute(sql, params)
+            names = [d[0] for d in c.description]
+            for row in c.fetchall():
+                item = {names[j]: row[j] for j in range(len(names))}
+                if item.get("snap_date") is not None:
+                    item["snap_date"] = str(item["snap_date"])[:10]
+                out.append(item)
+                if len(out) >= cap:
+                    break
+    return {"rows": out, "count": len(out), "since_date": since_date, "max_rows": max_rows}
+
+
 def apply_premium_goods_batch(conn, rows: list[dict]) -> int:
     return int(apply_premium_upsert(conn, rows).get("accepted") or 0)
 
