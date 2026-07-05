@@ -691,24 +691,26 @@ def get_member_profile(user_id: int) -> dict | None:
 
 
 def list_report_library() -> dict:
-    from cloud_deploy.reporting.constants import (
-        ARCHIVE_CUSTOM,
-        ARCHIVE_DAILY,
-        ARCHIVE_MONTHLY,
-        ARCHIVE_WEEKLY,
-    )
-
-    daily = list_archives(ARCHIVE_DAILY)
-    weekly = list_archives(ARCHIVE_WEEKLY)
-    monthly = list_archives(ARCHIVE_MONTHLY)
-    custom = list_archives(ARCHIVE_CUSTOM)
-    return {
-        "daily": daily,
-        "weekly": weekly,
-        "monthly": monthly,
-        "custom": custom,
-        "total_count": len(daily) + len(weekly) + len(monthly) + len(custom),
+    """全部历史报告库（日报 + 周报 + 月报 + 定制）。"""
+    archive_map = {
+        "daily": "member_daily_zip",
+        "weekly": "member_weekly_zip",
+        "monthly": "member_monthly_zip",
+        "custom": "member_custom_zip",
     }
+    out: dict = {}
+    total = 0
+    for key, archive_type in archive_map.items():
+        try:
+            rows = list_archives(archive_type)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning("list_archives(%s) failed: %s", archive_type, e)
+            rows = []
+        out[key] = rows
+        total += len(rows)
+    out["total_count"] = total
+    return out
 
 
 def list_member_watchlist(user_id: int, limit: int = 500) -> list:

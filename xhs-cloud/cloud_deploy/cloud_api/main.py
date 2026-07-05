@@ -327,9 +327,16 @@ def member_reports(
 @app.get("/api/v1/member/library")
 def member_library(user: dict = Depends(current_member)):
     """全部历史报告库（日报 + 周报 + 月报）。"""
-    library = db.list_report_library()
-    profile = db.get_member_profile(user["id"])
-    return {"membership": profile, "library": library}
+    import logging
+
+    logger = logging.getLogger(__name__)
+    try:
+        library = db.list_report_library()
+        profile = db.get_member_profile(user["id"])
+        return {"membership": profile, "library": library}
+    except Exception as e:
+        logger.exception("member_library failed for user_id=%s", user.get("id"))
+        raise HTTPException(status_code=500, detail=f"报告库加载失败: {e}") from e
 
 
 @app.get("/api/v1/member/watchlist")

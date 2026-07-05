@@ -531,25 +531,32 @@ def list_archives(archive_type: str = "member_daily_zip") -> list[dict]:
             )
             rows = []
             for r in c.fetchall():
-                meta = r["meta_json"] or {}
-                if isinstance(meta, str):
-                    meta = json.loads(meta)
+                meta = r.get("meta_json") if isinstance(r, dict) else r["meta_json"]
+                if not meta:
+                    meta = {}
+                elif isinstance(meta, str):
+                    try:
+                        meta = json.loads(meta) or {}
+                    except Exception:
+                        meta = {}
+                rd = r.get("report_date") if isinstance(r, dict) else r["report_date"]
+                report_date = rd.isoformat() if hasattr(rd, "isoformat") else (str(rd)[:10] if rd else "")
+                fn = (r.get("file_name") if isinstance(r, dict) else r["file_name"]) or ""
+                atype = (r.get("archive_type") if isinstance(r, dict) else r["archive_type"]) or archive_type
                 summary = meta.get("filter_label") or meta.get("set_label") or meta.get("title")
                 if not summary:
-                    summary = archive_display_label(
-                        r["report_date"].isoformat(),
-                        r["archive_type"],
-                        r["file_name"] or "",
-                    )
+                    summary = archive_display_label(report_date, atype, fn)
+                pub = r.get("published_at") if isinstance(r, dict) else r["published_at"]
+                published_at = pub.isoformat() if hasattr(pub, "isoformat") else (str(pub) if pub else "")
                 rows.append(
                     {
-                        "report_date": r["report_date"].isoformat(),
-                        "archive_type": r["archive_type"],
-                        "file_name": r["file_name"],
-                        "file_size_bytes": r["file_size_bytes"],
-                        "row_count": r["row_count"],
+                        "report_date": report_date,
+                        "archive_type": atype,
+                        "file_name": fn,
+                        "file_size_bytes": r.get("file_size_bytes") if isinstance(r, dict) else r["file_size_bytes"],
+                        "row_count": r.get("row_count") if isinstance(r, dict) else r["row_count"],
                         "summary": summary,
-                        "published_at": r["published_at"].isoformat() if r["published_at"] else "",
+                        "published_at": published_at,
                     }
                 )
             return rows
@@ -1023,24 +1030,26 @@ def get_member_profile(user_id: int) -> dict | None:
 
 
 def list_report_library() -> dict:
-    from cloud_deploy.reporting.constants import (
-        ARCHIVE_CUSTOM,
-        ARCHIVE_DAILY,
-        ARCHIVE_MONTHLY,
-        ARCHIVE_WEEKLY,
-    )
-
-    daily = list_archives(ARCHIVE_DAILY)
-    weekly = list_archives(ARCHIVE_WEEKLY)
-    monthly = list_archives(ARCHIVE_MONTHLY)
-    custom = list_archives(ARCHIVE_CUSTOM)
-    return {
-        "daily": daily,
-        "weekly": weekly,
-        "monthly": monthly,
-        "custom": custom,
-        "total_count": len(daily) + len(weekly) + len(monthly) + len(custom),
+    """全部历史报告库（日报 + 周报 + 月报 + 定制）。"""
+    archive_map = {
+        "daily": "member_daily_zip",
+        "weekly": "member_weekly_zip",
+        "monthly": "member_monthly_zip",
+        "custom": "member_custom_zip",
     }
+    out: dict = {}
+    total = 0
+    for key, archive_type in archive_map.items():
+        try:
+            rows = list_archives(archive_type)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning("list_archives(%s) failed: %s", archive_type, e)
+            rows = []
+        out[key] = rows
+        total += len(rows)
+    out["total_count"] = total
+    return out
 
 
 def list_member_watchlist(user_id: int, limit: int = 500) -> list:
