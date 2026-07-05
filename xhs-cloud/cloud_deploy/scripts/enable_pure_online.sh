@@ -120,9 +120,25 @@ systemctl list-timers --no-pager 'xhs-*' 2>/dev/null || systemctl list-timers --
 
 echo ""
 log "健康检查"
-sleep 2
 PORT="${XHS_CLOUD_PORT:-8080}"
-curl -sf "http://127.0.0.1:${PORT}/api/v1/health" && ok "API :${PORT} 正常" || warn "API 未响应"
+HEALTH_URL="http://127.0.0.1:${PORT}/api/v1/health"
+sleep 3
+HEALTH_OK=0
+for i in $(seq 1 30); do
+  if systemctl is-active --quiet xhs-cloud-api.service 2>/dev/null; then
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" 2>/dev/null || echo "000")
+    CODE="${CODE//$'\n'/}"
+    if [ "$CODE" = "200" ]; then
+      ok "API :${PORT} HTTP 200 (${i} 次尝试)"
+      HEALTH_OK=1
+      break
+    fi
+  fi
+  sleep 3
+done
+if [ "$HEALTH_OK" != 1 ]; then
+  warn "API 未响应（已等待约 90s）"
+fi
 
 echo ""
 echo "  ── 纯线上流水线 ──"

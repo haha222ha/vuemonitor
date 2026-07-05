@@ -129,12 +129,26 @@ if [[ "${XHS_SNAPSHOT_RETENTION_DAYS:-0}" == "0" ]] \
 fi
 
 log "健康检查"
-sleep 2
 PORT="${XHS_CLOUD_PORT:-8080}"
-if curl -sf "http://127.0.0.1:${PORT}/api/v1/health" >/dev/null; then
-  ok "API http://127.0.0.1:${PORT}/api/v1/health"
-else
-  warn "API 未响应，请 systemctl status xhs-cloud-api"
+HEALTH_URL="http://127.0.0.1:${PORT}/api/v1/health"
+HEALTH_OK=0
+# 2G 主机 API 冷启动较慢：重启后先等 systemd active，再轮询最多约 90s
+sleep 3
+for i in $(seq 1 30); do
+  if systemctl is-active --quiet xhs-cloud-api.service 2>/dev/null; then
+    CODE=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" 2>/dev/null || echo "000")
+    CODE="${CODE//$'\n'/}"
+    if [ "$CODE" = "200" ]; then
+      ok "API $HEALTH_URL HTTP 200 (${i} 次尝试)"
+      HEALTH_OK=1
+      break
+    fi
+  fi
+  sleep 3
+done
+if [ "$HEALTH_OK" != 1 ]; then
+  warn "API 未响应（已等待约 90s），请 systemctl status xhs-cloud-api"
+  sudo systemctl status xhs-cloud-api --no-pager -l 2>/dev/null | tail -12 || true
 fi
 
 if command -v nginx &>/dev/null && [ -f /etc/nginx/sites-enabled/xhs-monitor.conf ]; then
