@@ -86,7 +86,7 @@ class BatchDownloadBody(BaseModel):
 
 
 _MEMBER_ARCHIVE_TYPES = frozenset(
-    {"member_daily_zip", "member_weekly_zip", "member_monthly_zip"}
+    {"member_daily_zip", "member_weekly_zip", "member_monthly_zip", "member_custom_zip"}
 )
 
 
@@ -382,6 +382,43 @@ def download_report(
         media_type="application/zip",
         filename=os.path.basename(path),
     )
+
+
+@app.get("/member/preview", response_class=HTMLResponse)
+def member_preview_page():
+    path = os.path.join(_ASSETS, "member_preview.html")
+    if not os.path.isfile(path):
+        raise HTTPException(status_code=404, detail="预览页未部署")
+    return FileResponse(path, media_type="text/html; charset=utf-8")
+
+
+@app.get("/api/v1/member/reports/{report_date}/view/{file_path:path}")
+def member_report_view_file(
+    report_date: str,
+    file_path: str,
+    archive_type: str = "member_daily_zip",
+    access_token: str = "",
+    request: Request = None,
+    cred: HTTPAuthorizationCredentials | None = Depends(security),
+):
+    from cloud_deploy.cloud_api.auth import member_from_token
+    from cloud_deploy.cloud_api.member_report_preview import guess_media_type, resolve_member_report_file
+
+    if archive_type not in _MEMBER_ARCHIVE_TYPES:
+        raise HTTPException(status_code=400, detail="无效的报告类型")
+    token = (cred.credentials if cred else None) or (access_token or "").strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="需要登录")
+    user = member_from_token(token)
+    try:
+        path = resolve_member_report_file(report_date, archive_type, file_path)
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e) or "文件不存在") from e
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    ip = request.client.host if request and request.client else ""
+    db.log_download(user["id"], report_date, archive_type, ip)
+    return FileResponse(path, media_type=guess_media_type(path))
 
 
 def _remove_temp_file(path: str) -> None:

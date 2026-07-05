@@ -128,7 +128,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <li>报告含<strong>实体 + 虚拟</strong>商品：实体门槛 v1d&gt;5，虚拟门槛 v1d&gt;1（同一份 zip）</li>
     </ul>
     <div class="notice-tip">
-      下载 zip 后解压，<strong>右键 index_with_gr.html → 打开方式 → Google Chrome</strong> 查看（支持手机浏览器）。
+      下载 zip 后解压，<strong>右键 index_with_gr.html → Chrome 打开</strong> 查看；也可点 <strong>在线预览</strong> 直接在浏览器看（支持 Vue / 表格切换）。
       历史报告在会员有效期内均可重复下载。
     </div>
   </div>
@@ -195,6 +195,10 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
         <button data-type="monthly" onclick="setType('monthly')">月报</button>
         <button data-type="custom" onclick="setType('custom')">定制词库</button>
       </div>
+      <div class="seg" id="viewModeSeg" style="margin-top:10px">
+        <button type="button" data-entry="index_vue.html" class="active" onclick="setViewMode('index_vue.html')">Vue 列表</button>
+        <button type="button" data-entry="index_with_gr.html" onclick="setViewMode('index_with_gr.html')">表格 GR</button>
+      </div>
       <div id="batchBar" class="batch-bar hidden">
         <label style="display:inline-flex;align-items:center;gap:6px;font-size:14px;cursor:pointer">
           <input type="checkbox" class="report-check" id="selectAllCb" onchange="toggleSelectAll(this.checked)"> 全选
@@ -230,6 +234,7 @@ const STORAGE = {
   username: 'xhs_member_username',
   profile: 'xhs_member_profile',
   reportType: 'xhs_member_report_type',
+  viewMode: 'xhs_member_view_mode',
   activated: 'xhs_member_activated',
 };
 
@@ -552,7 +557,7 @@ function renderReportRows(items, at, month) {
     table += `<tr>
       ${checkCell}
       <td>${date}</td><td>${summary}</td><td>${rows}</td><td>${size}</td>
-      <td><button class="btn btn-primary" style="padding:8px 14px;font-size:13px;min-height:36px" onclick="downloadReport('${safeDate}','${at}', this)">下载</button></td>
+      <td><button class="btn btn-ghost" style="padding:8px 12px;font-size:13px;min-height:36px;margin-right:6px" onclick="previewReport('${safeDate}','${at}')">预览</button><button class="btn btn-primary" style="padding:8px 14px;font-size:13px;min-height:36px" onclick="downloadReport('${safeDate}','${at}', this)">下载</button></td>
     </tr>`;
     cards += `<div class="report-card">
       <div class="rc-top">
@@ -561,6 +566,7 @@ function renderReportRows(items, at, month) {
           <span class="rc-date">${date}</span>
         </label>
         <div class="rc-actions">
+          <button class="btn btn-ghost" style="min-height:36px;padding:8px 12px;font-size:13px" onclick="previewReport('${safeDate}','${at}')">预览</button>
           <button class="btn btn-primary" style="min-height:36px;padding:8px 16px;font-size:13px" onclick="downloadReport('${safeDate}','${at}', this)">下载</button>
         </div>
       </div>
@@ -619,6 +625,28 @@ function setType(t) {
   saveStored(STORAGE.reportType, t);
   document.querySelectorAll('#typeSeg button').forEach(b => b.classList.toggle('active', b.dataset.type === t));
   renderReports();
+}
+
+function currentViewMode() {
+  return loadStored(STORAGE.viewMode) || 'index_vue.html';
+}
+
+function setViewMode(entry) {
+  saveStored(STORAGE.viewMode, entry || 'index_vue.html');
+  document.querySelectorAll('#viewModeSeg button').forEach(b => b.classList.toggle('active', b.dataset.entry === entry));
+}
+
+function previewReport(date, archiveType) {
+  const t = loadStored(STORAGE.token);
+  if (!t) {
+    showMsg(document.getElementById('dashMsg'), '请先登录', 'error');
+    return;
+  }
+  const entry = currentViewMode();
+  const url = '/member/preview?date=' + encodeURIComponent(String(date || '').slice(0, 10))
+    + '&archive_type=' + encodeURIComponent(archiveType)
+    + '&entry=' + encodeURIComponent(entry);
+  window.open(url, '_blank', 'noopener');
 }
 
 async function downloadReport(date, archiveType, btnEl) {
@@ -839,6 +867,7 @@ async function loadDashboard(useCacheFirst) {
       b.classList.toggle('active', b.dataset.type === savedType);
     });
   }
+  setViewMode(currentViewMode());
   renderReports();
   showDashboard(data.membership);
 }
