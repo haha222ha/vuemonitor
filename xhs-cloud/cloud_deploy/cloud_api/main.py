@@ -28,6 +28,7 @@ from cloud_deploy.cloud_api.auth import (
     create_token,
     login_member,
     login_member_by_code,
+    refresh_member_token,
     security,
     verify_agent_access,
     verify_sync_key,
@@ -67,6 +68,16 @@ class RegisterBody(BaseModel):
 
 class ActivateBody(BaseModel):
     auth_code: str = Field(..., min_length=8, max_length=64)
+
+
+class WatchlistUpsertBody(BaseModel):
+    goods_ids: list[str] = Field(default_factory=list, max_length=500)
+    items: list[dict] = Field(default_factory=list, max_length=500)
+    source: str = ""
+
+
+class WatchlistDeleteBody(BaseModel):
+    goods_ids: list[str] = Field(..., min_length=1, max_length=500)
 
 
 class BatchDownloadBody(BaseModel):
@@ -279,6 +290,17 @@ def activate_code(body: ActivateBody, user: dict = Depends(current_member)):
     return {"membership": profile, "message": "续费成功"}
 
 
+@app.post("/api/v1/auth/refresh")
+def refresh_token(
+    cred: HTTPAuthorizationCredentials | None = Depends(security),
+    access_token: str = "",
+):
+    token = (cred.credentials if cred else None) or (access_token or "").strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="需要登录")
+    return refresh_member_token(token)
+
+
 @app.get("/api/v1/member/profile")
 def member_profile(user: dict = Depends(current_member)):
     profile = db.get_member_profile(user["id"])
@@ -308,6 +330,32 @@ def member_library(user: dict = Depends(current_member)):
     library = db.list_report_library()
     profile = db.get_member_profile(user["id"])
     return {"membership": profile, "library": library}
+
+
+@app.get("/api/v1/member/watchlist")
+def member_watchlist(
+    limit: int = 500,
+    user: dict = Depends(current_member),
+):
+    items = db.list_member_watchlist(user["id"], limit=min(max(limit, 1), 2000))
+    return {"items": items, "count": len(items)}
+
+
+@app.post("/api/v1/member/watchlist")
+def member_watchlist_upsert(body: WatchlistUpsertBody, user: dict = Depends(current_member)):
+    items = body.items or []
+    if body.goods_ids and not items:
+        items = [{"goods_id": gid.strip()} for gid in body.goods_ids if str(gid).strip()]
+    if not items:
+        raise HTTPException(status_code=400, detail="缺少 goods_ids 或 items")
+    result = db.upsert_member_watchlist(user["id"], items, source=body.source or "")
+    return {"message": "收藏已同步", **result}
+
+
+@app.delete("/api/v1/member/watchlist")
+def member_watchlist_delete(body: WatchlistDeleteBody, user: dict = Depends(current_member)):
+    removed = db.delete_member_watchlist(user["id"], body.goods_ids)
+    return {"message": f"已移除 {removed} 项", "removed": removed}
 
 
 @app.get("/api/v1/member/reports/{report_date}/download")

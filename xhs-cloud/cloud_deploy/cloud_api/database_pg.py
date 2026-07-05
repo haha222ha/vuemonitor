@@ -150,6 +150,18 @@ def _init_db_on_conn(conn) -> None:
                     downloaded_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                     ip INET
                 );
+                CREATE TABLE IF NOT EXISTS member_watchlist (
+                    id SERIAL PRIMARY KEY,
+                    user_id INT NOT NULL REFERENCES users(id),
+                    goods_id VARCHAR(64) NOT NULL,
+                    title TEXT,
+                    store_name TEXT,
+                    source TEXT,
+                    meta_json JSONB,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    UNIQUE(user_id, goods_id)
+                );
                 CREATE TABLE IF NOT EXISTS report_daily_meta (
                     report_date DATE PRIMARY KEY,
                     row_count INT,
@@ -1015,3 +1027,96 @@ def list_report_library() -> dict:
         "monthly": monthly,
         "total_count": len(daily) + len(weekly) + len(monthly),
     }
+
+
+def list_member_watchlist(user_id: int, limit: int = 500) -> list:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """SELECT goods_id, title, store_name, source, meta_json, created_at, updated_at
+                   FROM member_watchlist
+                   WHERE user_id=%s
+                   ORDER BY updated_at DESC
+                   LIMIT %s""",
+                (user_id, limit),
+            )
+            rows = c.fetchall()
+        out = []
+        for r in rows:
+            item = {
+                "goods_id": r["goods_id"],
+                "title": r.get("title") or "",
+                "store_name": r.get("store_name") or "",
+                "source": r.get("source") or "",
+                "created_at": r["created_at"].isoformat() if r.get("created_at") else "",
+                "updated_at": r["updated_at"].isoformat() if r.get("updated_at") else "",
+            }
+            meta = r.get("meta_json")
+            if isinstance(meta, dict):
+                item["meta"] = meta
+            out.append(item)
+        return out
+    finally:
+        conn.close()
+
+
+def upsert_member_watchlist(user_id: int, items: list, source: str = "") -> dict:
+    if not items:
+        return {"upserted": 0}
+    conn = _conn()
+    upserted = 0
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            for raw in items:
+                if not isinstance(raw, dict):
+                    continue
+                gid = str(raw.get("goods_id") or raw.get("product_id") or "").strip()
+                if not gid:
+                    continue
+                title = str(raw.get("title") or raw.get("product_name") or "")[:500]
+                store = str(raw.get("store_name") or "")[:256]
+                src = str(raw.get("source") or source or "")[:128]
+                meta = {
+                    k: raw[k]
+                    for k in ("price", "sold", "actual_v1d", "report_id", "report_date")
+                    if raw.get(k) is not None
+                }
+                c.execute(
+                    """INSERT INTO member_watchlist
+                       (user_id, goods_id, title, store_name, source, meta_json, updated_at)
+                       VALUES (%s,%s,%s,%s,%s,%s,NOW())
+                       ON CONFLICT (user_id, goods_id) DO UPDATE SET
+                         title=EXCLUDED.title,
+                         store_name=EXCLUDED.store_name,
+                         source=CASE WHEN EXCLUDED.source<>'' THEN EXCLUDED.source ELSE member_watchlist.source END,
+                         meta_json=EXCLUDED.meta_json,
+                         updated_at=NOW()""",
+                    (user_id, gid, title, store, src, json.dumps(meta) if meta else None),
+                )
+                upserted += 1
+        conn.commit()
+        return {"upserted": upserted}
+    finally:
+        conn.close()
+
+
+def delete_member_watchlist(user_id: int, goods_ids: list) -> int:
+    clean = [str(g).strip() for g in goods_ids if str(g).strip()]
+    if not clean:
+        return 0
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                "DELETE FROM member_watchlist WHERE user_id=%s AND goods_id = ANY(%s)",
+                (user_id, clean),
+            )
+            removed = c.rowcount
+        conn.commit()
+        return removed
+    finally:
+        conn.close()

@@ -42,6 +42,20 @@ def create_token(user: dict, ttl_hours: int | None = None) -> str:
 
 
 def decode_token(token: str) -> dict[str, Any]:
+    return _decode_token_payload(token, allow_expired=False)
+
+
+def decode_token_graceful(token: str, grace_seconds: int = 7 * 86400) -> dict[str, Any]:
+    """允许 JWT 过期后在 grace 窗口内刷新。"""
+    return _decode_token_payload(token, allow_expired=True, grace_seconds=grace_seconds)
+
+
+def _decode_token_payload(
+    token: str,
+    *,
+    allow_expired: bool = False,
+    grace_seconds: int = 0,
+) -> dict[str, Any]:
     s = get_settings()
     try:
         h, p, sig = token.split(".")
@@ -55,9 +69,14 @@ def decode_token(token: str) -> dict[str, Any]:
             raise ValueError("bad sig")
         pad = "=" * (-len(p) % 4)
         payload = json.loads(base64.urlsafe_b64decode(p + pad))
-        if payload.get("exp", 0) < time.time():
-            raise ValueError("expired")
+        exp = int(payload.get("exp", 0) or 0)
+        now = int(time.time())
+        if exp and exp < now:
+            if not allow_expired or exp + grace_seconds < now:
+                raise ValueError("expired")
         return payload
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=401, detail=f"无效令牌: {e}") from e
 
@@ -139,6 +158,22 @@ def login_member_by_code(auth_code: str) -> dict:
         "token_type": "bearer",
         "membership": profile,
         "login_method": "auth_code",
+    }
+
+
+def refresh_member_token(token: str) -> dict:
+    payload = decode_token_graceful(token)
+    uid = int(payload["sub"])
+    profile = db.get_member_profile(uid)
+    if not profile:
+        raise HTTPException(status_code=401, detail="用户不存在")
+    if not profile.get("is_active"):
+        raise HTTPException(status_code=402, detail="会员已过期或停用")
+    new_token = create_token({"id": uid, "username": profile["username"]})
+    return {
+        "access_token": new_token,
+        "token_type": "bearer",
+        "membership": profile,
     }
 
 

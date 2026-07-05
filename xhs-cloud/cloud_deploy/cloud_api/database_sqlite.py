@@ -81,6 +81,19 @@ def init_db() -> None:
             downloaded_at TEXT NOT NULL,
             ip TEXT
         );
+        CREATE TABLE IF NOT EXISTS member_watchlist (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            goods_id TEXT NOT NULL,
+            title TEXT,
+            store_name TEXT,
+            source TEXT,
+            meta_json TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            UNIQUE(user_id, goods_id),
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        );
         """
     )
     _migrate_legacy_columns(c)
@@ -682,3 +695,87 @@ def list_report_library() -> dict:
         "monthly": monthly,
         "total_count": len(daily) + len(weekly) + len(monthly),
     }
+
+
+def list_member_watchlist(user_id: int, limit: int = 500) -> list:
+    conn = _conn()
+    rows = conn.execute(
+        """SELECT goods_id, title, store_name, source, meta_json, created_at, updated_at
+           FROM member_watchlist
+           WHERE user_id=?
+           ORDER BY updated_at DESC
+           LIMIT ?""",
+        (user_id, limit),
+    ).fetchall()
+    conn.close()
+    out = []
+    for r in rows:
+        item = {
+            "goods_id": r["goods_id"],
+            "title": r["title"] or "",
+            "store_name": r["store_name"] or "",
+            "source": r["source"] or "",
+            "created_at": r["created_at"] or "",
+            "updated_at": r["updated_at"] or "",
+        }
+        if r["meta_json"]:
+            try:
+                item["meta"] = json.loads(r["meta_json"])
+            except Exception:
+                pass
+        out.append(item)
+    return out
+
+
+def upsert_member_watchlist(user_id: int, items: list, source: str = "") -> dict:
+    if not items:
+        return {"upserted": 0}
+    conn = _conn()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    upserted = 0
+    for raw in items:
+        if not isinstance(raw, dict):
+            continue
+        gid = str(raw.get("goods_id") or raw.get("product_id") or "").strip()
+        if not gid:
+            continue
+        title = str(raw.get("title") or raw.get("product_name") or "")[:500]
+        store = str(raw.get("store_name") or "")[:256]
+        src = str(raw.get("source") or source or "")[:128]
+        meta = {
+            k: raw[k]
+            for k in ("price", "sold", "actual_v1d", "report_id", "report_date")
+            if raw.get(k) is not None
+        }
+        conn.execute(
+            """INSERT INTO member_watchlist
+               (user_id, goods_id, title, store_name, source, meta_json, created_at, updated_at)
+               VALUES (?,?,?,?,?,?,?,?)
+               ON CONFLICT(user_id, goods_id) DO UPDATE SET
+                 title=excluded.title,
+                 store_name=excluded.store_name,
+                 source=CASE WHEN excluded.source<>'' THEN excluded.source ELSE member_watchlist.source END,
+                 meta_json=excluded.meta_json,
+                 updated_at=excluded.updated_at""",
+            (user_id, gid, title, store, src, json.dumps(meta) if meta else None, now, now),
+        )
+        upserted += 1
+    conn.commit()
+    conn.close()
+    return {"upserted": upserted}
+
+
+def delete_member_watchlist(user_id: int, goods_ids: list) -> int:
+    clean = [str(g).strip() for g in goods_ids if str(g).strip()]
+    if not clean:
+        return 0
+    conn = _conn()
+    placeholders = ",".join("?" * len(clean))
+    cur = conn.execute(
+        f"DELETE FROM member_watchlist WHERE user_id=? AND goods_id IN ({placeholders})",
+        [user_id, *clean],
+    )
+    removed = cur.rowcount
+    conn.commit()
+    conn.close()
+    return removed
