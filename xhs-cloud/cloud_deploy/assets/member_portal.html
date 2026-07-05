@@ -93,6 +93,17 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 .month-header .month-check{display:inline-flex;align-items:center;margin-right:2px}
 .report-card .rc-top{align-items:center}
 .report-card .rc-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.watchlist-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.watchlist-table{width:100%;border-collapse:collapse;font-size:13px;min-width:640px}
+.watchlist-table th,.watchlist-table td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.watchlist-table th{color:var(--text2);font-weight:500;font-size:12px}
+.watchlist-title{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.watchlist-gid{font-family:ui-monospace,monospace;font-size:11px;color:var(--text2)}
+.watchlist-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn-xs{padding:6px 10px;min-height:32px;font-size:12px;border-radius:8px}
+.dash-tabs{display:flex;gap:8px;margin-bottom:16px}
+.dash-tab{flex:1;text-align:center;padding:10px 12px;border-radius:20px;font-size:14px;cursor:pointer;background:#e8e8ed;color:var(--text2)}
+.dash-tab.active{background:var(--accent);color:#fff}
 </style>
 </head>
 <body>
@@ -112,6 +123,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <li><strong>日报</strong>：每天 <strong>18:00</strong>（北京时间）自动生成，一般 18:00～18:10 内可下载</li>
       <li><strong>周报</strong>：每周日 <strong>18:00</strong> 生成（汇总当周数据）</li>
       <li><strong>月报</strong>：每月 <strong>1 日 18:00</strong> 生成（汇总上月数据）</li>
+      <li><strong>定制词库</strong>：按词库生成的选品报告，推送后可在「定制词库」Tab 下载</li>
       <li>当日 18:00 前若列表暂无「今天」的日报，属正常情况，请稍后再来</li>
       <li>报告含<strong>实体 + 虚拟</strong>商品：实体门槛 v1d&gt;5，虚拟门槛 v1d&gt;1（同一份 zip）</li>
     </ul>
@@ -154,6 +166,10 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 
   <div id="dashView" class="hidden">
     <div id="expiryBanner"></div>
+    <div class="dash-tabs">
+      <div class="dash-tab active" data-dash="reports" onclick="switchDash('reports')">报告库</div>
+      <div class="dash-tab" data-dash="watchlist" onclick="switchDash('watchlist')">我的收藏</div>
+    </div>
     <div class="card">
       <div class="section-title">会员信息</div>
       <div class="profile-grid" id="profileGrid"></div>
@@ -169,6 +185,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
         <button class="btn btn-primary btn-block" onclick="doChangePassword()">保存新密码</button>
       </div>
     </div>
+    <div id="dashReports">
     <div class="card">
       <div class="section-title">报告库</div>
       <p style="font-size:13px;color:var(--text2);margin:8px 0 14px">有效期内可下载全部已发布报告（含历史往期）。按<strong>月份</strong>分组，<strong>本月默认展开</strong>，往期点击月份可展开/折叠。</p>
@@ -176,6 +193,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
         <button class="active" data-type="daily" onclick="setType('daily')">日报</button>
         <button data-type="weekly" onclick="setType('weekly')">周报</button>
         <button data-type="monthly" onclick="setType('monthly')">月报</button>
+        <button data-type="custom" onclick="setType('custom')">定制词库</button>
       </div>
       <div id="batchBar" class="batch-bar hidden">
         <label style="display:inline-flex;align-items:center;gap:6px;font-size:14px;cursor:pointer">
@@ -186,6 +204,22 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
         <button class="btn btn-ghost" onclick="clearSelection()">取消选择</button>
       </div>
       <div id="reportTable"></div>
+    </div>
+    </div>
+    <div id="dashWatchlist" class="hidden">
+    <div class="card">
+      <div class="section-title">我的收藏</div>
+      <p style="font-size:13px;color:var(--text2);margin:8px 0 14px">与 PC 端 ProductAnalyzer 共享收藏夹。在 PC 报告页勾选商品点「同步收藏」后，此处与 Web 均可查看。</p>
+      <div class="batch-bar" id="watchlistBar">
+        <label style="display:inline-flex;align-items:center;gap:6px;font-size:14px;cursor:pointer">
+          <input type="checkbox" id="watchlistSelectAll" onchange="toggleWatchlistAll(this.checked)"> 全选
+        </label>
+        <span class="selected-count" id="watchlistSelectedCount">已选 0 项</span>
+        <button class="btn btn-primary btn-xs" id="btnWatchlistRemove" onclick="removeSelectedWatchlist()" disabled>移除选中</button>
+        <button class="btn btn-ghost btn-xs" onclick="loadWatchlist()">刷新</button>
+      </div>
+      <div id="watchlistTable"></div>
+    </div>
     </div>
     <div id="dashMsg"></div>
   </div>
@@ -199,10 +233,21 @@ const STORAGE = {
   activated: 'xhs_member_activated',
 };
 
-let library = { daily: [], weekly: [], monthly: [] };
+let library = { daily: [], weekly: [], monthly: [], custom: [] };
 let currentType = 'daily';
+let currentDash = 'reports';
 let monthExpandState = {};
 let selectedReports = new Set();
+let watchlistItems = [];
+let watchlistSelected = new Set();
+
+function switchDash(name) {
+  currentDash = name || 'reports';
+  document.querySelectorAll('.dash-tab').forEach(t => t.classList.toggle('active', t.dataset.dash === currentDash));
+  document.getElementById('dashReports').classList.toggle('hidden', currentDash !== 'reports');
+  document.getElementById('dashWatchlist').classList.toggle('hidden', currentDash !== 'watchlist');
+  if (currentDash === 'watchlist') loadWatchlist();
+}
 
 function reportKey(date, archiveType) {
   return archiveType + ':' + String(date || '').slice(0, 10);
@@ -476,6 +521,7 @@ function renderProfile(m) {
 function archiveTypeFor(t) {
   if (t === 'weekly') return 'member_weekly_zip';
   if (t === 'monthly') return 'member_monthly_zip';
+  if (t === 'custom') return 'member_custom_zip';
   return 'member_daily_zip';
 }
 
@@ -486,6 +532,7 @@ function reportLabel(it) {
   if (/^(全量|周报|月报)/.test(fn)) return fn;
   if (it.archive_type === 'member_weekly_zip') return '周报' + mmdd;
   if (it.archive_type === 'member_monthly_zip') return '月报' + date.slice(0, 7).replace(/-/g, '');
+  if (it.archive_type === 'member_custom_zip') return it.summary || fn || ('定制' + mmdd);
   return '全量' + mmdd;
 }
 
@@ -529,14 +576,14 @@ function renderReports() {
   const items = library[currentType] || [];
   const el = document.getElementById('reportTable');
   if (!items.length) {
-    el.innerHTML = '<div class="empty">暂无报告。日报每天 18:00 更新，周报周日 18:00，月报每月 1 日 18:00（北京时间）</div>';
+    el.innerHTML = '<div class="empty">暂无报告。日报每天 18:00 更新，周报周日 18:00，月报每月 1 日 18:00；定制词库报告由运营推送后显示</div>';
     updateBatchToolbar();
     return;
   }
   const at = archiveTypeFor(currentType);
   const groups = groupReportsByMonth(items);
   const cur = currentMonthKey();
-  const typeLabel = currentType === 'daily' ? '份日报' : currentType === 'weekly' ? '份周报' : '份月报';
+  const typeLabel = currentType === 'daily' ? '份日报' : currentType === 'weekly' ? '份周报' : currentType === 'monthly' ? '份月报' : '份定制报告';
   let html = '<div class="month-groups">';
   groups.forEach(g => {
     const expanded = isMonthExpanded(g.month);
@@ -668,6 +715,108 @@ async function downloadBatch() {
   }
 }
 
+function goodsDetailUrl(gid) {
+  return 'https://www.xiaohongshu.com/goods-detail/' + encodeURIComponent(gid);
+}
+
+function updateWatchlistToolbar() {
+  const n = watchlistSelected.size;
+  document.getElementById('watchlistSelectedCount').textContent = '已选 ' + n + ' 项';
+  document.getElementById('btnWatchlistRemove').disabled = n === 0;
+  const allCb = document.getElementById('watchlistSelectAll');
+  if (allCb) {
+    allCb.checked = watchlistItems.length > 0 && n === watchlistItems.length;
+    allCb.indeterminate = n > 0 && n < watchlistItems.length;
+  }
+}
+
+function toggleWatchlistItem(gid, checked) {
+  if (checked) watchlistSelected.add(gid);
+  else watchlistSelected.delete(gid);
+  updateWatchlistToolbar();
+}
+
+function toggleWatchlistAll(checked) {
+  watchlistSelected.clear();
+  if (checked) watchlistItems.forEach(it => { if (it.goods_id) watchlistSelected.add(it.goods_id); });
+  document.querySelectorAll('.watchlist-item-check').forEach(cb => { cb.checked = checked; });
+  updateWatchlistToolbar();
+}
+
+async function loadWatchlist() {
+  const el = document.getElementById('watchlistTable');
+  const dashMsg = document.getElementById('dashMsg');
+  el.innerHTML = '<div class="empty">加载中…</div>';
+  try {
+    const data = await api('/api/v1/member/watchlist?limit=500', { auth: true });
+    watchlistItems = data.items || [];
+    watchlistSelected.clear();
+    renderWatchlist();
+    showMsg(dashMsg, '', 'ok');
+  } catch (e) {
+    el.innerHTML = '<div class="empty">' + esc(e.message || '加载失败') + '</div>';
+    showMsg(dashMsg, e.message, 'error');
+  }
+}
+
+function renderWatchlist() {
+  const el = document.getElementById('watchlistTable');
+  if (!watchlistItems.length) {
+    el.innerHTML = '<div class="empty">暂无收藏。在 PC 端报告页勾选商品后点「同步收藏」，或后续在此手动添加。</div>';
+    updateWatchlistToolbar();
+    return;
+  }
+  let html = '<div class="watchlist-table-wrap"><table class="watchlist-table"><thead><tr>'
+    + '<th style="width:36px"></th><th>商品</th><th>店铺</th><th>来源</th><th>更新时间</th><th></th></tr></thead><tbody>';
+  watchlistItems.forEach(it => {
+    const gid = esc(it.goods_id || '');
+    const safeGid = String(it.goods_id || '').replace(/'/g, '');
+    const checked = watchlistSelected.has(it.goods_id);
+    html += `<tr>
+      <td><input type="checkbox" class="watchlist-item-check" ${checked ? 'checked' : ''} onchange="toggleWatchlistItem('${safeGid}', this.checked)"></td>
+      <td><div class="watchlist-title" title="${esc(it.title || '')}">${esc(it.title || '—')}</div><div class="watchlist-gid">${gid}</div></td>
+      <td>${esc(it.store_name || '—')}</td>
+      <td style="font-size:12px;color:var(--text2)">${esc(it.source || '—')}</td>
+      <td style="font-size:12px;color:var(--text2)">${esc(String(it.updated_at || '').slice(0, 16))}</td>
+      <td><div class="watchlist-actions">
+        <a class="btn btn-primary btn-xs" href="${goodsDetailUrl(it.goods_id)}" target="_blank" rel="noopener">打开</a>
+        <button class="btn btn-ghost btn-xs" onclick="removeWatchlistOne('${safeGid}')">移除</button>
+      </div></td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+  updateWatchlistToolbar();
+}
+
+async function removeWatchlistOne(gid) {
+  if (!gid) return;
+  await removeWatchlistIds([gid]);
+}
+
+async function removeSelectedWatchlist() {
+  const ids = Array.from(watchlistSelected);
+  if (!ids.length) return;
+  if (!confirm('确定移除选中的 ' + ids.length + ' 个收藏？')) return;
+  await removeWatchlistIds(ids);
+}
+
+async function removeWatchlistIds(ids) {
+  const dashMsg = document.getElementById('dashMsg');
+  try {
+    await api('/api/v1/member/watchlist', {
+      method: 'DELETE',
+      auth: true,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ goods_ids: ids }),
+    });
+    showMsg(dashMsg, '已移除 ' + ids.length + ' 项', 'ok');
+    await loadWatchlist();
+  } catch (e) {
+    showMsg(dashMsg, e.message, 'error');
+  }
+}
+
 function showDashboard(cachedProfile) {
   document.getElementById('authView').classList.add('hidden');
   document.getElementById('dashView').classList.remove('hidden');
@@ -682,9 +831,9 @@ async function loadDashboard(useCacheFirst) {
   }
   const data = await api('/api/v1/member/library', { auth: true });
   renderProfile(data.membership || cached || {});
-  library = data.library || { daily: [], weekly: [], monthly: [] };
+  library = data.library || { daily: [], weekly: [], monthly: [], custom: [] };
   const savedType = loadStored(STORAGE.reportType);
-  if (savedType && ['daily','weekly','monthly'].includes(savedType)) {
+  if (savedType && ['daily','weekly','monthly','custom'].includes(savedType)) {
     currentType = savedType;
     document.querySelectorAll('#typeSeg button').forEach(b => {
       b.classList.toggle('active', b.dataset.type === savedType);

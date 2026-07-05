@@ -206,6 +206,10 @@ def archive_display_label(
         return f"周报{mmdd}"
     if archive_type == "member_monthly_zip":
         return f"月报{date[:7].replace('-', '')}"
+    if archive_type == "member_custom_zip":
+        if file_name:
+            return file_name.rsplit(".", 1)[0]
+        return f"定制{mmdd}"
     return f"全量{mmdd}"
 
 
@@ -227,6 +231,11 @@ def list_archives(archive_type: str = "member_daily_zip") -> list[dict]:
             meta = json.loads(r["meta_json"] or "{}")
         except Exception:
             pass
+        summary = meta.get("filter_label") or meta.get("set_label") or meta.get("title")
+        if not summary:
+            summary = archive_display_label(
+                r["report_date"], r["archive_type"], r["file_name"] or ""
+            )
         rows.append(
             {
                 "report_date": r["report_date"],
@@ -234,9 +243,7 @@ def list_archives(archive_type: str = "member_daily_zip") -> list[dict]:
                 "file_name": r["file_name"],
                 "file_size_bytes": r["file_size_bytes"],
                 "row_count": r["row_count"],
-                "summary": archive_display_label(
-                    r["report_date"], r["archive_type"], r["file_name"] or ""
-                ),
+                "summary": summary,
                 "published_at": r["published_at"],
             }
         )
@@ -684,16 +691,23 @@ def get_member_profile(user_id: int) -> dict | None:
 
 
 def list_report_library() -> dict:
-    from cloud_deploy.reporting.constants import ARCHIVE_DAILY, ARCHIVE_MONTHLY, ARCHIVE_WEEKLY
+    from cloud_deploy.reporting.constants import (
+        ARCHIVE_CUSTOM,
+        ARCHIVE_DAILY,
+        ARCHIVE_MONTHLY,
+        ARCHIVE_WEEKLY,
+    )
 
     daily = list_archives(ARCHIVE_DAILY)
     weekly = list_archives(ARCHIVE_WEEKLY)
     monthly = list_archives(ARCHIVE_MONTHLY)
+    custom = list_archives(ARCHIVE_CUSTOM)
     return {
         "daily": daily,
         "weekly": weekly,
         "monthly": monthly,
-        "total_count": len(daily) + len(weekly) + len(monthly),
+        "custom": custom,
+        "total_count": len(daily) + len(weekly) + len(monthly) + len(custom),
     }
 
 
