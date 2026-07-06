@@ -67,6 +67,30 @@ for app in web-user web-admin web-intel; do
     fail "$app/dist/index.html 不存在。请在开发机运行: scripts/local-release.ps1 后 push"
   fi
 done
+
+# admin 源码含选品会员时，dist 必须已构建进包（避免侧栏缺菜单）
+if grep -q 'pick-member' "$ROOT/web-admin/src/layouts/AdminLayout.vue" 2>/dev/null; then
+  if ! grep -rq 'pick-member\|选品会员\|PickMemberView' "$ROOT/web-admin/dist/" 2>/dev/null; then
+    if command -v npm &>/dev/null && [ -f "$ROOT/web-admin/package.json" ]; then
+      warn "web-admin dist 过期（缺选品会员），尝试在主机构建..."
+      cd "$ROOT/web-admin"
+      if [ ! -d node_modules ]; then
+        npm ci --legacy-peer-deps 2>/dev/null || npm install --legacy-peer-deps
+      fi
+      # node_modules/.bin 可能无执行位（git/解压导致 Permission denied）
+      chmod +x node_modules/.bin/* 2>/dev/null || true
+      npm run build:deploy 2>/dev/null || npx vite build
+      cd "$ROOT"
+      if ! grep -rq 'pick-member\|选品会员\|PickMemberView' "$ROOT/web-admin/dist/" 2>/dev/null; then
+        fail "web-admin 构建后仍缺选品会员。请在开发机运行: scripts/local-release.ps1 后 push"
+      fi
+      ok "web-admin 已在主机重新构建（含选品会员）"
+    else
+      fail "web-admin dist 过期（缺选品会员）。请在开发机运行: scripts/local-release.ps1 后 push"
+    fi
+  fi
+fi
+
 ok "前端 dist 已就绪 (user/admin/intel)"
 
 # --- 2b. 客户端安装包同步到静态目录（/downloads/）---

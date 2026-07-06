@@ -9,12 +9,14 @@ import time
 from typing import Any
 
 from fastapi import Depends, HTTPException, Header, Request
+from fastapi.responses import JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from cloud_deploy.cloud_api.config import get_settings
 from cloud_deploy.cloud_api import database as db
 
 security = HTTPBearer(auto_error=False)
+MEMBER_COOKIE = "xhs_member_session"
 
 
 def _b64url(data: bytes) -> str:
@@ -116,12 +118,56 @@ def verify_agent_access(
         raise HTTPException(status_code=403, detail="IP 未授权")
 
 
+def resolve_member_token(
+    cred: HTTPAuthorizationCredentials | None,
+    request: Request | None = None,
+    access_token: str = "",
+) -> str:
+    if cred and cred.credentials:
+        return cred.credentials.strip()
+    token = (access_token or "").strip()
+    if token:
+        return token
+    if request is not None:
+        cookie = (request.cookies.get(MEMBER_COOKIE) or "").strip()
+        if cookie:
+            return cookie
+    return ""
+
+
+def member_auth_response(payload: dict) -> JSONResponse:
+    """登录/续期响应：写入 HttpOnly Cookie，浏览器刷新后仍可鉴权。"""
+    s = get_settings()
+    resp = JSONResponse(content=payload)
+    token = (payload.get("access_token") or "").strip()
+    if not token:
+        return resp
+    resp.set_cookie(
+        key=MEMBER_COOKIE,
+        value=token,
+        max_age=max(int(s.xhs_cloud_jwt_ttl_days or 30), 1) * 86400,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        path="/",
+    )
+    return resp
+
+
+def clear_member_cookie_response(payload: dict | None = None) -> JSONResponse:
+    resp = JSONResponse(content=payload or {"message": "已退出"})
+    resp.delete_cookie(MEMBER_COOKIE, path="/", samesite="lax")
+    return resp
+
+
 def current_member(
+    request: Request,
     cred: HTTPAuthorizationCredentials | None = Depends(security),
 ) -> dict:
-    if not cred:
+    token = resolve_member_token(cred, request)
+    if not token:
         raise HTTPException(status_code=401, detail="需要登录")
-    return member_from_token(cred.credentials)
+    return member_from_token(token)
 
 
 def member_from_token(token: str) -> dict:

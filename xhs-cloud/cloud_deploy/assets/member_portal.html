@@ -3,8 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <meta name="theme-color" content="#0071e3">
 <title>选品报告会员中心</title>
+<script>
+(function () {
+  if (location.protocol === 'http:' && !/localhost|127\.0\.0\.1/.test(location.hostname)) {
+    location.replace('https:' + location.href.slice(location.protocol.length));
+  }
+})();
+</script>
 <style>
 :root{
   --bg:#f5f5f7;--surface:#fff;--text:#1d1d1f;--text2:#6e6e73;
@@ -140,7 +149,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <li>报告含<strong>实体 + 虚拟</strong>商品：实体门槛 v1d&gt;5，虚拟门槛 v1d&gt;1（同一份 zip）</li>
     </ul>
     <div class="notice-tip">
-      下载 zip 后解压，<strong>右键 index_with_gr.html → Chrome 打开</strong> 查看；也可点 <strong>在线预览</strong> 直接在浏览器看（支持 Vue / 表格切换）。
+      下载 zip 后解压，<strong>右键 index_with_gr.html → Chrome 打开</strong> 查看；也可点 <strong>在线预览</strong>（需已登录，自动加载 data.js）。
       历史报告在会员有效期内均可重复下载。
     </div>
   </div>
@@ -155,6 +164,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
         <button type="button" class="active" data-mode="password" onclick="switchLoginMode('password')">账号密码</button>
         <button type="button" data-mode="code" onclick="switchLoginMode('code')">授权码登录</button>
       </div>
+      <p class="sub" style="margin:-8px 0 12px;font-size:12px;color:var(--muted)">请使用 <strong>https://monitor.xhs365.cn/member</strong> 登录；登录后保持 30 天，刷新无需重复登录</p>
       <div id="panelLoginPassword">
         <div class="field"><label>用户名</label><input id="loginUser" autocomplete="username" enterkeyhint="next"></div>
         <div class="field"><label>密码</label><input id="loginPass" type="password" autocomplete="current-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doLogin()"></div>
@@ -249,6 +259,77 @@ const STORAGE = {
   viewMode: 'xhs_member_view_mode',
   activated: 'xhs_member_activated',
 };
+const TOKEN_COOKIE = 'xhs_member_token';
+const TOKEN_COOKIE_MAX_AGE = 30 * 86400;
+
+function storageOk() {
+  try {
+    const k = '__xhs_storage_test__';
+    localStorage.setItem(k, '1');
+    localStorage.removeItem(k);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+function cookieSecure() {
+  return location.protocol === 'https:';
+}
+
+function loadTokenCookie() {
+  try {
+    const parts = ('; ' + document.cookie).split('; ' + TOKEN_COOKIE + '=');
+    if (parts.length < 2) return null;
+    return decodeURIComponent(parts.pop().split(';').shift() || '');
+  } catch (_) {
+    return null;
+  }
+}
+
+function saveTokenCookie(token) {
+  if (!token || !cookieSecure()) return;
+  try {
+    document.cookie = TOKEN_COOKIE + '=' + encodeURIComponent(token)
+      + '; path=/; max-age=' + TOKEN_COOKIE_MAX_AGE + '; SameSite=Lax; Secure';
+  } catch (_) {}
+}
+
+function clearTokenCookie() {
+  try {
+    document.cookie = TOKEN_COOKIE + '=; path=/; max-age=0; SameSite=Lax'
+      + (cookieSecure() ? '; Secure' : '');
+  } catch (_) {}
+}
+
+function loadStored(key) {
+  try {
+    if (key === STORAGE.token) {
+      const ls = localStorage.getItem(key);
+      if (ls) return ls;
+      const ck = loadTokenCookie();
+      if (ck) {
+        try { localStorage.setItem(key, ck); } catch (_) {}
+        return ck;
+      }
+      return null;
+    }
+    return localStorage.getItem(key);
+  } catch (_) {
+    if (key === STORAGE.token) return loadTokenCookie();
+    return null;
+  }
+}
+
+function saveStored(key, val) {
+  try { localStorage.setItem(key, val); } catch (_) {}
+  if (key === STORAGE.token) saveTokenCookie(val);
+}
+
+function removeStored(key) {
+  try { localStorage.removeItem(key); } catch (_) {}
+  if (key === STORAGE.token) clearTokenCookie();
+}
 
 let library = { daily: [], weekly: [], monthly: [], custom: [] };
 let currentType = 'daily';
@@ -418,21 +499,14 @@ function toggleMonth(month) {
   renderReports();
 }
 
-function loadStored(key) {
-  try { return localStorage.getItem(key); } catch (_) { return null; }
-}
-function saveStored(key, val) {
-  try { localStorage.setItem(key, val); } catch (_) {}
-}
-function removeStored(key) {
-  try { localStorage.removeItem(key); } catch (_) {}
-}
-
 function saveSession(token, membership, username) {
   if (token) saveStored(STORAGE.token, token);
   if (username) saveStored(STORAGE.username, username);
   if (membership) saveStored(STORAGE.profile, JSON.stringify(membership));
   saveStored(STORAGE.activated, '1');
+  if (token && !loadStored(STORAGE.token) && !loadTokenCookie()) {
+    console.warn('xhs member: token not persisted — check browser privacy / incognito settings');
+  }
 }
 
 function loadCachedProfile() {
@@ -470,17 +544,96 @@ function api(path, opts = {}) {
     const t = loadStored(STORAGE.token);
     if (t) headers['Authorization'] = 'Bearer ' + t;
   }
-  return fetch(path, { ...opts, headers }).then(async r => {
+  return fetch(path, { ...opts, credentials: 'include', headers }).then(async r => {
     const text = await r.text();
     let data = {};
     if (text) {
       try { data = JSON.parse(text); } catch (_) {
-        if (!r.ok) throw new Error(text.slice(0, 300) || r.statusText || formatApiError({}, r.statusText, r.status));
+        if (!r.ok) {
+          const err = new Error(text.slice(0, 300) || r.statusText || formatApiError({}, r.statusText, r.status));
+          err.status = r.status;
+          throw err;
+        }
       }
     }
-    if (!r.ok) throw new Error(formatApiError(data, r.statusText, r.status));
+    if (!r.ok) {
+      const err = new Error(formatApiError(data, r.statusText, r.status));
+      err.status = r.status;
+      throw err;
+    }
     return data;
   });
+}
+
+function showAuthView() {
+  document.getElementById('authView').classList.remove('hidden');
+  document.getElementById('dashView').classList.add('hidden');
+  document.getElementById('btnLogout').classList.add('hidden');
+}
+
+function isAuthError(err) {
+  const s = err && err.status;
+  return s === 401 || s === 402;
+}
+
+async function refreshSessionToken() {
+  const res = await api('/api/v1/auth/refresh', { method: 'POST', auth: true });
+  const username = (res.membership && res.membership.username) || loadStored(STORAGE.username) || '';
+  saveSession(res.access_token, res.membership, username);
+  return res;
+}
+
+async function restoreSession() {
+  const token = loadStored(STORAGE.token);
+  if (!token) return false;
+
+  const cached = loadCachedProfile();
+  if (cached) showDashboard(cached);
+
+  try {
+    await loadDashboard(!!cached);
+    return true;
+  } catch (e) {
+    if (!isAuthError(e)) {
+      if (cached) {
+        showDashboard(cached);
+        showMsg(document.getElementById('dashMsg'), '网络异常，已显示本地缓存（报告列表可能不是最新）', 'warn');
+        return true;
+      }
+      showMsg(document.getElementById('authMsg'), (e.message || '网络异常') + '，请稍后刷新', 'warn');
+      switchTab('login');
+      return false;
+    }
+  }
+
+  try {
+    await refreshSessionToken();
+    await loadDashboard(false);
+    return true;
+  } catch (e) {
+    if (isAuthError(e)) {
+      removeStored(STORAGE.token);
+      showAuthView();
+      const authMsg = document.getElementById('authMsg');
+      if (cached) {
+        renderProfile({ ...cached, is_active: false, expiry_warning: '登录已过期，请重新登录' });
+        showMsg(authMsg, '会话已过期，请重新输入密码或授权码', 'warn');
+        switchLoginMode('code');
+      } else {
+        showMsg(authMsg, e.message || '请重新登录', 'warn');
+      }
+      switchTab('login');
+      return false;
+    }
+    if (cached) {
+      showDashboard(cached);
+      showMsg(document.getElementById('dashMsg'), '网络异常，已显示本地缓存（报告列表可能不是最新）', 'warn');
+      return true;
+    }
+    showMsg(document.getElementById('authMsg'), (e.message || '网络异常') + '，请稍后刷新', 'warn');
+    switchTab('login');
+    return false;
+  }
 }
 
 function showMsg(el, text, kind) {
@@ -892,6 +1045,7 @@ async function loadDashboard(useCacheFirst) {
 }
 
 function logout() {
+  api('/api/v1/auth/logout', { method: 'POST', auth: true }).catch(function () {});
   removeStored(STORAGE.token);
   removeStored(STORAGE.profile);
   removeStored(STORAGE.activated);
@@ -991,7 +1145,7 @@ async function doRenew() {
   }
 }
 
-(async function loadClientDownload() {
+async function loadClientDownload() {
   const link = document.getElementById('paInstallerLink');
   const meta = document.getElementById('paInstallerMeta');
   if (!link || !meta) return;
@@ -1013,11 +1167,17 @@ async function doRenew() {
   } catch (e) {
     /* 跨域失败时保留 fallback 链接与版本号 */
   }
-})();
+}
 
 (async function init() {
+  try {
   loadClientDownload();
   restoreFormFields();
+
+  if (!storageOk()) {
+    const authMsg = document.getElementById('authMsg');
+    showMsg(authMsg, '浏览器未允许本站保存登录状态（请关闭无痕模式，或检查隐私/存储权限）', 'warn');
+  }
 
   const token = loadStored(STORAGE.token);
   const activated = loadStored(STORAGE.activated);
@@ -1027,21 +1187,45 @@ async function doRenew() {
     const authMsg = document.getElementById('authMsg');
     showMsg(authMsg, `欢迎回来 ${cached.username || ''}，登录状态已过期。可用密码登录，或直接输入授权码登录`, 'warn');
     switchTab('login');
-    return;
   }
 
-  if (!token) return;
+  if (cached) showDashboard(cached);
 
   try {
-    await loadDashboard(true);
+    await loadDashboard(!!cached);
   } catch (e) {
-    removeStored(STORAGE.token);
-    const authMsg = document.getElementById('authMsg');
-    if (cached) {
-      renderProfile({ ...cached, is_active: false, expiry_warning: '登录已过期，请重新输入密码' });
-      showMsg(authMsg, '会话已过期，可用密码或授权码重新登录', 'warn');
-      switchLoginMode('code');
+    if (!isAuthError(e)) {
+      if (cached) {
+        showDashboard(cached);
+        showMsg(document.getElementById('dashMsg'), '网络异常，已显示本地缓存（报告列表可能不是最新）', 'warn');
+      }
+      return;
     }
+    if (!token && !cached && !activated) return;
+    try {
+      await refreshSessionToken();
+      await loadDashboard(false);
+    } catch (e2) {
+      if (isAuthError(e2)) {
+        removeStored(STORAGE.token);
+        showAuthView();
+        const authMsg = document.getElementById('authMsg');
+        if (cached) {
+          renderProfile({ ...cached, is_active: false, expiry_warning: '登录已过期，请重新登录' });
+          showMsg(authMsg, '会话已过期，请重新输入密码或授权码', 'warn');
+          switchLoginMode('code');
+        } else if (token || activated) {
+          showMsg(authMsg, e2.message || '请重新登录', 'warn');
+        }
+        switchTab('login');
+      } else if (cached) {
+        showDashboard(cached);
+        showMsg(document.getElementById('dashMsg'), '网络异常，已显示本地缓存（报告列表可能不是最新）', 'warn');
+      }
+    }
+  }
+  } catch (err) {
+    console.error('member init failed', err);
   }
 })();
 </script>

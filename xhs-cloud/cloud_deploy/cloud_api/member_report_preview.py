@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import tempfile
+from urllib.parse import quote
 
 ALLOWED_BASENAMES = frozenset(
     {
@@ -121,3 +123,58 @@ def guess_media_type(path: str) -> str:
 
     mt, _ = mimetypes.guess_type(path)
     return mt or "application/octet-stream"
+
+
+def rewrite_preview_html(
+    html: str,
+    *,
+    report_date: str,
+    archive_type: str,
+    access_token: str,
+) -> str:
+    """iframe 内 HTML 的 data.js 等相对路径需带上会员 token，否则二次请求 401。"""
+    safe_date = quote(str(report_date or "")[:10], safe="")
+    safe_type = quote(str(archive_type or "member_daily_zip"), safe="")
+    token_q = quote((access_token or "").strip(), safe="")
+    base = f"/api/v1/member/reports/{safe_date}/view"
+    query = f"?archive_type={safe_type}&access_token={token_q}"
+
+    def _abs_url(name: str) -> str:
+        return f"{base}/{quote(name, safe='/')}{query}"
+
+    out = html
+    for name in ("data.js", "enrich.js"):
+        for quote_char in ('"', "'"):
+            rel = f"src={quote_char}{name}{quote_char}"
+            abs_src = f"src={quote_char}{_abs_url(name)}{quote_char}"
+            out = out.replace(rel, abs_src)
+    # 兜底：未带 token 的相对 .js（仅替换简单 src="*.js"）
+    out = re.sub(
+        r'src=(["\'])(?!https?://|/api/v1/)([a-zA-Z0-9_.-]+\.js)\1',
+        lambda m: f'src={m.group(1)}{_abs_url(m.group(2))}{m.group(1)}',
+        out,
+    )
+    return out
+
+
+def read_member_report_file(
+    report_date: str,
+    archive_type: str,
+    rel_path: str,
+    *,
+    access_token: str = "",
+) -> tuple[str, str, str | None]:
+    """返回 (disk_path, media_type, optional_rewritten_html)。"""
+    path = resolve_member_report_file(report_date, archive_type, rel_path)
+    media = guess_media_type(path)
+    base = os.path.basename(path).lower()
+    if media.startswith("text/html") or base.endswith(".html"):
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            raw = f.read()
+        return path, media, rewrite_preview_html(
+            raw,
+            report_date=report_date,
+            archive_type=archive_type,
+            access_token=access_token,
+        )
+    return path, media, None

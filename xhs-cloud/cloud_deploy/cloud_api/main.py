@@ -28,7 +28,10 @@ from cloud_deploy.cloud_api.auth import (
     create_token,
     login_member,
     login_member_by_code,
+    clear_member_cookie_response,
+    member_auth_response,
     refresh_member_token,
+    resolve_member_token,
     security,
     verify_agent_access,
     verify_sync_key,
@@ -244,7 +247,11 @@ def member_portal_page():
     path = os.path.join(_ASSETS, "member_portal.html")
     if not os.path.isfile(path):
         raise HTTPException(status_code=404, detail="会员看板未部署")
-    return FileResponse(path, media_type="text/html; charset=utf-8")
+    return FileResponse(
+        path,
+        media_type="text/html; charset=utf-8",
+        headers={"Cache-Control": "no-store, must-revalidate"},
+    )
 
 
 @app.get("/api/v1/health")
@@ -254,12 +261,12 @@ def health():
 
 @app.post("/api/v1/auth/login")
 def login(body: LoginBody):
-    return login_member(body.username, body.password)
+    return member_auth_response(login_member(body.username, body.password))
 
 
 @app.post("/api/v1/auth/login-code")
 def login_with_code(body: LoginCodeBody):
-    return login_member_by_code(body.auth_code)
+    return member_auth_response(login_member_by_code(body.auth_code))
 
 
 @app.post("/api/v1/auth/register")
@@ -274,11 +281,16 @@ def register(body: RegisterBody):
         token = create_token(profile)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"登录令牌生成失败: {e}") from e
-    return {
+    return member_auth_response({
         "access_token": token,
         "token_type": "bearer",
         "membership": profile,
-    }
+    })
+
+
+@app.post("/api/v1/auth/logout")
+def logout_member():
+    return clear_member_cookie_response()
 
 
 @app.post("/api/v1/auth/activate")
@@ -292,13 +304,14 @@ def activate_code(body: ActivateBody, user: dict = Depends(current_member)):
 
 @app.post("/api/v1/auth/refresh")
 def refresh_token(
+    request: Request,
     cred: HTTPAuthorizationCredentials | None = Depends(security),
     access_token: str = "",
 ):
-    token = (cred.credentials if cred else None) or (access_token or "").strip()
+    token = resolve_member_token(cred, request, access_token)
     if not token:
         raise HTTPException(status_code=401, detail="需要登录")
-    return refresh_member_token(token)
+    return member_auth_response(refresh_member_token(token))
 
 
 @app.get("/api/v1/member/profile")
@@ -409,7 +422,7 @@ def member_report_view_file(
     cred: HTTPAuthorizationCredentials | None = Depends(security),
 ):
     from cloud_deploy.cloud_api.auth import member_from_token
-    from cloud_deploy.cloud_api.member_report_preview import guess_media_type, resolve_member_report_file
+    from cloud_deploy.cloud_api.member_report_preview import read_member_report_file
 
     if archive_type not in _MEMBER_ARCHIVE_TYPES:
         raise HTTPException(status_code=400, detail="无效的报告类型")
@@ -418,14 +431,21 @@ def member_report_view_file(
         raise HTTPException(status_code=401, detail="需要登录")
     user = member_from_token(token)
     try:
-        path = resolve_member_report_file(report_date, archive_type, file_path)
+        path, media_type, rewritten = read_member_report_file(
+            report_date,
+            archive_type,
+            file_path,
+            access_token=token,
+        )
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e) or "文件不存在") from e
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     ip = request.client.host if request and request.client else ""
     db.log_download(user["id"], report_date, archive_type, ip)
-    return FileResponse(path, media_type=guess_media_type(path))
+    if rewritten is not None:
+        return HTMLResponse(content=rewritten, media_type=media_type)
+    return FileResponse(path, media_type=media_type)
 
 
 def _remove_temp_file(path: str) -> None:
