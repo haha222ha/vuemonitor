@@ -186,8 +186,8 @@ const downloadHint = ref("");
 async function loadDownloadInfo() {
   try {
     const res = await api.get("/public/downloads");
-    const d = res.data?.data;
-    if (d) {
+    const d = res.data;
+    if (d && typeof d === "object") {
       version.value = d.version || version.value;
       if (d.installer_url) installerUrl.value = d.installer_url;
       installerAvailable.value = !!d.installer_available;

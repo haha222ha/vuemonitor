@@ -102,7 +102,16 @@ class Settings(BaseSettings):
     CLIENT_VERSION: str = "2026.07.06"
     CLIENT_INSTALLER_PATH: str = "deploy/downloads/XHS365-Setup-latest.exe"
 
-    CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"]
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "https://www.xhs365.cn",
+        "https://xhs365.cn",
+        "https://admin.xhs365.cn",
+        "https://intel.xhs365.cn",
+        "https://monitor.xhs365.cn",
+    ]
 
     DISCOVERY_DB_PATH: str = ""
 

@@ -995,21 +995,23 @@ async function doRenew() {
   const link = document.getElementById('paInstallerLink');
   const meta = document.getElementById('paInstallerMeta');
   if (!link || !meta) return;
+  const fallback = () => {
+    link.href = 'https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe';
+    meta.textContent = '版本 v2026.07.06 · Windows 64 位';
+  };
+  fallback();
   try {
-    const res = await fetch('https://www.xhs365.cn/api/v1/public/downloads', { cache: 'no-store' });
+    const res = await fetch('https://www.xhs365.cn/api/v1/public/downloads', { cache: 'no-store', mode: 'cors' });
     const json = await res.json();
     const d = json && json.data ? json.data : {};
     if (d.installer_url) link.href = d.installer_url;
     if (d.installer_available) {
       meta.textContent = '版本 v' + (d.version || '2026.07.06') + ' · Windows 64 位';
     } else {
-      meta.textContent = '安装包筹备中，请联系客服获取';
-      link.classList.remove('btn-primary');
-      link.style.pointerEvents = 'none';
-      link.style.opacity = '0.6';
+      meta.textContent = '安装包筹备中，请联系客服';
     }
   } catch (e) {
-    meta.textContent = '版本 v2026.07.06 · Windows 64 位';
+    /* 跨域失败时保留 fallback 链接与版本号 */
   }
 })();
 
