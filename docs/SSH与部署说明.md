@@ -48,27 +48,34 @@ cd /opt/xhs-cloud && bash cloud_deploy/scripts/host-update.sh
 
 安装包约 277MB，在 `.gitignore` 里，**必须 scp 上传**，不能靠 git pull。
 
-### 1. Windows 上执行
+**推荐（密钥在云主机生成，私钥只留本机）：** 见 [双链路部署说明.md](./双链路部署说明.md)
+
+### 快速步骤
+
+**云主机：**
+
+```bash
+cd /opt/vuemonitor
+bash scripts/server-setup-pc-upload-key.sh
+# 私钥下载到本机后：
+bash scripts/server-remove-pc-upload-private-key.sh
+```
+
+**Windows：**
 
 ```powershell
+mkdir $env:USERPROFILE\.ssh -Force
+scp admin@47.239.181.111:~/.ssh/xhs365_pc_upload_ed25519 $env:USERPROFILE\.ssh\xhs365_pc_upload
 cd E:\vuemonitor
+py -3.11 scripts\dev_deploy_gui.py
+```
+
+GUI 里配置私钥路径 → 保存 → 测试连接 → 点「上传 PC 安装包」。
+
+### 旧方案（本机生成密钥）
+
+```powershell
 powershell -ExecutionPolicy Bypass -File scripts\local-setup-ssh-upload.ps1
-```
-
-### 2. 按提示把公钥加到服务器 `authorized_keys`
-
-### 3. 测试
-
-```powershell
-ssh xhs365 "echo OK"
-```
-
-### 4. 告诉 Cursor「SSH 已配好 Host=xhs365」
-
-会自动执行：
-
-```powershell
-py -3.11 scripts/upload_productanalyzer_installer.py --host xhs365
 ```
 
 ---
