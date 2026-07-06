@@ -1,6 +1,6 @@
 {
-  "version": "2026.06.15",
+  "version": "2026.07.06",
   "min_version": "2026.06.01",
-  "release_notes": "托盘助手专属图标、最小化缩到系统托盘、远程版本检查",
-  "download_url": "https://xhs365.cn/downloads/ProductAnalyzer_latest.zip"
+  "release_notes": "店铺监控改版；销量热榜瀑布流；销量异常/重置智能识别；合规声明 Tab；报告本地缓存与 Tab 切换稳定性优化",
+  "download_url": "https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe"
 }

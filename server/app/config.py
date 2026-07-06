@@ -99,7 +99,7 @@ class Settings(BaseSettings):
     SUPPORT_TITLE: str = "QQ 客服"
     SUPPORT_HINT: str = "注册、授权码、套餐问题请扫码或搜索 QQ 添加客服（无需邮箱验证）"
 
-    CLIENT_VERSION: str = "0.1.0"
+    CLIENT_VERSION: str = "2026.07.06"
     CLIENT_INSTALLER_PATH: str = "deploy/downloads/XHS365-Setup-latest.exe"
 
     CORS_ORIGINS: list[str] = ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"]
