@@ -25,6 +25,7 @@ from cloud_deploy.cloud_api import database as db
 from cloud_deploy.cloud_api.auth import (
     change_member_password,
     current_member,
+    current_user,
     create_token,
     login_member,
     login_member_by_code,
@@ -73,6 +74,24 @@ class ActivateBody(BaseModel):
     auth_code: str = Field(..., min_length=8, max_length=64)
 
 
+class RenewWithCodeBody(BaseModel):
+    username: str = Field(..., min_length=3, max_length=64)
+    password: str = Field(..., min_length=6, max_length=128)
+    auth_code: str = Field(..., min_length=8, max_length=64)
+
+
+def _renew_message(profile: dict) -> str:
+    stack = profile.get("renew_stack") or {}
+    expires = profile.get("expires_at") or stack.get("expires_at") or ""
+    if stack.get("stacked"):
+        prev = int(stack.get("previous_days_remaining") or 0)
+        added = int(stack.get("days_added") or 0)
+        return f"续费成功：已叠加剩余 {prev} 天 + 新授权 {added} 天，到期 {expires}"
+    if stack.get("days_added"):
+        return f"续费成功：会员已延长 {stack['days_added']} 天，到期 {expires}"
+    return f"续费成功，到期时间 {expires}" if expires else "续费成功"
+
+
 class WatchlistUpsertBody(BaseModel):
     goods_ids: list[str] = Field(default_factory=list, max_length=500)
     items: list[dict] = Field(default_factory=list, max_length=500)
@@ -96,7 +115,7 @@ _MEMBER_ARCHIVE_TYPES = frozenset(
 class GenerateCodesBody(BaseModel):
     count: int = Field(default=1, ge=1, le=100)
     plan_code: str = "monthly"
-    duration_days: int = Field(default=30, ge=1, le=3650)
+    duration_days: int = Field(default=30, ge=1, le=36500)
     max_activations: int = Field(default=1, ge=1, le=1000)
     note: str = ""
 
@@ -294,12 +313,28 @@ def logout_member():
 
 
 @app.post("/api/v1/auth/activate")
-def activate_code(body: ActivateBody, user: dict = Depends(current_member)):
+def activate_code(body: ActivateBody, user: dict = Depends(current_user)):
     try:
         profile = db.renew_with_auth_code(user["id"], body.auth_code)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
-    return {"membership": profile, "message": "续费成功"}
+    return {"membership": profile, "message": _renew_message(profile)}
+
+
+@app.post("/api/v1/auth/renew-with-code")
+def renew_with_code(body: RenewWithCodeBody):
+    """已注册用户：账号密码 + 新授权码续费（支持剩余天数叠加）。"""
+    try:
+        profile = db.renew_with_credentials(body.username, body.password, body.auth_code)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    token = create_token({"id": profile["id"], "username": profile["username"]})
+    return member_auth_response({
+        "access_token": token,
+        "token_type": "bearer",
+        "membership": profile,
+        "message": _renew_message(profile),
+    })
 
 
 @app.post("/api/v1/auth/refresh")
@@ -315,7 +350,7 @@ def refresh_token(
 
 
 @app.get("/api/v1/member/profile")
-def member_profile(user: dict = Depends(current_member)):
+def member_profile(user: dict = Depends(current_user)):
     profile = db.get_member_profile(user["id"])
     if not profile:
         raise HTTPException(status_code=404, detail="用户不存在")
@@ -323,7 +358,7 @@ def member_profile(user: dict = Depends(current_member)):
 
 
 @app.post("/api/v1/member/change-password")
-def member_change_password(body: ChangePasswordBody, user: dict = Depends(current_member)):
+def member_change_password(body: ChangePasswordBody, user: dict = Depends(current_user)):
     current = body.current_password.strip() or None
     change_member_password(user["id"], body.new_password, current_password=current)
     return {"message": "密码已更新，下次可使用新密码登录"}
@@ -338,15 +373,30 @@ def member_reports(
 
 
 @app.get("/api/v1/member/library")
-def member_library(user: dict = Depends(current_member)):
+def member_library(user: dict = Depends(current_user)):
     """全部历史报告库（日报 + 周报 + 月报）。"""
     import logging
 
     logger = logging.getLogger(__name__)
     try:
-        library = db.list_report_library()
         profile = db.get_member_profile(user["id"])
+        if not profile:
+            raise HTTPException(status_code=404, detail="用户不存在")
+        ent = db.get_member_entitlements(user["id"])
+        if ent:
+            profile = dict(profile)
+            profile["entitlements"] = ent
+            profile["plan_label"] = db.PLAN_LABELS.get("experience", "体验会员")
+        if not profile.get("is_active"):
+            return {
+                "membership": profile,
+                "library": {"daily": [], "weekly": [], "monthly": [], "custom": []},
+                "expired": True,
+            }
+        library = db.list_report_library(user["id"])
         return {"membership": profile, "library": library}
+    except HTTPException:
+        raise
     except Exception as e:
         logger.exception("member_library failed for user_id=%s", user.get("id"))
         raise HTTPException(status_code=500, detail=f"报告库加载失败: {e}") from e
@@ -392,6 +442,8 @@ def download_report(
     if not token:
         raise HTTPException(status_code=401, detail="需要登录")
     user = member_from_token(token)
+    if not db.member_can_download_report(user["id"], report_date, archive_type):
+        raise HTTPException(status_code=403, detail="体验授权码仅可下载指定报告，请联系管理员开通完整会员")
     path = db.get_archive_path(report_date, archive_type)
     if not path or not os.path.isfile(path):
         raise HTTPException(status_code=404, detail="报告不存在")

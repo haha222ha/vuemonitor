@@ -131,11 +131,19 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">
       安装 <strong>ProductAnalyzer</strong> 后，可在本地查看选品报告、监控商品销量、同步收藏夹，与会员中心数据互通。
     </p>
+    <div id="paUpdateNotice" class="hidden" style="margin-bottom:12px;padding:10px 12px;border-radius:8px;background:#fff8e6;border:1px solid #f0d78a;font-size:13px;line-height:1.6">
+      <strong style="color:#b45309">📦 新版本已发布</strong>
+      <div id="paUpdateNoticeText" style="margin-top:6px;color:var(--text2)"></div>
+    </div>
     <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
       <a id="paInstallerLink" class="btn btn-primary" href="https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe" download style="text-decoration:none;color:#fff">下载 Windows 安装包</a>
       <span id="paInstallerMeta" style="font-size:12px;color:var(--text2)">版本加载中…</span>
     </div>
-    <p style="font-size:12px;color:var(--text2);margin-top:10px;line-height:1.5">安装时可选择目标目录；如遇 Windows 安全提示，请点击「更多信息」→「仍要运行」。</p>
+    <details style="margin-top:12px;font-size:12px;color:var(--text2)">
+      <summary style="cursor:pointer;color:var(--primary);font-weight:600">查看版本更新说明</summary>
+      <ul id="paChangelogList" style="margin:10px 0 0;padding-left:18px;line-height:1.7"></ul>
+    </details>
+    <p style="font-size:12px;color:var(--text2);margin-top:10px;line-height:1.5">安装后可自动检测新版本（启动约 8 秒后提示）；点击「下载安装包」覆盖安装即可升级，无需卸载。如遇 Windows 安全提示，请点击「更多信息」→「仍要运行」。</p>
   </div>
 
   <div class="card notice-card">
@@ -158,6 +166,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <div class="tabs">
       <div class="tab active" data-tab="login" onclick="switchTab('login')">登录</div>
       <div class="tab" data-tab="register" onclick="switchTab('register')">授权码开通</div>
+      <div class="tab" data-tab="renew" onclick="switchTab('renew')">授权码续费</div>
     </div>
     <div class="card" id="panelLogin">
       <div class="seg" id="loginModeSeg" style="margin-bottom:16px">
@@ -181,7 +190,14 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div class="field"><label>用户名（新建账号）</label><input id="regUser" autocomplete="username"></div>
       <div class="field"><label>密码（至少 6 位）</label><input id="regPass" type="password" autocomplete="new-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doRegister()"></div>
       <button class="btn btn-primary btn-block" onclick="doRegister()">开通并登录</button>
-      <p style="font-size:12px;color:var(--text2);margin-top:12px">开通成功后将自动记住登录状态，下次打开无需重新输入</p>
+      <p style="font-size:12px;color:var(--text2);margin-top:12px">首次开通专用。已有账号请用「授权码续费」或登录后在会员信息里续费。</p>
+    </div>
+    <div class="card hidden" id="panelRenew">
+      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">已有账号绑定新授权码续费。若当前会员<strong>还剩 5 天</strong>，激活<strong>30 天</strong>新码后将变为<strong>35 天</strong>（剩余时长叠加，非覆盖）。</p>
+      <div class="field"><label>用户名</label><input id="renewUser" autocomplete="username"></div>
+      <div class="field"><label>密码</label><input id="renewPass" type="password" autocomplete="current-password"></div>
+      <div class="field"><label>新授权码</label><input id="renewAuthCode" placeholder="输入新购买的授权码" autocomplete="off" enterkeyhint="go" onkeydown="if(event.key==='Enter')doRenewWithCode()"></div>
+      <button class="btn btn-primary btn-block" onclick="doRenewWithCode()">续费并登录</button>
     </div>
     <div id="authMsg"></div>
   </div>
@@ -644,6 +660,7 @@ function switchTab(name) {
   document.querySelectorAll('#authView > .tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
   document.getElementById('panelLogin').classList.toggle('hidden', name !== 'login');
   document.getElementById('panelRegister').classList.toggle('hidden', name !== 'register');
+  document.getElementById('panelRenew').classList.toggle('hidden', name !== 'renew');
 }
 
 function switchLoginMode(mode) {
@@ -686,12 +703,12 @@ function renderProfile(m) {
 
   const banner = document.getElementById('expiryBanner');
   if (m.expiry_warning) {
-    const kind = (m.days_remaining ?? 99) <= 7 ? 'warn' : (m.is_active ? 'ok' : 'error');
+    const kind = !m.is_active ? 'error' : ((m.days_remaining ?? 99) <= 7 ? 'warn' : 'ok');
     banner.innerHTML = `<div class="alert alert-${kind}">${esc(m.expiry_warning)}</div>`;
   } else if (m.is_active) {
     banner.innerHTML = `<div class="alert alert-ok">会员有效，可下载全部历史报告</div>`;
   } else {
-    banner.innerHTML = '';
+    banner.innerHTML = `<div class="alert alert-error">会员已过期，请在下方输入新授权码续费（支持剩余天数叠加）</div>`;
   }
 }
 
@@ -1032,6 +1049,9 @@ async function loadDashboard(useCacheFirst) {
   const data = await api('/api/v1/member/library', { auth: true });
   renderProfile(data.membership || cached || {});
   library = data.library || { daily: [], weekly: [], monthly: [], custom: [] };
+  if (data.expired) {
+    showMsg(document.getElementById('dashMsg'), '会员已过期，续费成功后可下载报告', 'warn');
+  }
   const savedType = loadStored(STORAGE.reportType);
   if (savedType && ['daily','weekly','monthly','custom'].includes(savedType)) {
     currentType = savedType;
@@ -1125,6 +1145,29 @@ async function doRegister() {
     showMsg(authMsg, '', 'ok');
   } catch (e) {
     showMsg(authMsg, e.message, 'error');
+    if (e.message && e.message.indexOf('用户名已存在') >= 0) {
+      switchTab('renew');
+    }
+  }
+}
+
+async function doRenewWithCode() {
+  const authMsg = document.getElementById('authMsg');
+  const username = document.getElementById('renewUser').value.trim();
+  const password = document.getElementById('renewPass').value;
+  const auth_code = document.getElementById('renewAuthCode').value.trim();
+  try {
+    const res = await api('/api/v1/auth/renew-with-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, auth_code })
+    });
+    saveSession(res.access_token, res.membership, username);
+    document.getElementById('renewAuthCode').value = '';
+    await loadDashboard(false);
+    showMsg(authMsg, res.message || '续费成功', 'ok');
+  } catch (e) {
+    showMsg(authMsg, e.message, 'error');
   }
 }
 
@@ -1140,6 +1183,9 @@ async function doRenew() {
     renderProfile(res.membership || {});
     document.getElementById('renewCode').value = '';
     showMsg(dashMsg, res.message || '续费成功，会员状态已更新', 'ok');
+    if (res.membership && res.membership.is_active) {
+      await loadDashboard(false);
+    }
   } catch (e) {
     showMsg(dashMsg, e.message, 'error');
   }
@@ -1148,24 +1194,51 @@ async function doRenew() {
 async function loadClientDownload() {
   const link = document.getElementById('paInstallerLink');
   const meta = document.getElementById('paInstallerMeta');
+  const notice = document.getElementById('paUpdateNotice');
+  const noticeText = document.getElementById('paUpdateNoticeText');
+  const changelogList = document.getElementById('paChangelogList');
   if (!link || !meta) return;
   const fallback = () => {
     link.href = 'https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe';
-    meta.textContent = '版本 v2026.07.06 · Windows 64 位';
+    meta.textContent = '最新 v2026.07.12 · Windows 64 位';
   };
   fallback();
+  let manifest = null;
+  try {
+    const mres = await fetch('https://www.xhs365.cn/downloads/productanalyzer-version.json', { cache: 'no-store', mode: 'cors' });
+    if (mres.ok) manifest = await mres.json();
+  } catch (e) { /* ignore */ }
+  if (manifest) {
+    if (manifest.download_url) link.href = manifest.download_url;
+    meta.textContent = '最新 v' + (manifest.version || '2026.07.12') + ' · Windows 64 位';
+    if (notice && noticeText && manifest.release_notes) {
+      notice.classList.remove('hidden');
+      noticeText.textContent = 'v' + (manifest.version || '') + '：' + manifest.release_notes + '。请下载安装包覆盖安装以体验最新功能。';
+    }
+    if (changelogList && Array.isArray(manifest.changelog)) {
+      changelogList.innerHTML = manifest.changelog.slice(0, 5).map(function(entry) {
+        const items = (entry.highlights || []).map(function(h) { return '<li>' + h + '</li>'; }).join('');
+        return '<li><strong>v' + entry.version + '</strong>（' + (entry.date || '') + '）<ul style="margin:4px 0 8px">' + items + '</ul></li>';
+      }).join('');
+    }
+  }
   try {
     const res = await fetch('https://www.xhs365.cn/api/v1/public/downloads', { cache: 'no-store', mode: 'cors' });
     const json = await res.json();
     const d = json && json.data ? json.data : {};
     if (d.installer_url) link.href = d.installer_url;
-    if (d.installer_available) {
-      meta.textContent = '版本 v' + (d.version || '2026.07.06') + ' · Windows 64 位';
-    } else {
+    const manifestVersion = manifest && manifest.version ? String(manifest.version) : '';
+    const apiVersion = d.version ? String(d.version) : '';
+    const bestVersion = manifestVersion && apiVersion
+      ? (manifestVersion.localeCompare(apiVersion, undefined, { numeric: true }) >= 0 ? manifestVersion : apiVersion)
+      : (manifestVersion || apiVersion || '2026.07.12');
+    if (d.installer_available || manifest) {
+      meta.textContent = '最新 v' + bestVersion + ' · Windows 64 位';
+    } else if (!manifest) {
       meta.textContent = '安装包筹备中，请联系客服';
     }
   } catch (e) {
-    /* 跨域失败时保留 fallback 链接与版本号 */
+    /* 跨域失败时保留 manifest / fallback 链接与版本号 */
   }
 }
 

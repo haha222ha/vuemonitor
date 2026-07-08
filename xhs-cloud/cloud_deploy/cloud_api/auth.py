@@ -164,25 +164,48 @@ def current_member(
     request: Request,
     cred: HTTPAuthorizationCredentials | None = Depends(security),
 ) -> dict:
+    user = current_user(request, cred)
+    member = db.get_active_member(user["id"])
+    if not member:
+        raise HTTPException(status_code=402, detail="会员已过期或停用")
+    return member
+
+
+def current_user(
+    request: Request,
+    cred: HTTPAuthorizationCredentials | None = Depends(security),
+) -> dict:
     token = resolve_member_token(cred, request)
     if not token:
         raise HTTPException(status_code=401, detail="需要登录")
-    return member_from_token(token)
+    return user_from_token(token)
+
+
+def user_from_token(token: str) -> dict:
+    payload = decode_token(token)
+    uid = int(payload["sub"])
+    username = str(payload.get("username") or "")
+    if not username:
+        profile = db.get_member_profile(uid)
+        if profile:
+            username = profile.get("username") or ""
+    if not username:
+        raise HTTPException(status_code=401, detail="用户不存在")
+    return {"id": uid, "username": username}
 
 
 def member_from_token(token: str) -> dict:
-    payload = decode_token(token)
-    uid = int(payload["sub"])
-    user = db.get_active_member(uid)
-    if not user:
+    user = user_from_token(token)
+    member = db.get_active_member(user["id"])
+    if not member:
         raise HTTPException(status_code=402, detail="会员已过期或停用")
-    return user
+    return member
 
 
 def login_member(username: str, password: str) -> dict:
-    user = db.authenticate(username, password)
+    user = db.authenticate_user(username, password)
     if not user:
-        raise HTTPException(status_code=401, detail="用户名或密码错误，或会员已过期")
+        raise HTTPException(status_code=401, detail="用户名或密码错误")
     profile = db.get_member_profile(user["id"]) or user
     token = create_token(user)
     return {
@@ -213,8 +236,6 @@ def refresh_member_token(token: str) -> dict:
     profile = db.get_member_profile(uid)
     if not profile:
         raise HTTPException(status_code=401, detail="用户不存在")
-    if not profile.get("is_active"):
-        raise HTTPException(status_code=402, detail="会员已过期或停用")
     new_token = create_token({"id": uid, "username": profile["username"]})
     return {
         "access_token": new_token,

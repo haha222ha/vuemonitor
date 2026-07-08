@@ -464,6 +464,21 @@ def get_active_member(user_id: int) -> dict | None:
         conn.close()
 
 
+def authenticate_user(username: str, password: str) -> dict | None:
+    """仅校验账号密码，不要求会员未过期（用于过期后续费登录）。"""
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute("SELECT id, username, password_hash FROM users WHERE username=%s", (username,))
+            u = c.fetchone()
+            if not u or not _verify_password(password, u["password_hash"]):
+                return None
+            return {"id": u["id"], "username": u["username"]}
+    finally:
+        conn.close()
+
+
 def authenticate(username: str, password: str) -> dict | None:
     conn = _conn()
     try:
@@ -642,8 +657,106 @@ PLAN_LABELS = {
     "weekly": "周会员",
     "monthly": "月度会员",
     "yearly": "年度会员",
+    "experience": "体验会员",
     "admin": "管理员",
 }
+
+
+def _parse_entitlements_from_note(note: str | None) -> dict | None:
+    if not note:
+        return None
+    text = str(note).strip()
+    if not text.startswith("{"):
+        return None
+    try:
+        import json
+        data = json.loads(text)
+        if isinstance(data, dict):
+            return data.get("entitlements") if isinstance(data.get("entitlements"), dict) else data
+    except Exception:
+        return None
+    return None
+
+
+def get_member_entitlements(user_id: int) -> dict | None:
+    """体验会员等受限授权：从激活过的 auth_codes.note JSON 读取 entitlements。"""
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """
+                SELECT ac.plan_code, ac.note
+                FROM auth_code_activations aca
+                JOIN auth_codes ac ON ac.id = aca.auth_code_id
+                WHERE aca.user_id = %s
+                ORDER BY aca.activated_at DESC
+                """,
+                (user_id,),
+            )
+            rows = c.fetchall() or []
+            for row in rows:
+                ent = _parse_entitlements_from_note(row.get("note"))
+                if ent:
+                    ent = dict(ent)
+                    ent.setdefault("plan_code", row.get("plan_code"))
+                    return ent
+                if str(row.get("plan_code") or "") == "experience":
+                    return {"plan_code": "experience", "pc_full": True, "report_download_limited": True}
+    finally:
+        conn.close()
+    return None
+
+
+def filter_report_library_by_entitlements(library: dict, entitlements: dict | None) -> dict:
+    if not library or not entitlements:
+        return library
+    allowed_dates = entitlements.get("allowed_report_dates") or entitlements.get("report_dates") or []
+    allowed_types = entitlements.get("allowed_archive_types") or entitlements.get("archive_types") or []
+    if not allowed_dates and not entitlements.get("report_download_limited"):
+        return library
+    allowed_dates = {str(x).strip() for x in allowed_dates if str(x).strip()}
+    allowed_types = {str(x).strip() for x in allowed_types if str(x).strip()}
+    archive_map = {
+        "daily": "member_daily_zip",
+        "weekly": "member_weekly_zip",
+        "monthly": "member_monthly_zip",
+        "custom": "member_custom_zip",
+    }
+    out = dict(library)
+    total = 0
+    for key in ("daily", "weekly", "monthly", "custom"):
+        rows = list(out.get(key) or [])
+        if allowed_types:
+            atype = archive_map.get(key)
+            if atype and atype not in allowed_types:
+                rows = []
+        if allowed_dates:
+            rows = [
+                r for r in rows
+                if str(r.get("report_date") or r.get("date") or "")[:10] in allowed_dates
+            ]
+        out[key] = rows
+        total += len(rows)
+    out["total_count"] = total
+    out["entitlements_applied"] = True
+    return out
+
+
+def member_can_download_report(user_id: int, report_date: str, archive_type: str) -> bool:
+    ent = get_member_entitlements(user_id)
+    if not ent:
+        return True
+    allowed_dates = ent.get("allowed_report_dates") or ent.get("report_dates") or []
+    allowed_types = ent.get("allowed_archive_types") or ent.get("archive_types") or []
+    if not allowed_dates and not allowed_types and not ent.get("report_download_limited"):
+        return True
+    day = str(report_date or "")[:10]
+    if allowed_dates and day not in {str(x).strip()[:10] for x in allowed_dates}:
+        return False
+    if allowed_types and archive_type not in {str(x).strip() for x in allowed_types}:
+        return False
+    return True
 
 
 def _normalize_code(code: str) -> str:
@@ -836,7 +949,7 @@ def _validate_auth_code_row(row: dict | None) -> dict:
     return row
 
 
-def _extend_membership(c, user_id: int, plan_code: str, duration_days: int) -> datetime:
+def _extend_membership(c, user_id: int, plan_code: str, duration_days: int) -> dict:
     c.execute(
         """SELECT expires_at FROM memberships
            WHERE user_id=%s AND status='active' ORDER BY expires_at DESC LIMIT 1""",
@@ -845,15 +958,26 @@ def _extend_membership(c, user_id: int, plan_code: str, duration_days: int) -> d
     row = c.fetchone()
     now = _now()
     base = now
-    if row and row[0] and _as_utc(row[0]) > now:
-        base = _as_utc(row[0])
+    previous_days = 0
+    stacked = False
+    if row and row[0]:
+        exp = _as_utc(row[0])
+        if exp > now:
+            base = exp
+            previous_days = max(0, _days_until(exp))
+            stacked = True
     expires = base + timedelta(days=duration_days)
     c.execute(
         """INSERT INTO memberships (user_id, plan_code, activated_at, expires_at, status)
            VALUES (%s,%s,NOW(),%s,'active')""",
         (user_id, plan_code, expires),
     )
-    return expires
+    return {
+        "expires_at": expires,
+        "stacked": stacked,
+        "previous_days_remaining": previous_days,
+        "days_added": int(duration_days),
+    }
 
 
 def register_with_auth_code(username: str, password: str, code: str) -> dict:
@@ -868,14 +992,15 @@ def register_with_auth_code(username: str, password: str, code: str) -> dict:
             c.execute("SET search_path TO xhs_monitor, public")
             c.execute("SELECT id FROM users WHERE username=%s", (username,))
             if c.fetchone():
-                raise ValueError("用户名已存在，请直接登录后使用授权码续费")
+                raise ValueError("用户名已存在，请切换到「授权码续费」或使用登录后在会员中心续费")
             row = _validate_auth_code_row(_fetch_auth_code(c, code))
             c.execute(
                 "INSERT INTO users (username, password_hash) VALUES (%s,%s) RETURNING id",
                 (username, _hash_password(password)),
             )
             uid = c.fetchone()["id"]
-            expires = _extend_membership(c, uid, row["plan_code"], row["duration_days"])
+            extend_info = _extend_membership(c, uid, row["plan_code"], row["duration_days"])
+            expires = extend_info["expires_at"]
             c.execute(
                 "INSERT INTO auth_code_activations (auth_code_id, user_id) VALUES (%s,%s)",
                 (row["id"], uid),
@@ -966,7 +1091,7 @@ def renew_with_auth_code(user_id: int, code: str) -> dict:
             )
             if c.fetchone():
                 raise ValueError("您已使用过此授权码")
-            _extend_membership(c, user_id, row["plan_code"], row["duration_days"])
+            extend_info = _extend_membership(c, user_id, row["plan_code"], row["duration_days"])
             c.execute(
                 "INSERT INTO auth_code_activations (auth_code_id, user_id) VALUES (%s,%s)",
                 (row["id"], user_id),
@@ -976,9 +1101,24 @@ def renew_with_auth_code(user_id: int, code: str) -> dict:
                 (row["id"],),
             )
         conn.commit()
-        return get_member_profile(user_id) or {}
+        profile = get_member_profile(user_id) or {}
+        profile["renew_stack"] = {
+            "stacked": extend_info["stacked"],
+            "previous_days_remaining": extend_info["previous_days_remaining"],
+            "days_added": extend_info["days_added"],
+            "expires_at": extend_info["expires_at"].strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        return profile
     finally:
         conn.close()
+
+
+def renew_with_credentials(username: str, password: str, code: str) -> dict:
+    """已注册用户用账号密码 + 新授权码续费/叠加时长。"""
+    user = authenticate_user(username, password)
+    if not user:
+        raise ValueError("用户名或密码错误")
+    return renew_with_auth_code(user["id"], code)
 
 
 def get_member_profile(user_id: int) -> dict | None:
@@ -1029,7 +1169,7 @@ def get_member_profile(user_id: int) -> dict | None:
     return member
 
 
-def list_report_library() -> dict:
+def list_report_library(user_id: int | None = None) -> dict:
     """全部历史报告库（日报 + 周报 + 月报 + 定制）。"""
     archive_map = {
         "daily": "member_daily_zip",
@@ -1049,6 +1189,10 @@ def list_report_library() -> dict:
         out[key] = rows
         total += len(rows)
     out["total_count"] = total
+    if user_id:
+        ent = get_member_entitlements(user_id)
+        if ent:
+            out = filter_report_library_by_entitlements(out, ent)
     return out
 
 
