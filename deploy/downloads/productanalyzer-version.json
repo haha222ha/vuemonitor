@@ -1,6 +1,38 @@
 {
-  "version": "2026.07.06",
+  "version": "2026.07.14",
   "min_version": "2026.06.01",
-  "release_notes": "店铺监控改版；销量热榜瀑布流；销量异常/重置智能识别；合规声明 Tab；报告本地缓存与 Tab 切换稳定性优化",
-  "download_url": "https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe"
+  "release_notes": "全部商品卡片对齐；上架时间含年份；曲线与异常说明统一悬浮展示；违规警示库与协同功能完善",
+  "download_url": "https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe",
+  "changelog": [
+    {
+      "version": "2026.07.14",
+      "date": "2026-07-08",
+      "highlights": [
+        "全部商品卡片等高对齐，指标栏布局统一",
+        "上架时间显示完整年份，文案统一为「上架时间」",
+        "成交曲线与异常说明改为悬浮窗展示，面板更整洁",
+        "违规警示库、协同跟进、趋势图重设计等近期功能一并打包"
+      ]
+    },
+    {
+      "version": "2026.07.13",
+      "date": "2026-07-08",
+      "highlights": [
+        "全部商品页新增违规警示横幅（总数 / 当前列表命中 / 近7日更新）",
+        "支持一键筛出列表违规商品、跳转完整警示库",
+        "快速筛选增加「违规警示」；瀑布流与表格红标强化"
+      ]
+    },
+    {
+      "version": "2026.07.12",
+      "date": "2026-07-12",
+      "highlights": [
+        "UI/UX Phase 1-5：Design Token、SVG 侧栏、卡片重设计",
+        "NotificationHub 通知中心 + Ctrl+K 命令面板",
+        "批量查询支持取消、失败重试；骨架屏与统一空状态"
+      ]
+    }
+  ],
+  "sha256": "981f912a3ec33fe31c9f337e93f4261f5a300ff28d5954f2ddfdd43da97ec406",
+  "file_size": 291191123
 }
