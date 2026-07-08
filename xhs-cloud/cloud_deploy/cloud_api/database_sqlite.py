@@ -108,6 +108,162 @@ def _migrate_legacy_columns(c) -> None:
         c.execute("ALTER TABLE report_archives ADD COLUMN status TEXT DEFAULT 'published'")
     if "published_at" not in cols:
         c.execute("ALTER TABLE report_archives ADD COLUMN published_at TEXT")
+    c.execute("PRAGMA table_info(users)")
+    user_cols = {row[1] for row in c.fetchall()}
+    for dtype in ("pc", "web"):
+        if f"{dtype}_device_id" not in user_cols:
+            c.execute(f"ALTER TABLE users ADD COLUMN {dtype}_device_id TEXT")
+        if f"{dtype}_session_version" not in user_cols:
+            c.execute(f"ALTER TABLE users ADD COLUMN {dtype}_session_version INTEGER NOT NULL DEFAULT 0")
+        if f"{dtype}_device_label" not in user_cols:
+            c.execute(f"ALTER TABLE users ADD COLUMN {dtype}_device_label TEXT")
+        if f"{dtype}_bound_at" not in user_cols:
+            c.execute(f"ALTER TABLE users ADD COLUMN {dtype}_bound_at TEXT")
+    # 旧版单槽字段（保留兼容，新逻辑不再写入）
+    if "session_device_id" not in user_cols:
+        c.execute("ALTER TABLE users ADD COLUMN session_device_id TEXT")
+    if "session_version" not in user_cols:
+        c.execute("ALTER TABLE users ADD COLUMN session_version INTEGER NOT NULL DEFAULT 0")
+    if "session_device_label" not in user_cols:
+        c.execute("ALTER TABLE users ADD COLUMN session_device_label TEXT")
+    if "session_bound_at" not in user_cols:
+        c.execute("ALTER TABLE users ADD COLUMN session_bound_at TEXT")
+    _migrate_legacy_single_session(c)
+
+
+def _migrate_legacy_single_session(c) -> None:
+    """将旧版单设备 session 迁移到 pc/web 分槽（仅当分槽为空时）。"""
+    c.execute(
+        """SELECT id, session_device_id, session_version, session_device_label, session_bound_at
+           FROM users
+           WHERE session_device_id IS NOT NULL AND TRIM(session_device_id) != ''"""
+    )
+    rows = c.fetchall()
+    for row in rows:
+        did = str(row["session_device_id"] or "").strip()
+        if ":" not in did:
+            continue
+        dtype = did.split(":", 1)[0].lower()
+        if dtype not in ("pc", "web"):
+            continue
+        c.execute(
+            f"""SELECT {dtype}_device_id, {dtype}_session_version FROM users WHERE id=?""",
+            (row["id"],),
+        )
+        slot = c.fetchone()
+        if slot and (slot[f"{dtype}_device_id"] or slot[f"{dtype}_session_version"]):
+            continue
+        c.execute(
+            f"""UPDATE users SET {dtype}_device_id=?, {dtype}_session_version=?,
+                   {dtype}_device_label=?, {dtype}_bound_at=?
+               WHERE id=?""",
+            (
+                did,
+                int(row["session_version"] or 0),
+                row["session_device_label"] or "",
+                row["session_bound_at"] or "",
+                row["id"],
+            ),
+        )
+
+
+def normalize_device_id(device_id: str, device_type: str = "") -> str:
+    raw = (device_id or "").strip()
+    if not raw:
+        return ""
+    if ":" in raw:
+        prefix, rest = raw.split(":", 1)
+        return f"{prefix.strip().lower()}:{rest.strip().upper()}"
+    dt = (device_type or "unknown").strip().lower()
+    return f"{dt}:{raw.upper()}"
+
+
+_DEVICE_SLOTS = frozenset({"pc", "web"})
+
+
+def _parse_device_slot(device_id: str) -> tuple[str, str]:
+    did = normalize_device_id(device_id)
+    parts = did.split(":", 1)
+    if len(parts) != 2 or parts[0] not in _DEVICE_SLOTS or len(parts[1]) < 8:
+        raise ValueError("device_id 无效")
+    return parts[0], did
+
+
+def get_member_session(user_id: int) -> dict | None:
+    conn = _conn()
+    c = conn.cursor()
+    c.execute(
+        """SELECT pc_device_id, pc_session_version, pc_device_label, pc_bound_at,
+                  web_device_id, web_session_version, web_device_label, web_bound_at
+           FROM users WHERE id=?""",
+        (user_id,),
+    )
+    row = c.fetchone()
+    conn.close()
+    if not row:
+        return None
+
+    def _slot(prefix: str) -> dict:
+        return {
+            "device_id": row[f"{prefix}_device_id"] or "",
+            "session_version": int(row[f"{prefix}_session_version"] or 0),
+            "device_label": row[f"{prefix}_device_label"] or "",
+            "bound_at": row[f"{prefix}_bound_at"] or "",
+        }
+
+    return {"pc": _slot("pc"), "web": _slot("web")}
+
+
+def get_member_session_slot(user_id: int, device_type: str) -> dict | None:
+    sessions = get_member_session(user_id)
+    if not sessions:
+        return None
+    return sessions.get(device_type)
+
+
+def bind_member_session(user_id: int, device_id: str, device_label: str = "") -> int:
+    dtype, did = _parse_device_slot(device_id)
+    current = get_member_session_slot(user_id, dtype) or {}
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    label = (device_label or "").strip()[:64]
+    if current.get("device_id") == did and int(current.get("session_version") or 0) > 0:
+        conn = _conn()
+        c = conn.cursor()
+        c.execute(
+            f"UPDATE users SET {dtype}_device_label=?, {dtype}_bound_at=? WHERE id=?",
+            (label or current.get("device_label"), now, user_id),
+        )
+        conn.commit()
+        conn.close()
+        return int(current["session_version"])
+    new_sv = int(current.get("session_version") or 0) + 1
+    conn = _conn()
+    c = conn.cursor()
+    c.execute(
+        f"""UPDATE users SET {dtype}_device_id=?, {dtype}_session_version=?,
+               {dtype}_device_label=?, {dtype}_bound_at=?
+           WHERE id=?""",
+        (did, new_sv, label, now, user_id),
+    )
+    conn.commit()
+    conn.close()
+    return new_sv
+
+
+def verify_member_session(user_id: int, device_id: str, session_version: int) -> bool:
+    try:
+        dtype, did = _parse_device_slot(device_id)
+    except ValueError:
+        return False
+    if session_version <= 0:
+        return False
+    current = get_member_session_slot(user_id, dtype)
+    if not current or not current.get("device_id"):
+        return False
+    return (
+        current["device_id"] == did
+        and int(current["session_version"]) == int(session_version)
+    )
 
 
 def _hash_password(password: str, salt: str | None = None) -> str:

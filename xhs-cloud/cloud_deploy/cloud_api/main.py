@@ -26,7 +26,7 @@ from cloud_deploy.cloud_api.auth import (
     change_member_password,
     current_member,
     current_user,
-    create_token,
+    issue_member_token,
     login_member,
     login_member_by_code,
     clear_member_cookie_response,
@@ -50,12 +50,17 @@ def _startup():
     db.ensure_admin()
 
 
-class LoginBody(BaseModel):
+class DeviceAuthBody(BaseModel):
+    device_id: str = Field(..., min_length=8, max_length=160)
+    device_label: str = Field(default="", max_length=64)
+
+
+class LoginBody(DeviceAuthBody):
     username: str
     password: str
 
 
-class LoginCodeBody(BaseModel):
+class LoginCodeBody(DeviceAuthBody):
     auth_code: str = Field(..., min_length=8, max_length=64)
 
 
@@ -64,7 +69,7 @@ class ChangePasswordBody(BaseModel):
     current_password: str = Field(default="")
 
 
-class RegisterBody(BaseModel):
+class RegisterBody(DeviceAuthBody):
     username: str = Field(..., min_length=3, max_length=64)
     password: str = Field(..., min_length=6, max_length=128)
     auth_code: str = Field(..., min_length=8, max_length=64)
@@ -74,7 +79,7 @@ class ActivateBody(BaseModel):
     auth_code: str = Field(..., min_length=8, max_length=64)
 
 
-class RenewWithCodeBody(BaseModel):
+class RenewWithCodeBody(DeviceAuthBody):
     username: str = Field(..., min_length=3, max_length=64)
     password: str = Field(..., min_length=6, max_length=128)
     auth_code: str = Field(..., min_length=8, max_length=64)
@@ -280,12 +285,16 @@ def health():
 
 @app.post("/api/v1/auth/login")
 def login(body: LoginBody):
-    return member_auth_response(login_member(body.username, body.password))
+    return member_auth_response(
+        login_member(body.username, body.password, body.device_id, body.device_label)
+    )
 
 
 @app.post("/api/v1/auth/login-code")
 def login_with_code(body: LoginCodeBody):
-    return member_auth_response(login_member_by_code(body.auth_code))
+    return member_auth_response(
+        login_member_by_code(body.auth_code, body.device_id, body.device_label)
+    )
 
 
 @app.post("/api/v1/auth/register")
@@ -297,7 +306,9 @@ def register(body: RegisterBody):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"开通失败: {e}") from e
     try:
-        token = create_token(profile)
+        token = issue_member_token(profile["id"], profile["username"], body.device_id, body.device_label)
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"登录令牌生成失败: {e}") from e
     return member_auth_response({
@@ -328,7 +339,7 @@ def renew_with_code(body: RenewWithCodeBody):
         profile = db.renew_with_credentials(body.username, body.password, body.auth_code)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
-    token = create_token({"id": profile["id"], "username": profile["username"]})
+    token = issue_member_token(profile["id"], profile["username"], body.device_id, body.device_label)
     return member_auth_response({
         "access_token": token,
         "token_type": "bearer",

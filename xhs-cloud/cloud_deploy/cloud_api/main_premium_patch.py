@@ -36,6 +36,8 @@ def _startup():
 class LoginBody(BaseModel):
     username: str
     password: str
+    device_id: str = Field(..., min_length=8, max_length=160)
+    device_label: str = Field(default="", max_length=64)
 
 
 class DailyReportSyncBody(BaseModel):
@@ -105,7 +107,7 @@ def health():
 
 @app.post("/api/v1/auth/login")
 def login(body: LoginBody):
-    return login_member(body.username, body.password)
+    return login_member(body.username, body.password, body.device_id, body.device_label)
 
 
 @app.get("/api/v1/member/reports")

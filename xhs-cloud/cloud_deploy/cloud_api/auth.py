@@ -23,7 +23,13 @@ def _b64url(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).decode().rstrip("=")
 
 
-def create_token(user: dict, ttl_hours: int | None = None) -> str:
+def create_token(
+    user: dict,
+    *,
+    device_id: str = "",
+    session_version: int = 0,
+    ttl_hours: int | None = None,
+) -> str:
     s = get_settings()
     if ttl_hours is None:
         ttl_hours = s.xhs_cloud_jwt_ttl_days * 24
@@ -33,6 +39,9 @@ def create_token(user: dict, ttl_hours: int | None = None) -> str:
         "username": user["username"],
         "exp": int(time.time()) + ttl_hours * 3600,
     }
+    if device_id and session_version > 0:
+        payload["did"] = device_id
+        payload["sv"] = int(session_version)
     h = _b64url(json.dumps(header, separators=(",", ":")).encode())
     p = _b64url(json.dumps(payload, separators=(",", ":")).encode())
     sig = hmac.new(
@@ -181,6 +190,15 @@ def current_user(
     return user_from_token(token)
 
 
+def _device_kick_message(device_id: str) -> str:
+    did = db.normalize_device_id(device_id)
+    if did.startswith("pc:"):
+        return "账号已在其他电脑登录，当前会话已失效"
+    if did.startswith("web:"):
+        return "账号已在其他浏览器登录，当前会话已失效"
+    return "账号已在其他设备登录，当前会话已失效"
+
+
 def user_from_token(token: str) -> dict:
     payload = decode_token(token)
     uid = int(payload["sub"])
@@ -191,23 +209,40 @@ def user_from_token(token: str) -> dict:
             username = profile.get("username") or ""
     if not username:
         raise HTTPException(status_code=401, detail="用户不存在")
+    did = str(payload.get("did") or "").strip()
+    sv = int(payload.get("sv") or 0)
+    if not did or sv <= 0:
+        raise HTTPException(status_code=401, detail="登录已失效，请重新登录")
+    if not db.verify_member_session(uid, did, sv):
+        raise HTTPException(status_code=401, detail=_device_kick_message(did))
     return {"id": uid, "username": username}
 
 
-def member_from_token(token: str) -> dict:
-    user = user_from_token(token)
-    member = db.get_active_member(user["id"])
-    if not member:
-        raise HTTPException(status_code=402, detail="会员已过期或停用")
-    return member
+def issue_member_token(
+    user_id: int,
+    username: str,
+    device_id: str,
+    device_label: str = "",
+) -> str:
+    try:
+        sv = db.bind_member_session(user_id, device_id, device_label)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    did = db.normalize_device_id(device_id)
+    return create_token({"id": user_id, "username": username}, device_id=did, session_version=sv)
 
 
-def login_member(username: str, password: str) -> dict:
+def login_member(
+    username: str,
+    password: str,
+    device_id: str,
+    device_label: str = "",
+) -> dict:
     user = db.authenticate_user(username, password)
     if not user:
         raise HTTPException(status_code=401, detail="用户名或密码错误")
+    token = issue_member_token(user["id"], user["username"], device_id, device_label)
     profile = db.get_member_profile(user["id"]) or user
-    token = create_token(user)
     return {
         "access_token": token,
         "token_type": "bearer",
@@ -216,12 +251,16 @@ def login_member(username: str, password: str) -> dict:
     }
 
 
-def login_member_by_code(auth_code: str) -> dict:
+def login_member_by_code(
+    auth_code: str,
+    device_id: str,
+    device_label: str = "",
+) -> dict:
     try:
         profile = db.login_with_auth_code(auth_code)
     except ValueError as e:
         raise HTTPException(status_code=401, detail=str(e)) from e
-    token = create_token({"id": profile["id"], "username": profile["username"]})
+    token = issue_member_token(profile["id"], profile["username"], device_id, device_label)
     return {
         "access_token": token,
         "token_type": "bearer",
@@ -233,15 +272,33 @@ def login_member_by_code(auth_code: str) -> dict:
 def refresh_member_token(token: str) -> dict:
     payload = decode_token_graceful(token)
     uid = int(payload["sub"])
+    did = str(payload.get("did") or "").strip()
+    sv = int(payload.get("sv") or 0)
+    if not did or sv <= 0:
+        raise HTTPException(status_code=401, detail="登录已失效，请重新登录")
+    if not db.verify_member_session(uid, did, sv):
+        raise HTTPException(status_code=401, detail=_device_kick_message(did))
     profile = db.get_member_profile(uid)
     if not profile:
         raise HTTPException(status_code=401, detail="用户不存在")
-    new_token = create_token({"id": uid, "username": profile["username"]})
+    new_token = create_token(
+        {"id": uid, "username": profile["username"]},
+        device_id=did,
+        session_version=sv,
+    )
     return {
         "access_token": new_token,
         "token_type": "bearer",
         "membership": profile,
     }
+
+
+def member_from_token(token: str) -> dict:
+    user = user_from_token(token)
+    member = db.get_active_member(user["id"])
+    if not member:
+        raise HTTPException(status_code=402, detail="会员已过期或停用")
+    return member
 
 
 def change_member_password(

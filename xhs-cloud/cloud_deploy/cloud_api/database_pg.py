@@ -361,6 +361,58 @@ def _migrate_legacy_columns(c) -> None:
             ON monitor_goods (monitor_status, last_scan_at NULLS FIRST, priority_score DESC)
         """
     )
+    c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS session_device_id VARCHAR(160)")
+    c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS session_version INT NOT NULL DEFAULT 0")
+    c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS session_device_label VARCHAR(64)")
+    c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS session_bound_at TIMESTAMPTZ")
+    for dtype in ("pc", "web"):
+        c.execute(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {dtype}_device_id VARCHAR(160)")
+        c.execute(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {dtype}_session_version INT NOT NULL DEFAULT 0")
+        c.execute(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {dtype}_device_label VARCHAR(64)")
+        c.execute(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {dtype}_bound_at TIMESTAMPTZ")
+    _migrate_legacy_single_session(c)
+
+
+def _migrate_legacy_single_session(c) -> None:
+    c.execute(
+        """SELECT id, session_device_id, session_version, session_device_label, session_bound_at
+           FROM users
+           WHERE session_device_id IS NOT NULL AND TRIM(session_device_id) <> ''"""
+    )
+    rows = c.fetchall() or []
+    for row in rows:
+        if isinstance(row, dict):
+            uid = row["id"]
+            did = str(row.get("session_device_id") or "").strip()
+            sv = int(row.get("session_version") or 0)
+            label = row.get("session_device_label") or ""
+            bound = row.get("session_bound_at")
+        else:
+            uid, did, sv, label, bound = row[0], str(row[1] or "").strip(), int(row[2] or 0), row[3] or "", row[4]
+        if ":" not in did:
+            continue
+        dtype = did.split(":", 1)[0].lower()
+        if dtype not in ("pc", "web"):
+            continue
+        c.execute(
+            f"SELECT {dtype}_device_id, {dtype}_session_version FROM users WHERE id=%s",
+            (uid,),
+        )
+        slot = c.fetchone()
+        if slot:
+            if isinstance(slot, dict):
+                slot_did = slot.get(f"{dtype}_device_id")
+                slot_sv = slot.get(f"{dtype}_session_version")
+            else:
+                slot_did, slot_sv = slot[0], slot[1]
+            if slot_did or slot_sv:
+                continue
+        c.execute(
+            f"""UPDATE users SET {dtype}_device_id=%s, {dtype}_session_version=%s,
+                   {dtype}_device_label=%s, {dtype}_bound_at=%s
+               WHERE id=%s""",
+            (did, sv, label, bound, uid),
+        )
     c.execute(
         """
         CREATE TABLE IF NOT EXISTS daemon_scan_stats (
@@ -431,6 +483,115 @@ def ensure_admin() -> None:
         conn.commit()
     finally:
         conn.close()
+
+
+def normalize_device_id(device_id: str, device_type: str = "") -> str:
+    raw = (device_id or "").strip()
+    if not raw:
+        return ""
+    if ":" in raw:
+        prefix, rest = raw.split(":", 1)
+        return f"{prefix.strip().lower()}:{rest.strip().upper()}"
+    dt = (device_type or "unknown").strip().lower()
+    return f"{dt}:{raw.upper()}"
+
+
+_DEVICE_SLOTS = frozenset({"pc", "web"})
+
+
+def _parse_device_slot(device_id: str) -> tuple[str, str]:
+    did = normalize_device_id(device_id)
+    parts = did.split(":", 1)
+    if len(parts) != 2 or parts[0] not in _DEVICE_SLOTS or len(parts[1]) < 8:
+        raise ValueError("device_id 无效")
+    return parts[0], did
+
+
+def get_member_session(user_id: int) -> dict | None:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """SELECT pc_device_id, pc_session_version, pc_device_label, pc_bound_at,
+                          web_device_id, web_session_version, web_device_label, web_bound_at
+                   FROM users WHERE id=%s""",
+                (user_id,),
+            )
+            row = c.fetchone()
+            if not row:
+                return None
+
+            def _slot(prefix: str) -> dict:
+                bound = row.get(f"{prefix}_bound_at")
+                return {
+                    "device_id": row.get(f"{prefix}_device_id") or "",
+                    "session_version": int(row.get(f"{prefix}_session_version") or 0),
+                    "device_label": row.get(f"{prefix}_device_label") or "",
+                    "bound_at": bound.strftime("%Y-%m-%d %H:%M:%S") if bound else "",
+                }
+
+            return {"pc": _slot("pc"), "web": _slot("web")}
+    finally:
+        conn.close()
+
+
+def get_member_session_slot(user_id: int, device_type: str) -> dict | None:
+    sessions = get_member_session(user_id)
+    if not sessions:
+        return None
+    return sessions.get(device_type)
+
+
+def bind_member_session(user_id: int, device_id: str, device_label: str = "") -> int:
+    dtype, did = _parse_device_slot(device_id)
+    current = get_member_session_slot(user_id, dtype) or {}
+    label = (device_label or "").strip()[:64]
+    if current.get("device_id") == did and int(current.get("session_version") or 0) > 0:
+        conn = _conn()
+        try:
+            with conn.cursor() as c:
+                c.execute("SET search_path TO xhs_monitor, public")
+                c.execute(
+                    f"""UPDATE users SET {dtype}_device_label=%s, {dtype}_bound_at=NOW()
+                       WHERE id=%s""",
+                    (label or current.get("device_label"), user_id),
+                )
+            conn.commit()
+        finally:
+            conn.close()
+        return int(current["session_version"])
+    new_sv = int(current.get("session_version") or 0) + 1
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                f"""UPDATE users SET {dtype}_device_id=%s, {dtype}_session_version=%s,
+                       {dtype}_device_label=%s, {dtype}_bound_at=NOW()
+                   WHERE id=%s""",
+                (did, new_sv, label, user_id),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+    return new_sv
+
+
+def verify_member_session(user_id: int, device_id: str, session_version: int) -> bool:
+    try:
+        dtype, did = _parse_device_slot(device_id)
+    except ValueError:
+        return False
+    if session_version <= 0:
+        return False
+    current = get_member_session_slot(user_id, dtype)
+    if not current or not current.get("device_id"):
+        return False
+    return (
+        current["device_id"] == did
+        and int(current["session_version"]) == int(session_version)
+    )
 
 
 def get_active_member(user_id: int) -> dict | None:

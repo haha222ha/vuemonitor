@@ -274,6 +274,7 @@ const STORAGE = {
   reportType: 'xhs_member_report_type',
   viewMode: 'xhs_member_view_mode',
   activated: 'xhs_member_activated',
+  deviceId: 'xhs_member_device_id',
 };
 const TOKEN_COOKIE = 'xhs_member_token';
 const TOKEN_COOKIE_MAX_AGE = 30 * 86400;
@@ -345,6 +346,34 @@ function saveStored(key, val) {
 function removeStored(key) {
   try { localStorage.removeItem(key); } catch (_) {}
   if (key === STORAGE.token) clearTokenCookie();
+}
+
+function randomDeviceSuffix() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID().replace(/-/g, '').slice(0, 32).toUpperCase();
+  return (Date.now().toString(36) + Math.random().toString(36).slice(2)).replace(/[^A-Z0-9]/gi, '').slice(0, 32).toUpperCase();
+}
+
+function getMemberDeviceId() {
+  let raw = loadStored(STORAGE.deviceId);
+  if (!raw || raw.length < 8) {
+    raw = randomDeviceSuffix();
+    saveStored(STORAGE.deviceId, raw);
+  }
+  return 'web:' + String(raw).toUpperCase();
+}
+
+function deviceAuthPayload() {
+  return {
+    device_id: getMemberDeviceId(),
+    device_label: '会员网页',
+  };
+}
+
+function isDeviceKickedMessage(msg) {
+  const text = String(msg || '');
+  return text.indexOf('其他设备登录') >= 0
+    || text.indexOf('其他电脑登录') >= 0
+    || text.indexOf('其他浏览器登录') >= 0;
 }
 
 let library = { daily: [], weekly: [], monthly: [], custom: [] };
@@ -631,12 +660,13 @@ async function restoreSession() {
       removeStored(STORAGE.token);
       showAuthView();
       const authMsg = document.getElementById('authMsg');
+      const kicked = isDeviceKickedMessage(e.message);
       if (cached) {
-        renderProfile({ ...cached, is_active: false, expiry_warning: '登录已过期，请重新登录' });
-        showMsg(authMsg, '会话已过期，请重新输入密码或授权码', 'warn');
+        renderProfile({ ...cached, is_active: false, expiry_warning: kicked ? '账号已在其他设备登录' : '登录已过期，请重新登录' });
+        showMsg(authMsg, kicked ? '账号已在其他设备登录，请在本浏览器重新登录' : '会话已过期，请重新输入密码或授权码', 'warn');
         switchLoginMode('code');
       } else {
-        showMsg(authMsg, e.message || '请重新登录', 'warn');
+        showMsg(authMsg, kicked ? '账号已在其他设备登录，请重新登录' : (e.message || '请重新登录'), 'warn');
       }
       switchTab('login');
       return false;
@@ -1080,7 +1110,7 @@ async function doLogin() {
     const res = await api('/api/v1/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ username, password, ...deviceAuthPayload() })
     });
     saveSession(res.access_token, res.membership, username);
     await loadDashboard(false);
@@ -1097,7 +1127,7 @@ async function doLoginCode() {
     const res = await api('/api/v1/auth/login-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ auth_code })
+      body: JSON.stringify({ auth_code, ...deviceAuthPayload() })
     });
     const username = (res.membership && res.membership.username) || '';
     saveSession(res.access_token, res.membership, username);
@@ -1137,7 +1167,7 @@ async function doRegister() {
     const res = await api('/api/v1/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ auth_code, username, password })
+      body: JSON.stringify({ auth_code, username, password, ...deviceAuthPayload() })
     });
     saveSession(res.access_token, res.membership, username);
     document.getElementById('regCode').value = '';
@@ -1160,7 +1190,7 @@ async function doRenewWithCode() {
     const res = await api('/api/v1/auth/renew-with-code', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, auth_code })
+      body: JSON.stringify({ username, password, auth_code, ...deviceAuthPayload() })
     });
     saveSession(res.access_token, res.membership, username);
     document.getElementById('renewAuthCode').value = '';
