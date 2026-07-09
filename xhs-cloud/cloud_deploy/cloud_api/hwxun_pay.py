@@ -3,6 +3,7 @@
 
 微信网关：https://pay.hwxun.cn/mapi.php  type=wxpay
 支付宝网关：https://xapay.hwxun.cn/mapi.php  type=alipay
+  文档：https://xapay.hwxun.cn/doc/epay_mapi （页面跳转见 epay_submit，我们不用）
 商户后台（支付宝云端）：https://xapay.hwxun.cn/user/
 """
 from __future__ import annotations

@@ -51,13 +51,26 @@ bash /opt/xhs-cloud/cloud_deploy/scripts/verify_payment_setup.sh
 
 | 项 | 值 |
 |----|-----|
-| 签名模式 | **MD5 + RSA 兼容** |
+| 签名模式 | **MD5 + RSA 兼容**（我们下单/验签走 **MD5**，与兼容模式一致） |
 | 异步通知 | `https://monitor.xhs365.cn/api/v1/payment/notify/hwxun` |
 | 支付通道 | 新增并启用 **「支付宝云端免挂」**（或按文档配置收款通道） |
 
 若下单报 **「没有找到可用支付账号」**：说明 PID/KEY 已对，但后台 **未绑定/启用支付宝收款通道**，与服务器无关。
 
-参考文档：[支付宝云端配置教程](https://docs.qq.com/doc/DUXhLdXN1TFVHTHRq)
+### 官方 API 文档（xapay）
+
+| 文档 | 地址 | 我们是否使用 |
+|------|------|----------------|
+| 页面跳转支付 | https://xapay.hwxun.cn/doc/epay_submit | 否（浏览器表单跳转 `submit.php`） |
+| **API 接口支付** | https://xapay.hwxun.cn/doc/epay_mapi | **是**（服务端下单拿二维码） |
+| 支付结果通知 | https://xapay.hwxun.cn/doc/epay_notify | 是（回调验签 + 返回 `success`） |
+| MD5 签名 | https://xapay.hwxun.cn/doc/epay_md5 | 是 |
+
+会员扫码购买走 **mapi**（非 submit）：`POST https://xapay.hwxun.cn/mapi.php`（与文档 `/xpay/epay/mapi.php` 等价），参数 `type=alipay`、`notify_url`、`clientip`、`device=pc`，`sign_type=MD5`。
+
+回调收到 `trade_status=TRADE_SUCCESS` 且验签通过后，接口返回纯文本 **`success`**（已实现）。
+
+参考：[支付宝云端配置教程](https://docs.qq.com/doc/DUXhLdXN1TFVHTHRq)
 
 ---
 
