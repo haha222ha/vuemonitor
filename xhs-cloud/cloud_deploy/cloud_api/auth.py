@@ -218,6 +218,19 @@ def user_from_token(token: str) -> dict:
     return {"id": uid, "username": username}
 
 
+def optional_user(
+    request: Request,
+    cred: HTTPAuthorizationCredentials | None = Depends(security),
+) -> dict | None:
+    token = resolve_member_token(cred, request)
+    if not token:
+        return None
+    try:
+        return user_from_token(token)
+    except HTTPException:
+        return None
+
+
 def issue_member_token(
     user_id: int,
     username: str,

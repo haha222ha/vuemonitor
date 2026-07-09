@@ -16,7 +16,7 @@ from cloud_deploy.scripts.bootstrap_env import bootstrap
 bootstrap()
 
 from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from starlette.background import BackgroundTask
@@ -36,8 +36,10 @@ from cloud_deploy.cloud_api.auth import (
     security,
     verify_agent_access,
     verify_sync_key,
+    optional_user,
 )
 from cloud_deploy.cloud_api.config import get_settings
+from cloud_deploy.cloud_api import payment_service as pay
 
 _ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
 
@@ -83,6 +85,19 @@ class RenewWithCodeBody(DeviceAuthBody):
     username: str = Field(..., min_length=3, max_length=64)
     password: str = Field(..., min_length=6, max_length=128)
     auth_code: str = Field(..., min_length=8, max_length=64)
+
+
+class PaymentCreateBody(BaseModel):
+    plan_code: str = Field(..., min_length=3, max_length=32)
+
+
+def _client_ip(request: Request) -> str:
+    forwarded = (request.headers.get("X-Forwarded-For") or "").split(",")[0].strip()
+    if forwarded:
+        return forwarded
+    if request.client:
+        return request.client.host or ""
+    return "127.0.0.1"
 
 
 def _renew_message(profile: dict) -> str:
@@ -358,6 +373,57 @@ def refresh_token(
     if not token:
         raise HTTPException(status_code=401, detail="需要登录")
     return member_auth_response(refresh_member_token(token))
+
+
+@app.get("/api/v1/payment/plans")
+def payment_plans():
+    return {"plans": pay.list_public_plans()}
+
+
+@app.post("/api/v1/payment/orders")
+def payment_create_order(
+    body: PaymentCreateBody,
+    request: Request,
+    user: dict | None = Depends(optional_user),
+):
+    try:
+        order = pay.create_order(
+            plan_code=body.plan_code,
+            user_id=user["id"] if user else None,
+            client_ip=_client_ip(request),
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    return order
+
+
+@app.get("/api/v1/payment/orders/{order_no}")
+def payment_get_order(order_no: str):
+    row = pay.get_order_public(order_no)
+    if not row:
+        raise HTTPException(status_code=404, detail="订单不存在")
+    return row
+
+
+@app.post("/api/v1/payment/orders/{order_no}/claim")
+def payment_claim_order(order_no: str, user: dict = Depends(current_user)):
+    try:
+        return pay.claim_paid_order(order_no, user["id"])
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@app.api_route("/api/v1/payment/notify/hwxun", methods=["GET", "POST"])
+async def payment_notify_hwxun(request: Request):
+    if request.method == "POST":
+        form = await request.form()
+        params = dict(form)
+    else:
+        params = dict(request.query_params)
+    result = pay.handle_hwxun_notify(params)
+    return PlainTextResponse(result)
 
 
 @app.get("/api/v1/member/profile")

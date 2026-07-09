@@ -23,6 +23,10 @@ class Settings:
     xhs_db_path: str = ""
     xhs_local_agent_key: str = ""
     xhs_agent_ip_allowlist: str = ""
+    xhs_pay_api_url: str = ""
+    xhs_pay_pid: str = ""
+    xhs_pay_key: str = ""
+    xhs_pay_notify_base: str = ""
 
 
 def get_settings() -> Settings:
@@ -49,4 +53,8 @@ def get_settings() -> Settings:
         xhs_db_path=os.environ.get("XHS_DB_PATH", ""),
         xhs_local_agent_key=os.environ.get("XHS_LOCAL_AGENT_KEY", ""),
         xhs_agent_ip_allowlist=os.environ.get("XHS_AGENT_IP_ALLOWLIST", ""),
+        xhs_pay_api_url=os.environ.get("XHS_PAY_API_URL", "https://pay.hwxun.cn/"),
+        xhs_pay_pid=os.environ.get("XHS_PAY_PID", ""),
+        xhs_pay_key=os.environ.get("XHS_PAY_KEY", ""),
+        xhs_pay_notify_base=os.environ.get("XHS_PAY_NOTIFY_BASE", ""),
     )

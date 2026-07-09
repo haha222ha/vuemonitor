@@ -94,6 +94,26 @@ def init_db() -> None:
             UNIQUE(user_id, goods_id),
             FOREIGN KEY(user_id) REFERENCES users(id)
         );
+        CREATE TABLE IF NOT EXISTS payment_orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_no TEXT UNIQUE NOT NULL,
+            user_id INTEGER,
+            plan_code TEXT NOT NULL,
+            duration_days INTEGER NOT NULL,
+            amount TEXT NOT NULL,
+            channel TEXT NOT NULL DEFAULT 'wxpay',
+            status TEXT NOT NULL DEFAULT 'pending',
+            qrcode TEXT,
+            payurl TEXT,
+            gateway_trade_no TEXT,
+            auth_code TEXT,
+            client_ip TEXT,
+            fulfilled_user_id INTEGER,
+            meta_json TEXT,
+            created_at TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            paid_at TEXT
+        );
         """
     )
     _migrate_legacy_columns(c)
@@ -487,6 +507,8 @@ def upsert_report_archive(
 PLAN_LABELS = {
     "weekly": "周会员",
     "monthly": "月度会员",
+    "quarterly": "季度会员",
+    "halfyear": "半年会员",
     "yearly": "年度会员",
     "experience": "体验会员",
     "admin": "管理员",
@@ -1079,3 +1101,118 @@ def delete_member_watchlist(user_id: int, goods_ids: list) -> int:
     conn.commit()
     conn.close()
     return removed
+
+
+def _payment_order_row(row) -> dict | None:
+    if not row:
+        return None
+    return {
+        "id": row["id"],
+        "order_no": row["order_no"],
+        "user_id": row["user_id"],
+        "plan_code": row["plan_code"],
+        "duration_days": row["duration_days"],
+        "amount": row["amount"],
+        "channel": row["channel"],
+        "status": row["status"],
+        "qrcode": row["qrcode"],
+        "payurl": row["payurl"],
+        "gateway_trade_no": row["gateway_trade_no"],
+        "auth_code": row["auth_code"],
+        "client_ip": row["client_ip"],
+        "fulfilled_user_id": row["fulfilled_user_id"],
+        "meta_json": row["meta_json"],
+        "created_at": row["created_at"],
+        "expires_at": row["expires_at"],
+        "paid_at": row["paid_at"],
+    }
+
+
+def insert_payment_order(
+    *,
+    order_no: str,
+    user_id: int | None,
+    plan_code: str,
+    duration_days: int,
+    amount: str,
+    channel: str,
+    client_ip: str,
+    expires_at: str,
+) -> None:
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = _conn()
+    conn.execute(
+        """INSERT INTO payment_orders
+           (order_no, user_id, plan_code, duration_days, amount, channel, status,
+            client_ip, created_at, expires_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?)""",
+        (order_no, user_id, plan_code, duration_days, amount, channel, "pending", client_ip, now, expires_at),
+    )
+    conn.commit()
+    conn.close()
+
+
+def update_payment_order_gateway(
+    order_no: str,
+    *,
+    qrcode: str = "",
+    payurl: str = "",
+    gateway_trade_no: str = "",
+) -> None:
+    conn = _conn()
+    conn.execute(
+        """UPDATE payment_orders SET qrcode=?, payurl=?, gateway_trade_no=?
+           WHERE order_no=? AND status='pending'""",
+        (qrcode or None, payurl or None, gateway_trade_no or None, order_no),
+    )
+    conn.commit()
+    conn.close()
+
+
+def get_payment_order(order_no: str) -> dict | None:
+    conn = _conn()
+    row = conn.execute("SELECT * FROM payment_orders WHERE order_no=?", (order_no,)).fetchone()
+    conn.close()
+    return _payment_order_row(row)
+
+
+def expire_stale_payment_order(order_no: str) -> None:
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = _conn()
+    conn.execute(
+        """UPDATE payment_orders SET status='expired'
+           WHERE order_no=? AND status='pending' AND expires_at < ?""",
+        (order_no, now),
+    )
+    conn.commit()
+    conn.close()
+
+
+def mark_payment_order_paid(
+    order_no: str,
+    *,
+    gateway_trade_no: str,
+    auth_code: str,
+    paid_at: str,
+) -> bool:
+    conn = _conn()
+    cur = conn.execute(
+        """UPDATE payment_orders
+           SET status='paid', gateway_trade_no=?, auth_code=?, paid_at=?
+           WHERE order_no=? AND status='pending'""",
+        (gateway_trade_no or None, auth_code, paid_at, order_no),
+    )
+    ok = cur.rowcount > 0
+    conn.commit()
+    conn.close()
+    return ok
+
+
+def mark_payment_order_fulfilled(order_no: str, user_id: int) -> None:
+    conn = _conn()
+    conn.execute(
+        "UPDATE payment_orders SET fulfilled_user_id=? WHERE order_no=?",
+        (user_id, order_no),
+    )
+    conn.commit()
+    conn.close()

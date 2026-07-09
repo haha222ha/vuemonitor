@@ -162,6 +162,26 @@ def _init_db_on_conn(conn) -> None:
                     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                     UNIQUE(user_id, goods_id)
                 );
+                CREATE TABLE IF NOT EXISTS payment_orders (
+                    id SERIAL PRIMARY KEY,
+                    order_no VARCHAR(64) UNIQUE NOT NULL,
+                    user_id INT REFERENCES users(id),
+                    plan_code VARCHAR(32) NOT NULL,
+                    duration_days INT NOT NULL,
+                    amount VARCHAR(16) NOT NULL,
+                    channel VARCHAR(16) NOT NULL DEFAULT 'wxpay',
+                    status VARCHAR(16) NOT NULL DEFAULT 'pending',
+                    qrcode TEXT,
+                    payurl TEXT,
+                    gateway_trade_no VARCHAR(64),
+                    auth_code VARCHAR(32),
+                    client_ip VARCHAR(64),
+                    fulfilled_user_id INT,
+                    meta_json JSONB,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    expires_at TIMESTAMPTZ NOT NULL,
+                    paid_at TIMESTAMPTZ
+                );
                 CREATE TABLE IF NOT EXISTS report_daily_meta (
                     report_date DATE PRIMARY KEY,
                     row_count INT,
@@ -817,6 +837,8 @@ def upsert_report_archive(
 PLAN_LABELS = {
     "weekly": "周会员",
     "monthly": "月度会员",
+    "quarterly": "季度会员",
+    "halfyear": "半年会员",
     "yearly": "年度会员",
     "experience": "体验会员",
     "admin": "管理员",
@@ -1446,5 +1468,151 @@ def delete_member_watchlist(user_id: int, goods_ids: list) -> int:
             removed = c.rowcount
         conn.commit()
         return removed
+    finally:
+        conn.close()
+
+
+def _fmt_ts(value) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return _as_utc(value).strftime("%Y-%m-%d %H:%M:%S")
+    return str(value)
+
+
+def _payment_order_row(row) -> dict | None:
+    if not row:
+        return None
+    return {
+        "id": row["id"],
+        "order_no": row["order_no"],
+        "user_id": row["user_id"],
+        "plan_code": row["plan_code"],
+        "duration_days": row["duration_days"],
+        "amount": str(row["amount"]),
+        "channel": row["channel"],
+        "status": row["status"],
+        "qrcode": row["qrcode"],
+        "payurl": row["payurl"],
+        "gateway_trade_no": row["gateway_trade_no"],
+        "auth_code": row["auth_code"],
+        "client_ip": row["client_ip"],
+        "fulfilled_user_id": row["fulfilled_user_id"],
+        "meta_json": row["meta_json"],
+        "created_at": _fmt_ts(row["created_at"]),
+        "expires_at": _fmt_ts(row["expires_at"]),
+        "paid_at": _fmt_ts(row["paid_at"]),
+    }
+
+
+def insert_payment_order(
+    *,
+    order_no: str,
+    user_id: int | None,
+    plan_code: str,
+    duration_days: int,
+    amount: str,
+    channel: str,
+    client_ip: str,
+    expires_at: str,
+) -> None:
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """INSERT INTO payment_orders
+                   (order_no, user_id, plan_code, duration_days, amount, channel, status,
+                    client_ip, expires_at)
+                   VALUES (%s,%s,%s,%s,%s,%s,'pending',%s,%s::timestamp)""",
+                (order_no, user_id, plan_code, duration_days, amount, channel, client_ip, expires_at),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def update_payment_order_gateway(
+    order_no: str,
+    *,
+    qrcode: str = "",
+    payurl: str = "",
+    gateway_trade_no: str = "",
+) -> None:
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """UPDATE payment_orders SET qrcode=%s, payurl=%s, gateway_trade_no=%s
+                   WHERE order_no=%s AND status='pending'""",
+                (qrcode or None, payurl or None, gateway_trade_no or None, order_no),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def get_payment_order(order_no: str) -> dict | None:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute("SELECT * FROM payment_orders WHERE order_no=%s", (order_no,))
+            row = c.fetchone()
+        return _payment_order_row(row)
+    finally:
+        conn.close()
+
+
+def expire_stale_payment_order(order_no: str) -> None:
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """UPDATE payment_orders SET status='expired'
+                   WHERE order_no=%s AND status='pending' AND expires_at < NOW()""",
+                (order_no,),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def mark_payment_order_paid(
+    order_no: str,
+    *,
+    gateway_trade_no: str,
+    auth_code: str,
+    paid_at: str,
+) -> bool:
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """UPDATE payment_orders
+                   SET status='paid', gateway_trade_no=%s, auth_code=%s, paid_at=%s::timestamp
+                   WHERE order_no=%s AND status='pending'""",
+                (gateway_trade_no or None, auth_code, paid_at, order_no),
+            )
+            ok = c.rowcount > 0
+        conn.commit()
+        return ok
+    finally:
+        conn.close()
+
+
+def mark_payment_order_fulfilled(order_no: str, user_id: int) -> None:
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                "UPDATE payment_orders SET fulfilled_user_id=%s WHERE order_no=%s",
+                (user_id, order_no),
+            )
+        conn.commit()
     finally:
         conn.close()
