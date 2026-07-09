@@ -16,7 +16,7 @@ from cloud_deploy.scripts.bootstrap_env import bootstrap
 bootstrap()
 
 from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
-from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
+from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Response
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from starlette.background import BackgroundTask
@@ -413,6 +413,24 @@ def payment_claim_order(order_no: str, user: dict = Depends(current_user)):
         return pay.claim_paid_order(order_no, user["id"])
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@app.get("/api/v1/payment/qrcode")
+def payment_qrcode_image(data: str = ""):
+    """服务端生成支付二维码（不依赖前端 CDN）。"""
+    text = (data or "").strip()
+    if not text or len(text) > 2048:
+        raise HTTPException(status_code=400, detail="无效的二维码内容")
+    try:
+        import io
+
+        import segno
+
+        buf = io.BytesIO()
+        segno.make(text, error="m").save(buf, kind="png", scale=6, border=1)
+        return Response(content=buf.getvalue(), media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"二维码生成失败: {e}") from e
 
 
 @app.api_route("/api/v1/payment/notify/hwxun", methods=["GET", "POST"])

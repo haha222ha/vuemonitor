@@ -217,7 +217,8 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <button class="btn btn-primary btn-block" id="btnStartPay" onclick="startWxPay()">微信扫码支付</button>
       <div id="payCheckout" class="hidden" style="margin-top:16px">
         <div class="pay-qr-wrap">
-          <canvas id="payQrCanvas"></canvas>
+          <img id="payQrImg" class="pay-qr-img hidden" alt="微信支付二维码" width="220" height="220">
+          <canvas id="payQrCanvas" class="hidden"></canvas>
           <p style="font-size:13px;color:var(--text2);margin-top:10px">请使用微信扫一扫完成支付</p>
         </div>
         <div class="pay-meta" id="payMeta"></div>
@@ -295,7 +296,6 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <div id="dashMsg"></div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -777,6 +777,25 @@ function selectPlan(code) {
   renderPlanGrid();
 }
 
+function renderPayQrcode(qrText) {
+  const img = document.getElementById('payQrImg');
+  const canvas = document.getElementById('payQrCanvas');
+  if (!qrText) {
+    if (img) img.classList.add('hidden');
+    if (canvas) canvas.classList.add('hidden');
+    return false;
+  }
+  if (img) {
+    img.src = '/api/v1/payment/qrcode?data=' + encodeURIComponent(qrText);
+    img.classList.remove('hidden');
+    img.onerror = () => {
+      showMsg(document.getElementById('authMsg'), '二维码加载失败，请刷新页面重试', 'error');
+    };
+  }
+  if (canvas) canvas.classList.add('hidden');
+  return true;
+}
+
 async function startWxPay() {
   const msgEl = document.getElementById('authMsg');
   showMsg(msgEl, '', '');
@@ -800,13 +819,13 @@ async function startWxPay() {
     document.getElementById('payCheckout').classList.remove('hidden');
     document.getElementById('payMeta').innerHTML =
       `订单号：<strong>${esc(order.order_no)}</strong><br>套餐：${esc(order.plan_label)} · ¥${esc(order.amount)}<br>请在 30 分钟内完成支付`;
-    const canvas = document.getElementById('payQrCanvas');
     const qrText = order.qrcode || order.payurl || '';
-    if (qrText && window.QRCode) {
-      await QRCode.toCanvas(canvas, qrText, { width: 220, margin: 1 });
-    }
     if (/MicroMessenger/i.test(navigator.userAgent) && order.payurl) {
       location.href = order.payurl;
+      return;
+    }
+    if (!renderPayQrcode(qrText)) {
+      showMsg(msgEl, '未获取到支付二维码，请稍后重试', 'error');
       return;
     }
     payPollTimer = setInterval(() => pollPayOrder(order.order_no), 2500);
