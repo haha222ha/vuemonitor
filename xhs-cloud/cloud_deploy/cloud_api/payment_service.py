@@ -243,7 +243,10 @@ def handle_hwxun_notify(params: dict) -> str:
         return "fail"
     if not verify_notify_epay(params, key):
         return "fail"
-    trade_status = str(params.get("trade_status") or "").upper()
+    trade_status = str(params.get("trade_status") or "").strip().upper()
+    # 无 trade_status 时不可返回 success，否则网关认为已通知成功而不再重试
+    if not trade_status:
+        return "fail"
     if trade_status != "TRADE_SUCCESS":
         return "success"
     order_no = str(params.get("out_trade_no") or "").strip()
@@ -270,12 +273,21 @@ def handle_hwxun_notify(params: dict) -> str:
         note=note,
     )
     auth_code = codes[0] if codes else ""
-    db.mark_payment_order_paid(
+    ok = db.mark_payment_order_paid(
         order_no,
         gateway_trade_no=gateway_trade_no,
         auth_code=auth_code,
         paid_at=paid_at,
     )
+    if not ok:
+        ok = db.mark_payment_order_paid_force(
+            order_no,
+            gateway_trade_no=gateway_trade_no,
+            auth_code=auth_code,
+            paid_at=paid_at,
+        )
+    if not ok:
+        return "fail"
     user_id = row.get("user_id")
     if user_id and auth_code:
         try:

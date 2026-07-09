@@ -1229,6 +1229,27 @@ def mark_payment_order_paid(
     return ok
 
 
+def mark_payment_order_paid_force(
+    order_no: str,
+    *,
+    gateway_trade_no: str,
+    auth_code: str,
+    paid_at: str,
+) -> bool:
+    """已付款但订单 pending/expired 时强制标记为 paid（补单）。"""
+    conn = _conn()
+    cur = conn.execute(
+        """UPDATE payment_orders
+           SET status='paid', gateway_trade_no=?, auth_code=?, paid_at=?
+           WHERE order_no=? AND status IN ('pending', 'expired')""",
+        (gateway_trade_no or None, auth_code, paid_at, order_no),
+    )
+    ok = cur.rowcount > 0
+    conn.commit()
+    conn.close()
+    return ok
+
+
 def mark_payment_order_fulfilled(order_no: str, user_id: int) -> None:
     conn = _conn()
     conn.execute(

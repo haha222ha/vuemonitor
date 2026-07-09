@@ -83,8 +83,27 @@ class PaymentFulfillTest(unittest.TestCase):
         after = db.get_member_profile(uid)
         self.assertGreaterEqual(after["days_remaining"], 30)
 
-    def test_guest_order_claim_after_login(self):
+    def test_notify_without_trade_status_returns_fail(self):
         db.insert_payment_order(
+            order_no="XHSPTEST003",
+            user_id=None,
+            plan_code="pay_test",
+            duration_days=1,
+            amount="1.00",
+            channel="alipay",
+            client_ip="127.0.0.1",
+            expires_at="2099-01-01 00:00:00",
+        )
+        params = {
+            "pid": "1001",
+            "trade_no": "GW125",
+            "out_trade_no": "XHSPTEST003",
+            "money": "1.00",
+        }
+        params["sign"] = _epay_sign(params, "test_pay_key")
+        self.assertEqual(pay.handle_hwxun_notify(params), "fail")
+
+    def test_guest_order_claim_after_login(self):
             order_no="XHSPTEST002",
             user_id=None,
             plan_code="monthly",

@@ -1628,6 +1628,31 @@ def mark_payment_order_paid(
         conn.close()
 
 
+def mark_payment_order_paid_force(
+    order_no: str,
+    *,
+    gateway_trade_no: str,
+    auth_code: str,
+    paid_at: str,
+) -> bool:
+    """已付款但订单 pending/expired 时强制标记为 paid（补单）。"""
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """UPDATE payment_orders
+                   SET status='paid', gateway_trade_no=%s, auth_code=%s, paid_at=%s::timestamp
+                   WHERE order_no=%s AND status IN ('pending', 'expired')""",
+                (gateway_trade_no or None, auth_code, paid_at, order_no),
+            )
+            ok = c.rowcount > 0
+        conn.commit()
+        return ok
+    finally:
+        conn.close()
+
+
 def mark_payment_order_fulfilled(order_no: str, user_id: int) -> None:
     conn = _conn()
     try:
