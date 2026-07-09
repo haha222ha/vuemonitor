@@ -40,6 +40,11 @@ from cloud_deploy.cloud_api.auth import (
 )
 from cloud_deploy.cloud_api.config import get_settings
 from cloud_deploy.cloud_api import payment_service as pay
+from cloud_deploy.cloud_api.email_service import smtp_configured
+from cloud_deploy.cloud_api.password_reset_service import (
+    request_password_reset,
+    reset_password_with_token,
+)
 
 _ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
 
@@ -95,6 +100,19 @@ class PaymentCompleteBody(DeviceAuthBody):
     mode: str = Field(..., pattern="^(register|login)$")
     username: str = Field(..., min_length=3, max_length=64)
     password: str = Field(..., min_length=6, max_length=128)
+
+
+class ForgotPasswordBody(BaseModel):
+    email: str = Field(..., min_length=5, max_length=255)
+
+
+class ResetPasswordBody(DeviceAuthBody):
+    token: str = Field(..., min_length=16, max_length=128)
+    new_password: str = Field(..., min_length=6, max_length=128)
+
+
+class BindEmailBody(BaseModel):
+    email: str = Field(..., min_length=5, max_length=255)
 
 
 def _client_ip(request: Request) -> str:
@@ -318,6 +336,43 @@ def login_with_code(body: LoginCodeBody):
     )
 
 
+@app.get("/api/v1/auth/password-reset-available")
+def password_reset_available():
+    return {"available": smtp_configured()}
+
+
+@app.post("/api/v1/auth/forgot-password")
+def forgot_password(body: ForgotPasswordBody):
+    try:
+        return request_password_reset(body.email)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+
+
+@app.post("/api/v1/auth/reset-password")
+def reset_password(body: ResetPasswordBody):
+    try:
+        result = reset_password_with_token(body.token, body.new_password)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    username = result.get("username") or ""
+    membership = result.get("membership") or {}
+    token = issue_member_token(
+        int(membership["id"]),
+        username,
+        body.device_id,
+        body.device_label,
+    )
+    return member_auth_response({
+        "access_token": token,
+        "token_type": "bearer",
+        "membership": membership,
+        "message": result.get("message") or "密码已重置",
+    })
+
+
 @app.post("/api/v1/auth/register")
 def register(body: RegisterBody):
     try:
@@ -484,6 +539,16 @@ def member_change_password(body: ChangePasswordBody, user: dict = Depends(curren
     current = body.current_password.strip() or None
     change_member_password(user["id"], body.new_password, current_password=current)
     return {"message": "密码已更新，下次可使用新密码登录"}
+
+
+@app.post("/api/v1/member/bind-email")
+def member_bind_email(body: BindEmailBody, user: dict = Depends(current_user)):
+    try:
+        db.set_user_email(user["id"], body.email)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    addr = body.email.strip().lower()
+    return {"message": "邮箱已绑定，可用于找回密码", "email": addr}
 
 
 @app.get("/api/v1/member/reports")

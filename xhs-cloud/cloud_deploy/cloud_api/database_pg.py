@@ -390,6 +390,26 @@ def _migrate_legacy_columns(c) -> None:
         c.execute(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {dtype}_session_version INT NOT NULL DEFAULT 0")
         c.execute(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {dtype}_device_label VARCHAR(64)")
         c.execute(f"ALTER TABLE users ADD COLUMN IF NOT EXISTS {dtype}_bound_at TIMESTAMPTZ")
+    c.execute("ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255)")
+    c.execute(
+        """
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email
+            ON users (LOWER(email)) WHERE email IS NOT NULL AND TRIM(email) != ''
+        """
+    )
+    c.execute(
+        """
+        CREATE TABLE IF NOT EXISTS password_reset_tokens (
+            id SERIAL PRIMARY KEY,
+            user_id INT NOT NULL REFERENCES users(id),
+            token_hash VARCHAR(64) NOT NULL,
+            expires_at TIMESTAMPTZ NOT NULL,
+            used_at TIMESTAMPTZ,
+            created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        )
+        """
+    )
+    c.execute("CREATE INDEX IF NOT EXISTS idx_prt_hash ON password_reset_tokens(token_hash)")
     _migrate_legacy_single_session(c)
 
 
@@ -620,7 +640,7 @@ def get_active_member(user_id: int) -> dict | None:
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
             c.execute("SET search_path TO xhs_monitor, public")
             c.execute(
-                """SELECT u.id, u.username, m.expires_at, m.status, m.plan_code
+                """SELECT u.id, u.username, u.email, m.expires_at, m.status, m.plan_code
                    FROM users u JOIN memberships m ON m.user_id=u.id
                    WHERE u.id=%s ORDER BY m.id DESC LIMIT 1""",
                 (user_id,),
@@ -637,6 +657,7 @@ def get_active_member(user_id: int) -> dict | None:
             return {
                 "id": row["id"],
                 "username": row["username"],
+                "email": (row.get("email") or "").strip(),
                 "expires_at": row["expires_at"].strftime("%Y-%m-%d %H:%M:%S"),
                 "plan_code": row.get("plan_code") or "monthly",
                 "days_remaining": _days_until(row["expires_at"]),
@@ -1236,7 +1257,7 @@ def login_with_auth_code(code: str) -> dict:
                     raise ValueError("账号数据异常，请联系管理员")
                 return profile
             _validate_auth_code_row(row)
-            raise ValueError("授权码尚未开通，请使用「授权码开通」完成首次注册")
+            raise ValueError("授权码尚未开通，请购买会员完成首次开通")
     finally:
         conn.close()
 
@@ -1312,7 +1333,7 @@ def get_member_profile(user_id: int) -> dict | None:
         try:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
                 c.execute("SET search_path TO xhs_monitor, public")
-                c.execute("SELECT username FROM users WHERE id=%s", (user_id,))
+                c.execute("SELECT username, email FROM users WHERE id=%s", (user_id,))
                 u = c.fetchone()
                 if not u:
                     return None
@@ -1328,13 +1349,14 @@ def get_member_profile(user_id: int) -> dict | None:
                 return {
                     "id": user_id,
                     "username": u["username"],
+                    "email": (u.get("email") or "").strip(),
                     "plan_code": m["plan_code"],
                     "plan_label": PLAN_LABELS.get(m["plan_code"], m["plan_code"]),
                     "expires_at": m["expires_at"].strftime("%Y-%m-%d %H:%M:%S"),
                     "status": m["status"],
                     "days_remaining": days,
                     "is_active": False,
-                    "expiry_warning": "会员已过期，请使用新授权码续费",
+                    "expiry_warning": "会员已过期，请使用下方「微信扫码续费」",
                 }
         finally:
             conn.close()
@@ -1350,6 +1372,7 @@ def get_member_profile(user_id: int) -> dict | None:
         member["expiry_warning"] = f"会员将在 {days} 天后到期"
     else:
         member["expiry_warning"] = ""
+    member.setdefault("email", "")
     return member
 
 
@@ -1615,5 +1638,86 @@ def mark_payment_order_fulfilled(order_no: str, user_id: int) -> None:
                 (user_id, order_no),
             )
         conn.commit()
+    finally:
+        conn.close()
+
+
+def get_user_by_email(email: str) -> dict | None:
+    addr = (email or "").strip().lower()
+    if not addr:
+        return None
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                "SELECT id, username, email FROM users WHERE LOWER(email)=%s",
+                (addr,),
+            )
+            row = c.fetchone()
+            return dict(row) if row else None
+    finally:
+        conn.close()
+
+
+def set_user_email(user_id: int, email: str) -> None:
+    addr = (email or "").strip().lower()
+    if not addr or "@" not in addr:
+        raise ValueError("请输入有效邮箱")
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                "SELECT id FROM users WHERE LOWER(email)=%s AND id!=%s",
+                (addr, user_id),
+            )
+            if c.fetchone():
+                raise ValueError("该邮箱已被其他账号绑定")
+            c.execute("UPDATE users SET email=%s WHERE id=%s", (addr, user_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def create_password_reset_token(user_id: int, token_hash: str, hours: int = 2) -> None:
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                "DELETE FROM password_reset_tokens WHERE user_id=%s AND used_at IS NULL",
+                (user_id,),
+            )
+            c.execute(
+                """INSERT INTO password_reset_tokens (user_id, token_hash, expires_at)
+                   VALUES (%s, %s, NOW() + (%s || ' hours')::interval)""",
+                (user_id, token_hash, str(int(hours))),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def consume_password_reset_token(token_hash: str) -> int | None:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """SELECT id, user_id FROM password_reset_tokens
+                   WHERE token_hash=%s AND used_at IS NULL AND expires_at >= NOW()""",
+                (token_hash,),
+            )
+            row = c.fetchone()
+            if not row:
+                return None
+            c.execute(
+                "UPDATE password_reset_tokens SET used_at=NOW() WHERE id=%s",
+                (row["id"],),
+            )
+            user_id = int(row["user_id"])
+        conn.commit()
+        return user_id
     finally:
         conn.close()

@@ -148,6 +148,23 @@ def _migrate_legacy_columns(c) -> None:
         c.execute("ALTER TABLE users ADD COLUMN session_device_label TEXT")
     if "session_bound_at" not in user_cols:
         c.execute("ALTER TABLE users ADD COLUMN session_bound_at TEXT")
+    if "email" not in user_cols:
+        c.execute("ALTER TABLE users ADD COLUMN email TEXT")
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS password_reset_tokens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            token_hash TEXT NOT NULL,
+            expires_at TEXT NOT NULL,
+            used_at TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )"""
+    )
+    c.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email) WHERE email IS NOT NULL AND email != ''"
+    )
+    c.execute("CREATE INDEX IF NOT EXISTS idx_prt_hash ON password_reset_tokens(token_hash)")
     _migrate_legacy_single_session(c)
 
 
@@ -327,7 +344,7 @@ def get_active_member(user_id: int) -> dict | None:
     conn = _conn()
     c = conn.cursor()
     c.execute(
-        """SELECT u.id, u.username, m.expires_at, m.status, m.plan_code
+        """SELECT u.id, u.username, u.email, m.expires_at, m.status, m.plan_code
            FROM users u JOIN memberships m ON m.user_id=u.id
            WHERE u.id=? ORDER BY m.id DESC LIMIT 1""",
         (user_id,),
@@ -342,6 +359,7 @@ def get_active_member(user_id: int) -> dict | None:
     return {
         "id": row["id"],
         "username": row["username"],
+        "email": (row["email"] or "").strip() if row["email"] else "",
         "expires_at": row["expires_at"],
         "plan_code": row["plan_code"] or "monthly",
         "days_remaining": max(0, (exp - datetime.now()).days),
@@ -889,7 +907,7 @@ def login_with_auth_code(code: str) -> dict:
             raise ValueError("账号数据异常，请联系管理员")
         return profile
     _validate_auth_code_row(row)
-    raise ValueError("授权码尚未开通，请使用「授权码开通」完成首次注册")
+    raise ValueError("授权码尚未开通，请购买会员完成首次开通")
 
 
 def change_password(user_id: int, new_password: str, current_password: str | None = None) -> None:
@@ -959,7 +977,7 @@ def get_member_profile(user_id: int) -> dict | None:
     if not member:
         conn = _conn()
         c = conn.cursor()
-        c.execute("SELECT username FROM users WHERE id=?", (user_id,))
+        c.execute("SELECT username, email FROM users WHERE id=?", (user_id,))
         u = c.fetchone()
         if not u:
             conn.close()
@@ -977,13 +995,14 @@ def get_member_profile(user_id: int) -> dict | None:
         return {
             "id": user_id,
             "username": u["username"],
+            "email": (u["email"] or "").strip() if u["email"] else "",
             "plan_code": m["plan_code"],
             "plan_label": PLAN_LABELS.get(m["plan_code"], m["plan_code"]),
             "expires_at": m["expires_at"],
             "status": m["status"],
             "days_remaining": days,
             "is_active": False,
-            "expiry_warning": "会员已过期，请使用新授权码续费",
+            "expiry_warning": "会员已过期，请使用下方「微信扫码续费」",
         }
     member["plan_label"] = PLAN_LABELS.get(member.get("plan_code", ""), member.get("plan_code", ""))
     member["is_active"] = True
@@ -995,6 +1014,7 @@ def get_member_profile(user_id: int) -> dict | None:
         member["expiry_warning"] = f"会员将在 {days} 天后到期"
     else:
         member["expiry_warning"] = ""
+    member.setdefault("email", "")
     return member
 
 
@@ -1217,3 +1237,68 @@ def mark_payment_order_fulfilled(order_no: str, user_id: int) -> None:
     )
     conn.commit()
     conn.close()
+
+
+def get_user_by_email(email: str) -> dict | None:
+    addr = (email or "").strip().lower()
+    if not addr:
+        return None
+    conn = _conn()
+    row = conn.execute(
+        "SELECT id, username, email FROM users WHERE LOWER(email)=?",
+        (addr,),
+    ).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def set_user_email(user_id: int, email: str) -> None:
+    addr = (email or "").strip().lower()
+    if not addr or "@" not in addr:
+        raise ValueError("请输入有效邮箱")
+    conn = _conn()
+    existing = conn.execute(
+        "SELECT id FROM users WHERE LOWER(email)=? AND id!=?",
+        (addr, user_id),
+    ).fetchone()
+    if existing:
+        conn.close()
+        raise ValueError("该邮箱已被其他账号绑定")
+    conn.execute("UPDATE users SET email=? WHERE id=?", (addr, user_id))
+    conn.commit()
+    conn.close()
+
+
+def create_password_reset_token(user_id: int, token_hash: str, hours: int = 2) -> None:
+    now = datetime.now()
+    expires = (now + timedelta(hours=hours)).strftime("%Y-%m-%d %H:%M:%S")
+    created = now.strftime("%Y-%m-%d %H:%M:%S")
+    conn = _conn()
+    conn.execute("DELETE FROM password_reset_tokens WHERE user_id=? AND used_at IS NULL", (user_id,))
+    conn.execute(
+        """INSERT INTO password_reset_tokens (user_id, token_hash, expires_at, created_at)
+           VALUES (?,?,?,?)""",
+        (user_id, token_hash, expires, created),
+    )
+    conn.commit()
+    conn.close()
+
+
+def consume_password_reset_token(token_hash: str) -> int | None:
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = _conn()
+    row = conn.execute(
+        """SELECT id, user_id FROM password_reset_tokens
+           WHERE token_hash=? AND used_at IS NULL AND expires_at >= ?""",
+        (token_hash, now),
+    ).fetchone()
+    if not row:
+        conn.close()
+        return None
+    conn.execute(
+        "UPDATE password_reset_tokens SET used_at=? WHERE id=?",
+        (now, row["id"]),
+    )
+    conn.commit()
+    conn.close()
+    return int(row["user_id"])
