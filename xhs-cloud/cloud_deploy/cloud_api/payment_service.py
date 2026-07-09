@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from cloud_deploy.cloud_api import database as db
 from cloud_deploy.cloud_api.config import get_settings
-from cloud_deploy.cloud_api.hwxun_pay import create_epay_order, notify_verify_key_for_order, verify_notify_epay
+from cloud_deploy.cloud_api.hwxun_pay import channel_merchant_credentials, create_epay_order, verify_notify_epay
 from cloud_deploy.cloud_api.payment_plans import get_plan
 
 
@@ -39,6 +39,19 @@ def list_public_plans() -> list[dict]:
         }
         for p in list_active_plans()
     ]
+
+
+def list_payment_channels() -> list[dict]:
+    """返回已配置凭证的支付方式（微信/支付宝 PID 独立）。"""
+    labels = {"wxpay": "微信扫码", "alipay": "支付宝扫码"}
+    out: list[dict] = []
+    for ch in ("wxpay", "alipay"):
+        try:
+            channel_merchant_credentials(ch)
+            out.append({"channel": ch, "label": labels[ch]})
+        except RuntimeError:
+            continue
+    return out
 
 
 def create_order(
@@ -220,10 +233,13 @@ def claim_paid_order(order_no: str, user_id: int) -> dict:
 def handle_hwxun_notify(params: dict) -> str:
     order_no = str(params.get("out_trade_no") or "").strip()
     row = db.get_payment_order(order_no) if order_no else None
-    key = notify_verify_key_for_order((row or {}).get("channel") or params.get("type") or "wxpay")
-    if not key:
-        key = (get_settings().xhs_pay_key or "").strip()
-    if not key:
+    ch = (row or {}).get("channel") or params.get("type") or "wxpay"
+    try:
+        expect_pid, key = channel_merchant_credentials(str(ch))
+    except RuntimeError:
+        return "fail"
+    notify_pid = str(params.get("pid") or "").strip()
+    if notify_pid and notify_pid != expect_pid:
         return "fail"
     if not verify_notify_epay(params, key):
         return "fail"

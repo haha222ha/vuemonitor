@@ -29,8 +29,6 @@ PAY_CHANNELS = {
         "default_api": "https://xapay.hwxun.cn/",
         "pid_env": "xhs_pay_alipay_pid",
         "key_env": "xhs_pay_alipay_key",
-        "pid_fallback": "xhs_pay_pid",
-        "key_fallback": "xhs_pay_key",
     },
 }
 
@@ -60,24 +58,18 @@ def _channel_credentials(channel: str) -> tuple[str, str, str]:
     api_url = (getattr(s, meta["api_env"], "") or meta["default_api"]).strip()
     pid = (getattr(s, meta["pid_env"], "") or "").strip()
     key = (getattr(s, meta["key_env"], "") or "").strip()
-    if not pid and meta.get("pid_fallback"):
-        pid = (getattr(s, meta["pid_fallback"], "") or "").strip()
-    if not key and meta.get("key_fallback"):
-        key = (getattr(s, meta["key_fallback"], "") or "").strip()
     if not pid or not key:
-        raise RuntimeError(f"未配置 {meta['pid_env']} / {meta['key_env']}（或微信共用 PID/KEY）")
+        label = "微信" if ch == "wxpay" else "支付宝"
+        raise RuntimeError(
+            f"未配置 {label}商户 {meta['pid_env']} / {meta['key_env']}（微信与支付宝 PID/KEY 需分别填写）"
+        )
     return api_url, pid, key
 
 
-def notify_verify_key_for_order(channel: str) -> str:
-    """按订单 channel 取回调验签密钥。"""
-    ch = (channel or "wxpay").strip().lower()
-    meta = PAY_CHANNELS.get(ch) or PAY_CHANNELS["wxpay"]
-    s = get_settings()
-    key = (getattr(s, meta["key_env"], "") or "").strip()
-    if not key and meta.get("key_fallback"):
-        key = (getattr(s, meta["key_fallback"], "") or "").strip()
-    return key
+def channel_merchant_credentials(channel: str) -> tuple[str, str]:
+    """返回 (pid, key)，用于回调验签。"""
+    _, pid, key = _channel_credentials(channel)
+    return pid, key
 
 
 def create_epay_order(

@@ -339,6 +339,7 @@ const STORAGE = {
 const TOKEN_COOKIE = 'xhs_member_token';
 let payPollTimer = null;
 let payPlans = [];
+let payChannels = [];
 let selectedPlanCode = 'monthly';
 let selectedPayChannel = 'wxpay';
 let currentPayOrder = null;
@@ -813,18 +814,40 @@ function stopPayPoll() {
 async function loadPayPlans() {
   if (payPlans.length) {
     renderPlanGrid();
+    renderPayChannels();
     return;
   }
   try {
-    const data = await api('/api/v1/payment/plans');
-    payPlans = data.plans || [];
+    const [planData, chData] = await Promise.all([
+      api('/api/v1/payment/plans'),
+      api('/api/v1/payment/channels').catch(() => ({ channels: [] })),
+    ]);
+    payPlans = planData.plans || [];
+    payChannels = chData.channels || [];
     if (payPlans.length && !payPlans.some(p => p.plan_code === selectedPlanCode)) {
       selectedPlanCode = payPlans[0].plan_code;
     }
+    if (payChannels.length && !payChannels.some(c => c.channel === selectedPayChannel)) {
+      selectedPayChannel = payChannels[0].channel;
+    }
     renderPlanGrid();
+    renderPayChannels();
   } catch (e) {
     showMsg(document.getElementById('authMsg'), e.message || '加载套餐失败', 'error');
   }
+}
+
+function renderPayChannels() {
+  const seg = document.getElementById('payChannelSeg');
+  if (!seg) return;
+  const channels = payChannels.length ? payChannels : [
+    { channel: 'wxpay', label: '微信扫码' },
+    { channel: 'alipay', label: '支付宝扫码' },
+  ];
+  seg.innerHTML = channels.map(c => `
+    <button type="button" class="${c.channel === selectedPayChannel ? 'active' : ''}" data-channel="${esc(c.channel)}" onclick="setPayChannel('${esc(c.channel)}')">${esc(c.label)}</button>
+  `).join('');
+  setPayChannel(selectedPayChannel);
 }
 
 function renderPlanGrid() {

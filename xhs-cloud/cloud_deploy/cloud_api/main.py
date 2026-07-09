@@ -437,6 +437,11 @@ def refresh_token(
     return member_auth_response(refresh_member_token(token))
 
 
+@app.get("/api/v1/payment/channels")
+def payment_channels():
+    return {"channels": pay.list_payment_channels()}
+
+
 @app.get("/api/v1/payment/plans")
 def payment_plans():
     return {"plans": pay.list_public_plans()}
