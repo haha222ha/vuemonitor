@@ -96,5 +96,7 @@ echo "    cd $ROOT && ./venv/bin/python cloud_deploy/scripts/run_full_pipeline.p
 echo "  混合模式（incoming 已有 全量MMDD）:"
 echo "    cd $ROOT && ./venv/bin/python cloud_deploy/scripts/run_daily_pipeline.py"
 echo "  重装 timer + daemon:"
+echo "    bash $ROOT/cloud_deploy/scripts/ensure_report_timers.sh"
+echo "    bash $ROOT/cloud_deploy/scripts/generate_today_report.sh"
 echo "    bash $ROOT/cloud_deploy/scripts/enable_pure_online.sh"
 echo ""

@@ -97,6 +97,14 @@ if [ -d "$ROOT/cloud_deploy/systemd" ]; then
   sudo systemctl daemon-reload
 fi
 
+# daemon 已启用但日报 timer 未开时自动修复（常见：只装了 daemon 没跑 enable_pure_online）
+if systemctl is-enabled xhs-daemon.service &>/dev/null; then
+  if ! systemctl is-enabled xhs-daily-report.timer &>/dev/null; then
+    warn "xhs-daily-report.timer 未启用，自动修复..."
+    bash "$ROOT/cloud_deploy/scripts/ensure_report_timers.sh" || true
+  fi
+fi
+
 if systemctl is-enabled xhs-cloud-api.service &>/dev/null; then
   log "重启 xhs-cloud-api"
   sudo systemctl restart xhs-cloud-api.service
