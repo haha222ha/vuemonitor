@@ -91,6 +91,12 @@ class PaymentCreateBody(BaseModel):
     plan_code: str = Field(..., min_length=3, max_length=32)
 
 
+class PaymentCompleteBody(DeviceAuthBody):
+    mode: str = Field(..., pattern="^(register|login)$")
+    username: str = Field(..., min_length=3, max_length=64)
+    password: str = Field(..., min_length=6, max_length=128)
+
+
 def _client_ip(request: Request) -> str:
     forwarded = (request.headers.get("X-Forwarded-For") or "").split(",")[0].strip()
     if forwarded:
@@ -413,6 +419,27 @@ def payment_claim_order(order_no: str, user: dict = Depends(current_user)):
         return pay.claim_paid_order(order_no, user["id"])
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
+
+
+@app.post("/api/v1/payment/orders/{order_no}/complete")
+def payment_complete_order(order_no: str, body: PaymentCompleteBody):
+    """支付成功后：新用户注册开通 / 老用户登录绑定（无需授权码）。"""
+    try:
+        result = pay.complete_paid_order(
+            order_no,
+            mode=body.mode,
+            username=body.username,
+            password=body.password,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    token = issue_member_token(result["membership"]["id"], result["username"], body.device_id, body.device_label)
+    return member_auth_response({
+        "access_token": token,
+        "token_type": "bearer",
+        "membership": result["membership"],
+        "message": result["message"],
+    })
 
 
 @app.get("/api/v1/payment/qrcode")

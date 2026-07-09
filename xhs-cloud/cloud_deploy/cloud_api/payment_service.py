@@ -100,6 +100,7 @@ def get_order_public(order_no: str) -> dict | None:
     db.expire_stale_payment_order(order_no)
     row = db.get_payment_order(order_no) or row
     plan = get_plan(row["plan_code"]) or {}
+    fulfilled = bool(row.get("fulfilled_user_id"))
     out = {
         "order_no": row["order_no"],
         "plan_code": row["plan_code"],
@@ -111,15 +112,75 @@ def get_order_public(order_no: str) -> dict | None:
         "paid_at": row.get("paid_at"),
         "qrcode": row.get("qrcode") or "",
         "payurl": row.get("payurl") or "",
-        "fulfilled": bool(row.get("fulfilled_user_id")),
+        "fulfilled": fulfilled,
     }
-    if row["status"] == "paid" and row.get("auth_code"):
-        out["auth_code"] = row["auth_code"]
-        if row.get("fulfilled_user_id"):
-            out["message"] = "支付成功，会员时长已自动延长"
+    if row["status"] == "paid":
+        if fulfilled:
+            out["message"] = "支付成功，会员已生效"
+            out["next_action"] = "none"
         else:
-            out["message"] = "支付成功，请复制授权码在「授权码开通/续费」中使用"
+            out["message"] = "支付成功，请设置账号或登录已有账号以完成开通"
+            out["next_action"] = "complete_account"
     return out
+
+
+def complete_paid_order(
+    order_no: str,
+    *,
+    mode: str,
+    username: str,
+    password: str,
+) -> dict:
+    """支付成功后：新用户注册开通，或老用户登录绑定续期（不再暴露授权码）。"""
+    row = db.get_payment_order(order_no)
+    if not row:
+        raise ValueError("订单不存在")
+    if row["status"] != "paid":
+        raise ValueError("订单尚未支付")
+    if row.get("fulfilled_user_id"):
+        uid = int(row["fulfilled_user_id"])
+        profile = db.get_member_profile(uid) or {}
+        return {
+            "membership": profile,
+            "message": "该订单已完成开通",
+            "username": profile.get("username") or "",
+        }
+    code = (row.get("auth_code") or "").strip()
+    if not code:
+        raise ValueError("订单处理中，请稍后刷新或联系客服")
+
+    username = (username or "").strip()
+    password = password or ""
+    if not username or not password:
+        raise ValueError("请填写用户名和密码")
+    if len(username) < 3:
+        raise ValueError("用户名至少 3 个字符")
+    if len(password) < 6:
+        raise ValueError("密码至少 6 位")
+
+    mode = (mode or "").strip().lower()
+    if mode == "register":
+        profile = db.register_with_auth_code(username, password, code)
+        msg = f"开通成功，会员已生效 {row['duration_days']} 天"
+    elif mode == "login":
+        profile = db.renew_with_credentials(username, password, code)
+        stack = profile.get("renew_stack") or {}
+        if stack.get("stacked"):
+            msg = (
+                f"续费成功：已叠加剩余 {stack.get('previous_days_remaining', 0)} 天 + "
+                f"新购 {stack.get('days_added', 0)} 天"
+            )
+        else:
+            msg = profile.get("message") or f"会员已延长 {stack.get('days_added', row['duration_days'])} 天"
+    else:
+        raise ValueError("无效操作，请选择新用户开通或已有账号登录")
+
+    db.mark_payment_order_fulfilled(order_no, int(profile["id"]))
+    return {
+        "membership": profile,
+        "message": msg,
+        "username": profile.get("username") or username,
+    }
 
 
 def claim_paid_order(order_no: str, user_id: int) -> dict:

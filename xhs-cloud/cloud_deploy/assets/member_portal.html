@@ -176,43 +176,17 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   <div id="authView">
     <div class="tabs">
       <div class="tab active" data-tab="login" onclick="switchTab('login')">登录</div>
-      <div class="tab" data-tab="buy" onclick="switchTab('buy')">在线购买</div>
-      <div class="tab" data-tab="register" onclick="switchTab('register')">授权码开通</div>
-      <div class="tab" data-tab="renew" onclick="switchTab('renew')">授权码续费</div>
+      <div class="tab" data-tab="buy" onclick="switchTab('buy')">购买会员</div>
     </div>
     <div class="card" id="panelLogin">
-      <div class="seg" id="loginModeSeg" style="margin-bottom:16px">
-        <button type="button" class="active" data-mode="password" onclick="switchLoginMode('password')">账号密码</button>
-        <button type="button" data-mode="code" onclick="switchLoginMode('code')">授权码登录</button>
-      </div>
-      <p class="sub" style="margin:-8px 0 12px;font-size:12px;color:var(--muted)">请使用 <strong>https://monitor.xhs365.cn/member</strong> 登录；登录后保持 30 天，刷新无需重复登录</p>
-      <div id="panelLoginPassword">
-        <div class="field"><label>用户名</label><input id="loginUser" autocomplete="username" enterkeyhint="next"></div>
-        <div class="field"><label>密码</label><input id="loginPass" type="password" autocomplete="current-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doLogin()"></div>
-        <button class="btn btn-primary btn-block" onclick="doLogin()">登录</button>
-      </div>
-      <div id="panelLoginCode" class="hidden">
-        <div class="field"><label>授权码</label><input id="loginCode" placeholder="XHS-XXXX-XXXX-XXXX" autocomplete="off" enterkeyhint="go" onkeydown="if(event.key==='Enter')doLoginCode()"></div>
-        <button class="btn btn-primary btn-block" onclick="doLoginCode()">授权码登录</button>
-        <p style="font-size:12px;color:var(--text2);margin-top:12px">私发给您的授权码可直接登录，无需记住用户名密码。首次使用请切换到「授权码开通」注册。</p>
-      </div>
-    </div>
-    <div class="card hidden" id="panelRegister">
-      <div class="field"><label>授权码</label><input id="regCode" placeholder="XHS-XXXX-XXXX-XXXX" autocomplete="off"></div>
-      <div class="field"><label>用户名（新建账号）</label><input id="regUser" autocomplete="username"></div>
-      <div class="field"><label>密码（至少 6 位）</label><input id="regPass" type="password" autocomplete="new-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doRegister()"></div>
-      <button class="btn btn-primary btn-block" onclick="doRegister()">开通并登录</button>
-      <p style="font-size:12px;color:var(--text2);margin-top:12px">首次开通专用。已有账号请用「授权码续费」或登录后在会员信息里续费。</p>
-    </div>
-    <div class="card hidden" id="panelRenew">
-      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">已有账号绑定新授权码续费。若当前会员<strong>还剩 5 天</strong>，激活<strong>30 天</strong>新码后将变为<strong>35 天</strong>（剩余时长叠加，非覆盖）。</p>
-      <div class="field"><label>用户名</label><input id="renewUser" autocomplete="username"></div>
-      <div class="field"><label>密码</label><input id="renewPass" type="password" autocomplete="current-password"></div>
-      <div class="field"><label>新授权码</label><input id="renewAuthCode" placeholder="输入新购买的授权码" autocomplete="off" enterkeyhint="go" onkeydown="if(event.key==='Enter')doRenewWithCode()"></div>
-      <button class="btn btn-primary btn-block" onclick="doRenewWithCode()">续费并登录</button>
+      <p class="sub" style="margin:0 0 14px;font-size:13px;color:var(--text2)">已有账号请登录；新用户请点「购买会员」微信扫码支付后设置账号即可开通。</p>
+      <div class="field"><label>用户名</label><input id="loginUser" autocomplete="username" enterkeyhint="next"></div>
+      <div class="field"><label>密码</label><input id="loginPass" type="password" autocomplete="current-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">登录</button>
+      <p style="font-size:12px;color:var(--text2);margin-top:12px;text-align:center">还没有账号？<button type="button" class="btn btn-link" style="padding:0;min-height:auto;font-size:12px" onclick="switchTab('buy')">购买会员</button></p>
     </div>
     <div class="card hidden" id="panelBuy">
-      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">微信扫码支付，支付成功后自动生成授权码。<strong>已登录</strong>用户将自动延长会员（剩余天数叠加）；未登录请复制授权码到「授权码开通/续费」。</p>
+      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">微信扫码支付。<strong>已登录</strong>用户支付后自动延长会员；<strong>未登录</strong>用户支付成功后在本页设置账号（新用户）或登录已有账号（续费）。</p>
       <div class="plan-grid" id="planGrid"></div>
       <button class="btn btn-primary btn-block" id="btnStartPay" onclick="startWxPay()">微信扫码支付</button>
       <div id="payCheckout" class="hidden" style="margin-top:16px">
@@ -222,9 +196,15 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
           <p style="font-size:13px;color:var(--text2);margin-top:10px">请使用微信扫一扫完成支付</p>
         </div>
         <div class="pay-meta" id="payMeta"></div>
-        <div id="payAuthCodeBox" class="hidden">
-          <div class="auth-code-box" id="payAuthCode"></div>
-          <button class="btn btn-ghost btn-block" style="margin-top:10px" onclick="copyPayAuthCode()">复制授权码</button>
+        <div id="payCompleteBox" class="hidden" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line)">
+          <p class="alert alert-ok" style="margin-bottom:14px">支付成功！请完成最后一步以开通/续费会员</p>
+          <div class="seg" id="payCompleteModeSeg" style="margin-bottom:14px">
+            <button type="button" class="active" data-mode="register" onclick="setPayCompleteMode('register')">我是新用户</button>
+            <button type="button" data-mode="login" onclick="setPayCompleteMode('login')">已有账号续费</button>
+          </div>
+          <div class="field"><label id="payCompleteUserLabel">新建用户名</label><input id="payCompleteUser" autocomplete="username"></div>
+          <div class="field"><label>密码</label><input id="payCompletePass" type="password" autocomplete="new-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')submitPayComplete()"></div>
+          <button class="btn btn-primary btn-block" id="btnPayComplete" onclick="submitPayComplete()">完成开通并进入会员中心</button>
         </div>
       </div>
     </div>
@@ -241,9 +221,8 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div class="section-title">会员信息</div>
       <div class="profile-grid" id="profileGrid"></div>
       <div class="renew-box">
-        <div class="field"><label>授权码续费</label><input id="renewCode" placeholder="输入新授权码延长会员" autocomplete="off"></div>
-        <button class="btn btn-primary btn-block" onclick="doRenew()">续费</button>
-        <button class="btn btn-ghost btn-block" style="margin-top:10px" onclick="openBuyFromDash()">微信扫码购买 / 续费</button>
+        <p style="font-size:13px;color:var(--text2);margin:0 0 12px">续费请使用微信扫码，支付成功后会员天数自动叠加。</p>
+        <button class="btn btn-primary btn-block" onclick="openBuyFromDash()">微信扫码续费</button>
       </div>
       <div class="renew-box">
         <div class="section-title" style="margin-bottom:10px">修改密码</div>
@@ -311,6 +290,7 @@ let payPollTimer = null;
 let payPlans = [];
 let selectedPlanCode = 'monthly';
 let currentPayOrder = null;
+let payCompleteMode = 'register';
 const TOKEN_COOKIE_MAX_AGE = 30 * 86400;
 
 function storageOk() {
@@ -724,8 +704,6 @@ function switchTab(name) {
   stopPayPoll();
   document.querySelectorAll('#authView > .tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
   document.getElementById('panelLogin').classList.toggle('hidden', name !== 'login');
-  document.getElementById('panelRegister').classList.toggle('hidden', name !== 'register');
-  document.getElementById('panelRenew').classList.toggle('hidden', name !== 'renew');
   document.getElementById('panelBuy').classList.toggle('hidden', name !== 'buy');
   if (name === 'buy') loadPayPlans();
 }
@@ -801,7 +779,7 @@ async function startWxPay() {
   showMsg(msgEl, '', '');
   stopPayPoll();
   document.getElementById('payCheckout').classList.add('hidden');
-  document.getElementById('payAuthCodeBox').classList.add('hidden');
+  document.getElementById('payCompleteBox').classList.add('hidden');
   const btn = document.getElementById('btnStartPay');
   btn.disabled = true;
   btn.textContent = '正在创建订单…';
@@ -853,47 +831,88 @@ async function pollPayOrder(orderNo) {
 
 async function onPaySuccess(data) {
   const msgEl = document.getElementById('authMsg');
+  document.getElementById('payQrImg')?.classList.add('hidden');
   if (data.fulfilled) {
-    showMsg(msgEl, data.message || '支付成功，会员已自动延长', 'ok');
+    showMsg(msgEl, data.message || '支付成功，会员已生效', 'ok');
     if (loadStored(STORAGE.token)) {
       try {
         const profile = await api('/api/v1/member/profile', { auth: true });
         showDashboard(profile);
         await loadDashboard(false);
       } catch (_) {}
+    } else {
+      switchTab('login');
+      showMsg(msgEl, '支付成功，请登录进入会员中心', 'ok');
     }
     return;
   }
-  if (loadStored(STORAGE.token) && data.auth_code) {
+  if (loadStored(STORAGE.token)) {
     try {
       const claimed = await api('/api/v1/payment/orders/' + encodeURIComponent(data.order_no) + '/claim', {
         method: 'POST',
         auth: true,
       });
+      saveSession(claimed.access_token, claimed.membership, claimed.membership?.username);
       showMsg(msgEl, claimed.message || '支付成功，会员已延长', 'ok');
+      showDashboard(claimed.membership);
       await loadDashboard(false);
       return;
     } catch (e) {
-      showMsg(msgEl, e.message || '自动续期失败，请手动复制授权码', 'warn');
+      showMsg(msgEl, e.message || '自动续期失败，请在下方面板完成账号绑定', 'warn');
     }
   }
-  if (data.auth_code) {
-    document.getElementById('payAuthCodeBox').classList.remove('hidden');
-    document.getElementById('payAuthCode').textContent = data.auth_code;
-    showMsg(msgEl, '支付成功！请复制下方授权码，在「授权码开通」或「授权码续费」中使用', 'ok');
-  } else {
-    showMsg(msgEl, data.message || '支付成功', 'ok');
+  if (data.next_action === 'complete_account') {
+    currentPayOrder = data.order_no;
+    document.getElementById('payCompleteBox')?.classList.remove('hidden');
+    setPayCompleteMode('register');
+    showMsg(msgEl, '支付成功！请设置账号或登录已有账号完成开通', 'ok');
+    return;
+  }
+  showMsg(msgEl, data.message || '支付成功', 'ok');
+}
+
+function setPayCompleteMode(mode) {
+  payCompleteMode = mode === 'login' ? 'login' : 'register';
+  document.querySelectorAll('#payCompleteModeSeg button').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === payCompleteMode);
+  });
+  const label = document.getElementById('payCompleteUserLabel');
+  const btn = document.getElementById('btnPayComplete');
+  if (label) label.textContent = payCompleteMode === 'login' ? '用户名' : '新建用户名';
+  if (btn) btn.textContent = payCompleteMode === 'login' ? '登录并续费' : '完成开通并进入会员中心';
+}
+
+async function submitPayComplete() {
+  const orderNo = currentPayOrder;
+  if (!orderNo) return toastPayCompleteError('缺少订单号，请重新购买');
+  const username = (document.getElementById('payCompleteUser')?.value || '').trim();
+  const password = document.getElementById('payCompletePass')?.value || '';
+  if (!username || !password) return toastPayCompleteError('请填写用户名和密码');
+  const btn = document.getElementById('btnPayComplete');
+  if (btn) { btn.disabled = true; btn.textContent = '处理中…'; }
+  try {
+    const res = await api('/api/v1/payment/orders/' + encodeURIComponent(orderNo) + '/complete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...deviceAuthPayload(), mode: payCompleteMode, username, password }),
+    });
+    saveSession(res.access_token, res.membership, res.membership?.username || username);
+    document.getElementById('payCompleteBox')?.classList.add('hidden');
+    showMsg(document.getElementById('authMsg'), res.message || '开通成功', 'ok');
+    showDashboard(res.membership);
+    await loadDashboard(false);
+  } catch (e) {
+    toastPayCompleteError(e.message || '开通失败');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      setPayCompleteMode(payCompleteMode);
+    }
   }
 }
 
-function copyPayAuthCode() {
-  const code = document.getElementById('payAuthCode').textContent.trim();
-  if (!code) return;
-  navigator.clipboard.writeText(code).then(() => {
-    showMsg(document.getElementById('authMsg'), '授权码已复制', 'ok');
-  }).catch(() => {
-    showMsg(document.getElementById('authMsg'), '复制失败，请手动选择复制', 'warn');
-  });
+function toastPayCompleteError(msg) {
+  showMsg(document.getElementById('authMsg'), msg, 'error');
 }
 
 function switchLoginMode(mode) {
@@ -1537,4 +1556,3 @@ async function loadClientDownload() {
 </script>
 </body>
 </html>
-     
