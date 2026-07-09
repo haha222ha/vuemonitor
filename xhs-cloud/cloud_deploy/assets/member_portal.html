@@ -215,7 +215,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       </details>
     </div>
     <div class="card hidden" id="panelForgot">
-      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">输入注册时绑定的邮箱，我们将发送重置链接（2 小时内有效）。未绑定邮箱的老用户请先用上方「授权码登录」，并在会员中心绑定邮箱。</p>
+      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">输入注册邮箱，我们将发送重置链接（2 小时内有效）。未设密码的老用户请先用上方「授权码登录」。</p>
       <div class="field"><label>邮箱</label><input id="forgotEmail" type="email" autocomplete="email" enterkeyhint="go" onkeydown="if(event.key==='Enter')doForgotPassword()"></div>
       <button class="btn btn-primary btn-block" id="btnForgot" onclick="doForgotPassword()">发送重置邮件</button>
       <button type="button" class="btn btn-link btn-block" style="margin-top:8px" onclick="toggleForgotPassword(false)">返回登录</button>
@@ -272,14 +272,8 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
         </details>
       </div>
       <div class="renew-box">
-        <div class="section-title" style="margin-bottom:10px">绑定邮箱</div>
-        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">绑定邮箱后可使用「忘记密码」自助找回。客服私发授权码仍可使用，与扫码购买并行。</p>
-        <div class="field"><label>邮箱</label><input id="bindEmail" type="email" autocomplete="email" placeholder="your@email.com"></div>
-        <button class="btn btn-primary btn-block" onclick="doBindEmail()">保存邮箱</button>
-      </div>
-      <div class="renew-box">
         <div class="section-title" style="margin-bottom:10px">修改密码</div>
-        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">设置或修改登录密码后，下次可用「账号密码」登录。忘记密码请使用登录页「忘记密码」（需已绑定邮箱）。</p>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">设置或修改登录密码后，下次可用「账号密码」登录。忘记密码可用授权码登录，或联系客服。</p>
         <div class="field"><label>当前密码（可选）</label><input id="pwdCurrent" type="password" autocomplete="current-password" placeholder="记得旧密码时填写，忘记可留空"></div>
         <div class="field"><label>新密码（至少 6 位）</label><input id="pwdNew" type="password" autocomplete="new-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doChangePassword()"></div>
         <button class="btn btn-primary btn-block" onclick="doChangePassword()">保存新密码</button>
@@ -1052,8 +1046,6 @@ function renderProfile(m) {
   } else {
     banner.innerHTML = `<div class="alert alert-error">会员已过期，请点击下方「微信扫码续费」</div>`;
   }
-  const emailInput = document.getElementById('bindEmail');
-  if (emailInput && m.email) emailInput.value = m.email;
 }
 
 function archiveTypeFor(t) {
@@ -1499,26 +1491,6 @@ async function doResetPassword() {
     showMsg(authMsg, e.message, 'error');
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '重置密码并登录'; }
-  }
-}
-
-async function doBindEmail() {
-  const dashMsg = document.getElementById('dashMsg');
-  const email = (document.getElementById('bindEmail')?.value || '').trim();
-  if (!email) return showMsg(dashMsg, '请输入邮箱', 'error');
-  try {
-    const res = await api('/api/v1/member/bind-email', {
-      method: 'POST',
-      auth: true,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
-    });
-    showMsg(dashMsg, res.message || '邮箱已绑定', 'ok');
-    const profile = await api('/api/v1/member/profile', { auth: true });
-    saveSession(loadStored(STORAGE.token), profile, profile.username);
-    showDashboard(profile);
-  } catch (e) {
-    showMsg(dashMsg, e.message, 'error');
   }
 }
 
