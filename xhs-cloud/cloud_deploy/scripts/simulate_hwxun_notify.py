@@ -3,9 +3,8 @@
 """本地模拟 hwxun 支付回调（验签 + 履约联调 / 网关已扣款但 notify 未到时补单）。
 
 用法（在服务器 /opt/xhs-cloud 下）:
-  ./venv/bin/python cloud_deploy/scripts/simulate_hwxun_notify.py XHSP20260709165518254DF4
-  ./venv/bin/python cloud_deploy/scripts/simulate_hwxun_notify.py XHSP... --dry-run
-"""
+  cd /opt/xhs-cloud
+  PYTHONPATH=/opt/xhs-cloud ./venv/bin/python cloud_deploy/scripts/simulate_hwxun_notify.py XHSP..."""
 from __future__ import annotations
 
 import argparse
@@ -14,12 +13,12 @@ import sys
 import urllib.parse
 import urllib.request
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-if ROOT not in sys.path:
-    sys.path.insert(0, os.path.dirname(ROOT))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+CLOUD_ROOT = os.path.dirname(os.path.dirname(SCRIPT_DIR))
+if CLOUD_ROOT not in sys.path:
+    sys.path.insert(0, CLOUD_ROOT)
 
 from cloud_deploy.scripts.bootstrap_env import bootstrap
-
 bootstrap()
 
 from cloud_deploy.cloud_api import database as db
