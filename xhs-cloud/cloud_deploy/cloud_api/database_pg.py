@@ -840,6 +840,7 @@ PLAN_LABELS = {
     "quarterly": "季度会员",
     "halfyear": "半年会员",
     "yearly": "年度会员",
+    "pay_test": "支付测试",
     "experience": "体验会员",
     "admin": "管理员",
 }

@@ -25,7 +25,7 @@ def _gen_order_no() -> str:
 
 
 def list_public_plans() -> list[dict]:
-    from cloud_deploy.cloud_api.payment_plans import PAYMENT_PLANS
+    from cloud_deploy.cloud_api.payment_plans import list_active_plans
 
     return [
         {
@@ -35,8 +35,9 @@ def list_public_plans() -> list[dict]:
             "amount": p["amount"],
             "price_yuan": p["price_yuan"],
             "summary": p["summary"],
+            **({"is_test": True} if p.get("is_test") else {}),
         }
-        for p in PAYMENT_PLANS
+        for p in list_active_plans()
     ]
 
 

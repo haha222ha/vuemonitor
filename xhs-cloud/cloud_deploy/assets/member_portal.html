@@ -119,7 +119,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 .plan-card.active{border-color:var(--accent);background:#eef5ff;box-shadow:0 0 0 2px rgba(0,113,227,.15)}
 .plan-card .price{font-size:22px;font-weight:700;color:var(--accent);margin:6px 0 4px}
 .plan-card .name{font-size:13px;font-weight:600}
-.plan-card .hint{font-size:11px;color:var(--text2);margin-top:4px}
+.plan-card.plan-test{border-color:#f0d78a;background:#fffbeb}
 .pay-qr-wrap{text-align:center;padding:16px 0}
 .pay-qr-wrap img,.pay-qr-wrap canvas{max-width:220px;border-radius:8px;border:1px solid var(--line)}
 .pay-meta{font-size:13px;color:var(--text2);line-height:1.7;margin-top:12px}
@@ -764,8 +764,8 @@ function renderPlanGrid() {
   const grid = document.getElementById('planGrid');
   if (!grid) return;
   grid.innerHTML = payPlans.map(p => `
-    <div class="plan-card ${p.plan_code === selectedPlanCode ? 'active' : ''}" onclick="selectPlan('${esc(p.plan_code)}')">
-      <div class="name">${esc(p.label)}</div>
+    <div class="plan-card ${p.plan_code === selectedPlanCode ? 'active' : ''} ${p.is_test ? 'plan-test' : ''}" onclick="selectPlan('${esc(p.plan_code)}')">
+      <div class="name">${esc(p.label)}${p.is_test ? ' <span style="font-size:10px;color:#b45309">联调</span>' : ''}</div>
       <div class="price">¥${p.price_yuan}</div>
       <div class="hint">${p.duration_days} 天</div>
     </div>
@@ -1537,3 +1537,4 @@ async function loadClientDownload() {
 </script>
 </body>
 </html>
+     
