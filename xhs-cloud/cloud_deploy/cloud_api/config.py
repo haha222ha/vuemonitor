@@ -24,8 +24,11 @@ class Settings:
     xhs_local_agent_key: str = ""
     xhs_agent_ip_allowlist: str = ""
     xhs_pay_api_url: str = ""
+    xhs_pay_alipay_api_url: str = ""
     xhs_pay_pid: str = ""
     xhs_pay_key: str = ""
+    xhs_pay_alipay_pid: str = ""
+    xhs_pay_alipay_key: str = ""
     xhs_pay_notify_base: str = ""
 
 
@@ -54,7 +57,10 @@ def get_settings() -> Settings:
         xhs_local_agent_key=os.environ.get("XHS_LOCAL_AGENT_KEY", ""),
         xhs_agent_ip_allowlist=os.environ.get("XHS_AGENT_IP_ALLOWLIST", ""),
         xhs_pay_api_url=os.environ.get("XHS_PAY_API_URL", "https://pay.hwxun.cn/"),
+        xhs_pay_alipay_api_url=os.environ.get("XHS_PAY_ALIPAY_API_URL", "https://xapay.hwxun.cn/"),
         xhs_pay_pid=os.environ.get("XHS_PAY_PID", ""),
         xhs_pay_key=os.environ.get("XHS_PAY_KEY", ""),
+        xhs_pay_alipay_pid=os.environ.get("XHS_PAY_ALIPAY_PID", ""),
+        xhs_pay_alipay_key=os.environ.get("XHS_PAY_ALIPAY_KEY", ""),
         xhs_pay_notify_base=os.environ.get("XHS_PAY_NOTIFY_BASE", ""),
     )

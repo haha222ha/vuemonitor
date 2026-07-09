@@ -227,14 +227,18 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <button class="btn btn-primary btn-block" id="btnReset" onclick="doResetPassword()">重置密码并登录</button>
     </div>
     <div class="card hidden" id="panelBuy">
-      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">微信扫码支付。<strong>已登录</strong>用户支付后自动延长会员；<strong>未登录</strong>用户支付成功后在本页设置账号（新用户）或登录已有账号（续费）。</p>
+      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">扫码支付。<strong>已登录</strong>用户支付后自动延长会员；<strong>未登录</strong>用户支付成功后在本页设置账号（新用户）或登录已有账号（续费）。</p>
       <div class="plan-grid" id="planGrid"></div>
+      <div class="seg" id="payChannelSeg" style="margin-bottom:14px">
+        <button type="button" class="active" data-channel="wxpay" onclick="setPayChannel('wxpay')">微信扫码</button>
+        <button type="button" data-channel="alipay" onclick="setPayChannel('alipay')">支付宝扫码</button>
+      </div>
       <button class="btn btn-primary btn-block" id="btnStartPay" onclick="startWxPay()">微信扫码支付</button>
       <div id="payCheckout" class="hidden" style="margin-top:16px">
         <div class="pay-qr-wrap">
-          <img id="payQrImg" class="pay-qr-img hidden" alt="微信支付二维码" width="220" height="220">
+          <img id="payQrImg" class="pay-qr-img hidden" alt="支付二维码" width="220" height="220">
           <canvas id="payQrCanvas" class="hidden"></canvas>
-          <p style="font-size:13px;color:var(--text2);margin-top:10px">请使用微信扫一扫完成支付</p>
+          <p style="font-size:13px;color:var(--text2);margin-top:10px" id="payQrHint">请使用微信扫一扫完成支付</p>
         </div>
         <div class="pay-meta" id="payMeta"></div>
         <div id="payCompleteBox" class="hidden" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line)">
@@ -336,6 +340,7 @@ const TOKEN_COOKIE = 'xhs_member_token';
 let payPollTimer = null;
 let payPlans = [];
 let selectedPlanCode = 'monthly';
+let selectedPayChannel = 'wxpay';
 let currentPayOrder = null;
 let payCompleteMode = 'register';
 let csCodeMode = 'register';
@@ -858,6 +863,17 @@ function renderPayQrcode(qrText) {
   return true;
 }
 
+function setPayChannel(channel) {
+  selectedPayChannel = channel === 'alipay' ? 'alipay' : 'wxpay';
+  document.querySelectorAll('#payChannelSeg button').forEach(b => {
+    b.classList.toggle('active', b.dataset.channel === selectedPayChannel);
+  });
+  const btn = document.getElementById('btnStartPay');
+  const hint = document.getElementById('payQrHint');
+  if (btn) btn.textContent = selectedPayChannel === 'alipay' ? '支付宝扫码支付' : '微信扫码支付';
+  if (hint) hint.textContent = selectedPayChannel === 'alipay' ? '请使用支付宝扫一扫完成支付' : '请使用微信扫一扫完成支付';
+}
+
 async function startWxPay() {
   const msgEl = document.getElementById('authMsg');
   showMsg(msgEl, '', '');
@@ -873,16 +889,16 @@ async function startWxPay() {
     const opts = {
       method: 'POST',
       headers,
-      body: JSON.stringify({ plan_code: selectedPlanCode }),
+      body: JSON.stringify({ plan_code: selectedPlanCode, channel: selectedPayChannel }),
     };
     if (token) opts.auth = true;
     const order = await api('/api/v1/payment/orders', opts);
     currentPayOrder = order.order_no;
     document.getElementById('payCheckout').classList.remove('hidden');
     document.getElementById('payMeta').innerHTML =
-      `订单号：<strong>${esc(order.order_no)}</strong><br>套餐：${esc(order.plan_label)} · ¥${esc(order.amount)}<br>请在 30 分钟内完成支付`;
+      `订单号：<strong>${esc(order.order_no)}</strong><br>套餐：${esc(order.plan_label)} · ¥${esc(order.amount)}<br>支付方式：${order.channel === 'alipay' ? '支付宝' : '微信'}<br>请在 30 分钟内完成支付`;
     const qrText = order.qrcode || order.payurl || '';
-    if (/MicroMessenger/i.test(navigator.userAgent) && order.payurl) {
+    if (/MicroMessenger/i.test(navigator.userAgent) && order.payurl && order.channel !== 'alipay') {
       location.href = order.payurl;
       return;
     }
@@ -896,7 +912,7 @@ async function startWxPay() {
     showMsg(msgEl, e.message || '创建订单失败', 'error');
   } finally {
     btn.disabled = false;
-    btn.textContent = '微信扫码支付';
+    btn.textContent = selectedPayChannel === 'alipay' ? '支付宝扫码支付' : '微信扫码支付';
   }
 }
 

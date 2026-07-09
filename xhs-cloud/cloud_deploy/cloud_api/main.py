@@ -94,6 +94,7 @@ class RenewWithCodeBody(DeviceAuthBody):
 
 class PaymentCreateBody(BaseModel):
     plan_code: str = Field(..., min_length=3, max_length=32)
+    channel: str = Field(default="wxpay", pattern="^(wxpay|alipay)$")
 
 
 class PaymentCompleteBody(DeviceAuthBody):
@@ -452,6 +453,7 @@ def payment_create_order(
             plan_code=body.plan_code,
             user_id=user["id"] if user else None,
             client_ip=_client_ip(request),
+            channel=body.channel,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e

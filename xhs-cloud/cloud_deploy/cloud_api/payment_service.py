@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from cloud_deploy.cloud_api import database as db
 from cloud_deploy.cloud_api.config import get_settings
-from cloud_deploy.cloud_api.hwxun_pay import create_wxpay_order, verify_notify_epay
+from cloud_deploy.cloud_api.hwxun_pay import create_epay_order, notify_verify_key_for_order, verify_notify_epay
 from cloud_deploy.cloud_api.payment_plans import get_plan
 
 
@@ -46,10 +46,14 @@ def create_order(
     plan_code: str,
     user_id: int | None,
     client_ip: str,
+    channel: str = "wxpay",
 ) -> dict:
     plan = get_plan(plan_code)
     if not plan:
         raise ValueError("无效套餐")
+    pay_channel = (channel or "wxpay").strip().lower()
+    if pay_channel not in ("wxpay", "alipay"):
+        raise ValueError("支付方式仅支持 wxpay 或 alipay")
     order_no = _gen_order_no()
     expires_at = (datetime.now() + timedelta(minutes=30)).strftime("%Y-%m-%d %H:%M:%S")
     db.insert_payment_order(
@@ -58,11 +62,12 @@ def create_order(
         plan_code=plan["plan_code"],
         duration_days=int(plan["duration_days"]),
         amount=plan["amount"],
-        channel="wxpay",
+        channel=pay_channel,
         client_ip=client_ip,
         expires_at=expires_at,
     )
-    gw = create_wxpay_order(
+    gw = create_epay_order(
+        channel=pay_channel,
         out_trade_no=order_no,
         amount=plan["amount"],
         name=f"选品报告会员-{plan['label']}",
@@ -90,6 +95,7 @@ def create_order(
         "payurl": payurl,
         "expires_at": expires_at,
         "status": "pending",
+        "channel": pay_channel,
     }
 
 
@@ -113,6 +119,7 @@ def get_order_public(order_no: str) -> dict | None:
         "qrcode": row.get("qrcode") or "",
         "payurl": row.get("payurl") or "",
         "fulfilled": fulfilled,
+        "channel": row.get("channel") or "wxpay",
     }
     if row["status"] == "paid":
         if fulfilled:
@@ -211,7 +218,11 @@ def claim_paid_order(order_no: str, user_id: int) -> dict:
 
 
 def handle_hwxun_notify(params: dict) -> str:
-    key = (get_settings().xhs_pay_key or "").strip()
+    order_no = str(params.get("out_trade_no") or "").strip()
+    row = db.get_payment_order(order_no) if order_no else None
+    key = notify_verify_key_for_order((row or {}).get("channel") or params.get("type") or "wxpay")
+    if not key:
+        key = (get_settings().xhs_pay_key or "").strip()
     if not key:
         return "fail"
     if not verify_notify_epay(params, key):
@@ -224,7 +235,8 @@ def handle_hwxun_notify(params: dict) -> str:
     gateway_trade_no = str(params.get("trade_no") or "").strip()
     if not order_no:
         return "fail"
-    row = db.get_payment_order(order_no)
+    if not row:
+        row = db.get_payment_order(order_no)
     if not row:
         return "fail"
     if row["status"] == "paid":
@@ -232,7 +244,8 @@ def handle_hwxun_notify(params: dict) -> str:
     if f"{float(row['amount']):.2f}" != f"{float(money):.2f}":
         return "fail"
     paid_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    note = json.dumps({"order_no": order_no, "source": "hwxun_wxpay"}, ensure_ascii=False)
+    ch = row.get("channel") or "wxpay"
+    note = json.dumps({"order_no": order_no, "source": f"hwxun_{ch}"}, ensure_ascii=False)
     codes = db.generate_auth_codes(
         count=1,
         plan_code=row["plan_code"],
