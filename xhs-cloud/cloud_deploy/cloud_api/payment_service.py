@@ -164,6 +164,7 @@ def complete_paid_order(
             "membership": profile,
             "message": "该订单已完成开通",
             "username": profile.get("username") or "",
+            "auth_code": (row.get("auth_code") or "").strip(),
         }
     code = (row.get("auth_code") or "").strip()
     if not code:
@@ -200,6 +201,7 @@ def complete_paid_order(
         "membership": profile,
         "message": msg,
         "username": profile.get("username") or username,
+        "auth_code": code,
     }
 
 
@@ -212,7 +214,11 @@ def claim_paid_order(order_no: str, user_id: int) -> dict:
     if row.get("fulfilled_user_id"):
         if int(row["fulfilled_user_id"]) == user_id:
             profile = db.get_member_profile(user_id) or {}
-            return {"membership": profile, "message": "该订单已履约"}
+            return {
+                "membership": profile,
+                "message": "该订单已履约",
+                "auth_code": (row.get("auth_code") or "").strip(),
+            }
         raise ValueError("该订单已被其他账号使用")
     code = row.get("auth_code")
     if not code:
@@ -227,7 +233,7 @@ def claim_paid_order(order_no: str, user_id: int) -> dict:
         )
     else:
         msg = f"会员已延长 {stack.get('days_added', row['duration_days'])} 天"
-    return {"membership": profile, "message": msg}
+    return {"membership": profile, "message": msg, "auth_code": (code or "").strip()}
 
 
 def handle_hwxun_notify(params: dict) -> str:
