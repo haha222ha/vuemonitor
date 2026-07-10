@@ -71,6 +71,15 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
 .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px}
 .welcome-chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);background:#e8e8ed;padding:6px 12px;border-radius:20px;margin-top:8px}
 .welcome-chip strong{color:var(--text)}
+.portal-tabs{display:flex;gap:8px;margin-bottom:16px}
+.portal-tab{flex:1;text-align:center;padding:12px 14px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;background:#e8e8ed;color:var(--text2);-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s}
+.portal-tab.active{background:var(--accent);color:#fff}
+.benefit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+@media(min-width:520px){.benefit-grid{grid-template-columns:repeat(3,1fr)}}
+.benefit-item{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.benefit-item .bi-icon{font-size:20px;margin-bottom:6px}
+.benefit-item .bi-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.benefit-item .bi-desc{font-size:12px;color:var(--text2);line-height:1.55}
 .section-title{font-size:16px;font-weight:600}
 .renew-box{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
 .notice-card{background:linear-gradient(135deg,#f0f7ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5}
@@ -131,22 +140,28 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   <div class="topbar">
     <div>
       <h1>选品报告会员中心</h1>
-      <p class="sub">登录后可下载全部历史日报 / 周报 / 月报（zip 含 HTML + data.js）</p>
+      <p class="sub">小红书选品情报与分析报告 · 登录会员可下载全量日报 / 周报 / 月报</p>
       <div class="welcome-chip hidden" id="welcomeChip">欢迎回来，<strong id="welcomeName"></strong></div>
     </div>
     <button class="btn btn-ghost hidden" id="btnLogout" onclick="logout()">退出登录</button>
   </div>
 
+  <div class="portal-tabs" id="portalTabs">
+    <div class="portal-tab active" data-portal="trial" onclick="switchPortal('trial')">免费体验包</div>
+    <div class="portal-tab" data-portal="center" onclick="switchPortal('center')">选品报告中心</div>
+  </div>
+
+  <div id="portalTrial" class="portal-panel">
   <div class="card notice-card trial-pack-card" id="trialPackCard" style="background:linear-gradient(135deg,#eef8ff 0%,#f0fdf4 100%);border:1px solid #93c5fd">
     <div class="notice-title">🎁 免费选品体验包（无需登录）</div>
     <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">
-      含 <strong>24h 加购指数</strong> 精选样本，虚拟/实体分轨展示，总量合规上限 <strong>3000 条</strong>。可在线预览或下载 ZIP，风格为明亮科技极简。
+      精选选品情报样本，含 <strong>24h 加购指数</strong> 等分析维度，虚拟/实体分轨展示，合规上限 <strong>3000 条</strong>。可在线预览或下载 ZIP，仅供研究参考。
     </p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px">
         <div style="font-size:11px;color:var(--text2)">会员定制词库</div>
         <div style="font-size:20px;font-weight:800;color:var(--accent);margin:4px 0">¥9.9<span style="font-size:12px">/次</span></div>
-        <div style="font-size:12px;color:var(--text2)">定向采集 · 稳定产出</div>
+        <div style="font-size:12px;color:var(--text2)">定向关键词洞察 · 稳定产出</div>
       </div>
       <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px">
         <div style="font-size:11px;color:var(--text2)">非会员定制词库</div>
@@ -160,14 +175,74 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <span id="trialPackMeta" style="font-size:12px;color:var(--text2)">加载体验包信息…</span>
     </div>
     <p style="font-size:12px;color:var(--text2);line-height:1.55;margin:0">
-      <strong>PC 端选品分析工具仅付费会员可用</strong>；免费用户请使用本网页体验包。完整日报/周报/月报需登录会员账号下载。
+      <strong>PC 端选品分析工具仅付费会员可用</strong>；免费用户请使用本网页体验包。完整日报/周报/月报需开通会员后下载。
     </p>
+  </div>
+  </div>
+
+  <div id="portalCenter" class="portal-panel hidden">
+  <div class="card notice-card" id="memberBenefitsCard">
+    <div class="notice-title">✨ 会员权益说明</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:4px">
+      开通会员后，可获取基于公开商品信息与系统计算的<strong>选品情报分析报告</strong>，助力趋势研判与选品决策。数据仅供研究参考，不构成投资建议。
+    </p>
+    <div class="benefit-grid">
+      <div class="benefit-item">
+        <div class="bi-icon">📊</div>
+        <div class="bi-title">全量选品报告</div>
+        <div class="bi-desc">日报 / 周报 / 月报，含实体与虚拟商品分析，会员期内历史报告均可重复下载</div>
+      </div>
+      <div class="benefit-item">
+        <div class="bi-icon">🔑</div>
+        <div class="bi-title">定制词库报告</div>
+        <div class="bi-desc">按您提交的关键词定向生成选品分析报告，推送后在「定制词库」Tab 下载</div>
+      </div>
+      <div class="benefit-item">
+        <div class="bi-icon">💻</div>
+        <div class="bi-title">PC 分析工具</div>
+        <div class="bi-desc">ProductAnalyzer 本地查看全量报告、商品动销跟踪与收藏夹同步（付费会员专享）</div>
+      </div>
+      <div class="benefit-item">
+        <div class="bi-icon">📈</div>
+        <div class="bi-title">多维分析指标</div>
+        <div class="bi-desc">真实增量、日增速、加购指数、爆发分、粉销比等，辅助交叉验证选品信号</div>
+      </div>
+      <div class="benefit-item">
+        <div class="bi-icon">🌐</div>
+        <div class="bi-title">网页在线预览</div>
+        <div class="bi-desc">登录后可直接在浏览器预览报告，无需每次解压 ZIP</div>
+      </div>
+      <div class="benefit-item">
+        <div class="bi-icon">📦</div>
+        <div class="bi-title">批量打包下载</div>
+        <div class="bi-desc">支持多份报告勾选后一键打包下载，方便离线存档与分析</div>
+      </div>
+    </div>
+    <div class="notice-tip">
+      体验包为免费样本（≤3000 条）；会员可获取每日<strong>全量</strong>选品情报。定制词库：会员 ¥9.9/次，非会员 ¥29.9/次。
+    </div>
+  </div>
+
+  <div class="card notice-card" id="reportScheduleCard">
+    <div class="notice-title">📋 报告更新说明</div>
+    <ul>
+      <li><strong>日报</strong>：每天 <strong>18:00</strong>（北京时间）自动生成，一般 18:00～18:10 内可下载</li>
+      <li><strong>周报</strong>：每周日 <strong>18:00</strong> 生成（汇总当周数据）</li>
+      <li><strong>月报</strong>：每月 <strong>1 日 18:00</strong> 生成（汇总上月数据）</li>
+      <li><strong>定制词库</strong>：按词库生成的选品分析报告，推送后可在「定制词库」Tab 下载</li>
+      <li>当日 18:00 前若列表暂无「今天」的日报，属正常情况，请稍后再来</li>
+      <li>报告含<strong>实体 + 虚拟</strong>商品：实体门槛预估日增 &gt;5，虚拟门槛预估日增 &gt;1（同一份 zip）</li>
+    </ul>
+    <div class="notice-tip">
+      下载 zip 后解压，<strong>右键 index_with_gr.html → Chrome 打开</strong> 查看；也可点 <strong>在线预览</strong>（需已登录，自动加载数据）。
+      历史报告在会员有效期内均可重复下载。数据基于公开信息与系统计算，存在延迟与误差，请理性参考。
+    </div>
   </div>
 
   <div class="card notice-card" id="clientDownloadCard" style="background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5">
     <div class="notice-title">💻 PC 端选品分析工具（付费会员专享）</div>
     <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">
-      安装 <strong>ProductAnalyzer</strong> 后，可在本地查看<strong>全量</strong>选品报告、监控商品销量、同步收藏夹。本工具<strong>不对免费用户开放</strong>，请先开通会员。
+      安装 <strong>ProductAnalyzer</strong> 后，可在本地查看<strong>全量</strong>选品情报报告、跟踪商品动销变化、同步收藏夹。本工具<strong>不对免费用户开放</strong>，请先开通会员。
     </p>
     <div id="paUpdateNotice" class="hidden" style="margin-bottom:12px;padding:10px 12px;border-radius:8px;background:#fff8e6;border:1px solid #f0d78a;font-size:13px;line-height:1.6">
       <strong style="color:#b45309">📦 新版本已发布</strong>
@@ -183,21 +258,6 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     </details>
     <p style="font-size:12px;color:var(--text2);margin-top:10px;line-height:1.5">安装后可自动检测新版本（启动约 8 秒后提示）；点击「下载安装包」覆盖安装即可升级，无需卸载。如遇 Windows 安全提示，请点击「更多信息」→「仍要运行」。</p>
   </div>
-
-  <div class="card notice-card">
-    <div class="notice-title">📋 报告更新说明</div>
-    <ul>
-      <li><strong>日报</strong>：每天 <strong>18:00</strong>（北京时间）自动生成，一般 18:00～18:10 内可下载</li>
-      <li><strong>周报</strong>：每周日 <strong>18:00</strong> 生成（汇总当周数据）</li>
-      <li><strong>月报</strong>：每月 <strong>1 日 18:00</strong> 生成（汇总上月数据）</li>
-      <li><strong>定制词库</strong>：按词库生成的选品报告，推送后可在「定制词库」Tab 下载</li>
-      <li>当日 18:00 前若列表暂无「今天」的日报，属正常情况，请稍后再来</li>
-      <li>报告含<strong>实体 + 虚拟</strong>商品：实体门槛 v1d&gt;5，虚拟门槛 v1d&gt;1（同一份 zip）</li>
-    </ul>
-    <div class="notice-tip">
-      下载 zip 后解压，<strong>右键 index_with_gr.html → Chrome 打开</strong> 查看；也可点 <strong>在线预览</strong>（需已登录，自动加载 data.js）。
-      历史报告在会员有效期内均可重复下载。
-    </div>
   </div>
 
   <div id="authView">
@@ -362,6 +422,7 @@ const STORAGE = {
   viewMode: 'xhs_member_view_mode',
   activated: 'xhs_member_activated',
   deviceId: 'xhs_member_device_id',
+  portalTab: 'xhs_member_portal_tab',
 };
 const TOKEN_COOKIE = 'xhs_member_token';
 let payPollTimer = null;
@@ -714,6 +775,42 @@ function showAuthView() {
   document.getElementById('authView').classList.remove('hidden');
   document.getElementById('dashView').classList.add('hidden');
   document.getElementById('btnLogout').classList.add('hidden');
+  updatePortalVisibility(null);
+}
+
+function switchPortal(name) {
+  const tab = name === 'center' ? 'center' : 'trial';
+  try { localStorage.setItem(STORAGE.portalTab, tab); } catch (_) {}
+  document.querySelectorAll('#portalTabs .portal-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.portal === tab);
+  });
+  const trial = document.getElementById('portalTrial');
+  const center = document.getElementById('portalCenter');
+  if (trial) trial.classList.toggle('hidden', tab !== 'trial');
+  if (center) center.classList.toggle('hidden', tab !== 'center');
+}
+
+function updatePortalVisibility(membership) {
+  const tabs = document.getElementById('portalTabs');
+  const trialPanel = document.getElementById('portalTrial');
+  const centerPanel = document.getElementById('portalCenter');
+  if (!tabs || !trialPanel || !centerPanel) return;
+
+  const isActiveMember = !!(membership && membership.is_active);
+  if (isActiveMember) {
+    tabs.classList.add('hidden');
+    trialPanel.classList.add('hidden');
+    centerPanel.classList.remove('hidden');
+    return;
+  }
+
+  tabs.classList.remove('hidden');
+  let saved = 'trial';
+  try {
+    const v = localStorage.getItem(STORAGE.portalTab);
+    if (v === 'center' || v === 'trial') saved = v;
+  } catch (_) {}
+  switchPortal(saved);
 }
 
 function isAuthError(err) {
@@ -1112,6 +1209,7 @@ function renderProfile(m) {
   } else {
     banner.innerHTML = `<div class="alert alert-error">会员已过期，请点击下方「扫码续费（微信/支付宝）」</div>`;
   }
+  updatePortalVisibility(m);
 }
 
 function archiveTypeFor(t) {
@@ -1440,7 +1538,11 @@ function showDashboard(cachedProfile) {
   document.getElementById('authView').classList.add('hidden');
   document.getElementById('dashView').classList.remove('hidden');
   document.getElementById('btnLogout').classList.remove('hidden');
-  if (cachedProfile) renderProfile(cachedProfile);
+  if (cachedProfile) {
+    renderProfile(cachedProfile);
+  } else {
+    updatePortalVisibility(loadCachedProfile());
+  }
 }
 
 async function loadDashboard(useCacheFirst) {
@@ -1715,6 +1817,7 @@ async function loadTrialPackInfo() {
   loadClientDownload();
   loadTrialPackInfo();
   restoreFormFields();
+  updatePortalVisibility(loadCachedProfile());
 
   const resetParam = new URLSearchParams(location.search).get('reset');
   if (resetParam) {
