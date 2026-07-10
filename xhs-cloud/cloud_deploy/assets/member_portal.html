@@ -137,10 +137,37 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <button class="btn btn-ghost hidden" id="btnLogout" onclick="logout()">退出登录</button>
   </div>
 
-  <div class="card notice-card" id="clientDownloadCard" style="background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5">
-    <div class="notice-title">💻 PC 端选品分析工具</div>
+  <div class="card notice-card trial-pack-card" id="trialPackCard" style="background:linear-gradient(135deg,#eef8ff 0%,#f0fdf4 100%);border:1px solid #93c5fd">
+    <div class="notice-title">🎁 免费选品体验包（无需登录）</div>
     <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">
-      安装 <strong>ProductAnalyzer</strong> 后，可在本地查看选品报告、监控商品销量、同步收藏夹，与会员中心数据互通。
+      含 <strong>24h 加购指数</strong> 精选样本，虚拟/实体分轨展示，总量合规上限 <strong>3000 条</strong>。可在线预览或下载 ZIP，风格为明亮科技极简。
+    </p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+      <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px">
+        <div style="font-size:11px;color:var(--text2)">会员定制词库</div>
+        <div style="font-size:20px;font-weight:800;color:var(--accent);margin:4px 0">¥9.9<span style="font-size:12px">/次</span></div>
+        <div style="font-size:12px;color:var(--text2)">定向采集 · 稳定产出</div>
+      </div>
+      <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px">
+        <div style="font-size:11px;color:var(--text2)">非会员定制词库</div>
+        <div style="font-size:20px;font-weight:800;color:var(--text2);margin:4px 0">¥29.9<span style="font-size:12px">/次</span></div>
+        <div style="font-size:12px;color:var(--text2)">单次试水验证</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">
+      <a class="btn btn-primary" id="trialPreviewLink" href="/public/trial/preview" target="_blank" rel="noopener" style="text-decoration:none;color:#fff">在线预览体验包</a>
+      <a class="btn btn-ghost" id="trialDownloadLink" href="/api/v1/public/trial-report/download" style="text-decoration:none">下载 ZIP</a>
+      <span id="trialPackMeta" style="font-size:12px;color:var(--text2)">加载体验包信息…</span>
+    </div>
+    <p style="font-size:12px;color:var(--text2);line-height:1.55;margin:0">
+      <strong>PC 端选品分析工具仅付费会员可用</strong>；免费用户请使用本网页体验包。完整日报/周报/月报需登录会员账号下载。
+    </p>
+  </div>
+
+  <div class="card notice-card" id="clientDownloadCard" style="background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5">
+    <div class="notice-title">💻 PC 端选品分析工具（付费会员专享）</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">
+      安装 <strong>ProductAnalyzer</strong> 后，可在本地查看<strong>全量</strong>选品报告、监控商品销量、同步收藏夹。本工具<strong>不对免费用户开放</strong>，请先开通会员。
     </p>
     <div id="paUpdateNotice" class="hidden" style="margin-bottom:12px;padding:10px 12px;border-radius:8px;background:#fff8e6;border:1px solid #f0d78a;font-size:13px;line-height:1.6">
       <strong style="color:#b45309">📦 新版本已发布</strong>
@@ -1666,9 +1693,27 @@ async function loadClientDownload() {
   }
 }
 
+async function loadTrialPackInfo() {
+  const metaEl = document.getElementById('trialPackMeta');
+  const card = document.getElementById('trialPackCard');
+  if (!metaEl || !card) return;
+  try {
+    const res = await fetch('/api/v1/public/trial-report/info', { cache: 'no-store' });
+    if (!res.ok) {
+      metaEl.textContent = '体验包部署中，请稍后刷新';
+      return;
+    }
+    const d = await res.json();
+    metaEl.textContent = `样本 ${d.count || 0} 条 · 虚拟 ${d.virtual_count || 0} / 实体 ${d.physical_count || 0} · ${d.date || ''}`;
+  } catch (e) {
+    metaEl.textContent = '体验包信息加载失败';
+  }
+}
+
 (async function init() {
   try {
   loadClientDownload();
+  loadTrialPackInfo();
   restoreFormFields();
 
   const resetParam = new URLSearchParams(location.search).get('reset');

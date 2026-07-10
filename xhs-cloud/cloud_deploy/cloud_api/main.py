@@ -719,6 +719,41 @@ def member_preview_page():
     return FileResponse(path, media_type="text/html; charset=utf-8")
 
 
+@app.get("/public/trial/preview", response_class=HTMLResponse)
+def public_trial_preview_page():
+    from cloud_deploy.cloud_api.trial_public_service import trial_file_response
+
+    return trial_file_response("index_trial.html")
+
+
+@app.get("/public/trial")
+def public_trial_redirect():
+    from fastapi.responses import RedirectResponse
+
+    return RedirectResponse(url="/public/trial/preview", status_code=302)
+
+
+@app.get("/api/v1/public/trial-report/info")
+def public_trial_report_info():
+    from cloud_deploy.cloud_api.trial_public_service import trial_info
+
+    return trial_info()
+
+
+@app.get("/api/v1/public/trial-report/download")
+def public_trial_report_download():
+    from cloud_deploy.cloud_api.trial_public_service import trial_download_response
+
+    return trial_download_response()
+
+
+@app.get("/api/v1/public/trial-report/view/{file_name}")
+def public_trial_report_view_file(file_name: str):
+    from cloud_deploy.cloud_api.trial_public_service import trial_file_response
+
+    return trial_file_response(file_name)
+
+
 @app.get("/api/v1/member/reports/{report_date}/view/{file_path:path}")
 def member_report_view_file(
     report_date: str,
