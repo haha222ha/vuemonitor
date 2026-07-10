@@ -16,6 +16,7 @@ const routes = [
       { path: "licenses", component: () => import("../views/LicensesView.vue") },
       { path: "intel-codes", component: () => import("../views/IntelCodesView.vue") },
       { path: "pick-member", component: () => import("../views/PickMemberView.vue") },
+      { path: "member-feedback", component: () => import("../views/MemberFeedbackView.vue") },
       { path: "collect", component: () => import("../views/CollectView.vue") },
       { path: "proxies", component: () => import("../views/ProxiesView.vue") },
       { path: "risk-events", component: () => import("../views/RiskEventsView.vue") },

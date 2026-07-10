@@ -94,6 +94,35 @@ def init_db() -> None:
             UNIQUE(user_id, goods_id),
             FOREIGN KEY(user_id) REFERENCES users(id)
         );
+        CREATE TABLE IF NOT EXISTS member_feedback (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            username TEXT,
+            category TEXT NOT NULL DEFAULT 'suggestion',
+            content TEXT NOT NULL,
+            contact TEXT,
+            app_version TEXT,
+            machine_id TEXT,
+            client_ip TEXT,
+            status TEXT NOT NULL DEFAULT 'new',
+            admin_note TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS member_keyword_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            username TEXT,
+            keywords TEXT NOT NULL,
+            note TEXT,
+            app_version TEXT,
+            machine_id TEXT,
+            client_ip TEXT,
+            status TEXT NOT NULL DEFAULT 'pending',
+            admin_note TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS payment_orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             order_no TEXT UNIQUE NOT NULL,
@@ -1323,3 +1352,157 @@ def consume_password_reset_token(token_hash: str) -> int | None:
     conn.commit()
     conn.close()
     return int(row["user_id"])
+
+
+def create_member_feedback(
+    *,
+    user_id: int,
+    username: str,
+    category: str,
+    content: str,
+    contact: str = "",
+    app_version: str = "",
+    machine_id: str = "",
+    client_ip: str = "",
+) -> dict:
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = _conn()
+    cur = conn.execute(
+        """INSERT INTO member_feedback
+           (user_id, username, category, content, contact, app_version, machine_id, client_ip, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?,?)""",
+        (
+            user_id,
+            (username or "")[:64],
+            (category or "suggestion")[:32],
+            (content or "")[:8000],
+            (contact or "")[:255],
+            (app_version or "")[:32],
+            (machine_id or "")[:64],
+            (client_ip or "")[:64],
+            now,
+            now,
+        ),
+    )
+    conn.commit()
+    rid = int(cur.lastrowid)
+    conn.close()
+    return {"id": rid, "created_at": now}
+
+
+def create_member_keyword_request(
+    *,
+    user_id: int,
+    username: str,
+    keywords: str,
+    note: str = "",
+    app_version: str = "",
+    machine_id: str = "",
+    client_ip: str = "",
+) -> dict:
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = _conn()
+    cur = conn.execute(
+        """INSERT INTO member_keyword_requests
+           (user_id, username, keywords, note, app_version, machine_id, client_ip, created_at, updated_at)
+           VALUES (?,?,?,?,?,?,?,?,?)""",
+        (
+            user_id,
+            (username or "")[:64],
+            (keywords or "")[:4000],
+            (note or "")[:2000],
+            (app_version or "")[:32],
+            (machine_id or "")[:64],
+            (client_ip or "")[:64],
+            now,
+            now,
+        ),
+    )
+    conn.commit()
+    rid = int(cur.lastrowid)
+    conn.close()
+    return {"id": rid, "created_at": now}
+
+
+def list_member_feedback(*, limit: int = 100, status: str | None = None) -> list:
+    conn = _conn()
+    lim = min(max(limit, 1), 500)
+    if status:
+        rows = conn.execute(
+            "SELECT * FROM member_feedback WHERE status=? ORDER BY created_at DESC LIMIT ?",
+            (status[:16], lim),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM member_feedback ORDER BY created_at DESC LIMIT ?",
+            (lim,),
+        ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def list_member_keyword_requests(*, limit: int = 100, status: str | None = None) -> list:
+    conn = _conn()
+    lim = min(max(limit, 1), 500)
+    if status:
+        rows = conn.execute(
+            "SELECT * FROM member_keyword_requests WHERE status=? ORDER BY created_at DESC LIMIT ?",
+            (status[:16], lim),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM member_keyword_requests ORDER BY created_at DESC LIMIT ?",
+            (lim,),
+        ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def update_member_feedback(item_id: int, *, status: str | None = None, admin_note: str | None = None) -> bool:
+    sets = []
+    params = []
+    if status is not None:
+        sets.append("status=?")
+        params.append(status[:16])
+    if admin_note is not None:
+        sets.append("admin_note=?")
+        params.append((admin_note or "")[:2000])
+    if not sets:
+        return False
+    sets.append("updated_at=?")
+    params.append(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    params.append(int(item_id))
+    conn = _conn()
+    cur = conn.execute(
+        f"UPDATE member_feedback SET {', '.join(sets)} WHERE id=?",
+        params,
+    )
+    conn.commit()
+    ok = cur.rowcount > 0
+    conn.close()
+    return ok
+
+
+def update_member_keyword_request(item_id: int, *, status: str | None = None, admin_note: str | None = None) -> bool:
+    sets = []
+    params = []
+    if status is not None:
+        sets.append("status=?")
+        params.append(status[:16])
+    if admin_note is not None:
+        sets.append("admin_note=?")
+        params.append((admin_note or "")[:2000])
+    if not sets:
+        return False
+    sets.append("updated_at=?")
+    params.append(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    params.append(int(item_id))
+    conn = _conn()
+    cur = conn.execute(
+        f"UPDATE member_keyword_requests SET {', '.join(sets)} WHERE id=?",
+        params,
+    )
+    conn.commit()
+    ok = cur.rowcount > 0
+    conn.close()
+    return ok

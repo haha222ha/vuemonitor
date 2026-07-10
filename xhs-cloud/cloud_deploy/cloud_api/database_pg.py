@@ -162,6 +162,37 @@ def _init_db_on_conn(conn) -> None:
                     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                     UNIQUE(user_id, goods_id)
                 );
+                CREATE TABLE IF NOT EXISTS member_feedback (
+                    id SERIAL PRIMARY KEY,
+                    user_id INT REFERENCES users(id),
+                    username VARCHAR(64),
+                    category VARCHAR(32) NOT NULL DEFAULT 'suggestion',
+                    content TEXT NOT NULL,
+                    contact TEXT,
+                    app_version VARCHAR(32),
+                    machine_id VARCHAR(64),
+                    client_ip INET,
+                    status VARCHAR(16) NOT NULL DEFAULT 'new',
+                    admin_note TEXT,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                );
+                CREATE INDEX IF NOT EXISTS idx_member_feedback_status ON member_feedback(status, created_at DESC);
+                CREATE TABLE IF NOT EXISTS member_keyword_requests (
+                    id SERIAL PRIMARY KEY,
+                    user_id INT REFERENCES users(id),
+                    username VARCHAR(64),
+                    keywords TEXT NOT NULL,
+                    note TEXT,
+                    app_version VARCHAR(32),
+                    machine_id VARCHAR(64),
+                    client_ip INET,
+                    status VARCHAR(16) NOT NULL DEFAULT 'pending',
+                    admin_note TEXT,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                );
+                CREATE INDEX IF NOT EXISTS idx_member_keyword_requests_status ON member_keyword_requests(status, created_at DESC);
                 CREATE TABLE IF NOT EXISTS payment_orders (
                     id SERIAL PRIMARY KEY,
                     order_no VARCHAR(64) UNIQUE NOT NULL,
@@ -1744,5 +1775,198 @@ def consume_password_reset_token(token_hash: str) -> int | None:
             user_id = int(row["user_id"])
         conn.commit()
         return user_id
+    finally:
+        conn.close()
+
+
+def create_member_feedback(
+    *,
+    user_id: int,
+    username: str,
+    category: str,
+    content: str,
+    contact: str = "",
+    app_version: str = "",
+    machine_id: str = "",
+    client_ip: str = "",
+) -> dict:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """INSERT INTO member_feedback
+                   (user_id, username, category, content, contact, app_version, machine_id, client_ip)
+                   VALUES (%s, %s, %s, %s, %s, %s, %s, NULLIF(%s, '')::inet)
+                   RETURNING id, created_at""",
+                (
+                    user_id,
+                    (username or "")[:64],
+                    (category or "suggestion")[:32],
+                    (content or "")[:8000],
+                    (contact or "")[:255],
+                    (app_version or "")[:32],
+                    (machine_id or "")[:64],
+                    (client_ip or "")[:64],
+                ),
+            )
+            row = c.fetchone()
+        conn.commit()
+        return {"id": int(row["id"]), "created_at": str(row["created_at"])}
+    finally:
+        conn.close()
+
+
+def create_member_keyword_request(
+    *,
+    user_id: int,
+    username: str,
+    keywords: str,
+    note: str = "",
+    app_version: str = "",
+    machine_id: str = "",
+    client_ip: str = "",
+) -> dict:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """INSERT INTO member_keyword_requests
+                   (user_id, username, keywords, note, app_version, machine_id, client_ip)
+                   VALUES (%s, %s, %s, %s, %s, %s, NULLIF(%s, '')::inet)
+                   RETURNING id, created_at""",
+                (
+                    user_id,
+                    (username or "")[:64],
+                    (keywords or "")[:4000],
+                    (note or "")[:2000],
+                    (app_version or "")[:32],
+                    (machine_id or "")[:64],
+                    (client_ip or "")[:64],
+                ),
+            )
+            row = c.fetchone()
+        conn.commit()
+        return {"id": int(row["id"]), "created_at": str(row["created_at"])}
+    finally:
+        conn.close()
+
+
+def _row_ts(row: dict, key: str = "created_at") -> str:
+    val = row.get(key)
+    return val.isoformat() if hasattr(val, "isoformat") else str(val or "")
+
+
+def list_member_feedback(*, limit: int = 100, status: str | None = None) -> list:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            if status:
+                c.execute(
+                    """SELECT * FROM member_feedback WHERE status=%s
+                       ORDER BY created_at DESC LIMIT %s""",
+                    (status[:16], min(max(limit, 1), 500)),
+                )
+            else:
+                c.execute(
+                    "SELECT * FROM member_feedback ORDER BY created_at DESC LIMIT %s",
+                    (min(max(limit, 1), 500),),
+                )
+            rows = c.fetchall() or []
+        out = []
+        for r in rows:
+            item = dict(r)
+            item["created_at"] = _row_ts(item)
+            item["updated_at"] = _row_ts(item, "updated_at")
+            if item.get("client_ip") is not None:
+                item["client_ip"] = str(item["client_ip"])
+            out.append(item)
+        return out
+    finally:
+        conn.close()
+
+
+def list_member_keyword_requests(*, limit: int = 100, status: str | None = None) -> list:
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            if status:
+                c.execute(
+                    """SELECT * FROM member_keyword_requests WHERE status=%s
+                       ORDER BY created_at DESC LIMIT %s""",
+                    (status[:16], min(max(limit, 1), 500)),
+                )
+            else:
+                c.execute(
+                    "SELECT * FROM member_keyword_requests ORDER BY created_at DESC LIMIT %s",
+                    (min(max(limit, 1), 500),),
+                )
+            rows = c.fetchall() or []
+        out = []
+        for r in rows:
+            item = dict(r)
+            item["created_at"] = _row_ts(item)
+            item["updated_at"] = _row_ts(item, "updated_at")
+            if item.get("client_ip") is not None:
+                item["client_ip"] = str(item["client_ip"])
+            out.append(item)
+        return out
+    finally:
+        conn.close()
+
+
+def update_member_feedback(item_id: int, *, status: str | None = None, admin_note: str | None = None) -> bool:
+    conn = _conn()
+    try:
+        sets = ["updated_at = NOW()"]
+        params: list = []
+        if status is not None:
+            sets.append("status = %s")
+            params.append(status[:16])
+        if admin_note is not None:
+            sets.append("admin_note = %s")
+            params.append((admin_note or "")[:2000])
+        if len(sets) <= 1:
+            return False
+        params.append(int(item_id))
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                f"UPDATE member_feedback SET {', '.join(sets)} WHERE id = %s",
+                params,
+            )
+            ok = c.rowcount > 0
+        conn.commit()
+        return ok
+    finally:
+        conn.close()
+
+
+def update_member_keyword_request(item_id: int, *, status: str | None = None, admin_note: str | None = None) -> bool:
+    conn = _conn()
+    try:
+        sets = ["updated_at = NOW()"]
+        params: list = []
+        if status is not None:
+            sets.append("status = %s")
+            params.append(status[:16])
+        if admin_note is not None:
+            sets.append("admin_note = %s")
+            params.append((admin_note or "")[:2000])
+        if len(sets) <= 1:
+            return False
+        params.append(int(item_id))
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                f"UPDATE member_keyword_requests SET {', '.join(sets)} WHERE id = %s",
+                params,
+            )
+            ok = c.rowcount > 0
+        conn.commit()
+        return ok
     finally:
         conn.close()

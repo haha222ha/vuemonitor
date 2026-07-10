@@ -147,6 +147,26 @@ class WatchlistDeleteBody(BaseModel):
     goods_ids: list[str] = Field(..., min_length=1, max_length=500)
 
 
+class MemberFeedbackBody(BaseModel):
+    category: str = Field(default="suggestion", max_length=32)
+    content: str = Field(..., min_length=4, max_length=8000)
+    contact: str = Field(default="", max_length=255)
+    app_version: str = Field(default="", max_length=32)
+    machine_id: str = Field(default="", max_length=64)
+
+
+class MemberKeywordRequestBody(BaseModel):
+    keywords: str = Field(..., min_length=1, max_length=4000)
+    note: str = Field(default="", max_length=2000)
+    app_version: str = Field(default="", max_length=32)
+    machine_id: str = Field(default="", max_length=64)
+
+
+class AdminFeedbackUpdateBody(BaseModel):
+    status: str | None = Field(default=None, max_length=16)
+    admin_note: str | None = Field(default=None, max_length=2000)
+
+
 class BatchDownloadBody(BaseModel):
     archive_type: str = "member_daily_zip"
     report_dates: list[str] = Field(..., min_length=1, max_length=50)
@@ -622,6 +642,47 @@ def member_watchlist_delete(body: WatchlistDeleteBody, user: dict = Depends(curr
     return {"message": f"已移除 {removed} 项", "removed": removed}
 
 
+@app.post("/api/v1/member/feedback")
+def member_submit_feedback(body: MemberFeedbackBody, request: Request, user: dict = Depends(current_member)):
+    try:
+        result = db.create_member_feedback(
+            user_id=int(user["id"]),
+            username=str(user.get("username") or ""),
+            category=body.category.strip() or "suggestion",
+            content=body.content.strip(),
+            contact=(body.contact or "").strip(),
+            app_version=(body.app_version or "").strip(),
+            machine_id=(body.machine_id or "").strip(),
+            client_ip=_client_ip(request),
+        )
+        return {"message": "感谢反馈，我们已收到", **result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"提交失败: {e}") from e
+
+
+@app.post("/api/v1/member/keyword-requests")
+def member_submit_keyword_request(body: MemberKeywordRequestBody, request: Request, user: dict = Depends(current_member)):
+    keywords = (body.keywords or "").strip()
+    if not keywords:
+        raise HTTPException(status_code=400, detail="请填写关键词")
+    try:
+        result = db.create_member_keyword_request(
+            user_id=int(user["id"]),
+            username=str(user.get("username") or ""),
+            keywords=keywords,
+            note=(body.note or "").strip(),
+            app_version=(body.app_version or "").strip(),
+            machine_id=(body.machine_id or "").strip(),
+            client_ip=_client_ip(request),
+        )
+        return {
+            "message": "关键词已提交，将纳入监控总词库排队；不保证采集结果",
+            **result,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"提交失败: {e}") from e
+
+
 @app.get("/api/v1/member/reports/{report_date}/download")
 def download_report(
     report_date: str,
@@ -848,6 +909,70 @@ def admin_stats(_: None = Depends(verify_sync_key)):
         "sold_history_pending_backfill": pending_backfill,
         "sold_snapshots_pending_backfill": pending_snapshots,
     }
+
+
+@app.get("/api/v1/admin/member-feedback")
+def admin_list_member_feedback(
+    limit: int = 100,
+    status: str | None = None,
+    _: None = Depends(verify_sync_key),
+):
+    try:
+        items = db.list_member_feedback(limit=min(max(limit, 1), 500), status=status)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
+    return {"items": items, "total": len(items)}
+
+
+@app.patch("/api/v1/admin/member-feedback/{item_id}")
+def admin_update_member_feedback(
+    item_id: int,
+    body: AdminFeedbackUpdateBody,
+    _: None = Depends(verify_sync_key),
+):
+    try:
+        ok = db.update_member_feedback(
+            item_id,
+            status=body.status,
+            admin_note=body.admin_note,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
+    if not ok:
+        raise HTTPException(status_code=404, detail="记录不存在或无变更")
+    return {"message": "已更新"}
+
+
+@app.get("/api/v1/admin/member-keyword-requests")
+def admin_list_member_keyword_requests(
+    limit: int = 100,
+    status: str | None = None,
+    _: None = Depends(verify_sync_key),
+):
+    try:
+        items = db.list_member_keyword_requests(limit=min(max(limit, 1), 500), status=status)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
+    return {"items": items, "total": len(items)}
+
+
+@app.patch("/api/v1/admin/member-keyword-requests/{item_id}")
+def admin_update_member_keyword_request(
+    item_id: int,
+    body: AdminFeedbackUpdateBody,
+    _: None = Depends(verify_sync_key),
+):
+    try:
+        ok = db.update_member_keyword_request(
+            item_id,
+            status=body.status,
+            admin_note=body.admin_note,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"数据库未就绪: {e}") from e
+    if not ok:
+        raise HTTPException(status_code=404, detail="记录不存在或无变更")
+    return {"message": "已更新"}
 
 
 @app.get("/api/v1/sync/status")

@@ -94,6 +94,24 @@ class XhsCloudClient:
         safe = quote(code.strip(), safe="")
         return await self._request("POST", f"/api/v1/admin/auth-codes/{safe}/revoke")
 
+    async def list_member_feedback(self, *, limit: int = 100, status: str | None = None) -> dict:
+        params: dict[str, Any] = {"limit": limit}
+        if status:
+            params["status"] = status
+        return await self._request("GET", "/api/v1/admin/member-feedback", params=params)
+
+    async def update_member_feedback(self, item_id: int, payload: dict) -> dict:
+        return await self._request("PATCH", f"/api/v1/admin/member-feedback/{item_id}", json=payload)
+
+    async def list_member_keyword_requests(self, *, limit: int = 100, status: str | None = None) -> dict:
+        params: dict[str, Any] = {"limit": limit}
+        if status:
+            params["status"] = status
+        return await self._request("GET", "/api/v1/admin/member-keyword-requests", params=params)
+
+    async def update_member_keyword_request(self, item_id: int, payload: dict) -> dict:
+        return await self._request("PATCH", f"/api/v1/admin/member-keyword-requests/{item_id}", json=payload)
+
 
 def get_xhs_cloud_client() -> XhsCloudClient:
     return XhsCloudClient()
