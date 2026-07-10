@@ -7,7 +7,7 @@ import os
 from typing import Any
 
 from fastapi import HTTPException
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 
 _TRIAL_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
@@ -78,6 +78,9 @@ def trial_info() -> dict[str, Any]:
         "virtual_count": meta.get("virtual_count") or 0,
         "physical_count": meta.get("physical_count") or 0,
         "max_items": meta.get("max_items") or 3000,
+        "source_total": meta.get("source_total") or 0,
+        "tier_counts": meta.get("tier_counts") or {},
+        "pack_version": meta.get("pack_version") or "v1",
         "preview_url": "/public/trial/preview",
         "download_url": "/api/v1/public/trial-report/download",
         "upsell": upsell,
@@ -109,6 +112,20 @@ def trial_file_response(filename: str) -> FileResponse:
     elif filename.endswith(".txt"):
         media = "text/plain; charset=utf-8"
     return FileResponse(path, media_type=media, headers={"Cache-Control": "public, max-age=300"})
+
+
+def trial_preview_html() -> HTMLResponse:
+    """在线预览页：注入资源根路径，使 data.js / css 从 /public/trial/ 加载。"""
+    path = resolve_trial_file("index_trial.html")
+    with open(path, "r", encoding="utf-8") as f:
+        html = f.read()
+    inject = (
+        '<script>window.__TRIAL_ASSET_BASE__="/public/trial/";</script>'
+    )
+    marker = "<head>"
+    if inject not in html and marker in html:
+        html = html.replace(marker, marker + "\n" + inject, 1)
+    return HTMLResponse(html, headers={"Cache-Control": "public, max-age=60"})
 
 
 def trial_download_response() -> FileResponse:

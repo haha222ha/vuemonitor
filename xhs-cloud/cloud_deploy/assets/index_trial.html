@@ -5,12 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>选品报告 · 免费体验包</title>
 <script>
-(function(){try{document.documentElement.dataset.theme='trial';}catch(e){document.documentElement.dataset.theme='trial';}})();
+(function(){
+  try { document.documentElement.dataset.theme = 'trial'; } catch (e) { document.documentElement.dataset.theme = 'trial'; }
+  var path = location.pathname || '';
+  var base = '';
+  if (path.indexOf('/public/trial') === 0) base = '/public/trial/';
+  else if (path.indexOf('/api/v1/public/trial-report/view') === 0) base = '/api/v1/public/trial-report/view/';
+  window.__TRIAL_ASSET_BASE__ = base;
+  ['report_theme.css', 'trial_theme.css'].forEach(function (file) {
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = base + file;
+    document.head.appendChild(link);
+  });
+})();
 </script>
 <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-<script src="data.js"></script>
-<link rel="stylesheet" href="report_theme.css">
-<link rel="stylesheet" href="trial_theme.css">
 <style>
 :root, [data-theme="classic"]{
   --bg-1:#0f0c29;--bg-2:#1a1a3e;--bg-3:#24243e;
@@ -121,6 +131,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Micr
 .card-type.virtual{background:rgba(157,92,255,0.2);color:var(--purple);border:1px solid rgba(157,92,255,0.3)}
 .card-type.physical{background:rgba(6,214,160,0.2);color:var(--green);border:1px solid rgba(6,214,160,0.3)}
 .card-pool{flex-shrink:0;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:0.5px}
+.card-tier{flex-shrink:0;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:800;letter-spacing:0.5px;border:1px solid transparent}
+.tier-S{background:rgba(255,36,66,0.2);color:var(--xhs-red);border-color:rgba(255,36,66,0.35)}
+.tier-A{background:rgba(255,140,66,0.2);color:var(--orange);border-color:rgba(255,140,66,0.35)}
+.tier-B{background:rgba(0,217,255,0.2);color:var(--cyan);border-color:rgba(0,217,255,0.35)}
+.tier-C{background:rgba(110,118,129,0.15);color:var(--text2);border-color:rgba(110,118,129,0.25)}
+.leaderboard-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.leaderboard-tab{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:10px;border:1px solid var(--glass-border);background:var(--card);color:var(--text2);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.leaderboard-tab .lb-icon{font-size:15px}
+.leaderboard-tab:hover{border-color:rgba(255,36,66,0.35);color:var(--text)}
+.leaderboard-tab.active{background:var(--xhs-grad);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(255,36,66,0.35)}
 .pool-BURST{background:rgba(255,36,66,0.2);color:var(--xhs-red);border:1px solid rgba(255,36,66,0.3)}
 .pool-ACCEL{background:rgba(255,140,66,0.2);color:var(--orange);border:1px solid rgba(255,140,66,0.3)}
 .pool-WATCH{background:rgba(0,217,255,0.2);color:var(--cyan);border:1px solid rgba(0,217,255,0.3)}
@@ -274,12 +294,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Micr
 
   <div class="main">
     <div class="trial-hero animate-in">
-      <h2>🎁 免费体验包 · 24h 加购指数精选</h2>
-      <p>本包从全量选品数据中筛选<strong>含 24h 加购指数（acc）</strong>的商品样本，按虚拟/实体分轨展示，总量不超过 3000 条。数据仅供研究参考，完整日报/周报/月报与 PC 监控工具需<strong>付费会员</strong>。</p>
+      <h2>🎁 免费体验包 · 三层漏斗精选</h2>
+      <p>从全量 <strong>{{ formatNum(meta.source_total || meta.full_report_count || meta.count) }}</strong> 条选品数据中，按 <strong>S/A/B/C 三层漏斗</strong>精选样本（加购加速 → 真实热卖 → 低粉高销），虚拟/实体分轨展示，总量 ≤3000 条。完整日报与 PC 监控工具需<strong>付费会员</strong>。</p>
       <div class="trial-hero-badges">
+        <span class="trial-badge">样本 <strong>{{ formatNum(meta.count) }}</strong></span>
         <span class="trial-badge">虚拟 <strong>{{ formatNum(virtualCount) }}</strong></span>
         <span class="trial-badge">实体 <strong>{{ formatNum(physicalCount) }}</strong></span>
-        <span class="trial-badge">合规上限 <strong>3000</strong> 条</span>
+        <span class="trial-badge" v-if="tierSummary">分层 <strong>{{ tierSummary }}</strong></span>
       </div>
       <div class="trial-cta-row">
         <a class="trial-btn trial-btn-primary" href="https://monitor.xhs365.cn/member" target="_blank" rel="noopener">立即开通会员</a>
@@ -306,6 +327,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Micr
       <div class="stat-card animate-in mint"><div class="v">{{ physicalCount }}</div><div class="l">实体商品</div></div>
       <div class="stat-card animate-in gold"><div class="v">¥{{ meta.median_price }}</div><div class="l">价格中位数</div></div>
       <div class="stat-card animate-in orange"><div class="v">{{ meta.avg_actual_v1d }}</div><div class="l">平均真实增量</div></div>
+    </div>
+
+    <div class="leaderboard-tabs animate-in">
+      <button v-for="lb in leaderboards" :key="lb.key"
+              :class="['leaderboard-tab', activeLeaderboard === lb.key && 'active']"
+              @click="switchLeaderboard(lb.key)">
+        <span class="lb-icon">{{ lb.icon }}</span>{{ lb.label }}
+      </button>
     </div>
 
     <div class="toolbar animate-in">
@@ -342,6 +371,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Micr
         <div :class="['card-rank', idx<10 && 'top10', idx>=10 && idx<50 && 'top50']">#{{ idx + 1 }}</div>
         <div class="card-header">
           <span :class="['card-type', item.is_virtual ? 'virtual' : 'physical']">{{ item.is_virtual ? '虚拟' : '实体' }}</span>
+          <span v-if="item.trial_tier" :class="['card-tier', 'tier-' + item.trial_tier]">{{ item.trial_tier }}</span>
           <span :class="['card-pool', 'pool-' + item.pool]">{{ item.pool }}</span>
           <div class="card-title">{{ item.title }}</div>
         </div>
@@ -425,6 +455,7 @@ createApp({
     const physicalCollapsed = ref(true);
     const activeType = ref('virtual');
     const activeMetric = ref('acc');
+    const activeLeaderboard = ref('acc');
     const searchQuery = ref('');
     const poolFilter = ref('ALL');
     const priceBand = ref('ALL');
@@ -451,6 +482,38 @@ createApp({
       { key: 'shop_fsr', label: '店铺粉销比(低粉高销)', icon: '🏪', asc: true }
     ];
 
+    const leaderboards = [
+      { key: 'acc', label: '加购加速', icon: '🛒', metric: 'acc', tiers: ['S'] },
+      { key: 'hot', label: '真实热卖', icon: '🔥', metric: 'actual_v1d', minActual: 5, minSold: 100, tiers: ['A'] },
+      { key: 'lowfan', label: '低粉高销', icon: '🎯', metric: 'goods_fsr', asc: true, maxFsr: 0.05, tiers: ['B'] },
+      { key: 'mix', label: '综合精选', icon: '⭐', metric: 'burst', tiers: ['S', 'A', 'B', 'C'] }
+    ];
+
+    const tierSummary = computed(() => {
+      const tc = meta.value.tier_counts;
+      if (!tc) return '';
+      return ['S', 'A', 'B', 'C'].map(t => t + (tc[t] || 0)).join(' / ');
+    });
+
+    function currentLeaderboard() {
+      return leaderboards.find(lb => lb.key === activeLeaderboard.value) || leaderboards[0];
+    }
+
+    function applyLeaderboardFilter(list) {
+      const lb = currentLeaderboard();
+      if (lb.tiers && lb.tiers.length && meta.value.trial_tiers) {
+        list = list.filter(i => lb.tiers.includes(i.trial_tier));
+      }
+      if (lb.minActual != null) list = list.filter(i => Number(i.actual_v1d) >= lb.minActual);
+      if (lb.minSold != null) list = list.filter(i => Number(i.sold) >= lb.minSold);
+      if (lb.maxFsr != null) list = list.filter(i => {
+        const fsr = Number(i.goods_fsr);
+        return fsr > 0 && fsr <= lb.maxFsr;
+      });
+      if (lb.key === 'acc') list = list.filter(i => Number(i.acc) > 0 || Number(i.burst) >= 25);
+      return list;
+    }
+
     const activeMetricLabel = computed(() => {
       const m = metrics.find(m => m.key === activeMetric.value);
       return m ? m.label : '';
@@ -465,6 +528,7 @@ createApp({
 
     const sortedItems = computed(() => {
       let list = activeType.value === 'virtual' ? virtualItems.value : physicalItems.value;
+      list = applyLeaderboardFilter(list);
       if (poolFilter.value !== 'ALL') {
         list = list.filter(i => i.pool === poolFilter.value);
       }
@@ -484,9 +548,10 @@ createApp({
           (i.goods_id || '').toLowerCase().includes(q)
         );
       }
-      const sb = activeMetric.value;
+      const lb = currentLeaderboard();
+      const sb = lb.metric || activeMetric.value;
       const m = metrics.find(m => m.key === sb);
-      const asc = m && m.asc;
+      const asc = lb.asc != null ? lb.asc : (m && m.asc);
       const sorted = [...list].sort((a, b) => {
         const va = Number(a[sb]) || 0;
         const vb = Number(b[sb]) || 0;
@@ -497,6 +562,7 @@ createApp({
 
     const filteredCount = computed(() => {
       let list = activeType.value === 'virtual' ? virtualItems.value : physicalItems.value;
+      list = applyLeaderboardFilter(list);
       if (poolFilter.value !== 'ALL') list = list.filter(i => i.pool === poolFilter.value);
       if (priceBand.value !== 'ALL') {
         list = list.filter(i => {
@@ -519,6 +585,13 @@ createApp({
 
     const hasMore = computed(() => loadedCount.value < sortedItems.value.length);
     const displayItems = computed(() => sortedItems.value.slice(0, loadedCount.value));
+
+    function switchLeaderboard(key) {
+      activeLeaderboard.value = key;
+      const lb = leaderboards.find(l => l.key === key);
+      if (lb && lb.metric) activeMetric.value = lb.metric;
+      resetLoading();
+    }
 
     function switchType(type) {
       activeType.value = type;
@@ -631,30 +704,56 @@ createApp({
       a.click();
     }
 
-    function loadData() {
+    function parseReportDataJs(text) {
+      const raw = (text || '').trim();
+      const jsonStr = raw.replace(/^var\s+REPORT_DATA\s*=\s*/, '').replace(/;\s*$/, '');
+      return JSON.parse(jsonStr);
+    }
+
+    async function fetchReportData() {
+      const bases = [];
+      if (window.__TRIAL_ASSET_BASE__) bases.push(window.__TRIAL_ASSET_BASE__);
+      bases.push('/public/trial/', '/api/v1/public/trial-report/view/', './');
+      const seen = new Set();
+      for (const base of bases) {
+        if (!base || seen.has(base)) continue;
+        seen.add(base);
+        const url = base + 'data.js';
+        try {
+          const res = await fetch(url, { cache: 'no-store' });
+          if (!res.ok) continue;
+          return parseReportDataJs(await res.text());
+        } catch (e) {
+          console.warn('[loadData] fetch failed:', url, e);
+        }
+      }
+      if (typeof REPORT_DATA !== 'undefined') return REPORT_DATA;
+      if (location.protocol === 'file:') {
+        await new Promise((resolve, reject) => {
+          const s = document.createElement('script');
+          s.src = 'data.js';
+          s.onload = () => resolve();
+          s.onerror = () => reject(new Error('本地 data.js 加载失败'));
+          document.head.appendChild(s);
+        });
+        if (typeof REPORT_DATA !== 'undefined') return REPORT_DATA;
+      }
+      throw new Error('data.js 加载失败，请检查网络或刷新重试');
+    }
+
+    async function loadData() {
       loading.value = true;
       meta.value = {};
-      console.log('[loadData] start, REPORT_DATA defined?', typeof REPORT_DATA !== 'undefined');
-      if (typeof REPORT_DATA !== 'undefined') {
-        console.log('[loadData] REPORT_DATA items count:', (REPORT_DATA.items || []).length);
-        processData(REPORT_DATA);
-        return;
+      console.log('[loadData] start');
+      try {
+        const data = await fetchReportData();
+        console.log('[loadData] items:', (data.items || []).length);
+        processData(data);
+      } catch (err) {
+        loading.value = false;
+        meta.value = { error: err.message || 'data.js 加载失败' };
+        console.error('[loadData]', err);
       }
-      let attempts = 0;
-      const maxAttempts = 50;
-      const timer = setInterval(() => {
-        attempts++;
-        if (typeof REPORT_DATA !== 'undefined') {
-          clearInterval(timer);
-          console.log('[loadData] REPORT_DATA found after', attempts, 'attempts');
-          processData(REPORT_DATA);
-        } else if (attempts >= maxAttempts) {
-          clearInterval(timer);
-          loading.value = false;
-          meta.value = { error: 'data.js 加载超时，请确保 data.js 与本文件在同一目录' };
-          console.error('[loadData] timeout: REPORT_DATA not found');
-        }
-      }, 100);
     }
 
     function retryLoad() {
@@ -692,6 +791,7 @@ createApp({
       const col_behavior = colIdx.behavior;
       const col_is_virtual = colIdx.is_virtual;
       const col_anomaly = colIdx.anomaly;
+      const tierMap = (d.meta && d.meta.trial_tiers) || {};
       const src = d.items || [];
       const len = src.length;
       const result = new Array(len);
@@ -719,7 +819,8 @@ createApp({
           goods_fsr: row[col_goods_fsr],
           behavior: row[col_behavior],
           is_virtual: row[col_is_virtual],
-          anomaly: row[col_anomaly]
+          anomaly: row[col_anomaly],
+          trial_tier: tierMap[row[col_goods_id]] || ''
         };
       }
       items.value = result;
@@ -745,13 +846,13 @@ createApp({
 
     return {
       loading, meta, items, sidebarOpen, virtualCollapsed, physicalCollapsed,
-      activeType, activeMetric, activeMetricLabel, metrics,
+      activeType, activeMetric, activeMetricLabel, activeLeaderboard, leaderboards, tierSummary, metrics,
       searchQuery, poolFilter, priceBand,
       detailItem, backTop, cardGrid,
       virtualCount, physicalCount, currentCount,
       sortedItems, filteredCount, displayItems, hasMore,
       loadedCount, loadingMore,
-      switchType, switchMetric, switchTypeMetric, showDetail, scrollToTop,
+      switchType, switchMetric, switchTypeMetric, switchLeaderboard, showDetail, scrollToTop,
       formatNum, exportCSV, retryLoad
     };
   }
