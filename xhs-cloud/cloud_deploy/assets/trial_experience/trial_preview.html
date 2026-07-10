@@ -44,7 +44,7 @@
       <div class="meta" id="trialPreviewMeta">明亮科技极简 · 选品情报样本预览</div>
     </div>
     <div class="trial-view-seg" id="viewSeg">
-      <button type="button" data-entry="index_with_gr.html" class="active" onclick="setEntry('index_with_gr.html')">表格 GR</button>
+      <button type="button" data-entry="index_trial_gr.html" class="active" onclick="setEntry('index_trial_gr.html')">表格 GR</button>
       <button type="button" data-entry="index_vue.html" onclick="setEntry('index_vue.html')">Vue 列表</button>
     </div>
     <div class="trial-preview-actions">
@@ -58,15 +58,16 @@
 <script>
 const STORAGE_KEY = 'xhs_trial_view_mode';
 const base = window.__TRIAL_ASSET_BASE__ || './';
-let entry = 'index_with_gr.html';
+let entry = 'index_trial_gr.html';
 
 try {
   const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved === 'index_vue.html' || saved === 'index_with_gr.html') entry = saved;
+  if (saved === 'index_vue.html') entry = saved;
+  else entry = 'index_trial_gr.html';
 } catch (e) {}
 
 function setEntry(ent) {
-  entry = ent || 'index_with_gr.html';
+  entry = ent || 'index_trial_gr.html';
   try { localStorage.setItem(STORAGE_KEY, entry); } catch (e) {}
   document.querySelectorAll('#viewSeg button').forEach(b => {
     b.classList.toggle('active', b.dataset.entry === entry);
@@ -76,7 +77,7 @@ function setEntry(ent) {
 
 function loadFrame() {
   const frame = document.getElementById('frame');
-  frame.src = base + entry + '?theme=aurora&_=' + Date.now();
+  frame.src = base + entry + '?theme=trial&_=' + Date.now();
 }
 
 async function loadMeta() {
