@@ -1,4 +1,4 @@
-/* 体验包 · 表格 GR 明亮科技极简（覆盖 index_with_gr 默认深色） */
+/* 体验包 · 表格 GR 明亮科技极简（覆盖 index_trial_gr 默认深色 inline） */
 [data-theme="trial"] body.gr-report,
 [data-theme="trial"] body:has(.c) {
   background: var(--bg, #f4f7fb) !important;
@@ -342,4 +342,24 @@
 
 [data-theme="trial"] .ins .ix {
   color: var(--text2, #475569) !important;
+}
+
+[data-theme="trial"] .adv-field label,
+[data-theme="trial"] .adv-pools label {
+  color: var(--text2, #475569) !important;
+}
+
+[data-theme="trial"] .adv-field input[type=number],
+[data-theme="trial"] .adv-field input[type=text] {
+  background: var(--bg2, #fff) !important;
+  border-color: var(--line, rgba(15, 23, 42, 0.12)) !important;
+  color: var(--text, #0f172a) !important;
+}
+
+[data-theme="trial"] .adv-reset {
+  color: var(--text2, #475569) !important;
+}
+
+[data-theme="trial"] .report-footer .fd-ver {
+  color: var(--text3, #94a3b8) !important;
 }

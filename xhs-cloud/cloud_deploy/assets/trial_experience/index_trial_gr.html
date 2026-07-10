@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="trial">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -192,6 +192,18 @@ td.na{color:#6e7681}
     </div>
   </div>
 </div>
+<script>
+(function(){
+  var b=window.__TRIAL_ASSET_BASE__;
+  if(!b)return;
+  var v=document.getElementById('trialVueLink');
+  if(v)v.href=b+'index_vue.html';
+  document.querySelectorAll('.trial-gr-switch a').forEach(function(a){
+    var h=a.getAttribute('href')||'';
+    if(h.indexOf('index_')===0)a.href=b+h;
+  });
+})();
+</script>
 <div class="c">
 <div class="trial-hero" id="trialHero">
   <h2>选品情报样本 · 明亮科技极简</h2>

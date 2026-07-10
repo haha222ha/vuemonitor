@@ -263,142 +263,19 @@ def build_trial_payload(source_items: list, report_date: str, source_meta: dict 
     return payload
 
 
-_TRIAL_GR_THEME_SCRIPT = (
-    '<script>\n'
-    "(function(){try{localStorage.setItem('xhs_report_theme','trial');"
-    "localStorage.setItem('pa_ui_theme','trial');}catch(e){}"
-    "document.documentElement.dataset.theme='trial';})();\n"
-    "</script>"
-)
-
-_TRIAL_GR_CSS = (
-    '<link rel="stylesheet" href="trial_gr_theme.css">\n'
-    '<link rel="stylesheet" href="trial_theme.css">\n'
-)
-
-_TRIAL_GR_TOPBAR = (
-    '<div class="trial-gr-topbar" id="trialGrTopbar">\n'
-    '  <div class="trial-gr-topbar-inner">\n'
-    '    <span class="trial-gr-brand">🎁 免费选品体验包</span>\n'
-    '    <div class="trial-gr-switch">\n'
-    '      <a href="index_trial_gr.html" class="active">表格 GR</a>\n'
-    '      <a href="index_vue.html" id="trialVueLink">Vue 列表</a>\n'
-    '    </div>\n'
-    '    <div class="trial-gr-actions">\n'
-    '      <a class="trial-btn trial-btn-ghost" href="/api/v1/public/trial-report/download" '
-    'id="trialZipBtn" style="min-height:32px;padding:0 12px;font-size:12px">下载 ZIP</a>\n'
-    '      <a class="trial-btn trial-btn-primary" href="https://monitor.xhs365.cn/member" '
-    'target="_blank" rel="noopener" style="min-height:32px;padding:0 12px;font-size:12px">开通会员</a>\n'
-    '    </div>\n'
-    '  </div>\n'
-    '</div>\n'
-)
-
-_TRIAL_GR_HERO = (
-    '<div class="trial-hero" id="trialHero">\n'
-    '  <h2>选品情报样本 · 明亮科技极简</h2>\n'
-    '  <p id="trialHeroSub">三层漏斗精选 · 仅供研究参考，不构成投资建议</p>\n'
-    '  <div class="trial-hero-badges" id="trialHeroBadges"></div>\n'
-    '</div>\n'
-)
-
-_TRIAL_DATA_LOADER = (
-    '<script>\n'
-    "(function(){\n"
-    "var bases=[];\n"
-    "if(window.__TRIAL_ASSET_BASE__)bases.push(window.__TRIAL_ASSET_BASE__);\n"
-    "bases.push('/public/trial/','/api/v1/public/trial-report/view/','./');\n"
-    "function boot(){\n"
-    " if(typeof REPORT_DATA!=='undefined'){window.__runTrialGr&&window.__runTrialGr();return;}\n"
-    " var i=0,seen={};\n"
-    " function next(){\n"
-    "  if(i>=bases.length){var el=document.getElementById('loading');"
-    "if(el)el.textContent='数据加载失败: data.js 未找到';return;}\n"
-    "  var b=bases[i++];if(!b||seen[b]){next();return;}seen[b]=1;\n"
-    "  var s=document.createElement('script');s.src=b+'data.js';\n"
-    "  s.onload=function(){window.__runTrialGr&&window.__runTrialGr();};\n"
-    "  s.onerror=next;\n"
-    "  document.head.appendChild(s);\n"
-    " }\n"
-    " next();\n"
-    "}\n"
-    "if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();\n"
-    "})();\n"
-    "</script>"
-)
-
-_TRIAL_META_PATCH = (
-    "\nvar heroSub=document.getElementById('trialHeroSub');\n"
-    "var heroBadges=document.getElementById('trialHeroBadges');\n"
-    "if(heroSub){heroSub.textContent='样本 '+fmtNum(m.count)+' 条 · 虚拟 '+fmtNum(m.virtual_count||0)"
-    "+' / 实体 '+fmtNum(m.physical_count||0)+' · '+(m.date||'');}\n"
-    "if(heroBadges&&m.tier_counts){\n"
-    " ['S','A','B','C'].forEach(function(t){\n"
-    "  if(m.tier_counts[t])heroBadges.innerHTML+="
-    "'<span class=\"trial-badge\">'+t+' <strong>'+m.tier_counts[t]+'</strong></span>';\n"
-    " });\n"
-    "}\n"
-    "var zipBtn=document.getElementById('trialZipBtn');\n"
-    "if(zipBtn&&location.protocol==='file:')zipBtn.href='./';\n"
-)
-
-
-def build_index_trial_gr_html(assets_dir: str, output_path: str) -> None:
-    """从 index_with_gr 生成体验包专用明亮 GR 页（默认预览格式）。"""
-    src = os.path.join(assets_dir, "index_with_gr.html")
-    if not os.path.isfile(src):
-        raise FileNotFoundError(f"缺少模板: {src}")
-    with open(src, "r", encoding="utf-8") as f:
-        html = f.read()
-
-    old_theme = (
-        "<script>\n"
-        "(function(){try{var t=localStorage.getItem('xhs_report_theme')||localStorage.getItem('pa_ui_theme');"
-        "document.documentElement.dataset.theme=(t==='classic')?'classic':'aurora';}catch(e){"
-        "document.documentElement.dataset.theme='aurora';}})();\n"
-        "</script>"
-    )
-    if old_theme in html:
-        html = html.replace(old_theme, _TRIAL_GR_THEME_SCRIPT)
-    elif _TRIAL_GR_THEME_SCRIPT not in html:
-        html = html.replace("<head>", "<head>\n" + _TRIAL_GR_THEME_SCRIPT, 1)
-
-    html = html.replace("<title>小红书选品分析报告</title>", "<title>选品报告 · 免费体验包</title>")
-    if "trial_gr_theme.css" not in html:
-        html = html.replace("</style>", "</style>\n" + _TRIAL_GR_CSS, 1)
-
-    marker = '<div class="c">'
-    if marker in html and "trial-gr-topbar" not in html:
-        html = html.replace(marker, _TRIAL_GR_TOPBAR + marker + "\n" + _TRIAL_GR_HERO, 1)
-
-    html = html.replace('<script src="data.js"></script>', _TRIAL_DATA_LOADER)
-    html = html.replace(
-        "<script>\n(function(){\nif(typeof REPORT_DATA==='undefined'){",
-        "<script>\nwindow.__runTrialGr=function(){\nif(typeof REPORT_DATA==='undefined'){",
-    )
-    html = html.replace(
-        "doFilter('physical');\n\n})();\n</script>",
-        "doFilter('physical');\n" + _TRIAL_META_PATCH + "\n};\n</script>",
-    )
-
-    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(html)
-
-
 def write_trial_dir(output_dir: str, payload: dict, assets_dir: str) -> None:
     os.makedirs(output_dir, exist_ok=True)
+    for stale in ("index_trial.html", "index_with_gr.html"):
+        path = os.path.join(output_dir, stale)
+        if os.path.isfile(path):
+            os.remove(path)
     js_path = os.path.join(output_dir, "data.js")
     with open(js_path, "w", encoding="utf-8") as f:
         f.write("var REPORT_DATA = " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
         f.write(";\n")
-    trial_gr_assets = os.path.join(assets_dir, "index_trial_gr.html")
-    trial_gr_out = os.path.join(output_dir, "index_trial_gr.html")
-    build_index_trial_gr_html(assets_dir, trial_gr_assets)
-    shutil.copy2(trial_gr_assets, trial_gr_out)
     bundle = (
         "trial_preview.html",
-        "index_with_gr.html",
+        "index_trial_gr.html",
         "index_vue.html",
         "trial_theme.css",
         "trial_gr_theme.css",
@@ -417,7 +294,7 @@ def write_trial_dir(output_dir: str, payload: dict, assets_dir: str) -> None:
             f"生成时间：{datetime.now():%Y-%m-%d %H:%M:%S}\n"
             f"商品数：{meta.get('count', 0)}（源 {meta.get('source_total', '?')} → 样本，上限 {MAX_ITEMS}）\n"
             f"分层 S/A/B/C：{meta.get('tier_counts')}\n"
-            "打开 index_trial_gr.html 或 trial_preview.html（默认明亮表格 GR，可切换 Vue）。\n"
+            "打开 index_trial_gr.html 或 trial_preview.html（默认表格 GR 明亮主题，可切换 Vue）。\n"
             "完整功能与 PC 端工具需开通付费会员。\n"
         )
 
@@ -435,7 +312,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="生成选品免费体验包 v2")
     parser.add_argument(
         "--source",
-        default=r"C:\Users\Administrator\Desktop\全量0626\data.js",
+        default=os.path.join(ROOT, "server_sync_pack", "historical_reports", "全量0619", "data.js"),
         help="源全量报告 data.js（非 --from-pg 时使用）",
     )
     parser.add_argument(
