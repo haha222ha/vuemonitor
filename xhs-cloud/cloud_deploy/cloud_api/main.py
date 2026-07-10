@@ -721,9 +721,16 @@ def member_preview_page():
 
 @app.get("/public/trial/preview", response_class=HTMLResponse)
 def public_trial_preview_page():
+    from cloud_deploy.cloud_api.trial_public_service import trial_preview_html
+
+    return trial_preview_html()
+
+
+@app.get("/public/trial/{file_name}")
+def public_trial_static_asset(file_name: str):
     from cloud_deploy.cloud_api.trial_public_service import trial_file_response
 
-    return trial_file_response("index_trial.html")
+    return trial_file_response(file_name)
 
 
 @app.get("/public/trial")
