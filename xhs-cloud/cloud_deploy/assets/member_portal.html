@@ -381,8 +381,8 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
         <button data-type="custom" onclick="setType('custom')">定制词库</button>
       </div>
       <div class="seg" id="viewModeSeg" style="margin-top:10px">
-        <button type="button" data-entry="index_vue.html" class="active" onclick="setViewMode('index_vue.html')">Vue 列表</button>
-        <button type="button" data-entry="index_with_gr.html" onclick="setViewMode('index_with_gr.html')">表格 GR</button>
+        <button type="button" data-entry="index_with_gr.html" class="active" onclick="setViewMode('index_with_gr.html')">表格 GR</button>
+        <button type="button" data-entry="index_vue.html" onclick="setViewMode('index_vue.html')">Vue 列表</button>
       </div>
       <div id="batchBar" class="batch-bar hidden">
         <label style="display:inline-flex;align-items:center;gap:6px;font-size:14px;cursor:pointer">
@@ -1317,11 +1317,11 @@ function setType(t) {
 }
 
 function currentViewMode() {
-  return loadStored(STORAGE.viewMode) || 'index_vue.html';
+  return loadStored(STORAGE.viewMode) || 'index_with_gr.html';
 }
 
 function setViewMode(entry) {
-  saveStored(STORAGE.viewMode, entry || 'index_vue.html');
+  saveStored(STORAGE.viewMode, entry || 'index_with_gr.html');
   document.querySelectorAll('#viewModeSeg button').forEach(b => b.classList.toggle('active', b.dataset.entry === entry));
 }
 

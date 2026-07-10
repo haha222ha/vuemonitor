@@ -18,6 +18,9 @@ _TRIAL_ZIP = _TRIAL_DIR + ".zip"
 _META_CACHE: dict[str, Any] | None = None
 
 _ALLOWED_FILES = frozenset({
+    "trial_preview.html",
+    "index_with_gr.html",
+    "index_vue.html",
     "index_trial.html",
     "data.js",
     "trial_theme.css",
@@ -25,6 +28,22 @@ _ALLOWED_FILES = frozenset({
     "report_theme.css",
     "README.txt",
 })
+
+_TRIAL_BRIGHT_INJECT = (
+    '<script>(function(){try{localStorage.setItem("xhs_report_theme","aurora");}'
+    'localStorage.setItem("pa_ui_theme","aurora");}catch(e){}'
+    'document.documentElement.dataset.theme="aurora";})();</script>'
+)
+
+
+def _inject_trial_bright_theme(html: str) -> str:
+    """体验包报告页强制明亮主题（极光清新），避免经典深色。"""
+    if _TRIAL_BRIGHT_INJECT in html:
+        return html
+    marker = "<head>"
+    if marker in html:
+        return html.replace(marker, marker + "\n" + _TRIAL_BRIGHT_INJECT, 1)
+    return _TRIAL_BRIGHT_INJECT + html
 
 
 def trial_dir() -> str:
@@ -105,6 +124,10 @@ def trial_file_response(filename: str) -> FileResponse:
     media = "application/octet-stream"
     if filename.endswith(".html"):
         media = "text/html; charset=utf-8"
+        if filename in ("index_with_gr.html", "index_vue.html"):
+            with open(path, "r", encoding="utf-8") as f:
+                html = _inject_trial_bright_theme(f.read())
+            return HTMLResponse(html, headers={"Cache-Control": "public, max-age=300"})
     elif filename.endswith(".js"):
         media = "application/javascript; charset=utf-8"
     elif filename.endswith(".css"):
@@ -115,17 +138,20 @@ def trial_file_response(filename: str) -> FileResponse:
 
 
 def trial_preview_html() -> HTMLResponse:
-    """在线预览页：注入资源根路径，使 data.js / css 从 /public/trial/ 加载。"""
-    path = resolve_trial_file("index_trial.html")
-    with open(path, "r", encoding="utf-8") as f:
-        html = f.read()
-    inject = (
-        '<script>window.__TRIAL_ASSET_BASE__="/public/trial/";</script>'
-    )
-    marker = "<head>"
-    if inject not in html and marker in html:
-        html = html.replace(marker, marker + "\n" + inject, 1)
-    return HTMLResponse(html, headers={"Cache-Control": "public, max-age=60"})
+    """在线预览壳：明亮科技极简 + 默认表格 GR，可切换 Vue。"""
+    assets_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
+    for candidate in (
+        os.path.join(_TRIAL_DIR, "trial_preview.html"),
+        os.path.join(assets_dir, "trial_preview.html"),
+    ):
+        if os.path.isfile(candidate):
+            with open(candidate, "r", encoding="utf-8") as f:
+                html = f.read()
+            inject = '<script>window.__TRIAL_ASSET_BASE__="/public/trial/";</script>'
+            if inject not in html and "<head>" in html:
+                html = html.replace("<head>", "<head>\n" + inject, 1)
+            return HTMLResponse(html, headers={"Cache-Control": "public, max-age=60"})
+    raise HTTPException(status_code=404, detail="体验包预览页未部署")
 
 
 def trial_download_response() -> FileResponse:

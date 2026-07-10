@@ -270,7 +270,9 @@ def write_trial_dir(output_dir: str, payload: dict, assets_dir: str) -> None:
         f.write("var REPORT_DATA = " + json.dumps(payload, ensure_ascii=False, separators=(",", ":")))
         f.write(";\n")
     bundle = (
-        "index_trial.html",
+        "trial_preview.html",
+        "index_with_gr.html",
+        "index_vue.html",
         "trial_theme.css",
         "report_theme.js",
         "report_theme.css",
@@ -287,7 +289,7 @@ def write_trial_dir(output_dir: str, payload: dict, assets_dir: str) -> None:
             f"生成时间：{datetime.now():%Y-%m-%d %H:%M:%S}\n"
             f"商品数：{meta.get('count', 0)}（源 {meta.get('source_total', '?')} → 样本，上限 {MAX_ITEMS}）\n"
             f"分层 S/A/B/C：{meta.get('tier_counts')}\n"
-            "打开 index_trial.html 预览（推荐 Chrome）。\n"
+            "打开 trial_preview.html 在线预览（默认表格 GR，可切换 Vue 列表）。\n"
             "完整功能与 PC 端工具需开通付费会员。\n"
         )
 
