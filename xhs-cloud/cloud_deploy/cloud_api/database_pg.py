@@ -1196,8 +1196,9 @@ def _extend_membership(c, user_id: int, plan_code: str, duration_days: int) -> d
     base = now
     previous_days = 0
     stacked = False
-    if row and row[0]:
-        exp = _as_utc(row[0])
+    exp_raw = row.get("expires_at") if row else None
+    if exp_raw:
+        exp = _as_utc(exp_raw)
         if exp > now:
             base = exp
             previous_days = max(0, _days_until(exp))
