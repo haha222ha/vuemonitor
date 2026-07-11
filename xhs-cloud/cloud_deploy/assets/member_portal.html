@@ -291,8 +291,9 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
           <div class="field"><label>授权码</label><input id="renewAuthCode" placeholder="客服提供的授权码" autocomplete="off"></div>
           <div class="field"><label>用户名</label><input id="renewUser" autocomplete="username"></div>
           <div class="field"><label>密码</label><input id="renewPass" type="password" autocomplete="current-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doRenewWithCode()"></div>
-          <button class="btn btn-ghost btn-block" onclick="doRenewWithCode()">授权码续费</button>
+          <button class="btn btn-ghost btn-block" id="btnRenewWithCode" onclick="doRenewWithCode()">授权码续费</button>
         </div>
+        <div id="csCodeMsg" style="margin-top:10px"></div>
       </details>
     </div>
     <div class="card hidden" id="panelForgot">
@@ -331,7 +332,8 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
           <summary style="cursor:pointer;color:var(--primary);font-weight:600">客服授权码续费（私发）</summary>
           <p style="margin:10px 0 8px;line-height:1.55">已登录用户可在此输入客服私发的授权码续费（支持剩余天数叠加）。</p>
           <div class="field"><label>授权码</label><input id="renewCode" placeholder="XHS-XXXX-XXXX-XXXX" autocomplete="off" enterkeyhint="go" onkeydown="if(event.key==='Enter')doRenew()"></div>
-          <button class="btn btn-ghost btn-block" onclick="doRenew()">激活授权码</button>
+          <button class="btn btn-ghost btn-block" id="btnActivateCode" onclick="doRenew()">激活授权码</button>
+          <div id="dashRenewMsg" style="margin-top:10px"></div>
         </details>
       </div>
       <div class="renew-box">
@@ -705,7 +707,20 @@ function restoreFormFields() {
 function formatApiError(data, statusText, status) {
   if (typeof data.detail === 'string') return data.detail;
   if (Array.isArray(data.detail)) {
-    return data.detail.map(e => e.msg || JSON.stringify(e)).join('；');
+    const fieldLabels = {
+      username: '用户名',
+      password: '密码',
+      auth_code: '授权码',
+      device_id: '设备标识',
+    };
+    return data.detail.map(e => {
+      const field = Array.isArray(e.loc) ? e.loc[e.loc.length - 1] : '';
+      const label = fieldLabels[field] || field || '参数';
+      if (e.type === 'missing') return `请填写${label}`;
+      if (e.type === 'string_too_short') return `${label}长度不足（至少 ${(e.ctx && e.ctx.min_length) || ''} 位）`;
+      if (e.type === 'string_too_long') return `${label}过长`;
+      return e.msg || JSON.stringify(e);
+    }).join('；');
   }
   if (data.detail && typeof data.detail === 'object') {
     return JSON.stringify(data.detail);
@@ -854,7 +869,21 @@ async function restoreSession() {
 }
 
 function showMsg(el, text, kind) {
+  if (!el) return;
   el.innerHTML = text ? `<div class="alert alert-${kind}">${text}</div>` : '';
+  if (text) {
+    try { el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (_) {}
+  }
+}
+
+function showAuthFeedback(text, kind) {
+  showMsg(document.getElementById('csCodeMsg'), text, kind);
+  showMsg(document.getElementById('authMsg'), text, kind);
+}
+
+function showDashRenewFeedback(text, kind) {
+  showMsg(document.getElementById('dashRenewMsg'), text, kind);
+  showMsg(document.getElementById('dashMsg'), text, kind);
 }
 
 function switchTab(name) {
@@ -1687,10 +1716,17 @@ async function doRegister() {
 }
 
 async function doRenewWithCode() {
-  const authMsg = document.getElementById('authMsg');
   const username = document.getElementById('renewUser').value.trim();
   const password = document.getElementById('renewPass').value;
   const auth_code = document.getElementById('renewAuthCode').value.trim();
+  if (!auth_code) return showAuthFeedback('请输入客服提供的授权码', 'error');
+  if (!username) return showAuthFeedback('请输入用户名', 'error');
+  if (username.length < 3) return showAuthFeedback('用户名至少 3 个字符', 'error');
+  if (!password) return showAuthFeedback('请输入密码', 'error');
+  if (password.length < 6) return showAuthFeedback('密码至少 6 位', 'error');
+  const btn = document.getElementById('btnRenewWithCode');
+  if (btn) { btn.disabled = true; btn.textContent = '续费中…'; }
+  showAuthFeedback('', '');
   try {
     const res = await api('/api/v1/auth/renew-with-code', {
       method: 'POST',
@@ -1699,30 +1735,58 @@ async function doRenewWithCode() {
     });
     saveSession(res.access_token, res.membership, username);
     document.getElementById('renewAuthCode').value = '';
-    await loadDashboard(false);
-    showMsg(authMsg, res.message || '续费成功', 'ok');
+    showAuthFeedback(res.message || '续费成功，正在进入会员中心…', 'ok');
+    try {
+      await loadDashboard(false);
+    } catch (dashErr) {
+      if (res.membership) showDashboard(res.membership);
+      showAuthFeedback((res.message || '续费成功') + '（报告列表加载失败，请刷新页面）', 'warn');
+      return;
+    }
+    showAuthFeedback(res.message || '续费成功', 'ok');
   } catch (e) {
-    showMsg(authMsg, e.message, 'error');
+    showAuthFeedback(e.message || '续费失败，请检查账号、密码与授权码', 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '授权码续费'; }
   }
 }
 
 async function doRenew() {
-  const dashMsg = document.getElementById('dashMsg');
+  const auth_code = document.getElementById('renewCode').value.trim();
+  if (!auth_code) return showDashRenewFeedback('请输入客服提供的授权码', 'error');
+  if (auth_code.length < 8) return showDashRenewFeedback('授权码格式不正确', 'error');
+  const btn = document.getElementById('btnActivateCode');
+  if (btn) { btn.disabled = true; btn.textContent = '激活中…'; }
+  showDashRenewFeedback('', '');
   try {
     const res = await api('/api/v1/auth/activate', {
       method: 'POST',
       auth: true,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ auth_code: document.getElementById('renewCode').value.trim() })
+      body: JSON.stringify({ auth_code })
     });
-    renderProfile(res.membership || {});
+    const membership = res.membership || {};
+    saveSession(loadStored(STORAGE.token), membership, membership.username || loadStored(STORAGE.username));
+    renderProfile(membership);
     document.getElementById('renewCode').value = '';
-    showMsg(dashMsg, res.message || '续费成功，会员状态已更新', 'ok');
-    if (res.membership && res.membership.is_active) {
-      await loadDashboard(false);
+    showDashRenewFeedback(res.message || '续费成功，会员状态已更新', 'ok');
+    if (membership.is_active) {
+      try {
+        await loadDashboard(false);
+        showDashRenewFeedback(res.message || '续费成功，会员状态已更新', 'ok');
+      } catch (_) {
+        showDashRenewFeedback((res.message || '续费成功') + '（报告列表刷新失败，请手动刷新页面）', 'warn');
+      }
     }
   } catch (e) {
-    showMsg(dashMsg, e.message, 'error');
+    const msg = e.message || '激活失败';
+    if (e.status === 401) {
+      showDashRenewFeedback(msg + '。登录已失效，请退出后重新登录，或使用登录页「已有账号续费」', 'error');
+    } else {
+      showDashRenewFeedback(msg, 'error');
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '激活授权码'; }
   }
 }
 

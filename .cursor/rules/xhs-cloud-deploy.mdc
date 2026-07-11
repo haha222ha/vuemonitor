@@ -1,0 +1,44 @@
+---
+description: xhs-cloud 选品云端部署流程（本地 push + 云主机一键 pull）
+alwaysApply: true
+---
+
+# xhs-cloud 部署约定
+
+## 路径
+
+| 角色 | 路径 |
+|------|------|
+| 开发机仓库 | `E:\vuemonitor` |
+| 云主机 git 克隆 | `/opt/vuemonitor` |
+| 云主机运行目录 | `/opt/xhs-cloud` |
+| 会员页 | https://monitor.xhs365.cn/member |
+
+## Agent 必须做的事（完成 xhs-cloud 改动后）
+
+1. **只提交相关文件**（例如 `xhs-cloud/**`、`.cursor/rules/**`），不要混入无关的 client/web-user 改动。
+2. **主动 commit + push 到 `origin/main`**，无需用户再次提醒「帮我 push」。
+3. push 成功后，**把下面「云主机一键指令」原样发给用户**（整块复制粘贴），并提醒浏览器 **Ctrl+F5** 强刷会员页。
+4. 若用户说「部署 / 上线 / pull」，先确认本地已 push，再给出云主机指令；未 push 则先 push。
+
+## 云主机一键指令（给用户复制粘贴）
+
+```bash
+cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main && rsync -a /opt/vuemonitor/xhs-cloud/ /opt/xhs-cloud/ --delete --exclude data --exclude venv --exclude .env && cd /opt/xhs-cloud && bash cloud_deploy/scripts/host-update.sh
+```
+
+等价脚本：`bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/pull-and-deploy.sh`
+
+## 禁止
+
+- 不要假设「只在服务器 rsync」就能更新——必须先 git push，服务器 `/opt/vuemonitor` 才有新代码。
+- 不要直接改 `/opt/xhs-cloud`（运行目录），改 `E:\vuemonitor\xhs-cloud` 再 push。
+- 不要提交 `.env`、数据库、大体积 data。
+
+## 仅改静态页时的最快热修（可选，跳过 git）
+
+```powershell
+scp E:\vuemonitor\xhs-cloud\cloud_deploy\assets\member_portal.html root@ECS_IP:/opt/xhs-cloud/cloud_deploy/assets/
+```
+
+服务器：`sudo systemctl restart xhs-cloud-api`
