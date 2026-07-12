@@ -9,7 +9,7 @@ import os
 import re
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, field_validator
 
@@ -117,14 +117,28 @@ def _user_for_request(
     return member_from_token(token)
 
 
-def _log_behavior(user_id: int, action: str, *, category: str | None = None, report_date: str | None = None) -> None:
+def _log_behavior(
+    user_id: int,
+    action: str,
+    *,
+    category: str | None = None,
+    report_date: str | None = None,
+    metadata: dict | None = None,
+) -> None:
     try:
         from cloud_deploy.cloud_api.database_pg import _conn
         from cloud_deploy.cloud_api.user_behavior import log_user_behavior
 
         conn = _conn()
         try:
-            log_user_behavior(conn, user_id, action, category=category, report_date=report_date)
+            log_user_behavior(
+                conn,
+                user_id,
+                action,
+                category=category,
+                report_date=report_date,
+                metadata=metadata,
+            )
         finally:
             conn.close()
     except Exception:
@@ -512,6 +526,33 @@ def insight_view(
         raise HTTPException(status_code=404, detail="情报报告不存在")
     _log_behavior(user["id"], "view", category=category, report_date=report_date)
     return FileResponse(path, media_type="text/html; charset=utf-8")
+
+
+@router.get("/{report_date}/{category}/pdf")
+def insight_pdf_export(
+    report_date: str,
+    category: str,
+    access_token: str = "",
+    cred: HTTPAuthorizationCredentials | None = Depends(security),
+):
+    """Q2-6：Pro 打印友好 PDF 摘要（浏览器另存为 PDF）。"""
+    user = _user_for_request(access_token, cred)
+    ent = assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.entitlements_v2 import can_insight_pdf
+    from cloud_deploy.reporting.insight_pdf_export import render_print_summary
+
+    if not can_insight_pdf(ent):
+        raise HTTPException(status_code=403, detail="当前套餐不含 PDF 摘要导出，请升级 V2-Pro")
+    _validate_path_params(report_date, category)
+    data = _load_insight_json(report_date, category)
+    if not data:
+        raise HTTPException(status_code=404, detail="情报报告不存在")
+    report = data.get("report") or {}
+    metrics = data.get("metrics") or {}
+    _strip_internal_fields(metrics)
+    _log_behavior(user["id"], "pdf_export", category=category, report_date=report_date)
+    html_body = render_print_summary(report, metrics)
+    return HTMLResponse(content=html_body, media_type="text/html; charset=utf-8")
 
 
 @router.get("/{report_date}/{category}/summary")

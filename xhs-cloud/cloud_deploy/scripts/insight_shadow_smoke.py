@@ -190,6 +190,29 @@ def main() -> int:
     else:
         _log(False, "GET /member/insight/health-score", f"HTTP {code_h}")
 
+    ent = profile.get("entitlements") or {}
+    if ent.get("insight_compare") and len(items) >= 2:
+        cats = ",".join(str(it.get("category") or "") for it in items[:2])
+        code_c, cmp_data = _request("GET", f"/api/v1/member/insight/compare?categories={quote(cats, safe='')}", token=token)
+        ok_cmp = code_c == 200 and isinstance(cmp_data, dict) and len(cmp_data.get("categories") or []) >= 2
+        _log(ok_cmp, "GET /member/insight/compare (Pro)", f"HTTP {code_c}")
+    else:
+        code_c, _ = _request("GET", "/api/v1/member/insight/compare?categories=a,b", token=token)
+        _log(code_c in (403, 400), "GET /member/insight/compare 门控", f"HTTP {code_c}")
+
+    if ent.get("insight_timeline_days") and items:
+        cat = str(items[0].get("category") or "")
+        days = int(ent.get("insight_timeline_days") or 7)
+        code_t, tl = _request(
+            "GET",
+            f"/api/v1/member/insight/timeline?category={quote(cat, safe='')}&days={days}",
+            token=token,
+        )
+        _log(code_t == 200 and isinstance(tl, dict), "GET /member/insight/timeline (Pro)", f"HTTP {code_t}")
+    else:
+        code_t, _ = _request("GET", "/api/v1/member/insight/timeline?category=test&days=7", token=token)
+        _log(code_t in (403, 400), "GET /member/insight/timeline 门控", f"HTTP {code_t}")
+
     if items:
         first = items[0]
         date = str(first.get("report_date") or "")[:10]

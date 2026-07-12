@@ -431,7 +431,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <div id="dashMsg"></div>
   </div>
 </div>
-<script src="/assets/member_insight.js?v=20260712t7"></script>
+<script src="/assets/member_insight.js?v=20260712t8"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -579,7 +579,7 @@ function ensureMemberInsight(done) {
   }
   _insightScriptLoading = true;
   var s = document.createElement('script');
-  s.src = '/assets/member_insight.js?v=20260712t7&_=' + Date.now();
+  s.src = '/assets/member_insight.js?v=20260712t8&_=' + Date.now();
   s.onload = function () {
     _insightScriptLoading = false;
     if (window.MemberInsight) done();
