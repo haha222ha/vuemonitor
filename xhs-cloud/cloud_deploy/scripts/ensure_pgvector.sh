@@ -91,9 +91,14 @@ ok "category_embeddings 表已就绪"
 log "运行类目嵌入批处理"
 export PYTHONPATH="$ROOT"
 export PYTHONUNBUFFERED=1
-if python3 "$ROOT/cloud_deploy/scripts/run_category_embeddings.py"; then
+PY="${ROOT}/venv/bin/python"
+if [[ ! -x "$PY" ]]; then
+  PY=python3
+  warn "未找到 $ROOT/venv，使用系统 python3（可能缺 psycopg2）"
+fi
+if "$PY" "$ROOT/cloud_deploy/scripts/run_category_embeddings.py"; then
   ok "嵌入批处理完成"
 else
   warn "嵌入批处理未完全成功（可能缺 INSIGHT_LLM_API_KEY 或 embedding 模型不可用）"
-  warn "表结构已就绪，可稍后重跑: python3 cloud_deploy/scripts/run_category_embeddings.py"
+  warn "表结构已就绪，可稍后重跑: cd $ROOT && PYTHONPATH=$ROOT ./venv/bin/python cloud_deploy/scripts/run_category_embeddings.py"
 fi
