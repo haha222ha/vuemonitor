@@ -17,6 +17,9 @@
 
   function api(path, opts) {
     opts = opts || {};
+    if (typeof global.api === 'function') {
+      return global.api(path, Object.assign({ auth: true }, opts));
+    }
     const headers = Object.assign({}, opts.headers || {});
     const t = loadStored(STORAGE.token);
     if (t) headers.Authorization = 'Bearer ' + t;
@@ -152,6 +155,8 @@
 
   function loadInsightTab() {
     var msg = document.getElementById('insightMsg');
+    var bar = document.getElementById('insightPlanBar');
+    if (bar) bar.textContent = '正在加载情报库…';
     return Promise.all([
       api('/api/v1/member/profile'),
       api('/api/v1/member/insight/library'),
@@ -167,7 +172,9 @@
         openPreview(first.report_date, first.category);
       }
     }).catch(function (e) {
-      if (msg) msg.textContent = e.message || '加载失败';
+      var detail = (e && e.message) ? e.message : '加载失败';
+      if (bar) bar.innerHTML = '<span class="insight-meta" style="color:var(--red)">情报加载失败：' + esc(detail) + '（请重新登录或 Ctrl+Shift+R 刷新）</span>';
+      if (msg) msg.textContent = detail;
     });
   }
 
