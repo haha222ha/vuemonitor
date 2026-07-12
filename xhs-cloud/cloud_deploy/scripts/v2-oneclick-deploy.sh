@@ -69,12 +69,20 @@ if [[ "${SKIP_MIGRATE:-}" != "1" ]]; then
     set -a && source "$ENV_FILE" && set +a
   fi
   if [[ "${XHS_DATABASE_URL:-}" == postgres* ]]; then
-    for sql in 08_insight_v2_tables.sql 09_retention_pg_schema.sql 10_pgvector_embeddings.sql; do
+    for sql in 08_insight_v2_tables.sql 09_retention_pg_schema.sql 11_insight_workflow_schema.sql; do
       f="${XHS_ROOT}/cloud_deploy/database/${sql}"
       if [[ -f "$f" ]]; then
         psql "$XHS_DATABASE_URL" -f "$f" && ok "applied ${sql}" || warn "${sql} 有告警（可能已存在）"
       fi
     done
+    PGV="${XHS_ROOT}/cloud_deploy/database/10_pgvector_embeddings.sql"
+    if [[ -f "$PGV" ]]; then
+      if psql "$XHS_DATABASE_URL" -tAc "SELECT 1 FROM pg_extension WHERE extname='vector'" 2>/dev/null | grep -q 1; then
+        psql "$XHS_DATABASE_URL" -f "$PGV" && ok "applied 10_pgvector_embeddings.sql" || warn "pgvector 迁移告警"
+      else
+        warn "未安装 pgvector 扩展，跳过 10_pgvector_embeddings.sql（T2 可选）"
+      fi
+    fi
     psql "$XHS_DATABASE_URL" -c "SET search_path TO xhs_monitor, public; SELECT tablename FROM pg_tables WHERE schemaname='xhs_monitor' AND tablename IN ('insight_daily_usage','daily_category_metrics','user_behavior');" 2>/dev/null | head -10 || true
   else
     warn "未配置 XHS_DATABASE_URL，跳过 PG 迁移"

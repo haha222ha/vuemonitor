@@ -309,6 +309,76 @@ def insight_recommendations(user: dict = Depends(current_user)):
     return data
 
 
+@router.get("/health-score")
+def insight_health_score(user: dict = Depends(current_user)):
+    """T2：用户健康度评分（REQ-RET-030）。"""
+    assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.database_pg import _conn
+    from cloud_deploy.cloud_api.insight_health import compute_health_score
+
+    conn = _conn()
+    try:
+        data = compute_health_score(conn, user["id"])
+    finally:
+        conn.close()
+    return data
+
+
+class InsightWorkflowBody(BaseModel):
+    category: str
+    report_date: str = ""
+    status: str = "stocked"
+    outcome: str = ""
+    note: str = ""
+
+    @field_validator("category")
+    @classmethod
+    def validate_category(cls, v: str) -> str:
+        v = str(v).strip()
+        if not _CATEGORY_RE.match(v):
+            raise ValueError("category 含非法字符")
+        return v
+
+
+@router.get("/workflow")
+def insight_workflow_list(user: dict = Depends(current_user)):
+    assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.database_pg import _conn
+    from cloud_deploy.cloud_api.insight_workflow import list_workflow
+
+    conn = _conn()
+    try:
+        items = list_workflow(conn, user["id"])
+    finally:
+        conn.close()
+    return {"items": items}
+
+
+@router.post("/workflow")
+def insight_workflow_post(body: InsightWorkflowBody, user: dict = Depends(current_user)):
+    assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.database_pg import _conn
+    from cloud_deploy.cloud_api.insight_workflow import upsert_workflow
+
+    conn = _conn()
+    try:
+        item = upsert_workflow(
+            conn,
+            user["id"],
+            category=body.category,
+            report_date=body.report_date,
+            status=body.status or "stocked",
+            outcome=body.outcome or None,
+            note=body.note or None,
+        )
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    finally:
+        conn.close()
+    _log_behavior(user["id"], "workflow", category=body.category, report_date=body.report_date[:10] or None)
+    return item
+
+
 @router.put("/watchlist")
 def insight_watchlist_put(body: InsightWatchlistBody, user: dict = Depends(current_user)):
     ent = assert_insight_allowed(user["id"])

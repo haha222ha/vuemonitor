@@ -7,8 +7,11 @@ import os
 DEFAULT_MIN_INGEST_ROWS = 10000
 
 
-def min_ingest_row_count() -> int:
-    raw = os.environ.get("XHS_CLOUD_UPLOAD_MIN_ROWS", str(DEFAULT_MIN_INGEST_ROWS)).strip()
+def min_ingest_row_count(archive_type: str = "") -> int:
+    if archive_type == "member_custom_zip":
+        raw = os.environ.get("XHS_CLOUD_CUSTOM_UPLOAD_MIN_ROWS", "1").strip()
+    else:
+        raw = os.environ.get("XHS_CLOUD_UPLOAD_MIN_ROWS", str(DEFAULT_MIN_INGEST_ROWS)).strip()
     try:
         return max(0, int(raw or DEFAULT_MIN_INGEST_ROWS))
     except ValueError:
@@ -32,11 +35,12 @@ def validate_ingest_row_count(
     *,
     force: bool = False,
     existing_row_count: int | None = None,
+    archive_type: str = "",
 ) -> None:
     """条数不足时抛出 ValueError（HTTP 400）。"""
     if force:
         return
-    min_rows = min_ingest_row_count()
+    min_rows = min_ingest_row_count(archive_type)
     if min_rows > 0 and row_count > 0 and row_count < min_rows:
         raise ValueError(
             f"报告仅 {row_count} 条，低于最低 {min_rows} 条"

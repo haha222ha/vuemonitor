@@ -79,6 +79,7 @@ def pack_register_sync(
         report_date,
         force=effective_force,
         existing_row_count=existing_rows,
+        archive_type=archive_type,
     )
 
     pack_info = pack_report_dir(report_dir)

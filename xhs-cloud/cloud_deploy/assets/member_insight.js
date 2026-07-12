@@ -117,6 +117,36 @@
     });
   }
 
+  function renderRecommendations(data) {
+    var bar = document.getElementById('insightRecommendBar');
+    if (!bar || !data || !(data.items || []).length) return;
+    var chips = (data.items || []).slice(0, 4).map(function (it) {
+      return '<span class="insight-badge insight-rec-chip" data-date="' + esc(String(it.report_date || '').slice(0, 10)) + '" data-category="' + esc(it.category || '') + '">' + esc(it.category) + '</span>';
+    }).join('');
+    bar.innerHTML = '<strong>为你推荐</strong><div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">' + chips + '</div>';
+    bar.classList.remove('hidden');
+    bar.querySelectorAll('.insight-rec-chip').forEach(function (el) {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function () {
+        openPreview(el.dataset.date, el.dataset.category);
+      });
+    });
+  }
+
+  function loadRecommendations() {
+    return api('/api/v1/member/insight/recommendations').then(renderRecommendations).catch(function () {});
+  }
+
+  function loadHealthScore() {
+    return api('/api/v1/member/insight/health-score').then(function (data) {
+      var bar = document.getElementById('insightHealthBar');
+      if (!bar || !data) return;
+      var label = data.band === 'at_risk' ? '建议今日查看情报' : (data.band === 'healthy' ? '活跃良好' : '保持关注');
+      bar.textContent = '健康度 ' + (data.score || 0) + '/100 · ' + label;
+      if (data.at_risk) bar.style.color = 'var(--red)';
+    }).catch(function () {});
+  }
+
   function renderLibrary(items) {
     var list = document.getElementById('insightLibraryList');
     var empty = document.getElementById('insightLibraryEmpty');
@@ -167,6 +197,8 @@
       renderPlanBar(profile);
       renderLibrary(lib.items || []);
       loadRadar();
+      loadRecommendations();
+      loadHealthScore();
       if (msg) msg.textContent = lib.shadow_mode ? '当前为 Shadow 预生成情报（只读）' : '';
       if ((lib.items || []).length) {
         var first = lib.items[0];

@@ -100,6 +100,7 @@ SELECTION_GUIDE = {
 ARCHIVE_DAILY = "member_daily_zip"
 ARCHIVE_WEEKLY = "member_weekly_zip"
 ARCHIVE_MONTHLY = "member_monthly_zip"
+ARCHIVE_CUSTOM = "member_custom_zip"
 
 
 def item_at(item: list, key: str, default=None):

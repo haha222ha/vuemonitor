@@ -116,7 +116,7 @@ def generate_daily_report(
     payload["meta"]["count_raw"] = raw
     _log(f"写入目录 {out_dir} ...")
     write_report_dir(out_dir, payload, _report_assets_dir())
-    _log(f"输出: {out_dir} items={len(items)} (raw={raw}) bundle=data.js+index_with_gr.html+index_vue.html")
+    _log(f"输出: {out_dir} items={len(items)} (raw={raw}) bundle=data.js+index_with_gr.html+index_vue.html+report_theme")
     return {"report_date": report_date, "output_dir": out_dir, "count": len(items), "raw": raw}
 
 

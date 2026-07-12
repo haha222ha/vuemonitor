@@ -181,6 +181,15 @@ def main() -> int:
     else:
         _log(False, "GET /member/insight/radar", f"HTTP {code_r}")
 
+    code_rec, rec = _request("GET", "/api/v1/member/insight/recommendations", token=token)
+    _log(code_rec == 200, "GET /member/insight/recommendations", f"HTTP {code_rec}")
+
+    code_h, health = _request("GET", "/api/v1/member/insight/health-score", token=token)
+    if code_h == 200 and isinstance(health, dict):
+        _log("score" in health, "GET /member/insight/health-score", f"score={health.get('score')}")
+    else:
+        _log(False, "GET /member/insight/health-score", f"HTTP {code_h}")
+
     if items:
         first = items[0]
         date = str(first.get("report_date") or "")[:10]

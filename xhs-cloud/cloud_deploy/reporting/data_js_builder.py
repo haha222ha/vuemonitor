@@ -133,6 +133,8 @@ def build_report_payload(
 REPORT_BUNDLE_FILES = (
     "index_with_gr.html",
     "index_vue.html",
+    "report_theme.css",
+    "report_theme.js",
 )
 
 
@@ -178,6 +180,7 @@ def write_report_dir(
             str(disc)
             + "\n解压后请右键 index_with_gr.html，选择「打开方式」→ Google Chrome 打开\n"
             + f"报告包文件: data.js, {', '.join(REPORT_BUNDLE_FILES)}\n"
+            + "默认主题为「极光清新」，可在报告页右上角切换；亦支持经典深色。\n"
             + "（gen_report.py 为本地生成脚本，不包含在会员 zip 中）\n"
         )
     return output_dir

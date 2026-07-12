@@ -6,17 +6,19 @@ import os
 import sys
 import threading
 import time
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, ProcessPoolExecutor, ThreadPoolExecutor, wait
 from typing import Callable
 
 MODE_MULTI_BROWSER = "multi_browser"       # A: 多进程，每进程一个 Chromium（原方案）
 MODE_SINGLE_BROWSER = "single_browser"     # C: 单 Chromium，多标签并行
 MODE_API_THEN_BROWSER = "api_then_browser"  # D: 本地 API 优先，失败再 Playwright
+MODE_API_ONLY = "api_only"                  # E: 仅 API，不启浏览器（推荐）
 
 MODE_LABELS = {
     MODE_MULTI_BROWSER: "A 多浏览器并发（原方案，最快，内存高）",
     MODE_SINGLE_BROWSER: "C 单浏览器多标签（省内存）",
-    MODE_API_THEN_BROWSER: "D API优先+浏览器兜底（最省资源）",
+    MODE_API_THEN_BROWSER: "D API优先+浏览器兜底（慢，易卡住）",
+    MODE_API_ONLY: "E 仅API（推荐，快，不启浏览器）",
 }
 
 _shared_context = None
@@ -121,38 +123,69 @@ def _call_with_timeout(fn, timeout_sec: int | None = None):
             raise TimeoutError(f"采集超时>{timeout_sec}s") from exc
 
 
-def _scan_wait_loop(futs: dict, log, item_timeout: int) -> list[dict]:
-    """带心跳的 as_completed 等待。"""
+def _scan_wait_loop(
+    futs: dict,
+    log,
+    item_timeout: int,
+    wait_hint: str = "任务较慢",
+) -> list[dict]:
+    """带心跳 + 单条超时的等待（卡住的任务会被跳过，批次继续）。"""
     results: list[dict] = []
     total = len(futs)
+    pending = dict(futs)
+    started = {fut: time.time() for fut in futs}
     stop_hb = threading.Event()
 
     def heartbeat() -> None:
         while not stop_hb.wait(20):
-            left = total - len(results)
+            left = len(pending)
             if left > 0:
-                log(f"仍在等待 {left}/{total} 条（浏览器兜底较慢，超时会自动跳过）...")
+                log(
+                    f"仍在等待 {total - len(results)}/{total} 条"
+                    f"（{wait_hint}，>{item_timeout}s 自动跳过）..."
+                )
 
     hb = threading.Thread(target=heartbeat, daemon=True)
     hb.start()
     try:
-        for fut in as_completed(futs):
-            gid = futs[fut]
-            try:
-                row = fut.result(timeout=item_timeout)
-            except Exception as exc:
-                row = {
-                    "goods_id": gid,
-                    "status": "fail",
-                    "sold": None,
-                    "message": str(exc)[:200],
-                    "engine": "",
-                    "ms": 0,
-                    "detail": {},
-                }
-            results.append(row)
-            ok_so_far = sum(1 for r in results if r.get("status") == "ok")
-            log(f"采集进度 {len(results)}/{total} ok={ok_so_far}")
+        while pending:
+            done, _ = wait(set(pending.keys()), timeout=5, return_when=FIRST_COMPLETED)
+            for fut in done:
+                gid = pending.pop(fut)
+                try:
+                    row = fut.result(timeout=1)
+                except Exception as exc:
+                    row = {
+                        "goods_id": gid,
+                        "status": "fail",
+                        "sold": None,
+                        "message": str(exc)[:200],
+                        "engine": "",
+                        "ms": 0,
+                        "detail": {},
+                    }
+                results.append(row)
+                ok_so_far = sum(1 for r in results if r.get("status") == "ok")
+                log(f"采集进度 {len(results)}/{total} ok={ok_so_far}")
+
+            now = time.time()
+            for fut in list(pending.keys()):
+                if now - started[fut] <= item_timeout:
+                    continue
+                gid = pending.pop(fut)
+                results.append(
+                    {
+                        "goods_id": gid,
+                        "status": "fail",
+                        "sold": None,
+                        "message": f"超时>{item_timeout}s",
+                        "engine": "",
+                        "ms": 0,
+                        "detail": {},
+                    }
+                )
+                ok_so_far = sum(1 for r in results if r.get("status") == "ok")
+                log(f"采集进度 {len(results)}/{total} ok={ok_so_far} (超时跳过)")
     finally:
         stop_hb.set()
     return results
@@ -204,6 +237,40 @@ def _fetch_single_tab(args: tuple) -> dict:
             "sold": None,
             "message": str(exc)[:200],
             "engine": "playwright",
+            "ms": int((time.time() - t0) * 1000),
+            "detail": {},
+        }
+    return _row_from_fetch(gid, detail, status, meta, t0)
+
+
+def _fetch_api_only(args: tuple) -> dict:
+    goods_id, crawler, cloud_root = args
+    if cloud_root not in sys.path:
+        sys.path.insert(0, cloud_root)
+    if crawler and os.path.isdir(crawler) and crawler not in sys.path:
+        sys.path.insert(0, crawler)
+    os.environ["XHS_ENABLE_PLAYWRIGHT"] = "0"
+    from xhs_full_sold_fetch import fetch_sold_detail
+
+    t0 = time.time()
+    gid = str(goods_id)
+    try:
+        detail, status, meta = _call_with_timeout(
+            lambda: fetch_sold_detail(
+                gid,
+                engine="api",
+                fallback_chain=("api",),
+                auto_fallback=False,
+            ),
+            timeout_sec=min(30, _fetch_timeout_sec()),
+        )
+    except Exception as exc:
+        return {
+            "goods_id": gid,
+            "status": "fail",
+            "sold": None,
+            "message": str(exc)[:200],
+            "engine": "api",
             "ms": int((time.time() - t0) * 1000),
             "detail": {},
         }
@@ -278,21 +345,28 @@ def scan_batch(
             initargs=(crawler, cloud_root),
         ) as pool:
             futs = {pool.submit(_worker_fetch_multi, w): w[0] for w in work}
-            results = _scan_wait_loop(futs, log, item_timeout)
+            results = _scan_wait_loop(futs, log, item_timeout, "多浏览器任务较慢")
 
     elif mode == MODE_SINGLE_BROWSER:
         log(f"模式=C 单浏览器多标签 并发={concurrency}")
         work = [(gid, crawler, cloud_root) for gid in work_ids]
         with ThreadPoolExecutor(max_workers=concurrency) as pool:
             futs = {pool.submit(_fetch_single_tab, w): w[0] for w in work}
-            results = _scan_wait_loop(futs, log, item_timeout)
+            results = _scan_wait_loop(futs, log, item_timeout, "单浏览器任务较慢")
+
+    elif mode == MODE_API_ONLY:
+        log(f"模式=E 仅API 并发={concurrency}")
+        work = [(gid, crawler, cloud_root) for gid in work_ids]
+        with ThreadPoolExecutor(max_workers=concurrency) as pool:
+            futs = {pool.submit(_fetch_api_only, w): w[0] for w in work}
+            results = _scan_wait_loop(futs, log, item_timeout, "API请求")
 
     elif mode == MODE_API_THEN_BROWSER:
         log(f"模式=D API优先+浏览器 并发={concurrency}")
         work = [(gid, crawler, cloud_root) for gid in work_ids]
         with ThreadPoolExecutor(max_workers=concurrency) as pool:
             futs = {pool.submit(_fetch_api_then_browser, w): w[0] for w in work}
-            results = _scan_wait_loop(futs, log, item_timeout)
+            results = _scan_wait_loop(futs, log, item_timeout, "浏览器兜底较慢")
     else:
         raise ValueError(f"未知模式: {mode}")
 
@@ -330,7 +404,7 @@ def compare_modes(
 ) -> list[dict]:
     """同一批商品用多种模式各跑一遍（仅测试，不上传）。"""
     log = log_fn or (lambda _m: None)
-    modes = modes or [MODE_API_THEN_BROWSER, MODE_SINGLE_BROWSER, MODE_MULTI_BROWSER]
+    modes = modes or [MODE_API_ONLY, MODE_API_THEN_BROWSER, MODE_SINGLE_BROWSER, MODE_MULTI_BROWSER]
     compare_n = max(3, min(len(items), int(os.environ.get("XHS_LOCAL_AGENT_COMPARE_N", "9"))))
     subset = items[:compare_n]
     os.environ.setdefault("XHS_LOCAL_AGENT_FETCH_TIMEOUT", "45")

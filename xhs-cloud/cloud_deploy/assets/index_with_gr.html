@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>小红书选品分析报告</title>
+<script>
+(function(){try{var t=localStorage.getItem('xhs_report_theme')||localStorage.getItem('pa_ui_theme');document.documentElement.dataset.theme=(t==='classic')?'classic':'aurora';}catch(e){document.documentElement.dataset.theme='aurora';}})();
+</script>
+<link rel="stylesheet" href="report_theme.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0d1117;color:#c9d1d9;padding:20px}
@@ -171,7 +175,7 @@ td.na{color:#6e7681}
 .report-footer .fd-ver{font-size:10px;color:#6e7681;margin-top:10px}
 </style>
 </head>
-<body>
+<body class="gr-report">
 <div class="c">
 <h1>小红书选品分析报告</h1>
 <div class="sub" id="subtitle">加载中...</div>
@@ -585,9 +589,11 @@ var pc=POOL_C[pool]||'#888';
 var title=item.title.length>40?item.title.substring(0,40)+'...':item.title;
 var storeName=item.storeName.length>16?item.storeName.substring(0,16)+'...':item.storeName;
 var behavior=item.behavior.length>30?item.behavior.substring(0,30)+'...':item.behavior;
+var gidUrl='https://www.xiaohongshu.com/goods-detail/'+encodeURIComponent(item.gid||'');
+var gidCell='<span class="pa-gid-cell"><a class="gid-link" href="'+gidUrl+'" data-pa-gid="'+esc(item.gid)+'" title="在内置窗口打开">'+esc(item.gid)+'</a><button type="button" class="pa-gid-copy" data-gid="'+esc(item.gid)+'" title="复制商品 ID">复制</button></span>';
 var byKey={
 idx:rowNum,
-gid:esc(item.gid),
+gid:gidCell,
 title:'<span title="'+esc(item.title)+'">'+esc(title)+'</span>',
 actualV1d:item.actualV1d,
 actualGr:item.actualGr,
@@ -893,7 +899,7 @@ html='<tr><td colspan="'+HEADERS.length+'" style="text-align:center;padding:24px
 var item=pageData[i];
 var cells=buildRowCells(item,start+i+1);
 
-html+='<tr'+(item.anomaly?' class="anomaly-row"':'')+'>';
+html+='<tr'+(item.anomaly?' class="anomaly-row"':'')+(item.gid?' data-pa-gid="'+esc(item.gid)+'"':'')+'>';
 for(var ci=0;ci<HEADERS.length;ci++){
 var h=HEADERS[ci];
 var cls=h.cls||'';
@@ -1248,5 +1254,6 @@ doFilter('physical');
 
 })();
 </script>
+<script src="report_theme.js"></script>
 </body>
 </html>

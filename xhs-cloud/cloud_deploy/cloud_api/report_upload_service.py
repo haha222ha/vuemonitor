@@ -7,7 +7,12 @@ import shutil
 import tempfile
 import zipfile
 
-from cloud_deploy.reporting.constants import ARCHIVE_DAILY, ARCHIVE_MONTHLY, ARCHIVE_WEEKLY
+from cloud_deploy.reporting.constants import (
+    ARCHIVE_CUSTOM,
+    ARCHIVE_DAILY,
+    ARCHIVE_MONTHLY,
+    ARCHIVE_WEEKLY,
+)
 
 
 def _archive_type_for_folder(folder_name: str) -> str:
@@ -15,7 +20,9 @@ def _archive_type_for_folder(folder_name: str) -> str:
         return ARCHIVE_WEEKLY
     if folder_name.startswith("月报"):
         return ARCHIVE_MONTHLY
-    return ARCHIVE_DAILY
+    if folder_name.startswith("全量"):
+        return ARCHIVE_DAILY
+    return ARCHIVE_CUSTOM
 
 
 def _report_sync_pg_enabled() -> bool:

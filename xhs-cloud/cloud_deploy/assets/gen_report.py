@@ -984,6 +984,12 @@ def main(dedup=True, output_dir='', min_v1d=DEFAULT_MIN_V1D, min_actual=DEFAULT_
     else:
         log(f'  警告: 未找到 {VUE_HTML_SRC}')
 
+    assets_dir = os.path.dirname(os.path.abspath(__file__))
+    for theme_name in ('report_theme.css', 'report_theme.js'):
+        theme_src = os.path.join(assets_dir, theme_name)
+        if os.path.isfile(theme_src):
+            shutil.copy2(theme_src, os.path.join(out_dir, theme_name))
+
     log(f'\n输出目录: {out_dir}')
     log(f'data.js 已生成: {js_path}')
     if os.path.isfile(html_dst):
