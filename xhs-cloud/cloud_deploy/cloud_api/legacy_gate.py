@@ -106,8 +106,7 @@ def insight_enabled(
         return True
     if plan == "experience" and ent.get("insight_enabled") is not False:
         return True
-    # Shadow 验收：在期 Legacy 月卡也可看到 AI Tab（只读预览）
-    if _shadow_preview_all_legacy() and plan in LEGACY_PLAN_CODES:
+    # 在期 Legacy 老会员：双轨（AI 情报 + zip 报告库），至 expires_at
+    if plan in LEGACY_PLAN_CODES:
         return True
-    # 纯 Legacy 在期用户：T0 后可选赠送情报预览（产品决策）；默认 False
     return bool(ent.get("insight_preview", False))

@@ -58,7 +58,7 @@
 
     var banner = document.getElementById('insightPreviewBanner');
     if banner) {
-      banner.classList.toggle('hidden', !(ent.insight_preview || m.portal_route === 'legacy_with_preview' || m.insight_shadow_preview));
+      banner.classList.toggle('hidden', m.portal_route !== 'legacy_with_preview');
     }
 
     var defaultDash = 'reports';

@@ -104,16 +104,16 @@ ENTITLEMENT_FIELD_GUIDE: dict[str, str] = {
 def merge_entitlements(raw: dict | None, membership_plan: str | None = None) -> dict[str, Any]:
     """
     将 DB 读出的 entitlements 规范为前端/insight API 可用结构。
-    无 V2 字段时：Legacy monthly 用户默认仅 legacy_zip，无 insight。
+    无 V2 字段时：Legacy 在期用户默认双轨（zip + AI 情报）；新 insight_* 仅 AI。
     """
     ent = dict(raw or {})
     plan = ent.get("plan_code") or membership_plan or ""
 
     if ent.get("insight_enabled") is None:
-        # 旧套餐 monthly/quarterly 等：仅 Legacy
         if plan in ("monthly", "quarterly", "halfyear", "yearly", "pay_test"):
             ent.setdefault("legacy_zip_enabled", True)
-            ent.setdefault("insight_enabled", False)
+            ent.setdefault("insight_enabled", True)
+            ent.setdefault("insight_categories_per_day", 3)
         elif plan.startswith("insight_") or plan == "dual_monthly":
             ent.setdefault("insight_enabled", True)
             ent.setdefault("legacy_zip_enabled", plan == "dual_monthly")
@@ -170,6 +170,8 @@ def portal_route(ent: dict | None) -> str:
         return "insight_only"
     if ent.get("insight_preview"):
         return "legacy_with_preview"
+    if ent.get("legacy_zip_enabled") and ent.get("insight_enabled"):
+        return "legacy_dual"
     if ent.get("legacy_zip_enabled"):
         return "legacy_only"
     if ent.get("insight_enabled"):

@@ -44,12 +44,6 @@ def enrich_member_profile(profile: dict | None, user_id: int) -> dict | None:
         expires_at=expires,
         entitlements=ent,
     )
-    if os.environ.get("XHS_INSIGHT_SHADOW_PREVIEW", "").strip().lower() in ("1", "true", "yes", "on"):
-        if out["insight_enabled"] and plan in ("monthly", "quarterly", "halfyear", "yearly"):
-            out["insight_shadow_preview"] = True
-            ent = dict(ent)
-            ent.setdefault("insight_preview", True)
-            out["entitlements"] = ent
     return out
 
 
