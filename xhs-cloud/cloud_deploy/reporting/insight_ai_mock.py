@@ -16,9 +16,12 @@ class InsightReport:
     opportunity_stars: int
     confidence: float
     pages: list[dict[str, Any]] = field(default_factory=list)
+    llm_meta: dict[str, Any] = field(default_factory=dict)
 
     def to_public_dict(self) -> dict[str, Any]:
-        return asdict(self)
+        d = asdict(self)
+        d.pop("llm_meta", None)
+        return d
 
 
 def _stars(score: int) -> int:

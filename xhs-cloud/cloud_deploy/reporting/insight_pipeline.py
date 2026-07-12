@@ -47,7 +47,7 @@ def run_insight_pipeline(
         llm_cfg = apply_runtime_env(resolve_runtime_config())
         budget = int(llm_cfg.get("budget_tokens_per_day") or 200_000)
         use_llm = bool(llm_cfg.get("enabled"))
-        _log(f"LLM mode={'on' if use_llm else 'mock'} provider={llm_cfg.get('provider')} model={llm_cfg.get('model')}")
+        _log(f"LLM mode={'on' if use_llm else 'mock'} agents=5 provider={llm_cfg.get('provider')} model={llm_cfg.get('model')}")
     except Exception as e:
         budget = int(os.environ.get("INSIGHT_LLM_BUDGET_TOKENS_PER_DAY", 200_000))
         use_llm = os.environ.get("INSIGHT_USE_LLM", "").strip().lower() in ("1", "true", "yes")

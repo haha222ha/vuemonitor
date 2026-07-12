@@ -60,9 +60,12 @@ def chat_json_with_usage(
     user: str,
     *,
     temperature: float = 0.3,
+    agent: str = "",
 ) -> tuple[dict[str, Any], LLMUsage]:
     base = (_env("INSIGHT_LLM_BASE_URL") or "https://www.packyapi.com/v1").rstrip("/")
-    model = _env("INSIGHT_LLM_MODEL") or "deepseek-v4-flash"
+    ceo_model = _env("INSIGHT_LLM_MODEL_CEO")
+    default_model = _env("INSIGHT_LLM_MODEL") or "deepseek-v4-flash"
+    model = ceo_model if agent == "ceo" and ceo_model else default_model
     provider = _env("INSIGHT_LLM_PROVIDER") or "packy_deepseek"
     thinking_disabled = _env("INSIGHT_LLM_THINKING", "disabled").lower() in (
         "0",

@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-PROMPT_VERSION = "v1"
+PROMPT_VERSION = "agent-v1"
 
 
 def _table_exists(conn) -> bool:
