@@ -349,7 +349,11 @@ def member_insight_js():
     path = os.path.join(_ASSETS, "member_insight.js")
     if not os.path.isfile(path):
         raise HTTPException(status_code=404, detail="member_insight.js missing")
-    return FileResponse(path, media_type="application/javascript; charset=utf-8")
+    return FileResponse(
+        path,
+        media_type="application/javascript; charset=utf-8",
+        headers={"Cache-Control": "no-store, must-revalidate"},
+    )
 
 
 @app.get("/api/v1/health")

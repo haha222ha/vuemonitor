@@ -104,7 +104,13 @@
     return api('/api/v1/member/insight/radar').then(function (data) {
       renderRadar(data);
       return data;
-    }).catch(function () { /* optional */ });
+    }).catch(function (e) {
+      var bar = document.getElementById('insightRadarBar');
+      if (bar) {
+        bar.classList.remove('hidden');
+        bar.innerHTML = '<strong>今日机会雷达</strong> · 加载失败，请刷新页面（' + esc(e && e.message ? e.message : '网络错误') + '）';
+      }
+    });
   }
 
   function renderLibrary(items) {
