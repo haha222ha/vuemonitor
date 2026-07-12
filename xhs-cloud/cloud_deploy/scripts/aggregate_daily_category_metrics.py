@@ -22,7 +22,11 @@ from cloud_deploy.cloud_api.database_pg import _conn, init_db
 from cloud_deploy.reporting.daily_metrics_store import upsert_daily_metrics
 from cloud_deploy.reporting.insight_metric_engine import aggregate_items_to_insights
 from cloud_deploy.reporting.insight_report_builder import pg_items_to_rows
-from cloud_deploy.reporting.pg_reader import fetch_items_for_insight, insight_min_delta
+from cloud_deploy.reporting.pg_reader import (
+    fetch_items_for_insight,
+    insight_min_delta,
+    insight_scan_window_days,
+)
 
 
 def main() -> int:

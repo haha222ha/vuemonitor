@@ -582,7 +582,7 @@ def merge_items_by_goods_id(base: list, extra: list) -> list:
     out = list(by_id.values())
     out.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
     if added:
-        print(f"[pg_reader] merge: +{added} premium-only goods (base={len(base)} total={len(out)})", flush=True)
+        print(f"[pg_reader] merge: +{added} extra goods (base={len(base)} total={len(out)})", flush=True)
     return out
 
 

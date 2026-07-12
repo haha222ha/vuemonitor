@@ -46,7 +46,11 @@ def main() -> int:
     )
     from cloud_deploy.reporting.insight_metric_engine import aggregate_items_to_insights
     from cloud_deploy.reporting.insight_report_builder import pg_items_to_rows
-    from cloud_deploy.reporting.pg_reader import fetch_items_for_insight, insight_min_delta
+    from cloud_deploy.reporting.pg_reader import (
+        fetch_items_for_insight,
+        insight_min_delta,
+        insight_scan_window_days,
+    )
 
     report_date = args.date[:10]
     min_sample = int(os.environ.get("INSIGHT_MIN_SAMPLE", args.min_sample or 3))
