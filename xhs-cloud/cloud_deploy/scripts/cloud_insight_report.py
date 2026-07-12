@@ -36,9 +36,9 @@ def main() -> int:
     )
     ap.add_argument(
         "--source",
-        default=os.environ.get("INSIGHT_PG_SOURCE", "auto"),
-        choices=("auto", "pg_items"),
-        help="PG 数据源，同 cloud_gen_report",
+        default=os.environ.get("INSIGHT_PG_SOURCE", "scan_delta"),
+        choices=("scan_delta", "auto", "pg_items"),
+        help="PG 数据源；默认 scan_delta（当日 delta>=1 唯一商品）",
     )
     args = ap.parse_args()
 

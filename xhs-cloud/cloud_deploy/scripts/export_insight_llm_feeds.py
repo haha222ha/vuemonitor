@@ -29,7 +29,7 @@ from cloud_deploy.scripts.bootstrap_env import bootstrap
 def main() -> int:
     ap = argparse.ArgumentParser(description="导出类目 LLM 投喂包（feed-v1，无 LLM）")
     ap.add_argument("--date", required=True, help="YYYY-MM-DD")
-    ap.add_argument("--source", default=os.environ.get("INSIGHT_PG_SOURCE", "auto"))
+    ap.add_argument("--source", default=os.environ.get("INSIGHT_PG_SOURCE", "scan_delta"))
     ap.add_argument("--out", default="", help="输出根目录，默认 data/llm_feeds")
     ap.add_argument("--min-sample", type=int, default=None)
     ap.add_argument("--max-categories", type=int, default=None)
@@ -46,7 +46,7 @@ def main() -> int:
     )
     from cloud_deploy.reporting.insight_metric_engine import aggregate_items_to_insights
     from cloud_deploy.reporting.insight_report_builder import pg_items_to_rows
-    from cloud_deploy.reporting.pg_reader import fetch_items_auto
+    from cloud_deploy.reporting.pg_reader import fetch_items_for_insight, insight_min_delta
 
     report_date = args.date[:10]
     min_sample = int(os.environ.get("INSIGHT_MIN_SAMPLE", args.min_sample or 3))
@@ -56,7 +56,12 @@ def main() -> int:
     init_db()
     conn = _conn()
     try:
-        raw_items = fetch_items_auto(conn, report_date) if args.source == "auto" else []
+        raw_items = fetch_items_for_insight(conn, report_date, source=args.source)
+        print(
+            f"[export-feed] PG rows={len(raw_items)} date={report_date} "
+            f"source={args.source} min_delta={insight_min_delta()}",
+            flush=True,
+        )
     finally:
         conn.close()
 
@@ -91,7 +96,13 @@ def main() -> int:
                 raw_selection_rows=len(raw_items),
                 pg_source=args.source,
                 k_anonymity_min=k_anon,
-                enriched=public,
+                enriched={
+                    **public,
+                    "selection_rule": (
+                        f"goods_sold_daily.delta>={insight_min_delta()}, "
+                        "unique per product vs last snapshot_date row"
+                    ),
+                },
             )
             bundle = os.path.join(base, insight.category)
             write_llm_feed_files(bundle, feed)

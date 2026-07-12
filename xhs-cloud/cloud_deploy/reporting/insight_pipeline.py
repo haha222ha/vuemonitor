@@ -20,7 +20,7 @@ from cloud_deploy.reporting.insight_report_builder import (
     render_insight_html,
     write_insight_bundle,
 )
-from cloud_deploy.reporting.pg_reader import fetch_items_auto
+from cloud_deploy.reporting.pg_reader import fetch_items_for_insight, insight_min_delta
 
 
 def _log(msg: str) -> None:
@@ -31,7 +31,7 @@ def run_insight_pipeline(
     report_date: str,
     *,
     shadow: bool = True,
-    source: str = "auto",
+    source: str = "scan_delta",
     min_sample: int | None = None,
     max_categories: int | None = None,
 ) -> dict[str, Any]:
@@ -60,13 +60,8 @@ def run_insight_pipeline(
     init_db()
     conn = _conn()
     try:
-        if source == "auto":
-            raw_items = fetch_items_auto(conn, report_date)
-        else:
-            from cloud_deploy.reporting.pg_reader import fetch_items_from_daily_table
-
-            raw_items = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
-        _log(f"PG rows={len(raw_items)} date={report_date} source={source}")
+        raw_items = fetch_items_for_insight(conn, report_date, source=source)
+        _log(f"PG rows={len(raw_items)} date={report_date} source={source} min_delta={insight_min_delta()}")
     finally:
         conn.close()
 
@@ -133,7 +128,13 @@ def run_insight_pipeline(
             raw_selection_rows=len(raw_items),
             pg_source=source,
             k_anonymity_min=k_anon,
-            enriched=public,
+            enriched={
+                **public,
+                "selection_rule": (
+                    f"goods_sold_daily.delta>={insight_min_delta()}, "
+                    "unique per product vs last snapshot_date row"
+                ),
+            },
         )
         agent_metrics = feed_to_agent_metrics(llm_feed)
         internal = asdict(insight)

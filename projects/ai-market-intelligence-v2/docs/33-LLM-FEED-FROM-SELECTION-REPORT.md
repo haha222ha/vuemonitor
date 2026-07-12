@@ -7,14 +7,14 @@
 
 ## 1. 结论（一句话）
 
-**AI 情报与 Legacy 选品报告读同一份 PG 选品池**；区别是 Legacy 输出 `data.js`（商品行），V2 先聚合成 **类目级 `llm_feed.json`**，再喂给 5 Agent 生成叙事报告。
+**AI 情报观察池**与 Legacy 选品日报 **分离**：默认读 `goods_sold_daily` 当日唯一商品且 `delta >= 1`（相对上次 snapshot 正增长）；Legacy 仍用 `fetch_items_auto` 输出 `data.js`。
 
 ```
-PG 选品池（fetch_items_auto，与 cloud_gen_report 相同）
+PG goods_sold_daily（scan_delta：当日 delta>=1 唯一商品）
         │
-        ├─► cloud_gen_report.py ──► data.js + HTML（Legacy 会员）
+        ├─► cloud_gen_report.py --source auto ──► data.js（Legacy 会员，monitor_incr 池）
         │
-        └─► cloud_insight_report.py
+        └─► cloud_insight_report.py（INSIGHT_PG_SOURCE=scan_delta）
                  │
                  ├─ aggregate_items_to_insights（类目 + k-匿名）
                  ├─ build_llm_feed() ──► llm_feed.json + llm_feed.md
@@ -29,7 +29,8 @@ PG 选品池（fetch_items_auto，与 cloud_gen_report 相同）
 | 问题 | feed-v1 如何解决 |
 |------|------------------|
 | 「AI 是不是瞎编？」 | 每个类目落盘 `llm_feed.json`，可对照 PG 样本数与指数 |
-| 「和选品报告什么关系？」 | `provenance` 写明同源脚本、`raw_selection_rows` |
+| 「观察池怎么定义？」 | `provenance.selection_rule`：`delta>=1` + 相对上次 snapshot 正增长 |
+| 「和选品报告什么关系？」 | Legacy 仍用 auto 池；AI 默认 scan_delta（更广的当日扫描增量） |
 | 「喂什么格式最好？」 | **JSON 主、MD 辅**；Agent 只吃 JSON，运维看 MD |
 | 「合规？」 | 禁止 goods_id / 店铺 / 标题列表；仅 keyword_themes 词频 |
 
@@ -52,7 +53,7 @@ data/insight_shadow/insight_YYYYMMDD/{类目}/
 | 块 | 含义 |
 |----|------|
 | `schema_version` | `feed-v1` |
-| `provenance` | 数据源、选品行数、k-匿名、生成时间 |
+| `provenance` | 数据源、筛选规则、选品行数、k-匿名、生成时间 |
 | `selection_summary` | 虚拟/实体占比、新品占比、中位价、行为 mix |
 | `indices` | 蓝海/竞争/增速/价格带/price_distribution |
 | `trends` | trend_label + trend_7d |
@@ -96,7 +97,14 @@ cd /opt/xhs-cloud
 ./venv/bin/python cloud_deploy/scripts/cloud_gen_report.py --date 2026-07-12 --source auto
 ```
 
-**同一天、同一 `--source auto`，两者读同一 PG 快照。**
+**同一天 AI 默认 `--source scan_delta`**（`INSIGHT_PG_SOURCE=scan_delta`，`INSIGHT_MIN_DELTA=1`）。Legacy 对照仍用 `auto`。
+
+环境变量：
+
+| 变量 | 默认 | 含义 |
+|------|------|------|
+| `INSIGHT_PG_SOURCE` | `scan_delta` | AI 观察池数据源 |
+| `INSIGHT_MIN_DELTA` | `1` | 相对上次 snapshot 最小销量增量 |
 
 ---
 
@@ -104,7 +112,7 @@ cd /opt/xhs-cloud
 
 | 文件 | 职责 |
 |------|------|
-| `reporting/pg_reader.py` | 选品池读取（与日报共用） |
+| `reporting/pg_reader.py` | `fetch_items_from_scan_delta` / `fetch_items_for_insight` |
 | `reporting/insight_metric_engine.py` | 类目聚合 → InsightMetrics |
 | `reporting/insight_llm_feed.py` | **feed-v1 构建 / MD / Agent 扁平化** |
 | `reporting/insight_pipeline.py` | 串联 feed → Agent → HTML |

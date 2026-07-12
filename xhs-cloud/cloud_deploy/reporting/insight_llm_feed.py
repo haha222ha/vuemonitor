@@ -2,7 +2,9 @@
 """
 选品报告 → AI 投喂包（LLM Feed v1）
 
-与 cloud_gen_report / insight_pipeline 共用 pg_reader.fetch_items_auto，
+V2 情报默认读 pg_reader.fetch_items_from_scan_delta（当日 delta>=1 唯一商品）；
+Legacy 选品日报仍用 fetch_items_auto。
+
 在类目聚合后生成 llm_feed.json + llm_feed.md，再交给 5 Agent。
 
 禁止字段：goods_id、store_id、store_name、商品链接、完整 title 列表。
@@ -74,7 +76,7 @@ def build_llm_feed(
     category_rows: list[dict[str, Any]],
     *,
     raw_selection_rows: int,
-    pg_source: str = "auto",
+    pg_source: str = "scan_delta",
     k_anonymity_min: int = 5,
     enriched: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -86,16 +88,33 @@ def build_llm_feed(
             if k not in public and k not in ("disclaimer",):
                 public[k] = v
 
+    selection_rule = (enriched or {}).get("selection_rule")
+    if not selection_rule and pg_source in ("scan_delta", "delta", "insight"):
+        selection_rule = (
+            "goods_sold_daily.delta>=1, unique per product vs last snapshot_date row"
+        )
+    elif not selection_rule and pg_source == "auto":
+        selection_rule = "fetch_items_auto (Legacy 选品池，monitor_incr + premium_daily)"
+
     feed: dict[str, Any] = {
         "schema_version": FEED_SCHEMA_VERSION,
         "report_date": insight.report_date,
         "category": insight.category,
         "sub_category": insight.sub_category or "",
         "provenance": {
-            "description": "与 cloud_gen_report 同源 PG 选品池，经类目聚合与 k-匿名后生成",
-            "selection_report_script": "cloud_deploy/scripts/cloud_gen_report.py --source auto",
+            "description": (
+                "当日扫描唯一商品，相对上次 snapshot 销量 delta 正增长（AI 观察池）"
+                if pg_source in ("scan_delta", "delta", "insight")
+                else "与 cloud_gen_report 同源 PG 选品池，经类目聚合与 k-匿名后生成"
+            ),
+            "selection_report_script": (
+                "cloud_deploy/reporting/pg_reader.fetch_items_from_scan_delta"
+                if pg_source in ("scan_delta", "delta", "insight")
+                else "cloud_deploy/scripts/cloud_gen_report.py --source auto"
+            ),
             "intelligence_script": "cloud_deploy/scripts/cloud_insight_report.py --playbook full",
             "pg_source": pg_source,
+            "selection_rule": selection_rule,
             "report_date": insight.report_date,
             "raw_selection_rows": int(raw_selection_rows),
             "category_rows": len(category_rows),
@@ -204,6 +223,7 @@ def render_llm_feed_md(feed: dict[str, Any]) -> str:
         "",
         f"- schema: `{feed.get('schema_version')}`",
         f"- 选品池: `{prov.get('pg_source')}` raw={prov.get('raw_selection_rows')} → category={prov.get('category_rows')}",
+        f"- 筛选规则: {prov.get('selection_rule') or '—'}",
         f"- k-匿名: min={prov.get('k_anonymity_min')} passed={prov.get('k_anonymity_passed')}",
         "",
         "## 选品摘要（类目聚合）",

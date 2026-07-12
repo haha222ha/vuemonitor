@@ -2,6 +2,7 @@
 """PG 读取与报告行转换（输出 28 列，与桌面报告 data.js 对齐）。"""
 from __future__ import annotations
 
+import os
 from datetime import date, timedelta
 from typing import Any
 
@@ -598,6 +599,141 @@ def fetch_items_auto(conn, report_date: str) -> list:
     if monitor:
         return monitor
     return []
+
+
+def insight_min_delta() -> int:
+    """AI 情报观察池：相对上次扫描销量差阈值（默认 1）。"""
+    try:
+        return max(1, int(os.environ.get("INSIGHT_MIN_DELTA", "1")))
+    except ValueError:
+        return 1
+
+
+def fetch_items_from_scan_delta(
+    conn,
+    report_date: str,
+    *,
+    min_delta: int | None = None,
+) -> list:
+    """
+    AI 情报观察池（与 Legacy auto 分离）：
+
+    - 当日 goods_sold_daily 中 **唯一 goods_id**
+    - ``delta >= min_delta``（默认 1）：相对 **上一有效 snapshot_date 行** 的正销量差
+    - 不限于 monitor 池；premium / monitor / report_daily_items 补齐标题与属性
+    """
+    min_delta = insight_min_delta() if min_delta is None else max(1, int(min_delta))
+    mg_shop = (
+        "m.shop_sales AS mg_shop_sales, m.shop_fans AS mg_shop_fans,"
+        if _monitor_goods_has_shop_cols(conn)
+        else "NULL::int AS mg_shop_sales, NULL::int AS mg_shop_fans,"
+    )
+    mg_fs = (
+        "m.first_seen AS mg_first_seen,"
+        if _monitor_goods_has_first_seen(conn)
+        else "NULL::timestamptz AS mg_first_seen,"
+    )
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            f"""
+            SELECT DISTINCT ON (sd.goods_id)
+                   sd.goods_id, sd.sold_num, sd.delta, sd.deal_price,
+                   prev.sold_num AS prev_sold,
+                   COALESCE(m.title, pg.title) AS title,
+                   COALESCE(m.is_virtual, pg.is_virtual) AS is_virtual,
+                   COALESCE(m.pool, 'WATCH') AS pool,
+                   COALESCE(m.store_id, pg.store_id) AS store_id,
+                   COALESCE(m.store_name, pg.store_name) AS store_name,
+                   m.first_tracked_at,
+                   {mg_fs}
+                   {mg_shop}
+                   (SELECT MIN(r.first_seen)
+                    FROM report_daily_items r
+                    WHERE r.goods_id = sd.goods_id AND r.first_seen IS NOT NULL) AS rdi_first_seen_min,
+                   gm.actual_v1d AS gm_actual_v1d, gm.v1d AS gm_v1d, gm.gr AS gm_gr,
+                   rdi.title AS rdi_title,
+                   rdi.price AS rdi_price,
+                   rdi.actual_v1d AS rdi_actual_v1d,
+                   rdi.v1d AS rdi_v1d,
+                   rdi.actual_gr AS rdi_actual_gr,
+                   rdi.gr AS rdi_gr,
+                   rdi.actual_vsr AS rdi_actual_vsr,
+                   rdi.vsr AS rdi_vsr,
+                   rdi.v1h AS rdi_v1h,
+                   rdi.v6h AS rdi_v6h,
+                   rdi.acc AS rdi_acc,
+                   rdi.burst AS rdi_burst,
+                   rdi.pool AS rdi_pool,
+                   rdi.first_seen AS rdi_first_seen,
+                   rdi.store_id AS rdi_store_id,
+                   rdi.store_name AS rdi_store_name,
+                   rdi.shelf_time AS rdi_shelf_time,
+                   rdi.shop_sales AS rdi_shop_sales,
+                   rdi.shop_fans AS rdi_shop_fans,
+                   rdi.shop_fsr AS rdi_shop_fsr,
+                   rdi.goods_fsr AS rdi_goods_fsr,
+                   rdi.behavior AS rdi_behavior,
+                   rdi.is_virtual AS rdi_is_virtual,
+                   rdi.base_hours AS rdi_base_hours,
+                   rdi.base_at AS rdi_base_at,
+                   rdi.anomaly AS rdi_anomaly
+            FROM goods_sold_daily sd
+            LEFT JOIN LATERAL (
+                SELECT p.sold_num
+                FROM goods_sold_daily p
+                WHERE p.goods_id = sd.goods_id AND p.snapshot_date < sd.snapshot_date
+                ORDER BY p.snapshot_date DESC
+                LIMIT 1
+            ) prev ON TRUE
+            LEFT JOIN monitor_goods m ON m.goods_id = sd.goods_id
+            LEFT JOIN premium_goods pg ON pg.goods_id = sd.goods_id AND pg.lifecycle < 3
+            LEFT JOIN goods_metrics_daily gm
+                   ON gm.goods_id = sd.goods_id AND gm.metric_date = %s
+            LEFT JOIN LATERAL (
+                SELECT *
+                FROM report_daily_items r
+                WHERE r.goods_id = sd.goods_id
+                ORDER BY r.report_date DESC
+                LIMIT 1
+            ) rdi ON TRUE
+            WHERE sd.snapshot_date = %s
+              AND COALESCE(sd.delta, 0) >= %s
+            ORDER BY sd.goods_id, sd.delta DESC
+            """,
+            (report_date, report_date, min_delta),
+        )
+        cols = [d[0] for d in c.description]
+        rows = [dict(zip(cols, r)) for r in c.fetchall()]
+
+    items: list = []
+    for r in rows:
+        prev_raw = r.get("prev_sold")
+        prev_sold = _i(prev_raw) if prev_raw is not None else None
+        item = sold_row_to_item(r, prev_sold)
+        if not item:
+            continue
+        items.append(item)
+
+    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    print(
+        f"[pg_reader] scan_delta {report_date}: kept={len(items)} "
+        f"pool={len(rows)} min_delta={min_delta}",
+        flush=True,
+    )
+    return items
+
+
+def fetch_items_for_insight(conn, report_date: str, *, source: str | None = None) -> list:
+    """V2 情报 / feed 专用数据源（默认 scan_delta）。"""
+    src = (source or os.environ.get("INSIGHT_PG_SOURCE", "scan_delta")).strip().lower()
+    if src in ("scan_delta", "delta", "insight"):
+        return fetch_items_from_scan_delta(conn, report_date)
+    if src == "auto":
+        return fetch_items_auto(conn, report_date)
+    if src == "pg_items":
+        return fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
+    raise ValueError(f"未知 INSIGHT_PG_SOURCE: {src}")
 
 
 def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
