@@ -9,6 +9,7 @@ Legacy 数据包访问 Gate — 合并进 database_pg / member API。
 """
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 from typing import Any
 
@@ -26,6 +27,16 @@ V2_PLAN_CODES = frozenset({
 
 # 环境变量 XHS_V2_LAUNCH=1 表示新购仅 V2（合并时读 config）
 V2_LAUNCH_DEFAULT = True
+
+
+def _shadow_preview_all_legacy() -> bool:
+    """Shadow 7 天：在期 Legacy 用户可预览 AI Tab（不影响 zip 权限）。"""
+    return os.environ.get("XHS_INSIGHT_SHADOW_PREVIEW", "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
 
 
 def _parse_expires(expires_at: Any) -> datetime | None:
@@ -94,6 +105,9 @@ def insight_enabled(
     if plan.startswith("insight_"):
         return True
     if plan == "experience" and ent.get("insight_enabled") is not False:
+        return True
+    # Shadow 验收：在期 Legacy 月卡也可看到 AI Tab（只读预览）
+    if _shadow_preview_all_legacy() and plan in LEGACY_PLAN_CODES:
         return True
     # 纯 Legacy 在期用户：T0 后可选赠送情报预览（产品决策）；默认 False
     return bool(ent.get("insight_preview", False))

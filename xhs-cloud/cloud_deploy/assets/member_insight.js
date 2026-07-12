@@ -57,8 +57,8 @@
     if (tabInsight) tabInsight.classList.toggle('hidden', !insight);
 
     var banner = document.getElementById('insightPreviewBanner');
-    if (banner) {
-      banner.classList.toggle('hidden', !(ent.insight_preview || m.portal_route === 'legacy_with_preview'));
+    if banner) {
+      banner.classList.toggle('hidden', !(ent.insight_preview || m.portal_route === 'legacy_with_preview' || m.insight_shadow_preview));
     }
 
     var defaultDash = 'reports';
