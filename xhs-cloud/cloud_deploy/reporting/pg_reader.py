@@ -770,7 +770,6 @@ def _fetch_sold_daily_scan_delta_rows(
                 LIMIT 1
             ) prev ON TRUE
             LEFT JOIN monitor_goods m ON m.goods_id = sd.goods_id
-            LEFT JOIN premium_goods pg ON pg.goods_id = sd.goods_id AND pg.lifecycle < 3
             LEFT JOIN goods_metrics_daily gm
                    ON gm.goods_id = sd.goods_id AND gm.metric_date = %s
             LEFT JOIN LATERAL (
@@ -821,48 +820,28 @@ def fetch_items_from_scan_delta(
     min_delta: int | None = None,
 ) -> list:
     """
-    AI 情报观察池（delta_only + 最近 N 日扫描窗，默认 1 天）：
+    AI 情报观察池（云 PG：goods_sold_daily delta_only + 最近 N 日扫描窗）：
 
-    - 主池：扫描窗内 premium_goods_daily.delta >= min_delta
-    - 补池：扫描窗内 goods_sold_daily.delta >= min_delta（精品库未覆盖）
-    - 扫描判定：goods_sold_snapshots.snapshot_time 或精品 last_app_scan 等
-    - 唯一 goods_id；lifecycle<3；销量上限 20 万；不用 actual_velocity 卡门槛
+    精品库报告在本地生成，云主机只读监控池同步的 goods_sold_daily / sold_history。
     """
     min_delta = insight_min_delta() if min_delta is None else max(1, int(min_delta))
     window_days = insight_scan_window_days()
 
-    premium_rows = _fetch_premium_scan_delta_rows(
-        conn, report_date, min_delta, window_days=window_days
-    )
-    premium_items: list = []
-    for raw in premium_rows:
-        item = premium_row_to_item(raw, delta_only=True)
-        if item:
-            premium_items.append(item)
-
-    premium_ids = {str(item_at(x, "goods_id", "") or "") for x in premium_items}
-    premium_ids.discard("")
-
     sold_rows = _fetch_sold_daily_scan_delta_rows(
         conn, report_date, min_delta, window_days=window_days
     )
-    monitor_items: list = []
+    items: list = []
     for r in sold_rows:
-        gid = str(r.get("goods_id") or "")
-        if gid and gid in premium_ids:
-            continue
         prev_raw = r.get("prev_sold")
         prev_sold = _i(prev_raw) if prev_raw is not None else None
         item = sold_row_to_item(r, prev_sold)
         if item:
-            monitor_items.append(item)
+            items.append(item)
 
-    items = merge_items_by_goods_id(premium_items, monitor_items)
+    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
     print(
-        f"[pg_reader] scan_delta {report_date}: kept={len(items)} "
-        f"premium={len(premium_items)}/{len(premium_rows)} "
-        f"monitor+={len(monitor_items)} min_delta={min_delta} "
-        f"scan_window_days={window_days} mode=delta_only",
+        f"[pg_reader] scan_delta {report_date}: kept={len(items)} pool={len(sold_rows)} "
+        f"min_delta={min_delta} scan_window_days={window_days} mode=delta_only source=goods_sold_daily",
         flush=True,
     )
     return items

@@ -104,8 +104,8 @@ def main() -> int:
                 enriched={
                     **public,
                     "selection_rule": (
-                        f"premium_goods_daily.delta>={insight_min_delta()} (delta_only), "
-                        "+ goods_sold_daily supplement, unique per product"
+                        f"goods_sold_daily.delta>={insight_min_delta()} (delta_only), "
+                        f"scanned within {insight_scan_window_days()}d, unique per product"
                     ),
                 },
             )

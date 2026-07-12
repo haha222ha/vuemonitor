@@ -362,9 +362,12 @@ def _init_db_on_conn(conn) -> None:
             _migrate_legacy_columns(c)
             _seed_default_rules(c)
             try:
-                from cloud_deploy.cloud_api.premium_schema_pg import init_premium_pg_schema
+                from cloud_deploy.cloud_api.premium_cloud_policy import premium_cloud_sync_enabled
 
-                init_premium_pg_schema(conn)
+                if premium_cloud_sync_enabled():
+                    from cloud_deploy.cloud_api.premium_schema_pg import init_premium_pg_schema
+
+                    init_premium_pg_schema(conn)
             except Exception:
                 pass
 

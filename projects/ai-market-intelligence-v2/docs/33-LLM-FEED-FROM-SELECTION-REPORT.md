@@ -7,13 +7,13 @@
 
 ## 1. 结论（一句话）
 
-**AI 情报观察池**：**delta_only** + **最近 1 天扫描窗**（`INSIGHT_SCAN_WINDOW_DAYS=1`）— 仅纳入报告日当天被扫描到、且 `premium_goods_daily.delta >= 1` 的唯一商品；`actual_velocity_1d` 不卡门槛。
+**AI 情报观察池（云 PG）**：精品库报告**在本地生成**，云主机只读监控池同步的 `goods_sold_daily`（delta_only + 最近 1 天扫描窗）。
 
-| 口径 | PG 字段 | 角色 |
+| 口径 | 云 PG 字段 | 角色 |
 |------|---------|------|
-| **delta ≥ 1** | `premium_goods_daily.delta` | **主门槛**（采集真实增量） |
-| **最近 1 天扫描** | `goods_sold_snapshots.snapshot_time` / `last_app_scan` | **范围限定**（只观察刚扫到的品） |
-| **actual_velocity_1d ≥ 1** | `premium_goods.actual_velocity_1d` | 仅展示/交叉比对，**不卡入选** |
+| **delta ≥ 1** | `goods_sold_daily.delta` | **主门槛** |
+| **最近 1 天扫描** | `goods_sold_snapshots` / `monitor_goods.last_scan_at` | **范围限定** |
+| **精品库** | `premium_goods_daily` | **不在云主机使用**（`XHS_PREMIUM_CLOUD_SYNC=0`） |
 
 ```
 PG goods_sold_daily（scan_delta：当日 delta>=1 唯一商品）

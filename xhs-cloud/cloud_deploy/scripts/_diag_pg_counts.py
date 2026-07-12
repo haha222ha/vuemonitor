@@ -51,10 +51,9 @@ queries = [
         "SELECT COUNT(DISTINCT goods_id) FROM goods_sold_daily WHERE snapshot_date >= CURRENT_DATE - 7",
     ),
     (
-        "premium_daily delta>=1 today",
-        """SELECT COUNT(DISTINCT pgd.goods_id) FROM premium_goods_daily pgd
-           JOIN premium_goods pg ON pg.goods_id=pgd.goods_id AND pg.lifecycle<3
-           WHERE pgd.snap_date=CURRENT_DATE::text AND COALESCE(pgd.delta,0)>=1""",
+        "sold_daily delta>=1 today distinct",
+        """SELECT COUNT(DISTINCT goods_id) FROM goods_sold_daily
+           WHERE snapshot_date=CURRENT_DATE AND COALESCE(delta,0)>=1""",
     ),
     (
         "distinct snapshot goods 1d",

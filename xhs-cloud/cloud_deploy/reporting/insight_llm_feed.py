@@ -2,8 +2,7 @@
 """
 选品报告 → AI 投喂包（LLM Feed v1）
 
-V2 情报默认读 pg_reader.fetch_items_from_scan_delta（当日 delta>=1 唯一商品）；
-Legacy 选品日报仍用 fetch_items_auto。
+V2 情报默认读 pg_reader.fetch_items_from_scan_delta（云 PG goods_sold_daily，非精品库）。
 
 在类目聚合后生成 llm_feed.json + llm_feed.md，再交给 5 Agent。
 
@@ -109,7 +108,7 @@ def build_llm_feed(
                 else "与 cloud_gen_report 同源 PG 选品池，经类目聚合与 k-匿名后生成"
             ),
             "selection_report_script": (
-                "cloud_deploy/reporting/pg_reader.fetch_items_from_scan_delta"
+                "cloud_deploy/reporting/pg_reader.fetch_items_from_scan_delta (goods_sold_daily)"
                 if pg_source in ("scan_delta", "delta", "insight")
                 else "cloud_deploy/scripts/cloud_gen_report.py --source auto"
             ),

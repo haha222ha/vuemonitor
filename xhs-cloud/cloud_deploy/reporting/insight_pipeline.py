@@ -134,7 +134,7 @@ def run_insight_pipeline(
             enriched={
                 **public,
                 "selection_rule": (
-                    f"premium_goods_daily.delta>={insight_min_delta()} (delta_only), "
+                    f"goods_sold_daily.delta>={insight_min_delta()} (delta_only), "
                     f"scanned within {insight_scan_window_days()}d, unique per product"
                 ),
             },

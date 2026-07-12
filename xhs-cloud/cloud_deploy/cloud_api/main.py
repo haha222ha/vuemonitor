@@ -1286,6 +1286,13 @@ def sync_prune_snapshots(_: None = Depends(verify_sync_key)):
 
 @app.post("/api/v1/sync/premium-upsert")
 def sync_premium_upsert(body: PremiumUpsertBody, _: None = Depends(verify_sync_key)):
+    from cloud_deploy.cloud_api.premium_cloud_policy import (
+        PREMIUM_CLOUD_SYNC_DISABLED_MSG,
+        premium_cloud_sync_enabled,
+    )
+
+    if not premium_cloud_sync_enabled():
+        raise HTTPException(status_code=410, detail=PREMIUM_CLOUD_SYNC_DISABLED_MSG)
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
@@ -1307,6 +1314,13 @@ def sync_premium_changes(
     limit: int = 500,
     _: None = Depends(verify_sync_key),
 ):
+    from cloud_deploy.cloud_api.premium_cloud_policy import (
+        PREMIUM_CLOUD_SYNC_DISABLED_MSG,
+        premium_cloud_sync_enabled,
+    )
+
+    if not premium_cloud_sync_enabled():
+        raise HTTPException(status_code=410, detail=PREMIUM_CLOUD_SYNC_DISABLED_MSG)
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
@@ -1325,6 +1339,13 @@ def sync_premium_snapshots_backfill(
     body: PremiumSnapshotsBackfillBody,
     _: None = Depends(verify_sync_key),
 ):
+    from cloud_deploy.cloud_api.premium_cloud_policy import (
+        PREMIUM_CLOUD_SYNC_DISABLED_MSG,
+        premium_cloud_sync_enabled,
+    )
+
+    if not premium_cloud_sync_enabled():
+        raise HTTPException(status_code=410, detail=PREMIUM_CLOUD_SYNC_DISABLED_MSG)
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
@@ -1344,6 +1365,13 @@ def sync_premium_snapshots_backfill(
 
 @app.post("/api/v1/sync/premium-catalog")
 def sync_premium_catalog(body: PremiumCatalogBody, _: None = Depends(verify_sync_key)):
+    from cloud_deploy.cloud_api.premium_cloud_policy import (
+        PREMIUM_CLOUD_SYNC_DISABLED_MSG,
+        premium_cloud_sync_enabled,
+    )
+
+    if not premium_cloud_sync_enabled():
+        raise HTTPException(status_code=410, detail=PREMIUM_CLOUD_SYNC_DISABLED_MSG)
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
@@ -1366,6 +1394,13 @@ def sync_premium_catalog(body: PremiumCatalogBody, _: None = Depends(verify_sync
 @app.post("/api/v1/sync/premium-fetch")
 def sync_premium_fetch(body: PremiumFetchBody, _: None = Depends(verify_sync_key)):
     """按 goods_id 拉取云精品行（本地缺的 cloud_only 商品）。"""
+    from cloud_deploy.cloud_api.premium_cloud_policy import (
+        PREMIUM_CLOUD_SYNC_DISABLED_MSG,
+        premium_cloud_sync_enabled,
+    )
+
+    if not premium_cloud_sync_enabled():
+        raise HTTPException(status_code=410, detail=PREMIUM_CLOUD_SYNC_DISABLED_MSG)
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
@@ -1383,6 +1418,13 @@ def sync_premium_fetch(body: PremiumFetchBody, _: None = Depends(verify_sync_key
 @app.post("/api/v1/sync/premium-daily-fetch")
 def sync_premium_daily_fetch(body: PremiumDailyFetchBody, _: None = Depends(verify_sync_key)):
     """按 goods_id 批量拉取云 premium_goods_daily 日快照。"""
+    from cloud_deploy.cloud_api.premium_cloud_policy import (
+        PREMIUM_CLOUD_SYNC_DISABLED_MSG,
+        premium_cloud_sync_enabled,
+    )
+
+    if not premium_cloud_sync_enabled():
+        raise HTTPException(status_code=410, detail=PREMIUM_CLOUD_SYNC_DISABLED_MSG)
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
@@ -1404,6 +1446,13 @@ def sync_premium_daily_fetch(body: PremiumDailyFetchBody, _: None = Depends(veri
 @app.post("/api/v1/sync/premium-daily-upsert")
 def sync_premium_daily_upsert(body: PremiumBatchSyncBody, _: None = Depends(verify_sync_key)):
     """批量推送 premium_goods_daily 日快照（本地历史 → 云 PG）。"""
+    from cloud_deploy.cloud_api.premium_cloud_policy import (
+        PREMIUM_CLOUD_SYNC_DISABLED_MSG,
+        premium_cloud_sync_enabled,
+    )
+
+    if not premium_cloud_sync_enabled():
+        raise HTTPException(status_code=410, detail=PREMIUM_CLOUD_SYNC_DISABLED_MSG)
     if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
         raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
     if not body.rows:
