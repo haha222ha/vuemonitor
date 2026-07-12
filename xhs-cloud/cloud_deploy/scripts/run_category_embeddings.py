@@ -23,15 +23,24 @@ if ROOT not in sys.path:
 from cloud_deploy.cloud_api.database_pg import _conn, init_db
 from cloud_deploy.cloud_api.insight_settings import resolve_runtime_config
 
+_MONITOR_SCHEMA = "xhs_monitor"
+
+
+def _set_search_path(conn) -> None:
+    with conn.cursor() as cur:
+        cur.execute("SET search_path TO xhs_monitor, public")
+
 
 def _fetch_categories(conn) -> list[str]:
+    _set_search_path(conn)
     with conn.cursor() as cur:
         cur.execute(
             """
             SELECT 1 FROM information_schema.tables
-            WHERE table_schema = current_schema() AND table_name = 'daily_category_metrics'
+            WHERE table_schema = %s AND table_name = 'daily_category_metrics'
             LIMIT 1
-            """
+            """,
+            (_MONITOR_SCHEMA,),
         )
         if cur.fetchone():
             cur.execute(
@@ -48,9 +57,10 @@ def _fetch_categories(conn) -> list[str]:
         cur.execute(
             """
             SELECT 1 FROM information_schema.tables
-            WHERE table_schema = current_schema() AND table_name = 'category_embeddings'
+            WHERE table_schema = %s AND table_name = 'category_embeddings'
             LIMIT 1
-            """
+            """,
+            (_MONITOR_SCHEMA,),
         )
         if not cur.fetchone():
             return []
@@ -66,12 +76,17 @@ def _fetch_categories(conn) -> list[str]:
         return []
 
 
-def _embed_text(text: str, *, base_url: str, api_key: str, model: str) -> list[float]:
+def _embed_text(
+    text: str, *, base_url: str, api_key: str, model: str, dimensions: int | None = None
+) -> list[float]:
     url = base_url.rstrip("/") + "/embeddings"
-    payload = json.dumps({"model": model, "input": text}).encode("utf-8")
+    payload: dict[str, Any] = {"model": model, "input": text}
+    if dimensions:
+        payload["dimensions"] = dimensions
+    body_bytes = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(
         url,
-        data=payload,
+        data=body_bytes,
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -96,6 +111,7 @@ def _upsert_embedding(
     model: str,
     vector: list[float],
 ) -> None:
+    _set_search_path(conn)
     vec_lit = "[" + ",".join(f"{x:.8f}" for x in vector) + "]"
     with conn.cursor() as cur:
         cur.execute(
@@ -114,6 +130,7 @@ def main() -> int:
     init_db()
     conn = _conn()
     try:
+        _set_search_path(conn)
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -126,9 +143,10 @@ def main() -> int:
             cur.execute(
                 """
                 SELECT 1 FROM information_schema.tables
-                WHERE table_schema = current_schema() AND table_name = 'category_embeddings'
+                WHERE table_schema = %s AND table_name = 'category_embeddings'
                 LIMIT 1
-                """
+                """,
+                (_MONITOR_SCHEMA,),
             )
             if not cur.fetchone():
                 print("[category-embed] category_embeddings 表不存在", flush=True)
@@ -165,7 +183,13 @@ def main() -> int:
         ok_n = 0
         for cat in categories:
             try:
-                vec = _embed_text(cat, base_url=str(base_url), api_key=api_key, model=model)
+                vec = _embed_text(
+                    cat,
+                    base_url=str(base_url),
+                    api_key=api_key,
+                    model=model,
+                    dimensions=dim,
+                )
                 if len(vec) != dim:
                     print(
                         f"[category-embed] {cat}: dim={len(vec)} != {dim}，跳过",
