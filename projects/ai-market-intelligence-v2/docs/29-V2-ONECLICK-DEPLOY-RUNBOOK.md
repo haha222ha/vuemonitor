@@ -47,28 +47,35 @@ flowchart LR
 
 ---
 
-## 2. 一键部署（云主机复制粘贴）
+## 2. 云主机 — 只跑这一条（选品会员 xhs-cloud）
 
-### 2.1 标准（推荐带 Token 冒烟）
-
-```bash
-export XHS_MEMBER_TOKEN='eyJ...'    # 浏览器 localStorage xhs_member_token
-export XHS_SMOKE_EXPECT=legacy_dual   # 老月卡；新 insight 用 insight_only
-
-bash /opt/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh
-```
-
-首次或脚本未同步时，先保证仓库最新：
+> **不要**和下面的 `scripts/host-update.sh` 混用——那是 SaaS 主站（admin API），你已经跑过了。
 
 ```bash
-cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main \
-  && rsync -a /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh /opt/xhs-cloud/cloud_deploy/scripts/ \
-  && chmod +x /opt/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh
+# Token：浏览器 F12 → Application → localStorage → xhs_member_token（不要用字面量 ...）
+export XHS_MEMBER_TOKEN='粘贴真实eyJ...'
+export XHS_SMOKE_EXPECT=legacy_dual
+
+bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh
 ```
 
-之后每次 **git push 后只跑一条** `v2-oneclick-deploy.sh` 即可（脚本内已含 pull+rsync）。
+脚本路径在 **git 仓库里**，不依赖 `/opt/xhs-cloud` 是否已有该文件。  
+无 Token 时：`SKIP_SMOKE=1 bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh`
 
-### 2.2 无 Token（仅部署不冒烟）
+**nginx 限流**：脚本内自动执行 `ensure_nginx_insight_limits.sh`，**无需手改 nginx.conf**。
+
+---
+
+## 2.1 两个子系统对照
+
+| 你要更新什么 | 命令 |
+|-------------|------|
+| **会员页 + 选品 API**（monitor.xhs365.cn） | `bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh` |
+| **Admin 后台 + SaaS API**（admin.xhs365.cn） | `cd /opt/vuemonitor && git pull && bash scripts/host-update.sh` |
+
+---
+
+## 2.2 旧版分步（可忽略，已由一键脚本包含）
 
 ```bash
 SKIP_SMOKE=1 bash /opt/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh

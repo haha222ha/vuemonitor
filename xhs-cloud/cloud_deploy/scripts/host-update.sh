@@ -134,16 +134,8 @@ if [[ "${XHS_DATABASE_URL:-}" == postgres* ]]; then
   fi
 fi
 
-if command -v nginx &>/dev/null && [[ -f "$ROOT/../nginx/snippets/insight-limits.conf" || -f /opt/vuemonitor/nginx/snippets/insight-limits.conf ]]; then
-  SNIP="${ROOT}/../nginx/snippets/insight-limits.conf"
-  [[ -f "$SNIP" ]] || SNIP="/opt/vuemonitor/nginx/snippets/insight-limits.conf"
-  if [[ -f "$SNIP" ]]; then
-    sudo mkdir -p /etc/nginx/snippets
-    sudo cp "$SNIP" /etc/nginx/snippets/insight-limits.conf 2>/dev/null || true
-    if ! grep -q 'insight-limits.conf' /etc/nginx/nginx.conf 2>/dev/null; then
-      warn "请在 /etc/nginx/nginx.conf http{} 内添加: include /etc/nginx/snippets/insight-limits.conf;"
-    fi
-  fi
+if command -v nginx &>/dev/null && [[ -f /opt/vuemonitor/nginx/snippets/insight-limits.conf ]]; then
+  bash "$ROOT/cloud_deploy/scripts/ensure_nginx_insight_limits.sh" 2>/dev/null && ok "nginx insight 限流" || warn "nginx 限流未更新"
 fi
 
 if [[ "${XHS_SNAPSHOT_RETENTION_DAYS:-0}" == "0" ]] \

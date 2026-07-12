@@ -1,10 +1,11 @@
 #!/bin/bash
 # V2 全链路一键部署 + 验收（云主机）
 #
-# 用法:
-#   bash /opt/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh
+# 用法（推荐 — 即使 /opt/xhs-cloud 尚未同步也可用）:
+#   bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh
 #
-# 带冒烟（推荐）:
+# 或同步后:
+#   bash /opt/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh
 #   export XHS_MEMBER_TOKEN='eyJ...'   # 或 XHS_SMOKE_USER + XHS_SMOKE_PASS
 #   export XHS_SMOKE_EXPECT=legacy_dual
 #   bash /opt/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh
@@ -86,6 +87,11 @@ fi
 step "4/6 host-update（依赖 / venv / systemd / API 重启）"
 cd "$XHS_ROOT"
 bash cloud_deploy/scripts/host-update.sh
+
+NGINX_SCRIPT="${XHS_ROOT}/cloud_deploy/scripts/ensure_nginx_insight_limits.sh"
+if [[ -f "$NGINX_SCRIPT" ]]; then
+  bash "$NGINX_SCRIPT" && ok "nginx insight 限流" || warn "nginx 限流跳过（见 ensure_nginx_insight_limits.sh）"
+fi
 
 # --- 5. VERIFY ---
 step "5/6 静态资源 + 健康检查"
