@@ -5,22 +5,13 @@ from __future__ import annotations
 from datetime import date
 from typing import Any, Callable
 
-
-def _table_exists(conn) -> bool:
-    with conn.cursor() as cur:
-        cur.execute(
-            """
-            SELECT 1 FROM information_schema.tables
-            WHERE table_schema = current_schema() AND table_name = 'daily_category_metrics'
-            LIMIT 1
-            """
-        )
-        return cur.fetchone() is not None
+from cloud_deploy.cloud_api.insight_pg import set_search_path, table_exists
 
 
 def load_radar_from_pg(conn, *, report_date: str | None = None, limit: int = 5) -> dict[str, Any] | None:
-    if not _table_exists(conn):
+    if not table_exists(conn, "daily_category_metrics"):
         return None
+    set_search_path(conn)
     with conn.cursor() as cur:
         if not report_date:
             cur.execute("SELECT MAX(report_date) FROM daily_category_metrics")

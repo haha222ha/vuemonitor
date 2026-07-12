@@ -33,6 +33,13 @@
   - [x] Q1-B：5 Agent 移植 `insight_agent_graph.py` + `prompts/agents.yaml`
   - [x] Q1-A：类目树 `category_taxonomy.yaml` + enrich + k-匿名
   - [x] Q1-C：HTML 指标依据折叠 + L1 cache schema 修复
+- [~] **Phase Q2 产品体验** → doc 32
+  - [x] Q2-1：雷达 PG search_path + 可点击 chip
+  - [x] Q2-2：推荐 v2（PG 蓝海排序 + reason_label）
+  - [x] Q2-3：对比 API + 会员页面板（Pro 门控）
+  - [x] Q2-4：时间轴 API + 会员页面板（Pro 门控）
+  - [x] Q2-5：工作流 POST 门控 + 会员页记录表单
+  - [ ] Q2-6：PDF 导出（Pro，可选）
 - [ ] Redis L1（可选，未做）
 
 ---

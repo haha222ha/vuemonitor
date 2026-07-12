@@ -5,22 +5,13 @@ from __future__ import annotations
 from datetime import date, timedelta
 from typing import Any
 
-
-def _table_exists(conn) -> bool:
-    with conn.cursor() as cur:
-        cur.execute(
-            """
-            SELECT 1 FROM information_schema.tables
-            WHERE table_schema = current_schema() AND table_name = 'member_insight_workflow'
-            LIMIT 1
-            """
-        )
-        return cur.fetchone() is not None
+from cloud_deploy.cloud_api.insight_pg import set_search_path, table_exists
 
 
 def list_workflow(conn, user_id: int, *, limit: int = 20) -> list[dict[str, Any]]:
-    if not _table_exists(conn):
+    if not table_exists(conn, "member_insight_workflow"):
         return []
+    set_search_path(conn)
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -72,8 +63,9 @@ def upsert_workflow(
     outcome: str | None = None,
     note: str | None = None,
 ) -> dict[str, Any]:
-    if not _table_exists(conn):
+    if not table_exists(conn, "member_insight_workflow"):
         raise RuntimeError("workflow 表未迁移")
+    set_search_path(conn)
     category = (category or "").strip()
     remind = (date.today() + timedelta(days=30)).isoformat()
     with conn.cursor() as cur:

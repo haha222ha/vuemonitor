@@ -5,20 +5,15 @@ from __future__ import annotations
 from datetime import date, timedelta
 from typing import Any
 
+from cloud_deploy.cloud_api.insight_pg import set_search_path, table_exists
+
 
 def compute_health_score(conn, user_id: int) -> dict[str, Any]:
     """0–100 分；&lt;40 为流失风险。"""
+    if not table_exists(conn, "user_behavior"):
+        return {"score": 50, "band": "unknown", "factors": {}, "at_risk": False}
+    set_search_path(conn)
     with conn.cursor() as cur:
-        cur.execute(
-            """
-            SELECT 1 FROM information_schema.tables
-            WHERE table_schema = current_schema() AND table_name = 'user_behavior'
-            LIMIT 1
-            """
-        )
-        if not cur.fetchone():
-            return {"score": 50, "band": "unknown", "factors": {}, "at_risk": False}
-
         cur.execute(
             """
             SELECT action, COUNT(*) AS n, MAX(created_at) AS last_at

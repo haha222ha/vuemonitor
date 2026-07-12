@@ -354,9 +354,67 @@ def insight_workflow_list(user: dict = Depends(current_user)):
     return {"items": items}
 
 
+@router.get("/compare")
+def insight_compare(categories: str = "", user: dict = Depends(current_user)):
+    """Q2：2～3 类目指标对比（读 PG，无实时 LLM）。"""
+    ent = assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.entitlements_v2 import can_insight_compare
+    from cloud_deploy.cloud_api.insight_compare import build_category_compare
+
+    if not can_insight_compare(ent):
+        raise HTTPException(status_code=403, detail="当前套餐不含类目对比，请升级 V2-Pro")
+    cats = [c.strip() for c in (categories or "").split(",") if c.strip()]
+    if len(cats) < 2 or len(cats) > 3:
+        raise HTTPException(status_code=400, detail="请选择 2～3 个类目（逗号分隔）")
+    for c in cats:
+        if not _CATEGORY_RE.match(c):
+            raise HTTPException(status_code=400, detail=f"非法类目: {c}")
+    from cloud_deploy.cloud_api.database_pg import _conn
+
+    conn = _conn()
+    try:
+        data = build_category_compare(conn, cats)
+    finally:
+        conn.close()
+    _log_behavior(user["id"], "compare", metadata={"categories": cats})
+    return data
+
+
+@router.get("/timeline")
+def insight_timeline(
+    category: str = "",
+    days: int = 7,
+    user: dict = Depends(current_user),
+):
+    """Q2：类目趋势时间轴（读 PG 序列）。"""
+    ent = assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.entitlements_v2 import can_insight_timeline
+    from cloud_deploy.cloud_api.insight_timeline import build_category_timeline
+
+    ok, msg = can_insight_timeline(ent, days=days)
+    if not ok:
+        raise HTTPException(status_code=403, detail=msg)
+    cat = str(category or "").strip()
+    if not _CATEGORY_RE.match(cat):
+        raise HTTPException(status_code=400, detail="category 含非法字符")
+    from cloud_deploy.cloud_api.database_pg import _conn
+
+    conn = _conn()
+    try:
+        data = build_category_timeline(conn, cat, days=days)
+    finally:
+        conn.close()
+    _log_behavior(user["id"], "timeline", category=cat)
+    return data
+
+
 @router.post("/workflow")
 def insight_workflow_post(body: InsightWorkflowBody, user: dict = Depends(current_user)):
-    assert_insight_allowed(user["id"])
+    ent = assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.entitlements_v2 import can_insight_workflow
+
+    if not can_insight_workflow(ent):
+        raise HTTPException(status_code=403, detail="当前套餐不含工作流记录，请升级 V2-Pro")
     from cloud_deploy.cloud_api.database_pg import _conn
     from cloud_deploy.cloud_api.insight_workflow import upsert_workflow
 
