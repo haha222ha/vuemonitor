@@ -9,11 +9,20 @@ from app.services.xhs_cloud_client import XhsCloudClient, XhsCloudNotConfigured,
 
 router = APIRouter(prefix="/xhs-cloud/admin", tags=["xhs-cloud-admin"])
 
-_PLAN_DURATION = {"weekly": 7, "monthly": 30, "yearly": 365, "experience": 36500}
+_PLAN_DURATION = {
+    "weekly": 7,
+    "monthly": 30,
+    "yearly": 365,
+    "experience": 36500,
+    "experience_insight": 7,
+}
 
 
 class GenerateMemberCodesRequest(BaseModel):
-    plan_code: str = Field(default="monthly", pattern="^(weekly|monthly|yearly|experience)$")
+    plan_code: str = Field(
+        default="monthly",
+        pattern="^(weekly|monthly|yearly|experience|experience_insight)$",
+    )
     duration_days: int = Field(default=0, ge=0, le=36500)
     count: int = Field(default=1, ge=1, le=100)
     max_activations: int = Field(default=1, ge=1, le=100)
@@ -91,8 +100,8 @@ async def generate_member_codes(
     client: XhsCloudClient = Depends(get_xhs_cloud_client),
 ):
     del admin
-    duration = req.duration_days or _PLAN_DURATION.get(req.plan_code, 30)
     note = (req.note or "").strip()
+    plan_code = req.plan_code
     if req.plan_code == "experience":
         import json
 
@@ -109,9 +118,28 @@ async def generate_member_codes(
         note = json.dumps({"entitlements": entitlements}, ensure_ascii=False)
         if not dates:
             raise HTTPException(status_code=400, detail="体验会员请至少选择一个可下载的报告日期")
+        duration = req.duration_days or _PLAN_DURATION["experience"]
+    elif req.plan_code == "experience_insight":
+        import json
+
+        entitlements = {
+            "plan_code": "experience",
+            "insight_enabled": True,
+            "insight_only": True,
+            "insight_categories_per_day": 1,
+            "insight_compare": False,
+            "insight_pdf_export": False,
+            "insight_timeline_days": 7,
+            "legacy_zip_enabled": False,
+        }
+        note = json.dumps({"entitlements": entitlements}, ensure_ascii=False)
+        plan_code = "experience"
+        duration = req.duration_days or _PLAN_DURATION["experience_insight"]
+    else:
+        duration = req.duration_days or _PLAN_DURATION.get(req.plan_code, 30)
     payload = {
         "count": req.count,
-        "plan_code": req.plan_code,
+        "plan_code": plan_code,
         "duration_days": duration,
         "max_activations": req.max_activations,
         "note": note,

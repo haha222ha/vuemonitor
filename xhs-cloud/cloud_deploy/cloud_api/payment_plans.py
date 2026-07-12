@@ -87,4 +87,9 @@ def get_plan(plan_code: str) -> dict | None:
     code = str(plan_code or "").strip()
     if code == PAYMENT_TEST_PLAN["plan_code"] and not test_plan_enabled():
         return None
-    return PLAN_BY_CODE.get(code)
+    plan = PLAN_BY_CODE.get(code)
+    if plan:
+        return plan
+    from cloud_deploy.cloud_api.payment_plans_v2 import INSIGHT_PLAN_BY_CODE
+
+    return INSIGHT_PLAN_BY_CODE.get(code)

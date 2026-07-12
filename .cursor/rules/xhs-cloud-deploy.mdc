@@ -5,6 +5,8 @@ alwaysApply: true
 
 # xhs-cloud 部署约定
 
+> 开发总纲与 V2 方向见根目录 **`AGENTS.md`** 与 **`project-core.mdc`**。
+
 ## 路径
 
 | 角色 | 路径 |
@@ -23,11 +25,31 @@ alwaysApply: true
 
 ## 云主机一键指令（给用户复制粘贴）
 
+**V2 全链路（推荐：pull + PG 08/09 + host-update + health + smoke）**
+
+```bash
+export XHS_MEMBER_TOKEN='...'    # 浏览器 localStorage xhs_member_token
+export XHS_SMOKE_EXPECT=legacy_dual
+bash /opt/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh
+```
+
+手册：`projects/ai-market-intelligence-v2/docs/29-V2-ONECLICK-DEPLOY-RUNBOOK.md`
+
+**仅 host-update（无迁移/冒烟）**
+
 ```bash
 cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main && rsync -a /opt/vuemonitor/xhs-cloud/ /opt/xhs-cloud/ --delete --exclude data --exclude venv --exclude .env && cd /opt/xhs-cloud && bash cloud_deploy/scripts/host-update.sh
 ```
 
-等价脚本：`bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/pull-and-deploy.sh`
+等价：`bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/pull-and-deploy.sh`
+
+**开发机 push + 远程一键（Windows，需 SSH）**
+
+```powershell
+$env:XHS_DEPLOY_SSH='root@你的ECS'
+$env:XHS_MEMBER_TOKEN='eyJ...'
+powershell -ExecutionPolicy Bypass -File scripts\v2-push-and-deploy.ps1 -Message "fix: ..."
+```
 
 ## 禁止
 

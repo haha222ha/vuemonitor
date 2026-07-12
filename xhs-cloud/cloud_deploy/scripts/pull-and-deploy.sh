@@ -25,4 +25,10 @@ echo "==> host-update"
 cd "$XHS_ROOT"
 bash cloud_deploy/scripts/host-update.sh
 
+ONECLICK="${XHS_ROOT}/cloud_deploy/scripts/v2-oneclick-deploy.sh"
+if [[ -f "$ONECLICK" && "${USE_LEGACY_PULL_ONLY:-}" != "1" ]]; then
+  echo "==> 提示: 完整链路请用 v2-oneclick-deploy.sh（含迁移+冒烟）"
+  echo "    export XHS_MEMBER_TOKEN='...' && bash $ONECLICK"
+fi
+
 echo "==> 完成。会员页请 Ctrl+F5 强刷: \${XHS_PAY_NOTIFY_BASE:-https://monitor.xhs365.cn}/member"

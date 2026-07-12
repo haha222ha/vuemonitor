@@ -35,7 +35,14 @@ def _default_report_source() -> str:
     return (os.environ.get("XHS_CLOUD_REPORT_SOURCE") or "premium_daily").strip() or "premium_daily"
 
 
+def _legacy_zip_disabled() -> bool:
+    return os.environ.get("XHS_LEGACY_ZIP_GENERATION", "1").strip().lower() in ("0", "false", "no", "off")
+
+
 def run_generate(report_date: str = "", source: str = "") -> dict:
+    if _legacy_zip_disabled():
+        _log("XHS_LEGACY_ZIP_GENERATION=0，跳过 Legacy 日报生成")
+        return {"skipped": True, "reason": "legacy_zip_disabled"}
     from cloud_deploy.cloud_api.config import get_settings
     from cloud_deploy.reporting.constants import ARCHIVE_DAILY
     from cloud_deploy.scripts.cloud_gen_report import generate_daily_report

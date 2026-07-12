@@ -93,7 +93,7 @@
           <el-button link type="primary" size="small" @click="copyOne(row.code)">复制</el-button>
         </template>
       </el-table-column>
-      <el-table-column prop="plan_code" label="套餐" width="100">
+      <el-table-column prop="plan_code" label="套餐" width="110">
         <template #default="{ row }">{{ planLabel(row.plan_code) }}</template>
       </el-table-column>
       <el-table-column prop="duration_days" label="天数" width="60" />
@@ -142,13 +142,43 @@
     <el-dialog v-model="showCreate" title="生成选品会员授权码" width="440px" @closed="generatedCodes = []">
       <el-form :model="form" :rules="formRules" ref="formRef" label-width="80px">
         <el-form-item label="套餐" prop="plan_code">
-          <el-select v-model="form.plan_code" style="width: 100%">
+          <el-select v-model="form.plan_code" style="width: 100%" @change="onPlanChange">
             <el-option label="周会员 (7天)" value="weekly" />
             <el-option label="月度会员 (30天)" value="monthly" />
             <el-option label="年度会员 (365天)" value="yearly" />
+            <el-option label="体验会员 (PC全功能 + 指定报告下载)" value="experience" />
+            <el-option label="AI 情报体验 (7天 · insight_only)" value="experience_insight" />
           </el-select>
         </el-form-item>
-        <el-form-item label="天数" prop="duration_days">
+        <template v-if="form.plan_code === 'experience'">
+          <el-form-item label="可下报告" prop="allowed_report_dates">
+            <el-select
+              v-model="form.allowed_report_dates"
+              multiple
+              filterable
+              allow-create
+              default-first-option
+              placeholder="选择或输入日期 YYYY-MM-DD"
+              style="width: 100%"
+            >
+              <el-option
+                v-for="d in suggestedReportDates"
+                :key="d"
+                :label="d"
+                :value="d"
+              />
+            </el-select>
+            <div class="form-hint">体验码永久有效，但会员中心仅可下载此处勾选的日报（可多选）</div>
+          </el-form-item>
+          <el-form-item label="报告类型">
+            <el-checkbox-group v-model="form.allowed_archive_types">
+              <el-checkbox label="member_daily_zip">日报</el-checkbox>
+              <el-checkbox label="member_weekly_zip">周报</el-checkbox>
+              <el-checkbox label="member_monthly_zip">月报</el-checkbox>
+            </el-checkbox-group>
+          </el-form-item>
+        </template>
+        <el-form-item v-if="form.plan_code !== 'experience'" label="天数" prop="duration_days">
           <el-input-number v-model="form.duration_days" :min="0" :max="3650" style="width: 100%" />
           <div class="form-hint">填 0 则按套餐默认天数</div>
         </el-form-item>
@@ -180,7 +210,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import type { FormInstance, FormRules } from "element-plus";
 import { useMemberCloudStore } from "../stores/memberCloud";
@@ -197,18 +227,58 @@ const form = reactive({
   count: 1,
   max_activations: 1,
   note: "",
+  allowed_report_dates: [] as string[],
+  allowed_archive_types: ["member_daily_zip"] as string[],
+});
+
+const suggestedReportDates = computed(() => {
+  const latest = store.status?.stats?.latest_report_date;
+  const dates: string[] = [];
+  if (latest) dates.push(String(latest).slice(0, 10));
+  const now = new Date();
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    dates.push(d.toISOString().slice(0, 10));
+  }
+  return [...new Set(dates)];
 });
 
 const formRules: FormRules = {
   plan_code: [{ required: true, message: "请选择套餐", trigger: "change" }],
   count: [{ required: true, message: "请输入数量", trigger: "blur" }],
+  allowed_report_dates: [{
+    validator: (_r, v, cb) => {
+      if (form.plan_code === "experience" && (!v || !v.length)) {
+        cb(new Error("体验会员请至少选择一个可下载报告日期"));
+        return;
+      }
+      cb();
+    },
+    trigger: "change",
+  }],
 };
+
+function onPlanChange(plan: string) {
+  if (plan === "experience") {
+    form.duration_days = 0;
+    form.max_activations = 1;
+    if (!form.allowed_archive_types.length) {
+      form.allowed_archive_types = ["member_daily_zip"];
+    }
+  } else if (plan === "experience_insight") {
+    form.duration_days = 7;
+    form.max_activations = 1;
+  }
+}
 
 function planLabel(plan: string) {
   const map: Record<string, string> = {
     weekly: "周会员",
     monthly: "月度会员",
     yearly: "年度会员",
+    experience: "体验会员",
+    experience_insight: "AI情报体验",
   };
   return map[plan] || plan;
 }
@@ -267,9 +337,11 @@ async function generate() {
     const result = await store.generateCodes({
       plan_code: form.plan_code,
       count: form.count,
-      duration_days: form.duration_days || undefined,
+      duration_days: form.plan_code === "experience" ? undefined : (form.duration_days || undefined),
       max_activations: form.max_activations,
       note: form.note || undefined,
+      allowed_report_dates: form.plan_code === "experience" ? form.allowed_report_dates : undefined,
+      allowed_archive_types: form.plan_code === "experience" ? form.allowed_archive_types : undefined,
     });
     generatedCodes.value = (result.codes || []).map((c) => c.code);
     ElMessage.success(`已生成 ${generatedCodes.value.length} 个授权码`);

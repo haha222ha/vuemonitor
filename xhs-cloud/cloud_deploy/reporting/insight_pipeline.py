@@ -109,8 +109,31 @@ def run_insight_pipeline(
             except Exception as e:
                 _log(f"trend_7d enrich skipped {insight.category}: {e}")
         internal = asdict(insight)
-        report_obj = run_agents_auto(public, budget_tokens=budget)
-        report = report_obj.to_public_dict()
+        from cloud_deploy.reporting.daily_metrics_store import metrics_hash as calc_metrics_hash
+        from cloud_deploy.reporting.insight_cache_store import (
+            PROMPT_VERSION,
+            get_cached_report,
+            upsert_cached_report,
+        )
+
+        mh = calc_metrics_hash(public)
+        report: dict[str, Any] | None = None
+        cache_hit = False
+        if metrics_conn is not None:
+            report = get_cached_report(metrics_conn, mh, PROMPT_VERSION)
+            if report:
+                cache_hit = True
+                _log(f"cache HIT {insight.category} hash={mh[:8]}")
+
+        if not report:
+            report_obj = run_agents_auto(public, budget_tokens=budget)
+            report = report_obj.to_public_dict()
+            if metrics_conn is not None and use_llm:
+                try:
+                    upsert_cached_report(metrics_conn, mh, report, prompt_version=PROMPT_VERSION)
+                except Exception as e:
+                    _log(f"cache write skipped {insight.category}: {e}")
+
         html = render_insight_html(report, public)
         meta = {
             "metrics": public,
@@ -120,6 +143,8 @@ def run_insight_pipeline(
                 "pipeline": "cloud_insight_report",
                 "shadow": shadow,
                 "llm": use_llm,
+                "cache_hit": cache_hit,
+                "metrics_hash": mh,
                 "generated_at": datetime.now().isoformat(),
             },
         }

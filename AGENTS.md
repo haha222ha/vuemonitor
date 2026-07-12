@@ -62,6 +62,7 @@
 | PC 重设计 / 打包 | `projects/ai-market-intelligence-v2/docs/23-PC-CLIENT-V2-REDESIGN-AND-PACKAGING.md` |
 | 全局路线图（隔离） | `projects/ai-market-intelligence-v2/docs/24-GLOBAL-TASK-ROADMAP-ISOLATION.md` |
 | **主 TODO 跟踪器** | `projects/ai-market-intelligence-v2/docs/28-MASTER-TODO-TRACKER.md` |
+| **V2 一键部署 Runbook** | `projects/ai-market-intelligence-v2/docs/29-V2-ONECLICK-DEPLOY-RUNBOOK.md` |
 | **留存 × PG 需求** | `projects/ai-market-intelligence-v2/docs/27-RETENTION-PG-STICKINESS-REQUIREMENTS.md` |
 | Legacy 下线策略 | `projects/ai-market-intelligence-v2/docs/19-LEGACY-SUNSET-AND-V2-LAUNCH.md` |
 | 云部署 | `.cursor/rules/xhs-cloud-deploy.mdc` |

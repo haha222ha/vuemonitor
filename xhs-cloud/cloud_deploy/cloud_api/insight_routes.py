@@ -293,6 +293,22 @@ def insight_watchlist_get(user: dict = Depends(current_user)):
     return {"categories": cats, "count": len(cats)}
 
 
+@router.get("/recommendations")
+def insight_recommendations(user: dict = Depends(current_user)):
+    """T2：基于浏览历史的类目推荐（骨架）。"""
+    assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.database_pg import _conn
+    from cloud_deploy.cloud_api.insight_recommend import build_recommendations
+
+    conn = _conn()
+    try:
+        data = build_recommendations(conn, user["id"], _list_items_from_disk, limit=4)
+    finally:
+        conn.close()
+    _log_behavior(user["id"], "recommendations")
+    return data
+
+
 @router.put("/watchlist")
 def insight_watchlist_put(body: InsightWatchlistBody, user: dict = Depends(current_user)):
     ent = assert_insight_allowed(user["id"])
@@ -321,7 +337,7 @@ def insight_generate(body: InsightGenerateBody, user: dict = Depends(current_use
 
     conn = _conn()
     try:
-        usage = get_usage_today(conn)
+        usage = get_usage_today(conn, user["id"])
         already = category in (usage.get("categories") or [])
         if already:
             snap = usage

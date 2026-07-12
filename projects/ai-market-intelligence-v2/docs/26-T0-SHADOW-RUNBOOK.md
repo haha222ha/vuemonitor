@@ -32,6 +32,16 @@
 
 ### 3.1 拉代码并部署
 
+**推荐（含 PG 迁移 + 冒烟）** — 见 **`29-V2-ONECLICK-DEPLOY-RUNBOOK.md`**：
+
+```bash
+export XHS_MEMBER_TOKEN='...'   # localStorage xhs_member_token
+export XHS_SMOKE_EXPECT=legacy_dual
+bash /opt/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh
+```
+
+仅 host-update（无迁移/冒烟）：
+
 ```bash
 cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main \
   && rsync -a /opt/vuemonitor/xhs-cloud/ /opt/xhs-cloud/ --delete --exclude data --exclude venv --exclude .env \
