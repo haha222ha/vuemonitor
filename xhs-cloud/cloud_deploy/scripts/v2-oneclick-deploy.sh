@@ -109,10 +109,10 @@ CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:${PORT}/api/v1/h
 JS_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:${PORT}/assets/member_insight.js" || echo "000")
 [[ "$JS_CODE" == "200" ]] && ok "member_insight.js HTTP 200" || fail "member_insight.js HTTP ${JS_CODE}"
 
-if grep -q "MemberInsight" "${XHS_ROOT}/cloud_deploy/assets/member_insight.js" 2>/dev/null; then
-  ok "member_insight.js 含 MemberInsight"
+if grep -q "loadHealthScore" "${XHS_ROOT}/cloud_deploy/assets/member_insight.js" 2>/dev/null; then
+  ok "member_insight.js 含 loadHealthScore"
 else
-  warn "member_insight.js 内容异常，请检查文件"
+  warn "member_insight.js 可能为旧缓存版本"
 fi
 
 if [[ "${SKIP_AGGREGATE:-}" != "1" && "${XHS_DATABASE_URL:-}" == postgres* ]]; then

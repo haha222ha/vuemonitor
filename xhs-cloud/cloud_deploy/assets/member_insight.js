@@ -138,13 +138,16 @@
   }
 
   function loadHealthScore() {
+    var bar = document.getElementById('insightHealthBar');
+    if (bar) bar.textContent = '健康度加载中…';
     return api('/api/v1/member/insight/health-score').then(function (data) {
-      var bar = document.getElementById('insightHealthBar');
       if (!bar || !data) return;
       var label = data.band === 'at_risk' ? '建议今日查看情报' : (data.band === 'healthy' ? '活跃良好' : '保持关注');
       bar.textContent = '健康度 ' + (data.score || 0) + '/100 · ' + label;
-      if (data.at_risk) bar.style.color = 'var(--red)';
-    }).catch(function () {});
+      bar.style.color = data.at_risk ? 'var(--red, #c00)' : '';
+    }).catch(function () {
+      if (bar) bar.textContent = '健康度暂不可用';
+    });
   }
 
   function renderLibrary(items) {
@@ -196,6 +199,7 @@
       var lib = res[1];
       renderPlanBar(profile);
       renderLibrary(lib.items || []);
+      renderRecommendations({ items: (lib.items || []).slice(0, 4) });
       loadRadar();
       loadRecommendations();
       loadHealthScore();
