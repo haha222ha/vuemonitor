@@ -9,7 +9,9 @@ T2: 类目 pgvector 嵌入批处理 → category_embeddings。
 """
 from __future__ import annotations
 
+import hashlib
 import json
+import math
 import os
 import sys
 import urllib.error
@@ -76,6 +78,51 @@ def _fetch_categories(conn) -> list[str]:
         return []
 
 
+def _deterministic_embed(text: str, *, dim: int) -> list[float]:
+    """无 embedding API 时的兜底向量（固定维、可复现；非语义相似）。"""
+    seed = hashlib.sha256(f"category:{text}".encode("utf-8")).digest()
+    out: list[float] = []
+    counter = 0
+    while len(out) < dim:
+        block = hashlib.sha256(seed + counter.to_bytes(4, "big")).digest()
+        counter += 1
+        for i in range(0, len(block), 4):
+            if len(out) >= dim:
+                break
+            chunk = int.from_bytes(block[i : i + 4], "big", signed=False)
+            out.append((chunk / 2**32) * 2.0 - 1.0)
+    norm = math.sqrt(sum(x * x for x in out)) or 1.0
+    return [x / norm for x in out]
+
+
+def _resolve_embed_config(cfg: dict[str, Any]) -> dict[str, Any]:
+    chat_base = str(cfg.get("base_url") or os.environ.get("INSIGHT_LLM_BASE_URL") or "").rstrip("/")
+    embed_base = (
+        os.environ.get("INSIGHT_EMBED_BASE_URL", "").strip()
+        or os.environ.get("OPENAI_API_BASE", "").strip().rstrip("/")
+        or chat_base
+        or "https://www.packyapi.com/v1"
+    )
+    embed_key = (
+        os.environ.get("INSIGHT_EMBED_API_KEY", "").strip()
+        or os.environ.get("OPENAI_API_KEY", "").strip()
+        or (cfg.get("api_key") or "").strip()
+        or os.environ.get("INSIGHT_LLM_API_KEY", "").strip()
+        or os.environ.get("DEEPSEEK_API_KEY", "").strip()
+    )
+    model = os.environ.get("INSIGHT_EMBED_MODEL", "text-embedding-3-small")
+    dim = int(os.environ.get("INSIGHT_EMBED_DIM", "768"))
+    fallback = os.environ.get("INSIGHT_EMBED_FALLBACK", "").strip().lower()
+    return {
+        "base_url": embed_base,
+        "api_key": embed_key,
+        "model": model,
+        "dim": dim,
+        "fallback": fallback,
+        "chat_base": chat_base,
+    }
+
+
 def _embed_text(
     text: str, *, base_url: str, api_key: str, model: str, dimensions: int | None = None
 ) -> list[float]:
@@ -102,6 +149,45 @@ def _embed_text(
     if not isinstance(emb, list) or not emb:
         raise RuntimeError("embedding 格式异常")
     return [float(x) for x in emb]
+
+
+def _embed_category(
+    cat: str,
+    *,
+    embed_cfg: dict[str, Any],
+) -> tuple[list[float], str]:
+    """返回 (vector, model_name)。"""
+    dim = int(embed_cfg["dim"])
+    model = str(embed_cfg["model"])
+    fallback = embed_cfg.get("fallback") or ""
+    use_det = fallback in ("deterministic", "1", "true", "yes", "auto")
+
+    if use_det and fallback != "auto":
+        return _deterministic_embed(cat, dim=dim), "deterministic-sha256-v1"
+
+    api_key = str(embed_cfg.get("api_key") or "").strip()
+    if not api_key:
+        if use_det:
+            print("[category-embed] 无 embedding API Key，使用 deterministic 兜底", flush=True)
+            return _deterministic_embed(cat, dim=dim), "deterministic-sha256-v1"
+        raise RuntimeError("缺少 INSIGHT_EMBED_API_KEY / INSIGHT_LLM_API_KEY")
+
+    try:
+        vec = _embed_text(
+            cat,
+            base_url=str(embed_cfg["base_url"]),
+            api_key=api_key,
+            model=model,
+            dimensions=dim,
+        )
+        if len(vec) != dim:
+            raise RuntimeError(f"dim={len(vec)} != {dim}")
+        return vec, model
+    except (urllib.error.HTTPError, urllib.error.URLError, RuntimeError) as e:
+        if fallback in ("deterministic", "auto", "1", "true", "yes"):
+            print(f"[category-embed] {cat}: API 失败 ({e})，deterministic 兜底", flush=True)
+            return _deterministic_embed(cat, dim=dim), "deterministic-sha256-v1"
+        raise
 
 
 def _upsert_embedding(
@@ -163,42 +249,22 @@ def main() -> int:
             cfg = {}
             print(f"[category-embed] LLM settings skipped: {e}", flush=True)
 
-        api_key = (
-            (cfg.get("api_key") or "").strip()
-            or os.environ.get("INSIGHT_LLM_API_KEY", "").strip()
-            or os.environ.get("DEEPSEEK_API_KEY", "").strip()
-        )
-        if not api_key:
-            print("[category-embed] 缺少 INSIGHT_LLM_API_KEY", flush=True)
-            return 1
-
-        base_url = (
-            cfg.get("base_url")
-            or os.environ.get("INSIGHT_LLM_BASE_URL")
-            or "https://www.packyapi.com/v1"
-        )
-        model = os.environ.get("INSIGHT_EMBED_MODEL", "text-embedding-3-small")
-        dim = int(os.environ.get("INSIGHT_EMBED_DIM", "768"))
+        embed_cfg = _resolve_embed_config(cfg)
+        if "packyapi.com" in embed_cfg["base_url"] and not os.environ.get("INSIGHT_EMBED_BASE_URL"):
+            print(
+                "[category-embed] 提示: PackyAPI DeepSeek 分组通常不支持 /embeddings；"
+                "可设 INSIGHT_EMBED_BASE_URL + INSIGHT_EMBED_API_KEY（OpenAI/智谱），"
+                "或 INSIGHT_EMBED_FALLBACK=auto 先入库",
+                flush=True,
+            )
 
         ok_n = 0
         for cat in categories:
             try:
-                vec = _embed_text(
-                    cat,
-                    base_url=str(base_url),
-                    api_key=api_key,
-                    model=model,
-                    dimensions=dim,
-                )
-                if len(vec) != dim:
-                    print(
-                        f"[category-embed] {cat}: dim={len(vec)} != {dim}，跳过",
-                        flush=True,
-                    )
-                    continue
+                vec, model = _embed_category(cat, embed_cfg=embed_cfg)
                 _upsert_embedding(conn, category=cat, model=model, vector=vec)
                 ok_n += 1
-                print(f"[category-embed] ok {cat}", flush=True)
+                print(f"[category-embed] ok {cat} ({model})", flush=True)
             except (urllib.error.HTTPError, urllib.error.URLError, RuntimeError) as e:
                 print(f"[category-embed] fail {cat}: {e}", flush=True)
 
