@@ -103,8 +103,12 @@ def run_insight_pipeline(
         metrics_conn = None
 
     root = os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud")
-    sub = "insight_shadow" if shadow else "report_archives"
-    out_base = os.path.join(root, "data", sub)
+    export_override = os.environ.get("XHS_INSIGHT_EXPORT_DIR", "").strip()
+    if export_override:
+        out_base = export_override
+    else:
+        sub = "insight_shadow" if shadow else "report_archives"
+        out_base = os.path.join(root, "data", sub)
 
     summaries: list[dict[str, Any]] = []
     from cloud_deploy.reporting.insight_llm_feed import (
@@ -125,6 +129,16 @@ def run_insight_pipeline(
             except Exception as e:
                 _log(f"trend_7d enrich skipped {insight.category}: {e}")
 
+        if source in ("local_delta", "local"):
+            sel_rule = (
+                f"local premium_goods_daily.delta>={insight_min_delta()} (delta_only), "
+                f"scanned within {insight_scan_window_days()}d"
+            )
+        else:
+            sel_rule = (
+                f"goods_sold_daily.delta>={insight_min_delta()} (delta_only), "
+                f"scanned within {insight_scan_window_days()}d, unique per product"
+            )
         llm_feed = build_llm_feed(
             insight,
             cat_rows,
@@ -133,10 +147,7 @@ def run_insight_pipeline(
             k_anonymity_min=k_anon,
             enriched={
                 **public,
-                "selection_rule": (
-                    f"goods_sold_daily.delta>={insight_min_delta()} (delta_only), "
-                    f"scanned within {insight_scan_window_days()}d, unique per product"
-                ),
+                "selection_rule": sel_rule,
             },
         )
         agent_metrics = feed_to_agent_metrics(llm_feed)

@@ -848,8 +848,10 @@ def fetch_items_from_scan_delta(
 
 
 def fetch_items_for_insight(conn, report_date: str, *, source: str | None = None) -> list:
-    """V2 情报 / feed 专用数据源（默认 scan_delta）。"""
+    """V2 情报 / feed 专用数据源。云默认 scan_delta；本地方案 A 用 local_delta。"""
     src = (source or os.environ.get("INSIGHT_PG_SOURCE", "scan_delta")).strip().lower()
+    if src in ("local_delta", "local"):
+        return fetch_items_from_local_delta(conn, report_date)
     if src in ("scan_delta", "delta", "insight"):
         return fetch_items_from_scan_delta(conn, report_date)
     if src == "auto":

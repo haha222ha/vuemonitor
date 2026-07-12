@@ -18,7 +18,7 @@ from typing import Any
 from cloud_deploy.reporting.category_taxonomy import infer_category
 from cloud_deploy.reporting.insight_metric_engine import InsightMetrics
 
-FEED_SCHEMA_VERSION = "feed-v1"
+FEED_SCHEMA_VERSION = "feed-v1.1"
 
 
 def _median(values: list[float]) -> float | None:
@@ -41,6 +41,47 @@ def filter_rows_for_category(all_rows: list[dict[str, Any]], category: str) -> l
         if inferred == cat:
             out.append(row)
     return out
+
+
+def _extract_growth_direction_hints(
+    category_rows: list[dict[str, Any]],
+    *,
+    top_pct: float = 0.05,
+    min_top: int = 5,
+    max_top: int = 30,
+    max_keywords: int = 8,
+) -> dict[str, Any]:
+    """
+    从类目内增速最高切片提炼产品方向词（不输出标题/goods_id）。
+    9 万行先在 SQL/内存聚合到类目，再对每类目取 top 5% 增量行做词频。
+    """
+    from cloud_deploy.reporting.insight_metric_engine import _extract_keywords
+
+    if not category_rows:
+        return {}
+    ranked = sorted(
+        category_rows,
+        key=lambda r: (
+            -float(r.get("actual_v1d") or 0),
+            -float(r.get("gr") or 0),
+        ),
+    )
+    n_top = max(min_top, min(max_top, int(len(ranked) * top_pct)))
+    top_slice = ranked[:n_top]
+    titles = [str(r.get("title") or "") for r in top_slice if r.get("title")]
+    keywords = _extract_keywords(titles, limit=max_keywords)
+    if not keywords:
+        return {}
+    avg_inc = sum(float(r.get("actual_v1d") or 0) for r in top_slice) / len(top_slice)
+    med_price_vals = [float(r.get("price") or 0) for r in top_slice if float(r.get("price") or 0) > 0]
+    med_price = _median(med_price_vals)
+    return {
+        "top_slice_size": len(top_slice),
+        "top_slice_pct": round(len(top_slice) / len(ranked) * 100.0, 1),
+        "avg_increment_in_slice": round(avg_inc, 2),
+        "median_price_in_slice": med_price,
+        "product_direction_keywords": keywords,
+    }
 
 
 def _selection_summary(category_rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -88,9 +129,14 @@ def build_llm_feed(
                 public[k] = v
 
     selection_rule = (enriched or {}).get("selection_rule")
-    if not selection_rule and pg_source in ("scan_delta", "delta", "insight"):
+    if not selection_rule and pg_source in ("local_delta", "local"):
         selection_rule = (
-            "premium_goods_daily.delta>=1 (delta_only), "
+            "local premium_goods_daily.delta>=1 (delta_only), "
+            "category aggregate → top-growth keyword slice"
+        )
+    elif not selection_rule and pg_source in ("scan_delta", "delta", "insight"):
+        selection_rule = (
+            "goods_sold_daily.delta>=1 (delta_only), "
             "scanned within last 1 day, unique per product"
         )
     elif not selection_rule and pg_source == "auto":
@@ -142,6 +188,7 @@ def build_llm_feed(
         },
         "context": {
             "keyword_themes": insight.top_keywords[:8],
+            "growth_direction_hints": _extract_growth_direction_hints(category_rows),
             "similar_categories": public.get("similar_categories") or enriched.get("similar_categories") or [],
             "season_note": _season_note(insight.category, insight.report_date, insight.season_score),
         },
@@ -153,6 +200,21 @@ def build_llm_feed(
         },
     }
     return feed
+
+
+def _format_growth_hints(hints: dict[str, Any] | None) -> str:
+    if not hints:
+        return "—"
+    kws = hints.get("product_direction_keywords") or []
+    if not kws:
+        return "—"
+    parts = [
+        f"top {hints.get('top_slice_size')} ({hints.get('top_slice_pct')}%)",
+        f"均增量 {hints.get('avg_increment_in_slice')}",
+    ]
+    if hints.get("median_price_in_slice") is not None:
+        parts.append(f"切片中位价 {hints.get('median_price_in_slice')}")
+    return "; ".join(parts) + " → " + ", ".join(kws)
 
 
 def _season_note(category: str, report_date: str, season_score: int) -> str:
@@ -196,6 +258,9 @@ def feed_to_agent_metrics(feed: dict[str, Any]) -> dict[str, Any]:
         out["similar_categories"] = context["similar_categories"]
     if context.get("keyword_themes"):
         out["keyword_themes"] = context["keyword_themes"]
+    hints = context.get("growth_direction_hints") or {}
+    if hints.get("product_direction_keywords"):
+        out["growth_direction_hints"] = hints
     sel = feed.get("selection_summary") or {}
     if sel.get("sample_size"):
         out["selection_summary"] = {
@@ -239,6 +304,10 @@ def render_llm_feed_md(feed: dict[str, Any]) -> str:
         "## 主题词（脱敏）",
         "",
         ", ".join(ctx.get("keyword_themes") or []) or "—",
+        "",
+        "## 增速最高切片 · 产品方向词",
+        "",
+        _format_growth_hints(ctx.get("growth_direction_hints")),
         "",
         "## 相关赛道",
         "",

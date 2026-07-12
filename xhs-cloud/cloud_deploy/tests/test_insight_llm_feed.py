@@ -36,11 +36,11 @@ def test_feed_from_insight():
         {"title": "保湿面霜 x", "price": 39.0, "actual_v1d": 12, "gr": 0.15, "is_virtual": False, "is_new": True, "behavior": "BURST"},
         {"title": "防晒喷雾 y", "price": 29.0, "actual_v1d": 8, "gr": 0.12, "is_virtual": False, "is_new": False, "behavior": "ACCEL"},
     ] * 60
-    feed = build_llm_feed(insight, rows, raw_selection_rows=5000, pg_source="scan_delta", k_anonymity_min=5)
-    assert feed["schema_version"] == "feed-v1"
+    feed = build_llm_feed(insight, rows, raw_selection_rows=5000, pg_source="local_delta", k_anonymity_min=5)
+    assert feed["schema_version"] == "feed-v1.1"
     assert feed["provenance"]["raw_selection_rows"] == 5000
-    assert feed["provenance"]["pg_source"] == "scan_delta"
-    assert "delta" in (feed["provenance"].get("selection_rule") or "")
+    assert feed["provenance"]["pg_source"] == "local_delta"
+    assert (feed.get("context") or {}).get("growth_direction_hints")
     assert feed["selection_summary"]["sample_size"] == 120
     assert "保湿" in (feed["context"]["keyword_themes"] or [])
 
