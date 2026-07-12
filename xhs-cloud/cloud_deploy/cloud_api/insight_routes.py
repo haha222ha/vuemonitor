@@ -368,6 +368,23 @@ def insight_workflow_list(user: dict = Depends(current_user)):
     return {"items": items}
 
 
+@router.get("/notifications")
+def insight_notifications(user: dict = Depends(current_user)):
+    """Q3-5：站内提醒（工作流到期 + 关注类目阈值）。"""
+    assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.insight_notifications import build_insight_notifications
+
+    from cloud_deploy.cloud_api.database_pg import _conn
+
+    conn = _conn()
+    try:
+        data = build_insight_notifications(conn, user["id"])
+    finally:
+        conn.close()
+    _log_behavior(user["id"], "notifications")
+    return data
+
+
 @router.get("/similar")
 def insight_similar(category: str = "", user: dict = Depends(current_user)):
     """Q3：相关赛道（pgvector 或同日蓝海兜底）。"""

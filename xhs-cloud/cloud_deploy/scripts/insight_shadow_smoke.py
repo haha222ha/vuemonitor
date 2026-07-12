@@ -190,6 +190,9 @@ def main() -> int:
     else:
         _log(False, "GET /member/insight/health-score", f"HTTP {code_h}")
 
+    code_n, notif = _request("GET", "/api/v1/member/insight/notifications", token=token)
+    _log(code_n == 200 and isinstance(notif, dict), "GET /member/insight/notifications", f"HTTP {code_n} count={notif.get('count') if isinstance(notif, dict) else ''}")
+
     ent = profile.get("entitlements") or {}
     if ent.get("insight_compare") and len(items) >= 2:
         cats = ",".join(str(it.get("category") or "") for it in items[:2])

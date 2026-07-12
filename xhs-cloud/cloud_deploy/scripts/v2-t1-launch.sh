@@ -64,5 +64,6 @@ PY
 echo ""
 echo "  T1 完成。新用户仅 insight；在期老月卡仍 legacy_dual。"
 echo "  体验码：admin → 选品会员 → AI 情报体验 (7天)"
+echo "  insight_only 验收: export XHS_MEMBER_TOKEN='...' && bash ${VM_REPO}/xhs-cloud/cloud_deploy/scripts/smoke_insight_only.sh"
 echo "  文档：projects/ai-market-intelligence-v2/docs/30-T1-LAUNCH-CHECKLIST.md"
 echo ""

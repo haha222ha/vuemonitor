@@ -690,6 +690,106 @@
 
 
 
+  function loadNotifications() {
+
+    var bar = document.getElementById('insightNotifBar');
+
+    if (!bar) return Promise.resolve();
+
+    var dismissed = [];
+
+    try {
+
+      dismissed = JSON.parse(localStorage.getItem('xhs_insight_notif_dismissed') || '[]');
+
+    } catch (e) { dismissed = []; }
+
+    return api('/api/v1/member/insight/notifications').then(function (data) {
+
+      var items = (data && data.items) || [];
+
+      items = items.filter(function (it) { return dismissed.indexOf(it.id) < 0; });
+
+      if (!items.length) {
+
+        bar.classList.add('hidden');
+
+        bar.innerHTML = '';
+
+        return;
+
+      }
+
+      var rows = items.slice(0, 5).map(function (it) {
+
+        return '<div class="insight-notif-item" data-id="' + esc(it.id || '') + '">' +
+
+          '<strong>' + esc(it.title || '') + '</strong>' +
+
+          '<div style="font-size:12px;color:var(--text2);margin-top:4px">' + esc(it.body || '') + '</div>' +
+
+          (it.category ? '<button type="button" class="btn btn-ghost btn-xs insight-notif-open" data-cat="' +
+
+            esc(it.category) + '" style="margin-top:6px">查看类目</button>' : '') +
+
+          '<button type="button" class="btn btn-ghost btn-xs insight-notif-dismiss" style="margin-top:6px;margin-left:6px">忽略</button>' +
+
+          '</div>';
+
+      }).join('');
+
+      bar.innerHTML = '<strong>智能提醒</strong> · ' + esc(items.length) + ' 条<div style="margin-top:8px;display:flex;flex-direction:column;gap:10px">' + rows + '</div>';
+
+      bar.classList.remove('hidden');
+
+      bar.querySelectorAll('.insight-notif-open').forEach(function (btn) {
+
+        btn.addEventListener('click', function () {
+
+          var cat = btn.dataset.cat;
+
+          var match = _libraryItems.filter(function (it) { return it.category === cat; })[0];
+
+          if (match) openPreview(match.report_date, cat);
+
+        });
+
+      });
+
+      bar.querySelectorAll('.insight-notif-dismiss').forEach(function (btn) {
+
+        btn.addEventListener('click', function () {
+
+          var item = btn.closest('.insight-notif-item');
+
+          var id = item && item.dataset.id;
+
+          if (id) {
+
+            dismissed.push(id);
+
+            try { localStorage.setItem('xhs_insight_notif_dismissed', JSON.stringify(dismissed.slice(-50))); } catch (e) {}
+
+          }
+
+          if (item) item.remove();
+
+          if (!bar.querySelector('.insight-notif-item')) bar.classList.add('hidden');
+
+        });
+
+      });
+
+    }).catch(function () {
+
+      bar.classList.add('hidden');
+
+    });
+
+  }
+
+
+
   function loadWatchlist() {
 
     return api('/api/v1/member/insight/watchlist').then(function (data) {
@@ -1009,6 +1109,8 @@
       loadRecommendations();
 
       loadHealthScore();
+
+      loadNotifications();
 
       if (msg) msg.textContent = lib.shadow_mode ? '当前为 Shadow 预生成情报（只读）' : '';
 

@@ -19,7 +19,7 @@
 - [x] 代码：`XHS_V2_LAUNCH=1` / get_plan / 体验码 UI / nginx / cache / aggregate timer
 - [x] **`v2-t1-launch.sh`** 一键开 T1
 - [x] **`31-EXPERIENCE-CODE-SOP.md`**
-- [~] 云主机执行 T1 launch + 体验码 insight_only smoke（**你今天做**）
+- [~] 云主机执行 T1 launch + 体验码 insight_only smoke（`smoke_insight_only.sh`）
 
 ---
 
@@ -43,9 +43,9 @@
 - [~] **Phase Q3 个性化** → doc 32
   - [x] Q3-1：类目关注 watchlist UI + 推荐加权
   - [x] Q3-2：user_behavior 埋点 + host-update PG 迁移
-  - [~] Q3-3：真实 embedding API（需 OpenAI/智谱 Key；现 deterministic 兜底）
+  - [~] Q3-3：真实 embedding API（智谱/OpenAI；deterministic 时自动降级 peer 相似）
   - [x] Q3-4：相关赛道 API + 会员页「相关赛道」
-  - [ ] Q3-5：阈值通知（可选）
+  - [x] Q3-5：站内提醒 API + 会员页（工作流到期 + 关注阈值）
 - [ ] Redis L1（可选，未做）
 
 ---

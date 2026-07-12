@@ -37,12 +37,12 @@ def _pgvector_available(conn) -> bool:
         return bool(cur.fetchone())
 
 
-def _load_category_vector(conn, category: str) -> list[float] | None:
+def _load_category_vector(conn, category: str) -> tuple[list[float] | None, str | None]:
     set_search_path(conn)
     with conn.cursor() as cur:
         cur.execute(
             """
-            SELECT embedding::text
+            SELECT embedding::text, model
             FROM category_embeddings
             WHERE category = %s AND sub_category = ''
             ORDER BY updated_at DESC
@@ -52,21 +52,27 @@ def _load_category_vector(conn, category: str) -> list[float] | None:
         )
         row = cur.fetchone()
     if not row:
-        return None
-    raw = row[0] if not isinstance(row, dict) else row.get("embedding")
+        return None, None
+    if isinstance(row, dict):
+        raw, model = row.get("embedding"), row.get("model")
+    else:
+        raw, model = row[0], row[1]
+    model_s = str(model or "")
+    if model_s.startswith("deterministic"):
+        return None, model_s
     if raw is None:
-        return None
+        return None, model_s
     text = str(raw).strip()
     if text.startswith("[") and text.endswith("]"):
         try:
-            return [float(x) for x in text[1:-1].split(",") if x.strip()]
+            return [float(x) for x in text[1:-1].split(",") if x.strip()], model_s
         except ValueError:
-            return None
-    return None
+            return None, model_s
+    return None, model_s
 
 
 def _similar_by_pgvector(conn, category: str, *, limit: int = 3) -> list[dict[str, Any]]:
-    vec = _load_category_vector(conn, category)
+    vec, model = _load_category_vector(conn, category)
     if not vec:
         return []
     vec_str = "[" + ",".join(str(x) for x in vec) + "]"
@@ -77,6 +83,7 @@ def _similar_by_pgvector(conn, category: str, *, limit: int = 3) -> list[dict[st
             SELECT category, 1 - (embedding <=> %s::vector) AS score
             FROM category_embeddings
             WHERE category <> %s AND sub_category = ''
+              AND model NOT LIKE 'deterministic%%'
             ORDER BY embedding <=> %s::vector
             LIMIT %s
             """,
@@ -91,7 +98,7 @@ def _similar_by_pgvector(conn, category: str, *, limit: int = 3) -> list[dict[st
         else:
             cat, score = row[0], float(row[1] or 0)
         if cat:
-            out.append({"category": str(cat), "score": round(score, 3)})
+            out.append({"category": str(cat), "score": round(score, 3), "model": model})
     return out
 
 

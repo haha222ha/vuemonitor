@@ -110,7 +110,15 @@ def _resolve_embed_config(cfg: dict[str, Any]) -> dict[str, Any]:
         or os.environ.get("INSIGHT_LLM_API_KEY", "").strip()
         or os.environ.get("DEEPSEEK_API_KEY", "").strip()
     )
-    model = os.environ.get("INSIGHT_EMBED_MODEL", "text-embedding-3-small")
+    model = os.environ.get("INSIGHT_EMBED_MODEL", "")
+    provider = os.environ.get("INSIGHT_EMBED_PROVIDER", "openai").strip().lower()
+    if not model:
+        if provider == "zhipu":
+            model = "embedding-2"
+        else:
+            model = "text-embedding-3-small"
+    if provider == "zhipu" and not os.environ.get("INSIGHT_EMBED_BASE_URL"):
+        embed_base = embed_base if embed_base != chat_base else "https://open.bigmodel.cn/api/paas/v4"
     dim = int(os.environ.get("INSIGHT_EMBED_DIM", "768"))
     fallback = os.environ.get("INSIGHT_EMBED_FALLBACK", "").strip().lower()
     return {
@@ -120,6 +128,7 @@ def _resolve_embed_config(cfg: dict[str, Any]) -> dict[str, Any]:
         "dim": dim,
         "fallback": fallback,
         "chat_base": chat_base,
+        "provider": provider,
     }
 
 

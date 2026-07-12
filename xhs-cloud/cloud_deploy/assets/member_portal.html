@@ -377,6 +377,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div id="insightRadarBar" class="insight-banner hidden"></div>
       <div id="insightRecommendBar" class="insight-banner hidden"></div>
       <div id="insightWatchlistBar" class="insight-banner hidden"></div>
+      <div id="insightNotifBar" class="insight-panel hidden"></div>
       <div id="insightHealthBar" class="insight-meta" style="margin:6px 0 10px;font-size:13px;color:var(--text2)"></div>
       <div id="insightToolsBar" class="insight-tools-bar hidden"></div>
       <div id="insightComparePanel" class="insight-panel hidden"></div>
@@ -435,7 +436,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <div id="dashMsg"></div>
   </div>
 </div>
-<script src="/assets/member_insight.js?v=20260712t9"></script>
+<script src="/assets/member_insight.js?v=20260712t10"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -583,7 +584,7 @@ function ensureMemberInsight(done) {
   }
   _insightScriptLoading = true;
   var s = document.createElement('script');
-  s.src = '/assets/member_insight.js?v=20260712t9&_=' + Date.now();
+  s.src = '/assets/member_insight.js?v=20260712t10&_=' + Date.now();
   s.onload = function () {
     _insightScriptLoading = false;
     if (window.MemberInsight) done();
