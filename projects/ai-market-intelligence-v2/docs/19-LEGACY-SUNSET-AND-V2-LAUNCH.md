@@ -10,8 +10,8 @@
 
 | 项 | 决定 |
 |----|------|
-| 13 | V2 新会员 | **只卖 AI 选品情报**，`legacy_zip_enabled: false` |
-| 14 | **在期老会员（monthly 等）** | **双轨**：`legacy_zip_enabled: true` + `insight_enabled: true`，至 `expires_at` |
+| V2 新会员 | **只卖 AI 选品情报**，`legacy_zip_enabled: false` |
+| 在期老会员（monthly 等） | **双轨**：`legacy_zip_enabled: true` + `insight_enabled: true`，至 `expires_at` |
 | 数据包下载 | V2 **永久舍弃**，不作为 SKU、不作为双轨选项 |
 | 老用户 | 已购 `monthly/quarterly/…` 且 **未过期** → 继续 zip 至 `expires_at` |
 | 新购/续费（上线日后） | **只能买** `insight_*`，不能再买纯 Legacy 套餐 |
