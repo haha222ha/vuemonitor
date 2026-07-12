@@ -1,18 +1,19 @@
 /**
- * PR-2：会员中心 AI 选品情报 Tab（骨架）
- * 依赖 member_portal.html 同源 api()/STORAGE（通过 window 暴露）
+ * PR-2：会员中心 AI 选品情报 Tab
+ * ES5 兼容（避免旧 WebView / 扩展干扰解析）
  */
 (function (global) {
   'use strict';
 
-  const STORAGE = { token: 'xhs_member_token' };
+  var STORAGE = { token: 'xhs_member_token' };
 
   function loadStored(key) {
-    try { return localStorage.getItem(key) || ''; } catch (_) { return ''; }
+    try { return localStorage.getItem(key) || ''; } catch (e) { return ''; }
   }
 
   function esc(s) {
-    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    if (s === null || s === undefined) s = '';
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
   }
 
   function api(path, opts) {
@@ -20,15 +21,15 @@
     if (typeof global.api === 'function') {
       return global.api(path, Object.assign({ auth: true }, opts));
     }
-    const headers = Object.assign({}, opts.headers || {});
-    const t = loadStored(STORAGE.token);
+    var headers = Object.assign({}, opts.headers || {});
+    var t = loadStored(STORAGE.token);
     if (t) headers.Authorization = 'Bearer ' + t;
-    return fetch(path, Object.assign({}, opts, { credentials: 'include', headers }))
+    return fetch(path, Object.assign({}, opts, { credentials: 'include', headers: headers }))
       .then(function (r) {
         return r.text().then(function (text) {
           var data = {};
           if (text) {
-            try { data = JSON.parse(text); } catch (_) {}
+            try { data = JSON.parse(text); } catch (e) {}
           }
           if (!r.ok) {
             var err = new Error((data && data.detail) || r.statusText || '请求失败');
@@ -59,9 +60,9 @@
     if (tabReports) tabReports.classList.toggle('hidden', !legacy);
     if (tabInsight) tabInsight.classList.toggle('hidden', !insight);
 
-    var banner = document.getElementById('insightPreviewBanner');
-    if banner) {
-      banner.classList.toggle('hidden', m.portal_route !== 'legacy_with_preview');
+    var previewBanner = document.getElementById('insightPreviewBanner');
+    if (previewBanner) {
+      previewBanner.classList.toggle('hidden', m.portal_route !== 'legacy_with_preview');
     }
 
     var defaultDash = 'reports';
@@ -111,7 +112,7 @@
       var bar = document.getElementById('insightRadarBar');
       if (bar) {
         bar.classList.remove('hidden');
-        bar.innerHTML = '<strong>今日机会雷达</strong> · 加载失败，请刷新页面（' + esc(e && e.message ? e.message : '网络错误') + '）';
+        bar.innerHTML = '<strong>今日机会雷达</strong> · 加载失败（' + esc(e && e.message ? e.message : '网络错误') + '）';
       }
     });
   }
@@ -173,7 +174,9 @@
       }
     }).catch(function (e) {
       var detail = (e && e.message) ? e.message : '加载失败';
-      if (bar) bar.innerHTML = '<span class="insight-meta" style="color:var(--red)">情报加载失败：' + esc(detail) + '（请重新登录或 Ctrl+Shift+R 刷新）</span>';
+      if (bar) {
+        bar.innerHTML = '<span class="insight-meta" style="color:var(--red)">情报加载失败：' + esc(detail) + '</span>';
+      }
       if (msg) msg.textContent = detail;
     });
   }
