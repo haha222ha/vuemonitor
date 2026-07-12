@@ -27,6 +27,7 @@
 - [ ] **09_retention_pg_schema.sql** 上云（pull 后 psql）
 - [ ] Shadow **D1–D7** journal 无 ERROR
 - [ ] 云主机 pull 最新 + host-update
+- [x] 云主机 W1-5 smoke **7 passed**（zzll1234 legacy_dual）
 
 ### 后端 / 双轨
 
@@ -41,12 +42,14 @@
 - [x] `member_insight.js` + AI Tab 骨架
 - [ ] 老月卡 **双 Tab E2E**（Ctrl+F5 + 重登）
 - [ ] AI Tab 预览 iframe 有 Shadow 报告
+- [x] 机会雷达 API 骨架 + 会员横幅 UI
 
 ### 验收脚本
 
 - [x] `insight_shadow_smoke.py` / `.sh`（W1-5）
 - [x] `test_payment_entitlements_note.py`（W2-1）
 - [ ] 云主机跑 smoke：`XHS_SMOKE_EXPECT=legacy_dual`
+- [x] 云主机 smoke 7/7 PASS（2026-07-12）
 
 ### T0 出口标准
 
@@ -68,8 +71,10 @@
 ### API / 配额
 
 - [ ] `POST /member/insight/generate` + 配额原子扣减
+- [x] `POST /member/insight/generate` Cache-First + 配额（骨架）
 - [ ] Cache-First 读 `insight_report_cache`（REQ-CACHE-002）
 - [ ] Watchlist PG API（`member_insight_watchlist`）
+- [x] Watchlist GET/PUT `/member/insight/watchlist`
 - [ ] nginx 限流 insight 10 req/min
 
 ### PG 留存 P0（doc 27）
@@ -79,6 +84,7 @@
 - [x] `user_behavior` 表 + view 埋点
 - [ ] 定时 `aggregate_daily_category_metrics` systemd（02:00）
 - [ ] 机会雷达 API / 会员横幅（REQ-RET-001）
+- [x] 机会雷达 GET `/member/insight/radar` + 横幅 UI
 - [ ] 体验码 Day1–3 SOP（REQ-RET-040～042）
 
 ### 文档
@@ -148,4 +154,5 @@ bash /opt/xhs-cloud/cloud_deploy/scripts/insight_shadow_smoke.sh
 
 | 日期 | 变更 |
 |------|------|
+| 2026-07-12 | T1：radar / generate / watchlist API + 会员雷达横幅 |
 | 2026-07-12 | 初版：合并战略报告 → doc 27；本跟踪器；T0 smoke + PG-1 代码 |

@@ -174,6 +174,13 @@ def main() -> int:
         shadow = lib.get("shadow_mode")
         _log(shadow is True or len(items) > 0, "shadow 库有数据或 shadow_mode", f"shadow={shadow}")
 
+    code_r, radar = _request("GET", "/api/v1/member/insight/radar", token=token)
+    if code_r == 200 and isinstance(radar, dict):
+        hl = len(radar.get("highlights") or [])
+        _log(hl >= 0, "GET /member/insight/radar", f"highlights={hl} source={radar.get('source')}")
+    else:
+        _log(False, "GET /member/insight/radar", f"HTTP {code_r}")
+
     if items:
         first = items[0]
         date = str(first.get("report_date") or "")[:10]

@@ -11,9 +11,10 @@ import re
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.security import HTTPAuthorizationCredentials
+from pydantic import BaseModel, field_validator
 
 from cloud_deploy.cloud_api.auth import current_user, member_from_token, security
-from cloud_deploy.cloud_api.entitlements_v2 import filter_insight_library
+from cloud_deploy.cloud_api.entitlements_v2 import can_insight_generate, filter_insight_library
 from cloud_deploy.cloud_api.member_entitlements import assert_insight_allowed
 
 router = APIRouter(prefix="/api/v1/member/insight", tags=["insight"])
@@ -159,6 +160,197 @@ def insight_categories(user: dict = Depends(current_user)):
             seen.add(c)
             cats.append({"category": c, "report_date": it.get("report_date")})
     return {"report_date": latest_date, "items": cats}
+
+
+class InsightWatchlistBody(BaseModel):
+    categories: list[str]
+
+    @field_validator("categories")
+    @classmethod
+    def validate_categories(cls, v: list[str]) -> list[str]:
+        out: list[str] = []
+        for c in v:
+            c = str(c).strip()
+            if not c:
+                continue
+            if not _CATEGORY_RE.match(c):
+                raise ValueError(f"非法类目: {c}")
+            if c not in out:
+                out.append(c)
+        if len(out) > 30:
+            raise ValueError("关注类目最多 30 个")
+        return out
+
+
+class InsightGenerateBody(BaseModel):
+    category: str
+    report_date: str = ""
+
+    @field_validator("category")
+    @classmethod
+    def validate_category(cls, v: str) -> str:
+        v = str(v).strip()
+        if not _CATEGORY_RE.match(v):
+            raise ValueError("category 含非法字符")
+        return v
+
+
+def _list_insight_watchlist(user_id: int) -> list[str]:
+    from cloud_deploy.cloud_api.database_pg import _conn
+
+    conn = _conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT 1 FROM information_schema.tables
+                WHERE table_schema = current_schema() AND table_name = 'member_insight_watchlist'
+                LIMIT 1
+                """
+            )
+            if not cur.fetchone():
+                return []
+            cur.execute(
+                """
+                SELECT category FROM member_insight_watchlist
+                WHERE user_id = %s ORDER BY sort_order, id
+                """,
+                (user_id,),
+            )
+            rows = cur.fetchall()
+        return [r[0] if not isinstance(r, dict) else r.get("category") for r in rows]
+    finally:
+        conn.close()
+
+
+def _replace_insight_watchlist(user_id: int, categories: list[str]) -> list[str]:
+    from cloud_deploy.cloud_api.database_pg import _conn
+
+    conn = _conn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT 1 FROM information_schema.tables
+                WHERE table_schema = current_schema() AND table_name = 'member_insight_watchlist'
+                LIMIT 1
+                """
+            )
+            if not cur.fetchone():
+                raise HTTPException(status_code=503, detail="类目关注表未迁移")
+            cur.execute("DELETE FROM member_insight_watchlist WHERE user_id = %s", (user_id,))
+            for i, cat in enumerate(categories):
+                cur.execute(
+                    """
+                    INSERT INTO member_insight_watchlist (user_id, category, sort_order)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT (user_id, category) DO UPDATE SET sort_order = EXCLUDED.sort_order
+                    """,
+                    (user_id, cat, i),
+                )
+        conn.commit()
+        return categories
+    finally:
+        conn.close()
+
+
+def _find_report_for_category(category: str, report_date: str = "") -> str | None:
+    """返回可用的 report_date（优先指定日，否则最新）。"""
+    report_date = (report_date or "")[:10]
+    if report_date and _resolve_insight_html(report_date, category):
+        return report_date
+    for it in _list_items_from_disk():
+        if it.get("category") != category:
+            continue
+        d = str(it.get("report_date") or "")[:10]
+        if report_date and d != report_date:
+            continue
+        if _resolve_insight_html(d, category):
+            return d
+    return None
+
+
+@router.get("/radar")
+def insight_radar(user: dict = Depends(current_user)):
+    """机会雷达：今日蓝海/增速摘要（REQ-RET-001）。"""
+    assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.database_pg import _conn
+    from cloud_deploy.reporting.insight_radar import build_opportunity_radar
+
+    conn = _conn()
+    try:
+        data = build_opportunity_radar(conn, _list_items_from_disk, limit=5)
+    finally:
+        conn.close()
+    _log_behavior(user["id"], "radar")
+    return data
+
+
+@router.get("/watchlist")
+def insight_watchlist_get(user: dict = Depends(current_user)):
+    assert_insight_allowed(user["id"])
+    cats = _list_insight_watchlist(user["id"])
+    return {"categories": cats, "count": len(cats)}
+
+
+@router.put("/watchlist")
+def insight_watchlist_put(body: InsightWatchlistBody, user: dict = Depends(current_user)):
+    ent = assert_insight_allowed(user["id"])
+    max_cats = max(int(ent.get("insight_categories_per_day") or 1) * 3, 10)
+    if len(body.categories) > max_cats:
+        raise HTTPException(status_code=400, detail=f"关注类目最多 {max_cats} 个")
+    cats = _replace_insight_watchlist(user["id"], body.categories)
+    _log_behavior(user["id"], "watchlist_add", metadata={"count": len(cats)})
+    return {"categories": cats, "count": len(cats)}
+
+
+@router.post("/generate")
+def insight_generate(body: InsightGenerateBody, user: dict = Depends(current_user)):
+    """
+    Cache-First 触达预生成报告；扣减类目日配额（REQ-CACHE-002 / REQ-QUOTA-001）。
+    未预生成则 404，不触发实时 LLM。
+    """
+    ent = assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.database_pg import _conn
+    from cloud_deploy.cloud_api.insight_quota import get_usage_today, try_reserve_category
+
+    category = body.category
+    report_date = _find_report_for_category(category, body.report_date)
+    if not report_date:
+        raise HTTPException(status_code=404, detail="该类目尚未预生成，请明日查看或浏览情报库")
+
+    conn = _conn()
+    try:
+        usage = get_usage_today(conn)
+        already = category in (usage.get("categories") or [])
+        if already:
+            snap = usage
+        else:
+            ok, msg, snap = try_reserve_category(
+                conn,
+                user["id"],
+                category,
+                int(ent.get("insight_categories_per_day") or 1),
+            )
+            if not ok:
+                raise HTTPException(status_code=429, detail=msg)
+    finally:
+        conn.close()
+
+    limit = int(ent.get("insight_categories_per_day") or 1)
+    _log_behavior(user["id"], "generate", category=category, report_date=report_date)
+    view_path = f"/api/v1/member/insight/{report_date}/{category}/view"
+    return {
+        "category": category,
+        "report_date": report_date,
+        "view_path": view_path,
+        "from_cache": True,
+        "quota": {
+            "used": int(snap.get("generated_count") or 0),
+            "limit": limit,
+            "categories_today": snap.get("categories") or [],
+        },
+    }
 
 
 @router.get("/{report_date}/{category}/view")

@@ -84,6 +84,29 @@
       (ent.insight_timeline_days > 0 ? '<span class="insight-meta">时间轴 ' + esc(ent.insight_timeline_days) + ' 天</span>' : '');
   }
 
+  function renderRadar(data) {
+    var bar = document.getElementById('insightRadarBar');
+    if (!bar || !data) return;
+    var msg = data.message || '';
+    var hl = (data.highlights || []).slice(0, 3);
+    if (!msg && !hl.length) {
+      bar.classList.add('hidden');
+      return;
+    }
+    var chips = hl.map(function (it) {
+      return '<span class="insight-badge">' + esc(it.category) + ' ★' + esc(it.blue_ocean_score || it.stars || '') + '</span>';
+    }).join('');
+    bar.innerHTML = '<strong>今日机会雷达</strong> · ' + esc(msg) + (chips ? '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">' + chips + '</div>' : '');
+    bar.classList.remove('hidden');
+  }
+
+  function loadRadar() {
+    return api('/api/v1/member/insight/radar').then(function (data) {
+      renderRadar(data);
+      return data;
+    }).catch(function () { /* optional */ });
+  }
+
   function renderLibrary(items) {
     var list = document.getElementById('insightLibraryList');
     var empty = document.getElementById('insightLibraryEmpty');
@@ -131,6 +154,7 @@
       var lib = res[1];
       renderPlanBar(profile);
       renderLibrary(lib.items || []);
+      loadRadar();
       if (msg) msg.textContent = lib.shadow_mode ? '当前为 Shadow 预生成情报（只读）' : '';
       if ((lib.items || []).length) {
         var first = lib.items[0];
