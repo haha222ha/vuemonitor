@@ -40,13 +40,13 @@ def test_aggregate_splits_categories():
         {"title": "小学数学练习册", "price": 15, "actual_v1d": 10, "gr": 0.2, "is_new": False},
         {"title": "小学语文暑假作业", "price": 12, "actual_v1d": 8, "gr": 0.15, "is_new": False},
         {"title": "小学英语教辅", "price": 18, "actual_v1d": 6, "gr": 0.1, "is_new": False},
-        {"title": "补水保湿面膜", "price": 39, "actual_v1d": 20, "gr": 0.25, "is_new": True},
-        {"title": "护肤精华套装", "price": 59, "actual_v1d": 15, "gr": 0.2, "is_new": False},
-        {"title": "防晒喷雾", "price": 49, "actual_v1d": 12, "gr": 0.18, "is_new": False},
+        {"title": "厨房收纳置物架", "price": 39, "actual_v1d": 20, "gr": 0.25, "is_new": True},
+        {"title": "桌面收纳盒整理", "price": 29, "actual_v1d": 15, "gr": 0.2, "is_new": False},
+        {"title": "衣柜收纳神器", "price": 49, "actual_v1d": 12, "gr": 0.18, "is_new": False},
     ]
     insights = aggregate_items_to_insights("2026-07-12", items, min_sample=3)
     cats = {i.category for i in insights}
     assert "小学教辅" in cats
-    assert "美妆护肤" in cats
+    assert "家居收纳" in cats
     for ins in insights:
         assert ins.price_distribution
