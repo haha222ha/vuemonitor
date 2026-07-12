@@ -7,7 +7,12 @@
 
 ## 1. 结论（一句话）
 
-**AI 情报观察池**与 Legacy 选品日报 **分离**：默认读 `goods_sold_daily` 当日唯一商品且 `delta >= 1`（相对上次 snapshot 正增长）；Legacy 仍用 `fetch_items_auto` 输出 `data.js`。
+**AI 情报观察池**与 Legacy 选品日报 **分离**：默认 **delta_only** — `premium_goods_daily.delta >= 1`（对齐 `sold_history.delta`），不用 `actual_velocity_1d` 卡门槛；监控池 `goods_sold_daily` 仅作补池。
+
+| 口径 | PG 字段 | 角色 |
+|------|---------|------|
+| **delta ≥ 1** | `premium_goods_daily.delta` / `goods_sold_daily.delta` | **主门槛**（采集真实增量） |
+| **actual_velocity_1d ≥ 1** | `premium_goods.actual_velocity_1d` | 仅展示/交叉比对，**不卡入选** |
 
 ```
 PG goods_sold_daily（scan_delta：当日 delta>=1 唯一商品）

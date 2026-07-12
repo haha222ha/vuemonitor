@@ -414,7 +414,7 @@ def _premium_has_metric_signal(row: dict) -> bool:
     )
 
 
-def premium_row_to_item(row: dict, *, sold_info: dict | None = None) -> list | None:
+def premium_row_to_item(row: dict, *, sold_info: dict | None = None, delta_only: bool = False) -> list | None:
     """premium_goods (+ 可选 premium_goods_daily / goods_sold_daily) → 28 列报告行。"""
     sold = _i(row.get("pgd_sold")) or _i(row.get("sold_num"))
     prev_raw = row.get("prev_sold")
@@ -438,8 +438,12 @@ def premium_row_to_item(row: dict, *, sold_info: dict | None = None) -> list | N
     recalc = _compute_daily_actual(sold, prev_sold, delta)
     if recalc is not None and recalc > 0:
         actual = recalc
+    elif delta_only and delta > 0:
+        actual = float(delta)
     elif actual <= 0:
         actual = _f(row.get("actual_velocity_1d"))
+    if actual <= 0 and delta_only and delta > 0:
+        actual = float(delta)
     if actual <= 0 and sold_info:
         gm_actual = _f(sold_info.get("gm_actual_v1d"))
         if gm_actual > 0:
@@ -609,20 +613,48 @@ def insight_min_delta() -> int:
         return 1
 
 
-def fetch_items_from_scan_delta(
-    conn,
-    report_date: str,
-    *,
-    min_delta: int | None = None,
-) -> list:
-    """
-    AI 情报观察池（与 Legacy auto 分离）：
+def _scan_delta_sold_cap() -> int:
+    return 200_000
 
-    - 当日 goods_sold_daily 中 **唯一 goods_id**
-    - ``delta >= min_delta``（默认 1）：相对 **上一有效 snapshot_date 行** 的正销量差
-    - 不限于 monitor 池；premium / monitor / report_daily_items 补齐标题与属性
-    """
-    min_delta = insight_min_delta() if min_delta is None else max(1, int(min_delta))
+
+def _fetch_premium_scan_delta_rows(conn, report_date: str, min_delta: int) -> list[dict]:
+    """精品库当日 premium_goods_daily.delta（对齐本地 sold_history.delta）。"""
+    if not _premium_table_exists(conn):
+        return []
+    with conn.cursor() as c:
+        c.execute("SET search_path TO xhs_monitor, public")
+        c.execute(
+            """
+            SELECT DISTINCT ON (pg.goods_id)
+                   pg.goods_id, pg.title, pg.deal_price, pg.sold_num, pg.velocity_1d,
+                   pg.actual_velocity_1d, pg.burst_score, pg.tier, pg.store_id, pg.store_name,
+                   pg.shop_fans, pg.shop_sales, pg.is_virtual, pg.first_seen_at, pg.first_report_date,
+                   pgd.sold_num AS pgd_sold, pgd.delta AS pgd_delta,
+                   pgd.actual_delta AS pgd_actual_delta, pgd.velocity_1d AS pgd_velocity,
+                   prev.sold_num AS prev_sold
+            FROM premium_goods pg
+            INNER JOIN premium_goods_daily pgd
+                   ON pgd.goods_id = pg.goods_id AND pgd.snap_date = %s
+            LEFT JOIN LATERAL (
+                SELECT p.sold_num
+                FROM premium_goods_daily p
+                WHERE p.goods_id = pg.goods_id AND p.snap_date < %s
+                ORDER BY p.snap_date DESC
+                LIMIT 1
+            ) prev ON TRUE
+            WHERE pg.lifecycle < 3
+              AND COALESCE(pgd.delta, 0) >= %s
+              AND COALESCE(pgd.sold_num, pg.sold_num, 0) <= %s
+            ORDER BY pg.goods_id, pgd.delta DESC
+            """,
+            (report_date, report_date, min_delta, _scan_delta_sold_cap()),
+        )
+        cols = [d[0] for d in c.description]
+        return [dict(zip(cols, r)) for r in c.fetchall()]
+
+
+def _fetch_sold_daily_scan_delta_rows(conn, report_date: str, min_delta: int) -> list[dict]:
+    """监控池 goods_sold_daily.delta（补全不在精品库的商品）。"""
     mg_shop = (
         "m.shop_sales AS mg_shop_sales, m.shop_fans AS mg_shop_fans,"
         if _monitor_goods_has_shop_cols(conn)
@@ -641,7 +673,7 @@ def fetch_items_from_scan_delta(
                    sd.goods_id, sd.sold_num, sd.delta, sd.deal_price,
                    prev.sold_num AS prev_sold,
                    COALESCE(m.title, pg.title) AS title,
-                     COALESCE(m.is_virtual::int, pg.is_virtual) AS is_virtual,
+                   COALESCE(m.is_virtual::int, pg.is_virtual) AS is_virtual,
                    COALESCE(m.pool, 'WATCH') AS pool,
                    COALESCE(m.store_id, pg.store_id) AS store_id,
                    COALESCE(m.store_name, pg.store_name) AS store_name,
@@ -699,26 +731,57 @@ def fetch_items_from_scan_delta(
             ) rdi ON TRUE
             WHERE sd.snapshot_date = %s
               AND COALESCE(sd.delta, 0) >= %s
+              AND COALESCE(sd.sold_num, 0) <= %s
             ORDER BY sd.goods_id, sd.delta DESC
             """,
-            (report_date, report_date, min_delta),
+            (report_date, report_date, min_delta, _scan_delta_sold_cap()),
         )
         cols = [d[0] for d in c.description]
-        rows = [dict(zip(cols, r)) for r in c.fetchall()]
+        return [dict(zip(cols, r)) for r in c.fetchall()]
 
-    items: list = []
-    for r in rows:
+
+def fetch_items_from_scan_delta(
+    conn,
+    report_date: str,
+    *,
+    min_delta: int | None = None,
+) -> list:
+    """
+    AI 情报观察池（delta_only，与 actual_velocity 门槛分离）：
+
+    - 主池：premium_goods_daily.delta >= min_delta（对齐 sold_history.delta）
+    - 补池：goods_sold_daily.delta >= min_delta（监控池未入精品库者）
+    - 唯一 goods_id；lifecycle<3；销量上限 20 万
+    """
+    min_delta = insight_min_delta() if min_delta is None else max(1, int(min_delta))
+
+    premium_rows = _fetch_premium_scan_delta_rows(conn, report_date, min_delta)
+    premium_items: list = []
+    for raw in premium_rows:
+        item = premium_row_to_item(raw, delta_only=True)
+        if item:
+            premium_items.append(item)
+
+    premium_ids = {str(item_at(x, "goods_id", "") or "") for x in premium_items}
+    premium_ids.discard("")
+
+    sold_rows = _fetch_sold_daily_scan_delta_rows(conn, report_date, min_delta)
+    monitor_items: list = []
+    for r in sold_rows:
+        gid = str(r.get("goods_id") or "")
+        if gid and gid in premium_ids:
+            continue
         prev_raw = r.get("prev_sold")
         prev_sold = _i(prev_raw) if prev_raw is not None else None
         item = sold_row_to_item(r, prev_sold)
-        if not item:
-            continue
-        items.append(item)
+        if item:
+            monitor_items.append(item)
 
-    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    items = merge_items_by_goods_id(premium_items, monitor_items)
     print(
         f"[pg_reader] scan_delta {report_date}: kept={len(items)} "
-        f"pool={len(rows)} min_delta={min_delta}",
+        f"premium={len(premium_items)}/{len(premium_rows)} "
+        f"monitor+={len(monitor_items)} min_delta={min_delta} mode=delta_only",
         flush=True,
     )
     return items

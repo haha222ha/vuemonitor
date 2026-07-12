@@ -131,8 +131,8 @@ def run_insight_pipeline(
             enriched={
                 **public,
                 "selection_rule": (
-                    f"goods_sold_daily.delta>={insight_min_delta()}, "
-                    "unique per product vs last snapshot_date row"
+                    f"premium_goods_daily.delta>={insight_min_delta()} (delta_only), "
+                    "+ goods_sold_daily supplement, unique per product"
                 ),
             },
         )
