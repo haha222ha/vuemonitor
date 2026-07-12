@@ -7,15 +7,23 @@ from datetime import date, timedelta
 from typing import Any
 
 
+_MONITOR_SCHEMA = "xhs_monitor"
+
+
+def _set_search_path(conn) -> None:
+    with conn.cursor() as cur:
+        cur.execute("SET search_path TO xhs_monitor, public")
+
+
 def _table_exists(conn, table: str) -> bool:
     with conn.cursor() as cur:
         cur.execute(
             """
             SELECT 1 FROM information_schema.tables
-            WHERE table_schema = current_schema() AND table_name = %s
+            WHERE table_schema = %s AND table_name = %s
             LIMIT 1
             """,
-            (table,),
+            (_MONITOR_SCHEMA, table),
         )
         return cur.fetchone() is not None
 
@@ -24,6 +32,7 @@ def upsert_daily_metrics(conn, report_date: str, insights: list[Any]) -> int:
     """将 InsightMetrics 列表 UPSERT 到 daily_category_metrics。表不存在时返回 0。"""
     if not insights or not _table_exists(conn, "daily_category_metrics"):
         return 0
+    _set_search_path(conn)
     n = 0
     with conn.cursor() as cur:
         for m in insights:
@@ -83,6 +92,7 @@ def load_trend_7d(
     """读取类目近 N 日指标序列（供 LLM trend_7d）。"""
     if not _table_exists(conn, "daily_category_metrics"):
         return []
+    _set_search_path(conn)
     try:
         end = date.fromisoformat(end_date[:10])
     except ValueError:
@@ -130,16 +140,53 @@ def load_trend_7d(
     return out
 
 
+def load_peer_categories(
+    conn,
+    category: str,
+    report_date: str,
+    *,
+    limit: int = 3,
+) -> list[str]:
+    """同日其他赛道（按蓝海指数，供 similar_categories 提示）。"""
+    if not category or not _table_exists(conn, "daily_category_metrics"):
+        return []
+    _set_search_path(conn)
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT category FROM daily_category_metrics
+            WHERE report_date = %s AND category <> %s
+            ORDER BY blue_ocean_score DESC, growth_rate_pct DESC
+            LIMIT %s
+            """,
+            (report_date[:10], category, int(limit)),
+        )
+        rows = cur.fetchall()
+    out: list[str] = []
+    for row in rows:
+        if isinstance(row, dict):
+            c = row.get("category")
+        else:
+            c = row[0]
+        if c and str(c) not in out:
+            out.append(str(c))
+    return out
+
+
 def enrich_metrics_for_llm(conn, metrics: dict[str, Any], report_date: str) -> dict[str, Any]:
-    """在公开指标上附加 trend_7d（若 PG 有历史）。"""
+    """在公开指标上附加 trend_7d / similar_categories（若 PG 有历史）。"""
     out = dict(metrics)
     cat = str(metrics.get("category") or "")
     sub = str(metrics.get("sub_category") or "")
     if not cat:
         return out
+    _set_search_path(conn)
     trend = load_trend_7d(conn, cat, report_date, sub_category=sub, days=7)
     if trend:
         out["trend_7d"] = trend
+    peers = load_peer_categories(conn, cat, report_date, limit=3)
+    if peers:
+        out["similar_categories"] = peers
     return out
 
 

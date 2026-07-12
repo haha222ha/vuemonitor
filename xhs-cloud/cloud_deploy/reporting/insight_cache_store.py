@@ -8,14 +8,23 @@ from typing import Any
 PROMPT_VERSION = "agent-v1"
 
 
-def _table_exists(conn) -> bool:
+_MONITOR_SCHEMA = "xhs_monitor"
+
+
+def _set_search_path(conn) -> None:
+    with conn.cursor() as cur:
+        cur.execute("SET search_path TO xhs_monitor, public")
+
+
+def _table_exists(conn, table: str = "insight_report_cache") -> bool:
     with conn.cursor() as cur:
         cur.execute(
             """
             SELECT 1 FROM information_schema.tables
-            WHERE table_schema = current_schema() AND table_name = 'insight_report_cache'
+            WHERE table_schema = %s AND table_name = %s
             LIMIT 1
-            """
+            """,
+            (_MONITOR_SCHEMA, table),
         )
         return cur.fetchone() is not None
 
@@ -27,6 +36,7 @@ def get_cached_report(
 ) -> dict[str, Any] | None:
     if not metrics_hash or not _table_exists(conn):
         return None
+    _set_search_path(conn)
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -60,6 +70,7 @@ def upsert_cached_report(
 ) -> None:
     if not metrics_hash or not report_json or not _table_exists(conn):
         return
+    _set_search_path(conn)
     with conn.cursor() as cur:
         cur.execute(
             """

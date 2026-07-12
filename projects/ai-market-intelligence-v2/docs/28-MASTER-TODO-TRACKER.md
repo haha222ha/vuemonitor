@@ -31,8 +31,8 @@
 - [x] pgvector 扩展 + `category_embeddings` 表（deterministic 兜底可入库）
 - [~] **Phase Q1 情报质量**（5 Agent + 类目树 + L1 cache）→ **`32-INTELLIGENCE-QUALITY-FULL-IMPLEMENTATION-PLAN.md`**
   - [x] Q1-B：5 Agent 移植 `insight_agent_graph.py` + `prompts/agents.yaml`
-  - [ ] Q1-A：类目树 + enrich 全量化
-  - [ ] Q1-C：HTML 指标依据 + L1 验收
+  - [x] Q1-A：类目树 `category_taxonomy.yaml` + enrich + k-匿名
+  - [x] Q1-C：HTML 指标依据折叠 + L1 cache schema 修复
 - [ ] Redis L1（可选，未做）
 
 ---

@@ -7,6 +7,8 @@ from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
+from cloud_deploy.reporting.category_taxonomy import infer_category
+
 
 @dataclass
 class InsightMetrics:
@@ -25,10 +27,14 @@ class InsightMetrics:
     price_band: str = ""
     trend_label: str = "平稳"
     top_keywords: list[str] = field(default_factory=list)
+    price_distribution: dict[str, float] = field(default_factory=dict)
 
     def to_public_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d.pop("sample_size", None)
+        d.pop("top_keywords", None)
+        if not d.get("price_distribution"):
+            d.pop("price_distribution", None)
         d["disclaimer"] = (
             "本报告基于公开市场趋势归纳，不构成对特定商品或店铺的建议。"
             "禁止将本报告用于定位、抄款或批量转售原始数据。"
@@ -40,27 +46,23 @@ def _clamp(n: float, lo: int = 0, hi: int = 100) -> int:
     return int(max(lo, min(hi, round(n))))
 
 
-def _infer_category(title: str) -> tuple[str, str]:
-    t = (title or "").strip()
-    rules = [
-        (r"小学|语文|数学|英语|教辅|暑假|衔接", "小学教辅", "K12"),
-        (r"美甲|穿戴甲|甲片", "美甲美睫", "美业"),
-        (r"收纳|置物|整理", "家居收纳", "家居"),
-        (r"宠物|猫|狗", "宠物用品", "宠物"),
-    ]
-    for pattern, cat, sub in rules:
-        if re.search(pattern, t):
-            return cat, sub
-    return "综合类目", "其他"
-
-
-def _price_band(price: float) -> str:
+def _price_band_label(price: float) -> str:
     if price <= 0:
         return "未知"
     for upper, label in [(10, "0-10"), (20, "10-20"), (50, "20-50"), (100, "50-100"), (99999, "100+")]:
         if price <= upper:
             return label
     return "100+"
+
+
+def _price_distribution(prices: list[float]) -> dict[str, float]:
+    if not prices:
+        return {}
+    counts: dict[str, int] = defaultdict(int)
+    for p in prices:
+        counts[_price_band_label(p)] += 1
+    total = len(prices)
+    return {k: round(v / total * 100.0, 1) for k, v in sorted(counts.items(), key=lambda x: -x[1])}
 
 
 def _season_score(category: str, report_date: str) -> int:
@@ -71,6 +73,7 @@ def _season_score(category: str, report_date: str) -> int:
     rules = {
         "教辅": {"peak": (6, 7, 8), "high": (1, 2, 9), "peak_v": 5, "high_v": 4, "low_v": 2},
         "美甲": {"peak": (11, 12, 1), "high": (), "peak_v": 4, "high_v": 3, "low_v": 3},
+        "户外": {"peak": (4, 5, 6, 9, 10), "high": (), "peak_v": 4, "high_v": 3, "low_v": 2},
     }
     for key, rule in rules.items():
         if key in category:
@@ -104,7 +107,11 @@ def aggregate_items_to_insights(
     buckets: dict[str, list[dict]] = defaultdict(list)
     cat_sub: dict[str, str] = {}
     for it in items:
-        cat, sub = _infer_category(str(it.get("title") or ""))
+        cat, sub = infer_category(
+            str(it.get("title") or ""),
+            behavior=str(it.get("behavior") or ""),
+            is_virtual=it.get("is_virtual") if "is_virtual" in it else None,
+        )
         buckets[cat].append(it)
         cat_sub[cat] = sub
 
@@ -139,7 +146,7 @@ def aggregate_items_to_insights(
         band = "综合"
         if prices:
             lo, hi = min(prices), max(prices)
-            band = f"{int(lo)}-{int(hi)}" if hi - lo > 5 else _price_band(lo)
+            band = f"{int(lo)}-{int(hi)}" if hi - lo > 5 else _price_band_label(lo)
 
         titles = [str(r.get("title") or "") for r in rows]
         out.append(
@@ -159,6 +166,7 @@ def aggregate_items_to_insights(
                 price_band=band,
                 trend_label=trend,
                 top_keywords=_extract_keywords(titles),
+                price_distribution=_price_distribution(prices),
             )
         )
     out.sort(key=lambda x: (-x.blue_ocean_score, -x.growth_rate_pct))

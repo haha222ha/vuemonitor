@@ -38,7 +38,11 @@ def run_insight_pipeline(
     from cloud_deploy.cloud_api.database_pg import _conn, init_db
 
     min_sample = int(os.environ.get("INSIGHT_MIN_SAMPLE", min_sample or 3))
-    max_categories = int(os.environ.get("INSIGHT_MAX_CATEGORIES", max_categories or 12))
+    max_categories = int(os.environ.get("INSIGHT_MAX_CATEGORIES", max_categories or 20))
+
+    from cloud_deploy.reporting.insight_compliance_gate import k_anonymity_threshold, passes_k_anonymity
+
+    k_anon = k_anonymity_threshold()
 
     # 从 PG admin 配置加载 LLM Key（优先于 .env 明文）
     try:
@@ -76,6 +80,12 @@ def run_insight_pipeline(
 
     if len(insights) > max_categories:
         insights = insights[:max_categories]
+        _log(f"cap categories to max={max_categories}")
+
+    insights = [m for m in insights if passes_k_anonymity(m.sample_size, k=k_anon)]
+    if not insights:
+        raise RuntimeError(f"无类目通过 k-匿名（k={k_anon}）")
+    _log(f"publishable categories={len(insights)} k_anon={k_anon}")
 
     metrics_conn = None
     try:
@@ -130,7 +140,19 @@ def run_insight_pipeline(
             report = report_obj.to_public_dict()
             if metrics_conn is not None and use_llm:
                 try:
-                    upsert_cached_report(metrics_conn, mh, report, prompt_version=PROMPT_VERSION)
+                    tokens = 0
+                    if hasattr(report_obj, "llm_meta") and isinstance(report_obj.llm_meta, dict):
+                        usage = report_obj.llm_meta.get("usage") or {}
+                        tokens = int(usage.get("prompt_tokens") or 0) + int(
+                            usage.get("completion_tokens") or 0
+                        )
+                    upsert_cached_report(
+                        metrics_conn,
+                        mh,
+                        report,
+                        prompt_version=PROMPT_VERSION,
+                        llm_tokens_used=tokens,
+                    )
                 except Exception as e:
                     _log(f"cache write skipped {insight.category}: {e}")
 
