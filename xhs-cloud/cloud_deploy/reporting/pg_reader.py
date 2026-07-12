@@ -641,7 +641,7 @@ def fetch_items_from_scan_delta(
                    sd.goods_id, sd.sold_num, sd.delta, sd.deal_price,
                    prev.sold_num AS prev_sold,
                    COALESCE(m.title, pg.title) AS title,
-                   COALESCE(m.is_virtual, pg.is_virtual) AS is_virtual,
+                     COALESCE(m.is_virtual::int, pg.is_virtual) AS is_virtual,
                    COALESCE(m.pool, 'WATCH') AS pool,
                    COALESCE(m.store_id, pg.store_id) AS store_id,
                    COALESCE(m.store_name, pg.store_name) AS store_name,
