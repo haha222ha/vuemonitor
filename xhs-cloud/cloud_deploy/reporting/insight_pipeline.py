@@ -77,6 +77,23 @@ def run_insight_pipeline(
     if len(insights) > max_categories:
         insights = insights[:max_categories]
 
+    metrics_conn = None
+    try:
+        from cloud_deploy.reporting.daily_metrics_store import upsert_daily_metrics
+
+        metrics_conn = _conn()
+        n_dcm = upsert_daily_metrics(metrics_conn, report_date, insights)
+        if n_dcm:
+            _log(f"daily_category_metrics upsert {n_dcm} rows")
+    except Exception as e:
+        _log(f"daily_category_metrics skipped: {e}")
+        if metrics_conn is not None:
+            try:
+                metrics_conn.close()
+            except Exception:
+                pass
+        metrics_conn = None
+
     root = os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud")
     sub = "insight_shadow" if shadow else "report_archives"
     out_base = os.path.join(root, "data", sub)
@@ -84,6 +101,13 @@ def run_insight_pipeline(
     summaries: list[dict[str, Any]] = []
     for insight in insights:
         public = insight.to_public_dict()
+        if metrics_conn is not None:
+            try:
+                from cloud_deploy.reporting.daily_metrics_store import enrich_metrics_for_llm
+
+                public = enrich_metrics_for_llm(metrics_conn, public, report_date)
+            except Exception as e:
+                _log(f"trend_7d enrich skipped {insight.category}: {e}")
         internal = asdict(insight)
         report_obj = run_agents_auto(public, budget_tokens=budget)
         report = report_obj.to_public_dict()
@@ -110,6 +134,12 @@ def run_insight_pipeline(
             }
         )
         _log(f"OK {insight.category} sample={insight.sample_size} → {bundle}")
+
+    if metrics_conn is not None:
+        try:
+            metrics_conn.close()
+        except Exception:
+            pass
 
     summary = {
         "report_date": report_date,

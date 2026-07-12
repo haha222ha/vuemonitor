@@ -116,11 +116,26 @@ def _user_for_request(
     return member_from_token(token)
 
 
+def _log_behavior(user_id: int, action: str, *, category: str | None = None, report_date: str | None = None) -> None:
+    try:
+        from cloud_deploy.cloud_api.database_pg import _conn
+        from cloud_deploy.cloud_api.user_behavior import log_user_behavior
+
+        conn = _conn()
+        try:
+            log_user_behavior(conn, user_id, action, category=category, report_date=report_date)
+        finally:
+            conn.close()
+    except Exception:
+        pass
+
+
 @router.get("/library")
 def insight_library(user: dict = Depends(current_user)):
     ent = assert_insight_allowed(user["id"])
     items = _list_items_from_disk()
     items = filter_insight_library(items, ent)
+    _log_behavior(user["id"], "library")
     return {
         "items": items,
         "shadow_mode": _shadow_mode(),
@@ -159,6 +174,7 @@ def insight_view(
     path = _resolve_insight_html(report_date, category)
     if not path:
         raise HTTPException(status_code=404, detail="情报报告不存在")
+    _log_behavior(user["id"], "view", category=category, report_date=report_date)
     return FileResponse(path, media_type="text/html; charset=utf-8")
 
 

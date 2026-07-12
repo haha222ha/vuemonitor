@@ -103,11 +103,25 @@
 |----|------|------|------|
 | REQ-PROD-001 | 支付仅 `insight_*` | `payment_plans.py` | ⏳ |
 | REQ-PROD-002 | 新会员激活 → `insight_portal` | 新 HTML + 登录跳转 | ⏳ |
-| REQ-PROD-003 | 合并 `entitlements_v2` + `legacy_gate` | `database_pg.py` | ⏳ |
-| REQ-PROD-004 | insight API 路由 | `cloud-stubs/insight_routes.py` | ⏳ |
-| REQ-PROD-005 | `member_insight_watchlist` 表 | migration SQL | ⏳ |
+| REQ-PROD-003 | 合并 `entitlements_v2` + `legacy_gate` | `database_pg.py` | ✅ |
+| REQ-PROD-004 | insight API 路由 | `insight_routes.py` | ✅ |
+| REQ-PROD-005 | `member_insight_watchlist` 表 | migration SQL | ✅ SQL |
 | REQ-PROD-006 | `insight_daily_usage` 原子配额表 | `insight_daily_usage_migration.sql` | ✅ SQL |
-| REQ-PROD-007 | 支付回调写 entitlements note | `payment_service.py` | ⏳ |
+| REQ-PROD-007 | 支付回调写 entitlements note | `payment_service.py` | ✅ |
+
+---
+
+## 15. 留存与 PG 深度集成（v2.2.5）
+
+> 详 **`27-RETENTION-PG-STICKINESS-REQUIREMENTS.md`** · 执行勾选 **`28-MASTER-TODO-TRACKER.md`**
+
+| ID | 需求 | 状态 |
+|----|------|------|
+| REQ-PG-010 | LLM Prompt + `trend_7d` | ✅ |
+| REQ-PG-020 | `daily_category_metrics` 聚合脚本 | ✅ |
+| REQ-RET-010 | `user_behavior` 表 + view 埋点 | ✅ 骨架 |
+| REQ-RET-001 | 机会雷达推送 | ⏳ T1 |
+| REQ-RET-012 | 个性化推荐 | ⏳ T2 |
 
 ---
 

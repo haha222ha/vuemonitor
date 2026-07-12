@@ -41,6 +41,8 @@
 | 34 | 全局任务路线图（Legacy 隔离） | **`24-GLOBAL-TASK-ROADMAP-ISOLATION.md`** | 全员 | ✅ v1.0 |
 | 35 | 全局实施缺口清单（T0→GA） | **`25-GLOBAL-IMPLEMENTATION-GAPS.md`** | 全员 / 运维 | ✅ v1.0 |
 | 36 | T0 Shadow 7 天 Runbook | **`26-T0-SHADOW-RUNBOOK.md`** | 运维 | ✅ v1.0 |
+| 37 | 留存 × PG 深度集成需求 | **`27-RETENTION-PG-STICKINESS-REQUIREMENTS.md`** | 产品 / 后端 | ✅ v1.0 |
+| 38 | **主 TODO 跟踪器（T0→GA）** | **`28-MASTER-TODO-TRACKER.md`** | 全员 | ✅ v1.0 |
 | + | PC 客户端对接（接口） | `09-PC-CLIENT-INTEGRATION.md` | 开发 | ✅ 草案 |
 | + | PC-1 cloud_client 合并说明 | `cloud-stubs/PC-1-CLOUD-CLIENT-INTEGRATION.md` | PC 开发 | ✅ 草案 |
 

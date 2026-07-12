@@ -44,7 +44,8 @@ cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main \
 cd /opt/xhs-cloud
 source .env 2>/dev/null || true
 psql "$XHS_DATABASE_URL" -f cloud_deploy/database/08_insight_v2_tables.sql
-psql "$XHS_DATABASE_URL" -c "SET search_path TO xhs_monitor, public; \dt insight_*; \dt system_settings"
+psql "$XHS_DATABASE_URL" -f cloud_deploy/database/09_retention_pg_schema.sql
+psql "$XHS_DATABASE_URL" -c "SET search_path TO xhs_monitor, public; \dt insight_*; \dt daily_category_metrics; \dt user_behavior"
 ```
 
 ### 3.3 `.env` Shadow 开关（不改 Legacy）
@@ -156,11 +157,33 @@ journalctl -u xhs-insight-report.service -n 50 --no-pager
 
 ---
 
-## 9. 相关路径
+## 9. Shadow 冒烟（W1-5）
+
+```bash
+# 方式 A：浏览器 Token（推荐）
+# 打开 https://monitor.xhs365.cn/member 登录 → F12 控制台:
+#   localStorage.getItem('xhs_member_token')
+export XHS_MEMBER_TOKEN='粘贴 eyJ...'
+export XHS_SMOKE_EXPECT=legacy_dual   # 老月卡；新 insight 码用 insight_only
+bash /opt/xhs-cloud/cloud_deploy/scripts/insight_shadow_smoke.sh
+
+# 方式 B：SSH 账号密码
+export XHS_SMOKE_USER='你的用户名'
+export XHS_SMOKE_PASS='你的密码'
+bash /opt/xhs-cloud/cloud_deploy/scripts/insight_shadow_smoke.sh
+```
+
+**期望**：`legacy_dual` 老月卡 → `insight_enabled=true`, `legacy_zip_enabled=true`, `portal_route=legacy_dual`。
+
+---
+
+## 10. 相关路径
 
 ```
 /opt/xhs-cloud/
 ├── cloud_deploy/scripts/run_insight_report_shadow.sh
+├── cloud_deploy/scripts/aggregate_daily_category_metrics.py
+├── cloud_deploy/scripts/insight_shadow_smoke.sh
 ├── cloud_deploy/scripts/ensure_insight_report_timer.sh
 ├── cloud_deploy/systemd/xhs-insight-report.{service,timer}
 ├── cloud_deploy/reporting/insight_pipeline.py
@@ -170,3 +193,5 @@ journalctl -u xhs-insight-report.service -n 50 --no-pager
 
 Admin UI：`web-admin/src/views/InsightLlmConfigView.vue`  
 API：`PUT /api/v1/admin/insight-llm-config`（xhs-cloud，经 server 代理）
+
+**主 TODO 清单**：`28-MASTER-TODO-TRACKER.md` · **留存/PG 需求**：`27-RETENTION-PG-STICKINESS-REQUIREMENTS.md`

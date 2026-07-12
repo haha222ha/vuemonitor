@@ -34,26 +34,27 @@ def should_use_llm() -> bool:
 
 
 def _metrics_prompt(metrics: dict[str, Any]) -> str:
-    allowed = {
-        k: metrics[k]
-        for k in (
-            "report_date",
-            "category",
-            "sub_category",
-            "window_days",
-            "growth_rate_pct",
-            "competition_index",
-            "blue_ocean_score",
-            "heat_score",
-            "new_product_score",
-            "lifecycle_stage",
-            "season_score",
-            "price_band",
-            "trend_label",
-            "sample_size",
-        )
-        if k in metrics
-    }
+    keys = (
+        "report_date",
+        "category",
+        "sub_category",
+        "window_days",
+        "growth_rate_pct",
+        "competition_index",
+        "blue_ocean_score",
+        "heat_score",
+        "new_product_score",
+        "lifecycle_stage",
+        "season_score",
+        "price_band",
+        "trend_label",
+        "sample_size",
+        "trend_7d",
+        "price_distribution",
+        "similar_categories",
+        "user_context",
+    )
+    allowed = {k: metrics[k] for k in keys if k in metrics}
     return json.dumps(allowed, ensure_ascii=False)
 
 

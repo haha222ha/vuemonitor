@@ -23,5 +23,11 @@ cd "$ROOT"
 export PYTHONPATH="${ROOT}:${PYTHONPATH:-}"
 export XHS_INSIGHT_SHADOW="${XHS_INSIGHT_SHADOW:-1}"
 
+AGG="${ROOT}/cloud_deploy/scripts/aggregate_daily_category_metrics.py"
+if [[ -f "$AGG" ]]; then
+  echo "[insight-shadow] pre-aggregate daily_category_metrics date=$DATE"
+  "$PY" "$AGG" "$DATE" || echo "[insight-shadow] aggregate skipped (table may not exist yet)"
+fi
+
 echo "[insight-shadow] date=$DATE shadow=1"
 exec "$PY" "$SCRIPT" --date "$DATE" --playbook full

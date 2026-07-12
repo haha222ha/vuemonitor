@@ -42,7 +42,18 @@
 | **GAP-T0-03** | 启用 `XHS_INSIGHT_SHADOW_TIMER=1` + `ensure_insight_report_timer.sh` | 运维 | `systemctl list-timers` 见 02:30 |
 | **GAP-T0-04** | Shadow 输出目录与权限 `data/insight_shadow/` | 运维 | 脚本可写、API library 可读 |
 | **GAP-T0-05** | **真 LLM 接入** | 后端 | ✅ admin 后台 + `INSIGHT_USE_LLM` / PG settings |
-| **GAP-T0-06** | E2E：三 persona（legacy / insight / dual）HTTP 用例 | QA | 扩展 `run_e2e.sh` |
+| **GAP-T0-06** | E2E：三 persona（legacy / insight / dual）HTTP 用例 | QA | ✅ `insight_shadow_smoke.py` |
+| **GAP-T0-07** | `09_retention_pg_schema.sql` + 聚合脚本 | 后端 | ✅ 代码；运维 psql 待执行 |
+
+---
+
+## 2b. 留存 / PG 预聚合（doc 27，T1 并行）
+
+| ID | 缺口 | 状态 |
+|----|------|------|
+| **GAP-RET-01** | `daily_category_metrics` 7 日趋势进 LLM | ✅ pipeline + prompt |
+| **GAP-RET-02** | 机会雷达 / 试用 SOP | ⏳ T1 |
+| **GAP-RET-03** | pgvector 相似类目 | ⏳ T2 |
 
 ---
 
