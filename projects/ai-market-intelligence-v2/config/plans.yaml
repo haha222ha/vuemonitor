@@ -1,0 +1,52 @@
+# V2 会员套餐 — 与 payment_plans_v2_patch.py / entitlements_v2 字段对齐
+
+plans:
+  insight_monthly:
+    display: AI 选品情报
+    price_label: "¥129/月"
+    product_line: v2
+    entitlements:
+      insight_categories_per_day: 3
+      insight_compare: false
+      insight_timeline_days: 0
+      insight_workflow: false
+      insight_pdf_export: false
+      insight_llm_tokens_per_day: 20000
+
+  insight_pro_monthly:
+    display: AI 选品情报 Pro
+    price_label: "¥299/月"
+    product_line: v2
+    recommended: true
+    entitlements:
+      insight_categories_per_day: 5
+      insight_compare: true
+      insight_timeline_days: 30
+      insight_workflow: true
+      insight_pdf_export: true
+      insight_llm_tokens_per_day: 40000
+
+  insight_team_monthly:
+    display: AI 选品情报 团队版
+    price_label: "¥899/月"
+    product_line: v2
+    entitlements:
+      insight_categories_per_day: 20
+      insight_compare: true
+      insight_timeline_days: 30
+      insight_workflow: true
+      insight_pdf_export: true
+      insight_team_seats: 5
+      insight_llm_tokens_per_day: 150000
+
+default_plan: insight_pro_monthly
+
+notification_rules:
+  blue_ocean_above: 75
+  growth_above_pct: 25
+  competition_spike: 15
+
+# 全局 fallback（无 entitlements 块时使用）
+llm_budget:
+  tokens_per_day_default: 200000
+  tokens_per_day_team: 800000

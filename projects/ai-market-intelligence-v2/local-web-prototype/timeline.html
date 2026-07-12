@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>趋势时间轴 · 实验室</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="lab-shared.css">
+</head>
+<body>
+<div class="app" style="max-width:960px">
+  <header>
+    <h1>趋势时间轴</h1>
+    <p style="color:var(--muted);font-size:13px;margin:0">7 / 14 / 30 天类目指标曲线 · mock 回溯扰动</p>
+  </header>
+  <div id="labNav"></div>
+
+  <section class="card">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+      <label>类目 <select id="selCategory" class="input" style="padding:8px;border-radius:8px;border:1px solid #e5e5ea"></select></label>
+      <label>窗口
+        <select id="selDays" class="input" style="padding:8px;border-radius:8px;border:1px solid #e5e5ea">
+          <option value="7" selected>7 天</option>
+          <option value="14">14 天</option>
+          <option value="30">30 天</option>
+        </select>
+      </label>
+      <button id="btnLoad" class="btn primary">加载</button>
+    </div>
+  </section>
+
+  <div id="aiWeekly" class="ai-box hidden"></div>
+  <div id="charts" class="timeline-grid"></div>
+</div>
+<script type="module" src="timeline.js"></script>
+</body>
+</html>

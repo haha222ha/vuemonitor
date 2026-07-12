@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>选品报告中心 · 实验室</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="member-demo.css">
+<link rel="stylesheet" href="lab-shared.css">
+</head>
+<body>
+<div class="portal">
+  <header class="portal-header">
+    <div>
+      <h1>选品报告中心</h1>
+      <p class="subtitle">实验室 · 双轨对照（Legacy + AI 情报）· 非新会员默认页</p>
+    </div>
+    <span class="lab-badge">LAB</span>
+  </header>
+
+  <nav class="lab-nav" id="labNav">
+    <a href="insight_portal.html">AI 选品情报</a>
+    <a href="member-demo.html" class="active">双轨对照(Lab)</a>
+    <a href="compare.html">类目对比</a>
+    <a href="timeline.html">趋势时间轴</a>
+    <a href="workflow.html">决策工作流</a>
+    <a href="notifications.html">提醒中心</a>
+  </nav>
+
+  <div class="banner banner-legacy" style="margin-bottom:12px">
+    本页为 <strong>实验室双轨对照</strong>（Legacy + AI 情报）。新会员正式门户见
+    <a href="insight_portal.html">AI 选品情报</a>。
+  </div>
+
+  <div id="planBar" class="plan-bar">加载套餐…</div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="legacy" role="tab" aria-selected="true">数据报告 Legacy</button>
+    <button class="tab" data-tab="insight" role="tab">AI 市场情报</button>
+  </nav>
+
+  <!-- Legacy Tab -->
+  <div id="panelLegacy" class="tab-panel active" role="tabpanel">
+    <div class="banner banner-legacy">
+      您的套餐含历史数据报告（zip/data.js）履约。到期后将统一为 AI 市场情报，不再提供可定位商品明细下载。
+    </div>
+    <section class="card">
+      <h2>Legacy 报告列表（模拟）</h2>
+      <div class="report-list" id="legacyList"></div>
+    </section>
+  </div>
+
+  <!-- Insight Tab -->
+  <div id="panelInsight" class="tab-panel" role="tabpanel" hidden>
+    <div class="banner banner-insight">
+      AI 市场情报 — 类目趋势与决策建议，非原始数据包。
+      <a href="https://monitor.xhs365.cn/member" target="_blank" rel="noopener" style="margin-left:8px">现网购买/扫码支付 →</a>
+    </div>
+
+    <div class="layout-split">
+      <section class="card">
+        <h2>今日推荐类目</h2>
+        <p class="hint">单击选择 · 双击加入对比 · 右键查看趋势</p>
+        <div id="categoryGrid" class="category-grid">加载中…</div>
+      </section>
+
+      <aside class="card sidebar">
+        <h2>类目关注</h2>
+        <p class="hint">同步至 <code>/api/v1/member/insight/watchlist</code>（非商品收藏）</p>
+        <div id="watchlistEditor" class="watchlist-editor">加载中…</div>
+        <button id="btnSaveWatchlist" class="btn secondary" style="width:100%;margin-top:8px;font-size:13px">保存关注列表</button>
+        <div id="watchlistMsg" class="msg" style="min-height:16px"></div>
+        <hr style="border:none;border-top:1px solid #eee;margin:16px 0">
+        <h2>我的情报库</h2>
+        <div id="libraryList" class="library-list">加载中…</div>
+      </aside>
+    </div>
+
+    <section class="card">
+      <h2>生成与阅读</h2>
+      <div class="action-row">
+        <button id="btnGen" class="btn primary" disabled>生成 AI 情报</button>
+        <button id="btnCompare" class="btn secondary" disabled>对比已选（0）</button>
+        <button id="btnExport" class="btn secondary" disabled title="V2-Pro 及以上">导出 PDF 摘要</button>
+        <a id="btnNotif" href="notifications.html" class="notif-bell">提醒 <span id="notifDot" class="dot hidden"></span></a>
+      </div>
+      <div id="progressWrap" class="progress-wrap hidden">
+        <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+        <ul id="progressSteps" class="progress-steps"></ul>
+      </div>
+      <div id="msg" class="msg"></div>
+    </section>
+
+    <section class="card" id="teamPanel" class="hidden" hidden>
+      <h2>团队席位（Team 套餐）</h2>
+      <div id="teamSeats"></div>
+    </section>
+
+    <section class="card preview-section">
+      <h2>报告预览</h2>
+      <iframe id="preview" title="情报报告预览" class="preview-frame"></iframe>
+    </section>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="modal hidden" role="dialog" aria-labelledby="fbTitle">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box">
+    <h3 id="fbTitle">内容纠错 / 投诉</h3>
+    <p class="muted">我们将在 15 个工作日内处理</p>
+    <select id="fbType" class="input">
+      <option value="correction">内容纠错</option>
+      <option value="complaint">投诉</option>
+    </select>
+    <textarea id="fbContent" class="input" rows="4" placeholder="请描述问题…"></textarea>
+    <div class="modal-actions">
+      <button id="fbCancel" class="btn secondary">取消</button>
+      <button id="fbSubmit" class="btn primary">提交</button>
+    </div>
+    <div id="fbMsg" class="msg"></div>
+  </div>
+</div>
+
+<button id="fabFeedback" class="fab" title="纠错 / 投诉">反馈</button>
+
+<script src="member-demo.js"></script>
+</body>
+</html>

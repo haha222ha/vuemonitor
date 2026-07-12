@@ -19,7 +19,23 @@ def _notify_url() -> str:
     return f"{base}/api/v1/payment/notify/hwxun"
 
 
-def _gen_order_no() -> str:
+def _payment_fulfillment_note(order_no: str, channel: str, plan_code: str) -> str:
+    """V2 套餐写入 entitlements 到 auth_codes.note（PR-1）。"""
+    from cloud_deploy.cloud_api.payment_plans_v2 import INSIGHT_PLAN_BY_CODE, entitlements_note_for_plan
+
+    code = str(plan_code or "").strip()
+    if code in INSIGHT_PLAN_BY_CODE:
+        try:
+            data = json.loads(entitlements_note_for_plan(code))
+        except Exception:
+            data = {"entitlements": {"plan_code": code}}
+        if isinstance(data, dict):
+            data.setdefault("order_no", order_no)
+            data.setdefault("source", f"hwxun_{channel}")
+            return json.dumps(data, ensure_ascii=False)
+    return json.dumps({"order_no": order_no, "source": f"hwxun_{channel}"}, ensure_ascii=False)
+
+
     ts = datetime.now().strftime("%Y%m%d%H%M%S")
     return f"XHSP{ts}{secrets.token_hex(3).upper()}"
 
@@ -270,7 +286,7 @@ def handle_hwxun_notify(params: dict) -> str:
         return "fail"
     paid_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     ch = row.get("channel") or "wxpay"
-    note = json.dumps({"order_no": order_no, "source": f"hwxun_{ch}"}, ensure_ascii=False)
+    note = _payment_fulfillment_note(order_no, ch, row["plan_code"])
     codes = db.generate_auth_codes(
         count=1,
         plan_code=row["plan_code"],

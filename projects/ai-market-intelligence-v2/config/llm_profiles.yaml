@@ -1,0 +1,17 @@
+# LLM 配置（可被 .env 覆盖）
+# 默认：PackyAPI 中继 + DeepSeek V4 Flash
+# 文档：docs/13-LLM-PACKYAPI-DEEPSEEK.md
+
+provider: packy_deepseek
+base_url: https://www.packyapi.com/v1
+default_model: deepseek-v4-flash
+thinking: disabled   # V4 默认 thinking 开；Agent JSON 任务建议关
+
+# 分 Agent 模型（flash 够用；ceo 可升级 pro）
+agents:
+  market: deepseek-v4-flash
+  data: deepseek-v4-flash
+  risk: deepseek-v4-flash
+  ops: deepseek-v4-flash
+  ceo: deepseek-v4-flash
+  # ceo: deepseek-v4-pro   # 需要更强推理时取消注释

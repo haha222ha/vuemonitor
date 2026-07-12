@@ -61,10 +61,22 @@ def test_plan_enabled() -> bool:
 
 
 def list_active_plans() -> list[dict]:
+    if v2_launch_enabled():
+        from cloud_deploy.cloud_api.payment_plans_v2 import list_active_plans_v2_only
+
+        plans = list_active_plans_v2_only()
+        if test_plan_enabled():
+            return [PAYMENT_TEST_PLAN, *plans]
+        return plans
     plans = list(PAYMENT_PLANS)
     if test_plan_enabled():
         plans = [PAYMENT_TEST_PLAN, *plans]
     return plans
+
+
+def v2_launch_enabled() -> bool:
+    """T0 上线后设为 1：支付页仅展示 insight_* SKU。"""
+    return os.environ.get("XHS_V2_LAUNCH", "").strip().lower() in ("1", "true", "yes", "on")
 
 
 PLAN_BY_CODE = {p["plan_code"]: p for p in PAYMENT_PLANS}

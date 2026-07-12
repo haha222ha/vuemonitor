@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>类目对比工作台 · 实验室</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="lab-shared.css">
+</head>
+<body>
+<div class="app" style="max-width:960px">
+  <header>
+    <h1>类目对比工作台</h1>
+    <p style="color:var(--muted);font-size:13px;margin:0">最多 3 个类目 · 雷达图 + AI 相对推荐序 · mock 数据</p>
+  </header>
+  <div id="labNav"></div>
+
+  <section class="card">
+    <h2>选择类目（2～3 个）</h2>
+    <div id="catChips" class="cat-chips">加载中…</div>
+    <button id="btnCompare" class="btn primary" disabled>开始对比</button>
+    <div id="msg" class="msg"></div>
+  </section>
+
+  <div id="result" class="hidden">
+    <div id="aiSummary" class="ai-box"></div>
+    <section class="chart-card">
+      <h2 class="chart-title">指标雷达</h2>
+      <div id="radarHost" class="radar-wrap"></div>
+    </section>
+    <section class="chart-card">
+      <h2 class="chart-title">数据对照</h2>
+      <div id="tableHost"></div>
+    </section>
+  </div>
+</div>
+<script type="module" src="compare.js"></script>
+</body>
+</html>

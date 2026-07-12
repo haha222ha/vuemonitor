@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 市场情报实验室</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>AI 市场情报实验室 V2</h1>
+    <p>本地验证 · 不连接现网 · 无商品 ID / 店铺名 / data.js</p>
+  </header>
+  <main>
+    <section class="card">
+      <h2>推荐入口</h2>
+      <div class="lab-nav" style="margin-bottom:12px">
+        <a href="insight_portal.html">AI 选品情报（新会员默认）</a>
+        <a href="member-demo.html">双轨对照(Lab)</a>
+        <a href="compare.html">类目对比</a>
+        <a href="timeline.html">趋势时间轴</a>
+        <a href="workflow.html">决策工作流</a>
+      </div>
+      <p style="margin:0 0 14px;color:var(--muted);font-size:14px">
+        8 月上线后：新购会员进入 <code>insight_portal</code>；老会员 Legacy 履约见双轨对照页。
+      </p>
+      <a href="insight_portal.html" class="btn primary" style="display:inline-block;text-decoration:none;margin-right:8px">打开 V2 独立门户 →</a>
+      <a href="member-demo.html" class="btn secondary" style="display:inline-block;text-decoration:none">双轨对照页 →</a>
+    </section>
+    <section class="card">
+      <h2>开发者精简页</h2>
+      <p style="font-size:13px;color:var(--muted);margin:0 0 12px">快速测试 API / 报告 HTML</p>
+      <div id="categoryList" class="list">加载中…</div>
+    </section>
+    <section class="card">
+      <h2>生成情报报告</h2>
+      <button id="btnGen" class="btn primary" disabled>生成 AI 情报</button>
+      <div id="msg" class="msg"></div>
+    </section>
+    <section class="card">
+      <h2>预览</h2>
+      <iframe id="preview" title="情报报告预览" class="preview-frame"></iframe>
+    </section>
+  </main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

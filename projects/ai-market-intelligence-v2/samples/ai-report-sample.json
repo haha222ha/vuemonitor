@@ -1,0 +1,23 @@
+{
+  "executive_summary": "小学教辅暑假衔接赛道处于成长早期，竞争尚未饱和，建议 7 日内完成内容布局。",
+  "trend_summary": "近 7 天类目整体增速约 42%，需求由暑假前准备驱动，热度指数 76。",
+  "metric_interpretation": "竞争指数 18 属中等偏低；蓝海指数 89 显示供给端仍有空间；价格带 9～19 元为主战场。",
+  "action_plan": {
+    "enter": true,
+    "category_focus": "小学语文衔接",
+    "price_band": "9-19 元",
+    "content_format": ["PDF 资料包", "每日一练"],
+    "timeline_days": 7
+  },
+  "risk_assessment": "同类内容供给开始增加，窗口期约 2～3 周；需避免同质化标题策略。",
+  "opportunity_stars": 5,
+  "confidence": 0.82,
+  "pages": [
+    { "page": 1, "title": "本周趋势评分", "stars": 5 },
+    { "page": 2, "title": "AI 总结", "body": "最近 7 天，小学教辅增长明显，暑假衔接需求持续增长。" },
+    { "page": 3, "title": "市场机会", "growth": "42%", "competition": "中", "stars": 5 },
+    { "page": 4, "title": "AI 建议", "focus": "小学语文", "price": "9-19", "format": "PDF 资料包" },
+    { "page": 5, "title": "风险提示", "body": "竞争开始增加，建议尽快布局。" },
+    { "page": 6, "title": "总结", "verdict": "适合进入", "action": "7 天内完成产品制作" }
+  ]
+}

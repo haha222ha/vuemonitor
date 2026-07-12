@@ -112,6 +112,15 @@ class XhsCloudClient:
     async def update_member_keyword_request(self, item_id: int, payload: dict) -> dict:
         return await self._request("PATCH", f"/api/v1/admin/member-keyword-requests/{item_id}", json=payload)
 
+    async def get_insight_llm_config(self) -> dict:
+        return await self._request("GET", "/api/v1/admin/insight-llm-config")
+
+    async def save_insight_llm_config(self, payload: dict) -> dict:
+        return await self._request("PUT", "/api/v1/admin/insight-llm-config", json=payload)
+
+    async def test_insight_llm_config(self) -> dict:
+        return await self._request("POST", "/api/v1/admin/insight-llm-config/test", timeout=120.0)
+
 
 def get_xhs_cloud_client() -> XhsCloudClient:
     return XhsCloudClient()

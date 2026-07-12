@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>智能提醒中心 · 实验室</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="lab-shared.css">
+</head>
+<body>
+<div class="app" style="max-width:720px">
+  <header>
+    <h1>智能提醒中心</h1>
+    <p style="color:var(--muted);font-size:13px;margin:0">蓝海突破 · 增速异常 · 竞争风险 · Legacy 到期（mock 规则触发）</p>
+  </header>
+  <div id="labNav"></div>
+
+  <div class="action-row" style="margin-bottom:12px">
+    <button id="btnRefresh" class="btn secondary">刷新规则</button>
+    <button id="btnReadAll" class="btn secondary">全部已读</button>
+    <span id="unreadBadge" class="plan-badge"></span>
+  </div>
+
+  <div id="notifList"></div>
+</div>
+<script type="module" src="notifications.js"></script>
+</body>
+</html>

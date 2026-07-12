@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 选品情报 · 会员中心</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="member-demo.css">
+<link rel="stylesheet" href="lab-shared.css">
+</head>
+<body>
+<div class="portal">
+  <header class="portal-header">
+    <div>
+      <h1>AI 选品情报</h1>
+      <p class="subtitle">新会员默认门户 · 类目级市场洞察 · 无数据包下载</p>
+    </div>
+    <span class="lab-badge">LAB</span>
+  </header>
+
+  <nav class="lab-nav" id="labNav">
+    <a href="insight_portal.html" class="active">AI 选品情报</a>
+    <a href="compare.html">类目对比</a>
+    <a href="timeline.html">趋势时间轴</a>
+    <a href="workflow.html">决策工作流</a>
+    <a href="notifications.html">提醒中心</a>
+    <a href="member-demo.html" style="margin-left:auto;font-size:12px;color:var(--muted)">双轨对照(Lab)</a>
+  </nav>
+
+  <div id="previewBanner" class="banner banner-insight hidden">
+    体验版预览：正式开通时间与权益以 8 月公告为准。Legacy 数据报告仍在
+    <a href="member-demo.html">双轨对照页</a> 履约至到期日。
+  </div>
+
+  <div id="planBar" class="plan-bar">加载账号…</div>
+
+  <div class="banner banner-insight">
+    AI 选品分析 — 聚合指标与决策建议，不含可定位商品/店铺的原始数据包。
+    <a href="https://monitor.xhs365.cn/member" target="_blank" rel="noopener" style="margin-left:8px">现网购买/续费 →</a>
+  </div>
+
+  <div class="layout-split">
+    <section class="card">
+      <h2>今日推荐类目</h2>
+      <p class="hint">单击选择 · 双击加入对比 · 右键查看趋势</p>
+      <div id="categoryGrid" class="category-grid">加载中…</div>
+    </section>
+
+    <aside class="card sidebar">
+      <h2>类目关注</h2>
+      <p class="hint">同步至 <code>/api/v1/member/insight/watchlist</code></p>
+      <div id="watchlistEditor" class="watchlist-editor">加载中…</div>
+      <button id="btnSaveWatchlist" class="btn secondary" style="width:100%;margin-top:8px;font-size:13px">保存关注列表</button>
+      <div id="watchlistMsg" class="msg" style="min-height:16px"></div>
+      <hr style="border:none;border-top:1px solid #eee;margin:16px 0">
+      <h2>我的情报库</h2>
+      <div id="libraryList" class="library-list">加载中…</div>
+    </aside>
+  </div>
+
+  <section class="card">
+    <h2>生成与阅读</h2>
+    <div class="action-row">
+      <button id="btnGen" class="btn primary" disabled>生成 AI 情报</button>
+      <button id="btnCompare" class="btn secondary" disabled>对比已选（0）</button>
+      <button id="btnExport" class="btn secondary" disabled title="V2-Pro 及以上">导出 PDF 摘要</button>
+      <a id="btnNotif" href="notifications.html" class="notif-bell">提醒 <span id="notifDot" class="dot hidden"></span></a>
+    </div>
+    <div id="progressWrap" class="progress-wrap hidden">
+      <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+      <ul id="progressSteps" class="progress-steps"></ul>
+    </div>
+    <div id="msg" class="msg"></div>
+  </section>
+
+  <section class="card" id="teamPanel" hidden>
+    <h2>团队席位（Team 套餐）</h2>
+    <div id="teamSeats"></div>
+  </section>
+
+  <section class="card preview-section">
+    <h2>报告预览</h2>
+    <iframe id="preview" title="情报报告预览" class="preview-frame"></iframe>
+  </section>
+</div>
+
+<div id="feedbackModal" class="modal hidden" role="dialog" aria-labelledby="fbTitle">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box">
+    <h3 id="fbTitle">内容纠错 / 投诉</h3>
+    <p class="muted">我们将在 15 个工作日内处理</p>
+    <select id="fbType" class="input">
+      <option value="correction">内容纠错</option>
+      <option value="complaint">投诉</option>
+    </select>
+    <textarea id="fbContent" class="input" rows="4" placeholder="请描述问题…"></textarea>
+    <div class="modal-actions">
+      <button id="fbCancel" class="btn secondary">取消</button>
+      <button id="fbSubmit" class="btn primary">提交</button>
+    </div>
+    <div id="fbMsg" class="msg"></div>
+  </div>
+</div>
+
+<button id="fabFeedback" class="fab" title="纠错 / 投诉">反馈</button>
+
+<script src="insight_portal.js"></script>
+</body>
+</html>

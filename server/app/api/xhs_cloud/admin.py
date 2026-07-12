@@ -147,73 +147,56 @@ async def revoke_member_code(
     return {"code": 0, "data": result}
 
 
-class MemberFeedbackUpdateRequest(BaseModel):
-    status: str | None = Field(default=None, max_length=16)
-    admin_note: str | None = Field(default=None, max_length=2000)
+class InsightLlmConfigRequest(BaseModel):
+    enabled: bool | None = None
+    provider: str | None = Field(default=None, max_length=32)
+    base_url: str | None = Field(default=None, max_length=256)
+    model: str | None = Field(default=None, max_length=64)
+    api_key: str | None = Field(default=None, max_length=512)
+    thinking_disabled: bool | None = None
+    budget_tokens_per_day: int | None = Field(default=None, ge=1000, le=10_000_000)
 
 
-@router.get("/member-feedback")
-async def list_member_feedback_admin(
+@router.get("/insight-llm-config")
+async def get_insight_llm_config(
     admin: AdminUser,
-    limit: int = Query(default=100, ge=1, le=500),
-    status: str | None = Query(default=None),
     client: XhsCloudClient = Depends(get_xhs_cloud_client),
 ):
     del admin
     try:
-        result = await client.list_member_feedback(limit=limit, status=status)
+        result = await client.get_insight_llm_config()
     except XhsCloudNotConfigured as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
-    items = result.get("items") or []
-    return {"code": 0, "data": {"items": items, "total": len(items)}}
+    return {"code": 0, "data": result}
 
 
-@router.patch("/member-feedback/{item_id}")
-async def update_member_feedback_admin(
-    item_id: int,
-    req: MemberFeedbackUpdateRequest,
+@router.put("/insight-llm-config")
+async def save_insight_llm_config(
+    req: InsightLlmConfigRequest,
     admin: AdminUser,
     client: XhsCloudClient = Depends(get_xhs_cloud_client),
 ):
     del admin
     payload = req.model_dump(exclude_unset=True)
     try:
-        result = await client.update_member_feedback(item_id, payload)
+        result = await client.save_insight_llm_config(payload)
     except XhsCloudNotConfigured as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
     return {"code": 0, "data": result}
 
 
-@router.get("/member-keyword-requests")
-async def list_member_keyword_requests_admin(
-    admin: AdminUser,
-    limit: int = Query(default=100, ge=1, le=500),
-    status: str | None = Query(default=None),
-    client: XhsCloudClient = Depends(get_xhs_cloud_client),
-):
-    del admin
-    try:
-        result = await client.list_member_keyword_requests(limit=limit, status=status)
-    except XhsCloudNotConfigured as e:
-        raise HTTPException(status_code=503, detail=str(e)) from e
-    items = result.get("items") or []
-    return {"code": 0, "data": {"items": items, "total": len(items)}}
-
-
-@router.patch("/member-keyword-requests/{item_id}")
-async def update_member_keyword_request_admin(
-    item_id: int,
-    req: MemberFeedbackUpdateRequest,
+@router.post("/insight-llm-config/test")
+async def test_insight_llm_config(
     admin: AdminUser,
     client: XhsCloudClient = Depends(get_xhs_cloud_client),
 ):
     del admin
-    payload = req.model_dump(exclude_unset=True)
     try:
-        result = await client.update_member_keyword_request(item_id, payload)
+        result = await client.test_insight_llm_config()
     except XhsCloudNotConfigured as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
     return {"code": 0, "data": result}
+
 
 
 class MemberFeedbackUpdateRequest(BaseModel):

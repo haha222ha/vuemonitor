@@ -122,6 +122,18 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 .dash-tabs{display:flex;gap:8px;margin-bottom:16px}
 .dash-tab{flex:1;text-align:center;padding:10px 12px;border-radius:20px;font-size:14px;cursor:pointer;background:#e8e8ed;color:var(--text2)}
 .dash-tab.active{background:var(--accent);color:#fff}
+.dash-tab.hidden{display:none!important}
+.insight-plan-bar{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-bottom:14px;font-size:13px}
+.insight-badge{background:#eef5ff;color:var(--accent);padding:4px 10px;border-radius:16px;font-weight:600}
+.insight-meta{color:var(--text2)}
+.insight-lib-list{display:flex;flex-direction:column;gap:8px;max-height:240px;overflow-y:auto;margin-bottom:14px}
+.insight-lib-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid var(--line);border-radius:10px;background:#f9f9fb;cursor:pointer}
+.insight-lib-item:hover{border-color:var(--accent)}
+.insight-lib-meta{font-size:12px;color:var(--text2);margin-top:4px}
+.insight-preview-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.insight-preview-wrap iframe{width:100%;height:min(520px,60vh);border:none;display:block}
+.insight-preview-hint{font-size:12px;color:var(--text2);margin:8px 0 10px}
+.insight-banner{padding:12px 14px;border-radius:10px;background:#eef5ff;border:1px solid #c5d9f5;font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.55}
 .plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
 @media(min-width:520px){.plan-grid{grid-template-columns:repeat(4,1fr)}}
 .plan-card{border:1px solid var(--line);border-radius:10px;padding:14px 12px;cursor:pointer;background:#f9f9fb;text-align:center;-webkit-tap-highlight-color:transparent}
@@ -319,7 +331,8 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   <div id="dashView" class="hidden">
     <div id="expiryBanner"></div>
     <div class="dash-tabs">
-      <div class="dash-tab active" data-dash="reports" onclick="switchDash('reports')">报告库</div>
+      <div class="dash-tab" id="dashTabInsight" data-dash="insight" onclick="switchDash('insight')">AI 选品情报</div>
+      <div class="dash-tab active" id="dashTabReports" data-dash="reports" onclick="switchDash('reports')">报告库</div>
       <div class="dash-tab" data-dash="watchlist" onclick="switchDash('watchlist')">我的收藏</div>
     </div>
     <div class="card">
@@ -343,6 +356,23 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
         <div class="field"><label>新密码（至少 6 位）</label><input id="pwdNew" type="password" autocomplete="new-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doChangePassword()"></div>
         <button class="btn btn-primary btn-block" onclick="doChangePassword()">保存新密码</button>
       </div>
+    </div>
+    <div id="dashInsight" class="hidden">
+    <div id="insightPreviewBanner" class="insight-banner hidden">
+      您正在预览 AI 选品情报功能。Legacy 数据包报告仍在「报告库」Tab 履约至会员到期。
+    </div>
+    <div class="card">
+      <div class="section-title">AI 选品情报</div>
+      <p style="font-size:13px;color:var(--text2);margin:8px 0 14px">类目级市场洞察与决策建议，不含可定位商品/店铺的原始数据包。报告由系统夜间预生成。</p>
+      <div id="insightPlanBar" class="insight-plan-bar">加载中…</div>
+      <div id="insightLibraryEmpty" class="empty hidden">暂无预生成情报。管理员运行 cloud_insight_report.py 后将在此展示。</div>
+      <div id="insightLibraryList" class="insight-lib-list"></div>
+      <div class="insight-preview-hint" id="insightPreviewHint">选择上方报告阅读</div>
+      <div class="insight-preview-wrap">
+        <iframe id="insightPreviewFrame" title="AI 情报预览" src="about:blank"></iframe>
+      </div>
+      <div id="insightMsg" style="font-size:13px;color:var(--text2);margin-top:12px"></div>
+    </div>
     </div>
     <div id="dashReports">
     <div class="card">
@@ -387,6 +417,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <div id="dashMsg"></div>
   </div>
 </div>
+<script src="/assets/member_insight.js"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -517,10 +548,16 @@ let watchlistSelected = new Set();
 
 function switchDash(name) {
   currentDash = name || 'reports';
-  document.querySelectorAll('.dash-tab').forEach(t => t.classList.toggle('active', t.dataset.dash === currentDash));
+  try { localStorage.setItem('xhs_member_dash_tab', currentDash); } catch (_) {}
+  document.querySelectorAll('.dash-tab').forEach(t => {
+    if (t.classList.contains('hidden')) return;
+    t.classList.toggle('active', t.dataset.dash === currentDash);
+  });
   document.getElementById('dashReports').classList.toggle('hidden', currentDash !== 'reports');
   document.getElementById('dashWatchlist').classList.toggle('hidden', currentDash !== 'watchlist');
+  document.getElementById('dashInsight').classList.toggle('hidden', currentDash !== 'insight');
   if (currentDash === 'watchlist') loadWatchlist();
+  if (currentDash === 'insight' && window.MemberInsight) MemberInsight.load();
 }
 
 function reportKey(date, archiveType) {
@@ -1221,6 +1258,7 @@ function renderProfile(m) {
     banner.innerHTML = `<div class="alert alert-error">会员已过期，请点击下方「扫码续费（微信/支付宝）」</div>`;
   }
   updatePortalVisibility(m);
+  if (window.MemberInsight) MemberInsight.applyEntitlements(m);
 }
 
 function archiveTypeFor(t) {
@@ -1562,7 +1600,12 @@ async function loadDashboard(useCacheFirst) {
     showDashboard(cached);
   }
   const data = await api('/api/v1/member/library', { auth: true });
-  renderProfile(data.membership || cached || {});
+  let profile = null;
+  try {
+    profile = await api('/api/v1/member/profile', { auth: true });
+  } catch (_) {}
+  const membership = profile || data.membership || cached || {};
+  renderProfile(membership);
   library = data.library || { daily: [], weekly: [], monthly: [], custom: [] };
   if (data.expired) {
     showMsg(document.getElementById('dashMsg'), '会员已过期，续费成功后可下载报告', 'warn');
@@ -1576,7 +1619,7 @@ async function loadDashboard(useCacheFirst) {
   }
   setViewMode(currentViewMode());
   renderReports();
-  showDashboard(data.membership);
+  showDashboard(membership);
 }
 
 function logout() {

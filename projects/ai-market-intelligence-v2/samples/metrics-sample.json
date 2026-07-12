@@ -1,0 +1,18 @@
+{
+  "report_date": "2026-07-12",
+  "category": "小学教辅",
+  "sub_category": "暑假衔接",
+  "window_days": 7,
+  "metrics": {
+    "growth_rate_pct": 42,
+    "competition_index": 18,
+    "blue_ocean_score": 89,
+    "heat_score": 76,
+    "new_product_score": 65,
+    "lifecycle_stage": "成长",
+    "season_score": 5,
+    "price_band": "9-19",
+    "trend_label": "连续上涨"
+  },
+  "disclaimer": "本报告基于公开市场趋势归纳，不构成对特定商品或店铺的建议。仅供研究参考。"
+}

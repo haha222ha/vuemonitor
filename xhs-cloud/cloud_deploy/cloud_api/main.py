@@ -45,10 +45,16 @@ from cloud_deploy.cloud_api.password_reset_service import (
     request_password_reset,
     reset_password_with_token,
 )
+from cloud_deploy.cloud_api.insight_routes import router as insight_router
+from cloud_deploy.cloud_api.member_entitlements import (
+    assert_legacy_zip_allowed,
+    enrich_member_profile,
+)
 
 _ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
 
 app = FastAPI(title="XHS 选品云服务", version="1.1.0")
+app.include_router(insight_router)
 
 
 @app.on_event("startup")
@@ -338,6 +344,14 @@ def member_portal_page():
     )
 
 
+@app.get("/assets/member_insight.js")
+def member_insight_js():
+    path = os.path.join(_ASSETS, "member_insight.js")
+    if not os.path.isfile(path):
+        raise HTTPException(status_code=404, detail="member_insight.js missing")
+    return FileResponse(path, media_type="application/javascript; charset=utf-8")
+
+
 @app.get("/api/v1/health")
 def health():
     return {"status": "ok"}
@@ -558,7 +572,7 @@ def member_profile(user: dict = Depends(current_user)):
     profile = db.get_member_profile(user["id"])
     if not profile:
         raise HTTPException(status_code=404, detail="用户不存在")
-    return profile
+    return enrich_member_profile(profile, user["id"])
 
 
 @app.post("/api/v1/member/change-password")
@@ -697,6 +711,7 @@ def download_report(
     if not token:
         raise HTTPException(status_code=401, detail="需要登录")
     user = member_from_token(token)
+    assert_legacy_zip_allowed(user["id"])
     if not db.member_can_download_report(user["id"], report_date, archive_type):
         raise HTTPException(status_code=403, detail="体验授权码仅可下载指定报告，请联系管理员开通完整会员")
     path = db.get_archive_path(report_date, archive_type)
@@ -779,6 +794,7 @@ def member_report_view_file(
     if not token:
         raise HTTPException(status_code=401, detail="需要登录")
     user = member_from_token(token)
+    assert_legacy_zip_allowed(user["id"])
     try:
         path, media_type, rewritten = read_member_report_file(
             report_date,
@@ -811,6 +827,7 @@ def batch_download_reports(
     user: dict = Depends(current_member),
 ):
     """将会员选中的多份报告 zip 再打包为一个 zip 下载。"""
+    assert_legacy_zip_allowed(user["id"])
     if body.archive_type not in _MEMBER_ARCHIVE_TYPES:
         raise HTTPException(status_code=400, detail="无效的报告类型")
 
@@ -1015,6 +1032,89 @@ def admin_update_member_keyword_request(
     if not ok:
         raise HTTPException(status_code=404, detail="记录不存在或无变更")
     return {"message": "已更新"}
+
+
+class InsightLlmConfigBody(BaseModel):
+    enabled: bool | None = None
+    provider: str | None = Field(default=None, max_length=32)
+    base_url: str | None = Field(default=None, max_length=256)
+    model: str | None = Field(default=None, max_length=64)
+    api_key: str | None = Field(default=None, max_length=512)
+    thinking_disabled: bool | None = None
+    budget_tokens_per_day: int | None = Field(default=None, ge=1000, le=10_000_000)
+
+
+@app.get("/api/v1/admin/insight-llm-config")
+def admin_get_insight_llm_config(_: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="需要 PostgreSQL")
+    try:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+        from cloud_deploy.cloud_api.insight_settings import get_public_config
+
+        init_db()
+        conn = _conn()
+        try:
+            return {"config": get_public_config(conn)}
+        finally:
+            conn.close()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"读取配置失败: {e}") from e
+
+
+@app.put("/api/v1/admin/insight-llm-config")
+def admin_put_insight_llm_config(body: InsightLlmConfigBody, _: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="需要 PostgreSQL")
+    try:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+        from cloud_deploy.cloud_api.insight_settings import save_config
+
+        init_db()
+        conn = _conn()
+        try:
+            cfg = save_config(conn, body.model_dump(exclude_unset=True))
+            return {"message": "已保存", "config": cfg}
+        finally:
+            conn.close()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"保存配置失败: {e}") from e
+
+
+@app.post("/api/v1/admin/insight-llm-config/test")
+def admin_test_insight_llm_config(_: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="需要 PostgreSQL")
+    try:
+        from cloud_deploy.cloud_api.database_pg import init_db
+        from cloud_deploy.cloud_api.insight_settings import apply_runtime_env, describe_public, resolve_runtime_config
+        from cloud_deploy.reporting.insight_llm_client import LLMError, chat_json_with_usage
+
+        init_db()
+        cfg = apply_runtime_env(resolve_runtime_config())
+        if not cfg.get("api_key"):
+            raise HTTPException(status_code=400, detail="未配置 API Key")
+        parsed, usage = chat_json_with_usage(
+            "你是助手。",
+            '回复 JSON：{"ok":true,"message":"pong"}',
+            temperature=0,
+        )
+        return {
+            "ok": bool(parsed.get("ok")),
+            "message": parsed.get("message") or "连接成功",
+            "usage": {
+                "prompt_tokens": usage.prompt_tokens,
+                "completion_tokens": usage.completion_tokens,
+                "model": usage.model,
+            },
+            "config": describe_public(cfg),
+        }
+    except HTTPException:
+        raise
+    except LLMError as e:
+        raise HTTPException(status_code=502, detail=str(e)) from e
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"测试失败: {e}") from e
 
 
 @app.get("/api/v1/sync/status")

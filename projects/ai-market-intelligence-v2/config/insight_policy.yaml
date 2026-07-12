@@ -1,0 +1,56 @@
+# 对外发布策略（Policy-First 配置）
+# 合并生产时可放在 /opt/xhs-cloud/config/insight_policy.yaml
+
+version: "1.0"
+product_name: "AI市场情报平台"
+legal_position: "research_intelligence_saas"  # 非 data_broker
+
+release_boundary:
+  allowed_output_types:
+    - insight_daily_html
+    - insight_summary_json
+  forbidden_output_types:
+    - member_daily_zip
+    - raw_csv
+    - goods_api
+
+field_policy:
+  mode: blacklist
+  forbidden_fields: []  # 见 compliance_gate.FORBIDDEN_KEYS
+
+ai_policy:
+  input_whitelist:
+    - category
+    - sub_category
+    - growth_rate_pct
+    - competition_index
+    - blue_ocean_score
+    - heat_score
+    - price_band
+    - trend_label
+    - window_days
+  require_ai_label: true
+  ai_label_text: "本内容由 AI 辅助生成，仅供市场研究参考，不构成投资建议。"
+
+retention:
+  raw_snapshots_days: 90
+  insight_published_days: 730
+  audit_logs_days: 365
+
+content_safety:
+  block_patterns:
+    - "刷单"
+    - "刷量"
+    - "保证收益"
+    - "1:1抄"
+
+k_anonymity:
+  min_sample_size: 5
+
+dual_track:
+  legacy_archive_types:
+    - member_daily_zip
+    - member_weekly_zip
+  v2_archive_types:
+    - insight_daily_html
+  new_sales_default: insight_pro

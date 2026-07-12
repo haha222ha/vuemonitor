@@ -1,0 +1,11 @@
+[Unit]
+Description=Run V2 insight shadow precompute (L0 batch, before daily traffic)
+After=network.target
+
+[Timer]
+# 02:30 — 在 Legacy 日报 17:00 之前完成；读 PG 昨日/当日快照
+OnCalendar=*-*-* 02:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

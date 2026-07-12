@@ -1,0 +1,53 @@
+<!-- 合并进 member_portal.html Phase 3：AI 情报 Tab 片段（UX v1） -->
+<div id="insightPanel" class="hidden">
+  <div class="banner banner-insight" style="padding:12px 16px;background:#e8f4fd;border-radius:8px;margin-bottom:16px;font-size:13px">
+    AI 市场情报 — 类目趋势与决策建议，不含商品 ID / 店铺明细 / 原始数据下载。
+  </div>
+
+  <div class="section-title">今日推荐</div>
+  <div id="insightCategoryGrid" class="category-grid"></div>
+
+  <div class="section-title" style="margin-top:20px">我的情报库</div>
+  <div id="insightList"></div>
+
+  <div id="insightLoading" class="hidden" style="margin:12px 0">
+    <div class="progress-bar" style="height:6px;background:#eee;border-radius:3px">
+      <div id="insightProgressFill" style="height:100%;width:0;background:#0071e3;border-radius:3px;transition:width .3s"></div>
+    </div>
+    <p class="sub" id="insightLoadingText">正在生成情报…</p>
+  </div>
+
+  <iframe id="insightPreview" class="preview-frame hidden" title="情报预览" style="width:100%;min-height:480px;border:1px solid #e5e5ea;border-radius:8px;margin-top:12px"></iframe>
+
+  <button type="button" class="btn btn-secondary btn-sm" style="margin-top:12px" onclick="openInsightFeedback()">纠错 / 投诉</button>
+</div>
+
+<script>
+async function loadInsightLibrary() {
+  const res = await api('/api/v1/member/insight/library', { auth: true });
+  const box = document.getElementById('insightList');
+  const items = res.items || [];
+  if (!items.length) {
+    box.innerHTML = '<p class="sub">今日情报生成中，预计 18:00 后可阅读。</p>';
+    return;
+  }
+  box.innerHTML = items.map(it => `
+    <div class="report-row">
+      <div><strong>${esc(it.title || it.category)}</strong><br>
+      <span class="muted">${it.report_date} · ${'★'.repeat(it.stars || 3)}</span></div>
+      <button class="btn btn-primary btn-xs" onclick="openInsight('${it.report_date}','${encodeURIComponent(it.category)}')">阅读</button>
+    </div>`).join('');
+}
+
+function openInsight(date, category) {
+  const frame = document.getElementById('insightPreview');
+  frame.classList.remove('hidden');
+  const token = loadStored(STORAGE.token) || '';
+  const q = token ? '?access_token=' + encodeURIComponent(token) : '';
+  frame.src = '/api/v1/member/insight/' + date + '/' + decodeURIComponent(category) + '/view' + q;
+}
+
+function openInsightFeedback() {
+  alert('将打开纠错表单（15 个工作日内处理）— 见 POST /api/v1/feedback');
+}
+</script>

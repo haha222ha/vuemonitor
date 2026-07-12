@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 选品情报 · 公开样例（D2 拉新）</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="lab-shared.css">
+</head>
+<body>
+<div class="app" style="max-width:720px">
+  <header>
+    <h1>AI 选品情报 · 公开样例</h1>
+    <p style="color:var(--muted);font-size:14px;margin:8px 0 0">
+      无需登录 · 预渲染静态报告 · 不调 LLM · 不含商品 ID / 店铺名 / data.js
+    </p>
+  </header>
+
+  <div class="banner banner-insight" style="margin-bottom:16px">
+    以下为缓存样例，展示 AI 结论质量。开通会员后可按套餐每日生成最新类目情报。
+    <a href="insight_portal.html" style="margin-left:8px">了解会员方案 →</a>
+  </div>
+
+  <section class="card">
+    <h2>精选类目样例</h2>
+    <div id="sampleList" class="category-grid">加载中…</div>
+  </section>
+
+  <section class="card preview-section">
+    <h2>报告预览</h2>
+    <iframe id="preview" title="情报样例" class="preview-frame" style="min-height:480px"></iframe>
+  </section>
+</div>
+<script>
+async function loadSamples() {
+  const box = document.getElementById('sampleList');
+  try {
+    const data = await fetch('/api/v1/demo/insight/samples').then(r => r.json());
+    box.innerHTML = (data.items || []).map(it => `
+      <div class="cat-card" data-slug="${it.slug}">
+        <h3>${it.category}</h3>
+        <p class="muted" style="font-size:12px;margin:0">${it.report_date} · 静态样例</p>
+      </div>`).join('');
+    box.querySelectorAll('.cat-card').forEach(card => {
+      card.addEventListener('click', () => openSample(card.dataset.slug));
+    });
+    if (data.items?.length) openSample(data.items[0].slug);
+  } catch (e) {
+    box.textContent = '样例加载失败';
+  }
+}
+function openSample(slug) {
+  document.querySelectorAll('.cat-card').forEach(c => c.classList.toggle('selected', c.dataset.slug === slug));
+  document.getElementById('preview').src = '/demo/insight/sample/' + encodeURIComponent(slug) + '?t=' + Date.now();
+}
+loadSamples();
+</script>
+</body>
+</html>

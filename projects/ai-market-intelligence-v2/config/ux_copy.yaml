@@ -1,0 +1,46 @@
+# UX 文案配置（实验室 + 现网合并时引用）
+version: "ux-v1"
+
+product:
+  name: "AI 市场情报"
+  tagline: "类目趋势与决策建议，非原始数据包"
+  legacy_tab: "数据报告 Legacy"
+  insight_tab: "AI 市场情报"
+
+legacy:
+  banner: "您的套餐含历史数据报告（zip/data.js）履约。到期后将统一为 AI 市场情报，不再提供可定位商品明细下载。"
+  empty: "暂无该日期的 Legacy 报告。"
+
+insight:
+  empty_library: "今日情报生成中，预计 18:00 后可阅读。"
+  generate_btn: "生成 AI 情报"
+  generating: "正在生成情报…"
+  success: "报告已就绪"
+  error_generic: "生成失败，请稍后重试"
+
+steps:
+  - "聚合类目指标"
+  - "市场分析师"
+  - "数据分析师"
+  - "风险分析师"
+  - "运营顾问"
+  - "CEO 总结"
+  - "合规检查"
+
+ai:
+  badge: "AI 辅助生成"
+  footer: "本内容由 AI 辅助生成，仅供市场研究参考，不构成投资建议或平台官方意见。"
+  explain_title: "指标依据（类目级）"
+
+feedback:
+  title: "内容纠错 / 投诉"
+  placeholder: "请描述问题：事实错误、建议不当、其他…"
+  success: "已收到，我们将在 15 个工作日内处理。"
+  types:
+    correction: "内容纠错"
+    complaint: "投诉"
+
+verdict_map:
+  适合进入: "success"
+  继续观察: "warn"
+  不建议: "danger"

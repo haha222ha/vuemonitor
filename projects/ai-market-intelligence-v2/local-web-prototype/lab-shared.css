@@ -1,0 +1,58 @@
+/* 实验室进阶页共享导航与组件 */
+.lab-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e5e5ea; }
+.lab-nav a { font-size: 13px; color: var(--primary); text-decoration: none; padding: 6px 12px; border-radius: 999px; background: #fff; border: 1px solid #e5e5ea; }
+.lab-nav a.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.lab-nav a:hover { border-color: var(--primary); }
+
+.chart-card { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+.chart-title { margin: 0 0 12px; font-size: 15px; font-weight: 600; }
+
+.radar-wrap { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: center; }
+.radar-svg { max-width: 320px; width: 100%; height: auto; }
+.radar-legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; margin-top: 8px; }
+.radar-legend span { display: flex; align-items: center; gap: 6px; }
+.radar-legend i { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+
+.compare-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.compare-table th, .compare-table td { padding: 10px 12px; border-bottom: 1px solid #eee; text-align: left; }
+.compare-table th { color: var(--muted); font-weight: 500; }
+.rank-badge { display: inline-block; background: #0071e3; color: #fff; width: 22px; height: 22px; border-radius: 50%; text-align: center; line-height: 22px; font-size: 12px; }
+
+.line-chart { width: 100%; height: 200px; }
+.timeline-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.mini-line { height: 120px; }
+
+.kanban { display: grid; grid-template-columns: repeat(5, minmax(160px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+@media (max-width: 900px) { .kanban { grid-template-columns: repeat(5, 200px); } }
+.kanban-col { background: #f0f2f7; border-radius: 10px; padding: 10px; min-height: 320px; }
+.kanban-col h3 { margin: 0 0 10px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.kanban-card { background: #fff; border-radius: 8px; padding: 10px; margin-bottom: 8px; font-size: 13px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.kanban-card strong { display: block; margin-bottom: 4px; font-size: 14px; }
+.kanban-card .tag { display: inline-block; font-size: 11px; background: #e8f4fd; color: #0071e3; padding: 2px 8px; border-radius: 999px; margin-top: 6px; }
+.kanban-actions { display: flex; gap: 4px; margin-top: 8px; flex-wrap: wrap; }
+.kanban-actions button { font-size: 11px; padding: 3px 8px; border: 1px solid #ddd; background: #fff; border-radius: 4px; cursor: pointer; }
+.kanban-actions button:hover { border-color: var(--primary); color: var(--primary); }
+
+.add-card-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; align-items: flex-end; }
+.add-card-form input, .add-card-form select { padding: 8px 10px; border: 1px solid #e5e5ea; border-radius: 8px; font-size: 14px; }
+.add-card-form input { flex: 1; min-width: 160px; }
+
+.ai-box { background: linear-gradient(135deg, #f0f7ff, #f5f0ff); border-radius: 10px; padding: 14px 16px; font-size: 14px; line-height: 1.6; margin-bottom: 16px; border: 1px solid #d6e4ff; }
+
+.cat-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.cat-chip { padding: 8px 14px; border: 2px solid #e5e5ea; border-radius: 999px; cursor: pointer; font-size: 13px; background: #fff; }
+.cat-chip.selected { border-color: var(--primary); background: #f0f7ff; color: var(--primary); }
+
+.plan-bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 12px 16px; background: #fff; border-radius: 10px; margin-bottom: 16px; border: 1px solid #e5e5ea; font-size: 13px; }
+.plan-badge { background: #5856d6; color: #fff; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.usage-text { color: var(--muted); }
+.notif-bell { position: relative; text-decoration: none; color: var(--primary); font-size: 13px; padding: 6px 12px; border: 1px solid #e5e5ea; border-radius: 999px; background: #fff; }
+.notif-bell .dot { position: absolute; top: 2px; right: 6px; width: 8px; height: 8px; background: #ff3b30; border-radius: 50%; }
+
+.notif-card { background: #fff; border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; border-left: 4px solid #0071e3; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.notif-card.read { opacity: .65; border-left-color: #ccc; }
+.notif-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 14px; }
+.notif-body { margin: 0 0 8px; font-size: 13px; color: #333; line-height: 1.5; }
+.notif-foot { display: flex; justify-content: space-between; font-size: 12px; }
+.tag-high { background: #ffebe9; color: #d70015; font-size: 11px; padding: 2px 8px; border-radius: 999px; }
+.btn-link { background: none; border: none; color: var(--primary); cursor: pointer; font-size: 12px; }
