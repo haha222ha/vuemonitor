@@ -62,7 +62,7 @@ def _extract_growth_direction_hints(
     ranked = sorted(
         category_rows,
         key=lambda r: (
-            -float(r.get("actual_v1d") or 0),
+            -float(r.get("delta") or 0),
             -float(r.get("gr") or 0),
         ),
     )
@@ -72,7 +72,7 @@ def _extract_growth_direction_hints(
     keywords = _extract_keywords(titles, limit=max_keywords)
     if not keywords:
         return {}
-    avg_inc = sum(float(r.get("actual_v1d") or 0) for r in top_slice) / len(top_slice)
+    avg_inc = sum(float(r.get("delta") or 0) for r in top_slice) / len(top_slice)
     med_price_vals = [float(r.get("price") or 0) for r in top_slice if float(r.get("price") or 0) > 0]
     med_price = _median(med_price_vals)
     return {
@@ -91,7 +91,7 @@ def _selection_summary(category_rows: list[dict[str, Any]]) -> dict[str, Any]:
     virtual = sum(1 for r in category_rows if r.get("is_virtual"))
     new_cnt = sum(1 for r in category_rows if r.get("is_new"))
     prices = [float(r.get("price") or 0) for r in category_rows if float(r.get("price") or 0) > 0]
-    actuals = [float(r.get("actual_v1d") or 0) for r in category_rows]
+    deltas = [float(r.get("delta") or 0) for r in category_rows]
     growths = [float(r.get("gr") or 0) for r in category_rows]
     behaviors: dict[str, int] = {}
     for r in category_rows:
@@ -105,7 +105,7 @@ def _selection_summary(category_rows: list[dict[str, Any]]) -> dict[str, Any]:
         "new_listing_ratio_pct": round(new_cnt / n * 100.0, 1),
         "median_price": _median(prices),
         "avg_price": round(sum(prices) / len(prices), 2) if prices else None,
-        "avg_daily_increment": round(sum(actuals) / n, 2),
+        "avg_daily_increment": round(sum(deltas) / n, 2),
         "avg_growth_rate_pct": round(sum(growths) / n * 100.0, 2),
         "behavior_mix_pct": behavior_mix,
     }

@@ -168,7 +168,7 @@ def test_unit_logic() -> None:
     assert_true(r_delta and r_delta[6] == 12.0, "sold_row delta fallback")
 
     r_prev = sold_row_to_item({"goods_id": "g1", "sold_num": 100, "delta": 0}, 88)
-    assert_true(r_prev and r_prev[6] == 12.0, "sold_row prev day diff")
+    assert_true(r_prev is None, "sold_row skip when delta=0 (no sold-prev fallback)")
 
     r_skip = sold_row_to_item({"goods_id": "g1", "sold_num": 100, "delta": 0}, None)
     assert_true(r_skip is None, "sold_row skip no baseline")

@@ -37,12 +37,12 @@ def test_k_anonymity():
 
 def test_aggregate_splits_categories():
     items = [
-        {"title": "小学数学练习册", "price": 15, "actual_v1d": 10, "gr": 0.2, "is_new": False},
-        {"title": "小学语文暑假作业", "price": 12, "actual_v1d": 8, "gr": 0.15, "is_new": False},
-        {"title": "小学英语教辅", "price": 18, "actual_v1d": 6, "gr": 0.1, "is_new": False},
-        {"title": "厨房收纳置物架", "price": 39, "actual_v1d": 20, "gr": 0.25, "is_new": True},
-        {"title": "桌面收纳盒整理", "price": 29, "actual_v1d": 15, "gr": 0.2, "is_new": False},
-        {"title": "衣柜收纳神器", "price": 49, "actual_v1d": 12, "gr": 0.18, "is_new": False},
+        {"title": "小学数学练习册", "price": 15, "delta": 10, "gr": 0.2, "is_new": False},
+        {"title": "小学语文暑假作业", "price": 12, "delta": 8, "gr": 0.15, "is_new": False},
+        {"title": "小学英语教辅", "price": 18, "delta": 6, "gr": 0.1, "is_new": False},
+        {"title": "厨房收纳置物架", "price": 39, "delta": 20, "gr": 0.25, "is_new": True},
+        {"title": "桌面收纳盒整理", "price": 29, "delta": 15, "gr": 0.2, "is_new": False},
+        {"title": "衣柜收纳神器", "price": 49, "delta": 12, "gr": 0.18, "is_new": False},
     ]
     insights = aggregate_items_to_insights("2026-07-12", items, min_sample=3)
     cats = {i.category for i in insights}

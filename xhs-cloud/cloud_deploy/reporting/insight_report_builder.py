@@ -146,7 +146,7 @@ def pg_items_to_rows(items: list) -> list[dict[str, Any]]:
             {
                 "title": title,
                 "price": float(item_at(it, "price") or 0),
-                "actual_v1d": float(item_at(it, "actual_v1d") or 0),
+                "delta": float(item_at(it, "actual_v1d") or 0),
                 "gr": gr,
                 "first_seen_days": 99,
                 "is_new": pool.upper() == "NEW",

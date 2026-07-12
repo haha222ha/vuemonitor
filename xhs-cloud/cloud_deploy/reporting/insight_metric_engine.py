@@ -120,18 +120,18 @@ def aggregate_items_to_insights(
         n = len(rows)
         if n < min_sample:
             continue
-        actuals = [float(r.get("actual_v1d") or 0) for r in rows]
+        deltas = [float(r.get("delta") or 0) for r in rows]
         growths = [float(r.get("gr") or 0) for r in rows]
         prices = [float(r.get("price") or 0) for r in rows if float(r.get("price") or 0) > 0]
         new_cnt = sum(1 for r in rows if r.get("is_new") or int(r.get("first_seen_days") or 99) <= 3)
 
-        avg_actual = sum(actuals) / max(n, 1)
+        avg_delta = sum(deltas) / max(n, 1)
         avg_gr = sum(growths) / max(n, 1)
         growth_pct = _clamp(avg_gr * 100, 0, 100)
         price_diversity = len({round(p) for p in prices}) if prices else 1
         competition = _clamp(n * 0.3 + price_diversity * 5, 0, 100)
         blue_ocean = _clamp(100 - competition * 0.6 + growth_pct * 0.4, 0, 100)
-        heat = _clamp(avg_actual * 2 + growth_pct * 0.5, 0, 100)
+        heat = _clamp(avg_delta * 2 + growth_pct * 0.5, 0, 100)
         new_score = _clamp(new_cnt / max(n, 1) * 100 + 20, 0, 100)
 
         if growth_pct >= 30:

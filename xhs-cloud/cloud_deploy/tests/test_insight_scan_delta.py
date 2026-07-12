@@ -67,6 +67,17 @@ def test_fetch_items_for_insight_default_source():
             fn.assert_called_once()
 
 
+def test_fetch_items_for_insight_routes_local_delta():
+    conn = object()
+    with mock.patch(
+        "cloud_deploy.reporting.pg_reader.fetch_items_from_local_delta",
+        return_value=[["g2"]],
+    ) as fn:
+        out = fetch_items_for_insight(conn, "2026-07-12", source="local_delta")
+        assert out == [["g2"]]
+        fn.assert_called_once_with(conn, "2026-07-12")
+
+
 def test_fetch_items_for_insight_unknown():
     try:
         fetch_items_for_insight(object(), "2026-07-12", source="nope")

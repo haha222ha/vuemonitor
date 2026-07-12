@@ -33,8 +33,8 @@ def test_feed_from_insight():
         price_distribution={"20-50": 55.0, "50-100": 30.0},
     )
     rows = [
-        {"title": "保湿面霜 x", "price": 39.0, "actual_v1d": 12, "gr": 0.15, "is_virtual": False, "is_new": True, "behavior": "BURST"},
-        {"title": "防晒喷雾 y", "price": 29.0, "actual_v1d": 8, "gr": 0.12, "is_virtual": False, "is_new": False, "behavior": "ACCEL"},
+        {"title": "保湿面霜 x", "price": 39.0, "delta": 12, "gr": 0.15, "is_virtual": False, "is_new": True, "behavior": "BURST"},
+        {"title": "防晒喷雾 y", "price": 29.0, "delta": 8, "gr": 0.12, "is_virtual": False, "is_new": False, "behavior": "ACCEL"},
     ] * 60
     feed = build_llm_feed(insight, rows, raw_selection_rows=5000, pg_source="local_delta", k_anonymity_min=5)
     assert feed["schema_version"] == "feed-v1.1"

@@ -13,6 +13,8 @@ from cloud_deploy.reporting.constants import (
     DEFAULT_MIN_V1D_VIRTUAL,
     REPORT_COLUMNS,
     item_at,
+    item_delta,
+    row_delta,
 )
 
 
@@ -27,7 +29,7 @@ def passes_threshold_values(
     *,
     is_virtual: bool,
     v1d: float,
-    actual_v1d: float,
+    delta: float,
     sold: float,
     min_v1d=DEFAULT_MIN_V1D,
     min_actual=DEFAULT_MIN_ACTUAL,
@@ -36,12 +38,12 @@ def passes_threshold_values(
 ) -> bool:
     if sold > 200000:
         return False
-    if v1d > 50000 or actual_v1d > 50000:
+    if v1d > 50000 or delta > 50000:
         return False
     th_v1d, th_actual = thresholds_for(
         is_virtual, min_v1d, min_actual, min_v1d_virtual, min_actual_virtual
     )
-    return v1d > th_v1d or actual_v1d >= th_actual
+    return v1d > th_v1d or delta >= th_actual
 
 
 def passes_threshold_row(row: dict, min_v1d=DEFAULT_MIN_V1D, min_actual=DEFAULT_MIN_ACTUAL,
@@ -50,7 +52,7 @@ def passes_threshold_row(row: dict, min_v1d=DEFAULT_MIN_V1D, min_actual=DEFAULT_
     return passes_threshold_values(
         is_virtual=bool(row.get("is_virtual")),
         v1d=_f(row.get("v1d")),
-        actual_v1d=_f(row.get("actual_v1d")),
+        delta=row_delta(row),
         sold=_f(row.get("sold")),
         min_v1d=min_v1d,
         min_actual=min_actual,
@@ -64,7 +66,7 @@ def passes_threshold(item: list, min_v1d=DEFAULT_MIN_V1D, min_actual=DEFAULT_MIN
     return passes_threshold_values(
         is_virtual=bool(item_at(item, "is_virtual")),
         v1d=float(item_at(item, "v1d", 0) or 0),
-        actual_v1d=float(item_at(item, "actual_v1d", 0) or 0),
+        delta=item_delta(item),
         sold=float(item_at(item, "sold", 0) or 0),
         min_v1d=min_v1d,
         min_actual=min_actual,
@@ -83,14 +85,14 @@ def dedup_by_title(items: list) -> list:
         if not prev:
             best[title] = item
             continue
-        a_act = float(item_at(item, "actual_v1d", 0) or 0)
+        a_act = item_delta(item)
         a_v1d = float(item_at(item, "v1d", 0) or 0)
-        p_act = float(item_at(prev, "actual_v1d", 0) or 0)
+        p_act = item_delta(prev)
         p_v1d = float(item_at(prev, "v1d", 0) or 0)
         if a_act > p_act or (a_act == p_act and a_v1d > p_v1d):
             best[title] = item
     out = list(best.values())
-    out.sort(key=lambda r: (-float(item_at(r, "actual_v1d", 0) or 0), -float(item_at(r, "v1d", 0) or 0)))
+    out.sort(key=lambda r: (-item_delta(r), -float(item_at(r, "v1d", 0) or 0)))
     return out
 
 
@@ -139,7 +141,23 @@ def calc_fan_sales_ratios(shop_fans: int, shop_sales: int, sold: int) -> tuple[f
 def row_to_report_item(row: dict) -> list:
     """report_daily_items 行或等价 dict → 28 列 items 数组。"""
     sold = _i(row.get("sold") if row.get("sold") is not None else row.get("sold_num"))
-    actual_v1d = _f(row.get("actual_v1d"))
+    delta_val = row_delta(row)
+    if delta_val <= 0:
+        delta_val = _f(row.get("actual_v1d"))
+    v1d = _f(row.get("v1d"))
+    if v1d <= 0 and delta_val > 0:
+        v1d = delta_val
+    actual_gr = _f(row.get("actual_gr"))
+    gr = _f(row.get("gr"))
+    if gr <= 0 and actual_gr > 0:
+        gr = actual_gr
+    actual_vsr = _f(row.get("actual_vsr")) or (round(delta_val / sold, 4) if sold > 0 else 0)
+    vsr = _f(row.get("vsr"))
+    if vsr <= 0 and v1d > 0 and sold > 0:
+        vsr = round(v1d / sold, 4)
+    elif vsr <= 0 and actual_vsr > 0:
+        vsr = actual_vsr
+
     shop_sales = _i(row.get("shop_sales"))
     shop_fans = _i(row.get("shop_fans"))
     shop_fsr = row.get("shop_fsr")
@@ -151,20 +169,6 @@ def row_to_report_item(row: dict) -> list:
         if goods_fsr is None:
             goods_fsr = calc_goods
 
-    v1d = _f(row.get("v1d"))
-    if v1d <= 0 and actual_v1d > 0:
-        v1d = actual_v1d
-    actual_gr = _f(row.get("actual_gr"))
-    gr = _f(row.get("gr"))
-    if gr <= 0 and actual_gr > 0:
-        gr = actual_gr
-    actual_vsr = _f(row.get("actual_vsr")) or (round(actual_v1d / sold, 4) if sold > 0 else 0)
-    vsr = _f(row.get("vsr"))
-    if vsr <= 0 and v1d > 0 and sold > 0:
-        vsr = round(v1d / sold, 4)
-    elif vsr <= 0 and actual_vsr > 0:
-        vsr = actual_vsr
-
     base_hours = row.get("base_hours")
     values = {
         "goods_id": row.get("goods_id") or "",
@@ -173,7 +177,7 @@ def row_to_report_item(row: dict) -> list:
         "sold": sold,
         "v1h": _f(row.get("v1h")),
         "v6h": _f(row.get("v6h")),
-        "actual_v1d": actual_v1d,
+        "actual_v1d": delta_val,
         "v1d": v1d,
         "actual_gr": actual_gr,
         "gr": gr,
@@ -234,16 +238,12 @@ def _pick_int(*vals: Any) -> int:
 
 
 def _compute_daily_actual(sold: int, prev_sold: int | None, delta: int) -> float | None:
-    """真实日增量：优先 今日销量 − 昨日销量，其次 PG delta（排除首日 delta≈总销量）。"""
-    if prev_sold is not None:
-        actual = max(0.0, float(sold - prev_sold))
-        if actual > 0:
-            return actual
-    if delta > 0:
-        if prev_sold is None and sold > 0 and float(delta) >= float(sold) * 0.95:
-            return None
-        return float(delta)
-    return None
+    """主指标仅 sold_history.delta；排除首日 delta≈总销量的噪声。"""
+    if delta <= 0:
+        return None
+    if prev_sold is None and sold > 0 and float(delta) >= float(sold) * 0.95:
+        return None
+    return float(delta)
 
 
 def _v1d_looks_like_sold(v1d: float, sold: int, actual: float) -> bool:
@@ -268,12 +268,16 @@ def _pick_v1d(actual: float, stored_v1d: float, gm_v1d: float, sold: int) -> flo
 
 def _recompute_derived_rates(row: dict) -> None:
     sold = _i(row.get("sold"))
-    actual = _f(row.get("actual_v1d"))
+    delta_val = row_delta(row)
+    if delta_val <= 0:
+        delta_val = _f(row.get("actual_v1d"))
     v1d = _f(row.get("v1d"))
-    if actual > 0:
-        sold_base = max(sold - int(actual), 1) if sold > int(actual) else max(sold, 1)
-        row["actual_gr"] = round(actual / sold_base * 100, 2)
-        row["actual_vsr"] = round(actual / sold, 4) if sold > 0 else 0.0
+    if delta_val > 0:
+        sold_base = max(sold - int(delta_val), 1) if sold > int(delta_val) else max(sold, 1)
+        row["actual_gr"] = round(delta_val / sold_base * 100, 2)
+        row["actual_vsr"] = round(delta_val / sold, 4) if sold > 0 else 0.0
+        row["delta"] = delta_val
+        row["actual_v1d"] = delta_val
     if v1d > 0 and sold > 0:
         row["vsr"] = round(v1d / sold, 4)
     if _f(row.get("gr")) <= 0 and _f(row.get("actual_gr")) > 0:
@@ -314,35 +318,35 @@ def _fetch_sold_daily_map(conn, report_date: str, goods_ids: list[str]) -> dict[
 
 def reconcile_row_metrics(row: dict, sold_info: dict | None) -> dict | None:
     """
-    用 goods_sold_daily 校正 report_daily_items 中 actual=0 / v1d≈sold 的脏行。
-    无法得到正增量且原行也无有效 actual 时返回 None（不入报告）。
+    用 goods_sold_daily.delta 校正 report_daily_items 脏行。
+    无法得到正 delta 时返回 None（不入报告）。
     """
     sold = _i(row.get("sold"))
-    actual = _f(row.get("actual_v1d"))
+    delta_val = row_delta(row)
+    if delta_val <= 0:
+        delta_val = _f(row.get("actual_v1d"))
     v1d = _f(row.get("v1d"))
     gm_v1d = _f(sold_info.get("gm_v1d") if sold_info else 0)
-    gm_actual = _f(sold_info.get("gm_actual_v1d") if sold_info else 0)
 
     if sold_info:
         sd_sold = _i(sold_info.get("sold_num"))
         prev_raw = sold_info.get("prev_sold")
         prev_sold = _i(prev_raw) if prev_raw is not None else None
-        delta = _i(sold_info.get("delta"))
+        sd_delta = _i(sold_info.get("delta"))
         if sd_sold > 0:
             sold = sd_sold
             row["sold"] = sold
-        recalc = _compute_daily_actual(sold, prev_sold, delta)
+        recalc = _compute_daily_actual(sold, prev_sold, sd_delta)
         if recalc is not None and recalc > 0:
-            actual = recalc
-        elif actual <= 0 and gm_actual > 0:
-            actual = gm_actual
-        row["actual_v1d"] = actual
+            delta_val = recalc
+        row["delta"] = delta_val
+        row["actual_v1d"] = delta_val
 
-    if _v1d_looks_like_sold(v1d, sold, actual) or v1d <= 0:
-        v1d = _pick_v1d(actual, v1d, gm_v1d, sold)
+    if _v1d_looks_like_sold(v1d, sold, delta_val) or v1d <= 0:
+        v1d = _pick_v1d(delta_val, v1d, gm_v1d, sold)
         row["v1d"] = v1d
 
-    if actual <= 0:
+    if delta_val <= 0:
         return None
 
     _recompute_derived_rates(row)
@@ -405,22 +409,15 @@ def _tier_to_pool(tier: str) -> str:
 
 
 def _premium_has_metric_signal(row: dict) -> bool:
-    return (
-        _f(row.get("pgd_actual_delta")) > 0
-        or _i(row.get("pgd_delta")) > 0
-        or _f(row.get("actual_velocity_1d")) > 0
-        or _f(row.get("velocity_1d")) > 0
-        or row.get("prev_sold") is not None
-    )
+    return row_delta(row) > 0
 
 
-def premium_row_to_item(row: dict, *, sold_info: dict | None = None, delta_only: bool = False) -> list | None:
+def premium_row_to_item(row: dict, *, sold_info: dict | None = None) -> list | None:
     """premium_goods (+ 可选 premium_goods_daily / goods_sold_daily) → 28 列报告行。"""
     sold = _i(row.get("pgd_sold")) or _i(row.get("sold_num"))
     prev_raw = row.get("prev_sold")
     prev_sold = _i(prev_raw) if prev_raw is not None else None
     delta = _i(row.get("pgd_delta"))
-    actual = _f(row.get("pgd_actual_delta"))
     stored_v1d = _f(row.get("pgd_velocity")) or _f(row.get("velocity_1d"))
     gm_v1d = _f(sold_info.get("gm_v1d") if sold_info else 0)
 
@@ -435,33 +432,21 @@ def premium_row_to_item(row: dict, *, sold_info: dict | None = None, delta_only:
         if sd_delta > 0:
             delta = sd_delta
 
-    recalc = _compute_daily_actual(sold, prev_sold, delta)
-    if recalc is not None and recalc > 0:
-        actual = recalc
-    elif delta_only and delta > 0:
-        actual = float(delta)
-    elif actual <= 0:
-        actual = _f(row.get("actual_velocity_1d"))
-    if actual <= 0 and delta_only and delta > 0:
-        actual = float(delta)
-    if actual <= 0 and sold_info:
-        gm_actual = _f(sold_info.get("gm_actual_v1d"))
-        if gm_actual > 0:
-            actual = gm_actual
-    if actual <= 0:
+    metric = _compute_daily_actual(sold, prev_sold, delta)
+    if metric is None or metric <= 0:
         return None
 
-    v1d = _pick_v1d(actual, stored_v1d, gm_v1d, sold)
+    v1d = _pick_v1d(metric, stored_v1d, gm_v1d, sold)
     if v1d <= 0:
-        v1d = actual
+        v1d = metric
 
     shop_fans = _i(row.get("shop_fans"))
     shop_sales = _i(row.get("shop_sales"))
     shop_fsr, goods_fsr = calc_fan_sales_ratios(shop_fans, shop_sales, sold)
-    sold_base = max((prev_sold or 0), sold - int(actual), 1)
-    actual_gr = round(actual / sold_base * 100, 2)
-    actual_vsr = round(actual / sold, 4) if sold > 0 else 0
-    vsr = round(v1d / sold, 4) if sold > 0 and abs(v1d - actual) > 0.01 else actual_vsr
+    sold_base = max((prev_sold or 0), sold - int(metric), 1)
+    actual_gr = round(metric / sold_base * 100, 2)
+    actual_vsr = round(metric / sold, 4) if sold > 0 else 0
+    vsr = round(v1d / sold, 4) if sold > 0 and abs(v1d - metric) > 0.01 else actual_vsr
 
     merged = {
         "goods_id": row.get("goods_id") or "",
@@ -470,7 +455,8 @@ def premium_row_to_item(row: dict, *, sold_info: dict | None = None, delta_only:
         "sold": sold,
         "v1h": 0,
         "v6h": 0,
-        "actual_v1d": round(actual, 1),
+        "delta": round(metric, 1),
+        "actual_v1d": round(metric, 1),
         "v1d": round(v1d, 1),
         "actual_gr": actual_gr,
         "gr": actual_gr,
@@ -499,7 +485,7 @@ def premium_row_to_item(row: dict, *, sold_info: dict | None = None, delta_only:
 def fetch_items_from_premium_daily(conn, report_date: str, *, incremental_only: bool = True) -> list:
     """从 premium_goods + premium_goods_daily 构造报告行。
 
-    incremental_only=True（默认）：仅当日有日快照且 actual_delta/delta>0 的精品（选品报告）。
+    incremental_only=True（默认）：仅当日有日快照且 delta>0 的精品（选品报告）。
     incremental_only=False：全表 premium_goods LEFT JOIN 当日快照（历史全量，慎用大数据量）。
     """
     if not _premium_table_exists(conn):
@@ -510,10 +496,7 @@ def fetch_items_from_premium_daily(conn, report_date: str, *, incremental_only: 
     incr_filter = ""
     if incremental_only:
         incr_filter = """
-              AND (
-                COALESCE(pgd.actual_delta, 0) > 0
-                OR COALESCE(pgd.delta, 0) > 0
-              )
+              AND COALESCE(pgd.delta, 0) > 0
         """
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
@@ -556,7 +539,7 @@ def fetch_items_from_premium_daily(conn, report_date: str, *, incremental_only: 
             if item:
                 items.append(item)
 
-    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    items.sort(key=lambda x: (-item_delta(x), -float(item_at(x, "v1d", 0) or 0)))
     mode = "incr" if incremental_only else "full"
     print(
         f"[pg_reader] premium_daily/{mode} {report_date}: kept={len(items)} pool={len(rows)} retry={len(retry_rows)}",
@@ -580,7 +563,7 @@ def merge_items_by_goods_id(base: list, extra: list) -> list:
         by_id[gid] = item
         added += 1
     out = list(by_id.values())
-    out.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    out.sort(key=lambda x: (-item_delta(x), -float(item_at(x, "v1d", 0) or 0)))
     if added:
         print(f"[pg_reader] merge: +{added} extra goods (base={len(base)} total={len(out)})", flush=True)
     return out
@@ -838,10 +821,36 @@ def fetch_items_from_scan_delta(
         if item:
             items.append(item)
 
-    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    items.sort(key=lambda x: (-item_delta(x), -float(item_at(x, "v1d", 0) or 0)))
     print(
         f"[pg_reader] scan_delta {report_date}: kept={len(items)} pool={len(sold_rows)} "
         f"min_delta={min_delta} scan_window_days={window_days} mode=delta_only source=goods_sold_daily",
+        flush=True,
+    )
+    return items
+
+
+def fetch_items_from_local_delta(
+    conn,
+    report_date: str,
+    *,
+    min_delta: int | None = None,
+) -> list:
+    """本地方案 A：premium_goods_daily.delta>=N（对齐 sold_history.delta）。"""
+    min_delta = insight_min_delta() if min_delta is None else max(1, int(min_delta))
+    window_days = insight_scan_window_days()
+    rows = _fetch_premium_scan_delta_rows(
+        conn, report_date, min_delta, window_days=window_days
+    )
+    items: list = []
+    for raw in rows:
+        item = premium_row_to_item(raw)
+        if item:
+            items.append(item)
+    items.sort(key=lambda x: (-item_delta(x), -float(item_at(x, "v1d", 0) or 0)))
+    print(
+        f"[pg_reader] local_delta {report_date}: kept={len(items)} pool={len(rows)} "
+        f"min_delta={min_delta} scan_window_days={window_days} source=premium_goods_daily",
         flush=True,
     )
     return items
@@ -865,39 +874,22 @@ def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
     """由 monitor_goods + goods_sold_daily (+ 可选 report_daily_items 补齐) 构造报告 item。"""
     sold = _i(row.get("sold_num"))
     delta = _i(row.get("delta"))
-    gm_actual = _f(row.get("gm_actual_v1d"))
     gm_v1d = _f(row.get("gm_v1d"))
     gm_gr = _f(row.get("gm_gr"))
-    rdi_actual = _f(row.get("rdi_actual_v1d"))
     rdi_v1d = _f(row.get("rdi_v1d"))
 
-    if prev_sold is None:
-        if delta > 0:
-            actual_v1d = float(delta)
-        elif gm_actual > 0:
-            actual_v1d = gm_actual
-        elif rdi_actual > 0:
-            actual_v1d = rdi_actual
-        else:
-            return None
-    else:
-        actual_v1d = max(0.0, float(sold - prev_sold))
-        if actual_v1d <= 0 and delta > 0:
-            actual_v1d = float(delta)
-        elif actual_v1d <= 0 and gm_actual > 0:
-            actual_v1d = gm_actual
-
-    if actual_v1d <= 0:
+    metric = _compute_daily_actual(sold, prev_sold, delta)
+    if metric is None or metric <= 0:
         return None
 
-    v1d = _pick_v1d(actual_v1d, rdi_v1d, gm_v1d, sold)
+    v1d = _pick_v1d(metric, rdi_v1d, gm_v1d, sold)
     if v1d <= 0:
-        v1d = actual_v1d
-    sold_base = max(prev_sold or 0, 1) if (prev_sold or 0) > 0 else max(sold - int(actual_v1d), 1)
-    actual_gr = _f(row.get("rdi_actual_gr")) or round(actual_v1d / sold_base * 100, 2)
+        v1d = metric
+    sold_base = max(prev_sold or 0, 1) if (prev_sold or 0) > 0 else max(sold - int(metric), 1)
+    actual_gr = _f(row.get("rdi_actual_gr")) or round(metric / sold_base * 100, 2)
     gr = _f(row.get("rdi_gr")) or gm_gr or actual_gr
-    actual_vsr = _f(row.get("rdi_actual_vsr")) or (round(actual_v1d / sold, 4) if sold > 0 else 0)
-    vsr = _f(row.get("rdi_vsr")) or (round(v1d / sold, 4) if sold > 0 and v1d != actual_v1d else actual_vsr)
+    actual_vsr = _f(row.get("rdi_actual_vsr")) or (round(metric / sold, 4) if sold > 0 else 0)
+    vsr = _f(row.get("rdi_vsr")) or (round(v1d / sold, 4) if sold > 0 and v1d != metric else actual_vsr)
     price = _f(row.get("deal_price") or row.get("rdi_price"))
     title = _pick_str(row.get("title"), row.get("rdi_title"))
     store_id = _pick_str(row.get("store_id"), row.get("rdi_store_id"))
@@ -917,7 +909,8 @@ def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
         "sold": sold,
         "v1h": row.get("rdi_v1h"),
         "v6h": row.get("rdi_v6h"),
-        "actual_v1d": round(actual_v1d, 1),
+        "actual_v1d": round(metric, 1),
+        "delta": round(metric, 1),
         "v1d": round(v1d, 1),
         "actual_gr": actual_gr,
         "gr": gr,
@@ -997,11 +990,7 @@ def fetch_items_from_sold_daily(conn, report_date: str, *, incremental_only: boo
     incr_filter = ""
     if incremental_only:
         incr_filter = """
-              AND (
-                COALESCE(sd.delta, 0) > 0
-                OR COALESCE(gm.actual_v1d, 0) > 0
-                OR (sp.sold_num IS NOT NULL AND sd.sold_num > sp.sold_num)
-              )
+              AND COALESCE(sd.delta, 0) > 0
         """
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
@@ -1067,9 +1056,9 @@ def fetch_items_from_sold_daily(conn, report_date: str, *, incremental_only: boo
         prev_raw = r.get("prev_sold")
         prev_sold = _i(prev_raw) if prev_raw is not None else None
         item = sold_row_to_item(r, prev_sold)
-        if item and float(item_at(item, "actual_v1d", 0) or 0) > 0:
+        if item and item_delta(item) > 0:
             items.append(item)
-    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    items.sort(key=lambda x: (-item_delta(x), -float(item_at(x, "v1d", 0) or 0)))
     if incremental_only:
         print(
             f"[pg_reader] monitor_incr {report_date}: kept={len(items)} scanned={len(rows)}",
@@ -1084,7 +1073,7 @@ def fetch_items_from_monitor_incremental(conn, report_date: str) -> list:
 
 
 def fetch_premium_items_for_period(conn, start_date: str, end_date: str) -> list:
-    """周期内每 goods_id 取 actual_delta 最高的 premium 日快照（对齐日报 premium_daily 逻辑）。"""
+    """周期内每 goods_id 取 delta 最高的 premium 日快照（对齐日报 premium_daily 逻辑）。"""
     if not _premium_table_exists(conn):
         return []
     with conn.cursor() as c:
@@ -1106,8 +1095,8 @@ def fetch_premium_items_for_period(conn, start_date: str, end_date: str) -> list
                   AND pgd_prev.snap_date = pgd.snap_date - 1
             WHERE pg.lifecycle < 3
               AND pgd.snap_date >= %s AND pgd.snap_date <= %s
-            ORDER BY pg.goods_id, pgd.actual_delta DESC NULLS LAST,
-                     pgd.velocity_1d DESC NULLS LAST, pgd.snap_date DESC
+            ORDER BY pg.goods_id, pgd.delta DESC NULLS LAST,
+                     pgd.snap_date DESC
             """,
             (start_date, end_date),
         )
@@ -1143,7 +1132,7 @@ def fetch_premium_items_for_period(conn, start_date: str, end_date: str) -> list
         if item:
             items.append(item)
 
-    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    items.sort(key=lambda x: (-item_delta(x), -float(item_at(x, "v1d", 0) or 0)))
     print(
         f"[pg_reader] premium_period {start_date}~{end_date}: kept={len(items)} pool={len(rows)}",
         flush=True,
@@ -1154,7 +1143,7 @@ def fetch_premium_items_for_period(conn, start_date: str, end_date: str) -> list
 def fetch_rdi_items_for_period(
     conn, start_date: str, end_date: str, *, reconcile_sold: bool = True
 ) -> list:
-    """周期内每 goods_id 保留 actual_v1d 最高的一行，并用 goods_sold_daily 校正。"""
+    """周期内每 goods_id 保留 delta 最高的一行，并用 goods_sold_daily 校正。"""
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
         c.execute(
@@ -1207,7 +1196,7 @@ def fetch_rdi_items_for_period(
             f"fixed={fixed} dropped={dropped} kept={len(items)}",
             flush=True,
         )
-    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    items.sort(key=lambda x: (-item_delta(x), -float(item_at(x, "v1d", 0) or 0)))
     return items
 
 
@@ -1280,11 +1269,7 @@ def fetch_monitor_items_for_period(conn, start_date: str, end_date: str) -> list
                 LIMIT 1
             ) rdi ON TRUE
             WHERE m.monitor_status IN ('active', 'idle')
-              AND (
-                COALESCE(sd.delta, 0) > 0
-                OR COALESCE(gm.actual_v1d, 0) > 0
-                OR (sp.sold_num IS NOT NULL AND sd.sold_num > sp.sold_num)
-              )
+              AND COALESCE(sd.delta, 0) > 0
             ORDER BY m.goods_id, sd.delta DESC NULLS LAST, sd.snapshot_date DESC
             """,
             (start_date, end_date),
@@ -1296,9 +1281,9 @@ def fetch_monitor_items_for_period(conn, start_date: str, end_date: str) -> list
         prev_raw = r.get("prev_sold")
         prev_sold = _i(prev_raw) if prev_raw is not None else None
         item = sold_row_to_item(r, prev_sold)
-        if item and float(item_at(item, "actual_v1d", 0) or 0) > 0:
+        if item and item_delta(item) > 0:
             items.append(item)
-    items.sort(key=lambda x: (-float(item_at(x, "actual_v1d", 0) or 0), -float(item_at(x, "v1d", 0) or 0)))
+    items.sort(key=lambda x: (-item_delta(x), -float(item_at(x, "v1d", 0) or 0)))
     print(
         f"[pg_reader] monitor_period {start_date}~{end_date}: kept={len(items)} scanned={len(rows)}",
         flush=True,

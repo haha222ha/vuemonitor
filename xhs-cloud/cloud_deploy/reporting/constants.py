@@ -34,7 +34,7 @@ FIELD_GUIDE = [
     {"field": "商品名称", "key": "title", "formula": "—", "desc": "抓取时的标题快照，同标题多规格已去重保留最高真实增量。", "reference": "含「定制/专属/活动」等词需警惕短期活动品；优先常青需求词。"},
     {"field": "价格", "key": "price", "formula": "deal_price", "desc": "当前成交价（券后/活动价）。", "reference": "虚拟品 9.9~59 走量；实体 30~150 利润带；超 200 需更高实际增量支撑。"},
     {"field": "销量", "key": "sold", "formula": "sold_num 快照", "desc": "平台累计已售，可能因活动结束、展示规则或退款回调。", "reference": "<100 新品窗口；100~1k 验证期；>1k 红海，靠实际增量/增速突围。"},
-    {"field": "真实增量", "key": "actual_v1d", "formula": "当前销量 − 上次有效快照", "desc": "自上次扫描以来真实多卖的件数，不外推。选品第一优先级。", "reference": "≥5 值得看；≥20 强动销；≥50 爆款候选。默认按此列降序。"},
+    {"field": "真实增量", "key": "actual_v1d", "formula": "sold_history.delta", "desc": "相对上次扫描的真实销量差（PG delta 字段），不外推、不用算法重算。选品第一优先级。", "reference": "≥5 值得看；≥20 强动销；≥50 爆款候选。默认按此列降序。"},
     {"field": "预估日增量", "key": "v1d", "formula": "按扫描间隔折算的日均估值", "desc": "辅助发现「正在加速」的商品，不能单独作为决策依据。", "reference": "与真实增量同涨时可提高优先级；二者背离时以真实增量为准。"},
     {"field": "真实日增速", "key": "actual_gr", "formula": "真实增量 ÷ 基准销量", "desc": "相对增幅（百分比），低销量新品上容易偏高。", "reference": ">10% 健康涨；>30% 高速；需结合真实增量绝对值看。"},
     {"field": "真实增销比", "key": "actual_vsr", "formula": "真实增量 ÷ 当前销量", "desc": "真实多卖部分占总量比例，通常 ≤100%。", "reference": ">5% 有感觉；>15% 强动销；>30% 极高关注（核实是否低基数）。"},
@@ -109,3 +109,25 @@ def item_at(item: list, key: str, default=None):
         return default
     val = item[idx]
     return default if val is None else val
+
+
+def row_delta(row: dict, default: float = 0.0) -> float:
+    """行 dict 主指标：sold_history / premium_goods_daily 的 delta。"""
+    for key in ("delta", "pgd_delta"):
+        v = row.get(key)
+        if v is not None and v != "":
+            try:
+                n = float(v)
+                if n > 0:
+                    return n
+            except (TypeError, ValueError):
+                pass
+    return default
+
+
+def item_delta(item: list, default: float = 0.0) -> float:
+    """28 列 item 主指标（actual_v1d 列存 delta 值，兼容 data.js 列名）。"""
+    try:
+        return float(item_at(item, "actual_v1d", default) or default)
+    except (TypeError, ValueError):
+        return default
