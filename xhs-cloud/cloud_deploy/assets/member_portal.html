@@ -418,7 +418,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <div id="dashMsg"></div>
   </div>
 </div>
-<script src="/assets/member_insight.js?v=20260712t2"></script>
+<script src="/assets/member_insight.js?v=20260712t3"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -546,6 +546,38 @@ let monthExpandState = {};
 let selectedReports = new Set();
 let watchlistItems = [];
 let watchlistSelected = new Set();
+let _insightScriptLoading = false;
+
+function ensureMemberInsight(done) {
+  if (window.MemberInsight) { done(); return; }
+  var bar = document.getElementById('insightPlanBar');
+  if (bar) bar.textContent = '正在加载情报模块…';
+  if (_insightScriptLoading) {
+    var n = 0;
+    var poll = setInterval(function () {
+      n += 1;
+      if (window.MemberInsight) { clearInterval(poll); done(); }
+      if (n > 100) {
+        clearInterval(poll);
+        if (bar) bar.innerHTML = '<span class="insight-meta" style="color:var(--red)">情报模块加载超时</span>';
+      }
+    }, 50);
+    return;
+  }
+  _insightScriptLoading = true;
+  var s = document.createElement('script');
+  s.src = '/assets/member_insight.js?v=20260712t3&_=' + Date.now();
+  s.onload = function () {
+    _insightScriptLoading = false;
+    if (window.MemberInsight) done();
+    else if (bar) bar.innerHTML = '<span class="insight-meta" style="color:var(--red)">情报模块解析失败</span>';
+  };
+  s.onerror = function () {
+    _insightScriptLoading = false;
+    if (bar) bar.innerHTML = '<span class="insight-meta" style="color:var(--red)">无法加载 /assets/member_insight.js（请检查部署）</span>';
+  };
+  document.head.appendChild(s);
+}
 
 function switchDash(name) {
   currentDash = name || 'reports';
@@ -558,10 +590,8 @@ function switchDash(name) {
   document.getElementById('dashWatchlist').classList.toggle('hidden', currentDash !== 'watchlist');
   document.getElementById('dashInsight').classList.toggle('hidden', currentDash !== 'insight');
   if (currentDash === 'watchlist') loadWatchlist();
-  if (currentDash === 'insight' && window.MemberInsight) MemberInsight.load();
-  else if (currentDash === 'insight') {
-    var bar = document.getElementById('insightPlanBar');
-    if (bar) bar.innerHTML = '<span class="insight-meta" style="color:var(--red)">情报脚本未加载，请 Ctrl+Shift+R 强刷</span>';
+  if (currentDash === 'insight') {
+    ensureMemberInsight(function () { MemberInsight.load(); });
   }
 }
 

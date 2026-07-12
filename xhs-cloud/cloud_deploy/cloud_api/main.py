@@ -17,6 +17,7 @@ bootstrap()
 
 from fastapi import Depends, FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Response
+from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
 from starlette.background import BackgroundTask
@@ -340,18 +341,6 @@ def member_portal_page():
     return FileResponse(
         path,
         media_type="text/html; charset=utf-8",
-        headers={"Cache-Control": "no-store, must-revalidate"},
-    )
-
-
-@app.get("/assets/member_insight.js")
-def member_insight_js():
-    path = os.path.join(_ASSETS, "member_insight.js")
-    if not os.path.isfile(path):
-        raise HTTPException(status_code=404, detail="member_insight.js missing")
-    return FileResponse(
-        path,
-        media_type="application/javascript; charset=utf-8",
         headers={"Cache-Control": "no-store, must-revalidate"},
     )
 
@@ -1436,6 +1425,9 @@ def sync_premium_daily_upsert(body: PremiumBatchSyncBody, _: None = Depends(veri
         }
     finally:
         conn.close()
+
+
+app.mount("/assets", StaticFiles(directory=_ASSETS), name="member_assets")
 
 
 def main():
