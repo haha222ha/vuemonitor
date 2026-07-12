@@ -19,14 +19,70 @@ set -a && source "$ENV_FILE" && set +a
 PGV="$ROOT/cloud_deploy/database/10_pgvector_embeddings.sql"
 [[ -f "$PGV" ]] || fail "缺少 $PGV"
 
-log "CREATE EXTENSION vector（需 PG superuser 或已预装）"
-if psql "$XHS_DATABASE_URL" -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS vector;" 2>/dev/null; then
-  ok "pgvector 扩展已就绪"
-else
-  warn "CREATE EXTENSION 失败 — 请在 PG 管理员控制台执行: CREATE EXTENSION vector;"
-  warn "或联系云 RDS 开启 pgvector 后重跑本脚本"
-  exit 1
-fi
+_db_name_from_url() {
+  local url="$1"
+  url="${url#postgresql://}"
+  url="${url#postgres://}"
+  url="${url#*@}"
+  url="${url#*/}"
+  url="${url%%\?*}"
+  url="${url%%/*}"
+  echo "$url"
+}
+
+_vector_installed() {
+  psql "$XHS_DATABASE_URL" -tAc "SELECT 1 FROM pg_extension WHERE extname = 'vector'" 2>/dev/null | grep -q 1
+}
+
+_suggest_pgvector_apt() {
+  local major=""
+  if command -v psql &>/dev/null; then
+    major="$(psql "$XHS_DATABASE_URL" -tAc "SHOW server_version" 2>/dev/null | grep -oE '[0-9]+' | head -1 || true)"
+  fi
+  if [[ -z "$major" ]] && command -v postgres &>/dev/null; then
+    major="$(postgres --version 2>/dev/null | grep -oE '[0-9]+' | head -1 || true)"
+  fi
+  if [[ -n "$major" ]]; then
+    echo "sudo apt-get update && sudo apt-get install -y postgresql-${major}-pgvector"
+  else
+    echo "sudo apt-get install -y postgresql-14-pgvector   # 按 psql --version 改主版本号"
+  fi
+}
+
+_ensure_vector_extension() {
+  if _vector_installed; then
+    ok "pgvector 扩展已就绪"
+    return 0
+  fi
+
+  log "CREATE EXTENSION vector（应用账号）"
+  if psql "$XHS_DATABASE_URL" -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS vector;" 2>/dev/null; then
+    ok "pgvector 扩展已就绪（应用账号）"
+    return 0
+  fi
+
+  local db_name
+  db_name="$(_db_name_from_url "$XHS_DATABASE_URL")"
+  [[ -n "$db_name" ]] || db_name="vuemonitor"
+
+  if command -v sudo &>/dev/null && id postgres &>/dev/null 2>&1; then
+    log "尝试 postgres 超级用户: sudo -u postgres psql -d ${db_name}"
+    if sudo -u postgres psql -d "$db_name" -v ON_ERROR_STOP=1 -c "CREATE EXTENSION IF NOT EXISTS vector;" 2>/dev/null; then
+      if _vector_installed; then
+        ok "pgvector 扩展已就绪（postgres 超级用户）"
+        return 0
+      fi
+    fi
+  fi
+
+  warn "CREATE EXTENSION 失败 — 常见原因：未安装 pgvector 系统包，或 RDS 未开扩展"
+  warn "本机 ECS 可先安装: $(_suggest_pgvector_apt)"
+  warn "安装后执行: sudo -u postgres psql -d ${db_name} -c \"CREATE EXTENSION IF NOT EXISTS vector;\""
+  warn "RDS 请在控制台「插件 / Extensions」启用 vector 后重跑本脚本"
+  return 1
+}
+
+_ensure_vector_extension || exit 1
 
 log "应用 10_pgvector_embeddings.sql"
 psql "$XHS_DATABASE_URL" -v ON_ERROR_STOP=1 -f "$PGV"
