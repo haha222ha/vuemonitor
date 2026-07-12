@@ -59,7 +59,8 @@ def main() -> int:
         raw_items = fetch_items_for_insight(conn, report_date, source=args.source)
         print(
             f"[export-feed] PG rows={len(raw_items)} date={report_date} "
-            f"source={args.source} min_delta={insight_min_delta()}",
+            f"source={args.source} min_delta={insight_min_delta()} "
+            f"scan_window_days={insight_scan_window_days()}",
             flush=True,
         )
     finally:

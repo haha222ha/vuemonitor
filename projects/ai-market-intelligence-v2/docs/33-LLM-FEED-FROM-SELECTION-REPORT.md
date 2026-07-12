@@ -7,11 +7,12 @@
 
 ## 1. 结论（一句话）
 
-**AI 情报观察池**与 Legacy 选品日报 **分离**：默认 **delta_only** — `premium_goods_daily.delta >= 1`（对齐 `sold_history.delta`），不用 `actual_velocity_1d` 卡门槛；监控池 `goods_sold_daily` 仅作补池。
+**AI 情报观察池**：**delta_only** + **最近 1 天扫描窗**（`INSIGHT_SCAN_WINDOW_DAYS=1`）— 仅纳入报告日当天被扫描到、且 `premium_goods_daily.delta >= 1` 的唯一商品；`actual_velocity_1d` 不卡门槛。
 
 | 口径 | PG 字段 | 角色 |
 |------|---------|------|
-| **delta ≥ 1** | `premium_goods_daily.delta` / `goods_sold_daily.delta` | **主门槛**（采集真实增量） |
+| **delta ≥ 1** | `premium_goods_daily.delta` | **主门槛**（采集真实增量） |
+| **最近 1 天扫描** | `goods_sold_snapshots.snapshot_time` / `last_app_scan` | **范围限定**（只观察刚扫到的品） |
 | **actual_velocity_1d ≥ 1** | `premium_goods.actual_velocity_1d` | 仅展示/交叉比对，**不卡入选** |
 
 ```

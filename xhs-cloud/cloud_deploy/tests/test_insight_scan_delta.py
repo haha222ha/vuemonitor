@@ -14,6 +14,7 @@ if str(_ROOT) not in sys.path:
 from cloud_deploy.reporting.pg_reader import (
     fetch_items_for_insight,
     insight_min_delta,
+    insight_scan_window_days,
 )
 
 
@@ -31,6 +32,17 @@ def test_insight_min_delta_env():
 def test_insight_min_delta_invalid():
     with mock.patch.dict(os.environ, {"INSIGHT_MIN_DELTA": "x"}):
         assert insight_min_delta() == 1
+
+
+def test_insight_scan_window_days_default():
+    with mock.patch.dict(os.environ, {}, clear=False):
+        os.environ.pop("INSIGHT_SCAN_WINDOW_DAYS", None)
+        assert insight_scan_window_days() == 1
+
+
+def test_insight_scan_window_days_env():
+    with mock.patch.dict(os.environ, {"INSIGHT_SCAN_WINDOW_DAYS": "2"}):
+        assert insight_scan_window_days() == 2
 
 
 def test_fetch_items_for_insight_routes_scan_delta():
@@ -67,6 +79,8 @@ if __name__ == "__main__":
     test_insight_min_delta_default()
     test_insight_min_delta_env()
     test_insight_min_delta_invalid()
+    test_insight_scan_window_days_default()
+    test_insight_scan_window_days_env()
     test_fetch_items_for_insight_routes_scan_delta()
     test_fetch_items_for_insight_default_source()
     test_fetch_items_for_insight_unknown()

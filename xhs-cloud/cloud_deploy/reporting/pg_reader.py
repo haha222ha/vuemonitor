@@ -613,14 +613,35 @@ def insight_min_delta() -> int:
         return 1
 
 
+def insight_scan_window_days() -> int:
+    """观察池扫描窗：最近 N 个自然日（默认 1 = 仅报告日当日扫描）。"""
+    try:
+        return max(1, int(os.environ.get("INSIGHT_SCAN_WINDOW_DAYS", "1")))
+    except ValueError:
+        return 1
+
+
+def _insight_scan_bounds(report_date: str, window_days: int) -> tuple[str, str, str, str]:
+    end_d = date.fromisoformat(report_date)
+    start_d = end_d - timedelta(days=window_days - 1)
+    start_date = start_d.isoformat()
+    end_date = end_d.isoformat()
+    ts_start = f"{start_date} 00:00:00+00"
+    ts_end = f"{(end_d + timedelta(days=1)).isoformat()} 00:00:00+00"
+    return start_date, end_date, ts_start, ts_end
+
+
 def _scan_delta_sold_cap() -> int:
     return 200_000
 
 
-def _fetch_premium_scan_delta_rows(conn, report_date: str, min_delta: int) -> list[dict]:
-    """精品库当日 premium_goods_daily.delta（对齐本地 sold_history.delta）。"""
+def _fetch_premium_scan_delta_rows(
+    conn, report_date: str, min_delta: int, *, window_days: int
+) -> list[dict]:
+    """精品库：扫描窗内 premium_goods_daily.delta（对齐 sold_history.delta）。"""
     if not _premium_table_exists(conn):
         return []
+    start_date, end_date, ts_start, ts_end = _insight_scan_bounds(report_date, window_days)
     with conn.cursor() as c:
         c.execute("SET search_path TO xhs_monitor, public")
         c.execute(
@@ -629,32 +650,62 @@ def _fetch_premium_scan_delta_rows(conn, report_date: str, min_delta: int) -> li
                    pg.goods_id, pg.title, pg.deal_price, pg.sold_num, pg.velocity_1d,
                    pg.actual_velocity_1d, pg.burst_score, pg.tier, pg.store_id, pg.store_name,
                    pg.shop_fans, pg.shop_sales, pg.is_virtual, pg.first_seen_at, pg.first_report_date,
+                   pgd.snap_date AS pgd_snap_date,
                    pgd.sold_num AS pgd_sold, pgd.delta AS pgd_delta,
                    pgd.actual_delta AS pgd_actual_delta, pgd.velocity_1d AS pgd_velocity,
                    prev.sold_num AS prev_sold
             FROM premium_goods pg
             INNER JOIN premium_goods_daily pgd
-                   ON pgd.goods_id = pg.goods_id AND pgd.snap_date = %s
+                   ON pgd.goods_id = pg.goods_id
+                  AND pgd.snap_date >= %s AND pgd.snap_date <= %s
             LEFT JOIN LATERAL (
                 SELECT p.sold_num
                 FROM premium_goods_daily p
-                WHERE p.goods_id = pg.goods_id AND p.snap_date < %s
+                WHERE p.goods_id = pg.goods_id AND p.snap_date < pgd.snap_date
                 ORDER BY p.snap_date DESC
                 LIMIT 1
             ) prev ON TRUE
             WHERE pg.lifecycle < 3
               AND COALESCE(pgd.delta, 0) >= %s
               AND COALESCE(pgd.sold_num, pg.sold_num, 0) <= %s
-            ORDER BY pg.goods_id, pgd.delta DESC
+              AND (
+                    EXISTS (
+                        SELECT 1 FROM goods_sold_snapshots gss
+                        WHERE gss.goods_id = pg.goods_id
+                          AND gss.snapshot_time >= %s::timestamptz
+                          AND gss.snapshot_time < %s::timestamptz
+                    )
+                    OR LEFT(
+                        COALESCE(
+                            NULLIF(pg.last_app_scan, ''),
+                            NULLIF(pg.last_metric_scan, ''),
+                            NULLIF(pg.web_sold_ok_at, ''),
+                            pgd.snap_date
+                        ),
+                        10
+                    ) >= %s
+              )
+            ORDER BY pg.goods_id, pgd.delta DESC, pgd.snap_date DESC
             """,
-            (report_date, report_date, min_delta, _scan_delta_sold_cap()),
+            (
+                start_date,
+                end_date,
+                min_delta,
+                _scan_delta_sold_cap(),
+                ts_start,
+                ts_end,
+                start_date,
+            ),
         )
         cols = [d[0] for d in c.description]
         return [dict(zip(cols, r)) for r in c.fetchall()]
 
 
-def _fetch_sold_daily_scan_delta_rows(conn, report_date: str, min_delta: int) -> list[dict]:
-    """监控池 goods_sold_daily.delta（补全不在精品库的商品）。"""
+def _fetch_sold_daily_scan_delta_rows(
+    conn, report_date: str, min_delta: int, *, window_days: int
+) -> list[dict]:
+    """监控池：扫描窗内 goods_sold_daily.delta（补全不在精品库的商品）。"""
+    start_date, end_date, ts_start, ts_end = _insight_scan_bounds(report_date, window_days)
     mg_shop = (
         "m.shop_sales AS mg_shop_sales, m.shop_fans AS mg_shop_fans,"
         if _monitor_goods_has_shop_cols(conn)
@@ -729,12 +780,35 @@ def _fetch_sold_daily_scan_delta_rows(conn, report_date: str, min_delta: int) ->
                 ORDER BY r.report_date DESC
                 LIMIT 1
             ) rdi ON TRUE
-            WHERE sd.snapshot_date = %s
+            WHERE sd.snapshot_date >= %s AND sd.snapshot_date <= %s
               AND COALESCE(sd.delta, 0) >= %s
               AND COALESCE(sd.sold_num, 0) <= %s
-            ORDER BY sd.goods_id, sd.delta DESC
+              AND (
+                    EXISTS (
+                        SELECT 1 FROM goods_sold_snapshots gss
+                        WHERE gss.goods_id = sd.goods_id
+                          AND gss.snapshot_time >= %s::timestamptz
+                          AND gss.snapshot_time < %s::timestamptz
+                    )
+                    OR (
+                        m.last_scan_at IS NOT NULL
+                        AND m.last_scan_at >= %s::timestamptz
+                        AND m.last_scan_at < %s::timestamptz
+                    )
+              )
+            ORDER BY sd.goods_id, sd.delta DESC, sd.snapshot_date DESC
             """,
-            (report_date, report_date, min_delta, _scan_delta_sold_cap()),
+            (
+                report_date,
+                start_date,
+                end_date,
+                min_delta,
+                _scan_delta_sold_cap(),
+                ts_start,
+                ts_end,
+                ts_start,
+                ts_end,
+            ),
         )
         cols = [d[0] for d in c.description]
         return [dict(zip(cols, r)) for r in c.fetchall()]
@@ -747,15 +821,19 @@ def fetch_items_from_scan_delta(
     min_delta: int | None = None,
 ) -> list:
     """
-    AI 情报观察池（delta_only，与 actual_velocity 门槛分离）：
+    AI 情报观察池（delta_only + 最近 N 日扫描窗，默认 1 天）：
 
-    - 主池：premium_goods_daily.delta >= min_delta（对齐 sold_history.delta）
-    - 补池：goods_sold_daily.delta >= min_delta（监控池未入精品库者）
-    - 唯一 goods_id；lifecycle<3；销量上限 20 万
+    - 主池：扫描窗内 premium_goods_daily.delta >= min_delta
+    - 补池：扫描窗内 goods_sold_daily.delta >= min_delta（精品库未覆盖）
+    - 扫描判定：goods_sold_snapshots.snapshot_time 或精品 last_app_scan 等
+    - 唯一 goods_id；lifecycle<3；销量上限 20 万；不用 actual_velocity 卡门槛
     """
     min_delta = insight_min_delta() if min_delta is None else max(1, int(min_delta))
+    window_days = insight_scan_window_days()
 
-    premium_rows = _fetch_premium_scan_delta_rows(conn, report_date, min_delta)
+    premium_rows = _fetch_premium_scan_delta_rows(
+        conn, report_date, min_delta, window_days=window_days
+    )
     premium_items: list = []
     for raw in premium_rows:
         item = premium_row_to_item(raw, delta_only=True)
@@ -765,7 +843,9 @@ def fetch_items_from_scan_delta(
     premium_ids = {str(item_at(x, "goods_id", "") or "") for x in premium_items}
     premium_ids.discard("")
 
-    sold_rows = _fetch_sold_daily_scan_delta_rows(conn, report_date, min_delta)
+    sold_rows = _fetch_sold_daily_scan_delta_rows(
+        conn, report_date, min_delta, window_days=window_days
+    )
     monitor_items: list = []
     for r in sold_rows:
         gid = str(r.get("goods_id") or "")
@@ -781,7 +861,8 @@ def fetch_items_from_scan_delta(
     print(
         f"[pg_reader] scan_delta {report_date}: kept={len(items)} "
         f"premium={len(premium_items)}/{len(premium_rows)} "
-        f"monitor+={len(monitor_items)} min_delta={min_delta} mode=delta_only",
+        f"monitor+={len(monitor_items)} min_delta={min_delta} "
+        f"scan_window_days={window_days} mode=delta_only",
         flush=True,
     )
     return items

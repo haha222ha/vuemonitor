@@ -36,7 +36,8 @@ def main() -> int:
         raw = fetch_items_for_insight(conn, report_date, source=source)
         print(
             f"[aggregate-dcm] PG rows={len(raw)} date={report_date} "
-            f"source={source} min_delta={insight_min_delta()}",
+            f"source={source} min_delta={insight_min_delta()} "
+            f"scan_window_days={insight_scan_window_days()}",
             flush=True,
         )
         if not raw:

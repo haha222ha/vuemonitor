@@ -20,7 +20,7 @@ from cloud_deploy.reporting.insight_report_builder import (
     render_insight_html,
     write_insight_bundle,
 )
-from cloud_deploy.reporting.pg_reader import fetch_items_for_insight, insight_min_delta
+from cloud_deploy.reporting.pg_reader import fetch_items_for_insight, insight_min_delta, insight_scan_window_days
 
 
 def _log(msg: str) -> None:
@@ -61,7 +61,10 @@ def run_insight_pipeline(
     conn = _conn()
     try:
         raw_items = fetch_items_for_insight(conn, report_date, source=source)
-        _log(f"PG rows={len(raw_items)} date={report_date} source={source} min_delta={insight_min_delta()}")
+        _log(
+            f"PG rows={len(raw_items)} date={report_date} source={source} "
+            f"min_delta={insight_min_delta()} scan_window_days={insight_scan_window_days()}"
+        )
     finally:
         conn.close()
 
@@ -132,7 +135,7 @@ def run_insight_pipeline(
                 **public,
                 "selection_rule": (
                     f"premium_goods_daily.delta>={insight_min_delta()} (delta_only), "
-                    "+ goods_sold_daily supplement, unique per product"
+                    f"scanned within {insight_scan_window_days()}d, unique per product"
                 ),
             },
         )

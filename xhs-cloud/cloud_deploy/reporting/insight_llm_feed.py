@@ -92,7 +92,7 @@ def build_llm_feed(
     if not selection_rule and pg_source in ("scan_delta", "delta", "insight"):
         selection_rule = (
             "premium_goods_daily.delta>=1 (delta_only), "
-            "+ goods_sold_daily supplement, unique per product"
+            "scanned within last 1 day, unique per product"
         )
     elif not selection_rule and pg_source == "auto":
         selection_rule = "fetch_items_auto (Legacy 选品池，monitor_incr + premium_daily)"
