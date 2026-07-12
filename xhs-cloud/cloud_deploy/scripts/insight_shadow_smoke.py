@@ -23,6 +23,7 @@ import sys
 import urllib.error
 import urllib.request
 import uuid
+from urllib.parse import quote
 
 ROOT = os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud")
 if ROOT not in sys.path:
@@ -45,7 +46,14 @@ def _log(ok: bool, name: str, detail: str = "") -> None:
         print(f"  [FAIL] {name}" + (f" — {detail}" if detail else ""))
 
 
-def _request(method: str, path: str, *, token: str | None = None, body: dict | None = None) -> tuple[int, dict]:
+def _request(
+    method: str,
+    path: str,
+    *,
+    token: str | None = None,
+    body: dict | None = None,
+    parse_json: bool = True,
+) -> tuple[int, dict | str]:
     url = f"{BASE}{path}"
     headers = {"Accept": "application/json"}
     if token:
@@ -57,10 +65,19 @@ def _request(method: str, path: str, *, token: str | None = None, body: dict | N
     req = urllib.request.Request(url, data=data, headers=headers, method=method)
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:
-            raw = resp.read().decode("utf-8")
-            return resp.status, json.loads(raw) if raw else {}
+            raw = resp.read().decode("utf-8", "replace")
+            if not parse_json:
+                return resp.status, raw
+            if not raw:
+                return resp.status, {}
+            try:
+                return resp.status, json.loads(raw)
+            except json.JSONDecodeError:
+                return resp.status, {"_raw_len": len(raw)}
     except urllib.error.HTTPError as e:
         raw = e.read().decode("utf-8", "replace")
+        if not parse_json:
+            return e.code, raw
         try:
             return e.code, json.loads(raw)
         except json.JSONDecodeError:
@@ -161,9 +178,15 @@ def main() -> int:
         first = items[0]
         date = str(first.get("report_date") or "")[:10]
         cat = first.get("category") or ""
-        view_path = f"/api/v1/member/insight/{date}/{cat}/view?access_token={token}"
-        vcode, _ = _request("GET", view_path)
-        _log(vcode == 200, "GET insight view HTML", f"{date}/{cat} HTTP {vcode}")
+        view_path = (
+            f"/api/v1/member/insight/{quote(date, safe='')}/{quote(cat, safe='')}"
+            f"/view?access_token={quote(token, safe='')}"
+        )
+        vcode, html = _request("GET", view_path, parse_json=False)
+        detail = f"{date}/{cat} HTTP {vcode}"
+        if vcode == 200 and isinstance(html, str):
+            detail += f" bytes={len(html.encode('utf-8'))}"
+        _log(vcode == 200, "GET insight view HTML", detail)
     else:
         _log(False, "insight library 非空", "请先跑 run_insight_report_shadow.sh")
 
