@@ -368,6 +368,26 @@ def insight_workflow_list(user: dict = Depends(current_user)):
     return {"items": items}
 
 
+@router.get("/similar")
+def insight_similar(category: str = "", user: dict = Depends(current_user)):
+    """Q3：相关赛道（pgvector 或同日蓝海兜底）。"""
+    assert_insight_allowed(user["id"])
+    from cloud_deploy.cloud_api.insight_similar import build_similar_categories
+
+    cat = str(category or "").strip()
+    if not _CATEGORY_RE.match(cat):
+        raise HTTPException(status_code=400, detail="category 含非法字符")
+    from cloud_deploy.cloud_api.database_pg import _conn
+
+    conn = _conn()
+    try:
+        data = build_similar_categories(conn, cat, limit=3)
+    finally:
+        conn.close()
+    _log_behavior(user["id"], "similar", category=cat)
+    return data
+
+
 @router.get("/compare")
 def insight_compare(categories: str = "", user: dict = Depends(current_user)):
     """Q2：2～3 类目指标对比（读 PG，无实时 LLM）。"""

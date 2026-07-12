@@ -7,10 +7,34 @@ from typing import Any, Callable
 from cloud_deploy.cloud_api.insight_pg import set_search_path, table_exists
 
 REASON_LABELS: dict[str, str] = {
+    "watchlist": "您关注的赛道",
     "based_on_history": "基于您的浏览记录",
     "trending": "今日蓝海指数较高",
     "library": "情报库热门",
 }
+
+
+def watchlist_categories(conn, user_id: int, *, limit: int = 10) -> list[str]:
+    if not table_exists(conn, "member_insight_watchlist"):
+        return []
+    set_search_path(conn)
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT category FROM member_insight_watchlist
+            WHERE user_id = %s
+            ORDER BY sort_order, id
+            LIMIT %s
+            """,
+            (user_id, limit),
+        )
+        rows = cur.fetchall()
+    out: list[str] = []
+    for row in rows:
+        cat = row[0] if not isinstance(row, dict) else row.get("category")
+        if cat and str(cat) not in out:
+            out.append(str(cat))
+    return out
 
 
 def top_categories_for_user(conn, user_id: int, *, limit: int = 5) -> list[str]:
@@ -79,6 +103,7 @@ def build_recommendations(
     limit: int = 4,
 ) -> dict[str, Any]:
     preferred = top_categories_for_user(conn, user_id, limit=limit)
+    watched = watchlist_categories(conn, user_id, limit=limit * 2)
     trending = trending_categories_from_pg(conn, limit=30)
     items = list_disk_items()
     by_cat: dict[str, dict] = {}
@@ -102,6 +127,9 @@ def build_recommendations(
             }
         )
 
+    for cat in watched:
+        _append(cat, "watchlist")
+
     for cat in preferred:
         _append(cat, "based_on_history")
 
@@ -112,5 +140,5 @@ def build_recommendations(
         for it in items:
             _append(str(it.get("category") or ""), "library")
 
-    source = "user_behavior" if preferred else ("pg_radar" if trending else "library")
+    source = "watchlist" if watched else ("user_behavior" if preferred else ("pg_radar" if trending else "library"))
     return {"items": recs[:limit], "source": source}

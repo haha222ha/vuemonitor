@@ -215,6 +215,13 @@ def main() -> int:
 
     if items:
         first = items[0]
+        cat = str(first.get("category") or "")
+        code_s, sim = _request("GET", f"/api/v1/member/insight/similar?category={quote(cat, safe='')}", token=token)
+        ok_sim = code_s == 200 and isinstance(sim, dict) and sim.get("category") == cat
+        _log(ok_sim, "GET /member/insight/similar", f"HTTP {code_s} source={sim.get('source') if isinstance(sim, dict) else ''}")
+
+    if items:
+        first = items[0]
         date = str(first.get("report_date") or "")[:10]
         cat = first.get("category") or ""
         view_path = (

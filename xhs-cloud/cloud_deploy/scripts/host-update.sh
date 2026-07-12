@@ -90,6 +90,10 @@ else
   warn "未配置 XHS_DATABASE_URL，跳过 PG init"
 fi
 
+if [[ "${XHS_DATABASE_URL:-}" == postgres* ]]; then
+  bash "$ROOT/cloud_deploy/scripts/ensure_insight_pg_schema.sh" 2>/dev/null && ok "V2 情报 PG 迁移" || warn "V2 PG 迁移跳过"
+fi
+
 log "systemd"
 if [ -d "$ROOT/cloud_deploy/systemd" ]; then
   sudo cp "$ROOT/cloud_deploy/systemd/"*.service /etc/systemd/system/ 2>/dev/null || true
@@ -121,7 +125,7 @@ if systemctl is-enabled xhs-ingest-report.timer &>/dev/null; then
   sudo systemctl restart xhs-ingest-report.timer || true
 fi
 
-for t in xhs-daemon-watchdog xhs-daily-report xhs-weekly-report xhs-monthly-report xhs-prune-snapshots xhs-aggregate-metrics; do
+for t in xhs-daemon-watchdog xhs-daily-report xhs-weekly-report xhs-monthly-report xhs-prune-snapshots xhs-aggregate-metrics xhs-v2-daily-ops; do
   if systemctl is-enabled "${t}.timer" &>/dev/null; then
     sudo systemctl restart "${t}.timer" || true
   fi
@@ -131,6 +135,9 @@ if [[ "${XHS_DATABASE_URL:-}" == postgres* ]]; then
   bash "$ROOT/cloud_deploy/scripts/ensure_aggregate_metrics_timer.sh" 2>/dev/null || true
   if [[ "${XHS_INSIGHT_SHADOW_TIMER:-0}" == "1" ]]; then
     bash "$ROOT/cloud_deploy/scripts/ensure_insight_report_timer.sh" 2>/dev/null || true
+  fi
+  if [[ "${XHS_V2_LAUNCH:-0}" == "1" ]] || [[ "${XHS_V2_DAILY_OPS:-1}" == "1" ]]; then
+    bash "$ROOT/cloud_deploy/scripts/ensure_v2_daily_ops_timer.sh" 2>/dev/null || true
   fi
 fi
 

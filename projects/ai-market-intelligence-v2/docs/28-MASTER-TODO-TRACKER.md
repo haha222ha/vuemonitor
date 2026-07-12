@@ -40,6 +40,12 @@
   - [x] Q2-4：时间轴 API + 会员页面板（Pro 门控）
   - [x] Q2-5：工作流 POST 门控 + 会员页记录表单
   - [x] Q2-6：PDF 摘要导出（Pro，浏览器 Print → PDF）
+- [~] **Phase Q3 个性化** → doc 32
+  - [x] Q3-1：类目关注 watchlist UI + 推荐加权
+  - [x] Q3-2：user_behavior 埋点 + host-update PG 迁移
+  - [~] Q3-3：真实 embedding API（需 OpenAI/智谱 Key；现 deterministic 兜底）
+  - [x] Q3-4：相关赛道 API + 会员页「相关赛道」
+  - [ ] Q3-5：阈值通知（可选）
 - [ ] Redis L1（可选，未做）
 
 ---
@@ -65,6 +71,7 @@ bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/v2-t1-launch.sh
 
 | 日期 | 变更 |
 |------|------|
-| 2026-07-12 | **32 情报质量全方位实施计划**（Q0～Q4） |
+| 2026-07-12 | Q3：watchlist UI、相关赛道 API、PG 迁移脚本 |
+| 2026-07-12 | Q2 完成：对比/时间轴/PDF + smoke |
 | 2026-07-12 | 今日冲刺：T1 launch、T2 API/UI、doc 30/31、daily ops |
 | 2026-07-12 | T1 批量 + 一键部署 + nginx 修复 |

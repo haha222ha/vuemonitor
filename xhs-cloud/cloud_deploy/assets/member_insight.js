@@ -22,6 +22,8 @@
 
   var _preview = { date: '', category: '' };
 
+  var _watchlist = [];
+
 
 
   function loadStored(key) {
@@ -688,6 +690,186 @@
 
 
 
+  function loadWatchlist() {
+
+    return api('/api/v1/member/insight/watchlist').then(function (data) {
+
+      _watchlist = (data && data.categories) || [];
+
+      renderWatchlistBar();
+
+      return _watchlist;
+
+    }).catch(function () {
+
+      _watchlist = [];
+
+      return _watchlist;
+
+    });
+
+  }
+
+
+
+  function renderWatchlistBar() {
+
+    var bar = document.getElementById('insightWatchlistBar');
+
+    if (!bar) return;
+
+    if (!_watchlist.length) {
+
+      bar.classList.add('hidden');
+
+      bar.innerHTML = '';
+
+      return;
+
+    }
+
+    var chips = _watchlist.map(function (cat) {
+
+      return '<span class="insight-badge insight-watch-chip" data-category="' + esc(cat) + '">' + esc(cat) + '</span>';
+
+    }).join('');
+
+    bar.innerHTML = '<strong>我的关注</strong><div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">' + chips + '</div>';
+
+    bar.classList.remove('hidden');
+
+    bar.querySelectorAll('.insight-watch-chip').forEach(function (el) {
+
+      el.style.cursor = 'pointer';
+
+      el.addEventListener('click', function () {
+
+        var cat = el.dataset.category;
+
+        var match = _libraryItems.filter(function (it) { return it.category === cat; })[0];
+
+        if (match) openPreview(match.report_date, cat);
+
+        else alert('该类目暂无预生成报告');
+
+      });
+
+    });
+
+  }
+
+
+
+  function toggleWatchCategory(cat) {
+
+    if (!cat) return;
+
+    var idx = _watchlist.indexOf(cat);
+
+    var next = _watchlist.slice();
+
+    if (idx >= 0) next.splice(idx, 1);
+
+    else next.push(cat);
+
+    api('/api/v1/member/insight/watchlist', {
+
+      method: 'PUT',
+
+      headers: { 'Content-Type': 'application/json' },
+
+      body: JSON.stringify({ categories: next }),
+
+    }).then(function (data) {
+
+      _watchlist = (data && data.categories) || next;
+
+      renderWatchlistBar();
+
+      renderLibrary(_libraryItems);
+
+      loadRecommendations();
+
+    }).catch(function (e) {
+
+      alert((e && e.message) || '关注失败');
+
+    });
+
+  }
+
+
+
+  function loadSimilarCategories(category) {
+
+    var bar = document.getElementById('insightSimilarBar');
+
+    if (!bar || !category) return;
+
+    bar.classList.remove('hidden');
+
+    bar.textContent = '相关赛道加载中…';
+
+    api('/api/v1/member/insight/similar?category=' + encodeURIComponent(category))
+
+      .then(function (data) {
+
+        var items = (data && data.items) || [];
+
+        if (!items.length) {
+
+          bar.classList.add('hidden');
+
+          bar.textContent = '';
+
+          return;
+
+        }
+
+        var chips = items.map(function (it) {
+
+          return '<span class="insight-badge insight-sim-chip" data-category="' + esc(it.category || '') + '">' +
+
+            esc(it.category) + '</span>';
+
+        }).join('');
+
+        var src = data.source === 'pgvector' ? '语义相似' : '同日蓝海';
+
+        bar.innerHTML = '<strong>相关赛道</strong> · ' + esc(src) +
+
+          '<span style="margin-left:8px;display:inline-flex;flex-wrap:wrap;gap:6px">' + chips + '</span>';
+
+        bar.querySelectorAll('.insight-sim-chip').forEach(function (el) {
+
+          el.style.cursor = 'pointer';
+
+          el.addEventListener('click', function () {
+
+            var cat = el.dataset.category;
+
+            var match = _libraryItems.filter(function (it) { return it.category === cat; })[0];
+
+            if (match) openPreview(match.report_date, cat);
+
+            else alert('该类目暂无预生成报告');
+
+          });
+
+        });
+
+      })
+
+      .catch(function () {
+
+        bar.classList.add('hidden');
+
+      });
+
+  }
+
+
+
   function renderLibrary(items) {
 
     var list = document.getElementById('insightLibraryList');
@@ -718,13 +900,21 @@
 
       var stars = it.stars || 3;
 
+      var watched = _watchlist.indexOf(cat) >= 0;
+
       return (
 
         '<div class="insight-lib-item" data-date="' + esc(date) + '" data-category="' + esc(cat) + '">' +
 
         '<div><strong>' + esc(cat) + '</strong><div class="insight-lib-meta">' + esc(date) + ' · ★' + stars + '</div></div>' +
 
-        '<button type="button" class="btn btn-ghost btn-xs insight-read-btn">阅读</button></div>'
+        '<div style="display:flex;gap:6px;align-items:center">' +
+
+        '<button type="button" class="btn btn-ghost btn-xs insight-watch-btn' + (watched ? ' active' : '') + '" title="关注赛道">' +
+
+        (watched ? '★' : '☆') + '</button>' +
+
+        '<button type="button" class="btn btn-ghost btn-xs insight-read-btn">阅读</button></div></div>'
 
       );
 
@@ -734,11 +924,27 @@
 
       row.addEventListener('click', function (e) {
 
+        if (e.target.closest('.insight-watch-btn')) return;
+
         if (e.target.closest('.insight-read-btn') || e.target === row) {
 
           openPreview(row.dataset.date, row.dataset.category);
 
         }
+
+      });
+
+    });
+
+    list.querySelectorAll('.insight-watch-btn').forEach(function (btn) {
+
+      btn.addEventListener('click', function (e) {
+
+        e.stopPropagation();
+
+        var row = btn.closest('.insight-lib-item');
+
+        if (row) toggleWatchCategory(row.dataset.category);
 
       });
 
@@ -762,6 +968,8 @@
 
     if (hint) hint.textContent = category + ' · ' + _preview.date;
 
+    loadSimilarCategories(category);
+
   }
 
 
@@ -780,15 +988,21 @@
 
       api('/api/v1/member/insight/library'),
 
+      api('/api/v1/member/insight/watchlist').catch(function () { return { categories: [] }; }),
+
     ]).then(function (res) {
 
       var profile = res[0];
 
       var lib = res[1];
 
+      _watchlist = (res[2] && res[2].categories) || [];
+
       renderPlanBar(profile);
 
       renderLibrary(lib.items || []);
+
+      renderWatchlistBar();
 
       loadRadar();
 
