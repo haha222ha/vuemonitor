@@ -33,6 +33,7 @@
   - [x] Q1-B：5 Agent 移植 `insight_agent_graph.py` + `prompts/agents.yaml`
   - [x] Q1-A：类目树 `category_taxonomy.yaml` + enrich + k-匿名
   - [x] Q1-C：HTML 指标依据折叠 + L1 cache schema 修复
+  - [x] Q1-D：**feed-v1** 选品→`llm_feed.json` 投喂层 → **`33-LLM-FEED-FROM-SELECTION-REPORT.md`**
 - [~] **Phase Q2 产品体验** → doc 32
   - [x] Q2-1：雷达 PG search_path + 可点击 chip
   - [x] Q2-2：推荐 v2（PG 蓝海排序 + reason_label）
@@ -71,6 +72,7 @@ bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/v2-t1-launch.sh
 
 | 日期 | 变更 |
 |------|------|
+| 2026-07-12 | **33 LLM Feed**：选品 PG → feed-v1 → 5 Agent |
 | 2026-07-12 | Q3：watchlist UI、相关赛道 API、PG 迁移脚本 |
 | 2026-07-12 | Q2 完成：对比/时间轴/PDF + smoke |
 | 2026-07-12 | 今日冲刺：T1 launch、T2 API/UI、doc 30/31、daily ops |

@@ -17,7 +17,7 @@ from cloud_deploy.reporting.insight_ai_mock import InsightReport, run_agents_moc
 from cloud_deploy.reporting.insight_llm_client import LLMError, LLMUsage, chat_json_with_usage, llm_configured
 
 PROMPTS_PATH = Path(__file__).resolve().parents[1] / "prompts" / "agents.yaml"
-PROMPT_VERSION = "agent-v1"
+PROMPT_VERSION = "agent-v1-feed"
 
 _REPORT_CACHE: dict[str, dict[str, Any]] = {}
 
@@ -74,6 +74,8 @@ def _metrics_prompt(metrics: dict[str, Any]) -> str:
         "trend_7d",
         "price_distribution",
         "similar_categories",
+        "keyword_themes",
+        "selection_summary",
     )
     allowed = {k: metrics[k] for k in keys if k in metrics}
     return json.dumps(allowed, ensure_ascii=False)

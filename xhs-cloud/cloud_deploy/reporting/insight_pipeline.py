@@ -109,7 +109,15 @@ def run_insight_pipeline(
     out_base = os.path.join(root, "data", sub)
 
     summaries: list[dict[str, Any]] = []
+    from cloud_deploy.reporting.insight_llm_feed import (
+        build_llm_feed,
+        feed_to_agent_metrics,
+        filter_rows_for_category,
+        write_llm_feed_files,
+    )
+
     for insight in insights:
+        cat_rows = filter_rows_for_category(rows, insight.category)
         public = insight.to_public_dict()
         if metrics_conn is not None:
             try:
@@ -118,6 +126,16 @@ def run_insight_pipeline(
                 public = enrich_metrics_for_llm(metrics_conn, public, report_date)
             except Exception as e:
                 _log(f"trend_7d enrich skipped {insight.category}: {e}")
+
+        llm_feed = build_llm_feed(
+            insight,
+            cat_rows,
+            raw_selection_rows=len(raw_items),
+            pg_source=source,
+            k_anonymity_min=k_anon,
+            enriched=public,
+        )
+        agent_metrics = feed_to_agent_metrics(llm_feed)
         internal = asdict(insight)
         from cloud_deploy.reporting.daily_metrics_store import metrics_hash as calc_metrics_hash
         from cloud_deploy.reporting.insight_cache_store import (
@@ -126,7 +144,7 @@ def run_insight_pipeline(
             upsert_cached_report,
         )
 
-        mh = calc_metrics_hash(public)
+        mh = calc_metrics_hash(agent_metrics)
         report: dict[str, Any] | None = None
         cache_hit = False
         if metrics_conn is not None:
@@ -136,7 +154,7 @@ def run_insight_pipeline(
                 _log(f"cache HIT {insight.category} hash={mh[:8]}")
 
         if not report:
-            report_obj = run_agents_auto(public, budget_tokens=budget)
+            report_obj = run_agents_auto(agent_metrics, budget_tokens=budget)
             report = report_obj.to_public_dict()
             if metrics_conn is not None and use_llm:
                 try:
@@ -156,13 +174,17 @@ def run_insight_pipeline(
                 except Exception as e:
                     _log(f"cache write skipped {insight.category}: {e}")
 
-        html = render_insight_html(report, public)
+        html = render_insight_html(report, agent_metrics)
         meta = {
-            "metrics": public,
+            "metrics": agent_metrics,
+            "llm_feed": llm_feed,
             "report": report,
             "meta": {
                 "data_source": "pg",
                 "pipeline": "cloud_insight_report",
+                "feed_schema": llm_feed.get("schema_version"),
+                "selection_rows": len(cat_rows),
+                "raw_selection_rows": len(raw_items),
                 "shadow": shadow,
                 "llm": use_llm,
                 "cache_hit": cache_hit,
@@ -171,6 +193,7 @@ def run_insight_pipeline(
             },
         }
         bundle = write_insight_bundle(out_base, report_date, insight.category, html, meta)
+        write_llm_feed_files(bundle, llm_feed)
         summaries.append(
             {
                 "category": insight.category,
@@ -178,9 +201,10 @@ def run_insight_pipeline(
                 "stars": report.get("opportunity_stars"),
                 "bundle": str(bundle),
                 "sample_size": insight.sample_size,
+                "feed_schema": llm_feed.get("schema_version"),
             }
         )
-        _log(f"OK {insight.category} sample={insight.sample_size} → {bundle}")
+        _log(f"OK {insight.category} sample={insight.sample_size} feed={llm_feed.get('schema_version')} → {bundle}")
 
     if metrics_conn is not None:
         try:

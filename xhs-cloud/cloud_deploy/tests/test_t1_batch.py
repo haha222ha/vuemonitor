@@ -36,7 +36,7 @@ def test_metrics_hash_stable():
 
 
 def test_prompt_version():
-    assert PROMPT_VERSION == "v1"
+    assert PROMPT_VERSION == "agent-v1-feed"
 
 
 if __name__ == "__main__":

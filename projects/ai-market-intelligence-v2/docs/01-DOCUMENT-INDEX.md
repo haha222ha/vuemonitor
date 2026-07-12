@@ -44,6 +44,8 @@
 | 37 | 留存 × PG 深度集成需求 | **`27-RETENTION-PG-STICKINESS-REQUIREMENTS.md`** | 产品 / 后端 | ✅ v1.0 |
 | 38 | **主 TODO 跟踪器（T0→GA）** | **`28-MASTER-TODO-TRACKER.md`** | 全员 | ✅ v1.0 |
 | 39 | **V2 全链路一键部署 Runbook** | **`29-V2-ONECLICK-DEPLOY-RUNBOOK.md`** | 运维 / Agent | ✅ v1.0 |
+| 40 | **AI 情报质量 · 全方位实施计划** | **`32-INTELLIGENCE-QUALITY-FULL-IMPLEMENTATION-PLAN.md`** | 产品 / 后端 / AI | ✅ v1.0 |
+| 41 | **选品报告 → LLM 投喂包 feed-v1** | **`33-LLM-FEED-FROM-SELECTION-REPORT.md`** | 产品 / AI / 运维 | ✅ v1.0 |
 | + | PC 客户端对接（接口） | `09-PC-CLIENT-INTEGRATION.md` | 开发 | ✅ 草案 |
 | + | PC-1 cloud_client 合并说明 | `cloud-stubs/PC-1-CLOUD-CLIENT-INTEGRATION.md` | PC 开发 | ✅ 草案 |
 

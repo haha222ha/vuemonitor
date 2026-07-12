@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-PROMPT_VERSION = "agent-v1"
+from cloud_deploy.reporting.insight_agent_graph import PROMPT_VERSION  # noqa: F401 — re-export
 
 
 _MONITOR_SCHEMA = "xhs_monitor"
