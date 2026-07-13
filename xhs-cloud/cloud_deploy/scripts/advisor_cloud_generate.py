@@ -56,11 +56,15 @@ def _load_context(report_date: str) -> dict | None:
     return None
 
 
-def _try_rank_engine_generate(report_date: str, context: dict) -> dict | None:
+def _try_rank_engine_generate(report_date: str, context: dict, *, llm_enhance: bool = False) -> dict | None:
     try:
         from cloud_deploy.rank_engine.ai_advisor import AiAdvisor
 
-        return AiAdvisor().run_batch(target_date=report_date, context=context)
+        return AiAdvisor().run_batch(
+            target_date=report_date,
+            context=context,
+            llm_enhance=llm_enhance,
+        )
     except ImportError:
         return None
     except Exception as e:
@@ -137,7 +141,7 @@ def _pack_zip(report_date: str, publish_dir: str) -> str:
     return zip_path
 
 
-def process_one(report_date: str, *, dry_run: bool = False) -> dict:
+def process_one(report_date: str, *, dry_run: bool = False, llm_enhance: bool = False) -> dict:
     if not _DATE_RE.match(report_date):
         return {"report_date": report_date, "status": "error", "detail": "invalid date"}
 
@@ -152,7 +156,7 @@ def process_one(report_date: str, *, dry_run: bool = False) -> dict:
     if dry_run:
         return {"report_date": report_date, "status": "dry-run", "detail": "context loaded"}
 
-    advice = _try_rank_engine_generate(report_date, context) or _stub_advice(report_date, context)
+    advice = _try_rank_engine_generate(report_date, context, llm_enhance=llm_enhance) or _stub_advice(report_date, context)
     publish_dir = _write_publish_bundle(report_date, advice)
     zip_path = _pack_zip(report_date, publish_dir)
 
@@ -171,7 +175,7 @@ def process_one(report_date: str, *, dry_run: bool = False) -> dict:
     }
 
 
-def process_pending(report_date: str | None = None, *, dry_run: bool = False) -> list[dict]:
+def process_pending(report_date: str | None = None, *, dry_run: bool = False, llm_enhance: bool = False) -> list[dict]:
     incoming = _incoming_dir()
     if not os.path.isdir(incoming):
         return []
@@ -189,7 +193,7 @@ def process_pending(report_date: str | None = None, *, dry_run: bool = False) ->
 
     out = []
     for d in dates:
-        out.append(process_one(d, dry_run=dry_run))
+        out.append(process_one(d, dry_run=dry_run, llm_enhance=llm_enhance))
     return out
 
 
@@ -201,8 +205,9 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="AI 顾问云侧预生成")
     ap.add_argument("--date", default="", help="仅处理指定日期 YYYY-MM-DD")
     ap.add_argument("--dry-run", action="store_true", help="只验证 context，不写发布目录")
+    ap.add_argument("--llm-enhance", action="store_true", help="在预生成 advice 上追加 LLM 补充（非主路径）")
     args = ap.parse_args()
-    results = process_pending(report_date=args.date or None, dry_run=args.dry_run)
+    results = process_pending(report_date=args.date or None, dry_run=args.dry_run, llm_enhance=args.llm_enhance)
     if not results:
         print("[advisor] no pending context")
         return 0
