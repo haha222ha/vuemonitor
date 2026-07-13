@@ -47,6 +47,7 @@ from cloud_deploy.cloud_api.password_reset_service import (
     reset_password_with_token,
 )
 from cloud_deploy.cloud_api.insight_routes import router as insight_router
+from cloud_deploy.cloud_api.advisor_member_routes import router as advisor_member_router
 from cloud_deploy.cloud_api.member_entitlements import (
     assert_legacy_zip_allowed,
     enrich_member_profile,
@@ -56,6 +57,7 @@ _ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 app = FastAPI(title="XHS 选品云服务", version="1.1.0")
 app.include_router(insight_router)
+app.include_router(advisor_member_router)
 
 
 @app.on_event("startup")

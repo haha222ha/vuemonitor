@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 选品情报 · 免费样例</title>
+<style>
+:root{--bg:#f5f5f7;--surface:#fff;--text:#1d1d1f;--text2:#6e6e73;--accent:#0071e3;--line:rgba(0,0,0,.08);--warn:#b45309;--warn-bg:#fff8e6}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.shell{max-width:960px;margin:0 auto;padding:16px}
+.banner{background:var(--warn-bg);border:1px solid #f0d78a;border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.6;margin-bottom:14px}
+.banner strong{color:var(--warn)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.h1{font-size:18px;font-weight:700;margin-bottom:6px}
+.meta{font-size:12px;color:var(--text2);line-height:1.55}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.tool{padding:8px 12px;border-radius:10px;border:1px dashed #d1d5db;background:#f9fafb;font-size:12px;color:#9ca3af;cursor:not-allowed;user-select:none}
+.tool .lock{margin-left:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}
+.chip{padding:8px 14px;border-radius:20px;border:1px solid var(--line);background:#f9f9fb;font-size:13px;cursor:pointer}
+.chip.active{background:#eef5ff;border-color:var(--accent);font-weight:600;color:var(--accent)}
+.frame-wrap{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+iframe{width:100%;height:min(520px,62vh);border:none;display:block}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:10px;font-size:14px;font-weight:600;text-decoration:none;border:none;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-ghost{background:#fff;color:var(--accent);border:1px solid rgba(0,113,227,.25)}
+.fallback{padding:24px 16px;text-align:center;color:var(--text2);font-size:14px;line-height:1.7}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="banner" id="demoBanner">
+    <strong>免费样例</strong> · 仅可阅读<strong>历史</strong>预生成报告（非最新） ·
+    <strong>不支持</strong> AI 预生成调用、动态 LLM 与顾问对话。开通 <strong>¥9.9 体验卡（3 天）</strong> 或正式会员后可使用完整 AI 能力。
+  </div>
+  <div class="card">
+    <div class="h1">AI 选品情报 · 样例阅读</div>
+    <div class="meta" id="demoMeta">加载样例信息…</div>
+    <div class="tools" aria-hidden="true">
+      <span class="tool">机会雷达 <span class="lock">🔒</span></span>
+      <span class="tool">类目对比 <span class="lock">🔒</span></span>
+      <span class="tool">AI 动态生成 <span class="lock">🔒</span></span>
+      <span class="tool">顾问对话 <span class="lock">🔒</span></span>
+      <span class="tool">PDF 导出 <span class="lock">🔒</span></span>
+    </div>
+    <div class="chips" id="demoChips"></div>
+    <div class="frame-wrap">
+      <iframe id="demoFrame" title="AI 情报样例" src="about:blank"></iframe>
+      <div class="fallback hidden" id="demoFallback">样例筹备中，请先查看「免费体验包」表格数据，或稍后再来。</div>
+    </div>
+    <div class="cta">
+      <a class="btn btn-primary" href="/member#center" onclick="try{parent.switchPortal&&parent.switchPortal('center')}catch(e){}">开通体验卡 ¥9.9</a>
+      <a class="btn btn-ghost" href="/public/trial/preview" target="_blank" rel="noopener">查看选品表格体验包</a>
+    </div>
+  </div>
+</div>
+<script>
+let demoState = { available: false, report_date: '', category: '', categories: [], view_url: '' };
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+}
+
+function renderChips() {
+  const box = document.getElementById('demoChips');
+  if (!box) return;
+  const cats = demoState.categories || [];
+  if (!cats.length) {
+    box.innerHTML = '';
+    return;
+  }
+  box.innerHTML = cats.map(c => {
+    const name = c.category || '';
+    const active = name === demoState.category ? ' active' : '';
+    return '<button type="button" class="chip' + active + '" data-cat="' + esc(name) + '">' + esc(name) + '</button>';
+  }).join('');
+  box.querySelectorAll('.chip').forEach(el => {
+    el.addEventListener('click', () => selectCategory(el.dataset.cat || ''));
+  });
+}
+
+function loadFrame() {
+  const frame = document.getElementById('demoFrame');
+  const fb = document.getElementById('demoFallback');
+  if (!demoState.available || !demoState.view_url) {
+    if (frame) frame.classList.add('hidden');
+    if (fb) fb.classList.remove('hidden');
+    return;
+  }
+  if (frame) {
+    frame.classList.remove('hidden');
+    frame.src = demoState.view_url + '&_=' + Date.now();
+  }
+  if (fb) fb.classList.add('hidden');
+}
+
+function selectCategory(cat) {
+  if (!cat || cat === demoState.category) return;
+  demoState.category = cat;
+  demoState.view_url = '/api/v1/public/advisor-demo/view?date=' + encodeURIComponent(demoState.report_date)
+    + '&category=' + encodeURIComponent(cat);
+  renderChips();
+  loadFrame();
+}
+
+async function initDemo() {
+  const metaEl = document.getElementById('demoMeta');
+  try {
+    const res = await fetch('/api/v1/public/advisor-demo/info', { cache: 'no-store' });
+    const d = await res.json();
+    demoState = Object.assign(demoState, d);
+    if (!d.available) {
+      if (metaEl) metaEl.textContent = d.message || '样例暂不可用';
+      loadFrame();
+      return;
+    }
+    if (metaEl) {
+      metaEl.innerHTML = '样例日期 <strong>' + esc(d.report_date) + '</strong>（最新 ' + esc(d.latest_date || '—') + ' 需会员）'
+        + ' · 当前类目 <strong>' + esc(d.category) + '</strong> · 只读预览';
+    }
+    renderChips();
+    loadFrame();
+  } catch (e) {
+    if (metaEl) metaEl.textContent = '样例加载失败，请刷新重试';
+  }
+}
+initDemo();
+</script>
+</body>
+</html>

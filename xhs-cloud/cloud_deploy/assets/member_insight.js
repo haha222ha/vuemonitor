@@ -144,13 +144,9 @@
 
 
 
-    var tabReports = document.getElementById('dashTabReports');
+    var tabToday = document.getElementById('dashTabToday');
 
-    var tabInsight = document.getElementById('dashTabInsight');
-
-    if (tabReports) tabReports.classList.add('hidden');
-
-    if (tabInsight) tabInsight.classList.toggle('hidden', !insight);
+    if (tabToday) tabToday.classList.toggle('hidden', !insight);
 
 
 
@@ -160,7 +156,7 @@
 
 
 
-    var defaultDash = 'insight';
+    var defaultDash = 'today';
 
     if (!insight) defaultDash = 'client';
 
@@ -168,13 +164,17 @@
 
       var saved = loadStored('xhs_member_dash_tab');
 
-      if (saved === 'watchlist' || saved === 'client') defaultDash = saved;
+      if (saved === 'watchlist' || saved === 'client' || saved === 'archive' || saved === 'account') defaultDash = saved;
 
-      else if (saved === 'insight' && insight) defaultDash = 'insight';
+      else if ((saved === 'today' || saved === 'insight') && insight) defaultDash = 'today';
 
     } catch (_) {}
 
-    if (typeof global.switchDash === 'function') {
+    if (typeof global.MemberRouter !== 'undefined' && global.MemberRouter.go) {
+
+      global.MemberRouter.go(defaultDash, true);
+
+    } else if (typeof global.switchDash === 'function') {
 
       global.switchDash(defaultDash);
 

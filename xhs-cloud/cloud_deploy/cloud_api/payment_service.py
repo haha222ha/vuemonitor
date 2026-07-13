@@ -33,9 +33,22 @@ def _payment_fulfillment_note(order_no: str, channel: str, plan_code: str) -> st
             data.setdefault("order_no", order_no)
             data.setdefault("source", f"hwxun_{channel}")
             return json.dumps(data, ensure_ascii=False)
+    from cloud_deploy.cloud_api.payment_plans import entitlements_note_for_payment_plan
+
+    note = entitlements_note_for_payment_plan(code)
+    if note:
+        try:
+            data = json.loads(note)
+        except Exception:
+            data = {}
+        if isinstance(data, dict):
+            data.setdefault("order_no", order_no)
+            data.setdefault("source", f"hwxun_{channel}")
+            return json.dumps(data, ensure_ascii=False)
     return json.dumps({"order_no": order_no, "source": f"hwxun_{channel}"}, ensure_ascii=False)
 
 
+def _gen_order_no() -> str:
     ts = datetime.now().strftime("%Y%m%d%H%M%S")
     return f"XHSP{ts}{secrets.token_hex(3).upper()}"
 
@@ -52,6 +65,7 @@ def list_public_plans() -> list[dict]:
             "price_yuan": p["price_yuan"],
             "summary": p["summary"],
             **({"is_test": True} if p.get("is_test") else {}),
+            **({"recommended": True} if p.get("recommended") else {}),
         }
         for p in list_active_plans()
     ]
@@ -99,7 +113,7 @@ def create_order(
         channel=pay_channel,
         out_trade_no=order_no,
         amount=plan["amount"],
-        name=f"选品报告会员-{plan['label']}",
+        name=f"AI选品会员-{plan['label']}",
         notify_url=_notify_url(),
         clientip=client_ip,
     )

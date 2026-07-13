@@ -1431,6 +1431,7 @@ def get_member_profile(user_id: int) -> dict | None:
 def list_report_library(user_id: int | None = None) -> dict:
     """全部历史报告库（日报 + 周报 + 月报 + 定制）。"""
     archive_map = {
+        "ai_advisor": "member_ai_advisor_zip",
         "daily": "member_daily_zip",
         "weekly": "member_weekly_zip",
         "monthly": "member_monthly_zip",

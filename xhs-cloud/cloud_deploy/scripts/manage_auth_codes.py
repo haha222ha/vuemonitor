@@ -23,6 +23,16 @@ from cloud_deploy.scripts.bootstrap_env import bootstrap
 bootstrap()
 
 
+_PLAN_DEFAULT_DAYS = {
+    "experience_3d": 3,
+    "monthly": 30,
+    "quarterly": 90,
+    "halfyear": 183,
+    "yearly": 365,
+    "weekly": 7,
+}
+
+
 def main() -> None:
     from cloud_deploy.cloud_api.database import generate_auth_codes, init_db, list_auth_codes
 
@@ -32,8 +42,12 @@ def main() -> None:
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     g = sub.add_parser("generate", help="生成授权码")
-    g.add_argument("--plan", default="monthly", choices=["weekly", "monthly", "yearly"])
-    g.add_argument("--days", type=int, default=30, help="会员有效天数")
+    g.add_argument(
+        "--plan",
+        default="monthly",
+        choices=["experience_3d", "monthly", "quarterly", "halfyear", "yearly", "weekly"],
+    )
+    g.add_argument("--days", type=int, default=0, help="会员有效天数（0=按套餐默认）")
     g.add_argument("--count", type=int, default=1, help="生成数量")
     g.add_argument("--max-activations", type=int, default=1, help="每码最多激活次数")
     g.add_argument("--note", default="", help="备注（渠道/订单号）")
@@ -43,14 +57,15 @@ def main() -> None:
     args = ap.parse_args()
 
     if args.cmd == "generate":
+        days = args.days or _PLAN_DEFAULT_DAYS.get(args.plan, 30)
         codes = generate_auth_codes(
             count=args.count,
             plan_code=args.plan,
-            duration_days=args.days,
+            duration_days=days,
             max_activations=args.max_activations,
             note=args.note,
         )
-        print(f"已生成 {len(codes)} 个授权码（{args.plan} / {args.days}天）:")
+        print(f"已生成 {len(codes)} 个授权码（{args.plan} / {days}天）:")
         for c in codes:
             print(c)
     elif args.cmd == "list":

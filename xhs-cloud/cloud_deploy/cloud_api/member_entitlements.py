@@ -12,7 +12,7 @@ from cloud_deploy.cloud_api.legacy_gate import insight_enabled, legacy_zip_enabl
 
 LEGACY_ZIP_DENIED = "当前套餐不含 Legacy 数据包下载，请开通 AI 选品情报或联系客服"
 LEGACY_ZIP_OFFLINE_DETAIL = "表格数据包已下线，请使用 AI 选品分析中心阅读最新报告"
-LEGACY_ZIP_MIGRATION_URL = "/member#insight"
+LEGACY_ZIP_MIGRATION_URL = "/member#today"
 
 
 def legacy_zip_globally_disabled() -> bool:
@@ -82,3 +82,29 @@ def assert_insight_allowed(user_id: int) -> dict:
     if not enriched or not enriched.get("insight_enabled"):
         raise HTTPException(status_code=403, detail="当前账号不含 AI 选品情报权益")
     return enriched.get("entitlements") or {}
+
+
+def assert_advisor_allowed(user_id: int, report_date: str | None = None) -> dict:
+    """顾问 API 门控；返回 entitlements。"""
+    profile = db.get_member_profile(user_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="用户不存在")
+    if not profile.get("is_active"):
+        raise HTTPException(status_code=402, detail="会员已过期，请续费后阅读 AI 分析")
+    enriched = enrich_member_profile(profile, user_id)
+    ent = enriched.get("entitlements") or resolve_entitlements(user_id, profile)
+    if ent.get("advisor_read") is False:
+        raise HTTPException(status_code=403, detail="当前套餐不含 AI 选品顾问阅读")
+    if report_date and ent.get("advisor_history_days"):
+        try:
+            from datetime import datetime, timezone
+
+            limit = int(ent.get("advisor_history_days") or 0)
+            if limit > 0:
+                dt = datetime.strptime(report_date[:10], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                days = (datetime.now(timezone.utc) - dt).days
+                if days > limit:
+                    raise HTTPException(status_code=403, detail=f"当前套餐仅可阅读近 {limit} 天报告")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="无效 report_date") from None
+    return ent
