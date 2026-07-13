@@ -5,9 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260713f">
-<link rel="stylesheet" href="/assets/member_theme.css?v=20260713f">
-<link rel="stylesheet" href="/assets/member_reader.css?v=20260713f">
+<meta name="portal-build" content="20260713h">
+<link rel="stylesheet" href="/assets/member_theme.css?v=20260713h">
+<link rel="stylesheet" href="/assets/member_reader.css?v=20260713h">
+<link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260713h">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
 <script>
@@ -197,6 +198,10 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div class="welcome-chip hidden" id="welcomeChip">欢迎回来，<strong id="welcomeName"></strong></div>
     </div>
     <div class="topbar-actions">
+      <label class="theme-switch-wrap" title="界面主题（5 套风格）">
+        <span>主题</span>
+        <select id="memberThemeSelect" aria-label="会员中心主题"></select>
+      </label>
       <button type="button" class="btn btn-ghost btn-broadcast hidden" id="btnBroadcast" onclick="openBroadcastModal(true)" title="查看最新站内动态">
         📢 站内动态
         <span class="broadcast-dot hidden" id="broadcastDot"></span>
@@ -205,6 +210,18 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     </div>
   </div>
 
+  <div id="sessionStatusBar" class="session-status" data-state="guest">
+    <span class="ss-badge" id="sessionStatusBadge">访客</span>
+    <span id="sessionStatusHint">可预览 AI 阅读样例；开通会员后阅读最新分析与使用 PC 客户端。</span>
+    <div class="ss-actions" id="sessionStatusActions">
+      <button type="button" class="btn btn-ghost" style="min-height:32px;padding:6px 12px;font-size:13px" onclick="switchPortal('demo')">看样例</button>
+      <button type="button" class="btn btn-primary" style="min-height:32px;padding:6px 12px;font-size:13px" onclick="switchPortal('center')">开通会员</button>
+    </div>
+  </div>
+
+  <div class="capability-grid" id="capabilityGrid"></div>
+
+  <div id="guestShell" class="guest-shell">
   <div class="card notice-card hidden" id="clientDownloadCard" style="background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5">
     <div class="notice-title">💻 PC 端 ProductAnalyzer</div>
     <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">
@@ -265,18 +282,45 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px">
       <button type="button" class="btn btn-primary" onclick="switchPortal('center')">开通体验卡 ¥9.9</button>
+      <button type="button" class="btn btn-ghost" onclick="switchPortal('center');switchPricingCategory('custom')">定制分析</button>
       <a class="btn btn-ghost" href="/public/advisor-demo" target="_blank" rel="noopener" style="text-decoration:none">新窗口打开样例</a>
     </div>
   </div>
   </div>
 
   <div id="portalCenter" class="portal-panel hidden">
-  <div class="card notice-card" id="memberPricingCard" style="background:linear-gradient(135deg,#fffbeb 0%,#f0f7ff 100%);border:1px solid #c5d9f5">
+  <div class="card notice-card" id="memberPricingCard" style="background:var(--hero-grad);border:1px solid var(--line)">
     <div class="notice-title">💎 会员套餐与价格</div>
     <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:14px">
       开通会员后可阅读<strong> AI 选品分析</strong>与类目情报，并使用 PC 端 ProductAnalyzer。数据仅供研究参考，不构成投资建议。
     </p>
+    <div class="pricing-category-tabs">
+      <button type="button" class="pricing-category-tab active" data-pricing="membership" onclick="switchPricingCategory('membership')">会员订阅</button>
+      <button type="button" class="pricing-category-tab" data-pricing="custom" onclick="switchPricingCategory('custom')">定制分析</button>
+    </div>
+    <div id="pricingMembershipPanel">
     <div class="plan-grid" id="portalPlanGrid"></div>
+    </div>
+    <div id="pricingCustomPanel" class="hidden">
+      <div class="custom-analysis-card">
+        <div class="section-title" style="margin-bottom:8px">定制分析 · 定向词库采集</div>
+        <p style="font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 4px">按次购买，支付后在 PC 端「使用说明」提交词库需求，或联系会员客服。不延长会员天数。</p>
+        <div class="custom-analysis-prices" id="customAnalysisPrices">
+          <div class="custom-analysis-price" id="customPriceMember">
+            <div class="label">有效会员</div>
+            <div class="amount">¥9.9</div>
+            <div style="font-size:11px;color:var(--text2)">/ 次</div>
+          </div>
+          <div class="custom-analysis-price" id="customPriceGuest">
+            <div class="label">非会员 / 访客</div>
+            <div class="amount">¥29.9</div>
+            <div style="font-size:11px;color:var(--text2)">/ 次</div>
+          </div>
+        </div>
+        <p id="customAnalysisHint" style="font-size:12px;color:var(--text2);line-height:1.55;margin:0 0 12px"></p>
+        <button type="button" class="btn btn-primary btn-block" id="btnBuyCustomAnalysis" onclick="startCustomAnalysisPay()">购买定制分析</button>
+      </div>
+    </div>
     <div class="seg" id="portalPayChannelSeg" style="margin-bottom:14px">
       <button type="button" class="active" data-channel="wxpay" onclick="setPayChannel('wxpay')">微信扫码</button>
       <button type="button" data-channel="alipay" onclick="setPayChannel('alipay')">支付宝扫码</button>
@@ -302,7 +346,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     </div>
     <div id="portalPayMsg" style="margin-top:12px"></div>
     <div class="notice-tip" style="margin-top:14px">
-      含体验卡 ¥9.9（3 天）/ 月度 / 季度 / 半年 / 年度套餐；已登录用户支付后自动延长会员天数。定制词库：会员 ¥9.9/次，非会员 ¥29.9/次。
+      会员订阅含体验卡 ¥9.9（3 天）/ 月度 / 季度 / 半年 / 年度。<strong>定制分析</strong>：有效会员 ¥9.9/次，非会员 ¥29.9/次（按次加购，不含会员天数）。
     </div>
   </div>
   </div>
@@ -368,7 +412,9 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     </div>
     <div id="authMsg"></div>
   </div>
+  </div><!-- /guestShell -->
 
+  <div id="memberShell" class="member-shell hidden">
   <div id="dashView" class="hidden">
     <div id="expiryBanner"></div>
     <div class="dash-tabs">
@@ -484,11 +530,13 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     </div>
     <div id="dashMsg"></div>
   </div>
+  </div><!-- /memberShell -->
 </div>
-<script src="/assets/member_core.js?v=20260713f"></script>
-<script src="/assets/member_reader.js?v=20260713f"></script>
-<script src="/assets/member_router.js?v=20260713f"></script>
-<script src="/assets/member_insight.js?v=20260713f"></script>
+<script src="/assets/member_portal_state.js?v=20260713h"></script>
+<script src="/assets/member_core.js?v=20260713h"></script>
+<script src="/assets/member_reader.js?v=20260713h"></script>
+<script src="/assets/member_router.js?v=20260713h"></script>
+<script src="/assets/member_insight.js?v=20260713h"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -503,6 +551,9 @@ const STORAGE = {
 const TOKEN_COOKIE = 'xhs_member_token';
 let payPollTimer = null;
 let payPlans = [];
+let addonPlans = [];
+let customAnalysis = { member_price_yuan: 9.9, guest_price_yuan: 29.9, label: '定制分析' };
+let pricingCategory = 'membership';
 let payChannels = [];
 let selectedPlanCode = 'monthly';
 let selectedPayChannel = 'wxpay';
@@ -706,10 +757,13 @@ function api(path, opts = {}) {
 function showAuthView() {
   document.getElementById('authView').classList.remove('hidden');
   document.getElementById('dashView').classList.add('hidden');
+  document.getElementById('guestShell')?.classList.remove('hidden');
+  document.getElementById('memberShell')?.classList.add('hidden');
   document.getElementById('btnLogout').classList.add('hidden');
   const btnBc = document.getElementById('btnBroadcast');
   if (btnBc) btnBc.classList.add('hidden');
   updatePortalVisibility(null, false);
+  if (window.MemberPortalState) MemberPortalState.renderSessionBar(null, false);
 }
 
 function switchPortal(name) {
@@ -756,15 +810,6 @@ function updatePortalVisibility(membership, loggedIn) {
 
   if (reportSchedule) reportSchedule.classList.remove('hidden');
   if (clientCard) clientCard.classList.remove('hidden');
-
-  const isActiveMember = !!(membership && membership.is_active);
-  if (isActiveMember) {
-    tabs.classList.add('hidden');
-    if (demoPanel) demoPanel.classList.add('hidden');
-    if (downloadPanel) downloadPanel.classList.add('hidden');
-    centerPanel.classList.add('hidden');
-    return;
-  }
 
   tabs.classList.remove('hidden');
   let saved = 'demo';
@@ -902,7 +947,11 @@ function setCsCodeMode(mode) {
 }
 
 function openBuyFromDash() {
+  document.getElementById('guestShell')?.classList.remove('hidden');
+  document.getElementById('memberShell')?.classList.add('hidden');
+  document.getElementById('authView')?.classList.remove('hidden');
   switchPortal('center');
+  switchPricingCategory('membership');
   loadPayPlans();
   document.getElementById('memberPricingCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -922,6 +971,7 @@ async function loadPayPlans() {
   if (payPlans.length) {
     renderPlanGrid();
     renderPayChannels();
+    renderCustomAnalysisPricing();
     return;
   }
   try {
@@ -929,7 +979,9 @@ async function loadPayPlans() {
       api('/api/v1/payment/plans'),
       api('/api/v1/payment/channels').catch(() => ({ channels: [] })),
     ]);
-    payPlans = planData.plans || [];
+    payPlans = (planData && planData.plans) ? planData.plans : [];
+    addonPlans = (planData && planData.addons) ? planData.addons : [];
+    if (planData.custom_analysis) customAnalysis = planData.custom_analysis;
     payChannels = chData.channels || [];
     if (payPlans.length && !payPlans.some(p => p.plan_code === selectedPlanCode)) {
       selectedPlanCode = payPlans[0].plan_code;
@@ -939,9 +991,62 @@ async function loadPayPlans() {
     }
     renderPlanGrid();
     renderPayChannels();
+    renderCustomAnalysisPricing();
   } catch (e) {
     showMsg(payMsgEl(), e.message || '加载套餐失败', 'error');
   }
+}
+
+function switchPricingCategory(name) {
+  pricingCategory = name === 'custom' ? 'custom' : 'membership';
+  document.querySelectorAll('.pricing-category-tab').forEach(function (btn) {
+    btn.classList.toggle('active', btn.dataset.pricing === pricingCategory);
+  });
+  document.getElementById('pricingMembershipPanel')?.classList.toggle('hidden', pricingCategory !== 'membership');
+  document.getElementById('pricingCustomPanel')?.classList.toggle('hidden', pricingCategory !== 'custom');
+  const btn = document.getElementById('portalBtnStartPay');
+  if (btn) btn.classList.toggle('hidden', pricingCategory === 'custom');
+  renderCustomAnalysisPricing();
+}
+
+function resolveCustomAnalysisPlanCode() {
+  const profile = loadCachedProfile();
+  const active = !!(profile && profile.is_active === true);
+  const addon = addonPlans.find(function (p) {
+    return active ? p.plan_code === 'custom_analysis_member' : p.plan_code === 'custom_analysis_guest';
+  });
+  return addon ? addon.plan_code : (active ? 'custom_analysis_member' : 'custom_analysis_guest');
+}
+
+function renderCustomAnalysisPricing() {
+  const memberEl = document.getElementById('customPriceMember');
+  const guestEl = document.getElementById('customPriceGuest');
+  const hint = document.getElementById('customAnalysisHint');
+  const profile = loadCachedProfile();
+  const active = !!(profile && profile.is_active === true);
+  const memberPrice = customAnalysis.member_price_yuan != null ? customAnalysis.member_price_yuan : 9.9;
+  const guestPrice = customAnalysis.guest_price_yuan != null ? customAnalysis.guest_price_yuan : 29.9;
+  if (memberEl) memberEl.querySelector('.amount').textContent = '¥' + memberPrice;
+  if (guestEl) guestEl.querySelector('.amount').textContent = '¥' + guestPrice;
+  if (memberEl) memberEl.classList.toggle('highlight', active);
+  if (guestEl) guestEl.classList.toggle('highlight', !active);
+  if (hint) {
+    hint.textContent = active
+      ? '您当前为有效会员，将按 ¥' + memberPrice + '/次 结算。支付后请在 PC 端提交词库需求。'
+      : (loadStored(STORAGE.token)
+        ? '当前账号非有效会员，将按 ¥' + guestPrice + '/次 结算。开通会员后定制分析享 ¥' + memberPrice + '/次。'
+        : '未登录将按 ¥' + guestPrice + '/次 结算；登录且为有效会员享 ¥' + memberPrice + '/次。');
+  }
+  const buyBtn = document.getElementById('btnBuyCustomAnalysis');
+  if (buyBtn) {
+    buyBtn.textContent = '购买定制分析 · ¥' + (active ? memberPrice : guestPrice);
+  }
+}
+
+function startCustomAnalysisPay() {
+  selectedPlanCode = resolveCustomAnalysisPlanCode();
+  switchPricingCategory('custom');
+  startWxPay();
 }
 
 function renderPayChannels() {
@@ -1210,6 +1315,8 @@ function renderProfile(m) {
     banner.innerHTML = `<div class="alert alert-warn">会员状态加载中，请稍候…</div>`;
   }
   updatePortalVisibility(m, true);
+  if (window.MemberPortalState) MemberPortalState.renderSessionBar(m, true);
+  renderCustomAnalysisPricing();
 }
 
 function goodsDetailUrl(gid) {
@@ -1317,13 +1424,16 @@ async function removeWatchlistIds(ids) {
 function showDashboard(cachedProfile) {
   document.getElementById('authView').classList.add('hidden');
   document.getElementById('dashView').classList.remove('hidden');
+  document.getElementById('guestShell')?.classList.add('hidden');
+  document.getElementById('memberShell')?.classList.remove('hidden');
   document.getElementById('btnLogout').classList.remove('hidden');
   const btnBc = document.getElementById('btnBroadcast');
   if (btnBc) btnBc.classList.remove('hidden');
-  updatePortalVisibility(cachedProfile || loadCachedProfile(), true);
-  if (cachedProfile) {
-    renderProfile(cachedProfile);
-  }
+  const profile = cachedProfile || loadCachedProfile();
+  updatePortalVisibility(profile, true);
+  if (profile) renderProfile(profile);
+  if (window.MemberPortalState) MemberPortalState.renderSessionBar(profile, true);
+  renderCustomAnalysisPricing();
 }
 
 async function loadDashboard(useCacheFirst) {

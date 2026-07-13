@@ -466,7 +466,7 @@ def payment_channels():
 
 @app.get("/api/v1/payment/plans")
 def payment_plans():
-    return {"plans": pay.list_public_plans()}
+    return pay.list_public_plans()
 
 
 @app.post("/api/v1/payment/orders")

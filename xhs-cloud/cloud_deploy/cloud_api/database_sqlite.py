@@ -888,8 +888,13 @@ def register_with_auth_code(username: str, password: str, code: str) -> dict:
         (username, _hash_password(password), now),
     )
     uid = c.lastrowid
-    extend_info = _extend_membership(c, uid, row["plan_code"], row["duration_days"])
-    expires = extend_info["expires_at"]
+    from cloud_deploy.cloud_api.payment_plans import is_addon_plan
+
+    if is_addon_plan(row["plan_code"]):
+        expires = ""
+    else:
+        extend_info = _extend_membership(c, uid, row["plan_code"], row["duration_days"])
+        expires = extend_info["expires_at"]
     c.execute(
         "INSERT INTO auth_code_activations (auth_code_id, user_id, activated_at) VALUES (?,?,?)",
         (row["id"], uid, now),
@@ -905,7 +910,7 @@ def register_with_auth_code(username: str, password: str, code: str) -> dict:
         "username": username,
         "expires_at": expires,
         "plan_code": row["plan_code"],
-        "is_active": True,
+        "is_active": bool(expires),
     }
 
 
@@ -972,7 +977,12 @@ def renew_with_auth_code(user_id: int, code: str) -> dict:
     if c.fetchone():
         conn.close()
         raise ValueError("您已使用过此授权码")
-    extend_info = _extend_membership(c, user_id, row["plan_code"], row["duration_days"])
+    from cloud_deploy.cloud_api.payment_plans import is_addon_plan
+
+    if is_addon_plan(row["plan_code"]):
+        extend_info = {"stacked": False, "previous_days_remaining": 0, "days_added": 0, "expires_at": ""}
+    else:
+        extend_info = _extend_membership(c, user_id, row["plan_code"], row["duration_days"])
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     c.execute(
         "INSERT INTO auth_code_activations (auth_code_id, user_id, activated_at) VALUES (?,?,?)",
@@ -992,6 +1002,10 @@ def renew_with_auth_code(user_id: int, code: str) -> dict:
         "expires_at": extend_info["expires_at"],
     }
     return profile
+
+
+def fulfill_addon_order(user_id: int, code: str, plan_code: str) -> dict:
+    return renew_with_auth_code(user_id, code)
 
 
 def renew_with_credentials(username: str, password: str, code: str) -> dict:

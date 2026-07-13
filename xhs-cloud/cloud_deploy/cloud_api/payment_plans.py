@@ -2,6 +2,7 @@
 """选品会员在线购买套餐（Web / PC 共用）。
 
 定价（2026-07）：体验 9.9/3天 · 月 39 · 季 99 · 半年 188 · 年 299
+定制分析（按次）：会员 ¥9.9 · 非会员 ¥29.9
 """
 from __future__ import annotations
 
@@ -117,15 +118,30 @@ def v2_launch_enabled() -> bool:
     return os.environ.get("XHS_V2_LAUNCH", "").strip().lower() in ("1", "true", "yes", "on")
 
 
-def list_active_plans() -> list[dict]:
+def list_active_plans(*, include_addons: bool = False) -> list[dict]:
     plans = list(PAYMENT_PLANS)
     if test_plan_enabled():
         plans = [PAYMENT_TEST_PLAN, *plans]
+    if include_addons:
+        plans = [*plans, *PAYMENT_ADDON_PLANS]
     return plans
 
 
-PLAN_BY_CODE = {p["plan_code"]: p for p in PAYMENT_PLANS}
+PLAN_BY_CODE = {p["plan_code"]: p for p in (*PAYMENT_PLANS, *PAYMENT_ADDON_PLANS)}
 PLAN_BY_CODE[PAYMENT_TEST_PLAN["plan_code"]] = PAYMENT_TEST_PLAN
+
+
+def is_addon_plan(plan_code: str) -> bool:
+    plan = PLAN_BY_CODE.get(str(plan_code or "").strip())
+    return bool(plan and plan.get("plan_type") == "addon")
+
+
+def resolve_custom_analysis_plan(*, is_active_member: bool) -> str:
+    return "custom_analysis_member" if is_active_member else "custom_analysis_guest"
+
+
+def list_addon_plans() -> list[dict]:
+    return list(PAYMENT_ADDON_PLANS)
 
 
 def entitlements_note_for_payment_plan(plan_code: str) -> str | None:

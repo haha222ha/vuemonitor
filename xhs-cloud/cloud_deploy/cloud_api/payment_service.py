@@ -53,22 +53,33 @@ def _gen_order_no() -> str:
     return f"XHSP{ts}{secrets.token_hex(3).upper()}"
 
 
-def list_public_plans() -> list[dict]:
-    from cloud_deploy.cloud_api.payment_plans import list_active_plans
+def list_public_plans() -> dict:
+    from cloud_deploy.cloud_api.payment_plans import CUSTOM_ANALYSIS_PRICING, list_addon_plans
 
-    return [
-        {
+    def _pub(p: dict) -> dict:
+        row = {
             "plan_code": p["plan_code"],
             "label": p["label"],
             "duration_days": p["duration_days"],
             "amount": p["amount"],
             "price_yuan": p["price_yuan"],
             "summary": p["summary"],
-            **({"is_test": True} if p.get("is_test") else {}),
-            **({"recommended": True} if p.get("recommended") else {}),
         }
-        for p in list_active_plans()
-    ]
+        if p.get("is_test"):
+            row["is_test"] = True
+        if p.get("recommended"):
+            row["recommended"] = True
+        if p.get("plan_type"):
+            row["plan_type"] = p["plan_type"]
+        if p.get("requires_active_member"):
+            row["requires_active_member"] = True
+        return row
+
+    return {
+        "plans": [_pub(p) for p in list_active_plans()],
+        "addons": [_pub(p) for p in list_addon_plans()],
+        "custom_analysis": dict(CUSTOM_ANALYSIS_PRICING),
+    }
 
 
 def list_payment_channels() -> list[dict]:
@@ -91,9 +102,17 @@ def create_order(
     client_ip: str,
     channel: str = "wxpay",
 ) -> dict:
+    from cloud_deploy.cloud_api.payment_plans import is_addon_plan
+
     plan = get_plan(plan_code)
     if not plan:
         raise ValueError("无效套餐")
+    if plan.get("requires_active_member"):
+        if not user_id:
+            raise ValueError("请先登录有效会员账号后再购买会员价定制分析")
+        profile = db.get_member_profile(int(user_id)) or {}
+        if not profile.get("is_active"):
+            raise ValueError("当前账号非有效会员，请购买非会员价或先开通会员")
     pay_channel = (channel or "wxpay").strip().lower()
     if pay_channel not in ("wxpay", "alipay"):
         raise ValueError("支付方式仅支持 wxpay 或 alipay")
@@ -113,7 +132,7 @@ def create_order(
         channel=pay_channel,
         out_trade_no=order_no,
         amount=plan["amount"],
-        name=f"AI选品会员-{plan['label']}",
+        name=f"{'定制分析' if is_addon_plan(plan['plan_code']) else 'AI选品会员'}-{plan['label']}",
         notify_url=_notify_url(),
         clientip=client_ip,
     )
@@ -210,19 +229,29 @@ def complete_paid_order(
         raise ValueError("密码至少 6 位")
 
     mode = (mode or "").strip().lower()
+    from cloud_deploy.cloud_api.payment_plans import is_addon_plan
+
+    is_addon = is_addon_plan(row["plan_code"])
     if mode == "register":
         profile = db.register_with_auth_code(username, password, code)
-        msg = f"开通成功，会员已生效 {row['duration_days']} 天"
+        msg = (
+            "定制分析订单已提交，请在 PC 端「使用说明」填写词库需求或联系客服"
+            if is_addon
+            else f"开通成功，会员已生效 {row['duration_days']} 天"
+        )
     elif mode == "login":
         profile = db.renew_with_credentials(username, password, code)
-        stack = profile.get("renew_stack") or {}
-        if stack.get("stacked"):
-            msg = (
-                f"续费成功：已叠加剩余 {stack.get('previous_days_remaining', 0)} 天 + "
-                f"新购 {stack.get('days_added', 0)} 天"
-            )
+        if is_addon:
+            msg = "定制分析订单已提交，请在 PC 端「使用说明」填写词库需求或联系客服"
         else:
-            msg = profile.get("message") or f"会员已延长 {stack.get('days_added', row['duration_days'])} 天"
+            stack = profile.get("renew_stack") or {}
+            if stack.get("stacked"):
+                msg = (
+                    f"续费成功：已叠加剩余 {stack.get('previous_days_remaining', 0)} 天 + "
+                    f"新购 {stack.get('days_added', 0)} 天"
+                )
+            else:
+                msg = profile.get("message") or f"会员已延长 {stack.get('days_added', row['duration_days'])} 天"
     else:
         raise ValueError("无效操作，请选择新用户开通或已有账号登录")
 
@@ -253,8 +282,16 @@ def claim_paid_order(order_no: str, user_id: int) -> dict:
     code = row.get("auth_code")
     if not code:
         raise ValueError("订单缺少授权码，请联系客服")
+    from cloud_deploy.cloud_api.payment_plans import is_addon_plan
+
     profile = db.renew_with_auth_code(user_id, code)
     db.mark_payment_order_fulfilled(order_no, user_id)
+    if is_addon_plan(row["plan_code"]):
+        return {
+            "membership": profile,
+            "message": "定制分析订单已提交，请在 PC 端「使用说明」填写词库需求或联系客服",
+            "auth_code": (code or "").strip(),
+        }
     stack = profile.get("renew_stack") or {}
     if stack.get("stacked"):
         msg = (
@@ -326,9 +363,18 @@ def handle_hwxun_notify(params: dict) -> str:
         return "fail"
     user_id = row.get("user_id")
     if user_id and auth_code:
-        try:
-            db.renew_with_auth_code(int(user_id), auth_code)
-            db.mark_payment_order_fulfilled(order_no, int(user_id))
-        except Exception:
-            pass
+        from cloud_deploy.cloud_api.payment_plans import is_addon_plan
+
+        if not is_addon_plan(row["plan_code"]):
+            try:
+                db.renew_with_auth_code(int(user_id), auth_code)
+                db.mark_payment_order_fulfilled(order_no, int(user_id))
+            except Exception:
+                pass
+        else:
+            try:
+                db.fulfill_addon_order(int(user_id), auth_code, row["plan_code"])
+                db.mark_payment_order_fulfilled(order_no, int(user_id))
+            except Exception:
+                pass
     return "success"

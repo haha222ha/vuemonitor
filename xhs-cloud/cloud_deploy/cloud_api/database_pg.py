@@ -1253,8 +1253,13 @@ def register_with_auth_code(username: str, password: str, code: str) -> dict:
                 (username, _hash_password(password)),
             )
             uid = c.fetchone()["id"]
-            extend_info = _extend_membership(c, uid, row["plan_code"], row["duration_days"])
-            expires = extend_info["expires_at"]
+            from cloud_deploy.cloud_api.payment_plans import is_addon_plan
+
+            if is_addon_plan(row["plan_code"]):
+                expires = None
+            else:
+                extend_info = _extend_membership(c, uid, row["plan_code"], row["duration_days"])
+                expires = extend_info["expires_at"]
             c.execute(
                 "INSERT INTO auth_code_activations (auth_code_id, user_id) VALUES (%s,%s)",
                 (row["id"], uid),
@@ -1270,10 +1275,10 @@ def register_with_auth_code(username: str, password: str, code: str) -> dict:
         return {
             "id": uid,
             "username": username,
-            "expires_at": expires.strftime("%Y-%m-%d %H:%M:%S"),
+            "expires_at": expires.strftime("%Y-%m-%d %H:%M:%S") if expires else "",
             "plan_code": row["plan_code"],
-            "days_remaining": _days_until(expires),
-            "is_active": True,
+            "days_remaining": _days_until(expires) if expires else 0,
+            "is_active": bool(expires),
         }
     finally:
         conn.close()
@@ -1345,7 +1350,17 @@ def renew_with_auth_code(user_id: int, code: str) -> dict:
             )
             if c.fetchone():
                 raise ValueError("您已使用过此授权码")
-            extend_info = _extend_membership(c, user_id, row["plan_code"], row["duration_days"])
+            from cloud_deploy.cloud_api.payment_plans import is_addon_plan
+
+            if is_addon_plan(row["plan_code"]):
+                extend_info = {
+                    "stacked": False,
+                    "previous_days_remaining": 0,
+                    "days_added": 0,
+                    "expires_at": _now(),
+                }
+            else:
+                extend_info = _extend_membership(c, user_id, row["plan_code"], row["duration_days"])
             c.execute(
                 "INSERT INTO auth_code_activations (auth_code_id, user_id) VALUES (%s,%s)",
                 (row["id"], user_id),
@@ -1365,6 +1380,11 @@ def renew_with_auth_code(user_id: int, code: str) -> dict:
         return profile
     finally:
         conn.close()
+
+
+def fulfill_addon_order(user_id: int, code: str, plan_code: str) -> dict:
+    """定制分析等加购订单：仅核销授权码，不延长会员。"""
+    return renew_with_auth_code(user_id, code)
 
 
 def renew_with_credentials(username: str, password: str, code: str) -> dict:
