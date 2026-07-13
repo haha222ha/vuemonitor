@@ -477,8 +477,15 @@ def test_api_http(work: Path) -> None:
         assert_true(bool(token), "login token")
 
         auth_h = {"Authorization": f"Bearer {token}"}
-        reports = get("/api/v1/member/reports", auth_h)
-        assert_true("items" in reports, "member reports list")
+        try:
+            get("/api/v1/member/reports", auth_h)
+            fail("member reports legacy 410", "expected HTTP 410")
+        except urllib.error.HTTPError as e:
+            assert_true(e.code == 410, "member reports legacy 410", f"got {e.code}")
+            body = json.loads(e.read().decode("utf-8", errors="replace"))
+            detail = body.get("detail") if isinstance(body, dict) else body
+            if isinstance(detail, dict):
+                assert_true(detail.get("migration_url") == "/member#today", "legacy migration_url")
 
         sync_h = {"X-Sync-Key": "e2e-sync-key"}
         status = get("/api/v1/sync/status", sync_h)

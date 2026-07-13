@@ -83,23 +83,6 @@ class PremiumCatalogBody(BaseModel):
     since_date: str = ""
 
 
-class BatchDownloadBody(BaseModel):
-    archive_type: str = "member_daily_zip"
-    report_dates: list[str] = Field(..., min_length=1, max_length=50)
-
-
-_MEMBER_ARCHIVE_TYPES = frozenset(
-    {"member_daily_zip", "member_weekly_zip", "member_monthly_zip"}
-)
-
-
-def _remove_temp_file(path: str) -> None:
-    try:
-        os.remove(path)
-    except OSError:
-        pass
-
-
 @app.get("/api/v1/health")
 def health():
     return {"status": "ok"}
@@ -111,95 +94,17 @@ def login(body: LoginBody):
 
 
 @app.get("/api/v1/member/reports")
-def member_reports(
+def member_reports_legacy_gone(
     archive_type: str = "member_daily_zip",
     user: dict = Depends(current_member),
 ):
-    return {"items": db.list_archives(archive_type=archive_type), "user": user["username"]}
-
-
-@app.get("/api/v1/member/reports/{report_date}/download")
-def download_report(
-    report_date: str,
-    archive_type: str = "member_daily_zip",
-    request: Request = None,
-    user: dict = Depends(current_member),
-):
-    path = db.get_archive_path(report_date, archive_type)
-    if not path or not os.path.isfile(path):
-        raise HTTPException(status_code=404, detail="报告不存在")
-    ip = request.client.host if request and request.client else ""
-    db.log_download(user["id"], report_date, archive_type, ip)
-    return FileResponse(
-        path,
-        media_type="application/zip",
-        filename=os.path.basename(path),
-    )
-
-
-@app.post("/api/v1/member/reports/batch-download")
-def batch_download_reports(
-    body: BatchDownloadBody,
-    request: Request = None,
-    user: dict = Depends(current_member),
-):
-    if body.archive_type not in _MEMBER_ARCHIVE_TYPES:
-        raise HTTPException(status_code=400, detail="无效的报告类型")
-
-    seen: set[str] = set()
-    ordered_dates: list[str] = []
-    for raw in body.report_dates:
-        date = str(raw).strip()[:10]
-        if not date or date in seen:
-            continue
-        seen.add(date)
-        ordered_dates.append(date)
-
-    if not ordered_dates:
-        raise HTTPException(status_code=400, detail="未选择有效报告")
-
-    entries: list[tuple[str, str]] = []
-    missing: list[str] = []
-    ip = request.client.host if request and request.client else ""
-    for date in ordered_dates:
-        path = db.get_archive_path(date, body.archive_type)
-        if not path or not os.path.isfile(path):
-            missing.append(date)
-            continue
-        entries.append((date, path))
-
-    if missing:
-        raise HTTPException(
-            status_code=404,
-            detail=f"以下报告不存在: {', '.join(missing)}",
-        )
-
-    fd, tmp_path = tempfile.mkstemp(suffix=".zip", prefix="member_batch_")
-    os.close(fd)
-    used_names: set[str] = set()
-    try:
-        with zipfile.ZipFile(tmp_path, "w", zipfile.ZIP_DEFLATED) as zout:
-            for date, path in entries:
-                base = os.path.basename(path)
-                arcname = base
-                if arcname in used_names:
-                    stem, ext = os.path.splitext(base)
-                    arcname = f"{stem}_{date}{ext or '.zip'}"
-                used_names.add(arcname)
-                zout.write(path, arcname=arcname)
-                db.log_download(user["id"], date, body.archive_type, ip)
-    except Exception:
-        _remove_temp_file(tmp_path)
-        raise
-
-    type_short = body.archive_type.replace("member_", "").replace("_zip", "")
-    stamp = datetime.now().strftime("%Y%m%d")
-    out_name = f"reports_{type_short}_{len(entries)}份_{stamp}.zip"
-    return FileResponse(
-        tmp_path,
-        media_type="application/zip",
-        filename=out_name,
-        background=BackgroundTask(_remove_temp_file, tmp_path),
+    raise HTTPException(
+        status_code=410,
+        detail={
+            "detail": "表格数据包已下线，请使用 AI 选品分析中心阅读最新报告",
+            "migration_url": "/member#today",
+            "archive_type": archive_type,
+        },
     )
 
 
