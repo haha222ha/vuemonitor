@@ -57,7 +57,18 @@ def main() -> None:
     args = ap.parse_args()
 
     if args.cmd == "generate":
+        from cloud_deploy.cloud_api.payment_plans import entitlements_note_for_payment_plan
+        import json
+
         days = args.days or _PLAN_DEFAULT_DAYS.get(args.plan, 30)
+        note = entitlements_note_for_payment_plan(args.plan)
+        remark = (args.note or "").strip()
+        if note and remark:
+            payload = json.loads(note)
+            payload["remark"] = remark
+            note = json.dumps(payload, ensure_ascii=False)
+        elif not note:
+            note = remark
         codes = generate_auth_codes(
             count=args.count,
             plan_code=args.plan,

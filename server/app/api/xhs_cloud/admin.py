@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
+import json
+import re
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
@@ -9,20 +12,92 @@ from app.services.xhs_cloud_client import XhsCloudClient, XhsCloudNotConfigured,
 
 router = APIRouter(prefix="/xhs-cloud/admin", tags=["xhs-cloud-admin"])
 
+_PLAN_CODE_PATTERN = (
+    r"^(monthly|quarterly|halfyear|yearly|weekly|experience_3d|"
+    r"experience|experience_insight|experience_ai|"
+    r"insight_monthly|insight_pro_monthly)$"
+)
+
 _PLAN_DURATION = {
-    "weekly": 7,
     "monthly": 30,
+    "quarterly": 90,
+    "halfyear": 183,
     "yearly": 365,
+    "weekly": 7,
+    "experience_3d": 3,
     "experience": 36500,
     "experience_insight": 7,
+    "experience_ai": 7,
+    "insight_monthly": 30,
+    "insight_pro_monthly": 30,
+}
+
+# 在线支付同价套餐权益（月 39 / 季 99 / 半年 188 / 年 299）
+_STANDARD_AI_ENTITLEMENTS: dict = {
+    "insight_enabled": True,
+    "insight_only": True,
+    "insight_categories_per_day": 5,
+    "insight_compare": True,
+    "insight_timeline_days": 30,
+    "insight_workflow": True,
+    "insight_pdf_export": True,
+    "insight_llm_tokens_per_day": 40_000,
+    "advisor_read": True,
+    "advisor_directions_per_day": 28,
+    "advisor_history_days": 365,
+    "advisor_chat_daily": 10,
+    "legacy_zip_enabled": False,
+}
+
+_EXPERIENCE_3D_ENTITLEMENTS: dict = {
+    "plan_code": "experience_3d",
+    "insight_enabled": True,
+    "insight_only": True,
+    "insight_categories_per_day": 3,
+    "insight_compare": False,
+    "insight_timeline_days": 7,
+    "insight_workflow": False,
+    "insight_pdf_export": False,
+    "insight_llm_tokens_per_day": 0,
+    "advisor_read": True,
+    "advisor_directions_per_day": 8,
+    "advisor_history_days": 30,
+    "advisor_chat_daily": 0,
+    "legacy_zip_enabled": False,
+}
+
+_PLAN_ENTITLEMENTS: dict[str, dict] = {
+    "experience_3d": dict(_EXPERIENCE_3D_ENTITLEMENTS),
+    "insight_monthly": {
+        **_STANDARD_AI_ENTITLEMENTS,
+        "plan_code": "insight_monthly",
+    },
+    "insight_pro_monthly": {
+        **_STANDARD_AI_ENTITLEMENTS,
+        "plan_code": "insight_pro_monthly",
+    },
 }
 
 
+def _build_note(entitlements: dict, remark: str = "") -> str:
+    payload: dict = {"entitlements": entitlements}
+    text = (remark or "").strip()
+    if text and not text.startswith("{"):
+        payload["remark"] = text
+    return json.dumps(payload, ensure_ascii=False)
+
+
+def _normalize_dates(dates: list[str]) -> list[str]:
+    out: list[str] = []
+    for raw in dates or []:
+        d = str(raw).strip()[:10]
+        if d and re.match(r"^\d{4}-\d{2}-\d{2}$", d) and d not in out:
+            out.append(d)
+    return out
+
+
 class GenerateMemberCodesRequest(BaseModel):
-    plan_code: str = Field(
-        default="monthly",
-        pattern="^(weekly|monthly|yearly|experience|experience_insight)$",
-    )
+    plan_code: str = Field(default="yearly", pattern=_PLAN_CODE_PATTERN)
     duration_days: int = Field(default=0, ge=0, le=36500)
     count: int = Field(default=1, ge=1, le=100)
     max_activations: int = Field(default=1, ge=1, le=100)
@@ -100,29 +175,26 @@ async def generate_member_codes(
     client: XhsCloudClient = Depends(get_xhs_cloud_client),
 ):
     del admin
-    note = (req.note or "").strip()
+    remark = (req.note or "").strip()
     plan_code = req.plan_code
-    if req.plan_code == "experience":
-        import json
+    ui_plan = req.plan_code
 
-        dates = [str(d).strip()[:10] for d in (req.allowed_report_dates or []) if str(d).strip()]
-        archive_types = [
-            str(t).strip() for t in (req.allowed_archive_types or ["member_daily_zip"]) if str(t).strip()
-        ]
-        entitlements = {
-            "allowed_report_dates": dates,
-            "allowed_archive_types": archive_types or ["member_daily_zip"],
-            "pc_full": True,
-            "report_download_limited": True,
-        }
-        note = json.dumps({"entitlements": entitlements}, ensure_ascii=False)
+    if req.plan_code in _PLAN_ENTITLEMENTS:
+        ent = dict(_PLAN_ENTITLEMENTS[req.plan_code])
+        plan_code = req.plan_code
+        duration = req.duration_days or _PLAN_DURATION[req.plan_code]
+        note = _build_note(ent, remark)
+    elif req.plan_code in ("monthly", "quarterly", "halfyear", "yearly"):
+        ent = dict(_STANDARD_AI_ENTITLEMENTS)
+        ent["plan_code"] = req.plan_code
+        plan_code = req.plan_code
+        duration = req.duration_days or _PLAN_DURATION[req.plan_code]
+        note = _build_note(ent, remark)
+    elif req.plan_code in ("experience_ai", "experience_insight"):
+        dates = _normalize_dates(req.allowed_report_dates)
         if not dates:
-            raise HTTPException(status_code=400, detail="体验会员请至少选择一个可下载的报告日期")
-        duration = req.duration_days or _PLAN_DURATION["experience"]
-    elif req.plan_code == "experience_insight":
-        import json
-
-        entitlements = {
+            raise HTTPException(status_code=400, detail="AI 体验码请至少选择一个可阅读的 report_date（YYYY-MM-DD）")
+        ent = {
             "plan_code": "experience",
             "insight_enabled": True,
             "insight_only": True,
@@ -130,13 +202,37 @@ async def generate_member_codes(
             "insight_compare": False,
             "insight_pdf_export": False,
             "insight_timeline_days": 7,
+            "advisor_read": True,
+            "advisor_directions_per_day": 3,
+            "advisor_history_days": 7,
             "legacy_zip_enabled": False,
+            "allowed_report_dates": dates,
         }
-        note = json.dumps({"entitlements": entitlements}, ensure_ascii=False)
         plan_code = "experience"
-        duration = req.duration_days or _PLAN_DURATION["experience_insight"]
+        ui_plan = "experience_ai"
+        duration = req.duration_days or _PLAN_DURATION["experience_ai"]
+        note = _build_note(ent, remark)
+    elif req.plan_code == "experience":
+        # Legacy ZIP 体验（API 兼容；Admin UI 已下线）
+        dates = _normalize_dates(req.allowed_report_dates)
+        archive_types = [
+            str(t).strip() for t in (req.allowed_archive_types or ["member_daily_zip"]) if str(t).strip()
+        ]
+        ent = {
+            "allowed_report_dates": dates,
+            "allowed_archive_types": archive_types or ["member_daily_zip"],
+            "pc_full": True,
+            "report_download_limited": True,
+            "legacy_zip_enabled": True,
+        }
+        if not dates:
+            raise HTTPException(status_code=400, detail="Legacy 体验码请至少选择一个报告日期")
+        duration = req.duration_days or _PLAN_DURATION["experience"]
+        note = _build_note(ent, remark)
     else:
         duration = req.duration_days or _PLAN_DURATION.get(req.plan_code, 30)
+        note = remark
+
     payload = {
         "count": req.count,
         "plan_code": plan_code,
@@ -153,9 +249,9 @@ async def generate_member_codes(
     return {
         "code": 0,
         "data": {
-            "codes": [{"code": c, "plan_code": req.plan_code, "duration_days": duration} for c in codes],
+            "codes": [{"code": c, "plan_code": ui_plan, "duration_days": duration} for c in codes],
             "count": len(codes),
-            "plan_code": req.plan_code,
+            "plan_code": ui_plan,
             "duration_days": duration,
         },
     }
@@ -224,7 +320,6 @@ async def test_insight_llm_config(
     except XhsCloudNotConfigured as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
     return {"code": 0, "data": result}
-
 
 
 class MemberFeedbackUpdateRequest(BaseModel):
