@@ -56,7 +56,8 @@ def _load_context(report_date: str) -> dict | None:
     return None
 
 
-def _try_rank_engine_generate(report_date: str, context: dict, *, llm_enhance: bool = False) -> dict | None:
+def _try_rank_engine_generate(report_date: str, context: dict, *, llm_enhance: bool = True) -> dict | None:
+    """调云侧 AiAdvisor.run_batch，默认 llm_enhance=True 走 LLM 主路径。"""
     try:
         from cloud_deploy.rank_engine.ai_advisor import AiAdvisor
 
@@ -65,7 +66,8 @@ def _try_rank_engine_generate(report_date: str, context: dict, *, llm_enhance: b
             context=context,
             llm_enhance=llm_enhance,
         )
-    except ImportError:
+    except ImportError as e:
+        print(f"[advisor] rank_engine ImportError: {e}", file=sys.stderr)
         return None
     except Exception as e:
         print(f"[advisor] rank_engine failed: {e}", file=sys.stderr)
@@ -141,7 +143,7 @@ def _pack_zip(report_date: str, publish_dir: str) -> str:
     return zip_path
 
 
-def process_one(report_date: str, *, dry_run: bool = False, llm_enhance: bool = False) -> dict:
+def process_one(report_date: str, *, dry_run: bool = False, llm_enhance: bool = True) -> dict:
     if not _DATE_RE.match(report_date):
         return {"report_date": report_date, "status": "error", "detail": "invalid date"}
 
@@ -175,7 +177,7 @@ def process_one(report_date: str, *, dry_run: bool = False, llm_enhance: bool = 
     }
 
 
-def process_pending(report_date: str | None = None, *, dry_run: bool = False, llm_enhance: bool = False) -> list[dict]:
+def process_pending(report_date: str | None = None, *, dry_run: bool = False, llm_enhance: bool = True) -> list[dict]:
     incoming = _incoming_dir()
     if not os.path.isdir(incoming):
         return []
@@ -205,9 +207,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="AI 顾问云侧预生成")
     ap.add_argument("--date", default="", help="仅处理指定日期 YYYY-MM-DD")
     ap.add_argument("--dry-run", action="store_true", help="只验证 context，不写发布目录")
-    ap.add_argument("--llm-enhance", action="store_true", help="在预生成 advice 上追加 LLM 补充（非主路径）")
+    ap.add_argument("--llm-enhance", action="store_true", help="（已默认开启）强制走 LLM 主路径")
+    ap.add_argument("--no-llm", action="store_true", help="禁用 LLM，仅走模板兜底（调试用）")
     args = ap.parse_args()
-    results = process_pending(report_date=args.date or None, dry_run=args.dry_run, llm_enhance=args.llm_enhance)
+    llm_on = not args.no_llm
+    results = process_pending(report_date=args.date or None, dry_run=args.dry_run, llm_enhance=llm_on)
     if not results:
         print("[advisor] no pending context")
         return 0

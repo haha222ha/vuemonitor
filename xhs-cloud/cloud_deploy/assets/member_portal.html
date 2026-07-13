@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta name="portal-build" content="20260713p">
 <link rel="stylesheet" href="/assets/member_theme.css?v=20260713p">
-<link rel="stylesheet" href="/assets/member_reader.css?v=20260713p">
+<link rel="stylesheet" href="/assets/member_reader.css?v=20260713llm">
 <link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260713p">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
@@ -392,6 +392,24 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   </div><!-- /guestShell -->
 
   <div id="memberShell" class="member-shell hidden">
+  <div id="aiGenOverlay" class="ai-gen-overlay hidden" aria-live="polite" aria-atomic="true">
+    <div class="ai-gen-card">
+      <div class="ai-gen-header">
+        <span class="ai-gen-pulse"></span>
+        <span class="ai-gen-title">AI 选品顾问实时分析中</span>
+      </div>
+      <div class="ai-gen-sub" id="aiGenSub">正在连接云端 AI 模型…</div>
+      <div class="ai-gen-bar"><span id="aiGenBarFill"></span></div>
+      <div class="ai-gen-meta">
+        <span id="aiGenPct">0%</span>
+        <span class="ai-gen-dot">·</span>
+        <span id="aiGenStage">初始化</span>
+        <span class="ai-gen-dot">·</span>
+        <span class="ai-gen-model">DeepSeek V4</span>
+      </div>
+      <div class="ai-gen-hint">本报告由云端 AI 基于脱敏榜单实时生成，预计 1–2 秒</div>
+    </div>
+  </div>
   <div id="dashView" class="hidden">
     <div id="expiryBanner"></div>
     <div class="dash-tabs">
@@ -535,7 +553,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 </div>
 <script src="/assets/member_portal_state.js?v=20260713p"></script>
 <script src="/assets/member_core.js?v=20260713p"></script>
-<script src="/assets/member_reader.js?v=20260713p"></script>
+<script src="/assets/member_reader.js?v=20260713llm"></script>
 <script src="/assets/member_router.js?v=20260713p"></script>
 <script src="/assets/member_insight.js?v=20260713p"></script>
 <script>

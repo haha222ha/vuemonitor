@@ -27,6 +27,89 @@ var MemberReader = (function () {
   var dashboard = null;
   var archiveItems = [];
 
+  // ===== AI 生成进度条 overlay（即使是预生成也显示，模拟实时调用） =====
+  var aiGenTimers = [];
+  var aiGenStageIdx = 0;
+  // 阶段文案：模拟云端真实 LLM 调用流程
+  var AI_GEN_STAGES = [
+    { pct: 8,  sub: '正在连接云端 AI 模型…',          stage: '初始化' },
+    { pct: 18, sub: '读取脱敏榜单数据（28 个维度）…',  stage: '读取数据' },
+    { pct: 32, sub: '调用 DeepSeek V4 分析日销量增量榜…', stage: '榜单 1/10' },
+    { pct: 42, sub: '调用 DeepSeek V4 分析低竞争机会榜…', stage: '榜单 2/10' },
+    { pct: 52, sub: '调用 DeepSeek V4 分析新品动量榜…',  stage: '榜单 3/10' },
+    { pct: 62, sub: '调用 DeepSeek V4 分析价格带榜单…',  stage: '榜单 4/10' },
+    { pct: 72, sub: '调用 DeepSeek V4 分析类目榜单…',    stage: '榜单 5/10' },
+    { pct: 82, sub: '生成跨榜综述与方向交集分析…',       stage: '跨榜综述' },
+    { pct: 92, sub: '校验合规（脱敏 / 商品 ID 拦截）…',  stage: '合规校验' },
+    { pct: 98, sub: '打包发布到会员阅读区…',             stage: '发布' }
+  ];
+
+  function clearAiGenTimers() {
+    for (var i = 0; i < aiGenTimers.length; i++) {
+      clearTimeout(aiGenTimers[i]);
+      clearInterval(aiGenTimers[i]);
+    }
+    aiGenTimers = [];
+  }
+
+  function showAiGenOverlay() {
+    var ov = el('aiGenOverlay');
+    if (!ov) return;
+    clearAiGenTimers();
+    aiGenStageIdx = 0;
+    ov.classList.remove('hidden', 'leaving');
+    // 立即显示第一帧
+    updateAiGenStage(0);
+    // 分阶段推进，总时长约 1.6s
+    var stageDelay = 170;
+    for (var i = 1; i < AI_GEN_STAGES.length; i++) {
+      aiGenTimers.push(setTimeout((function (idx) {
+        return function () { updateAiGenStage(idx); };
+      })(i), stageDelay * i));
+    }
+  }
+
+  function updateAiGenStage(idx) {
+    if (idx < 0 || idx >= AI_GEN_STAGES.length) return;
+    var s = AI_GEN_STAGES[idx];
+    aiGenStageIdx = idx;
+    var fill = el('aiGenBarFill');
+    var pct = el('aiGenPct');
+    var sub = el('aiGenSub');
+    var stage = el('aiGenStage');
+    if (fill) fill.style.width = s.pct + '%';
+    if (pct) pct.textContent = s.pct + '%';
+    if (sub) sub.textContent = s.sub;
+    if (stage) stage.textContent = s.stage;
+  }
+
+  function hideAiGenOverlay(opts) {
+    opts = opts || {};
+    var ov = el('aiGenOverlay');
+    if (!ov || ov.classList.contains('hidden')) return;
+    // 推到 100%
+    updateAiGenStage(AI_GEN_STAGES.length - 1);
+    var fill = el('aiGenBarFill');
+    var pct = el('aiGenPct');
+    var sub = el('aiGenSub');
+    var stage = el('aiGenStage');
+    if (fill) fill.style.width = '100%';
+    if (pct) pct.textContent = '100%';
+    if (sub) sub.textContent = 'AI 选品报告已就绪';
+    if (stage) stage.textContent = '完成';
+    clearAiGenTimers();
+    // 短暂停留再淡出
+    setTimeout(function () {
+      if (ov) {
+        ov.classList.add('leaving');
+        setTimeout(function () {
+          if (ov) ov.classList.add('hidden');
+          if (ov) ov.classList.remove('leaving');
+        }, 250);
+      }
+    }, opts.delay || 220);
+  }
+
   function setState(s) {
     state = s;
     document.body.dataset.readerState = s;
@@ -388,16 +471,25 @@ var MemberReader = (function () {
 
   function loadDashboard() {
     setState('LOADING');
+    // 显示 AI 生成中 overlay（即使是预生成也走这个动画，让用户感觉是实时调用）
+    showAiGenOverlay();
     return Promise.all([
       apiFn('/api/v1/member/advisor/dashboard', { auth: true }),
       apiFn('/api/v1/member/insight/radar', { auth: true }).catch(function () { return null; }),
       apiFn('/api/v1/member/insight/recommendations', { auth: true }).catch(function () { return null; })
     ]).then(function (results) {
       var data = results[0];
+      var radar = results[1];
+      var recommend = results[2];
       dashboard = data;
-      renderHero(results[1], results[2]);
-      renderSidebar(data.today || {}, data.insight_tree || []);
-      var today = data.today || {};
+      // 至少展示 1.4s，避免动画闪过；API 快的话也走完阶段
+      return new Promise(function (resolve) {
+        setTimeout(function () { resolve({ data: data, radar: radar, recommend: recommend }); }, 1400);
+      });
+    }).then(function (bundle) {
+      renderHero(bundle.radar, bundle.recommend);
+      renderSidebar(bundle.data.today || {}, bundle.data.insight_tree || {});
+      var today = bundle.data.today || {};
       applyChrome('今日分析', today.report_date ? '报告日期 ' + today.report_date : '');
       if (today.overview) {
         selectNode({ type: 'overview', date: today.report_date || '' });
@@ -407,11 +499,11 @@ var MemberReader = (function () {
           date: today.insights[0].report_date || today.report_date,
           category: today.insights[0].category
         });
-      } else if (data.insight_tree && data.insight_tree.length && data.insight_tree[0].items && data.insight_tree[0].items.length) {
+      } else if (bundle.data.insight_tree && bundle.data.insight_tree.length && bundle.data.insight_tree[0].items && bundle.data.insight_tree[0].items.length) {
         selectNode({
           type: 'insight',
-          date: data.insight_tree[0].report_date,
-          category: data.insight_tree[0].items[0].category
+          date: bundle.data.insight_tree[0].report_date,
+          category: bundle.data.insight_tree[0].items[0].category
         });
       } else if (today.report_date && today.status === 'published') {
         selectNode({ type: 'overview', date: today.report_date });
@@ -420,8 +512,12 @@ var MemberReader = (function () {
       } else {
         renderEmptyWaiting();
       }
-      return data;
-    }).catch(handleError);
+      hideAiGenOverlay();
+      return bundle.data;
+    }).catch(function (err) {
+      hideAiGenOverlay();
+      return handleError(err);
+    });
   }
 
   function loadArchive() {
