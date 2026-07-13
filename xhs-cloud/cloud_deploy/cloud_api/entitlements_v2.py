@@ -111,9 +111,24 @@ def merge_entitlements(raw: dict | None, membership_plan: str | None = None) -> 
 
     if ent.get("insight_enabled") is None:
         if plan in ("monthly", "quarterly", "halfyear", "yearly", "pay_test"):
-            ent.setdefault("legacy_zip_enabled", True)
+            ent.setdefault("legacy_zip_enabled", False)
             ent.setdefault("insight_enabled", True)
+            ent.setdefault("advisor_read", True)
+            ent.setdefault("advisor_directions_per_day", 28)
+            ent.setdefault("insight_categories_per_day", 5)
+        elif plan == "experience_3d":
+            ent.setdefault("legacy_zip_enabled", False)
+            ent.setdefault("insight_enabled", True)
+            ent.setdefault("insight_only", True)
+            ent.setdefault("advisor_read", True)
+            ent.setdefault("advisor_directions_per_day", 8)
+            ent.setdefault("advisor_history_days", 30)
+            ent.setdefault("advisor_chat_daily", 0)
             ent.setdefault("insight_categories_per_day", 3)
+            ent.setdefault("insight_llm_tokens_per_day", 0)
+            ent.setdefault("insight_compare", False)
+            ent.setdefault("insight_workflow", False)
+            ent.setdefault("insight_pdf_export", False)
         elif plan.startswith("insight_") or plan == "dual_monthly":
             ent.setdefault("insight_enabled", True)
             ent.setdefault("legacy_zip_enabled", plan == "dual_monthly")
@@ -162,12 +177,12 @@ def llm_token_budget(ent: dict | None) -> int:
 
 
 def portal_route(ent: dict | None) -> str:
-    """返回前端路由：insight_only | legacy_only | legacy_with_preview."""
+    """返回前端路由：ai_reader | insight_only | legacy_only | legacy_with_preview."""
     ent = merge_entitlements(ent)
     if ent.get("insight_only") or (
         ent.get("insight_enabled") and not ent.get("legacy_zip_enabled")
     ):
-        return "insight_only"
+        return "ai_reader" if ent.get("advisor_read") else "insight_only"
     if ent.get("insight_preview"):
         return "legacy_with_preview"
     if ent.get("legacy_zip_enabled") and ent.get("insight_enabled"):

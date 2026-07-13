@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta name="theme-color" content="#0071e3">
-<title>选品报告会员中心</title>
+<title>选品 AI 顾问 · 会员中心</title>
 <script>
 (function () {
   if (location.protocol === 'http:' && !/localhost|127\.0\.0\.1/.test(location.hostname)) {
@@ -143,17 +143,43 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 .insight-radar-chip{cursor:pointer}
 .insight-cmp-pick{margin:4px 6px 4px 0;padding:4px 10px;border:1px solid var(--line);border-radius:16px;cursor:pointer;display:inline-block;font-size:12px}
 .insight-cmp-pick.active{background:#eef5ff;border-color:var(--accent);font-weight:600}
-.plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
-@media(min-width:520px){.plan-grid{grid-template-columns:repeat(4,1fr)}}
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;margin-bottom:16px}
 .plan-card{border:1px solid var(--line);border-radius:10px;padding:14px 12px;cursor:pointer;background:#f9f9fb;text-align:center;-webkit-tap-highlight-color:transparent}
 .plan-card.active{border-color:var(--accent);background:#eef5ff;box-shadow:0 0 0 2px rgba(0,113,227,.15)}
 .plan-card .price{font-size:22px;font-weight:700;color:var(--accent);margin:6px 0 4px}
 .plan-card .name{font-size:13px;font-weight:600}
 .plan-card .hint{font-size:11px;color:var(--text2);margin-top:2px}
-.plan-card.plan-test{border-color:#f0d78a;background:#fffbeb}
+.plan-card.plan-entry{border-color:#93c5fd;background:#f0f7ff}
 .pay-qr-wrap{text-align:center;padding:16px 0}
 .pay-qr-wrap img,.pay-qr-wrap canvas{max-width:220px;border-radius:8px;border:1px solid var(--line)}
 .pay-meta{font-size:13px;color:var(--text2);line-height:1.7;margin-top:12px}
+.version-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.version-item{border:1px solid var(--line);border-radius:10px;padding:14px;background:#f9f9fb}
+.version-item.is-latest{border-color:#93c5fd;background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%)}
+.version-item .vi-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.version-item .vi-ver{font-size:16px;font-weight:700}
+.version-item .vi-date{font-size:12px;color:var(--text2)}
+.version-item .vi-notes{font-size:13px;color:var(--text2);line-height:1.65;margin:0 0 10px}
+.version-item .vi-notes ul{margin:4px 0 0;padding-left:18px}
+.version-item .vi-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.version-badge{font-size:11px;font-weight:600;color:var(--accent);background:#eef5ff;padding:2px 8px;border-radius:10px}
+.topbar-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.btn-broadcast{position:relative;min-height:36px;padding:6px 12px;font-size:13px}
+.btn-broadcast .broadcast-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--surface)}
+.broadcast-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px 16px calc(20px + var(--safe-b))}
+.broadcast-overlay.hidden{display:none!important}
+.broadcast-modal{width:min(520px,100%);max-height:min(86vh,720px);overflow:auto;background:var(--surface);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);border:1px solid var(--line)}
+.broadcast-head{padding:20px 20px 12px;background:linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);color:#fff;border-radius:16px 16px 0 0}
+.broadcast-head .bh-badge{display:inline-block;font-size:11px;font-weight:700;background:rgba(255,255,255,.22);padding:3px 10px;border-radius:20px;margin-bottom:8px}
+.broadcast-head h2{font-size:clamp(18px,4.5vw,22px);font-weight:800;line-height:1.35;margin:0 0 6px}
+.broadcast-head p{margin:0;font-size:13px;opacity:.92;line-height:1.55}
+.broadcast-body{padding:18px 20px 8px;font-size:14px;line-height:1.65;color:var(--text)}
+.broadcast-body ul{margin:8px 0 0;padding-left:18px;color:var(--text2)}
+.broadcast-body li{margin-bottom:6px}
+.broadcast-section{margin-bottom:14px}
+.broadcast-section h3{font-size:14px;font-weight:700;margin:0 0 6px;color:var(--text)}
+.broadcast-foot{padding:12px 20px 18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.broadcast-countdown{font-size:12px;color:var(--text2)}
 .auth-code-box{margin-top:12px;padding:12px;background:#f0f7ff;border:1px dashed #c5d9f5;border-radius:10px;font-family:ui-monospace,monospace;font-size:15px;word-break:break-all;text-align:center}
 </style>
 </head>
@@ -161,80 +187,81 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 <div class="wrap">
   <div class="topbar">
     <div>
-      <h1>选品报告会员中心</h1>
-      <p class="sub">小红书选品情报与分析报告 · 登录会员可下载全量日报 / 周报 / 月报</p>
+      <h1>选品 AI 顾问 · 会员中心</h1>
+      <p class="sub">每晚 AI 预生成选品分析，点开即读 · 不含可下载商品表格 · 方向级文字结论</p>
       <div class="welcome-chip hidden" id="welcomeChip">欢迎回来，<strong id="welcomeName"></strong></div>
     </div>
-    <button class="btn btn-ghost hidden" id="btnLogout" onclick="logout()">退出登录</button>
+    <div class="topbar-actions">
+      <button type="button" class="btn btn-ghost btn-broadcast hidden" id="btnBroadcast" onclick="openBroadcastModal(true)" title="查看最新站内动态">
+        📢 站内动态
+        <span class="broadcast-dot hidden" id="broadcastDot"></span>
+      </button>
+      <button class="btn btn-ghost hidden" id="btnLogout" onclick="logout()">退出登录</button>
+    </div>
   </div>
 
-  <div class="card notice-card" id="clientDownloadCard" style="background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5">
-    <div class="notice-title">💻 PC 端选品分析工具（付费会员专享）</div>
+  <div class="card notice-card hidden" id="clientDownloadCard" style="background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5">
+    <div class="notice-title">💻 PC 端 ProductAnalyzer</div>
     <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">
-      安装 <strong>ProductAnalyzer</strong> 后，可在本地查看<strong>全量</strong>选品情报报告、跟踪商品动销变化、同步收藏夹。本工具<strong>不对免费用户开放</strong>，请先开通会员。
+      安装客户端后可同步 AI 选品分析、管理商品监控与收藏。请切换到上方 <strong>「PC 客户端」</strong> 标签查看版本历史并下载。
+    </p>
+  </div>
+
+  <div class="card notice-card" id="reportScheduleCard">
+    <div class="notice-title">📋 AI 分析更新说明</div>
+    <ul>
+      <li><strong>类目情报</strong>：系统夜间预生成，一般 <strong>18:00～19:00</strong>（北京时间）可在「AI 选品分析」阅读</li>
+      <li><strong>AI 阅读样例</strong>：未登录访客可预览历史期次脱敏样例（非最新期次）</li>
+      <li>报告为<strong>方向级文字结论</strong>，不含可排序商品表、店铺明细或数据包下载</li>
+      <li>PC 端登录后自动同步云端 AI 分析；会员鉴权与授权码逻辑保持不变</li>
+    </ul>
+    <div class="notice-tip">
+      本服务仅供研究参考，不构成投资建议。数据基于公开信息与系统计算，存在延迟与误差，请理性参考。
+    </div>
+  </div>
+
+  <div class="portal-tabs" id="portalTabs">
+    <div class="portal-tab active" data-portal="demo" onclick="switchPortal('demo')">AI 阅读样例</div>
+    <div class="portal-tab" data-portal="download" onclick="switchPortal('download')">PC 客户端</div>
+    <div class="portal-tab" data-portal="center" onclick="switchPortal('center')">开通会员</div>
+  </div>
+
+  <div id="portalTrial" class="portal-panel hidden"></div>
+
+  <div id="portalDownload" class="portal-panel hidden">
+  <div class="card notice-card" style="background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5">
+    <div class="notice-title">💻 PC 端 ProductAnalyzer（付费会员专享）</div>
+    <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">
+      安装后可在本地阅读 AI 选品分析、同步收藏与监控配置。启动时会<strong>联网校验会员</strong>（授权码 / 账号密码），与网页登录逻辑一致。
     </p>
     <div id="paUpdateNotice" class="hidden" style="margin-bottom:12px;padding:10px 12px;border-radius:8px;background:#fff8e6;border:1px solid #f0d78a;font-size:13px;line-height:1.6">
       <strong style="color:#b45309">📦 新版本已发布</strong>
       <div id="paUpdateNoticeText" style="margin-top:6px;color:var(--text2)"></div>
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
-      <a id="paInstallerLink" class="btn btn-primary" href="https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe" download style="text-decoration:none;color:#fff">下载 Windows 安装包</a>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
+      <a id="paInstallerLink" class="btn btn-primary" href="https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe" download style="text-decoration:none;color:#fff">下载最新版 Windows 安装包</a>
       <span id="paInstallerMeta" style="font-size:12px;color:var(--text2)">版本加载中…</span>
     </div>
-    <details style="margin-top:12px;font-size:12px;color:var(--text2)">
-      <summary style="cursor:pointer;color:var(--primary);font-weight:600">查看版本更新说明</summary>
-      <ul id="paChangelogList" style="margin:10px 0 0;padding-left:18px;line-height:1.7"></ul>
-    </details>
-    <p style="font-size:12px;color:var(--text2);margin-top:10px;line-height:1.5">安装后可自动检测新版本（启动约 8 秒后提示）；点击「下载安装包」覆盖安装即可升级，无需卸载。如遇 Windows 安全提示，请点击「更多信息」→「仍要运行」。</p>
+    <p style="font-size:12px;color:var(--text2);line-height:1.55;margin-bottom:4px">覆盖安装即可升级，无需卸载。如遇 Windows 安全提示，请点击「更多信息」→「仍要运行」。</p>
+    <div class="section-title" style="margin-top:18px">版本历史</div>
+    <p style="font-size:12px;color:var(--text2);margin:6px 0 0">以下为已安全发版的历史版本，可按需下载对应安装包。</p>
+    <div class="client-versions-host" id="clientVersionsGuest"></div>
+  </div>
   </div>
 
-  <div class="card notice-card" id="reportScheduleCard">
-    <div class="notice-title">📋 报告更新说明</div>
-    <ul>
-      <li><strong>日报</strong>：每天 <strong>18:00</strong>（北京时间）自动生成，一般 18:00～18:10 内可下载</li>
-      <li><strong>周报</strong>：每周日 <strong>18:00</strong> 生成（汇总当周数据）</li>
-      <li><strong>月报</strong>：每月 <strong>1 日 18:00</strong> 生成（汇总上月数据）</li>
-      <li><strong>定制词库</strong>：按词库生成的选品分析报告，推送后可在「定制词库」Tab 下载</li>
-      <li>当日 18:00 前若列表暂无「今天」的日报，属正常情况，请稍后再来</li>
-      <li>报告含<strong>实体 + 虚拟</strong>商品：实体门槛预估日增 &gt;5，虚拟门槛预估日增 &gt;1（同一份 zip）</li>
-    </ul>
-    <div class="notice-tip">
-      下载 zip 后解压，<strong>右键 index_with_gr.html → Chrome 打开</strong> 查看；也可点 <strong>在线预览</strong>（需已登录，自动加载数据）。
-      历史报告在会员有效期内均可重复下载。数据基于公开信息与系统计算，存在延迟与误差，请理性参考。
-    </div>
-  </div>
-
-  <div class="portal-tabs" id="portalTabs">
-    <div class="portal-tab active" data-portal="trial" onclick="switchPortal('trial')">免费体验包</div>
-    <div class="portal-tab" data-portal="center" onclick="switchPortal('center')">选品报告中心</div>
-  </div>
-
-  <div id="portalTrial" class="portal-panel">
-  <div class="card notice-card trial-pack-card" id="trialPackCard" style="background:linear-gradient(135deg,#eef8ff 0%,#f0fdf4 100%);border:1px solid #93c5fd">
-    <div class="notice-title">🎁 免费选品体验包（无需登录）</div>
+  <div id="portalDemo" class="portal-panel hidden">
+  <div class="card notice-card" style="background:linear-gradient(135deg,#fff8e6 0%,#f0f7ff 100%);border:1px solid #f0d78a">
+    <div class="notice-title">📖 AI 选品情报 · 免费样例</div>
     <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">
-      精选选品情报样本，含 <strong>24h 加购指数</strong> 等分析维度，虚拟/实体分轨展示，合规上限 <strong>3000 条</strong>。可在线预览或下载 ZIP，仅供研究参考。
+      进入即可预览<strong>历史期次</strong>的 AI 预生成报告（<strong>非最新</strong>）。免费用户<strong>不支持</strong> AI 预生成调用、动态 LLM 与顾问对话；完整能力请开通 <strong>¥9.9 体验卡（3 天）</strong> 或正式会员。
     </p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px">
-        <div style="font-size:11px;color:var(--text2)">会员定制词库</div>
-        <div style="font-size:20px;font-weight:800;color:var(--accent);margin:4px 0">¥9.9<span style="font-size:12px">/次</span></div>
-        <div style="font-size:12px;color:var(--text2)">定向关键词洞察 · 稳定产出</div>
-      </div>
-      <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px">
-        <div style="font-size:11px;color:var(--text2)">非会员定制词库</div>
-        <div style="font-size:20px;font-weight:800;color:var(--text2);margin:4px 0">¥29.9<span style="font-size:12px">/次</span></div>
-        <div style="font-size:12px;color:var(--text2)">单次试水验证</div>
-      </div>
+    <div style="border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;min-height:420px">
+      <iframe id="advisorDemoFrame" title="AI 阅读样例" src="/public/advisor-demo" style="width:100%;height:min(560px,68vh);border:none;display:block"></iframe>
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:10px">
-      <a class="btn btn-primary" id="trialPreviewLink" href="/public/trial/preview" target="_blank" rel="noopener" style="text-decoration:none;color:#fff">在线预览体验包</a>
-      <a class="btn btn-ghost" id="trialDownloadLink" href="/api/v1/public/trial-report/download" style="text-decoration:none">下载 ZIP</a>
-      <span id="trialPackMeta" style="font-size:12px;color:var(--text2)">加载体验包信息…</span>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px">
+      <button type="button" class="btn btn-primary" onclick="switchPortal('center')">开通体验卡 ¥9.9</button>
+      <a class="btn btn-ghost" href="/public/advisor-demo" target="_blank" rel="noopener" style="text-decoration:none">新窗口打开样例</a>
     </div>
-    <p style="font-size:12px;color:var(--text2);line-height:1.55;margin:0">
-      <strong>PC 端选品分析工具仅付费会员可用</strong>；免费用户请使用本网页体验包。完整日报/周报/月报需开通会员后下载。
-    </p>
   </div>
   </div>
 
@@ -242,7 +269,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   <div class="card notice-card" id="memberPricingCard" style="background:linear-gradient(135deg,#fffbeb 0%,#f0f7ff 100%);border:1px solid #c5d9f5">
     <div class="notice-title">💎 会员套餐与价格</div>
     <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:14px">
-      开通会员后可下载<strong>全量</strong>选品情报日报 / 周报 / 月报，并使用 PC 端分析工具。数据仅供研究参考，不构成投资建议。
+      开通会员后可阅读<strong> AI 选品分析</strong>与类目情报，并使用 PC 端 ProductAnalyzer。数据仅供研究参考，不构成投资建议。
     </p>
     <div class="plan-grid" id="portalPlanGrid"></div>
     <div class="seg" id="portalPayChannelSeg" style="margin-bottom:14px">
@@ -270,7 +297,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     </div>
     <div id="portalPayMsg" style="margin-top:12px"></div>
     <div class="notice-tip" style="margin-top:14px">
-      含月度 / 季度 / 半年 / 年度套餐；已登录用户支付后自动延长会员天数。定制词库：会员 ¥9.9/次，非会员 ¥29.9/次。
+      含体验卡 ¥9.9（3 天）/ 月度 / 季度 / 半年 / 年度套餐；已登录用户支付后自动延长会员天数。定制词库：会员 ¥9.9/次，非会员 ¥29.9/次。
     </div>
   </div>
   </div>
@@ -330,8 +357,8 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <button class="btn btn-primary btn-block" id="btnReset" onclick="doResetPassword()">重置密码并登录</button>
     </div>
     <div class="card hidden" id="panelBuy">
-      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">请在上方切换到 <strong>「选品报告中心」</strong>，选择月度 / 季度 / 半年 / 年度套餐，微信或支付宝扫码开通。</p>
-      <button class="btn btn-primary btn-block" onclick="switchPortal('center')">前往选品报告中心购买</button>
+      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">请在上方切换到 <strong>「开通会员」</strong>，选择体验卡 / 月度 / 季度 / 半年 / 年度套餐，微信或支付宝扫码开通。</p>
+      <button class="btn btn-primary btn-block" onclick="switchPortal('center')">前往开通会员</button>
       <p style="font-size:12px;color:var(--text2);margin-top:12px;line-height:1.55;text-align:center">已登录用户支付后会员天数自动叠加；新用户支付成功后设置账号即可开通。</p>
     </div>
     <div id="authMsg"></div>
@@ -340,8 +367,9 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   <div id="dashView" class="hidden">
     <div id="expiryBanner"></div>
     <div class="dash-tabs">
-      <div class="dash-tab" id="dashTabInsight" data-dash="insight" onclick="switchDash('insight')">AI 选品情报</div>
-      <div class="dash-tab active" id="dashTabReports" data-dash="reports" onclick="switchDash('reports')">报告库</div>
+      <div class="dash-tab active" id="dashTabInsight" data-dash="insight" onclick="switchDash('insight')">AI 选品分析</div>
+      <div class="dash-tab" id="dashTabClient" data-dash="client" onclick="switchDash('client')">PC 客户端</div>
+      <div class="dash-tab hidden" id="dashTabReports" data-dash="reports" onclick="switchDash('reports')">报告库</div>
       <div class="dash-tab" data-dash="watchlist" onclick="switchDash('watchlist')">我的收藏</div>
     </div>
     <div class="card">
@@ -368,10 +396,10 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     </div>
     <div id="dashInsight" class="hidden">
     <div id="insightPreviewBanner" class="insight-banner hidden">
-      您正在预览 AI 选品情报功能。Legacy 数据包报告仍在「报告库」Tab 履约至会员到期。
+      您正在预览 AI 选品分析功能。
     </div>
     <div class="card">
-      <div class="section-title">AI 选品情报</div>
+      <div class="section-title">AI 选品分析</div>
       <p style="font-size:13px;color:var(--text2);margin:8px 0 14px">类目级市场洞察与决策建议，不含可定位商品/店铺的原始数据包。报告由系统夜间预生成。</p>
       <div id="insightPlanBar" class="insight-plan-bar">加载中…</div>
       <div id="insightRadarBar" class="insight-banner hidden"></div>
@@ -393,7 +421,19 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div id="insightMsg" style="font-size:13px;color:var(--text2);margin-top:12px"></div>
     </div>
     </div>
-    <div id="dashReports">
+    <div id="dashClient" class="hidden">
+    <div class="card notice-card" style="background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5">
+      <div class="notice-title">💻 PC 端 ProductAnalyzer</div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">会员登录客户端后自动同步 AI 分析；启动时联网校验会员身份（授权码 / 账号密码）。</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
+        <a id="paInstallerLinkDash" class="btn btn-primary" href="https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe" download style="text-decoration:none;color:#fff">下载最新版</a>
+        <span id="paInstallerMetaDash" style="font-size:12px;color:var(--text2)">版本加载中…</span>
+      </div>
+      <div class="section-title" style="margin-top:8px">版本历史</div>
+      <div class="client-versions-host" id="clientVersionsMember"></div>
+    </div>
+    </div>
+    <div id="dashReports" class="hidden">
     <div class="card">
       <div class="section-title">报告库</div>
       <p style="font-size:13px;color:var(--text2);margin:8px 0 14px">有效期内可下载全部已发布报告（含历史往期）。按<strong>月份</strong>分组，<strong>本月默认展开</strong>，往期点击月份可展开/折叠。</p>
@@ -559,7 +599,7 @@ function isDeviceKickedMessage(msg) {
 
 let library = { daily: [], weekly: [], monthly: [], custom: [] };
 let currentType = 'daily';
-let currentDash = 'reports';
+let currentDash = 'insight';
 let monthExpandState = {};
 let selectedReports = new Set();
 let watchlistItems = [];
@@ -584,7 +624,7 @@ function ensureMemberInsight(done) {
   }
   _insightScriptLoading = true;
   var s = document.createElement('script');
-  s.src = '/assets/member_insight.js?v=20260712t10&_=' + Date.now();
+  s.src = '/assets/member_insight.js?v=20260713ai&_=' + Date.now();
   s.onload = function () {
     _insightScriptLoading = false;
     if (window.MemberInsight) done();
@@ -598,16 +638,19 @@ function ensureMemberInsight(done) {
 }
 
 function switchDash(name) {
-  currentDash = name || 'reports';
+  currentDash = name || 'insight';
   try { localStorage.setItem('xhs_member_dash_tab', currentDash); } catch (_) {}
   document.querySelectorAll('.dash-tab').forEach(t => {
     if (t.classList.contains('hidden')) return;
     t.classList.toggle('active', t.dataset.dash === currentDash);
   });
-  document.getElementById('dashReports').classList.toggle('hidden', currentDash !== 'reports');
+  document.getElementById('dashReports').classList.add('hidden');
   document.getElementById('dashWatchlist').classList.toggle('hidden', currentDash !== 'watchlist');
   document.getElementById('dashInsight').classList.toggle('hidden', currentDash !== 'insight');
+  var dashClient = document.getElementById('dashClient');
+  if (dashClient) dashClient.classList.toggle('hidden', currentDash !== 'client');
   if (currentDash === 'watchlist') loadWatchlist();
+  if (currentDash === 'client') loadClientDownload();
   if (currentDash === 'insight') {
     ensureMemberInsight(function () { MemberInsight.load(); });
   }
@@ -852,42 +895,51 @@ function showAuthView() {
   document.getElementById('authView').classList.remove('hidden');
   document.getElementById('dashView').classList.add('hidden');
   document.getElementById('btnLogout').classList.add('hidden');
+  const btnBc = document.getElementById('btnBroadcast');
+  if (btnBc) btnBc.classList.add('hidden');
   updatePortalVisibility(null);
 }
 
 function switchPortal(name) {
-  const tab = name === 'center' ? 'center' : 'trial';
+  const tab = (name === 'center' || name === 'demo' || name === 'download') ? name : 'demo';
   try { localStorage.setItem(STORAGE.portalTab, tab); } catch (_) {}
   document.querySelectorAll('#portalTabs .portal-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.portal === tab);
   });
   const trial = document.getElementById('portalTrial');
+  const demo = document.getElementById('portalDemo');
   const center = document.getElementById('portalCenter');
-  if (trial) trial.classList.toggle('hidden', tab !== 'trial');
+  const download = document.getElementById('portalDownload');
+  if (trial) trial.classList.add('hidden');
+  if (demo) demo.classList.toggle('hidden', tab !== 'demo');
   if (center) center.classList.toggle('hidden', tab !== 'center');
+  if (download) download.classList.toggle('hidden', tab !== 'download');
   if (tab === 'center') loadPayPlans();
+  if (tab === 'download') loadClientDownload();
 }
 
 function updatePortalVisibility(membership) {
   const tabs = document.getElementById('portalTabs');
-  const trialPanel = document.getElementById('portalTrial');
+  const demoPanel = document.getElementById('portalDemo');
   const centerPanel = document.getElementById('portalCenter');
-  if (!tabs || !trialPanel || !centerPanel) return;
+  const downloadPanel = document.getElementById('portalDownload');
+  if (!tabs || !centerPanel) return;
 
   const isActiveMember = !!(membership && membership.is_active);
   if (isActiveMember) {
     tabs.classList.add('hidden');
-    trialPanel.classList.add('hidden');
+    if (demoPanel) demoPanel.classList.add('hidden');
+    if (downloadPanel) downloadPanel.classList.add('hidden');
     centerPanel.classList.remove('hidden');
     loadPayPlans();
     return;
   }
 
   tabs.classList.remove('hidden');
-  let saved = 'trial';
+  let saved = 'demo';
   try {
     const v = localStorage.getItem(STORAGE.portalTab);
-    if (v === 'center' || v === 'trial') saved = v;
+    if (v === 'center' || v === 'demo' || v === 'download') saved = v;
   } catch (_) {}
   switchPortal(saved);
 }
@@ -1078,8 +1130,8 @@ function renderPlanGrid() {
   const grid = document.getElementById('portalPlanGrid');
   if (!grid) return;
   grid.innerHTML = payPlans.map(p => `
-    <div class="plan-card ${p.plan_code === selectedPlanCode ? 'active' : ''} ${p.is_test ? 'plan-test' : ''}" onclick="selectPlan('${esc(p.plan_code)}')">
-      <div class="name">${esc(p.label)}${p.is_test ? ' <span style="font-size:10px;color:#b45309">联调</span>' : ''}</div>
+    <div class="plan-card ${p.plan_code === selectedPlanCode ? 'active' : ''} ${p.is_test ? 'plan-test' : ''} ${p.recommended ? 'plan-recommended' : ''} ${p.plan_code === 'experience_3d' ? 'plan-entry' : ''}" onclick="selectPlan('${esc(p.plan_code)}')">
+      <div class="name">${esc(p.label)}${p.recommended ? ' <span style="font-size:10px;color:#0ea5e9">推荐</span>' : ''}${p.plan_code === 'experience_3d' ? ' <span style="font-size:10px;color:#2563eb">尝鲜</span>' : ''}${p.is_test ? ' <span style="font-size:10px;color:#b45309">联调</span>' : ''}</div>
       <div class="price">¥${p.price_yuan}</div>
       <div class="hint">${p.duration_days} 天 · ${esc(p.summary || '')}</div>
     </div>
@@ -1306,7 +1358,7 @@ function renderProfile(m) {
     const kind = !m.is_active ? 'error' : ((m.days_remaining ?? 99) <= 7 ? 'warn' : 'ok');
     banner.innerHTML = `<div class="alert alert-${kind}">${esc(m.expiry_warning)}</div>`;
   } else if (m.is_active) {
-    banner.innerHTML = `<div class="alert alert-ok">会员有效，可下载全部历史报告</div>`;
+    banner.innerHTML = `<div class="alert alert-ok">会员有效，可阅读 AI 选品分析与类目情报</div>`;
   } else {
     banner.innerHTML = `<div class="alert alert-error">会员已过期，请点击下方「扫码续费（微信/支付宝）」</div>`;
   }
@@ -1640,6 +1692,8 @@ function showDashboard(cachedProfile) {
   document.getElementById('authView').classList.add('hidden');
   document.getElementById('dashView').classList.remove('hidden');
   document.getElementById('btnLogout').classList.remove('hidden');
+  const btnBc = document.getElementById('btnBroadcast');
+  if (btnBc) btnBc.classList.remove('hidden');
   if (cachedProfile) {
     renderProfile(cachedProfile);
   } else {
@@ -1661,17 +1715,14 @@ async function loadDashboard(useCacheFirst) {
   renderProfile(membership);
   library = data.library || { daily: [], weekly: [], monthly: [], custom: [] };
   if (data.expired) {
-    showMsg(document.getElementById('dashMsg'), '会员已过期，续费成功后可下载报告', 'warn');
+    showMsg(document.getElementById('dashMsg'), '会员已过期，续费成功后可阅读 AI 分析', 'warn');
   }
-  const savedType = loadStored(STORAGE.reportType);
-  if (savedType && ['daily','weekly','monthly','custom'].includes(savedType)) {
-    currentType = savedType;
-    document.querySelectorAll('#typeSeg button').forEach(b => {
-      b.classList.toggle('active', b.dataset.type === savedType);
-    });
+  if (window.MemberInsight) {
+    MemberInsight.applyEntitlements(membership);
+  } else {
+    switchDash('insight');
   }
-  setViewMode(currentViewMode());
-  renderReports();
+  await loadMemberBroadcast(membership);
   showDashboard(membership);
 }
 
@@ -1888,53 +1939,86 @@ async function doRenew() {
 
 async function loadClientDownload() {
   const link = document.getElementById('paInstallerLink');
+  const linkDash = document.getElementById('paInstallerLinkDash');
   const meta = document.getElementById('paInstallerMeta');
+  const metaDash = document.getElementById('paInstallerMetaDash');
   const notice = document.getElementById('paUpdateNotice');
   const noticeText = document.getElementById('paUpdateNoticeText');
-  const changelogList = document.getElementById('paChangelogList');
-  if (!link || !meta) return;
-  const fallback = () => {
-    link.href = 'https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe';
-    meta.textContent = '最新 v2026.07.12 · Windows 64 位';
+  const latestUrl = 'https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe';
+  const setLinks = function (url, label) {
+    if (link) { link.href = url; }
+    if (linkDash) { linkDash.href = url; }
+    if (meta) meta.textContent = label;
+    if (metaDash) metaDash.textContent = label;
   };
-  fallback();
+  setLinks(latestUrl, '最新版加载中…');
   let manifest = null;
   try {
     const mres = await fetch('https://www.xhs365.cn/downloads/productanalyzer-version.json', { cache: 'no-store', mode: 'cors' });
     if (mres.ok) manifest = await mres.json();
   } catch (e) { /* ignore */ }
-  if (manifest) {
-    if (manifest.download_url) link.href = manifest.download_url;
-    meta.textContent = '最新 v' + (manifest.version || '2026.07.12') + ' · Windows 64 位';
-    if (notice && noticeText && manifest.release_notes) {
-      notice.classList.remove('hidden');
-      noticeText.textContent = 'v' + (manifest.version || '') + '：' + manifest.release_notes + '。请下载安装包覆盖安装以体验最新功能。';
-    }
-    if (changelogList && Array.isArray(manifest.changelog)) {
-      changelogList.innerHTML = manifest.changelog.slice(0, 5).map(function(entry) {
-        const items = (entry.highlights || []).map(function(h) { return '<li>' + h + '</li>'; }).join('');
-        return '<li><strong>v' + entry.version + '</strong>（' + (entry.date || '') + '）<ul style="margin:4px 0 8px">' + items + '</ul></li>';
-      }).join('');
-    }
-  }
+  let apiData = null;
   try {
     const res = await fetch('https://www.xhs365.cn/api/v1/public/downloads', { cache: 'no-store', mode: 'cors' });
     const json = await res.json();
-    const d = json && json.data ? json.data : {};
-    if (d.installer_url) link.href = d.installer_url;
-    const manifestVersion = manifest && manifest.version ? String(manifest.version) : '';
-    const apiVersion = d.version ? String(d.version) : '';
-    const bestVersion = manifestVersion && apiVersion
-      ? (manifestVersion.localeCompare(apiVersion, undefined, { numeric: true }) >= 0 ? manifestVersion : apiVersion)
-      : (manifestVersion || apiVersion || '2026.07.12');
-    if (d.installer_available || manifest) {
-      meta.textContent = '最新 v' + bestVersion + ' · Windows 64 位';
-    } else if (!manifest) {
-      meta.textContent = '安装包筹备中，请联系客服';
-    }
-  } catch (e) {
-    /* 跨域失败时保留 manifest / fallback 链接与版本号 */
+    apiData = json && json.data ? json.data : null;
+  } catch (e) { /* ignore */ }
+  const manifestVersion = manifest && manifest.version ? String(manifest.version) : '';
+  const apiVersion = apiData && apiData.version ? String(apiData.version) : '';
+  const bestVersion = manifestVersion && apiVersion
+    ? (manifestVersion.localeCompare(apiVersion, undefined, { numeric: true }) >= 0 ? manifestVersion : apiVersion)
+    : (manifestVersion || apiVersion || '2026.07.24');
+  const downloadUrl = (manifest && manifest.download_url) || (apiData && apiData.installer_url) || latestUrl;
+  setLinks(downloadUrl, '最新 v' + bestVersion + ' · Windows 64 位');
+  if (notice && noticeText && manifest && manifest.release_notes) {
+    notice.classList.remove('hidden');
+    noticeText.textContent = 'v' + bestVersion + '：' + manifest.release_notes + '。请下载安装包覆盖安装以体验最新功能。';
   }
+  renderClientVersionHistory(manifest, bestVersion, downloadUrl);
+}
+
+function renderClientVersionHistory(manifest, latestVersion, latestUrl) {
+  const hosts = document.querySelectorAll('.client-versions-host');
+  if (!hosts.length) return;
+  const changelog = (manifest && Array.isArray(manifest.changelog)) ? manifest.changelog.slice() : [];
+  const historical = (manifest && Array.isArray(manifest.historical_installers)) ? manifest.historical_installers.slice() : [];
+  const byVersion = {};
+  changelog.forEach(function (entry) {
+    if (!entry || !entry.version) return;
+    byVersion[String(entry.version)] = Object.assign({}, byVersion[String(entry.version)] || {}, entry);
+  });
+  historical.forEach(function (item) {
+    if (!item || !item.version) return;
+    const key = String(item.version);
+    byVersion[key] = Object.assign({}, byVersion[key] || {}, item);
+  });
+  const versions = Object.keys(byVersion).sort(function (a, b) {
+    return b.localeCompare(a, undefined, { numeric: true });
+  });
+  if (!versions.length && latestVersion) {
+    versions.push(String(latestVersion));
+    byVersion[String(latestVersion)] = { version: latestVersion, date: '', highlights: [(manifest && manifest.release_notes) || '当前最新版'] };
+  }
+  const html = versions.map(function (ver, idx) {
+    const entry = byVersion[ver] || { version: ver };
+    const isLatest = idx === 0 || ver === String(latestVersion);
+    const url = entry.url || entry.download_url || (isLatest ? latestUrl : ('https://www.xhs365.cn/downloads/ProductAnalyzer_Setup_' + ver.replace(/\./g, '') + '.exe'));
+    const highlights = Array.isArray(entry.highlights) ? entry.highlights : (entry.release_notes ? [entry.release_notes] : []);
+    const notesHtml = highlights.length
+      ? '<ul>' + highlights.map(function (h) { return '<li>' + esc(h) + '</li>'; }).join('') + '</ul>'
+      : '<p style="margin:0">—</p>';
+    return '<div class="version-item' + (isLatest ? ' is-latest' : '') + '">'
+      + '<div class="vi-head"><div><span class="vi-ver">v' + esc(ver) + '</span>'
+      + (isLatest ? ' <span class="version-badge">最新</span>' : '')
+      + '</div><span class="vi-date">' + esc(entry.date || '') + '</span></div>'
+      + '<div class="vi-notes">' + notesHtml + '</div>'
+      + '<div class="vi-actions"><a class="btn btn-primary btn-xs" href="' + esc(url) + '" download style="text-decoration:none;color:#fff">下载此版本</a>'
+      + (entry.file_size ? '<span style="font-size:12px;color:var(--text2)">' + Math.round(entry.file_size / (1024 * 1024)) + ' MB</span>' : '')
+      + '</div></div>';
+  }).join('');
+  hosts.forEach(function (el) {
+    el.innerHTML = html ? ('<div class="version-list">' + html + '</div>') : '<div class="empty">暂无版本记录</div>';
+  });
 }
 
 async function loadTrialPackInfo() {
@@ -1954,10 +2038,113 @@ async function loadTrialPackInfo() {
   }
 }
 
+var _broadcastState = null;
+var _broadcastTimer = null;
+var _broadcastAutoClose = false;
+
+function renderBroadcastModal(b) {
+  if (!b) return;
+  document.getElementById('broadcastBadge').textContent = b.badge || '站内动态';
+  document.getElementById('broadcastTitle').textContent = b.title || '站内通知';
+  document.getElementById('broadcastSubtitle').textContent = b.subtitle || '';
+  var html = '';
+  if (Array.isArray(b.highlights) && b.highlights.length) {
+    html += '<ul>' + b.highlights.map(function (h) { return '<li>' + esc(h) + '</li>'; }).join('') + '</ul>';
+  }
+  if (Array.isArray(b.sections)) {
+    b.sections.forEach(function (sec) {
+      html += '<div class="broadcast-section"><h3>' + esc(sec.heading || '') + '</h3>';
+      if (Array.isArray(sec.items) && sec.items.length) {
+        html += '<ul>' + sec.items.map(function (it) { return '<li>' + esc(it) + '</li>'; }).join('') + '</ul>';
+      }
+      html += '</div>';
+    });
+  }
+  if (b.footer) html += '<p style="font-size:12px;color:var(--text2);margin:12px 0 0">' + esc(b.footer) + '</p>';
+  document.getElementById('broadcastBody').innerHTML = html;
+  var cta = document.getElementById('btnBroadcastClose');
+  if (cta) cta.textContent = b.cta_label || '我知道了';
+}
+
+function updateBroadcastButton(data) {
+  var dot = document.getElementById('broadcastDot');
+  if (!dot || !data) return;
+  dot.classList.toggle('hidden', !!(data.acknowledged || !data.broadcast));
+}
+
+function startBroadcastCountdown(seconds, onDone) {
+  var el = document.getElementById('broadcastCountdown');
+  var left = seconds;
+  if (_broadcastTimer) clearInterval(_broadcastTimer);
+  if (el) {
+    el.classList.remove('hidden');
+    el.textContent = left + ' 秒后自动关闭';
+  }
+  _broadcastTimer = setInterval(function () {
+    left -= 1;
+    if (el) el.textContent = Math.max(left, 0) + ' 秒后自动关闭';
+    if (left <= 0) {
+      clearInterval(_broadcastTimer);
+      _broadcastTimer = null;
+      if (typeof onDone === 'function') onDone();
+    }
+  }, 1000);
+}
+
+function openBroadcastModal(manual) {
+  var data = _broadcastState;
+  if (!data || !data.broadcast) return;
+  _broadcastAutoClose = !manual && !!data.show_popup;
+  renderBroadcastModal(data.broadcast);
+  document.getElementById('broadcastOverlay').classList.remove('hidden');
+  var cd = document.getElementById('broadcastCountdown');
+  if (_broadcastAutoClose) {
+    startBroadcastCountdown(5, function () { closeBroadcastModal(true); });
+  } else if (cd) {
+    cd.classList.add('hidden');
+  }
+}
+
+function closeBroadcastModal(fromAuto) {
+  if (_broadcastTimer) {
+    clearInterval(_broadcastTimer);
+    _broadcastTimer = null;
+  }
+  document.getElementById('broadcastOverlay').classList.add('hidden');
+  var cd = document.getElementById('broadcastCountdown');
+  if (cd) cd.classList.add('hidden');
+  if (_broadcastState && _broadcastState.broadcast && (_broadcastAutoClose || fromAuto)) {
+    if (!_broadcastState.acknowledged) {
+      api('/api/v1/member/broadcast/ack', {
+        method: 'POST',
+        auth: true,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ broadcast_id: _broadcastState.broadcast.id })
+      }).then(function () {
+        _broadcastState.acknowledged = true;
+        _broadcastState.show_popup = false;
+        updateBroadcastButton(_broadcastState);
+      }).catch(function () {});
+    }
+  }
+  _broadcastAutoClose = false;
+}
+
+async function loadMemberBroadcast(membership) {
+  if (!loadStored(STORAGE.token)) return;
+  try {
+    var data = await api('/api/v1/member/broadcast', { auth: true });
+    _broadcastState = data;
+    updateBroadcastButton(data);
+    if (data.show_popup && data.broadcast && membership && membership.is_active) {
+      setTimeout(function () { openBroadcastModal(false); }, 400);
+    }
+  } catch (e) { /* ignore */ }
+}
+
 (async function init() {
   try {
   loadClientDownload();
-  loadTrialPackInfo();
   restoreFormFields();
   updatePortalVisibility(loadCachedProfile());
 
@@ -2021,5 +2208,20 @@ async function loadTrialPackInfo() {
   }
 })();
 </script>
+
+<div id="broadcastOverlay" class="broadcast-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="broadcastTitle">
+  <div class="broadcast-modal">
+    <div class="broadcast-head">
+      <div class="bh-badge" id="broadcastBadge">重大更新</div>
+      <h2 id="broadcastTitle">站内通知</h2>
+      <p id="broadcastSubtitle"></p>
+    </div>
+    <div class="broadcast-body" id="broadcastBody"></div>
+    <div class="broadcast-foot">
+      <span class="broadcast-countdown hidden" id="broadcastCountdown">5 秒后自动关闭</span>
+      <button type="button" class="btn btn-primary" id="btnBroadcastClose" onclick="closeBroadcastModal(false)">我知道了</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

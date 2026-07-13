@@ -69,7 +69,7 @@ if [[ "${SKIP_MIGRATE:-}" != "1" ]]; then
     set -a && source "$ENV_FILE" && set +a
   fi
   if [[ "${XHS_DATABASE_URL:-}" == postgres* ]]; then
-    for sql in 08_insight_v2_tables.sql 09_retention_pg_schema.sql 11_insight_workflow_schema.sql; do
+    for sql in 08_insight_v2_tables.sql 09_retention_pg_schema.sql 11_insight_workflow_schema.sql 12_member_broadcast.sql; do
       f="${XHS_ROOT}/cloud_deploy/database/${sql}"
       if [[ -f "$f" ]]; then
         psql "$XHS_DATABASE_URL" -f "$f" && ok "applied ${sql}" || warn "${sql} 有告警（可能已存在）"

@@ -140,12 +140,6 @@
 
     var ent = m.entitlements || {};
 
-    var legacy = true;
-
-    if (m.legacy_zip_enabled === false || ent.legacy_zip_enabled === false) legacy = false;
-
-    if (m.legacy_zip_enabled === true || ent.legacy_zip_enabled === true) legacy = true;
-
     var insight = m.insight_enabled === true || ent.insight_enabled === true;
 
 
@@ -154,7 +148,7 @@
 
     var tabInsight = document.getElementById('dashTabInsight');
 
-    if (tabReports) tabReports.classList.toggle('hidden', !legacy);
+    if (tabReports) tabReports.classList.add('hidden');
 
     if (tabInsight) tabInsight.classList.toggle('hidden', !insight);
 
@@ -162,25 +156,23 @@
 
     var previewBanner = document.getElementById('insightPreviewBanner');
 
-    if (previewBanner) {
-
-      previewBanner.classList.toggle('hidden', m.portal_route !== 'legacy_with_preview');
-
-    }
+    if (previewBanner) previewBanner.classList.add('hidden');
 
 
 
-    var defaultDash = 'reports';
+    var defaultDash = 'insight';
 
-    if (insight && (!legacy || m.portal_route === 'insight_only')) {
+    if (!insight) defaultDash = 'client';
 
-      defaultDash = 'insight';
+    try {
 
-    } else if (insight && legacy) {
+      var saved = loadStored('xhs_member_dash_tab');
 
-      defaultDash = loadStored('xhs_member_dash_tab') || 'insight';
+      if (saved === 'watchlist' || saved === 'client') defaultDash = saved;
 
-    }
+      else if (saved === 'insight' && insight) defaultDash = 'insight';
+
+    } catch (_) {}
 
     if (typeof global.switchDash === 'function') {
 

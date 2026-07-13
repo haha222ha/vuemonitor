@@ -444,6 +444,19 @@ def _migrate_legacy_columns(c) -> None:
         """
     )
     c.execute("CREATE INDEX IF NOT EXISTS idx_prt_hash ON password_reset_tokens(token_hash)")
+    c.execute(
+        """
+        CREATE TABLE IF NOT EXISTS member_broadcast_acks (
+            user_id INT NOT NULL REFERENCES users(id),
+            broadcast_id VARCHAR(64) NOT NULL,
+            acknowledged_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+            PRIMARY KEY (user_id, broadcast_id)
+        )
+        """
+    )
+    c.execute(
+        "CREATE INDEX IF NOT EXISTS idx_member_broadcast_acks_bid ON member_broadcast_acks (broadcast_id, acknowledged_at DESC)"
+    )
     _migrate_legacy_single_session(c)
 
 
@@ -890,6 +903,7 @@ def upsert_report_archive(
 
 
 PLAN_LABELS = {
+    "experience_3d": "体验卡",
     "weekly": "周会员",
     "monthly": "月度会员",
     "quarterly": "季度会员",
@@ -897,6 +911,9 @@ PLAN_LABELS = {
     "yearly": "年度会员",
     "pay_test": "支付测试",
     "experience": "体验会员",
+    "insight_monthly": "AI选品月卡",
+    "insight_pro_monthly": "AI选品Pro",
+    "insight_team_monthly": "AI选品团队",
     "admin": "管理员",
 }
 
@@ -1968,6 +1985,40 @@ def update_member_keyword_request(item_id: int, *, status: str | None = None, ad
             c.execute(
                 f"UPDATE member_keyword_requests SET {', '.join(sets)} WHERE id = %s",
                 params,
+            )
+            ok = c.rowcount > 0
+        conn.commit()
+        return ok
+    finally:
+        conn.close()
+
+
+def has_member_broadcast_ack(user_id: int, broadcast_id: str) -> bool:
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                "SELECT 1 FROM member_broadcast_acks WHERE user_id=%s AND broadcast_id=%s LIMIT 1",
+                (int(user_id), str(broadcast_id)[:64]),
+            )
+            return c.fetchone() is not None
+    finally:
+        conn.close()
+
+
+def ack_member_broadcast(user_id: int, broadcast_id: str) -> bool:
+    conn = _conn()
+    try:
+        with conn.cursor() as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """
+                INSERT INTO member_broadcast_acks (user_id, broadcast_id)
+                VALUES (%s, %s)
+                ON CONFLICT (user_id, broadcast_id) DO NOTHING
+                """,
+                (int(user_id), str(broadcast_id)[:64]),
             )
             ok = c.rowcount > 0
         conn.commit()

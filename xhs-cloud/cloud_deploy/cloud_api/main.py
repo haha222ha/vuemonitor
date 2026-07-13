@@ -568,6 +568,32 @@ def member_profile(user: dict = Depends(current_user)):
     return enrich_member_profile(profile, user["id"])
 
 
+@app.get("/api/v1/member/broadcast")
+def member_broadcast(user: dict = Depends(current_user)):
+    """当前站内广播；有效会员且未 ack 时 show_popup=true。"""
+    from cloud_deploy.cloud_api.member_broadcast import member_broadcast_payload
+
+    profile = db.get_member_profile(user["id"])
+    is_active = bool(profile and profile.get("is_active"))
+    return member_broadcast_payload(user["id"], is_active=is_active)
+
+
+class BroadcastAckBody(BaseModel):
+    broadcast_id: str = Field(..., min_length=1, max_length=64)
+
+
+@app.post("/api/v1/member/broadcast/ack")
+def member_broadcast_ack(body: BroadcastAckBody, user: dict = Depends(current_user)):
+    from cloud_deploy.cloud_api.member_broadcast import get_active_broadcast
+
+    active = get_active_broadcast()
+    bid = (body.broadcast_id or "").strip()
+    if not active or active.get("id") != bid:
+        raise HTTPException(status_code=400, detail="无效的广播 ID")
+    db.ack_member_broadcast(user["id"], bid)
+    return {"message": "已记录", "broadcast_id": bid, "acknowledged": True}
+
+
 @app.post("/api/v1/member/change-password")
 def member_change_password(body: ChangePasswordBody, user: dict = Depends(current_user)):
     current = body.current_password.strip() or None
@@ -767,6 +793,27 @@ def public_trial_report_view_file(file_name: str):
     from cloud_deploy.cloud_api.trial_public_service import trial_file_response
 
     return trial_file_response(file_name)
+
+
+@app.get("/public/advisor-demo", response_class=HTMLResponse)
+def public_advisor_demo_shell():
+    from cloud_deploy.cloud_api.advisor_demo_service import demo_shell_response
+
+    return demo_shell_response()
+
+
+@app.get("/api/v1/public/advisor-demo/info")
+def public_advisor_demo_info():
+    from cloud_deploy.cloud_api.advisor_demo_service import demo_info
+
+    return demo_info()
+
+
+@app.get("/api/v1/public/advisor-demo/view")
+def public_advisor_demo_view(date: str = "", category: str = ""):
+    from cloud_deploy.cloud_api.advisor_demo_service import demo_view_response
+
+    return demo_view_response(date, category)
 
 
 @app.get("/api/v1/member/reports/{report_date}/view/{file_path:path}")

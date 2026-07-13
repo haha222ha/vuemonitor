@@ -1,17 +1,58 @@
 {
-  "version": "2026.07.15",
+  "version": "2026.07.25",
   "min_version": "2026.06.01",
-  "release_notes": "全部商品卡片对齐；上架时间含年份；曲线与异常说明统一悬浮展示",
+  "release_notes": "会员中心 AI 选品改造；PC 客户端版本历史页恢复；Legacy 表格报告下线",
   "download_url": "https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe",
   "changelog": [
+    {
+      "version": "2026.07.25",
+      "date": "2026-07-11",
+      "highlights": [
+        "会员中心改造为 AI 选品顾问，恢复 PC 客户端版本历史标签页",
+        "表格数据包下载下线，改为 AI 预生成文字分析阅读",
+        "PC 登录会员校验逻辑保持不变（授权码 / 账号密码 + 单设备）"
+      ]
+    },
+    {
+      "version": "2026.07.24",
+      "date": "2026-07-11",
+      "highlights": [
+        "复核启动黑屏修复；源码与安装包同步；启动失败自动重试",
+        "Launcher 加载失败自动重试（最多 6 次），失败时显示原生启动层而非黑屏"
+      ]
+    },
+    {
+      "version": "2026.07.23",
+      "date": "2026-07-10",
+      "highlights": [
+        "修复安装后黑框 JSON、启动卡在载入页不进入工作台的问题",
+        "启动流程：Logo + 可见进度条 → 服务端校验会员 → 未登录必须输入授权码/账号密码",
+        "已登录会员经服务端确认后自动进入主页，不再仅凭本地缓存误入"
+      ]
+    },
+    {
+      "version": "2026.07.22",
+      "date": "2026-07-10",
+      "highlights": [
+        "体验包在线预览默认表格 GR 明亮科技极简主题",
+        "会员门户选品报告中心与定价展示优化"
+      ]
+    },
+    {
+      "version": "2026.07.19",
+      "date": "2026-07-11",
+      "highlights": [
+        "AI 选品情报 Tab 与会员权益门控优化",
+        "类目情报预生成与阅读体验改进"
+      ]
+    },
     {
       "version": "2026.07.15",
       "date": "2026-07-08",
       "highlights": [
         "全部商品卡片等高对齐，指标栏右侧操作位统一",
         "上架时间显示完整年份，文案统一为「上架时间」",
-        "成交曲线与异常说明合并为同一悬浮窗展示",
-        "修复悬浮预览未弹出的问题"
+        "成交曲线与异常说明合并为同一悬浮窗展示"
       ]
     },
     {
@@ -21,8 +62,76 @@
         "全部商品页新增违规警示横幅",
         "支持一键筛出列表违规商品、跳转完整警示库"
       ]
+    },
+    {
+      "version": "2026.07.11",
+      "date": "2026-07-06",
+      "highlights": [
+        "会员中心双 Tab 重构：免费体验包 / 选品报告中心",
+        "PC 客户端下载与版本说明独立展示"
+      ]
+    },
+    {
+      "version": "2026.07.06",
+      "date": "2026-06-28",
+      "highlights": [
+        "微信 / 支付宝扫码支付开通会员",
+        "单设备登录（PC 与网页各 1 槽位）"
+      ]
+    },
+    {
+      "version": "2026.06.17",
+      "date": "2026-06-17",
+      "highlights": [
+        "ProductAnalyzer 早期稳定版",
+        "授权码会员体系与云端报告同步"
+      ]
     }
   ],
-  "sha256": "6e4e24dac8ac75d3a6d060a1c621cfead0f2a7e082f599a65d9d61511ea887bb",
-  "file_size": 291184635
+  "historical_installers": [
+    {
+      "version": "2026.07.25",
+      "filename": "ProductAnalyzer_Setup_20260725.exe",
+      "url": "https://www.xhs365.cn/downloads/ProductAnalyzer_Setup_20260725.exe",
+      "file_size": 291912589
+    },
+    {
+      "version": "2026.07.22",
+      "filename": "ProductAnalyzer_Setup_20260722.exe",
+      "url": "https://www.xhs365.cn/downloads/ProductAnalyzer_Setup_20260722.exe",
+      "file_size": 291912589
+    },
+    {
+      "version": "2026.07.19",
+      "filename": "ProductAnalyzer_Setup_20260719.exe",
+      "url": "https://www.xhs365.cn/downloads/ProductAnalyzer_Setup_20260719.exe",
+      "file_size": 291912589
+    },
+    {
+      "version": "2026.07.15",
+      "filename": "ProductAnalyzer_Setup_20260715.exe",
+      "url": "https://www.xhs365.cn/downloads/ProductAnalyzer_Setup_20260715.exe",
+      "file_size": 291184635
+    },
+    {
+      "version": "2026.07.11",
+      "filename": "ProductAnalyzer_Setup_20260711.exe",
+      "url": "https://www.xhs365.cn/downloads/ProductAnalyzer_Setup_20260711.exe",
+      "file_size": 291184635
+    },
+    {
+      "version": "2026.07.06",
+      "filename": "ProductAnalyzer_Setup_20260706.exe",
+      "url": "https://www.xhs365.cn/downloads/ProductAnalyzer_Setup_20260706.exe",
+      "file_size": 291184635
+    },
+    {
+      "version": "2026.06.17",
+      "filename": "ProductAnalyzer_Setup_20260617.exe",
+      "url": "https://www.xhs365.cn/downloads/ProductAnalyzer_Setup_20260617.exe",
+      "file_size": 291184635
+    }
+  ],
+  "sha256": "3435d873a2602aaddaedfe86117e7f272edf377f40767fc498e64ed1c0dea559",
+  "file_size": 291912589
 }

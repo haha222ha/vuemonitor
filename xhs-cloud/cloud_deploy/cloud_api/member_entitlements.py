@@ -2,6 +2,8 @@
 """会员 V2 权益解析 — PR-1 合并骨架，供 profile / insight API / legacy_gate 共用。"""
 from __future__ import annotations
 
+import os
+
 from fastapi import HTTPException
 
 from cloud_deploy.cloud_api import database as db
@@ -9,6 +11,12 @@ from cloud_deploy.cloud_api.entitlements_v2 import merge_entitlements, portal_ro
 from cloud_deploy.cloud_api.legacy_gate import insight_enabled, legacy_zip_enabled
 
 LEGACY_ZIP_DENIED = "当前套餐不含 Legacy 数据包下载，请开通 AI 选品情报或联系客服"
+LEGACY_ZIP_OFFLINE_DETAIL = "表格数据包已下线，请使用 AI 选品分析中心阅读最新报告"
+LEGACY_ZIP_MIGRATION_URL = "/member#insight"
+
+
+def legacy_zip_globally_disabled() -> bool:
+    return os.environ.get("XHS_LEGACY_ZIP_DISABLED", "1") == "1"
 
 
 def resolve_entitlements(user_id: int, profile: dict | None) -> dict:
@@ -49,6 +57,14 @@ def enrich_member_profile(profile: dict | None, user_id: int) -> dict | None:
 
 def assert_legacy_zip_allowed(user_id: int) -> None:
     """Legacy zip 下载/批量下载/报告内文件查看门控。"""
+    if legacy_zip_globally_disabled():
+        raise HTTPException(
+            status_code=410,
+            detail={
+                "detail": LEGACY_ZIP_OFFLINE_DETAIL,
+                "migration_url": LEGACY_ZIP_MIGRATION_URL,
+            },
+        )
     profile = db.get_member_profile(user_id)
     if not profile:
         raise HTTPException(status_code=404, detail="用户不存在")
