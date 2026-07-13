@@ -3,8 +3,6 @@ from __future__ import annotations
 
 import os
 import sys
-import tempfile
-import zipfile
 from datetime import datetime
 
 CRAWLER_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -16,9 +14,7 @@ from cloud_deploy.scripts.bootstrap_env import bootstrap
 bootstrap()
 
 from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
-from starlette.background import BackgroundTask
 
 from cloud_deploy.cloud_api import database as db
 from cloud_deploy.cloud_api.auth import current_member, login_member, verify_sync_key
