@@ -104,6 +104,8 @@ def insight_enabled(
         return True
     if plan.startswith("insight_"):
         return True
+    if plan == "experience_3d":
+        return True
     if plan == "experience" and ent.get("insight_enabled") is not False:
         return True
     # 在期 Legacy 老会员：双轨（AI 情报 + zip 报告库），至 expires_at

@@ -171,7 +171,7 @@
     } catch (_) {}
 
     if (typeof global.MemberRouter !== 'undefined' && global.MemberRouter.go) {
-
+      if (global.MemberRouter.resetBoot) global.MemberRouter.resetBoot();
       global.MemberRouter.go(defaultDash, true);
 
     } else if (typeof global.switchDash === 'function') {

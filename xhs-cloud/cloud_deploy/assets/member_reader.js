@@ -188,6 +188,15 @@ var MemberReader = (function () {
       if (errEl) errEl.style.display = 'none';
       return;
     }
+    if (err && err.status === 401) {
+      setState('ERROR');
+      if (locked) locked.style.display = 'none';
+      if (errEl) {
+        errEl.style.display = 'block';
+        errEl.textContent = '登录已失效，请退出后重新登录';
+      }
+      return;
+    }
     setState('ERROR');
     if (locked) locked.style.display = 'none';
     if (errEl) {

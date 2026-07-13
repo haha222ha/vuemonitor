@@ -15,6 +15,8 @@ var MemberRouter = (function () {
   };
 
   var current = 'today';
+  var hashBound = false;
+  var booted = false;
 
   function normalizeHash() {
     var raw = (location.hash || '').replace(/^#/, '').trim().toLowerCase();
@@ -44,8 +46,9 @@ var MemberRouter = (function () {
     if (dashWatchlist) dashWatchlist.classList.toggle('hidden', current !== 'watchlist');
     if (profileCard) profileCard.classList.toggle('hidden', current !== 'account');
 
-    if (current === 'today' && window.MemberReader) {
-      MemberReader.boot();
+    if (current === 'today' && window.MemberReader && !booted) {
+      booted = true;
+      MemberReader.boot().catch(function () { booted = false; });
     }
     if (current === 'today' && window.MemberInsight && typeof MemberInsight.load === 'function') {
       MemberInsight.load();
@@ -78,12 +81,15 @@ var MemberRouter = (function () {
       history.replaceState(null, '', location.pathname + location.search + '#' + (route === 'today' ? 'today' : route));
     }
     applyRoute(route);
-    window.addEventListener('hashchange', function () {
-      applyRoute(normalizeHash());
-    });
+    if (!hashBound) {
+      hashBound = true;
+      window.addEventListener('hashchange', function () {
+        applyRoute(normalizeHash());
+      });
+    }
   }
 
-  return { go: go, init: init, current: function () { return current; } };
+  return { go: go, init: init, current: function () { return current; }, resetBoot: function () { booted = false; } };
 })();
 
 function switchDash(name) {

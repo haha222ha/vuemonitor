@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260713c">
-<link rel="stylesheet" href="/assets/member_theme.css?v=20260713c">
-<link rel="stylesheet" href="/assets/member_reader.css?v=20260713c">
+<meta name="portal-build" content="20260713d">
+<link rel="stylesheet" href="/assets/member_theme.css?v=20260713d">
+<link rel="stylesheet" href="/assets/member_reader.css?v=20260713d">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
 <script>
@@ -166,7 +166,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 .version-item .vi-notes ul{margin:4px 0 0;padding-left:18px}
 .version-item .vi-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .version-badge{font-size:11px;font-weight:600;color:var(--accent);background:#eef5ff;padding:2px 8px;border-radius:10px}
-.topbar-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.topbar-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;position:relative;z-index:20}
 .btn-broadcast{position:relative;min-height:36px;padding:6px 12px;font-size:13px}
 .btn-broadcast .broadcast-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--red);border:2px solid var(--surface)}
 .broadcast-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px 16px calc(20px + var(--safe-b))}
@@ -484,10 +484,10 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <div id="dashMsg"></div>
   </div>
 </div>
-<script src="/assets/member_core.js?v=20260713c"></script>
-<script src="/assets/member_reader.js?v=20260713c"></script>
-<script src="/assets/member_router.js?v=20260713c"></script>
-<script src="/assets/member_insight.js?v=20260713c"></script>
+<script src="/assets/member_core.js?v=20260713d"></script>
+<script src="/assets/member_reader.js?v=20260713d"></script>
+<script src="/assets/member_router.js?v=20260713d"></script>
+<script src="/assets/member_insight.js?v=20260713d"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -707,7 +707,7 @@ function showAuthView() {
   document.getElementById('btnLogout').classList.add('hidden');
   const btnBc = document.getElementById('btnBroadcast');
   if (btnBc) btnBc.classList.add('hidden');
-  updatePortalVisibility(null);
+  updatePortalVisibility(null, false);
 }
 
 function switchPortal(name) {
@@ -728,20 +728,39 @@ function switchPortal(name) {
   if (tab === 'download') loadClientDownload();
 }
 
-function updatePortalVisibility(membership) {
+function updatePortalVisibility(membership, loggedIn) {
   const tabs = document.getElementById('portalTabs');
   const demoPanel = document.getElementById('portalDemo');
   const centerPanel = document.getElementById('portalCenter');
   const downloadPanel = document.getElementById('portalDownload');
+  const reportSchedule = document.getElementById('reportScheduleCard');
+  const clientCard = document.getElementById('clientDownloadCard');
+  const dashView = document.getElementById('dashView');
   if (!tabs || !centerPanel) return;
+
+  if (loggedIn === undefined) {
+    loggedIn = dashView && !dashView.classList.contains('hidden');
+  }
+
+  if (loggedIn) {
+    tabs.classList.add('hidden');
+    if (demoPanel) demoPanel.classList.add('hidden');
+    if (downloadPanel) downloadPanel.classList.add('hidden');
+    centerPanel.classList.add('hidden');
+    if (reportSchedule) reportSchedule.classList.add('hidden');
+    if (clientCard) clientCard.classList.add('hidden');
+    return;
+  }
+
+  if (reportSchedule) reportSchedule.classList.remove('hidden');
+  if (clientCard) clientCard.classList.remove('hidden');
 
   const isActiveMember = !!(membership && membership.is_active);
   if (isActiveMember) {
     tabs.classList.add('hidden');
     if (demoPanel) demoPanel.classList.add('hidden');
     if (downloadPanel) downloadPanel.classList.add('hidden');
-    centerPanel.classList.remove('hidden');
-    loadPayPlans();
+    centerPanel.classList.add('hidden');
     return;
   }
 
@@ -1146,6 +1165,12 @@ function esc(s) {
 
 function renderProfile(m) {
   if (!m) return;
+  const hasIdentity = !!(m.username || m.plan_code || m.id);
+  if (!hasIdentity) {
+    const banner = document.getElementById('expiryBanner');
+    if (banner) banner.innerHTML = '<div class="alert alert-warn">正在加载会员信息…</div>';
+    return;
+  }
   saveStored(STORAGE.profile, JSON.stringify(m));
   if (m.username) saveStored(STORAGE.username, m.username);
 
@@ -1164,16 +1189,19 @@ function renderProfile(m) {
   }
 
   const banner = document.getElementById('expiryBanner');
-  if (m.expiry_warning) {
-    const kind = !m.is_active ? 'error' : ((m.days_remaining ?? 99) <= 7 ? 'warn' : 'ok');
-    banner.innerHTML = `<div class="alert alert-${kind}">${esc(m.expiry_warning)}</div>`;
-  } else if (m.is_active) {
-    banner.innerHTML = `<div class="alert alert-ok">会员有效，可阅读 AI 选品分析与类目情报</div>`;
+  if (m.is_active === true) {
+    if (m.expiry_warning) {
+      const kind = (m.days_remaining ?? 99) <= 7 ? 'warn' : 'ok';
+      banner.innerHTML = `<div class="alert alert-${kind}">${esc(m.expiry_warning)}</div>`;
+    } else {
+      banner.innerHTML = `<div class="alert alert-ok">会员有效，可阅读 AI 选品分析与类目情报</div>`;
+    }
+  } else if (m.is_active === false) {
+    banner.innerHTML = `<div class="alert alert-error">会员已过期，请点击下方「扫码续费（微信/支付宝）」或切换至「账户」标签续费。<button type="button" class="btn btn-ghost" style="margin-left:8px;min-height:32px;padding:4px 10px;font-size:13px" onclick="switchDash('account')">前往账户</button></div>`;
   } else {
-    banner.innerHTML = `<div class="alert alert-error">会员已过期，请点击下方「扫码续费（微信/支付宝）」</div>`;
+    banner.innerHTML = `<div class="alert alert-warn">会员状态加载中，请稍候…</div>`;
   }
-  updatePortalVisibility(m);
-  if (window.MemberInsight) MemberInsight.applyEntitlements(m);
+  updatePortalVisibility(m, true);
 }
 
 function goodsDetailUrl(gid) {
@@ -1284,42 +1312,63 @@ function showDashboard(cachedProfile) {
   document.getElementById('btnLogout').classList.remove('hidden');
   const btnBc = document.getElementById('btnBroadcast');
   if (btnBc) btnBc.classList.remove('hidden');
+  updatePortalVisibility(cachedProfile || loadCachedProfile(), true);
   if (cachedProfile) {
     renderProfile(cachedProfile);
-  } else {
-    updatePortalVisibility(loadCachedProfile());
   }
 }
 
 async function loadDashboard(useCacheFirst) {
   const cached = loadCachedProfile();
+  if (!loadStored(STORAGE.token)) {
+    showAuthView();
+    return;
+  }
   if (useCacheFirst && cached) {
     showDashboard(cached);
   }
   let profile = null;
   try {
     profile = await api('/api/v1/member/profile', { auth: true });
-  } catch (_) {}
-  const membership = profile || cached || {};
-  renderProfile(membership);
-  if (profile && profile.expired) {
-    showMsg(document.getElementById('dashMsg'), '会员已过期，续费成功后可阅读 AI 分析', 'warn');
+  } catch (e) {
+    if (isAuthError(e)) throw e;
+    if (cached) {
+      profile = cached;
+      showMsg(document.getElementById('dashMsg'), '网络异常，已显示本地缓存的会员信息', 'warn');
+    } else {
+      throw e;
+    }
   }
+  const membership = profile || cached || null;
+  if (!membership) {
+    showMsg(document.getElementById('dashMsg'), '无法加载会员信息', 'error');
+    return;
+  }
+  renderProfile(membership);
+  if (membership.is_active === false) {
+    showMsg(document.getElementById('dashMsg'), '会员已过期，续费成功后可阅读 AI 分析', 'warn');
+  } else {
+    showMsg(document.getElementById('dashMsg'), '', 'ok');
+  }
+  if (window.MemberRouter) MemberRouter.init();
   if (window.MemberInsight) {
     MemberInsight.applyEntitlements(membership);
-    MemberInsight.load();
-  } else if (window.MemberRouter) {
-    MemberRouter.init();
+    if (membership.is_active !== false) MemberInsight.load();
   }
   await loadMemberBroadcast(membership);
   showDashboard(membership);
 }
 
 function logout() {
+  if (typeof closeBroadcastModal === 'function') closeBroadcastModal();
   api('/api/v1/auth/logout', { method: 'POST', auth: true }).catch(function () {});
   removeStored(STORAGE.token);
   removeStored(STORAGE.profile);
   removeStored(STORAGE.activated);
+  try { localStorage.removeItem('xhs_member_dash_tab'); } catch (_) {}
+  try { localStorage.removeItem('xhs_member_portal_tab'); } catch (_) {}
+  history.replaceState(null, '', location.pathname + location.search);
+  showAuthView();
   location.reload();
 }
 
@@ -1742,12 +1791,11 @@ async function loadMemberBroadcast(membership) {
     } catch (e2) {
       if (isAuthError(e2)) {
         removeStored(STORAGE.token);
+        removeStored(STORAGE.profile);
         showAuthView();
         const authMsg = document.getElementById('authMsg');
-        if (cached) {
-          renderProfile({ ...cached, is_active: false, expiry_warning: '登录已过期，请重新登录' });
+        if (cached && cached.username) {
           showMsg(authMsg, '会话已过期，请重新输入密码或授权码', 'warn');
-          switchLoginMode('code');
         } else if (token || activated) {
           showMsg(authMsg, e2.message || '请重新登录', 'warn');
         }
