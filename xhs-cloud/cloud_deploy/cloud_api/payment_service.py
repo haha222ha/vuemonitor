@@ -54,7 +54,7 @@ def _gen_order_no() -> str:
 
 
 def list_public_plans() -> dict:
-    from cloud_deploy.cloud_api.payment_plans import CUSTOM_ANALYSIS_PRICING, list_addon_plans
+    from cloud_deploy.cloud_api.payment_plans import CUSTOM_ANALYSIS_PRICING, list_active_plans, list_addon_plans
 
     def _pub(p: dict) -> dict:
         row = {
