@@ -255,6 +255,23 @@ def advisor_article(report_date: str, article_key: str, user: dict = Depends(cur
     }
 
 
+@router.get("/{report_date}/download")
+def advisor_zip_download(report_date: str, user: dict = Depends(current_user)):
+    """PC 端 sync ai_advisor ZIP（非 Legacy daily zip）。"""
+    assert_advisor_allowed(user["id"], report_date=report_date)
+    if not _DATE_RE.match(report_date):
+        raise HTTPException(status_code=400, detail="report_date 格式应为 YYYY-MM-DD")
+    path = db.get_archive_path(report_date, "member_ai_advisor_zip")
+    if not path or not os.path.isfile(path):
+        raise HTTPException(status_code=404, detail="AI 顾问 ZIP 不存在")
+    _log_behavior(user["id"], "advisor_download", report_date=report_date)
+    return FileResponse(
+        path,
+        media_type="application/zip",
+        filename=os.path.basename(path),
+    )
+
+
 @router.get("/{report_date}/view")
 def advisor_html(report_date: str, user: dict = Depends(current_user)):
     assert_advisor_allowed(user["id"], report_date=report_date)

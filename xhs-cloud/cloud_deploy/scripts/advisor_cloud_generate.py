@@ -195,6 +195,9 @@ def process_pending(report_date: str | None = None, *, dry_run: bool = False) ->
 
 def main() -> int:
     bootstrap()
+    from cloud_deploy.scripts.insight_llm_runtime import apply_admin_insight_llm
+
+    apply_admin_insight_llm(log_prefix="advisor")
     ap = argparse.ArgumentParser(description="AI 顾问云侧预生成")
     ap.add_argument("--date", default="", help="仅处理指定日期 YYYY-MM-DD")
     ap.add_argument("--dry-run", action="store_true", help="只验证 context，不写发布目录")

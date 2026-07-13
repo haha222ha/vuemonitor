@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import os
 import sys
-import tempfile
 import zipfile
 from datetime import datetime
 
@@ -20,7 +19,6 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Res
 from fastapi.staticfiles import StaticFiles
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field
-from starlette.background import BackgroundTask
 
 from cloud_deploy.cloud_api import database as db
 from cloud_deploy.cloud_api.auth import (
@@ -49,10 +47,7 @@ from cloud_deploy.cloud_api.password_reset_service import (
 from cloud_deploy.cloud_api.insight_routes import router as insight_router
 from cloud_deploy.cloud_api.advisor_member_routes import router as advisor_member_router
 from cloud_deploy.cloud_api.advisor_routes import router as advisor_internal_router
-from cloud_deploy.cloud_api.member_entitlements import (
-    assert_legacy_zip_allowed,
-    enrich_member_profile,
-)
+from cloud_deploy.cloud_api.member_entitlements import enrich_member_profile
 
 _ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
 
@@ -66,6 +61,12 @@ app.include_router(advisor_internal_router)
 def _startup():
     db.init_db()
     db.ensure_admin()
+    try:
+        from cloud_deploy.scripts.insight_llm_runtime import apply_admin_insight_llm
+
+        apply_admin_insight_llm(log_prefix="startup")
+    except Exception:
+        pass
 
 
 class DeviceAuthBody(BaseModel):
@@ -176,16 +177,6 @@ class MemberKeywordRequestBody(BaseModel):
 class AdminFeedbackUpdateBody(BaseModel):
     status: str | None = Field(default=None, max_length=16)
     admin_note: str | None = Field(default=None, max_length=2000)
-
-
-class BatchDownloadBody(BaseModel):
-    archive_type: str = "member_daily_zip"
-    report_dates: list[str] = Field(..., min_length=1, max_length=50)
-
-
-_MEMBER_ARCHIVE_TYPES = frozenset(
-    {"member_daily_zip", "member_weekly_zip", "member_monthly_zip", "member_custom_zip"}
-)
 
 
 class GenerateCodesBody(BaseModel):
@@ -720,43 +711,6 @@ def member_submit_keyword_request(body: MemberKeywordRequestBody, request: Reque
         raise HTTPException(status_code=500, detail=f"提交失败: {e}") from e
 
 
-@app.get("/api/v1/member/reports/{report_date}/download")
-def download_report(
-    report_date: str,
-    archive_type: str = "member_daily_zip",
-    access_token: str = "",
-    request: Request = None,
-    cred: HTTPAuthorizationCredentials | None = Depends(security),
-):
-    from cloud_deploy.cloud_api.auth import member_from_token
-
-    token = (cred.credentials if cred else None) or (access_token or "").strip()
-    if not token:
-        raise HTTPException(status_code=401, detail="需要登录")
-    user = member_from_token(token)
-    assert_legacy_zip_allowed(user["id"])
-    if not db.member_can_download_report(user["id"], report_date, archive_type):
-        raise HTTPException(status_code=403, detail="体验授权码仅可下载指定报告，请联系管理员开通完整会员")
-    path = db.get_archive_path(report_date, archive_type)
-    if not path or not os.path.isfile(path):
-        raise HTTPException(status_code=404, detail="报告不存在")
-    ip = request.client.host if request and request.client else ""
-    db.log_download(user["id"], report_date, archive_type, ip)
-    return FileResponse(
-        path,
-        media_type="application/zip",
-        filename=os.path.basename(path),
-    )
-
-
-@app.get("/member/preview", response_class=HTMLResponse)
-def member_preview_page():
-    path = os.path.join(_ASSETS, "member_preview.html")
-    if not os.path.isfile(path):
-        raise HTTPException(status_code=404, detail="预览页未部署")
-    return FileResponse(path, media_type="text/html; charset=utf-8")
-
-
 @app.get("/public/trial/preview", response_class=HTMLResponse)
 def public_trial_preview_page():
     from cloud_deploy.cloud_api.trial_public_service import trial_preview_html
@@ -818,120 +772,6 @@ def public_advisor_demo_view(date: str = "", category: str = ""):
     from cloud_deploy.cloud_api.advisor_demo_service import demo_view_response
 
     return demo_view_response(date, category)
-
-
-@app.get("/api/v1/member/reports/{report_date}/view/{file_path:path}")
-def member_report_view_file(
-    report_date: str,
-    file_path: str,
-    archive_type: str = "member_daily_zip",
-    access_token: str = "",
-    request: Request = None,
-    cred: HTTPAuthorizationCredentials | None = Depends(security),
-):
-    from cloud_deploy.cloud_api.auth import member_from_token
-    from cloud_deploy.cloud_api.member_report_preview import read_member_report_file
-
-    if archive_type not in _MEMBER_ARCHIVE_TYPES:
-        raise HTTPException(status_code=400, detail="无效的报告类型")
-    token = (cred.credentials if cred else None) or (access_token or "").strip()
-    if not token:
-        raise HTTPException(status_code=401, detail="需要登录")
-    user = member_from_token(token)
-    assert_legacy_zip_allowed(user["id"])
-    try:
-        path, media_type, rewritten = read_member_report_file(
-            report_date,
-            archive_type,
-            file_path,
-            access_token=token,
-        )
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e) or "文件不存在") from e
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e)) from e
-    ip = request.client.host if request and request.client else ""
-    db.log_download(user["id"], report_date, archive_type, ip)
-    if rewritten is not None:
-        return HTMLResponse(content=rewritten, media_type=media_type)
-    return FileResponse(path, media_type=media_type)
-
-
-def _remove_temp_file(path: str) -> None:
-    try:
-        os.remove(path)
-    except OSError:
-        pass
-
-
-@app.post("/api/v1/member/reports/batch-download")
-def batch_download_reports(
-    body: BatchDownloadBody,
-    request: Request = None,
-    user: dict = Depends(current_member),
-):
-    """将会员选中的多份报告 zip 再打包为一个 zip 下载。"""
-    assert_legacy_zip_allowed(user["id"])
-    if body.archive_type not in _MEMBER_ARCHIVE_TYPES:
-        raise HTTPException(status_code=400, detail="无效的报告类型")
-
-    seen: set[str] = set()
-    ordered_dates: list[str] = []
-    for raw in body.report_dates:
-        date = str(raw).strip()[:10]
-        if not date or date in seen:
-            continue
-        seen.add(date)
-        ordered_dates.append(date)
-
-    if not ordered_dates:
-        raise HTTPException(status_code=400, detail="未选择有效报告")
-
-    entries: list[tuple[str, str]] = []
-    missing: list[str] = []
-    ip = request.client.host if request and request.client else ""
-    for date in ordered_dates:
-        path = db.get_archive_path(date, body.archive_type)
-        if not path or not os.path.isfile(path):
-            missing.append(date)
-            continue
-        entries.append((date, path))
-
-    if missing:
-        raise HTTPException(
-            status_code=404,
-            detail=f"以下报告不存在: {', '.join(missing)}",
-        )
-    if not entries:
-        raise HTTPException(status_code=404, detail="没有可下载的报告")
-
-    fd, tmp_path = tempfile.mkstemp(suffix=".zip", prefix="member_batch_")
-    os.close(fd)
-    used_names: set[str] = set()
-    try:
-        with zipfile.ZipFile(tmp_path, "w", zipfile.ZIP_DEFLATED) as zout:
-            for date, path in entries:
-                base = os.path.basename(path)
-                arcname = base
-                if arcname in used_names:
-                    stem, ext = os.path.splitext(base)
-                    arcname = f"{stem}_{date}{ext or '.zip'}"
-                used_names.add(arcname)
-                zout.write(path, arcname=arcname)
-                db.log_download(user["id"], date, body.archive_type, ip)
-    except Exception:
-        _remove_temp_file(tmp_path)
-        raise
-
-    type_short = body.archive_type.replace("member_", "").replace("_zip", "")
-    stamp = datetime.now().strftime("%Y%m%d")
-    out_name = f"reports_{type_short}_{len(entries)}份_{stamp}.zip"
-    return FileResponse(
-        tmp_path,
-        media_type="application/zip",
-        filename=out_name,
-        background=BackgroundTask(_remove_temp_file, tmp_path),
-    )
 
 
 @app.post("/api/v1/admin/auth-codes")

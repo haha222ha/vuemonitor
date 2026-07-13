@@ -63,6 +63,8 @@ async def trigger_generate(
     report_date = str((body or {}).get("report_date") or "")[:10] or None
 
     from cloud_deploy.scripts.advisor_cloud_generate import process_pending
+    from cloud_deploy.scripts.insight_llm_runtime import apply_admin_insight_llm
 
+    apply_admin_insight_llm(log_prefix="advisor")
     results = process_pending(report_date=report_date)
     return {"ok": True, "processed": results}

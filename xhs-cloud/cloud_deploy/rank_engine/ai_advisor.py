@@ -17,8 +17,10 @@ class AiAdvisor:
             raise ValueError("缺少 target_date")
 
         try:
+            from cloud_deploy.scripts.insight_llm_runtime import apply_admin_insight_llm
             from cloud_deploy.reporting.insight_llm_client import chat_json_with_usage, llm_configured
 
+            apply_admin_insight_llm(log_prefix="advisor")
             if llm_configured():
                 advice = self._llm_generate(report_date, ctx)
                 validate_advisory_output(advice)
