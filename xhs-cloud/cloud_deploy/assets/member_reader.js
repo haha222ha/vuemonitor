@@ -49,12 +49,57 @@ var MemberReader = (function () {
     setState('IDLE');
   }
 
-  function renderSidebar(today) {
+  function renderHero(radar, recommendations) {
+    var chrome = el('readerChrome');
+    if (!chrome) return;
+    var parts = [];
+    if (radar && radar.items && radar.items.length) {
+      parts.push('<div class="reader-hero-block"><span class="reader-hero-label">机会雷达</span> ');
+      for (var i = 0; i < Math.min(3, radar.items.length); i++) {
+        var it = radar.items[i];
+        parts.push('<button type="button" class="reader-hero-chip" data-insight-cat="' + escFn(it.category) + '" data-insight-date="' + escFn(it.report_date || '') + '">'
+          + escFn(it.category || '') + '</button>');
+      }
+      parts.push('</div>');
+    }
+    if (recommendations && recommendations.items && recommendations.items.length) {
+      parts.push('<div class="reader-hero-block"><span class="reader-hero-label">推荐阅读</span> ');
+      for (var j = 0; j < Math.min(3, recommendations.items.length); j++) {
+        var rec = recommendations.items[j];
+        parts.push('<button type="button" class="reader-hero-chip" data-insight-cat="' + escFn(rec.category) + '" data-insight-date="' + escFn(rec.report_date || '') + '">'
+          + escFn(rec.category || '') + '</button>');
+      }
+      parts.push('</div>');
+    }
+    var heroHtml = parts.length ? '<div class="reader-hero">' + parts.join('') + '</div>' : '';
+    chrome.setAttribute('data-hero-html', heroHtml);
+  }
+
+  function applyChrome(title, subtitle) {
+    var chrome = el('readerChrome');
+    if (!chrome) return;
+    var hero = chrome.getAttribute('data-hero-html') || '';
+    chrome.innerHTML = hero + '<h2>' + escFn(title || 'AI 选品分析') + '</h2>'
+      + (subtitle ? '<p>' + escFn(subtitle) + '</p>' : '');
+    chrome.querySelectorAll('.reader-hero-chip').forEach(function (btn) {
+      btn.onclick = function () {
+        selectNode({
+          type: 'insight',
+          date: btn.getAttribute('data-insight-date') || '',
+          category: btn.getAttribute('data-insight-cat') || ''
+        });
+      };
+    });
+  }
+
+  function renderSidebar(today, insightTree) {
     var side = el('readerSidebar');
     if (!side) return;
     today = today || {};
+    insightTree = insightTree || [];
     var html = '';
     var date = today.report_date || '';
+    var seenInsight = {};
 
     if (today.overview) {
       html += '<div class="reader-tree-group"><div class="reader-tree-title">今日简报</div>';
@@ -74,13 +119,31 @@ var MemberReader = (function () {
       html += '</div>';
     }
 
-    if (today.insights && today.insights.length) {
+    if (insightTree.length) {
+      for (var g = 0; g < insightTree.length; g++) {
+        var group = insightTree[g];
+        var gdate = group.report_date || '';
+        html += '<div class="reader-tree-group"><div class="reader-tree-title">类目情报 · ' + escFn(gdate) + '</div>';
+        var items = group.items || [];
+        for (var j = 0; j < items.length; j++) {
+          var ins = items[j];
+          var cat = ins.category || '';
+          var key = gdate + ':' + cat;
+          if (seenInsight[key]) continue;
+          seenInsight[key] = true;
+          html += '<button type="button" class="reader-tree-item" data-node="insight" data-category="' + escFn(cat) + '" data-date="' + escFn(gdate) + '">'
+            + escFn(cat || '类目')
+            + '<span class="rt-meta">★' + escFn(ins.stars || 0) + ' · ' + escFn((ins.summary || '').slice(0, 40)) + '</span></button>';
+        }
+        html += '</div>';
+      }
+    } else if (today.insights && today.insights.length) {
       html += '<div class="reader-tree-group"><div class="reader-tree-title">类目情报</div>';
-      for (var j = 0; j < today.insights.length; j++) {
-        var ins = today.insights[j];
-        html += '<button type="button" class="reader-tree-item" data-node="insight" data-category="' + escFn(ins.category) + '" data-date="' + escFn(ins.report_date || date) + '">'
-          + escFn(ins.category || '类目')
-          + '<span class="rt-meta">★' + escFn(ins.stars || 0) + ' · ' + escFn((ins.summary || '').slice(0, 40)) + '</span></button>';
+      for (var k = 0; k < today.insights.length; k++) {
+        var ins2 = today.insights[k];
+        html += '<button type="button" class="reader-tree-item" data-node="insight" data-category="' + escFn(ins2.category) + '" data-date="' + escFn(ins2.report_date || date) + '">'
+          + escFn(ins2.category || '类目')
+          + '<span class="rt-meta">★' + escFn(ins2.stars || 0) + '</span></button>';
       }
       html += '</div>';
     }
@@ -93,14 +156,12 @@ var MemberReader = (function () {
     var buttons = side.querySelectorAll('.reader-tree-item');
     for (var b = 0; b < buttons.length; b++) {
       buttons[b].onclick = function () {
-        var nodeType = this.getAttribute('data-node');
-        var node = {
-          type: nodeType,
+        selectNode({
+          type: this.getAttribute('data-node'),
           date: this.getAttribute('data-date') || '',
           key: this.getAttribute('data-key') || '',
           category: this.getAttribute('data-category') || ''
-        };
-        selectNode(node);
+        });
       };
     }
   }
@@ -120,10 +181,7 @@ var MemberReader = (function () {
   }
 
   function updateChrome(title, subtitle) {
-    var chrome = el('readerChrome');
-    if (!chrome) return;
-    chrome.innerHTML = '<h2>' + escFn(title || 'AI 选品分析') + '</h2>'
-      + (subtitle ? '<p>' + escFn(subtitle) + '</p>' : '');
+    applyChrome(title, subtitle);
   }
 
   function renderMarkdownArticle(data, node) {
@@ -186,6 +244,19 @@ var MemberReader = (function () {
       setState('LOCKED');
       if (locked) locked.style.display = 'flex';
       if (errEl) errEl.style.display = 'none';
+      return;
+    }
+    if (err && err.status === 410) {
+      setState('ERROR');
+      var mig = '/member#today';
+      try {
+        var det = err.data && err.data.detail;
+        if (det && typeof det === 'object' && det.migration_url) mig = det.migration_url;
+      } catch (e) {}
+      if (errEl) {
+        errEl.style.display = 'block';
+        errEl.innerHTML = '表格数据包已下线，请前往 <a href="' + escFn(mig) + '" style="color:var(--reader-accent)">AI 分析中心</a> 阅读。';
+      }
       return;
     }
     if (err && err.status === 401) {
@@ -255,10 +326,17 @@ var MemberReader = (function () {
 
   function loadDashboard() {
     setState('LOADING');
-    return apiFn('/api/v1/member/advisor/dashboard', { auth: true }).then(function (data) {
+    return Promise.all([
+      apiFn('/api/v1/member/advisor/dashboard', { auth: true }),
+      apiFn('/api/v1/member/insight/radar', { auth: true }).catch(function () { return null; }),
+      apiFn('/api/v1/member/insight/recommendations', { auth: true }).catch(function () { return null; })
+    ]).then(function (results) {
+      var data = results[0];
       dashboard = data;
-      renderSidebar(data.today || {});
+      renderHero(results[1], results[2]);
+      renderSidebar(data.today || {}, data.insight_tree || []);
       var today = data.today || {};
+      applyChrome('今日分析', today.report_date ? '报告日期 ' + today.report_date : '');
       if (today.overview) {
         selectNode({ type: 'overview', date: today.report_date || '' });
       } else if (today.insights && today.insights.length) {
@@ -266,6 +344,12 @@ var MemberReader = (function () {
           type: 'insight',
           date: today.insights[0].report_date || today.report_date,
           category: today.insights[0].category
+        });
+      } else if (data.insight_tree && data.insight_tree.length && data.insight_tree[0].items && data.insight_tree[0].items.length) {
+        selectNode({
+          type: 'insight',
+          date: data.insight_tree[0].report_date,
+          category: data.insight_tree[0].items[0].category
         });
       } else if (today.report_date && today.status === 'published') {
         selectNode({ type: 'overview', date: today.report_date });

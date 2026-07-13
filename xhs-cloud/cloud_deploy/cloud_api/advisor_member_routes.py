@@ -22,6 +22,33 @@ router = APIRouter(prefix="/api/v1/member/advisor", tags=["advisor"])
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
+def _log_behavior(
+    user_id: int,
+    action: str,
+    *,
+    report_date: str | None = None,
+    metadata: dict | None = None,
+) -> None:
+    try:
+        from cloud_deploy.cloud_api.database_pg import _conn
+        from cloud_deploy.cloud_api.user_behavior import log_user_behavior
+
+        conn = _conn()
+        try:
+            log_user_behavior(
+                conn,
+                user_id,
+                action,
+                category=None,
+                report_date=report_date,
+                metadata=metadata,
+            )
+        finally:
+            conn.close()
+    except Exception:
+        pass
+
+
 def _advisor_root() -> str:
     root = os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud")
     sub = os.environ.get("XHS_ADVISOR_PUBLISH_DIR", "data/advisor_published")
@@ -72,13 +99,17 @@ def _advisor_library_items() -> list[dict]:
     return items
 
 
-def _insight_today_items(user_id: int) -> list[dict]:
+def _insight_library_items(user_id: int) -> list[dict]:
     from cloud_deploy.cloud_api.insight_routes import _list_items_from_disk
     from cloud_deploy.cloud_api.entitlements_v2 import filter_insight_library
 
     items = _list_items_from_disk()
     ent = resolve_entitlements(user_id, db.get_member_profile(user_id))
-    items = filter_insight_library(items, ent)
+    return filter_insight_library(items, ent)
+
+
+def _insight_today_items(user_id: int) -> list[dict]:
+    items = _insight_library_items(user_id)
     if not items:
         return []
     dates = sorted({str(it.get("report_date") or "")[:10] for it in items}, reverse=True)
@@ -86,15 +117,44 @@ def _insight_today_items(user_id: int) -> list[dict]:
     return [it for it in items if str(it.get("report_date") or "")[:10] == latest]
 
 
+def _insight_tree(user_id: int, limit_dates: int = 7) -> list[dict]:
+    items = _insight_library_items(user_id)
+    if not items:
+        return []
+    by_date: dict[str, list[dict]] = {}
+    for it in items:
+        d = str(it.get("report_date") or "")[:10]
+        if not d:
+            continue
+        by_date.setdefault(d, []).append(it)
+    out = []
+    for d in sorted(by_date.keys(), reverse=True)[:limit_dates]:
+        cats = sorted(by_date[d], key=lambda x: -(x.get("stars") or 0))
+        out.append({
+            "report_date": d,
+            "items": [
+                {
+                    "category": c.get("category") or "",
+                    "stars": c.get("stars") or 0,
+                    "summary": c.get("summary") or "",
+                }
+                for c in cats[:30]
+            ],
+        })
+    return out
+
+
 @router.get("/library")
 def advisor_library(user: dict = Depends(current_user)):
     assert_advisor_allowed(user["id"])
+    _log_behavior(user["id"], "advisor_library")
     return {"items": _advisor_library_items()}
 
 
 @router.get("/dashboard")
 def advisor_dashboard(user: dict = Depends(current_user)):
     assert_advisor_allowed(user["id"])
+    _log_behavior(user["id"], "advisor_dashboard")
     profile = db.get_member_profile(user["id"])
     if not profile:
         raise HTTPException(status_code=404, detail="用户不存在")
@@ -155,6 +215,7 @@ def advisor_dashboard(user: dict = Depends(current_user)):
             "directions": directions,
             "insights": insights,
         },
+        "insight_tree": _insight_tree(user["id"]),
         "archive_hint": {
             "latest_month": archive_months[0] if archive_months else "",
             "total_days": len(dates),
@@ -168,6 +229,7 @@ def advisor_day(report_date: str, user: dict = Depends(current_user)):
     assert_advisor_allowed(user["id"], report_date=report_date)
     if not _DATE_RE.match(report_date):
         raise HTTPException(status_code=400, detail="report_date 格式应为 YYYY-MM-DD")
+    _log_behavior(user["id"], "advisor_day", report_date=report_date)
     return _load_public_advice(report_date)
 
 
@@ -184,6 +246,7 @@ def advisor_article(report_date: str, article_key: str, user: dict = Depends(cur
         )
     if not block:
         raise HTTPException(status_code=404, detail="文章不存在")
+    _log_behavior(user["id"], "advisor_article", report_date=report_date, metadata={"key": article_key})
     return {
         "report_date": report_date,
         "key": article_key,
@@ -198,6 +261,7 @@ def advisor_html(report_date: str, user: dict = Depends(current_user)):
     html = os.path.join(_advisor_root(), report_date, "advisor.html")
     if not os.path.isfile(html):
         raise HTTPException(status_code=404, detail="HTML 视图不存在")
+    _log_behavior(user["id"], "advisor_view", report_date=report_date)
     return FileResponse(
         html,
         media_type="text/html; charset=utf-8",

@@ -58,12 +58,11 @@ def _load_context(report_date: str) -> dict | None:
 
 def _try_rank_engine_generate(report_date: str, context: dict) -> dict | None:
     try:
-        from cloud_deploy.rank_engine.ai_advisor import AiAdvisor  # type: ignore
+        from cloud_deploy.rank_engine.ai_advisor import AiAdvisor
+
+        return AiAdvisor().run_batch(target_date=report_date, context=context)
     except ImportError:
         return None
-    try:
-        advisor = AiAdvisor()
-        return advisor.run_batch(target_date=report_date, context=context)
     except Exception as e:
         print(f"[advisor] rank_engine failed: {e}", file=sys.stderr)
         return None

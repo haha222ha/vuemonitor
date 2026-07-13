@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260713e">
-<link rel="stylesheet" href="/assets/member_theme.css?v=20260713d">
-<link rel="stylesheet" href="/assets/member_reader.css?v=20260713d">
+<meta name="portal-build" content="20260713f">
+<link rel="stylesheet" href="/assets/member_theme.css?v=20260713f">
+<link rel="stylesheet" href="/assets/member_reader.css?v=20260713f">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
 <script>
@@ -485,10 +485,10 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <div id="dashMsg"></div>
   </div>
 </div>
-<script src="/assets/member_core.js?v=20260713d"></script>
-<script src="/assets/member_reader.js?v=20260713d"></script>
-<script src="/assets/member_router.js?v=20260713e"></script>
-<script src="/assets/member_insight.js?v=20260713d"></script>
+<script src="/assets/member_core.js?v=20260713f"></script>
+<script src="/assets/member_reader.js?v=20260713f"></script>
+<script src="/assets/member_router.js?v=20260713f"></script>
+<script src="/assets/member_insight.js?v=20260713f"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -696,6 +696,7 @@ function api(path, opts = {}) {
     if (!r.ok) {
       const err = new Error(formatApiError(data, r.statusText, r.status));
       err.status = r.status;
+      err.data = data;
       throw err;
     }
     return data;
