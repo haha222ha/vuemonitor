@@ -816,6 +816,13 @@ def public_advisor_demo_info():
     return demo_info()
 
 
+@app.get("/api/v1/public/advisor-demo/directions")
+def public_advisor_demo_directions():
+    from cloud_deploy.cloud_api.advisor_demo_service import demo_directions
+
+    return demo_directions()
+
+
 @app.get("/api/v1/public/advisor-demo/view")
 def public_advisor_demo_view(date: str = "", category: str = ""):
     from cloud_deploy.cloud_api.advisor_demo_service import demo_view_response

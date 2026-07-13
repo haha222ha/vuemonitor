@@ -143,6 +143,17 @@ def _insight_tree(user_id: int, limit_dates: int = 7) -> list[dict]:
                     "category": c.get("category") or "",
                     "stars": c.get("stars") or 0,
                     "summary": c.get("summary") or "",
+                    "growth_rate": c.get("growth_rate"),
+                    "blue_ocean_score": c.get("blue_ocean_score"),
+                    "competition_index": c.get("competition_index"),
+                    "heat_score": c.get("heat_score"),
+                    "lifecycle_stage": c.get("lifecycle_stage"),
+                    "trend_label": c.get("trend_label"),
+                    "price_band": c.get("price_band"),
+                    "median_price": c.get("median_price"),
+                    "confidence": c.get("confidence"),
+                    "action_enter": c.get("action_enter"),
+                    "sample_size": c.get("sample_size"),
                 }
                 for c in cats[:30]
             ],

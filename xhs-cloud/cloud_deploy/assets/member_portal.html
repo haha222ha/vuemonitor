@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260713p">
+<meta name="portal-build" content="20260714w18">
 <link rel="stylesheet" href="/assets/member_theme.css?v=20260713p">
-<link rel="stylesheet" href="/assets/member_reader.css?v=20260713llm">
-<link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260713p">
+<link rel="stylesheet" href="/assets/member_reader.css?v=20260714w12">
+<link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260714w14">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
 <script>
@@ -27,7 +27,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:var(--safe-b)}
-.wrap{max-width:920px;margin:0 auto;padding:20px 16px calc(48px + var(--safe-b))}
+.wrap{max-width:1600px;margin:0 auto;padding:20px 24px calc(48px + var(--safe-b))}
 h1{font-size:clamp(22px,5vw,28px);font-weight:700;margin-bottom:4px;letter-spacing:-.02em}
 .sub{color:var(--text2);font-size:clamp(13px,3.2vw,14px);margin-bottom:20px;line-height:1.5}
 .card{background:var(--surface);border-radius:var(--radius);padding:clamp(16px,4vw,20px);margin-bottom:16px;border:1px solid var(--line);box-shadow:var(--card-shadow,0 1px 3px rgba(0,0,0,.04))}
@@ -71,6 +71,38 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
 }
 .empty{text-align:center;padding:36px 16px;color:var(--text2);font-size:14px}
 .hidden{display:none!important}
+.demo-card-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:8px}
+@media(max-width:1280px){.demo-card-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:960px){.demo-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:640px){.demo-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.demo-card-item{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:14px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04);cursor:pointer;min-height:96px;transition:transform .18s,box-shadow .18s,border-color .18s;position:relative;overflow:hidden}
+.demo-card-item:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.1);border-color:var(--accent)}
+.demo-card-item.unlocked:hover{border-color:var(--accent)}
+.demo-card-item.locked{background:linear-gradient(135deg,#f5f5f7 0%,#e8e8ed 100%);opacity:.75}
+.demo-card-item.locked:hover{opacity:.95;border-color:var(--accent)}
+.demo-card-item .demo-card-icon{font-size:22px;margin-bottom:8px}
+.demo-card-item .demo-card-title{font-size:13px;font-weight:700;line-height:1.4;color:var(--text);word-break:break-word;flex:1;display:flex;align-items:center;justify-content:center}
+.demo-card-item .demo-card-tag{font-size:10px;font-weight:600;color:var(--text2);background:rgba(0,0,0,.06);padding:2px 8px;border-radius:6px;margin-top:6px}
+.demo-card-item.unlocked .demo-card-tag{color:var(--accent);background:rgba(0,113,227,.1)}
+.demo-detail-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px}
+.demo-detail-overlay.hidden{display:none!important}
+.demo-detail-modal{width:min(640px,100%);max-height:80vh;overflow-y:auto;background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);border:1px solid var(--line)}
+.demo-detail-head{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:10;border-radius:16px 16px 0 0}
+.demo-detail-head h3{margin:0;font-size:18px;font-weight:700}
+.demo-detail-close{font-size:24px;color:var(--text2);cursor:pointer;line-height:1;background:none;border:none}
+.demo-detail-body{padding:20px;font-size:14px;line-height:1.7;color:var(--text)}
+.demo-detail-body h1,.demo-detail-body h2,.demo-detail-body h3,.demo-detail-body h4{margin:1em 0 .5em;font-weight:700}
+.demo-detail-body h1{font-size:20px}.demo-detail-body h2{font-size:18px}.demo-detail-body h3{font-size:16px}.demo-detail-body h4{font-size:15px}
+.demo-detail-body blockquote{border-left:3px solid var(--accent);padding:8px 12px;margin:8px 0;background:#f0f7ff;border-radius:0 6px 6px 0}
+.demo-detail-body ul{margin:8px 0;padding-left:20px}
+.demo-detail-body li{margin-bottom:4px}
+.demo-detail-body strong{color:var(--accent)}
+.demo-detail-body code{background:#f5f5f7;padding:2px 6px;border-radius:4px;font-size:13px}
+.demo-detail-body hr{border:none;border-top:1px solid var(--line);margin:12px 0}
+.demo-detail-body p{margin-bottom:10px}
+.demo-detail-body p{margin-bottom:12px}
+.demo-detail-body strong{color:var(--accent)}
+.demo-detail-cta{padding:16px 20px;border-top:1px solid var(--line);background:#f9f9fb;border-radius:0 0 16px 16px;text-align:center}
 .expiry-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
 .topbar{z-index:10000;position:relative}
 .welcome-chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);background:#e8e8ed;padding:6px 12px;border-radius:20px;margin-top:8px}
@@ -234,7 +266,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <div class="notice-title">📋 AI 分析更新说明</div>
     <ul>
       <li><strong>类目情报</strong>：系统夜间预生成，一般 <strong>18:00～19:00</strong>（北京时间）可在「AI 选品分析」阅读</li>
-      <li><strong>AI 阅读样例</strong>：未登录访客可预览历史期次脱敏样例（非最新期次）</li>
+      <li><strong>AI 阅读样例</strong>：未登录访客可预览历史期次样例（非最新期次）</li>
       <li>报告为<strong>方向级文字结论</strong>，不含可排序商品表、店铺明细或数据包下载</li>
       <li>PC 端登录后自动同步云端 AI 分析；会员鉴权与授权码逻辑保持不变</li>
     </ul>
@@ -254,16 +286,13 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   <div id="portalDemo" class="portal-panel hidden">
   <div class="card notice-card" style="background:linear-gradient(135deg,#fff8e6 0%,#f0f7ff 100%);border:1px solid #f0d78a">
     <div class="notice-title">📖 AI 选品情报 · 免费样例</div>
-    <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">
-      进入即可预览<strong>历史期次</strong>的 AI 预生成报告（<strong>非最新</strong>）。免费用户<strong>不支持</strong> AI 预生成调用、动态 LLM 与顾问对话；完整能力请开通 <strong>¥9.9 体验卡（3 天）</strong> 或正式会员。
+    <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:6px">
+      <strong>报告日期：<span id="demoReportDate">加载中</span></strong> · <span id="demoDirectionCount">30</span> 个方向解读（前 10 个可预览，其余开通会员阅读）
     </p>
-    <div style="border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;min-height:420px">
-      <iframe id="advisorDemoFrame" title="AI 阅读样例" src="/public/advisor-demo?v=20260713p" style="width:100%;height:min(560px,68vh);border:none;display:block"></iframe>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px">
+    <div class="demo-card-grid" id="demoCardGrid"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:16px">
       <button type="button" class="btn btn-primary" onclick="switchPortal('center')">开通体验卡 ¥9.9</button>
       <button type="button" class="btn btn-ghost" onclick="switchPortal('center');switchPricingCategory('custom')">定制分析</button>
-      <a class="btn btn-ghost" href="/public/advisor-demo" target="_blank" rel="noopener" style="text-decoration:none">新窗口打开样例</a>
     </div>
   </div>
   </div>
@@ -286,7 +315,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     </div>
     <div id="pricingCustomPanel" class="hidden">
       <div class="custom-analysis-card">
-        <div class="section-title" style="margin-bottom:8px">定制分析 · 定向词库采集</div>
+        <div class="section-title" style="margin-bottom:8px">定制分析 · 定向词库分析</div>
         <p style="font-size:13px;color:var(--text2);line-height:1.6;margin:0 0 4px">按次购买，支付后在 PC 端「使用说明」提交词库需求，或联系会员客服。不延长会员天数。</p>
         <div class="custom-analysis-prices" id="customAnalysisPrices">
           <div class="custom-analysis-price" id="customPriceMember">
@@ -407,28 +436,79 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
         <span class="ai-gen-dot">·</span>
         <span class="ai-gen-model">DeepSeek V4</span>
       </div>
-      <div class="ai-gen-hint">本报告由云端 AI 基于脱敏榜单实时生成，预计 1–2 秒</div>
+      <div class="ai-gen-hint">本报告由云端 AI 实时生成，预计 1–2 秒</div>
     </div>
   </div>
   <div id="dashView" class="hidden">
     <div id="expiryBanner"></div>
-    <div class="dash-tabs">
-      <div class="dash-tab active" id="dashTabToday" data-dash="today" onclick="switchDash('today')">今日分析</div>
-      <div class="dash-tab" id="dashTabArchive" data-dash="archive" onclick="switchDash('archive')">历史归档</div>
-      <div class="dash-tab" data-dash="watchlist" onclick="switchDash('watchlist')">我的收藏</div>
-      <div class="dash-tab" data-dash="account" onclick="switchDash('account')">账户</div>
+    <div class="app-shell">
+    <aside class="app-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">📊</div>
+        <div>
+          <div class="brand-text">选品 AI 顾问</div>
+          <div class="brand-sub" id="sidebarPlanLabel">会员版</div>
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">核心功能</div>
+        <button type="button" class="nav-item active" data-app-nav="today" onclick="switchAppPanel('today')">
+          <span class="nav-icon">📊</span><span class="nav-label">今日分析</span>
+        </button>
+        <button type="button" class="nav-item" data-app-nav="archive" onclick="switchAppPanel('archive')">
+          <span class="nav-icon">📚</span><span class="nav-label">历史归档</span>
+        </button>
+        <button type="button" class="nav-item" data-app-nav="watchlist" onclick="switchAppPanel('watchlist')">
+          <span class="nav-icon">⭐</span><span class="nav-label">我的收藏</span>
+        </button>
+        <button type="button" class="nav-item" data-app-nav="account" onclick="switchAppPanel('account')">
+          <span class="nav-icon">⚙️</span><span class="nav-label">账户设置</span>
+        </button>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="nav-section">
+        <div class="nav-section-title">帮助与合规</div>
+        <button type="button" class="nav-item" onclick="openHelpModal('help')">
+          <span class="nav-icon">📖</span><span class="nav-label">使用说明</span>
+        </button>
+        <button type="button" class="nav-item" onclick="openHelpModal('compliance')">
+          <span class="nav-icon">🛡️</span><span class="nav-label">合规声明</span>
+        </button>
+        <button type="button" class="nav-item" onclick="logout()">
+          <span class="nav-icon">🚪</span><span class="nav-label">退出登录</span>
+        </button>
+      </div>
+      <div class="sidebar-footer">
+        <div>报告每日 18:30 更新</div>
+        <div style="margin-top:4px;opacity:0.6">build 20260713w9</div>
+      </div>
+    </aside>
+    <div class="app-content">
+    <div class="app-panel active" id="panelToday">
+    <div class="kpi-row" id="kpiRow">
+      <div class="kpi-card"><div class="kpi-icon">📋</div><div class="kpi-label">今日榜单</div><div class="kpi-value" id="kpiRankings">—</div><div class="kpi-delta neutral" id="kpiRankingsDelta">加载中</div></div>
+      <div class="kpi-card"><div class="kpi-icon">🎯</div><div class="kpi-label">方向解读</div><div class="kpi-value" id="kpiDirections">—</div><div class="kpi-delta neutral" id="kpiDirectionsDelta">加载中</div></div>
+      <div class="kpi-card"><div class="kpi-icon">💎</div><div class="kpi-label">蓝海机会</div><div class="kpi-value" id="kpiBlueOcean">—</div><div class="kpi-delta neutral">方向级</div></div>
+      <div class="kpi-card"><div class="kpi-icon">📈</div><div class="kpi-label">报告日期</div><div class="kpi-value" id="kpiDate" style="font-size:20px">—</div><div class="kpi-delta neutral" id="kpiMode">AI</div></div>
     </div>
     <div id="dashInsight">
     <div class="card" style="padding:0;border:none;background:transparent;box-shadow:none">
       <section id="routeToday" class="member-route">
-        <div class="reader-layout">
-          <aside id="readerSidebar" class="reader-sidebar"></aside>
-          <main id="readerMain" class="reader-main">
-            <div class="reader-topbar">
-              <button type="button" id="readerSidebarToggle" class="reader-sidebar-toggle" aria-label="打开报告目录">☰ 目录</button>
-              <div id="readerProgress" class="reader-progress" aria-hidden="true"><span></span></div>
+        <div class="reader-layout-v2">
+          <!-- 卡片列表视图（默认显示） -->
+          <div id="readerCardList" class="reader-card-list">
+            <div class="reader-card-list-header">
+              <h2>📊 今日分析</h2>
+              <p id="cardListDate">加载中…</p>
             </div>
-            <header class="reader-chrome" id="readerChrome"><h2>今日分析</h2><p>加载中…</p></header>
+            <div id="readerCardListBody"></div>
+          </div>
+          <!-- 详情视图（点击卡片后显示） -->
+          <div id="readerDetail" class="reader-detail hidden">
+            <div class="reader-detail-bar">
+              <button type="button" class="reader-back-btn" onclick="backToCardList()">← 返回列表</button>
+              <header class="reader-chrome" id="readerChrome"><h2>今日分析</h2><p>加载中…</p></header>
+            </div>
             <div id="readerLocked" class="reader-locked">
               <p style="font-size:15px;color:var(--text2)">会员已过期，请续费后阅读 AI 分析</p>
               <button type="button" class="btn btn-primary" onclick="openBuyFromDash()">扫码续费</button>
@@ -438,7 +518,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
             <div id="readerFrameWrap" class="reader-frame-wrap hidden">
               <iframe id="readerFrame" class="reader-frame" title="类目情报" src="about:blank"></iframe>
             </div>
-          </main>
+          </div>
         </div>
       </section>
     </div>
@@ -465,14 +545,18 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     </div>
     </details>
     </div>
-    <div id="dashArchive" class="hidden">
+    </div><!-- /panelToday -->
+    <div class="app-panel" id="panelArchive">
+    <div id="dashArchive">
     <div class="card">
       <div class="section-title">历史归档</div>
       <p style="font-size:13px;color:var(--text2);margin:8px 0 14px">按日期浏览已发布的 AI 选品顾问报告。不含可下载表格数据包。</p>
       <div id="archiveList"><div class="reader-empty">加载中…</div></div>
     </div>
     </div>
-    <div id="dashWatchlist" class="hidden">
+    </div><!-- /panelArchive -->
+    <div class="app-panel" id="panelWatchlist">
+    <div id="dashWatchlist">
     <div class="card">
       <div class="section-title">我的收藏</div>
       <p style="font-size:13px;color:var(--text2);margin:8px 0 14px">与 PC 端 ProductAnalyzer 共享收藏夹。在 PC 报告页勾选商品点「同步收藏」后，此处与 Web 均可查看。</p>
@@ -487,7 +571,9 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div id="watchlistTable"></div>
     </div>
     </div>
-    <div id="dashAccount" class="hidden">
+    </div><!-- /panelWatchlist -->
+    <div class="app-panel" id="panelAccount">
+    <div id="dashAccount">
     <div class="card account-card">
       <div class="section-title">会员信息</div>
       <div class="profile-grid" id="profileGrid"></div>
@@ -515,7 +601,90 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       </div>
     </div>
     </div>
+    </div><!-- /panelAccount -->
+    </div><!-- /app-content -->
+    </div><!-- /app-shell -->
     <div id="dashMsg"></div>
+
+  <!-- 使用说明 Modal -->
+  <div class="help-modal" id="helpModal" onclick="if(event.target===this)closeHelpModal()">
+    <div class="help-modal-body">
+      <div class="help-modal-header">
+        <div class="help-modal-title">📖 使用说明</div>
+        <button type="button" class="help-modal-close" onclick="closeHelpModal()">✕</button>
+      </div>
+      <div class="help-modal-section">
+        <h4>📊 这是什么？</h4>
+        <p>选品 AI 顾问是一个基于小红书商品榜单数据的智能选品分析服务。由云端 AI（DeepSeek V4）自动生成方向级文字分析报告，帮助您快速识别市场趋势与蓝海机会。</p>
+      </div>
+      <div class="help-modal-section">
+        <h4>🕐 更新时间</h4>
+        <ul>
+          <li><strong>类目情报</strong>：系统夜间预生成，一般 18:00～19:00（北京时间）可阅读</li>
+          <li><strong>AI 选品分析</strong>：每日更新，含今日简报 + 方向解读 + 跨榜综述</li>
+          <li>报告为方向级文字结论，不含可排序商品表或数据包下载</li>
+        </ul>
+      </div>
+      <div class="help-modal-section">
+        <h4>📋 如何阅读</h4>
+        <ul>
+          <li>左侧「今日简报」为 AI 生成的当日市场总览，建议先读</li>
+          <li>「方向解读」为各榜单的结构化分析，可按需选读</li>
+          <li>「类目情报」为具体类目的深度分析</li>
+          <li>底部「高级工具」可展开类目对比、时间轴、PDF 导出等</li>
+        </ul>
+        <div class="help-callout">💡 提示：报告内容由 AI 基于榜单数据生成，不含商品 ID、店铺名等敏感信息，可放心参考。</div>
+      </div>
+      <div class="help-modal-section">
+        <h4>💎 会员权益</h4>
+        <ul>
+          <li>每日 AI 选品分析报告阅读权限</li>
+          <li>类目情报库访问</li>
+          <li>类目对比 / 时间轴 / PDF 导出等高级工具</li>
+          <li>PC 端 ProductAnalyzer 客户端同步</li>
+        </ul>
+      </div>
+      <div class="help-modal-footer">如有疑问请联系会员客服 · 选品 AI 顾问</div>
+    </div>
+  </div>
+
+  <!-- 合规声明 Modal -->
+  <div class="help-modal" id="complianceModal" onclick="if(event.target===this)closeHelpModal()">
+    <div class="help-modal-body">
+      <div class="help-modal-header">
+        <div class="help-modal-title">🛡️ 合规声明</div>
+        <button type="button" class="help-modal-close" onclick="closeHelpModal()">✕</button>
+      </div>
+      <div class="help-modal-section">
+        <h4>⚠️ 免责声明</h4>
+        <p>本服务仅供研究参考，<strong>不构成投资建议</strong>。数据基于公开信息与系统计算，存在延迟与误差，请理性参考。使用者需自行承担依据本服务内容做出决策的一切风险与责任。</p>
+      </div>
+      <div class="help-modal-section">
+        <h4>🔒 数据合规</h4>
+        <ul>
+          <li>所有报告内容基于<strong>榜单数据</strong>生成，不含商品 ID、店铺名称、商品链接、完整商品标题</li>
+          <li>AI 分析仅提及类目、价格带、关注度等级等抽象维度</li>
+          <li>不提供可下载的商品表格、数据包或店铺明细</li>
+        </ul>
+        <div class="help-callout">✅ 合规保障：系统已对输入数据做合规处理，对 AI 输出进行合规校验，拦截敏感信息。</div>
+      </div>
+      <div class="help-modal-section">
+        <h4>📋 使用规范</h4>
+        <ul>
+          <li>会员账号仅限本人使用，禁止共享或转售</li>
+          <li>报告内容禁止批量爬取、复制传播或用于商业再分发</li>
+          <li>PC 客户端需联网校验会员身份，与网页登录逻辑一致</li>
+          <li>违反使用规范可能导致账号封禁</li>
+        </ul>
+      </div>
+      <div class="help-modal-section">
+        <h4>📞 联系方式</h4>
+        <p>如有合规疑问或侵权投诉，请联系会员客服。</p>
+      </div>
+      <div class="help-modal-footer">© 选品 AI 顾问 · 最终解释权归本站所有</div>
+    </div>
+  </div>
+
   </div>
   <nav id="readerMobileNav" class="reader-mobile-nav hidden" aria-label="阅读导航">
     <button type="button" class="reader-mobile-nav-btn" data-route="today">今日</button>
@@ -553,9 +722,9 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 </div>
 <script src="/assets/member_portal_state.js?v=20260713p"></script>
 <script src="/assets/member_core.js?v=20260713p"></script>
-<script src="/assets/member_reader.js?v=20260713llm"></script>
-<script src="/assets/member_router.js?v=20260713p"></script>
-<script src="/assets/member_insight.js?v=20260713p"></script>
+<script src="/assets/member_reader.js?v=20260714w12"></script>
+<script src="/assets/member_router.js?v=20260714w15"></script>
+<script src="/assets/member_insight.js?v=20260713w5"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -683,11 +852,43 @@ function isDeviceKickedMessage(msg) {
 let watchlistItems = [];
 let watchlistSelected = new Set();
 
-function switchDash(name) {
-  if (window.MemberRouter) {
+// ===== 新布局 v2：左侧栏面板切换 =====
+function switchAppPanel(name) {
+  var validPanels = ['today', 'archive', 'watchlist', 'account'];
+  if (validPanels.indexOf(name) < 0) name = 'today';
+  // 更新侧栏 nav-item active
+  document.querySelectorAll('.app-sidebar .nav-item[data-app-nav]').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-app-nav') === name);
+  });
+  // 切换 app-panel
+  var panelMap = { today: 'panelToday', archive: 'panelArchive', watchlist: 'panelWatchlist', account: 'panelAccount' };
+  var panelId = panelMap[name];
+  document.querySelectorAll('.app-panel').forEach(function(p) {
+    p.classList.toggle('active', p.id === panelId);
+  });
+  // 保存当前 tab
+  try { localStorage.setItem('xhs_member_dash_tab', name); } catch(_) {}
+  // 路由同步：MemberRouter.go → applyRoute 负责数据加载（archive/watchlist/account/profile）
+  // 不在此处重复调用 loadArchive/loadWatchlist/loadProfile，避免与 applyRoute 双触发
+  if (window.MemberRouter && typeof MemberRouter.go === 'function') {
     MemberRouter.go(name);
-    return;
   }
+}
+
+// ===== 使用说明 / 合规 Modal =====
+function openHelpModal(type) {
+  var modal = document.getElementById(type === 'compliance' ? 'complianceModal' : 'helpModal');
+  if (modal) modal.classList.add('open');
+}
+function closeHelpModal() {
+  document.querySelectorAll('.help-modal.open').forEach(function(m) { m.classList.remove('open'); });
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeHelpModal();
+});
+
+function switchDash(name) {
+  switchAppPanel(name);
 }
 
 function saveSession(token, membership, username) {
@@ -810,6 +1011,83 @@ function switchTopNav(zone) {
   return zone;
 }
 
+var DEMO_DIRECTIONS = [];
+var DEMO_REPORT_DATE = '';
+function renderMarkdown(md) {
+  if (!md) return '';
+  var text = String(md).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  text = text.replace(/^#### (.+)$/gm, '\n<h4>$1</h4>\n');
+  text = text.replace(/^### (.+)$/gm, '\n<h3>$1</h3>\n');
+  text = text.replace(/^## (.+)$/gm, '\n<h2>$1</h2>\n');
+  text = text.replace(/^# (.+)$/gm, '\n<h1>$1</h1>\n');
+  text = text.replace(/^&gt; (.+)$/gm, '\n<blockquote>$1</blockquote>\n');
+  text = text.replace(/^---+$/gm, '\n<hr>\n');
+  text = text.replace(/^[\-\*] (.+)$/gm, '\n<li>$1</li>\n');
+  text = text.replace(/^\d+\. (.+)$/gm, '\n<li>$1</li>\n');
+  text = text.replace(/(?:<li>[\s\S]*?<\/li>\s*)+/g, function (m) { return '<ul>' + m.replace(/\s+/g, ' ') + '</ul>'; });
+  text = text.replace(/\*\*([^\*]+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/`([^`]+?)`/g, '<code>$1</code>');
+  var blocks = text.split(/\n{2,}/);
+  var out = [];
+  for (var i = 0; i < blocks.length; i++) {
+    var b = blocks[i].replace(/^\n+|\n+$/g, '');
+    if (!b) continue;
+    if (/^<(h[1-6]|ul|ol|blockquote|hr|pre|table|div|p)/.test(b)) { out.push(b); }
+    else { out.push('<p>' + b.replace(/\n/g, '<br>') + '</p>'); }
+  }
+  return out.join('\n');
+}
+function renderDemoCards() {
+  var grid = document.getElementById('demoCardGrid');
+  if (!grid) return;
+  var html = '';
+  if (DEMO_DIRECTIONS.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">加载中…</div>';
+    loadDemoDirections();
+    return;
+  }
+  for (var i = 0; i < DEMO_DIRECTIONS.length; i++) {
+    var d = DEMO_DIRECTIONS[i];
+    var unlocked = d.unlocked;
+    var cls = unlocked ? 'unlocked' : 'locked';
+    var onclick = unlocked ? 'showDemoDetail(' + i + ')' : 'switchPortal(\'center\')';
+    var tag = unlocked ? '可预览' : '会员专享';
+    var icon = unlocked ? '🎯' : '🔒';
+    html += '<div class="demo-card-item ' + cls + '" onclick="' + onclick + '">'
+      + '<div class="demo-card-icon">' + icon + '</div>'
+      + '<div class="demo-card-title">' + d.title + '</div>'
+      + '<div class="demo-card-tag">' + tag + '</div>'
+      + '</div>';
+  }
+  grid.innerHTML = html;
+  var dateEl = document.getElementById('demoReportDate');
+  if (dateEl) dateEl.textContent = DEMO_REPORT_DATE;
+}
+function loadDemoDirections() {
+  fetch('/api/v1/public/advisor-demo/directions').then(function (r) { return r.json(); }).then(function (data) {
+    if (data && data.available && data.directions && data.directions.length) {
+      DEMO_DIRECTIONS = data.directions;
+      DEMO_REPORT_DATE = (data.report_date || '').replace(/-/g, '').slice(4);
+      renderDemoCards();
+    } else {
+      var grid = document.getElementById('demoCardGrid');
+      if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">样例报告筹备中，请稍后刷新</div>';
+    }
+  }).catch(function () {
+    var grid = document.getElementById('demoCardGrid');
+    if (grid) grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text2)">加载失败，请刷新重试</div>';
+  });
+}
+function showDemoDetail(idx) {
+  var d = DEMO_DIRECTIONS[idx];
+  if (!d || !d.content) return;
+  document.getElementById('demoDetailTitle').textContent = d.title;
+  document.getElementById('demoDetailBody').innerHTML = renderMarkdown(d.content) + '<p style="color:var(--text2);font-size:13px;margin-top:16px;border-top:1px solid var(--line);padding-top:12px">⚠️ 以上为样例预览。开通会员可阅读完整 ' + DEMO_DIRECTIONS.length + ' 个方向解读。</p>';
+  document.getElementById('demoDetailOverlay').classList.remove('hidden');
+}
+function closeDemoDetail() {
+  document.getElementById('demoDetailOverlay').classList.add('hidden');
+}
 function switchPortal(name) {
   switchTopNav('member');
   const tab = (name === 'center' || name === 'demo' || name === 'login') ? name : 'demo';
@@ -1572,6 +1850,9 @@ async function loadDashboard(useCacheFirst) {
   } else {
     showMsg(document.getElementById('dashMsg'), '', 'ok');
   }
+  // 先显示 dashboard 界面（让 memberShell 可见），再初始化路由触发 AI 动画
+  await loadMemberBroadcast(membership);
+  showDashboard(membership);
   if (window.MemberRouter) {
     if (membership.is_active === false) {
       MemberRouter.go('account', true);
@@ -1584,8 +1865,6 @@ async function loadDashboard(useCacheFirst) {
     MemberInsight.applyEntitlements(membership);
     if (membership.is_active !== false) MemberInsight.load();
   }
-  await loadMemberBroadcast(membership);
-  showDashboard(membership);
 }
 
 function logout() {
@@ -1970,6 +2249,7 @@ async function loadMemberBroadcast(membership) {
   try {
   loadClientDownload();
   restoreFormFields();
+  renderDemoCards();
   updatePortalVisibility(loadCachedProfile(), !!loadStored(STORAGE.token));
 
   const resetParam = new URLSearchParams(location.search).get('reset');
@@ -2037,6 +2317,19 @@ async function loadMemberBroadcast(membership) {
   }
 })();
 </script>
+
+<div id="demoDetailOverlay" class="demo-detail-overlay hidden" role="dialog" aria-modal="true">
+  <div class="demo-detail-modal">
+    <div class="demo-detail-head">
+      <h3 id="demoDetailTitle">预览</h3>
+      <button type="button" class="demo-detail-close" onclick="closeDemoDetail()">&times;</button>
+    </div>
+    <div class="demo-detail-body" id="demoDetailBody"></div>
+    <div class="demo-detail-cta">
+      <button type="button" class="btn btn-primary" onclick="closeDemoDetail();switchPortal('center')">开通会员 · 阅读完整报告</button>
+    </div>
+  </div>
+</div>
 
 <div id="broadcastOverlay" class="broadcast-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="broadcastTitle">
   <div class="broadcast-modal">

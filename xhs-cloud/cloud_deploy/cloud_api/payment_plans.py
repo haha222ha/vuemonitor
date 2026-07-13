@@ -46,7 +46,7 @@ EXPERIENCE_3D_ENTITLEMENTS: dict = {
 # 定制分析（按次加购，不延长会员天数）
 CUSTOM_ANALYSIS_PRICING: dict = {
     "label": "定制分析",
-    "summary": "定向词库采集 · 一次交付 · PC 端提交需求",
+    "summary": "定向词库分析 · 一次交付 · PC 端提交需求",
     "member_price_yuan": 9.9,
     "guest_price_yuan": 29.9,
     "unit": "次",
@@ -65,7 +65,7 @@ PAYMENT_ADDON_PLANS: tuple[dict, ...] = (
         "duration_days": 0,
         "amount": "9.90",
         "price_yuan": 9.9,
-        "summary": "会员专享 · 定向词库采集 1 次",
+        "summary": "会员专享 · 定向词库分析 1 次",
         "plan_type": "addon",
         "requires_active_member": True,
         "entitlements_template": CUSTOM_ANALYSIS_ENTITLEMENTS,
@@ -76,7 +76,7 @@ PAYMENT_ADDON_PLANS: tuple[dict, ...] = (
         "duration_days": 0,
         "amount": "29.90",
         "price_yuan": 29.9,
-        "summary": "非会员 · 定向词库采集 1 次",
+        "summary": "非会员 · 定向词库分析 1 次",
         "plan_type": "addon",
         "requires_active_member": False,
         "entitlements_template": CUSTOM_ANALYSIS_ENTITLEMENTS,

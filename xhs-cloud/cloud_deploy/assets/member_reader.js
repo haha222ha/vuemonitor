@@ -24,6 +24,8 @@ var MemberReader = (function () {
 
   var state = 'IDLE';
   var current = { date: '', node: null };
+  var dashData = { today: {}, insightTree: [] }; // 全局保存 dashboard 数据，供卡片视图使用
+  var readerViewMode = 'list'; // 'list' | 'cards'
   var dashboard = null;
   var archiveItems = [];
 
@@ -33,14 +35,14 @@ var MemberReader = (function () {
   // 阶段文案：模拟云端真实 LLM 调用流程
   var AI_GEN_STAGES = [
     { pct: 8,  sub: '正在连接云端 AI 模型…',          stage: '初始化' },
-    { pct: 18, sub: '读取脱敏榜单数据（28 个维度）…',  stage: '读取数据' },
+    { pct: 18, sub: '读取榜单数据（28 个维度）…',  stage: '读取数据' },
     { pct: 32, sub: '调用 DeepSeek V4 分析日销量增量榜…', stage: '榜单 1/10' },
     { pct: 42, sub: '调用 DeepSeek V4 分析低竞争机会榜…', stage: '榜单 2/10' },
     { pct: 52, sub: '调用 DeepSeek V4 分析新品动量榜…',  stage: '榜单 3/10' },
     { pct: 62, sub: '调用 DeepSeek V4 分析价格带榜单…',  stage: '榜单 4/10' },
     { pct: 72, sub: '调用 DeepSeek V4 分析类目榜单…',    stage: '榜单 5/10' },
     { pct: 82, sub: '生成跨榜综述与方向交集分析…',       stage: '跨榜综述' },
-    { pct: 92, sub: '校验合规（脱敏 / 商品 ID 拦截）…',  stage: '合规校验' },
+    { pct: 92, sub: '校验合规（商品 ID 拦截）…',  stage: '合规校验' },
     { pct: 98, sub: '打包发布到会员阅读区…',             stage: '发布' }
   ];
 
@@ -52,16 +54,30 @@ var MemberReader = (function () {
     aiGenTimers = [];
   }
 
-  function showAiGenOverlay() {
+  function showAiGenOverlay(inline) {
     var ov = el('aiGenOverlay');
     if (!ov) return;
     clearAiGenTimers();
     aiGenStageIdx = 0;
+    // inline 模式：把 overlay 移入 reader-detail，只覆盖详情视图区域
+    if (inline) {
+      var detail = el('readerDetail');
+      if (detail && detail !== ov.parentNode) {
+        detail.appendChild(ov);
+      }
+      ov.classList.add('inline');
+    } else {
+      var shell = el('memberShell');
+      if (shell && shell !== ov.parentNode) {
+        shell.appendChild(ov);
+      }
+      ov.classList.remove('inline');
+    }
     ov.classList.remove('hidden', 'leaving');
     // 立即显示第一帧
     updateAiGenStage(0);
-    // 分阶段推进，总时长约 1.6s
-    var stageDelay = 170;
+    // 分阶段推进：inline 模式用更短的总时长（~0.9s），全屏模式 1.6s
+    var stageDelay = inline ? 100 : 170;
     for (var i = 1; i < AI_GEN_STAGES.length; i++) {
       aiGenTimers.push(setTimeout((function (idx) {
         return function () { updateAiGenStage(idx); };
@@ -104,10 +120,15 @@ var MemberReader = (function () {
         ov.classList.add('leaving');
         setTimeout(function () {
           if (ov) ov.classList.add('hidden');
-          if (ov) ov.classList.remove('leaving');
+          if (ov) ov.classList.remove('leaving', 'inline');
+          // 恢复 overlay 到 memberShell（如果在 inline 模式下被移到了 reader-main）
+          var shell = el('memberShell');
+          if (shell && ov.parentNode && ov.parentNode.id !== 'memberShell') {
+            shell.appendChild(ov);
+          }
         }, 250);
       }
-    }, opts.delay || 220);
+    }, opts.delay || 120);
   }
 
   function setState(s) {
@@ -158,33 +179,22 @@ var MemberReader = (function () {
       bar.setAttribute('aria-hidden', pct <= 2 ? 'true' : 'false');
     }
     var body = el('readerBody');
-    var main = el('readerMain');
     if (body) body.addEventListener('scroll', function () { onScroll(body); });
-    if (main) main.addEventListener('scroll', function () { onScroll(main); });
   }
 
   function bindReaderUX() {
-    var toggle = el('readerSidebarToggle');
-    var layout = document.querySelector('.reader-layout');
-    if (toggle && layout) {
-      toggle.onclick = function () {
-        layout.classList.toggle('sidebar-open');
-      };
-    }
     var mobileNav = el('readerMobileNav');
     if (mobileNav) {
       mobileNav.classList.remove('hidden');
       mobileNav.querySelectorAll('[data-route]').forEach(function (btn) {
         btn.onclick = function () {
           var route = btn.getAttribute('data-route') || 'today';
-          if (layout) layout.classList.remove('sidebar-open');
+          // switchDash → switchAppPanel → MemberRouter.go，避免重复触发
           if (typeof switchDash === 'function') {
-            if (route === 'today') switchDash('today');
-            else if (route === 'archive') switchDash('archive');
-            else if (route === 'watchlist') switchDash('watchlist');
-            else if (route === 'account') switchDash('account');
+            switchDash(route);
+          } else if (window.MemberRouter) {
+            MemberRouter.go(route);
           }
-          if (window.MemberRouter) MemberRouter.go(route);
           mobileNav.querySelectorAll('.reader-mobile-nav-btn').forEach(function (b) {
             b.classList.toggle('active', b === btn);
           });
@@ -237,38 +247,71 @@ var MemberReader = (function () {
     });
   }
 
-  function renderSidebar(today, insightTree) {
-    var side = el('readerSidebar');
-    if (!side) return;
+  // ===== 8 列等宽规整卡片网格（v2） =====
+  function renderCardList(today, insightTree) {
     today = today || {};
     insightTree = insightTree || [];
-    var html = '';
+    dashData.today = today;
+    dashData.insightTree = insightTree;
+
+    var body = el('readerCardListBody');
+    var dateEl = el('cardListDate');
+    if (!body) return;
     var date = today.report_date || '';
+    if (dateEl) {
+      if (today.status === 'pending') {
+        dateEl.textContent = date ? ('报告日期 ' + date + ' · 生成中') : '报告生成中';
+      } else if (date) {
+        dateEl.textContent = '报告日期 ' + date;
+      } else {
+        dateEl.textContent = '暂无报告';
+      }
+    }
+
+    var html = '';
     var seenInsight = {};
 
+    // 今日简报分组
     if (today.overview) {
-      html += '<div class="reader-tree-group"><div class="reader-tree-title">今日简报</div>';
-      html += '<button type="button" class="reader-tree-item" data-node="overview" data-date="' + escFn(date) + '">'
-        + escFn(today.overview.title || '市场观察')
-        + '<span class="rt-meta">' + escFn((today.overview.summary || '').slice(0, 60)) + '</span></button></div>';
+      html += '<div class="reader-card-group">';
+      html += '<div class="reader-card-group-title">今日简报<span class="count">1</span></div>';
+      html += '<div class="reader-card-grid">';
+      html += buildCardCell({
+        icon: '📊',
+        badge: '简报',
+        title: today.overview.title || '市场观察',
+        tags: [{ text: 'AI 选品', cls: '' }],
+        node: { type: 'overview', date: date }
+      });
+      html += '</div></div>';
     }
 
+    // 方向解读分组
     if (today.directions && today.directions.length) {
-      html += '<div class="reader-tree-group"><div class="reader-tree-title">方向解读</div>';
+      html += '<div class="reader-card-group">';
+      html += '<div class="reader-card-group-title">方向解读<span class="count">' + today.directions.length + '</span></div>';
+      html += '<div class="reader-card-grid">';
       for (var i = 0; i < today.directions.length; i++) {
         var d = today.directions[i];
-        html += '<button type="button" class="reader-tree-item" data-node="direction" data-key="' + escFn(d.key) + '" data-date="' + escFn(date) + '">'
-          + escFn(d.title || d.key)
-          + '<span class="rt-meta">' + escFn((d.summary || '').slice(0, 50)) + '</span></button>';
+        var tags = [];
+        if (d.key) tags.push({ text: d.key, cls: '' });
+        html += buildCardCell({
+          icon: '🎯',
+          badge: '方向',
+          title: d.title || d.key,
+          tags: tags,
+          node: { type: 'direction', date: date, key: d.key }
+        });
       }
-      html += '</div>';
+      html += '</div></div>';
     }
 
+    // 类目情报分组
+    var insightItems = [];
     if (insightTree.length) {
       for (var g = 0; g < insightTree.length; g++) {
         var group = insightTree[g];
         var gdate = group.report_date || '';
-        html += '<div class="reader-tree-group"><div class="reader-tree-title">类目情报 · ' + escFn(gdate) + '</div>';
         var items = group.items || [];
         for (var j = 0; j < items.length; j++) {
           var ins = items[j];
@@ -276,47 +319,86 @@ var MemberReader = (function () {
           var key = gdate + ':' + cat;
           if (seenInsight[key]) continue;
           seenInsight[key] = true;
-          html += '<button type="button" class="reader-tree-item" data-node="insight" data-category="' + escFn(cat) + '" data-date="' + escFn(gdate) + '">'
-            + escFn(cat || '类目')
-            + '<span class="rt-meta">★' + escFn(ins.stars || 0) + ' · ' + escFn((ins.summary || '').slice(0, 40)) + '</span></button>';
+          insightItems.push({ ins: ins, gdate: gdate });
         }
-        html += '</div>';
       }
     } else if (today.insights && today.insights.length) {
-      html += '<div class="reader-tree-group"><div class="reader-tree-title">类目情报</div>';
       for (var k = 0; k < today.insights.length; k++) {
-        var ins2 = today.insights[k];
-        html += '<button type="button" class="reader-tree-item" data-node="insight" data-category="' + escFn(ins2.category) + '" data-date="' + escFn(ins2.report_date || date) + '">'
-          + escFn(ins2.category || '类目')
-          + '<span class="rt-meta">★' + escFn(ins2.stars || 0) + '</span></button>';
+        insightItems.push({ ins: today.insights[k], gdate: today.insights[k].report_date || date });
       }
-      html += '</div>';
+    }
+
+    if (insightItems.length) {
+      html += '<div class="reader-card-group">';
+      html += '<div class="reader-card-group-title">类目情报<span class="count">' + insightItems.length + '</span></div>';
+      html += '<div class="reader-card-grid">';
+      for (var m = 0; m < insightItems.length; m++) {
+        var item = insightItems[m];
+        var ins2 = item.ins;
+        var gdate2 = item.gdate;
+        var stars = ins2.stars || 0;
+        var growth = ins2.growth_rate;
+        var growthStr = (growth !== null && growth !== undefined && growth !== '') ? (growth + '%') : '';
+        var growthCls = growth > 0 ? 'growth-up' : (growth < 0 ? 'growth-down' : '');
+        var trend = ins2.trend_label || '';
+        var tags = [];
+        if (stars) tags.push({ text: '★' + stars, cls: 'stars' });
+        if (growthStr) tags.push({ text: (growth > 0 ? '↑' : growth < 0 ? '↓' : '') + growthStr, cls: growthCls });
+        if (trend) tags.push({ text: trend, cls: '' });
+        if (ins2.lifecycle_stage) tags.push({ text: ins2.lifecycle_stage, cls: '' });
+        html += buildCardCell({
+          icon: '📈',
+          badge: stars ? ('★' + stars) : '类目',
+          title: ins2.category || '类目',
+          tags: tags,
+          node: { type: 'insight', date: gdate2, category: ins2.category || '' }
+        });
+      }
+      html += '</div></div>';
     }
 
     if (!html) {
-      html = '<div class="reader-empty" style="padding:16px">暂无今日内容</div>';
+      if (today.status === 'pending') {
+        html = '<div class="reader-empty">报告生成中，预计今日 18:30 前更新。</div>';
+      } else {
+        html = '<div class="reader-empty">今日 AI 分析尚未发布，请稍后再来。</div>';
+      }
     }
-    side.innerHTML = html;
+    body.innerHTML = html;
 
-    var buttons = side.querySelectorAll('.reader-tree-item');
-    for (var b = 0; b < buttons.length; b++) {
-      buttons[b].onclick = function () {
+    // 绑定卡片点击
+    var cells = body.querySelectorAll('.reader-card-cell');
+    for (var r = 0; r < cells.length; r++) {
+      cells[r].onclick = function () {
         selectNode({
           type: this.getAttribute('data-node'),
           date: this.getAttribute('data-date') || '',
           key: this.getAttribute('data-key') || '',
           category: this.getAttribute('data-category') || ''
-        });
+        }, true);
       };
     }
   }
 
-  function highlightTree(node) {
-    var side = el('readerSidebar');
-    if (!side) return;
-    var items = side.querySelectorAll('.reader-tree-item');
-    for (var i = 0; i < items.length; i++) {
-      var btn = items[i];
+  function buildCardCell(opts) {
+    var node = opts.node || {};
+    return '<button type="button" class="reader-card-cell"'
+      + ' data-node="' + escFn(node.type || '') + '"'
+      + ' data-date="' + escFn(node.date || '') + '"'
+      + (node.key ? ' data-key="' + escFn(node.key) + '"' : '')
+      + (node.category ? ' data-category="' + escFn(node.category) + '"' : '')
+      + '>'
+      + '<div class="rcc-icon">' + opts.icon + '</div>'
+      + '<div class="rcc-title">' + escFn(opts.title) + '</div>'
+      + '</button>';
+  }
+
+  function highlightCard(node) {
+    var body = el('readerCardListBody');
+    if (!body) return;
+    var cells = body.querySelectorAll('.reader-card-cell');
+    for (var i = 0; i < cells.length; i++) {
+      var btn = cells[i];
       var match = btn.getAttribute('data-node') === node.type
         && (btn.getAttribute('data-date') || '') === (node.date || '');
       if (node.type === 'direction') match = match && btn.getAttribute('data-key') === node.key;
@@ -325,8 +407,74 @@ var MemberReader = (function () {
     }
   }
 
+  // 切换到详情视图
+  function showDetailView() {
+    var list = el('readerCardList');
+    var detail = el('readerDetail');
+    if (list) list.classList.add('hidden');
+    if (detail) detail.classList.remove('hidden');
+  }
+
+  // 返回卡片列表
+  function backToCardList() {
+    var list = el('readerCardList');
+    var detail = el('readerDetail');
+    if (detail) detail.classList.add('hidden');
+    if (list) list.classList.remove('hidden');
+    // 重置详情视图状态
+    var frameWrap = el('readerFrameWrap');
+    var body = el('readerBody');
+    if (frameWrap) frameWrap.classList.add('hidden');
+    if (body) body.classList.add('hidden');
+    current.node = null;
+    setState('IDLE');
+  }
+
   function updateChrome(title, subtitle) {
     applyChrome(title, subtitle);
+  }
+
+  // 轻量 Markdown → HTML 渲染（ES5 兼容，支持 emoji/标题/引用/列表/加粗/代码/分隔线）
+  function renderMarkdown(md) {
+    if (!md) return '';
+    var text = String(md);
+    // 1. 转义 HTML 特殊字符
+    text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    // 2. 标题（#### ### ## #）
+    text = text.replace(/^#### (.+)$/gm, '\n<h4>$1</h4>\n');
+    text = text.replace(/^### (.+)$/gm, '\n<h3>$1</h3>\n');
+    text = text.replace(/^## (.+)$/gm, '\n<h2>$1</h2>\n');
+    text = text.replace(/^# (.+)$/gm, '\n<h1>$1</h1>\n');
+    // 3. 引用块（> ...）
+    text = text.replace(/^&gt; (.+)$/gm, '\n<blockquote>$1</blockquote>\n');
+    // 4. 分隔线 ---
+    text = text.replace(/^---+$/gm, '\n<hr>\n');
+    // 5. 无序列表（- ... 或 * ...）
+    text = text.replace(/^[\-\*] (.+)$/gm, '\n<li>$1</li>\n');
+    // 6. 有序列表（1. ...）
+    text = text.replace(/^\d+\. (.+)$/gm, '\n<li>$1</li>\n');
+    // 7. 把连续 <li> 包成 <ul>
+    text = text.replace(/(?:<li>[\s\S]*?<\/li>\s*)+/g, function (m) {
+      return '<ul>' + m.replace(/\s+/g, ' ') + '</ul>';
+    });
+    // 8. 加粗 **...**
+    text = text.replace(/\*\*([^\*]+?)\*\*/g, '<strong>$1</strong>');
+    // 9. 行内代码 `...`
+    text = text.replace(/`([^`]+?)`/g, '<code>$1</code>');
+    // 10. 段落处理：按空行分块
+    var blocks = text.split(/\n{2,}/);
+    var out = [];
+    for (var i = 0; i < blocks.length; i++) {
+      var b = blocks[i].replace(/^\n+|\n+$/g, '');
+      if (!b) continue;
+      if (/^<(h[1-6]|ul|ol|blockquote|hr|pre|table|div|p)/.test(b)) {
+        out.push(b);
+      } else {
+        b = b.replace(/\n/g, '<br>');
+        out.push('<p>' + b + '</p>');
+      }
+    }
+    return out.join('\n');
   }
 
   function renderMarkdownArticle(data, node) {
@@ -350,7 +498,7 @@ var MemberReader = (function () {
 
     updateChrome(title, node && node.date ? '报告日期 ' + node.date : '');
     body.classList.remove('hidden');
-    body.innerHTML = '<article class="advisor-prose">' + escFn(html) + '</article>'
+    body.innerHTML = '<article class="advisor-prose">' + renderMarkdown(html) + '</article>'
       + '<footer class="advisor-disclaimer">仅供参考，不构成投资建议。数据基于公开信息与系统计算，存在延迟与误差。</footer>';
     setState('READING');
   }
@@ -366,6 +514,10 @@ var MemberReader = (function () {
       frame.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'access_token=' + encodeURIComponent(t);
     }
     setState('READING');
+    // iframe 加载完成后隐藏 AI overlay（如有）
+    if (frame) {
+      frame.onload = function () { hideAiGenOverlay(); };
+    }
   }
 
   function loadAdvisorHtml(date) {
@@ -380,6 +532,9 @@ var MemberReader = (function () {
     }
     updateChrome('AI 选品顾问', date);
     setState('READING');
+    if (frame) {
+      frame.onload = function () { hideAiGenOverlay(); };
+    }
   }
 
   function handleError(err) {
@@ -421,16 +576,24 @@ var MemberReader = (function () {
     }
   }
 
-  function selectNode(node) {
+  function selectNode(node, isUserClick) {
     current.node = node;
     current.date = node.date || '';
     setState('LOADING');
-    highlightTree(node);
+    highlightCard(node);
+
+    // 切换到详情视图
+    showDetailView();
 
     var locked = el('readerLocked');
     var errEl = el('readerError');
     if (locked) locked.style.display = 'none';
     if (errEl) errEl.style.display = 'none';
+
+    // 用户点击卡片时，模拟 AI 实时生成动画（inline 模式，只覆盖详情视图区域）
+    if (isUserClick) {
+      showAiGenOverlay(true);
+    }
 
     if (node.type === 'insight') {
       updateChrome(node.category, node.date);
@@ -442,7 +605,9 @@ var MemberReader = (function () {
     if (node.type === 'overview' && node.date) {
       apiFn('/api/v1/member/advisor/' + encodeURIComponent(node.date), { auth: true })
         .then(function (data) { renderMarkdownArticle(data, node); })
+        .then(function () { if (isUserClick) hideAiGenOverlay(); })
         .catch(function (e) {
+          if (isUserClick) hideAiGenOverlay();
           if (e && e.status === 404) loadAdvisorHtml(node.date);
           else handleError(e);
         });
@@ -452,21 +617,80 @@ var MemberReader = (function () {
     if (node.type === 'direction' && node.date && node.key) {
       apiFn('/api/v1/member/advisor/' + encodeURIComponent(node.date) + '/articles/' + encodeURIComponent(node.key), { auth: true })
         .then(function (data) { renderMarkdownArticle(data, node); })
-        .catch(handleError);
+        .then(function () { if (isUserClick) hideAiGenOverlay(); })
+        .catch(function (e) {
+          if (isUserClick) hideAiGenOverlay();
+          handleError(e);
+        });
       return;
     }
 
     if (node.type === 'archive' && node.date) {
       apiFn('/api/v1/member/advisor/' + encodeURIComponent(node.date), { auth: true })
         .then(function (data) { renderMarkdownArticle(data, node); })
+        .then(function () { if (isUserClick) hideAiGenOverlay(); })
         .catch(function (e) {
+          if (isUserClick) hideAiGenOverlay();
           if (e && e.status === 404) loadAdvisorHtml(node.date);
           else handleError(e);
         });
       return;
     }
 
+    if (isUserClick) hideAiGenOverlay();
     renderEmptyWaiting();
+  }
+
+  function updateKPIs(data) {
+    data = data || {};
+    var today = data.today || {};
+    var insightTree = data.insight_tree || [];
+    var directions = today.directions || [];
+    var insights = today.insights || [];
+    // 今日榜单 = 类目情报数（优先 insight_tree 第一组的 items 数，回退 today.insights）
+    var rankingCount = 0;
+    if (insightTree.length && insightTree[0] && insightTree[0].items) {
+      rankingCount = insightTree[0].items.length;
+    } else {
+      rankingCount = insights.length;
+    }
+    // 方向解读 = directions 数量
+    var dirCount = directions.length;
+    // 蓝海机会 = 高星级（≥4星）类目情报数
+    var blueOcean = 0;
+    var allInsights = [];
+    if (insightTree.length) {
+      for (var i = 0; i < insightTree.length; i++) {
+        var items = (insightTree[i] || {}).items || [];
+        for (var j = 0; j < items.length; j++) allInsights.push(items[j]);
+      }
+    } else {
+      allInsights = insights;
+    }
+    for (var k = 0; k < allInsights.length; k++) {
+      if ((allInsights[k].stars || 0) >= 4) blueOcean++;
+    }
+    // 报告日期
+    var dateStr = today.report_date || '';
+    var dateShort = dateStr ? dateStr.slice(5) : '—'; // MM-DD
+    // 模式标签
+    var mode = today.status === 'published' ? 'AI 已生成' : '生成中';
+
+    var set = function (id, val) {
+      var n = document.getElementById(id);
+      if (n) n.textContent = val;
+    };
+    set('kpiRankings', rankingCount || '—');
+    set('kpiDirections', dirCount || '—');
+    set('kpiBlueOcean', blueOcean || '—');
+    set('kpiDate', dateShort);
+    set('kpiMode', mode);
+    set('kpiRankingsDelta', rankingCount ? '类目情报' : '暂无');
+    set('kpiDirectionsDelta', dirCount ? '个方向' : '暂无');
+    // 侧栏会员标签
+    var planLabel = (data.membership && (data.membership.plan_label || data.membership.plan_code)) || '会员版';
+    var planNode = document.getElementById('sidebarPlanLabel');
+    if (planNode) planNode.textContent = planLabel;
   }
 
   function loadDashboard() {
@@ -488,30 +712,11 @@ var MemberReader = (function () {
       });
     }).then(function (bundle) {
       renderHero(bundle.radar, bundle.recommend);
-      renderSidebar(bundle.data.today || {}, bundle.data.insight_tree || {});
+      // 渲染横排卡片瀑布流列表（今日简报 / 方向解读 / 类目情报）
+      renderCardList(bundle.data.today || {}, bundle.data.insight_tree || []);
       var today = bundle.data.today || {};
       applyChrome('今日分析', today.report_date ? '报告日期 ' + today.report_date : '');
-      if (today.overview) {
-        selectNode({ type: 'overview', date: today.report_date || '' });
-      } else if (today.insights && today.insights.length) {
-        selectNode({
-          type: 'insight',
-          date: today.insights[0].report_date || today.report_date,
-          category: today.insights[0].category
-        });
-      } else if (bundle.data.insight_tree && bundle.data.insight_tree.length && bundle.data.insight_tree[0].items && bundle.data.insight_tree[0].items.length) {
-        selectNode({
-          type: 'insight',
-          date: bundle.data.insight_tree[0].report_date,
-          category: bundle.data.insight_tree[0].items[0].category
-        });
-      } else if (today.report_date && today.status === 'published') {
-        selectNode({ type: 'overview', date: today.report_date });
-      } else if (today.status === 'pending') {
-        renderPendingState(today);
-      } else {
-        renderEmptyWaiting();
-      }
+      updateKPIs(bundle.data);
       hideAiGenOverlay();
       return bundle.data;
     }).catch(function (err) {
@@ -558,11 +763,18 @@ var MemberReader = (function () {
     return loadDashboard();
   }
 
+  // 暴露为全局，供 HTML onclick 调用
+  window.backToCardList = backToCardList;
+  window.selectNode = function (node, isUserClick) {
+    selectNode(node, isUserClick !== undefined ? isUserClick : true);
+  };
+
   return {
     boot: boot,
     loadDashboard: loadDashboard,
     loadArchive: loadArchive,
     selectNode: selectNode,
+    backToCardList: backToCardList,
     getDashboard: function () { return dashboard; }
   };
 })();

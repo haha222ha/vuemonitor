@@ -90,12 +90,27 @@ def _list_items_from_disk() -> list[dict]:
                 continue
             meta = _load_insight_json(report_date, cat) or {}
             report = meta.get("report") or {}
+            metrics = meta.get("metrics") or {}
+            llm_feed = meta.get("llm_feed") or {}
+            sel_summary = llm_feed.get("selection_summary") or {}
             items.append(
                 {
                     "category": cat,
                     "report_date": report_date,
                     "stars": report.get("opportunity_stars") or 3,
                     "title": f"{cat} 情报",
+                    "summary": report.get("executive_summary") or report.get("trend_summary") or "",
+                    "growth_rate": metrics.get("growth_rate_pct"),
+                    "blue_ocean_score": metrics.get("blue_ocean_score"),
+                    "competition_index": metrics.get("competition_index"),
+                    "heat_score": metrics.get("heat_score"),
+                    "lifecycle_stage": metrics.get("lifecycle_stage") or report.get("lifecycle_stage"),
+                    "trend_label": metrics.get("trend_label"),
+                    "price_band": metrics.get("price_band"),
+                    "median_price": sel_summary.get("median_price"),
+                    "confidence": report.get("confidence"),
+                    "action_enter": (report.get("action_plan") or {}).get("enter"),
+                    "sample_size": sel_summary.get("sample_size"),
                 }
             )
     items.sort(key=lambda x: (x.get("report_date", ""), x.get("category", "")), reverse=True)

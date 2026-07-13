@@ -101,6 +101,30 @@ var MemberRouter = (function () {
 
     });
 
+    // 新布局 v2：同步左侧栏 nav-item active + app-panel active
+    document.querySelectorAll('.app-sidebar .nav-item[data-app-nav]').forEach(function (btn) {
+
+      btn.classList.toggle('active', btn.getAttribute('data-app-nav') === current);
+
+    });
+
+    var panelMap = { today: 'panelToday', archive: 'panelArchive', watchlist: 'panelWatchlist', account: 'panelAccount' };
+
+    var panelId = panelMap[current];
+
+    document.querySelectorAll('.app-panel').forEach(function (p) {
+
+      p.classList.toggle('active', p.id === panelId);
+
+    });
+
+    // 同步移动端底部导航 active
+    document.querySelectorAll('.reader-mobile-nav-btn[data-route]').forEach(function (btn) {
+
+      btn.classList.toggle('active', btn.getAttribute('data-route') === current);
+
+    });
+
 
 
     var dashInsight = document.getElementById('dashInsight');
@@ -125,11 +149,31 @@ var MemberRouter = (function () {
 
 
 
-    if (current === 'today' && window.MemberReader && !booted && !expired) {
+    if (current === 'today' && window.MemberReader && !expired) {
 
-      booted = true;
+      if (!booted) {
 
-      MemberReader.boot().catch(function () { booted = false; });
+        booted = true;
+
+        MemberReader.boot().catch(function () { booted = false; });
+
+      } else if (typeof MemberReader.loadDashboard === 'function') {
+
+        // 已 boot 过：如果卡片列表为空（之前加载失败或被清空），重新加载
+
+        var cardBody = document.getElementById('readerCardListBody');
+
+        var cardDetail = document.getElementById('readerDetail');
+
+        var isEmpty = (!cardBody || !cardBody.children.length) && (!cardDetail || cardDetail.classList.contains('hidden'));
+
+        if (isEmpty) {
+
+          MemberReader.loadDashboard();
+
+        }
+
+      }
 
     }
 
@@ -193,7 +237,8 @@ var MemberRouter = (function () {
 
     } else if (location.hash !== hash) {
 
-      location.hash = hash;
+      // 用 pushState 替代 location.hash = hash，避免浏览器默认滚动行为导致页面"滑走"
+      history.pushState(null, '', location.pathname + location.search + hash);
 
     }
 
@@ -206,6 +251,14 @@ var MemberRouter = (function () {
   function init() {
 
     var route = normalizeHash();
+
+    // 已登录用户如果 URL hash 是 guest portal tab（login/demo/center），强制跳到 today
+    var dashView = document.getElementById('dashView');
+    var isLoggedIn = dashView && !dashView.classList.contains('hidden');
+    if (isLoggedIn && (route === 'login' || route === 'demo' || route === 'center')) {
+      route = membershipExpired() ? 'account' : 'today';
+      history.replaceState(null, '', location.pathname + location.search + '#' + route);
+    }
 
     if (location.hash === '#reports' || location.hash === '#insight') {
 
@@ -220,6 +273,13 @@ var MemberRouter = (function () {
       hashBound = true;
 
       window.addEventListener('hashchange', function () {
+
+        applyRoute(normalizeHash());
+
+      });
+
+      // pushState 改变了 URL 但不触发 hashchange，需要监听 popstate 让后退/前进按钮正常工作
+      window.addEventListener('popstate', function () {
 
         applyRoute(normalizeHash());
 
