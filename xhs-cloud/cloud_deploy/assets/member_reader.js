@@ -49,6 +49,68 @@ var MemberReader = (function () {
     setState('IDLE');
   }
 
+  function renderPendingState(today) {
+    var hint = '报告生成中，预计今日 18:30 前更新。';
+    if (today && today.report_date) {
+      hint += ' 可先浏览侧栏类目情报或「历史归档」。';
+    }
+    renderEmptyWaiting(hint);
+    setState('PENDING');
+    var chrome = el('readerChrome');
+    if (chrome) {
+      var hero = chrome.getAttribute('data-hero-html') || '';
+      chrome.innerHTML = hero + '<h2>今日分析</h2><p>生成中 · 预计 18:30 前更新</p>';
+    }
+  }
+
+  function bindReadingProgress() {
+    var bar = el('readerProgress');
+    if (!bar) return;
+    var span = bar.querySelector('span');
+    function onScroll(target) {
+      if (!target) return;
+      var h = target.scrollHeight - target.clientHeight;
+      var pct = h > 0 ? Math.min(100, Math.round((target.scrollTop / h) * 100)) : 0;
+      if (span) span.style.width = pct + '%';
+      bar.setAttribute('aria-hidden', pct <= 2 ? 'true' : 'false');
+    }
+    var body = el('readerBody');
+    var main = el('readerMain');
+    if (body) body.addEventListener('scroll', function () { onScroll(body); });
+    if (main) main.addEventListener('scroll', function () { onScroll(main); });
+  }
+
+  function bindReaderUX() {
+    var toggle = el('readerSidebarToggle');
+    var layout = document.querySelector('.reader-layout');
+    if (toggle && layout) {
+      toggle.onclick = function () {
+        layout.classList.toggle('sidebar-open');
+      };
+    }
+    var mobileNav = el('readerMobileNav');
+    if (mobileNav) {
+      mobileNav.classList.remove('hidden');
+      mobileNav.querySelectorAll('[data-route]').forEach(function (btn) {
+        btn.onclick = function () {
+          var route = btn.getAttribute('data-route') || 'today';
+          if (layout) layout.classList.remove('sidebar-open');
+          if (typeof switchDash === 'function') {
+            if (route === 'today') switchDash('today');
+            else if (route === 'archive') switchDash('archive');
+            else if (route === 'watchlist') switchDash('watchlist');
+            else if (route === 'account') switchDash('account');
+          }
+          if (window.MemberRouter) MemberRouter.go(route);
+          mobileNav.querySelectorAll('.reader-mobile-nav-btn').forEach(function (b) {
+            b.classList.toggle('active', b === btn);
+          });
+        };
+      });
+    }
+    bindReadingProgress();
+  }
+
   function renderHero(radar, recommendations) {
     var chrome = el('readerChrome');
     if (!chrome) return;
@@ -353,6 +415,8 @@ var MemberReader = (function () {
         });
       } else if (today.report_date && today.status === 'published') {
         selectNode({ type: 'overview', date: today.report_date });
+      } else if (today.status === 'pending') {
+        renderPendingState(today);
       } else {
         renderEmptyWaiting();
       }
@@ -394,6 +458,7 @@ var MemberReader = (function () {
   }
 
   function boot() {
+    bindReaderUX();
     return loadDashboard();
   }
 

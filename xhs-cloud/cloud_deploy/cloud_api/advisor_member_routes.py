@@ -9,6 +9,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
+from pydantic import BaseModel, Field
 
 from cloud_deploy.cloud_api import database as db
 from cloud_deploy.cloud_api.auth import current_user
@@ -20,6 +21,11 @@ from cloud_deploy.cloud_api.member_entitlements import (
 
 router = APIRouter(prefix="/api/v1/member/advisor", tags=["advisor"])
 _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+class AdvisorChatBody(BaseModel):
+    query: str = Field(..., min_length=2, max_length=2000)
+    context_date: str = Field(default="", max_length=10)
 
 
 def _log_behavior(
@@ -149,6 +155,80 @@ def advisor_library(user: dict = Depends(current_user)):
     assert_advisor_allowed(user["id"])
     _log_behavior(user["id"], "advisor_library")
     return {"items": _advisor_library_items()}
+
+
+@router.post("/chat")
+def advisor_chat(body: AdvisorChatBody, user: dict = Depends(current_user)):
+    enriched = assert_advisor_allowed(user["id"])
+    daily_limit = int(enriched.get("advisor_chat_daily") or 0)
+    if daily_limit <= 0:
+        raise HTTPException(status_code=403, detail="当前套餐不含 AI 对话")
+
+    from cloud_deploy.cloud_api.advisor_chat_quota import try_consume_chat
+    from cloud_deploy.cloud_api.database_pg import _conn
+
+    conn = _conn()
+    try:
+        ok, msg, usage = try_consume_chat(conn, user["id"], daily_limit)
+        if not ok:
+            raise HTTPException(status_code=429, detail=msg)
+        conn.commit()
+    finally:
+        conn.close()
+
+    query = body.query.strip()
+    context_date = (body.context_date or "").strip()
+    if context_date and not _DATE_RE.match(context_date):
+        raise HTTPException(status_code=400, detail="context_date 格式应为 YYYY-MM-DD")
+
+    dates = _list_advisor_dates()
+    ref_date = context_date or (dates[0] if dates else "")
+    context_hint = ""
+    if ref_date:
+        try:
+            advice = _load_public_advice(ref_date)
+            ov = advice.get("daily_overview") or {}
+            context_hint = str(ov.get("summary") or ov.get("content") or "")[:1200]
+        except HTTPException:
+            context_hint = ""
+
+    content = ""
+    try:
+        from cloud_deploy.reporting.insight_llm_client import LLMError, chat_json_with_usage
+
+        prompt = (
+            "你是 PA AI 选品顾问，仅基于预生成报告摘要回答，不得编造商品 ID 或店铺名。\n"
+            f"报告日期：{ref_date or '未知'}\n摘要：{context_hint or '（暂无当日摘要）'}\n"
+            f"用户问题：{query}\n"
+            "请用简洁中文回答，并注明仅供参考。"
+        )
+        parsed, _usage = chat_json_with_usage(
+            messages=[{"role": "user", "content": prompt}],
+            response_schema=None,
+            max_tokens=800,
+        )
+        if isinstance(parsed, dict):
+            content = str(parsed.get("content") or parsed.get("answer") or "")
+        elif isinstance(parsed, str):
+            content = parsed
+    except Exception:
+        content = ""
+
+    if not content.strip():
+        content = (
+            f"基于当前已发布报告（{ref_date or '暂无'}），"
+            f"「{query}」建议结合侧栏「方向解读」与类目情报进一步阅读。"
+            "如需实时追问，请确保当日报告已发布。"
+        )
+
+    quota_remaining = max(daily_limit - int(usage.get("chat_count") or 0), 0)
+    _log_behavior(user["id"], "advisor_chat", report_date=ref_date or None, metadata={"query_len": len(query)})
+    return {
+        "query": query,
+        "content": content.strip(),
+        "quota_remaining": quota_remaining,
+        "disclaimer": "仅供参考，不构成投资建议。回答基于预生成报告摘要，存在延迟与误差。",
+    }
 
 
 @router.get("/dashboard")

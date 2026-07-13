@@ -193,6 +193,25 @@ def _init_db_on_conn(conn) -> None:
                     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
                 );
                 CREATE INDEX IF NOT EXISTS idx_member_keyword_requests_status ON member_keyword_requests(status, created_at DESC);
+                CREATE TABLE IF NOT EXISTS user_addon_credits (
+                    id SERIAL PRIMARY KEY,
+                    user_id INT NOT NULL REFERENCES users(id),
+                    addon_type VARCHAR(32) NOT NULL DEFAULT 'custom_analysis',
+                    credits INT NOT NULL DEFAULT 0,
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    UNIQUE(user_id, addon_type)
+                );
+                CREATE TABLE IF NOT EXISTS user_addon_credit_log (
+                    id SERIAL PRIMARY KEY,
+                    user_id INT NOT NULL REFERENCES users(id),
+                    addon_type VARCHAR(32) NOT NULL,
+                    delta INT NOT NULL,
+                    balance_after INT NOT NULL,
+                    source TEXT,
+                    ref_id VARCHAR(64),
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                );
+                CREATE INDEX IF NOT EXISTS idx_user_addon_credit_log_user ON user_addon_credit_log(user_id, created_at DESC);
                 CREATE TABLE IF NOT EXISTS payment_orders (
                     id SERIAL PRIMARY KEY,
                     order_no VARCHAR(64) UNIQUE NOT NULL,
@@ -1382,9 +1401,105 @@ def renew_with_auth_code(user_id: int, code: str) -> dict:
         conn.close()
 
 
+def get_addon_credits(user_id: int, addon_type: str = "custom_analysis") -> int:
+    addon_type = (addon_type or "custom_analysis").strip() or "custom_analysis"
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                "SELECT credits FROM user_addon_credits WHERE user_id=%s AND addon_type=%s",
+                (user_id, addon_type),
+            )
+            row = c.fetchone()
+            return int(row["credits"]) if row else 0
+    finally:
+        conn.close()
+
+
+def add_addon_credits(
+    user_id: int,
+    addon_type: str,
+    amount: int,
+    *,
+    source: str = "",
+    ref_id: str = "",
+) -> int:
+    addon_type = (addon_type or "custom_analysis").strip() or "custom_analysis"
+    delta = int(amount or 0)
+    if delta <= 0:
+        return get_addon_credits(user_id, addon_type)
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """INSERT INTO user_addon_credits (user_id, addon_type, credits, updated_at)
+                   VALUES (%s, %s, %s, NOW())
+                   ON CONFLICT (user_id, addon_type) DO UPDATE
+                   SET credits = user_addon_credits.credits + EXCLUDED.credits,
+                       updated_at = NOW()
+                   RETURNING credits""",
+                (user_id, addon_type, delta),
+            )
+            balance = int(c.fetchone()["credits"])
+            c.execute(
+                """INSERT INTO user_addon_credit_log
+                   (user_id, addon_type, delta, balance_after, source, ref_id)
+                   VALUES (%s, %s, %s, %s, %s, %s)""",
+                (user_id, addon_type, delta, balance, (source or "")[:255], (ref_id or "")[:64]),
+            )
+        conn.commit()
+        return balance
+    finally:
+        conn.close()
+
+
+def consume_addon_credit(user_id: int, addon_type: str = "custom_analysis") -> bool:
+    addon_type = (addon_type or "custom_analysis").strip() or "custom_analysis"
+    conn = _conn()
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """UPDATE user_addon_credits
+                   SET credits = credits - 1, updated_at = NOW()
+                   WHERE user_id=%s AND addon_type=%s AND credits > 0
+                   RETURNING credits""",
+                (user_id, addon_type),
+            )
+            row = c.fetchone()
+            if not row:
+                conn.rollback()
+                return False
+            balance = int(row["credits"])
+            c.execute(
+                """INSERT INTO user_addon_credit_log
+                   (user_id, addon_type, delta, balance_after, source, ref_id)
+                   VALUES (%s, %s, %s, %s, %s, %s)""",
+                (user_id, addon_type, -1, balance, "consume", ""),
+            )
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+
 def fulfill_addon_order(user_id: int, code: str, plan_code: str) -> dict:
-    """定制分析等加购订单：仅核销授权码，不延长会员。"""
-    return renew_with_auth_code(user_id, code)
+    """定制分析等加购订单：核销授权码并写入按次额度，不延长会员。"""
+    from cloud_deploy.cloud_api.payment_plans import PLAN_BY_CODE
+
+    profile = renew_with_auth_code(user_id, code)
+    plan = PLAN_BY_CODE.get(str(plan_code or "").strip()) or {}
+    tpl = plan.get("entitlements_template") or {}
+    addon = str(tpl.get("addon") or "custom_analysis")
+    credit = int(tpl.get("custom_analysis_credit") or 0)
+    if credit > 0:
+        balance = add_addon_credits(user_id, addon, credit, source="addon_order", ref_id=code)
+        profile["custom_analysis_credits"] = balance
+    else:
+        profile["custom_analysis_credits"] = get_addon_credits(user_id, addon)
+    return profile
 
 
 def renew_with_credentials(username: str, password: str, code: str) -> dict:

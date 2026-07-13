@@ -200,3 +200,90 @@
 .reader-hero-label{font-size:11px;font-weight:700;color:var(--reader-muted);margin-right:4px}
 .reader-hero-chip{border:1px solid var(--reader-line);background:#eef5ff;color:var(--reader-accent);border-radius:16px;padding:4px 10px;font-size:12px;cursor:pointer}
 .reader-hero-chip:hover{border-color:var(--reader-accent)}
+
+.reader-topbar {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 0;
+}
+
+.reader-sidebar-toggle {
+  display: none;
+  border: 1px solid var(--reader-line);
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.reader-progress {
+  flex: 1;
+  height: 3px;
+  background: var(--reader-line);
+  border-radius: 999px;
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.reader-progress[aria-hidden="false"] { opacity: 1; }
+
+.reader-progress span {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--reader-accent);
+  transition: width 0.12s linear;
+}
+
+.reader-mobile-nav {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 120;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0));
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--reader-line);
+}
+
+.reader-mobile-nav-btn {
+  border: none;
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 4px;
+  color: var(--reader-muted);
+  cursor: pointer;
+}
+
+.reader-mobile-nav-btn.active,
+.reader-mobile-nav-btn:hover { color: var(--reader-accent); }
+
+@media (max-width: 720px) {
+  .reader-topbar { display: flex; }
+  .reader-sidebar-toggle { display: inline-flex; }
+  .reader-sidebar {
+    display: none;
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: calc(56px + env(safe-area-inset-bottom, 0));
+    max-height: min(52vh, 420px);
+    z-index: 110;
+    box-shadow: var(--reader-shadow);
+  }
+  .reader-layout.sidebar-open .reader-sidebar { display: block; }
+  .reader-mobile-nav:not(.hidden) { display: grid; }
+  #memberShell { padding-bottom: calc(64px + env(safe-area-inset-bottom, 0)); }
+  body[data-reader-state="PENDING"] .reader-empty {
+    background: linear-gradient(180deg, rgba(0, 113, 227, 0.06), transparent);
+    border-radius: 12px;
+    padding: 24px 16px;
+  }
+}

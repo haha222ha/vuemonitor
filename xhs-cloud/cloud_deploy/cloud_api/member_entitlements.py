@@ -52,6 +52,10 @@ def enrich_member_profile(profile: dict | None, user_id: int) -> dict | None:
         expires_at=expires,
         entitlements=ent,
     )
+    try:
+        out["custom_analysis_credits"] = db.get_addon_credits(user_id, "custom_analysis")
+    except Exception:
+        out["custom_analysis_credits"] = 0
     return out
 
 

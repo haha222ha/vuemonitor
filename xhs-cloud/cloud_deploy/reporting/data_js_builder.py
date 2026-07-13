@@ -19,7 +19,6 @@ from cloud_deploy.reporting.constants import (
     REPORT_DISCLAIMER,
     SELECTION_GUIDE,
     item_at,
-    item_delta,
 )
 from cloud_deploy.reporting.report_charts import build_charts_and_tops
 
@@ -62,8 +61,8 @@ def build_report_payload(
     median_price = round(prices[len(prices) // 2], 1) if prices else 0
     avg_price = round(sum(prices) / len(prices), 1) if prices else 0
     avg_v1d = round(sum(float(item_at(item, "v1d", 0) or 0) for item in items) / len(items), 1) if items else 0
-    delta_values = [item_delta(item) for item in items if item_delta(item) > 0]
-    avg_actual_v1d = round(sum(delta_values) / len(delta_values), 1) if delta_values else 0
+    actual_values = [float(item_at(item, "actual_v1d", 0) or 0) for item in items if float(item_at(item, "actual_v1d", 0) or 0) > 0]
+    avg_actual_v1d = round(sum(actual_values) / len(actual_values), 1) if actual_values else 0
     gr_values = [float(item_at(item, "actual_gr", 0) or 0) for item in items if float(item_at(item, "actual_gr", 0) or 0) > 0]
     avg_actual_gr = round(sum(gr_values) / len(gr_values), 2) if gr_values else 0
     vsr_values = [float(item_at(item, "actual_vsr", 0) or 0) for item in items if float(item_at(item, "actual_vsr", 0) or 0) > 0]

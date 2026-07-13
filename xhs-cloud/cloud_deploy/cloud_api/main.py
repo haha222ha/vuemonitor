@@ -174,6 +174,13 @@ class MemberKeywordRequestBody(BaseModel):
     machine_id: str = Field(default="", max_length=64)
 
 
+class CustomAnalysisSubmitBody(BaseModel):
+    keywords: str = Field(..., min_length=1, max_length=4000)
+    note: str = Field(default="", max_length=2000)
+    app_version: str = Field(default="", max_length=32)
+    machine_id: str = Field(default="", max_length=64)
+
+
 class AdminFeedbackUpdateBody(BaseModel):
     status: str | None = Field(default=None, max_length=16)
     admin_note: str | None = Field(default=None, max_length=2000)
@@ -719,46 +726,80 @@ def member_submit_keyword_request(body: MemberKeywordRequestBody, request: Reque
         raise HTTPException(status_code=500, detail=f"提交失败: {e}") from e
 
 
-@app.get("/public/trial/preview", response_class=HTMLResponse)
-def public_trial_preview_page():
-    from cloud_deploy.cloud_api.trial_public_service import trial_preview_html
+@app.post("/api/v1/member/custom-analysis/submit")
+def member_submit_custom_analysis(
+    body: CustomAnalysisSubmitBody, request: Request, user: dict = Depends(current_member)
+):
+    keywords = (body.keywords or "").strip()
+    if not keywords:
+        raise HTTPException(status_code=400, detail="请填写关键词或需求描述")
+    credits = db.get_addon_credits(int(user["id"]), "custom_analysis")
+    if credits <= 0:
+        raise HTTPException(status_code=402, detail="无可用定制分析次数，请先购买")
+    if not db.consume_addon_credit(int(user["id"]), "custom_analysis"):
+        raise HTTPException(status_code=402, detail="无可用定制分析次数，请先购买")
+    note = (body.note or "").strip()
+    full_note = "[定制分析] " + note if note else "[定制分析]"
+    try:
+        result = db.create_member_keyword_request(
+            user_id=int(user["id"]),
+            username=str(user.get("username") or ""),
+            keywords=keywords,
+            note=full_note[:2000],
+            app_version=(body.app_version or "").strip(),
+            machine_id=(body.machine_id or "").strip(),
+            client_ip=_client_ip(request),
+        )
+        remaining = db.get_addon_credits(int(user["id"]), "custom_analysis")
+        return {
+            "message": "定制分析需求已提交，已扣减 1 次额度",
+            "credits_remaining": remaining,
+            **result,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"提交失败: {e}") from e
 
-    return trial_preview_html()
+
+@app.get("/public/trial/preview")
+def public_trial_preview_page():
+    from fastapi.responses import RedirectResponse
+
+    return RedirectResponse(url="/public/advisor-demo", status_code=302)
 
 
 @app.get("/public/trial/{file_name}")
 def public_trial_static_asset(file_name: str):
-    from cloud_deploy.cloud_api.trial_public_service import trial_file_response
+    from fastapi.responses import RedirectResponse
 
-    return trial_file_response(file_name)
+    return RedirectResponse(url="/public/advisor-demo", status_code=302)
 
 
 @app.get("/public/trial")
 def public_trial_redirect():
     from fastapi.responses import RedirectResponse
 
-    return RedirectResponse(url="/public/trial/preview", status_code=302)
+    return RedirectResponse(url="/public/advisor-demo", status_code=302)
+
+
+_TRIAL_REPORT_GONE = {
+    "detail": "表格体验包已下线，请使用 AI 选品样例",
+    "migration_url": "/public/advisor-demo",
+}
 
 
 @app.get("/api/v1/public/trial-report/info")
 def public_trial_report_info():
-    from cloud_deploy.cloud_api.trial_public_service import trial_info
-
-    return trial_info()
+    raise HTTPException(status_code=410, detail=_TRIAL_REPORT_GONE)
 
 
 @app.get("/api/v1/public/trial-report/download")
 def public_trial_report_download():
-    from cloud_deploy.cloud_api.trial_public_service import trial_download_response
-
-    return trial_download_response()
+    raise HTTPException(status_code=410, detail=_TRIAL_REPORT_GONE)
 
 
 @app.get("/api/v1/public/trial-report/view/{file_name}")
 def public_trial_report_view_file(file_name: str):
-    from cloud_deploy.cloud_api.trial_public_service import trial_file_response
-
-    return trial_file_response(file_name)
+    raise HTTPException(status_code=410, detail=_TRIAL_REPORT_GONE)
 
 
 @app.get("/public/advisor-demo", response_class=HTMLResponse)

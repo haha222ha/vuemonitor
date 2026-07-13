@@ -48,7 +48,7 @@ def pick_demo_report() -> dict[str, Any]:
         out = {
             "available": False,
             "reason": "no_data",
-            "message": "样例报告筹备中，请稍后刷新或先查看选品体验包",
+            "message": "样例报告筹备中，请稍后刷新或开通体验卡阅读完整 AI 分析",
         }
         _META_CACHE = out
         return dict(out)

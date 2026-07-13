@@ -123,6 +123,24 @@ def init_db() -> None:
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS user_addon_credits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            addon_type TEXT NOT NULL DEFAULT 'custom_analysis',
+            credits INTEGER NOT NULL DEFAULT 0,
+            updated_at TEXT NOT NULL,
+            UNIQUE(user_id, addon_type)
+        );
+        CREATE TABLE IF NOT EXISTS user_addon_credit_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            addon_type TEXT NOT NULL,
+            delta INTEGER NOT NULL,
+            balance_after INTEGER NOT NULL,
+            source TEXT,
+            ref_id TEXT,
+            created_at TEXT NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS payment_orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             order_no TEXT UNIQUE NOT NULL,
@@ -1004,8 +1022,105 @@ def renew_with_auth_code(user_id: int, code: str) -> dict:
     return profile
 
 
+def get_addon_credits(user_id: int, addon_type: str = "custom_analysis") -> int:
+    addon_type = (addon_type or "custom_analysis").strip() or "custom_analysis"
+    conn = _conn()
+    c = conn.cursor()
+    c.execute(
+        "SELECT credits FROM user_addon_credits WHERE user_id=? AND addon_type=?",
+        (user_id, addon_type),
+    )
+    row = c.fetchone()
+    conn.close()
+    return int(row[0]) if row else 0
+
+
+def add_addon_credits(
+    user_id: int,
+    addon_type: str,
+    amount: int,
+    *,
+    source: str = "",
+    ref_id: str = "",
+) -> int:
+    addon_type = (addon_type or "custom_analysis").strip() or "custom_analysis"
+    delta = int(amount or 0)
+    if delta <= 0:
+        return get_addon_credits(user_id, addon_type)
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    conn = _conn()
+    c = conn.cursor()
+    c.execute(
+        "SELECT credits FROM user_addon_credits WHERE user_id=? AND addon_type=?",
+        (user_id, addon_type),
+    )
+    row = c.fetchone()
+    if row:
+        balance = int(row[0]) + delta
+        c.execute(
+            "UPDATE user_addon_credits SET credits=?, updated_at=? WHERE user_id=? AND addon_type=?",
+            (balance, now, user_id, addon_type),
+        )
+    else:
+        balance = delta
+        c.execute(
+            "INSERT INTO user_addon_credits (user_id, addon_type, credits, updated_at) VALUES (?,?,?,?)",
+            (user_id, addon_type, balance, now),
+        )
+    c.execute(
+        """INSERT INTO user_addon_credit_log
+           (user_id, addon_type, delta, balance_after, source, ref_id, created_at)
+           VALUES (?,?,?,?,?,?,?)""",
+        (user_id, addon_type, delta, balance, (source or "")[:255], (ref_id or "")[:64], now),
+    )
+    conn.commit()
+    conn.close()
+    return balance
+
+
+def consume_addon_credit(user_id: int, addon_type: str = "custom_analysis") -> bool:
+    addon_type = (addon_type or "custom_analysis").strip() or "custom_analysis"
+    conn = _conn()
+    c = conn.cursor()
+    c.execute(
+        "SELECT credits FROM user_addon_credits WHERE user_id=? AND addon_type=? AND credits > 0",
+        (user_id, addon_type),
+    )
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        return False
+    balance = int(row[0]) - 1
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    c.execute(
+        "UPDATE user_addon_credits SET credits=?, updated_at=? WHERE user_id=? AND addon_type=?",
+        (balance, now, user_id, addon_type),
+    )
+    c.execute(
+        """INSERT INTO user_addon_credit_log
+           (user_id, addon_type, delta, balance_after, source, ref_id, created_at)
+           VALUES (?,?,?,?,?,?,?)""",
+        (user_id, addon_type, -1, balance, "consume", "", now),
+    )
+    conn.commit()
+    conn.close()
+    return True
+
+
 def fulfill_addon_order(user_id: int, code: str, plan_code: str) -> dict:
-    return renew_with_auth_code(user_id, code)
+    from cloud_deploy.cloud_api.payment_plans import PLAN_BY_CODE
+
+    profile = renew_with_auth_code(user_id, code)
+    plan = PLAN_BY_CODE.get(str(plan_code or "").strip()) or {}
+    tpl = plan.get("entitlements_template") or {}
+    addon = str(tpl.get("addon") or "custom_analysis")
+    credit = int(tpl.get("custom_analysis_credit") or 0)
+    if credit > 0:
+        balance = add_addon_credits(user_id, addon, credit, source="addon_order", ref_id=code)
+        profile["custom_analysis_credits"] = balance
+    else:
+        profile["custom_analysis_credits"] = get_addon_credits(user_id, addon)
+    return profile
 
 
 def renew_with_credentials(username: str, password: str, code: str) -> dict:
