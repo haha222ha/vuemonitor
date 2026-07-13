@@ -7,11 +7,11 @@
   var THEME_KEY = 'xhs_member_portal_theme';
   var THEMES = ['apple', 'aurora', 'classic', 'light', 'warm'];
   var THEME_LABELS = {
-    apple: 'Apple 默认',
-    aurora: '极光清新',
-    classic: '经典深色',
-    light: '高对比浅色',
-    warm: '暖色体验'
+    apple: 'Apple 冰晶',
+    aurora: '极光霓虹',
+    classic: '深空终端',
+    light: '电光极简',
+    warm: '琥珀熔金'
   };
 
   function getToken() {

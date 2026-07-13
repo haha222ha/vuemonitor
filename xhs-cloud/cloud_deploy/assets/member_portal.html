@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260713h">
-<link rel="stylesheet" href="/assets/member_theme.css?v=20260713h">
-<link rel="stylesheet" href="/assets/member_reader.css?v=20260713h">
-<link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260713h">
+<meta name="portal-build" content="20260713i">
+<link rel="stylesheet" href="/assets/member_theme.css?v=20260713i">
+<link rel="stylesheet" href="/assets/member_reader.css?v=20260713i">
+<link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260713i">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
 <script>
@@ -30,9 +30,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;backgrou
 .wrap{max-width:920px;margin:0 auto;padding:20px 16px calc(48px + var(--safe-b))}
 h1{font-size:clamp(22px,5vw,28px);font-weight:700;margin-bottom:4px;letter-spacing:-.02em}
 .sub{color:var(--text2);font-size:clamp(13px,3.2vw,14px);margin-bottom:20px;line-height:1.5}
-.card{background:var(--surface);border-radius:var(--radius);padding:clamp(16px,4vw,20px);margin-bottom:16px;border:1px solid var(--line);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card{background:var(--surface);border-radius:var(--radius);padding:clamp(16px,4vw,20px);margin-bottom:16px;border:1px solid var(--line);box-shadow:var(--card-shadow,0 1px 3px rgba(0,0,0,.04))}
 .tabs{display:flex;gap:8px;margin-bottom:16px}
-.tab{flex:1;text-align:center;padding:10px 12px;border-radius:20px;font-size:14px;cursor:pointer;background:#e8e8ed;color:var(--text2);-webkit-tap-highlight-color:transparent}
+.tab{flex:1;text-align:center;padding:10px 12px;border-radius:20px;font-size:14px;cursor:pointer;background:var(--chip-bg,#e8e8ed);color:var(--text2);-webkit-tap-highlight-color:transparent}
 .tab.active{background:var(--accent);color:#fff}
 .field{margin-bottom:14px}
 .field label{display:block;font-size:12px;color:var(--text2);margin-bottom:6px}
@@ -41,7 +41,6 @@ h1{font-size:clamp(22px,5vw,28px);font-weight:700;margin-bottom:4px;letter-spaci
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 20px;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .btn-block{width:100%}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:active{filter:brightness(.92)}
 .btn-ghost{background:transparent;color:var(--accent);min-height:36px;padding:6px 12px;font-size:14px}
 .alert{padding:12px 14px;border-radius:10px;font-size:14px;margin-bottom:16px;line-height:1.5}
 .alert-warn{background:#fff4e5;color:#8a6100;border:1px solid #ffd699}
@@ -77,7 +76,7 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
 .welcome-chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);background:#e8e8ed;padding:6px 12px;border-radius:20px;margin-top:8px}
 .welcome-chip strong{color:var(--text)}
 .portal-tabs{display:flex;gap:8px;margin-bottom:16px}
-.portal-tab{flex:1;text-align:center;padding:12px 14px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;background:#e8e8ed;color:var(--text2);-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s}
+.portal-tab{flex:1;text-align:center;padding:12px 14px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;background:var(--chip-bg,#e8e8ed);color:var(--text2);-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,box-shadow .2s,transform .2s}
 .portal-tab.active{background:var(--accent);color:#fff}
 .benefit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
 @media(min-width:520px){.benefit-grid{grid-template-columns:repeat(3,1fr)}}
@@ -87,7 +86,7 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
 .benefit-item .bi-desc{font-size:12px;color:var(--text2);line-height:1.55}
 .section-title{font-size:16px;font-weight:600}
 .renew-box{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
-.notice-card{background:linear-gradient(135deg,#f0f7ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5}
+.notice-card{background:var(--notice-grad,linear-gradient(135deg,#f0f7ff 0%,#f9f9fb 100%));border:1px solid var(--notice-border,#c5d9f5)}
 .notice-card .notice-title{font-size:15px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .notice-card ul{margin:0;padding-left:18px;font-size:13px;color:var(--text2);line-height:1.75}
 .notice-card li{margin-bottom:4px}
@@ -191,9 +190,9 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 </head>
 <body>
 <div class="wrap">
-  <div class="topbar">
+  <div class="topbar portal-hero">
     <div>
-      <h1>选品 AI 顾问 · 会员中心</h1>
+      <h1 class="portal-title">选品 AI 顾问 · 会员中心</h1>
       <p class="sub">每晚 AI 预生成选品分析，点开即读 · 不含可下载商品表格 · 方向级文字结论</p>
       <div class="welcome-chip hidden" id="welcomeChip">欢迎回来，<strong id="welcomeName"></strong></div>
     </div>
@@ -532,11 +531,11 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   </div>
   </div><!-- /memberShell -->
 </div>
-<script src="/assets/member_portal_state.js?v=20260713h"></script>
-<script src="/assets/member_core.js?v=20260713h"></script>
-<script src="/assets/member_reader.js?v=20260713h"></script>
-<script src="/assets/member_router.js?v=20260713h"></script>
-<script src="/assets/member_insight.js?v=20260713h"></script>
+<script src="/assets/member_portal_state.js?v=20260713i"></script>
+<script src="/assets/member_core.js?v=20260713i"></script>
+<script src="/assets/member_reader.js?v=20260713i"></script>
+<script src="/assets/member_router.js?v=20260713i"></script>
+<script src="/assets/member_insight.js?v=20260713i"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',

@@ -1,4 +1,4 @@
-/* AI 阅读器主题 token — 扩展会员中心 */
+/* AI 阅读器主题 token — 由 member_portal_themes.css 在 html 上注入，此处为回退 */
 :root {
   --reader-bg: #f5f5f7;
   --reader-surface: #ffffff;
@@ -9,7 +9,7 @@
   --reader-muted: #6e6e73;
   --reader-line: rgba(0, 0, 0, 0.08);
   --reader-radius: 12px;
-  --reader-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  --reader-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   --reader-aurora: linear-gradient(135deg, #0ea5e9 0%, #6366f1 55%, #8b5cf6 100%);
 }
 
@@ -48,17 +48,37 @@ body[data-reader-state="ERROR"] .reader-error {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  background: #e8e8ed;
+  background: var(--chip-bg, #e8e8ed);
   color: var(--reader-muted);
-  border: none;
+  border: 1px solid var(--line, transparent);
   -webkit-tap-highlight-color: transparent;
+  transition: all 0.22s ease;
 }
 
 .nav-pill.active {
-  background: var(--reader-accent);
+  background: var(--btn-grad, var(--reader-accent));
   color: #fff;
+  box-shadow: var(--btn-shadow, none);
 }
 
 .member-route.hidden {
   display: none !important;
+}
+
+.reader-chrome h2 {
+  background: var(--title-grad, none);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.reader-sidebar {
+  background: var(--surface) !important;
+  backdrop-filter: blur(var(--glass-blur, 12px));
+  border-color: var(--line) !important;
+}
+
+.reader-main {
+  background: var(--surface) !important;
+  backdrop-filter: blur(var(--glass-blur, 12px));
 }
