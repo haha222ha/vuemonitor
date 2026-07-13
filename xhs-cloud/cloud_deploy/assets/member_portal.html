@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
+<meta name="portal-build" content="20260713b">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
 <script>
@@ -169,8 +170,10 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 .broadcast-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px 16px calc(20px + var(--safe-b))}
 .broadcast-overlay.hidden{display:none!important}
 .broadcast-modal{width:min(520px,100%);max-height:min(86vh,720px);overflow:auto;background:var(--surface);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.25);border:1px solid var(--line)}
-.broadcast-head{padding:20px 20px 12px;background:linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);color:#fff;border-radius:16px 16px 0 0}
+.broadcast-head{padding:20px 20px 12px;background:linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);color:#fff;border-radius:16px 16px 0 0;position:relative;padding-right:48px}
 .broadcast-head .bh-badge{display:inline-block;font-size:11px;font-weight:700;background:rgba(255,255,255,.22);padding:3px 10px;border-radius:20px;margin-bottom:8px}
+.broadcast-close-x{position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;border-radius:50%;background:rgba(255,255,255,.18);color:#fff;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.broadcast-close-x:hover{background:rgba(255,255,255,.28)}
 .broadcast-head h2{font-size:clamp(18px,4.5vw,22px);font-weight:800;line-height:1.35;margin:0 0 6px}
 .broadcast-head p{margin:0;font-size:13px;opacity:.92;line-height:1.55}
 .broadcast-body{padding:18px 20px 8px;font-size:14px;line-height:1.65;color:var(--text)}
@@ -178,8 +181,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 .broadcast-body li{margin-bottom:6px}
 .broadcast-section{margin-bottom:14px}
 .broadcast-section h3{font-size:14px;font-weight:700;margin:0 0 6px;color:var(--text)}
-.broadcast-foot{padding:12px 20px 18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
-.broadcast-countdown{font-size:12px;color:var(--text2)}
+.broadcast-foot{padding:12px 20px 18px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:10px}
 .auth-code-box{margin-top:12px;padding:12px;background:#f0f7ff;border:1px dashed #c5d9f5;border-radius:10px;font-family:ui-monospace,monospace;font-size:15px;word-break:break-all;text-align:center}
 </style>
 </head>
@@ -2039,8 +2041,7 @@ async function loadTrialPackInfo() {
 }
 
 var _broadcastState = null;
-var _broadcastTimer = null;
-var _broadcastAutoClose = false;
+var _broadcastPendingAck = false;
 
 function renderBroadcastModal(b) {
   if (!b) return;
@@ -2063,7 +2064,7 @@ function renderBroadcastModal(b) {
   if (b.footer) html += '<p style="font-size:12px;color:var(--text2);margin:12px 0 0">' + esc(b.footer) + '</p>';
   document.getElementById('broadcastBody').innerHTML = html;
   var cta = document.getElementById('btnBroadcastClose');
-  if (cta) cta.textContent = b.cta_label || '我知道了';
+  if (cta) cta.textContent = b.cta_label || '关闭';
 }
 
 function updateBroadcastButton(data) {
@@ -2072,62 +2073,29 @@ function updateBroadcastButton(data) {
   dot.classList.toggle('hidden', !!(data.acknowledged || !data.broadcast));
 }
 
-function startBroadcastCountdown(seconds, onDone) {
-  var el = document.getElementById('broadcastCountdown');
-  var left = seconds;
-  if (_broadcastTimer) clearInterval(_broadcastTimer);
-  if (el) {
-    el.classList.remove('hidden');
-    el.textContent = left + ' 秒后自动关闭';
-  }
-  _broadcastTimer = setInterval(function () {
-    left -= 1;
-    if (el) el.textContent = Math.max(left, 0) + ' 秒后自动关闭';
-    if (left <= 0) {
-      clearInterval(_broadcastTimer);
-      _broadcastTimer = null;
-      if (typeof onDone === 'function') onDone();
-    }
-  }, 1000);
-}
-
 function openBroadcastModal(manual) {
   var data = _broadcastState;
   if (!data || !data.broadcast) return;
-  _broadcastAutoClose = !manual && !!data.show_popup;
+  _broadcastPendingAck = !manual && !!data.show_popup && !data.acknowledged;
   renderBroadcastModal(data.broadcast);
   document.getElementById('broadcastOverlay').classList.remove('hidden');
-  var cd = document.getElementById('broadcastCountdown');
-  if (_broadcastAutoClose) {
-    startBroadcastCountdown(5, function () { closeBroadcastModal(true); });
-  } else if (cd) {
-    cd.classList.add('hidden');
-  }
 }
 
-function closeBroadcastModal(fromAuto) {
-  if (_broadcastTimer) {
-    clearInterval(_broadcastTimer);
-    _broadcastTimer = null;
-  }
+function closeBroadcastModal() {
   document.getElementById('broadcastOverlay').classList.add('hidden');
-  var cd = document.getElementById('broadcastCountdown');
-  if (cd) cd.classList.add('hidden');
-  if (_broadcastState && _broadcastState.broadcast && (_broadcastAutoClose || fromAuto)) {
-    if (!_broadcastState.acknowledged) {
-      api('/api/v1/member/broadcast/ack', {
-        method: 'POST',
-        auth: true,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ broadcast_id: _broadcastState.broadcast.id })
-      }).then(function () {
-        _broadcastState.acknowledged = true;
-        _broadcastState.show_popup = false;
-        updateBroadcastButton(_broadcastState);
-      }).catch(function () {});
-    }
+  if (_broadcastState && _broadcastState.broadcast && _broadcastPendingAck && !_broadcastState.acknowledged) {
+    api('/api/v1/member/broadcast/ack', {
+      method: 'POST',
+      auth: true,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ broadcast_id: _broadcastState.broadcast.id })
+    }).then(function () {
+      _broadcastState.acknowledged = true;
+      _broadcastState.show_popup = false;
+      updateBroadcastButton(_broadcastState);
+    }).catch(function () {});
   }
-  _broadcastAutoClose = false;
+  _broadcastPendingAck = false;
 }
 
 async function loadMemberBroadcast(membership) {
@@ -2212,14 +2180,14 @@ async function loadMemberBroadcast(membership) {
 <div id="broadcastOverlay" class="broadcast-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="broadcastTitle">
   <div class="broadcast-modal">
     <div class="broadcast-head">
+      <button type="button" class="broadcast-close-x" id="btnBroadcastX" onclick="closeBroadcastModal()" aria-label="关闭">×</button>
       <div class="bh-badge" id="broadcastBadge">重大更新</div>
       <h2 id="broadcastTitle">站内通知</h2>
       <p id="broadcastSubtitle"></p>
     </div>
     <div class="broadcast-body" id="broadcastBody"></div>
     <div class="broadcast-foot">
-      <span class="broadcast-countdown hidden" id="broadcastCountdown">5 秒后自动关闭</span>
-      <button type="button" class="btn btn-primary" id="btnBroadcastClose" onclick="closeBroadcastModal(false)">我知道了</button>
+      <button type="button" class="btn btn-primary" id="btnBroadcastClose" onclick="closeBroadcastModal()">关闭</button>
     </div>
   </div>
 </div>
