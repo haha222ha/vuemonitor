@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260713n">
-<link rel="stylesheet" href="/assets/member_theme.css?v=20260713n">
-<link rel="stylesheet" href="/assets/member_reader.css?v=20260713n">
-<link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260713n">
+<meta name="portal-build" content="20260713p">
+<link rel="stylesheet" href="/assets/member_theme.css?v=20260713p">
+<link rel="stylesheet" href="/assets/member_reader.css?v=20260713p">
+<link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260713p">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
 <script>
@@ -75,8 +75,8 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
 .topbar{z-index:10000;position:relative}
 .welcome-chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);background:#e8e8ed;padding:6px 12px;border-radius:20px;margin-top:8px}
 .welcome-chip strong{color:var(--text)}
-.portal-tabs{display:flex;gap:8px;margin-bottom:16px}
-.portal-tab{flex:1;text-align:center;padding:12px 14px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;background:var(--chip-bg,#e8e8ed);color:var(--text2);-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,box-shadow .2s,transform .2s}
+.portal-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px}
+.portal-tab{text-align:center;padding:12px 10px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;background:var(--chip-bg,#e8e8ed);color:var(--text2);-webkit-tap-highlight-color:transparent;transition:background .2s,color .2s,box-shadow .2s,transform .2s}
 .portal-tab.active{background:var(--accent);color:#fff}
 .benefit-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
 @media(min-width:520px){.benefit-grid{grid-template-columns:repeat(3,1fr)}}
@@ -212,30 +212,25 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 
   <div id="sessionStatusBar" class="session-status" data-state="guest">
     <span class="ss-badge" id="sessionStatusBadge">访客</span>
-    <span id="sessionStatusHint">可预览 AI 阅读样例；开通会员后阅读最新分析与使用 PC 客户端。</span>
-    <div class="ss-actions" id="sessionStatusActions">
-      <button type="button" class="btn btn-ghost" style="min-height:32px;padding:6px 12px;font-size:13px" onclick="switchPortal('demo')">看样例</button>
-      <button type="button" class="btn btn-primary" style="min-height:32px;padding:6px 12px;font-size:13px" onclick="switchPortal('center')">开通会员</button>
-    </div>
+    <span id="sessionStatusHint">未登录：可先看「免费样例」，需要完整能力请「开通会员」。PC 下载在上方独立 Tab。</span>
+    <div class="ss-actions" id="sessionStatusActions"></div>
   </div>
 
   <nav class="portal-topnav" id="portalTopnav" aria-label="站点分区">
     <button type="button" class="topnav-item active" data-topnav="member" onclick="switchTopNav('member')">
-      <span class="topnav-label">会员服务</span>
-      <span class="topnav-desc">AI 样例 · 订阅 · 阅读</span>
+      <span class="topnav-label">会员中心</span>
+      <span class="topnav-desc">样例 · 订阅 · AI 阅读</span>
     </button>
     <button type="button" class="topnav-item" data-topnav="pc" onclick="switchTopNav('pc')">
       <span class="topnav-label">PC 客户端</span>
-      <span class="topnav-desc">下载 · 监控 · 云端同步</span>
+      <span class="topnav-desc">下载安装包 · 独立分区</span>
     </button>
   </nav>
-
-  <div class="capability-grid bento-grid" id="capabilityGrid"></div>
 
   <div id="topnavMemberZone">
   <div id="guestShell" class="guest-shell">
 
-  <div class="card notice-card" id="reportScheduleCard">
+  <div class="card notice-card guest-notice-card" id="reportScheduleCard">
     <div class="notice-title">📋 AI 分析更新说明</div>
     <ul>
       <li><strong>类目情报</strong>：系统夜间预生成，一般 <strong>18:00～19:00</strong>（北京时间）可在「AI 选品分析」阅读</li>
@@ -249,8 +244,9 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   </div>
 
   <div class="portal-tabs" id="portalTabs">
-    <div class="portal-tab active" data-portal="demo" onclick="switchPortal('demo')">AI 阅读样例</div>
+    <div class="portal-tab active" data-portal="demo" onclick="switchPortal('demo')">免费样例</div>
     <div class="portal-tab" data-portal="center" onclick="switchPortal('center')">开通会员</div>
+    <div class="portal-tab" data-portal="login" onclick="switchPortal('login')">登录</div>
   </div>
 
   <div id="portalTrial" class="portal-panel hidden"></div>
@@ -262,7 +258,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       进入即可预览<strong>历史期次</strong>的 AI 预生成报告（<strong>非最新</strong>）。免费用户<strong>不支持</strong> AI 预生成调用、动态 LLM 与顾问对话；完整能力请开通 <strong>¥9.9 体验卡（3 天）</strong> 或正式会员。
     </p>
     <div style="border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;min-height:420px">
-      <iframe id="advisorDemoFrame" title="AI 阅读样例" src="/public/advisor-demo?v=20260713n" style="width:100%;height:min(560px,68vh);border:none;display:block"></iframe>
+      <iframe id="advisorDemoFrame" title="AI 阅读样例" src="/public/advisor-demo?v=20260713p" style="width:100%;height:min(560px,68vh);border:none;display:block"></iframe>
     </div>
     <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px">
       <button type="button" class="btn btn-primary" onclick="switchPortal('center')">开通体验卡 ¥9.9</button>
@@ -273,6 +269,9 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   </div>
 
   <div id="portalCenter" class="portal-panel hidden">
+  <div id="renewBackBar" class="renew-back-bar hidden">
+    <button type="button" class="btn btn-ghost btn-sm" onclick="closeRenewPricing()">← 返回会员中心</button>
+  </div>
   <div class="card notice-card" id="memberPricingCard" style="background:var(--hero-grad);border:1px solid var(--line)">
     <div class="notice-title">💎 会员套餐与价格</div>
     <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:14px">
@@ -335,18 +334,16 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   </div>
   </div>
 
+  <div id="portalLogin" class="portal-panel hidden">
   <div id="authView">
-    <div class="tabs">
-      <div class="tab active" data-tab="login" onclick="switchTab('login')">登录</div>
-      <div class="tab" data-tab="buy" onclick="switchTab('buy')">购买会员</div>
-    </div>
     <div class="card" id="panelLogin">
-      <p class="sub" style="margin:0 0 14px;font-size:13px;color:var(--text2)">已有账号请登录；新用户请点「购买会员」扫码支付（微信/支付宝）后设置账号即可开通。</p>
+      <div class="section-title" style="margin-bottom:8px">账号登录</div>
+      <p class="sub" style="margin:0 0 14px;font-size:13px;color:var(--text2)">已有账号请在此登录。新用户请切换到「开通会员」扫码支付后设置账号。</p>
       <div class="field"><label>用户名</label><input id="loginUser" autocomplete="username" enterkeyhint="next"></div>
       <div class="field"><label>密码</label><input id="loginPass" type="password" autocomplete="current-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doLogin()"></div>
       <button class="btn btn-primary btn-block" onclick="doLogin()">登录</button>
       <p style="font-size:12px;color:var(--text2);margin-top:12px;text-align:center">
-        还没有账号？<button type="button" class="btn btn-link" style="padding:0;min-height:auto;font-size:12px" onclick="switchTab('buy')">购买会员</button>
+        还没有账号？<button type="button" class="btn btn-link" style="padding:0;min-height:auto;font-size:12px" onclick="switchPortal('center')">去开通会员</button>
         · <button type="button" class="btn btn-link" style="padding:0;min-height:auto;font-size:12px" onclick="toggleForgotPassword(true)">忘记密码</button>
       </p>
       <details style="margin-top:14px;font-size:13px;color:var(--text2)">
@@ -389,13 +386,9 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div class="field"><label>确认新密码</label><input id="resetPass2" type="password" autocomplete="new-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doResetPassword()"></div>
       <button class="btn btn-primary btn-block" id="btnReset" onclick="doResetPassword()">重置密码并登录</button>
     </div>
-    <div class="card hidden" id="panelBuy">
-      <p style="font-size:13px;color:var(--text2);margin:0 0 14px">请在上方切换到 <strong>「开通会员」</strong>，选择体验卡 / 月度 / 季度 / 半年 / 年度套餐，微信或支付宝扫码开通。</p>
-      <button class="btn btn-primary btn-block" onclick="switchPortal('center')">前往开通会员</button>
-      <p style="font-size:12px;color:var(--text2);margin-top:12px;line-height:1.55;text-align:center">已登录用户支付后会员天数自动叠加；新用户支付成功后设置账号即可开通。</p>
-    </div>
     <div id="authMsg"></div>
   </div>
+  </div><!-- /portalLogin -->
   </div><!-- /guestShell -->
 
   <div id="memberShell" class="member-shell hidden">
@@ -406,28 +399,6 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div class="dash-tab" id="dashTabArchive" data-dash="archive" onclick="switchDash('archive')">历史归档</div>
       <div class="dash-tab" data-dash="watchlist" onclick="switchDash('watchlist')">我的收藏</div>
       <div class="dash-tab" data-dash="account" onclick="switchDash('account')">账户</div>
-    </div>
-    <div class="card">
-      <div class="section-title">会员信息</div>
-      <div class="profile-grid" id="profileGrid"></div>
-      <div class="renew-box">
-        <p style="font-size:13px;color:var(--text2);margin:0 0 12px">续费请使用微信或支付宝扫码，支付成功后会员天数自动叠加。</p>
-        <button class="btn btn-primary btn-block" onclick="openBuyFromDash()">扫码续费（微信/支付宝）</button>
-        <details style="margin-top:12px;font-size:13px;color:var(--text2)">
-          <summary style="cursor:pointer;color:var(--primary);font-weight:600">客服授权码续费（私发）</summary>
-          <p style="margin:10px 0 8px;line-height:1.55">已登录用户可在此输入客服私发的授权码续费（支持剩余天数叠加）。</p>
-          <div class="field"><label>授权码</label><input id="renewCode" placeholder="XHS-XXXX-XXXX-XXXX" autocomplete="off" enterkeyhint="go" onkeydown="if(event.key==='Enter')doRenew()"></div>
-          <button class="btn btn-ghost btn-block" id="btnActivateCode" onclick="doRenew()">激活授权码</button>
-          <div id="dashRenewMsg" style="margin-top:10px"></div>
-        </details>
-      </div>
-      <div class="renew-box">
-        <div class="section-title" style="margin-bottom:10px">修改密码</div>
-        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">设置或修改登录密码后，下次可用「账号密码」登录。忘记密码可用授权码登录，或联系客服。</p>
-        <div class="field"><label>当前密码（可选）</label><input id="pwdCurrent" type="password" autocomplete="current-password" placeholder="记得旧密码时填写，忘记可留空"></div>
-        <div class="field"><label>新密码（至少 6 位）</label><input id="pwdNew" type="password" autocomplete="new-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doChangePassword()"></div>
-        <button class="btn btn-primary btn-block" onclick="doChangePassword()">保存新密码</button>
-      </div>
     </div>
     <div id="dashInsight">
     <div class="card" style="padding:0;border:none;background:transparent;box-shadow:none">
@@ -483,18 +454,6 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div id="archiveList"><div class="reader-empty">加载中…</div></div>
     </div>
     </div>
-    <div id="dashClient" class="hidden">
-    <div class="card notice-card" style="background:linear-gradient(135deg,#eef5ff 0%,#f9f9fb 100%);border:1px solid #c5d9f5">
-      <div class="notice-title">💻 PC 端 ProductAnalyzer</div>
-      <p style="font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:12px">会员登录客户端后自动同步 AI 分析；启动时联网校验会员身份（授权码 / 账号密码）。</p>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px">
-        <a id="paInstallerLinkDash" class="btn btn-primary" href="https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe" download style="text-decoration:none;color:#fff">下载最新版</a>
-        <span id="paInstallerMetaDash" style="font-size:12px;color:var(--text2)">版本加载中…</span>
-      </div>
-      <div class="section-title" style="margin-top:8px">版本历史</div>
-      <div class="client-versions-host" id="clientVersionsMember"></div>
-    </div>
-    </div>
     <div id="dashWatchlist" class="hidden">
     <div class="card">
       <div class="section-title">我的收藏</div>
@@ -510,6 +469,34 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div id="watchlistTable"></div>
     </div>
     </div>
+    <div id="dashAccount" class="hidden">
+    <div class="card account-card">
+      <div class="section-title">会员信息</div>
+      <div class="profile-grid" id="profileGrid"></div>
+      <div class="renew-box">
+        <p style="font-size:13px;color:var(--text2);margin:0 0 12px">续费请使用微信或支付宝扫码，支付成功后会员天数自动叠加。</p>
+        <button class="btn btn-primary btn-block" onclick="openBuyFromDash()">扫码续费（微信/支付宝）</button>
+        <details style="margin-top:12px;font-size:13px;color:var(--text2)">
+          <summary style="cursor:pointer;color:var(--primary);font-weight:600">客服授权码续费（私发）</summary>
+          <p style="margin:10px 0 8px;line-height:1.55">已登录用户可在此输入客服私发的授权码续费（支持剩余天数叠加）。</p>
+          <div class="field"><label>授权码</label><input id="renewCode" placeholder="XHS-XXXX-XXXX-XXXX" autocomplete="off" enterkeyhint="go" onkeydown="if(event.key==='Enter')doRenew()"></div>
+          <button class="btn btn-ghost btn-block" id="btnActivateCode" onclick="doRenew()">激活授权码</button>
+          <div id="dashRenewMsg" style="margin-top:10px"></div>
+        </details>
+      </div>
+      <div class="renew-box">
+        <div class="section-title" style="margin-bottom:10px">修改密码</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">设置或修改登录密码后，下次可用「账号密码」登录。</p>
+        <div class="field"><label>当前密码（可选）</label><input id="pwdCurrent" type="password" autocomplete="current-password" placeholder="记得旧密码时填写，忘记可留空"></div>
+        <div class="field"><label>新密码（至少 6 位）</label><input id="pwdNew" type="password" autocomplete="new-password" enterkeyhint="go" onkeydown="if(event.key==='Enter')doChangePassword()"></div>
+        <button class="btn btn-primary btn-block" onclick="doChangePassword()">保存新密码</button>
+      </div>
+      <div class="account-pc-link" style="margin-top:16px;padding-top:16px;border-top:1px solid var(--line)">
+        <p style="font-size:13px;color:var(--text2);margin:0 0 10px">PC 客户端下载与版本历史在独立分区，不与订阅混排。</p>
+        <button type="button" class="btn btn-ghost btn-block" onclick="switchTopNav('pc')">前往 PC 客户端下载</button>
+      </div>
+    </div>
+    </div>
     <div id="dashMsg"></div>
   </div>
   <nav id="readerMobileNav" class="reader-mobile-nav hidden" aria-label="阅读导航">
@@ -522,6 +509,11 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   </div><!-- /topnavMemberZone -->
 
   <div id="topnavPcZone" class="portal-panel hidden">
+    <div class="card notice-card pc-zone-intro">
+      <div class="notice-title">独立下载区</div>
+      <p class="pc-zone-lead">PC 客户端与网页会员订阅<strong>分开管理</strong>：此处仅提供安装包下载；安装后需用会员账号登录才能同步 AI 分析与收藏。</p>
+      <button type="button" class="btn btn-ghost btn-sm" onclick="switchTopNav('member');switchPortal('center')">前往开通会员 →</button>
+    </div>
     <div class="card notice-card pc-download-card">
       <div class="notice-title">💻 PC 端 ProductAnalyzer</div>
       <p class="pc-download-lead">安装后可在本地阅读 AI 选品分析、同步收藏与监控配置。启动时会<strong>联网校验会员</strong>（授权码 / 账号密码），与网页登录逻辑一致。</p>
@@ -541,11 +533,11 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   </div>
 
 </div>
-<script src="/assets/member_portal_state.js?v=20260713n"></script>
-<script src="/assets/member_core.js?v=20260713n"></script>
-<script src="/assets/member_reader.js?v=20260713n"></script>
-<script src="/assets/member_router.js?v=20260713n"></script>
-<script src="/assets/member_insight.js?v=20260713n"></script>
+<script src="/assets/member_portal_state.js?v=20260713p"></script>
+<script src="/assets/member_core.js?v=20260713p"></script>
+<script src="/assets/member_reader.js?v=20260713p"></script>
+<script src="/assets/member_router.js?v=20260713p"></script>
+<script src="/assets/member_insight.js?v=20260713p"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -765,15 +757,16 @@ function api(path, opts = {}) {
 }
 
 function showAuthView() {
-  document.getElementById('authView').classList.remove('hidden');
   document.getElementById('dashView').classList.add('hidden');
   document.getElementById('guestShell')?.classList.remove('hidden');
   document.getElementById('memberShell')?.classList.add('hidden');
   document.getElementById('btnLogout').classList.add('hidden');
+  document.getElementById('renewBackBar')?.classList.add('hidden');
   const btnBc = document.getElementById('btnBroadcast');
   if (btnBc) btnBc.classList.add('hidden');
   updatePortalVisibility(null, false);
   if (window.MemberPortalState) MemberPortalState.renderSessionBar(null, false);
+  restoreTopNavFromStorage();
 }
 
 function switchTopNav(zone) {
@@ -787,13 +780,8 @@ function switchTopNav(zone) {
   var pcZone = document.getElementById('topnavPcZone');
   if (memberZone) memberZone.classList.toggle('hidden', zone !== 'member');
   if (pcZone) pcZone.classList.toggle('hidden', zone !== 'pc');
-  var capGrid = document.getElementById('capabilityGrid');
-  if (capGrid) capGrid.classList.toggle('hidden', zone === 'pc');
   if (zone === 'pc') {
     loadClientDownload();
-    if (window.MemberPortalState && MemberPortalState.highlightCapability) {
-      MemberPortalState.highlightCapability('pc');
-    }
     try {
       if (location.hash !== '#pc') {
         history.replaceState(null, '', location.pathname + location.search + '#pc');
@@ -801,15 +789,12 @@ function switchTopNav(zone) {
     } catch (_) {}
     return zone;
   }
-  if (window.MemberPortalState && MemberPortalState.highlightCapability) {
-    MemberPortalState.highlightCapability(null);
-  }
   return zone;
 }
 
 function switchPortal(name) {
   switchTopNav('member');
-  const tab = (name === 'center' || name === 'demo') ? name : 'demo';
+  const tab = (name === 'center' || name === 'demo' || name === 'login') ? name : 'demo';
   try { localStorage.setItem(STORAGE.portalTab, tab); } catch (_) {}
   document.querySelectorAll('#portalTabs .portal-tab').forEach(t => {
     t.classList.toggle('active', t.dataset.portal === tab);
@@ -817,15 +802,19 @@ function switchPortal(name) {
   const trial = document.getElementById('portalTrial');
   const demo = document.getElementById('portalDemo');
   const center = document.getElementById('portalCenter');
+  const login = document.getElementById('portalLogin');
   if (trial) trial.classList.add('hidden');
   if (demo) demo.classList.toggle('hidden', tab !== 'demo');
   if (center) center.classList.toggle('hidden', tab !== 'center');
+  if (login) login.classList.toggle('hidden', tab !== 'login');
   if (tab === 'center') loadPayPlans();
-  if (window.MemberPortalState && MemberPortalState.highlightCapability) {
-    MemberPortalState.highlightCapability(tab === 'center' ? 'custom' : 'demo');
+  if (tab === 'login') {
+    document.getElementById('panelLogin')?.classList.remove('hidden');
+    document.getElementById('panelForgot')?.classList.add('hidden');
+    document.getElementById('panelReset')?.classList.add('hidden');
   }
   try {
-    var hash = tab === 'center' ? '#center' : '#demo';
+    var hash = tab === 'center' ? '#center' : (tab === 'login' ? '#login' : '#demo');
     if (location.hash !== hash) history.replaceState(null, '', location.pathname + location.search + hash);
   } catch (_) {}
 }
@@ -834,7 +823,9 @@ function updatePortalVisibility(membership, loggedIn) {
   const tabs = document.getElementById('portalTabs');
   const demoPanel = document.getElementById('portalDemo');
   const centerPanel = document.getElementById('portalCenter');
+  const loginPanel = document.getElementById('portalLogin');
   const reportSchedule = document.getElementById('reportScheduleCard');
+  const guestShell = document.getElementById('guestShell');
   const dashView = document.getElementById('dashView');
   const topnav = document.getElementById('portalTopnav');
   if (!tabs || !centerPanel) return;
@@ -846,14 +837,26 @@ function updatePortalVisibility(membership, loggedIn) {
   if (topnav) topnav.classList.remove('hidden');
 
   if (loggedIn) {
+    if (guestShell && !document.getElementById('renewBackBar')?.classList.contains('hidden')) {
+      /* 续费扫码模式：保留 guestShell 中的定价面板 */
+    } else {
+      if (guestShell) guestShell.classList.add('hidden');
+    }
     tabs.classList.add('hidden');
     if (demoPanel) demoPanel.classList.add('hidden');
-    centerPanel.classList.add('hidden');
+    if (loginPanel) loginPanel.classList.add('hidden');
     if (reportSchedule) reportSchedule.classList.add('hidden');
+    if (!document.getElementById('renewBackBar')?.classList.contains('hidden')) {
+      centerPanel.classList.remove('hidden');
+    } else {
+      centerPanel.classList.add('hidden');
+    }
     restoreTopNavFromStorage();
     return;
   }
 
+  if (guestShell) guestShell.classList.remove('hidden');
+  document.getElementById('renewBackBar')?.classList.add('hidden');
   if (reportSchedule) reportSchedule.classList.remove('hidden');
   tabs.classList.remove('hidden');
   restoreTopNavFromStorage();
@@ -865,16 +868,20 @@ function restoreTopNavFromStorage() {
   try {
     if (location.hash === '#pc' || location.hash === '#download') zone = 'pc';
     else if (location.hash === '#center') { zone = 'member'; tab = 'center'; }
+    else if (location.hash === '#login') { zone = 'member'; tab = 'login'; }
     else if (location.hash === '#demo') { zone = 'member'; tab = 'demo'; }
     else {
       var storedNav = localStorage.getItem(STORAGE.topNav);
       if (storedNav === 'pc') zone = 'pc';
       var v = localStorage.getItem(STORAGE.portalTab);
-      if (v === 'center' || v === 'demo') tab = v;
+      if (v === 'center' || v === 'demo' || v === 'login') tab = v;
     }
   } catch (_) {}
   switchTopNav(zone);
-  if (zone === 'member') switchPortal(tab);
+  var dashView = document.getElementById('dashView');
+  var loggedIn = dashView && !dashView.classList.contains('hidden');
+  var renewMode = document.getElementById('renewBackBar') && !document.getElementById('renewBackBar').classList.contains('hidden');
+  if (zone === 'member' && (!loggedIn || renewMode)) switchPortal(tab);
 }
 
 function isAuthError(err) {
@@ -963,17 +970,16 @@ function showDashRenewFeedback(text, kind) {
 
 function switchTab(name) {
   stopPayPoll();
-  document.querySelectorAll('#authView > .tabs .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-  document.getElementById('panelLogin').classList.toggle('hidden', name !== 'login');
-  document.getElementById('panelBuy').classList.toggle('hidden', name !== 'buy');
+  if (name === 'buy') {
+    switchPortal('center');
+    loadPayPlans();
+    return;
+  }
+  switchPortal('login');
   if (name === 'login' && !resetToken) {
     document.getElementById('panelForgot')?.classList.add('hidden');
     document.getElementById('panelReset')?.classList.add('hidden');
     document.getElementById('panelLogin')?.classList.remove('hidden');
-  }
-  if (name === 'buy') {
-    switchPortal('center');
-    loadPayPlans();
   }
 }
 
@@ -986,12 +992,11 @@ function toggleForgotPassword(show) {
 
 function showResetPanel(token) {
   resetToken = (token || '').trim();
-  document.querySelectorAll('#authView > .tabs .tab').forEach(t => t.classList.remove('active'));
   document.getElementById('panelLogin')?.classList.add('hidden');
   document.getElementById('panelForgot')?.classList.add('hidden');
-  document.getElementById('panelBuy')?.classList.add('hidden');
   document.getElementById('panelReset')?.classList.remove('hidden');
   showAuthView();
+  switchPortal('login');
 }
 
 function setCsCodeMode(mode) {
@@ -1004,13 +1009,35 @@ function setCsCodeMode(mode) {
 }
 
 function openBuyFromDash() {
+  const dashVisible = document.getElementById('dashView') && !document.getElementById('dashView').classList.contains('hidden');
+  switchTopNav('member');
   document.getElementById('guestShell')?.classList.remove('hidden');
-  document.getElementById('memberShell')?.classList.add('hidden');
-  document.getElementById('authView')?.classList.remove('hidden');
+  document.getElementById('portalTabs')?.classList.add('hidden');
+  document.getElementById('reportScheduleCard')?.classList.add('hidden');
+  document.getElementById('portalDemo')?.classList.add('hidden');
+  document.getElementById('portalLogin')?.classList.add('hidden');
+  if (dashVisible) {
+    document.getElementById('memberShell')?.classList.add('hidden');
+    document.getElementById('renewBackBar')?.classList.remove('hidden');
+  } else {
+    document.getElementById('renewBackBar')?.classList.add('hidden');
+  }
   switchPortal('center');
   switchPricingCategory('membership');
   loadPayPlans();
   document.getElementById('memberPricingCard')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function closeRenewPricing() {
+  document.getElementById('renewBackBar')?.classList.add('hidden');
+  document.getElementById('guestShell')?.classList.add('hidden');
+  document.getElementById('portalCenter')?.classList.add('hidden');
+  document.getElementById('memberShell')?.classList.remove('hidden');
+  document.getElementById('dashView')?.classList.remove('hidden');
+  document.getElementById('portalTabs')?.classList.remove('hidden');
+  if (window.MemberRouter) {
+    MemberRouter.go(MemberRouter.current ? MemberRouter.current() : 'today', true);
+  }
 }
 
 function stopPayPoll() {
@@ -1481,9 +1508,9 @@ async function removeWatchlistIds(ids) {
 }
 
 function showDashboard(cachedProfile) {
-  document.getElementById('authView').classList.add('hidden');
   document.getElementById('dashView').classList.remove('hidden');
   document.getElementById('guestShell')?.classList.add('hidden');
+  document.getElementById('renewBackBar')?.classList.add('hidden');
   document.getElementById('memberShell')?.classList.remove('hidden');
   document.getElementById('btnLogout').classList.remove('hidden');
   const btnBc = document.getElementById('btnBroadcast');
@@ -1769,17 +1796,13 @@ async function doRenew() {
 
 async function loadClientDownload() {
   const link = document.getElementById('paInstallerLink');
-  const linkDash = document.getElementById('paInstallerLinkDash');
   const meta = document.getElementById('paInstallerMeta');
-  const metaDash = document.getElementById('paInstallerMetaDash');
   const notice = document.getElementById('paUpdateNotice');
   const noticeText = document.getElementById('paUpdateNoticeText');
   const latestUrl = 'https://www.xhs365.cn/downloads/XHS365-Setup-latest.exe';
   const setLinks = function (url, label) {
     if (link) { link.href = url; }
-    if (linkDash) { linkDash.href = url; }
     if (meta) meta.textContent = label;
-    if (metaDash) metaDash.textContent = label;
   };
   setLinks(latestUrl, '最新版加载中…');
   let manifest = null;
@@ -1929,7 +1952,7 @@ async function loadMemberBroadcast(membership) {
   try {
   loadClientDownload();
   restoreFormFields();
-  updatePortalVisibility(loadCachedProfile());
+  updatePortalVisibility(loadCachedProfile(), !!loadStored(STORAGE.token));
 
   const resetParam = new URLSearchParams(location.search).get('reset');
   if (resetParam) {

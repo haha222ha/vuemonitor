@@ -545,6 +545,37 @@ html[data-member-theme="classic"] .portal-title {
   color: #ff453a;
 }
 .session-status .ss-actions { margin-left: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+.session-status .ss-btn {
+  min-height: 34px;
+  padding: 6px 14px;
+  font-size: 13px;
+}
+@media (max-width: 640px) {
+  .session-status { flex-direction: column; align-items: stretch; }
+  .session-status .ss-actions { margin-left: 0; width: 100%; }
+  .session-status .ss-actions .ss-btn { flex: 1; }
+  .portal-topnav { grid-template-columns: 1fr; border-radius: var(--radius-theme, 14px); position: static; }
+  .topnav-item { align-items: center; text-align: center; }
+}
+
+/* ── PC 独立下载区 ── */
+.pc-zone-intro {
+  margin-bottom: 12px;
+  background: var(--notice-grad) !important;
+}
+.pc-zone-lead {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+  margin: 0 0 12px;
+}
+.renew-back-bar {
+  margin-bottom: 10px;
+}
+.renew-back-bar .btn {
+  font-size: 13px;
+  min-height: 36px;
+}
 
 /* ── 卡片 & 通知 ── */
 .card, .notice-card, .custom-analysis-card {
@@ -562,6 +593,9 @@ html[data-member-theme="classic"] .portal-title {
 
 /* ── 浮动 Tab 导航（Liquid Glass pill bar）── */
 .portal-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
   padding: 5px;
   border-radius: 999px;
   background: var(--chip-bg);
@@ -571,6 +605,7 @@ html[data-member-theme="classic"] .portal-title {
   margin-bottom: 18px;
 }
 .portal-tab {
+  flex: unset;
   border-radius: 999px !important;
   border: none !important;
   transition: all 0.22s var(--mp-ease) !important;

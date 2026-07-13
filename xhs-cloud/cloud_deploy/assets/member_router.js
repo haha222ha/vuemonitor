@@ -107,11 +107,9 @@ var MemberRouter = (function () {
 
     var dashArchive = document.getElementById('dashArchive');
 
-    var dashClient = document.getElementById('dashClient');
-
     var dashWatchlist = document.getElementById('dashWatchlist');
 
-    var profileCard = document.querySelector('#dashView > .card');
+    var dashAccount = document.getElementById('dashAccount');
 
     var expired = membershipExpired();
 
@@ -121,11 +119,9 @@ var MemberRouter = (function () {
 
     if (dashArchive) dashArchive.classList.toggle('hidden', current !== 'archive');
 
-    if (dashClient) dashClient.classList.toggle('hidden', current !== 'client');
-
     if (dashWatchlist) dashWatchlist.classList.toggle('hidden', current !== 'watchlist');
 
-    if (profileCard) profileCard.classList.toggle('hidden', current !== 'account' && !expired);
+    if (dashAccount) dashAccount.classList.toggle('hidden', current !== 'account');
 
 
 
@@ -155,12 +151,21 @@ var MemberRouter = (function () {
 
     }
 
-    if (current === 'client' && typeof loadClientDownload === 'function') {
+    if (current === 'account' && typeof renderProfile === 'function') {
 
-      loadClientDownload();
+      var prof = null;
+
+      try {
+
+        var raw = localStorage.getItem('xhs_member_profile');
+
+        if (raw) prof = JSON.parse(raw);
+
+      } catch (e) { /* ignore */ }
+
+      if (prof) renderProfile(prof);
 
     }
-
   }
 
 
