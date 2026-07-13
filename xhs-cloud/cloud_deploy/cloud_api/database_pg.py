@@ -688,18 +688,15 @@ def get_active_member(user_id: int) -> dict | None:
             c.execute("SET search_path TO xhs_monitor, public")
             c.execute(
                 """SELECT u.id, u.username, u.email, m.expires_at, m.status, m.plan_code
-                   FROM users u JOIN memberships m ON m.user_id=u.id
-                   WHERE u.id=%s ORDER BY m.id DESC LIMIT 1""",
+                   FROM users u
+                   JOIN memberships m ON m.user_id = u.id
+                   WHERE u.id = %s AND m.status = 'active' AND m.expires_at > NOW()
+                   ORDER BY m.expires_at DESC
+                   LIMIT 1""",
                 (user_id,),
             )
             row = c.fetchone()
-            if not row or row["status"] != "active":
-                return None
-            c.execute(
-                "SELECT 1 FROM memberships WHERE user_id=%s AND expires_at > NOW()",
-                (user_id,),
-            )
-            if not c.fetchone():
+            if not row:
                 return None
             return {
                 "id": row["id"],

@@ -372,17 +372,17 @@ def ensure_admin() -> None:
 def get_active_member(user_id: int) -> dict | None:
     conn = _conn()
     c = conn.cursor()
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     c.execute(
         """SELECT u.id, u.username, u.email, m.expires_at, m.status, m.plan_code
            FROM users u JOIN memberships m ON m.user_id=u.id
-           WHERE u.id=? ORDER BY m.id DESC LIMIT 1""",
-        (user_id,),
+           WHERE u.id=? AND m.status='active' AND m.expires_at > ?
+           ORDER BY m.expires_at DESC LIMIT 1""",
+        (user_id, now),
     )
     row = c.fetchone()
     conn.close()
-    if not row or row["status"] != "active":
-        return None
-    if row["expires_at"] < datetime.now().strftime("%Y-%m-%d %H:%M:%S"):
+    if not row:
         return None
     exp = datetime.strptime(row["expires_at"], "%Y-%m-%d %H:%M:%S")
     return {

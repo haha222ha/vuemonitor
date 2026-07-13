@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260713d">
+<meta name="portal-build" content="20260713e">
 <link rel="stylesheet" href="/assets/member_theme.css?v=20260713d">
 <link rel="stylesheet" href="/assets/member_reader.css?v=20260713d">
 <meta name="theme-color" content="#0071e3">
@@ -71,7 +71,8 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
 }
 .empty{text-align:center;padding:36px 16px;color:var(--text2);font-size:14px}
 .hidden{display:none!important}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px}
+.expiry-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;align-items:center}
+.topbar{z-index:10000;position:relative}
 .welcome-chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);background:#e8e8ed;padding:6px 12px;border-radius:20px;margin-top:8px}
 .welcome-chip strong{color:var(--text)}
 .portal-tabs{display:flex;gap:8px;margin-bottom:16px}
@@ -486,7 +487,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 </div>
 <script src="/assets/member_core.js?v=20260713d"></script>
 <script src="/assets/member_reader.js?v=20260713d"></script>
-<script src="/assets/member_router.js?v=20260713d"></script>
+<script src="/assets/member_router.js?v=20260713e"></script>
 <script src="/assets/member_insight.js?v=20260713d"></script>
 <script>
 const STORAGE = {
@@ -1197,7 +1198,13 @@ function renderProfile(m) {
       banner.innerHTML = `<div class="alert alert-ok">会员有效，可阅读 AI 选品分析与类目情报</div>`;
     }
   } else if (m.is_active === false) {
-    banner.innerHTML = `<div class="alert alert-error">会员已过期，请点击下方「扫码续费（微信/支付宝）」或切换至「账户」标签续费。<button type="button" class="btn btn-ghost" style="margin-left:8px;min-height:32px;padding:4px 10px;font-size:13px" onclick="switchDash('account')">前往账户</button></div>`;
+    banner.innerHTML = '<div class="alert alert-error">'
+      + '会员已过期，请续费后阅读 AI 选品分析。'
+      + '<div class="expiry-actions">'
+      + '<button type="button" class="btn btn-primary" style="min-height:36px;padding:8px 14px;font-size:13px" onclick="switchDash(\'account\')">扫码续费</button>'
+      + '<button type="button" class="btn btn-ghost" style="min-height:36px;padding:8px 14px;font-size:13px" onclick="logout()">退出登录</button>'
+      + '</div></div>';
+    try { localStorage.setItem('xhs_member_expired_hint', '1'); } catch (_) {}
   } else {
     banner.innerHTML = `<div class="alert alert-warn">会员状态加载中，请稍候…</div>`;
   }
@@ -1350,7 +1357,14 @@ async function loadDashboard(useCacheFirst) {
   } else {
     showMsg(document.getElementById('dashMsg'), '', 'ok');
   }
-  if (window.MemberRouter) MemberRouter.init();
+  if (window.MemberRouter) {
+    if (membership.is_active === false) {
+      MemberRouter.go('account', true);
+    } else {
+      try { localStorage.removeItem('xhs_member_expired_hint'); } catch (_) {}
+      MemberRouter.init();
+    }
+  }
   if (window.MemberInsight) {
     MemberInsight.applyEntitlements(membership);
     if (membership.is_active !== false) MemberInsight.load();
@@ -1360,16 +1374,24 @@ async function loadDashboard(useCacheFirst) {
 }
 
 function logout() {
-  if (typeof closeBroadcastModal === 'function') closeBroadcastModal();
+  var overlay = document.getElementById('broadcastOverlay');
+  if (overlay) overlay.classList.add('hidden');
+  _broadcastPendingAck = false;
   api('/api/v1/auth/logout', { method: 'POST', auth: true }).catch(function () {});
   removeStored(STORAGE.token);
   removeStored(STORAGE.profile);
   removeStored(STORAGE.activated);
   try { localStorage.removeItem('xhs_member_dash_tab'); } catch (_) {}
   try { localStorage.removeItem('xhs_member_portal_tab'); } catch (_) {}
+  try { localStorage.removeItem('xhs_member_expired_hint'); } catch (_) {}
+  if (window.MemberRouter && MemberRouter.resetBoot) MemberRouter.resetBoot();
+  document.body.removeAttribute('data-reader-state');
+  var banner = document.getElementById('expiryBanner');
+  if (banner) banner.innerHTML = '';
   history.replaceState(null, '', location.pathname + location.search);
   showAuthView();
-  location.reload();
+  switchTab('login');
+  showMsg(document.getElementById('authMsg'), '已退出登录', 'ok');
 }
 
 async function doLogin() {
@@ -1772,13 +1794,19 @@ async function loadMemberBroadcast(membership) {
     switchTab('login');
   }
 
-  if (cached) showDashboard(cached);
+  if (cached && token) {
+    showDashboard(cached);
+    if (cached.is_active === false) {
+      const banner = document.getElementById('expiryBanner');
+      if (banner) banner.innerHTML = '<div class="alert alert-warn">正在确认会员状态…</div>';
+    }
+  }
 
   try {
     await loadDashboard(!!cached);
   } catch (e) {
     if (!isAuthError(e)) {
-      if (cached) {
+      if (cached && token) {
         showDashboard(cached);
         showMsg(document.getElementById('dashMsg'), '网络异常，已显示本地缓存（报告列表可能不是最新）', 'warn');
       }
