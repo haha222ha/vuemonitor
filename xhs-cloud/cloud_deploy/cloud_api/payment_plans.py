@@ -43,6 +43,46 @@ EXPERIENCE_3D_ENTITLEMENTS: dict = {
     "legacy_zip_enabled": False,
 }
 
+# 定制分析（按次加购，不延长会员天数）
+CUSTOM_ANALYSIS_PRICING: dict = {
+    "label": "定制分析",
+    "summary": "定向词库采集 · 一次交付 · PC 端提交需求",
+    "member_price_yuan": 9.9,
+    "guest_price_yuan": 29.9,
+    "unit": "次",
+}
+
+CUSTOM_ANALYSIS_ENTITLEMENTS: dict = {
+    "addon": "custom_analysis",
+    "custom_analysis_credit": 1,
+    "extends_membership": False,
+}
+
+PAYMENT_ADDON_PLANS: tuple[dict, ...] = (
+    {
+        "plan_code": "custom_analysis_member",
+        "label": "定制分析（会员价）",
+        "duration_days": 0,
+        "amount": "9.90",
+        "price_yuan": 9.9,
+        "summary": "会员专享 · 定向词库采集 1 次",
+        "plan_type": "addon",
+        "requires_active_member": True,
+        "entitlements_template": CUSTOM_ANALYSIS_ENTITLEMENTS,
+    },
+    {
+        "plan_code": "custom_analysis_guest",
+        "label": "定制分析",
+        "duration_days": 0,
+        "amount": "29.90",
+        "price_yuan": 29.9,
+        "summary": "非会员 · 定向词库采集 1 次",
+        "plan_type": "addon",
+        "requires_active_member": False,
+        "entitlements_template": CUSTOM_ANALYSIS_ENTITLEMENTS,
+    },
+)
+
 PAYMENT_PLANS: tuple[dict, ...] = (
     {
         "plan_code": "experience_3d",
