@@ -55,24 +55,6 @@ def enrich_member_profile(profile: dict | None, user_id: int) -> dict | None:
     return out
 
 
-def assert_legacy_zip_allowed(user_id: int) -> None:
-    """Legacy zip 下载/批量下载/报告内文件查看门控。"""
-    if legacy_zip_globally_disabled():
-        raise HTTPException(
-            status_code=410,
-            detail={
-                "detail": LEGACY_ZIP_OFFLINE_DETAIL,
-                "migration_url": LEGACY_ZIP_MIGRATION_URL,
-            },
-        )
-    profile = db.get_member_profile(user_id)
-    if not profile:
-        raise HTTPException(status_code=404, detail="用户不存在")
-    enriched = enrich_member_profile(profile, user_id)
-    if not enriched or not enriched.get("legacy_zip_enabled"):
-        raise HTTPException(status_code=403, detail=LEGACY_ZIP_DENIED)
-
-
 def assert_insight_allowed(user_id: int) -> dict:
     """情报 API 门控；返回 entitlements。"""
     profile = db.get_member_profile(user_id)

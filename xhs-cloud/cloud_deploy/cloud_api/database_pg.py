@@ -1426,14 +1426,19 @@ def get_member_profile(user_id: int) -> dict | None:
 
 
 def list_report_library(user_id: int | None = None) -> dict:
-    """全部历史报告库（日报 + 周报 + 月报 + 定制）。"""
-    archive_map = {
-        "ai_advisor": "member_ai_advisor_zip",
-        "daily": "member_daily_zip",
-        "weekly": "member_weekly_zip",
-        "monthly": "member_monthly_zip",
-        "custom": "member_custom_zip",
-    }
+    """历史报告库 — Legacy zip 在 XHS_LEGACY_ZIP_DISABLED=1 时仅返回 ai_advisor。"""
+    from cloud_deploy.cloud_api.member_entitlements import legacy_zip_globally_disabled
+
+    archive_map = {"ai_advisor": "member_ai_advisor_zip"}
+    if not legacy_zip_globally_disabled():
+        archive_map.update(
+            {
+                "daily": "member_daily_zip",
+                "weekly": "member_weekly_zip",
+                "monthly": "member_monthly_zip",
+                "custom": "member_custom_zip",
+            }
+        )
     out: dict = {}
     total = 0
     for key, archive_type in archive_map.items():

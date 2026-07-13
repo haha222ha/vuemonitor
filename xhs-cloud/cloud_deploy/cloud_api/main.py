@@ -607,11 +607,19 @@ def member_bind_email(body: BindEmailBody, user: dict = Depends(current_user)):
 
 
 @app.get("/api/v1/member/reports")
-def member_reports(
+def member_reports_legacy_gone(
     archive_type: str = "member_daily_zip",
     user: dict = Depends(current_member),
 ):
-    return {"items": db.list_archives(archive_type=archive_type), "user": user["username"]}
+    """Legacy 表格数据包列表已下线。"""
+    raise HTTPException(
+        status_code=410,
+        detail={
+            "detail": "表格数据包已下线，请使用 AI 选品分析中心阅读最新报告",
+            "migration_url": "/member#today",
+            "archive_type": archive_type,
+        },
+    )
 
 
 @app.get("/api/v1/member/library")
