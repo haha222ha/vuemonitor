@@ -547,6 +547,24 @@ var MemberReader = (function () {
     return out.join('\n');
   }
 
+  function renderSourceRefsBlock(refs) {
+    if (!refs || !refs.length) return '';
+    var rows = '';
+    for (var i = 0; i < refs.length; i++) {
+      var r = refs[i] || {};
+      rows += '<tr><td><code>' + escFn(String(r.id || '')) + '</code></td>'
+        + '<td>' + escFn(String(r.label || '')) + '</td>'
+        + '<td>' + escFn(String(r.value == null ? '—' : r.value)) + '</td>'
+        + '<td class="src-origin">' + escFn(String(r.origin || '')) + '</td></tr>';
+    }
+    return '<details class="advisor-source-refs">'
+      + '<summary>数据来源（程序事实 · 可核对）</summary>'
+      + '<p class="src-hint">正文中的 [sr_…] 引用对应下列程序侧事实；AI 不得编造清单外数字。</p>'
+      + '<div class="src-table-wrap"><table class="src-table"><thead><tr>'
+      + '<th>引用 ID</th><th>含义</th><th>数值</th><th>来源</th></tr></thead><tbody>'
+      + rows + '</tbody></table></div></details>';
+  }
+
   function renderMarkdownArticle(data, node) {
     var body = el('readerBody');
     var frameWrap = el('readerFrameWrap');
@@ -555,9 +573,13 @@ var MemberReader = (function () {
 
     var html = '';
     var title = '';
+    var refs = data.source_refs || [];
     if (data.daily_overview) {
       title = data.daily_overview.title || '今日市场观察';
       html = data.daily_overview.content || data.daily_overview.summary || '';
+      if (!refs.length && data.daily_overview.source_refs) {
+        refs = data.daily_overview.source_refs;
+      }
     } else if (data.content) {
       title = data.title || '分析';
       html = data.content;
@@ -569,6 +591,7 @@ var MemberReader = (function () {
     updateChrome(title, node && node.date ? '报告日期 ' + node.date : '');
     body.classList.remove('hidden');
     body.innerHTML = '<article class="advisor-prose">' + renderMarkdown(html) + '</article>'
+      + renderSourceRefsBlock(refs)
       + '<footer class="advisor-disclaimer">仅供参考，不构成投资建议。数据基于公开信息与系统计算，存在延迟与误差。</footer>';
     setState('READING');
   }

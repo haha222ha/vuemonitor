@@ -624,10 +624,41 @@ class AiAdvisor:
         )
         return self._llm_b_mode_cross(report_date, ctx, directions, wrapped)
 
+    def _overview_source_refs(self, brief: dict[str, Any], summaries: dict[str, Any]) -> list[dict[str, Any]]:
+        refs: list[dict[str, Any]] = [{
+            "id": "sr_ov_active",
+            "label": "活跃方向数",
+            "value": brief.get("active_direction_count", len(summaries)),
+            "origin": "daily_brief",
+            "ranking_key": "daily_overview",
+        }, {
+            "id": "sr_ov_total",
+            "label": "总样本数",
+            "value": brief.get("total_products"),
+            "origin": "daily_brief",
+            "ranking_key": "daily_overview",
+        }, {
+            "id": "sr_ov_burst",
+            "label": "平均爆发指数",
+            "value": brief.get("avg_burst"),
+            "origin": "daily_brief",
+            "ranking_key": "daily_overview",
+        }]
+        for i, p in enumerate((brief.get("top_price_bands") or [])[:5]):
+            refs.append({
+                "id": f"sr_ov_pb_{i}",
+                "label": f"价格带:{p.get('band', '?')}",
+                "value": p.get("count", 0),
+                "origin": "daily_brief.top_price_bands",
+                "ranking_key": "daily_overview",
+            })
+        return [r for r in refs if r.get("value") is not None][:40]
+
     def _llm_b_mode_overview(self, report_date: str, ctx: dict[str, Any], chat_fn) -> dict[str, Any]:
         """B 模式 daily_overview：基于预计算 brief 润色。"""
         brief = ctx.get("daily_brief") or {}
         summaries = ctx.get("feature_summaries") or {}
+        source_refs = self._overview_source_refs(brief, summaries)
 
         # 用预计算数据构建摘要
         ranking_titles = "\n".join(
@@ -640,6 +671,10 @@ class AiAdvisor:
             f"  - {p.get('band','?')}: {p.get('count',0)} 条"
             for p in price_bands[:5]
         ) or "  （暂无）"
+        refs_text = "\n".join(
+            f"  [{r.get('id')}] {r.get('label')} = {r.get('value')}"
+            for r in source_refs[:20]
+        ) or "  （无）"
 
         system = (
             "你是小红书选品顾问首席分析师。基于程序预计算的市场数据，"
@@ -647,14 +682,16 @@ class AiAdvisor:
             "排版要求：\n"
             "1. 用 emoji 标注重点（如 🔥 强势、💎 蓝海、⚠️ 风险、📈 增长、💰 高客单）\n"
             "2. 用 markdown 标题分节（## / ###），每节 2-4 段\n"
-            "3. 关键数据用 **加粗** 或 `代码` 标注\n"
+            "3. 关键数据用 **加粗**，并在首次出现处标注引用如 [sr_ov_total]\n"
             "4. 用 > 引用块突出核心洞察\n"
             "5. 语言口语化、有节奏感，像朋友聊天而非机械报告\n\n"
+            "重要：禁止编造清单外的数字。凡出现具体数值必须能对应 source_refs 中的 id。\n"
             "合规：禁止 goods_id、店铺名、商品链接、完整商品标题。\n"
             "输出 JSON: {\"title\": str(带emoji), \"summary\": str(<=240字), \"content\": str(600-1200字markdown)}"
         )
         user = (
             f"报告日期：{report_date}\n"
+            f"可引用事实（source_refs）：\n{refs_text}\n\n"
             f"活跃方向数：{brief.get('active_direction_count', len(summaries))}\n"
             f"总样本数：{brief.get('total_products', '未知')}\n"
             f"平均爆发指数：{brief.get('avg_burst', '未知')}\n\n"
@@ -668,6 +705,7 @@ class AiAdvisor:
             "title": str(parsed.get("title") or "今日市场观察"),
             "summary": str(parsed.get("summary") or "")[:240],
             "content": str(parsed.get("content") or parsed.get("summary") or ""),
+            "source_refs": source_refs,
         }
 
     @staticmethod

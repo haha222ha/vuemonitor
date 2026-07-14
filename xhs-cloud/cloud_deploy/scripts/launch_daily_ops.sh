@@ -27,4 +27,9 @@ if [[ "${XHS_DATABASE_URL:-}" == postgres* ]]; then
   " 2>/dev/null || echo "(workflow 表未迁移或无到期)"
 fi
 
+if [[ -f "$ROOT/cloud_deploy/scripts/launch_advisor_health.sh" ]]; then
+  echo "--- advisor three-question health ---"
+  bash "$ROOT/cloud_deploy/scripts/launch_advisor_health.sh" || true
+fi
+
 echo "=== done ==="

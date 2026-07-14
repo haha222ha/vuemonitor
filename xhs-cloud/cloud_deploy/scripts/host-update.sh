@@ -140,6 +140,7 @@ if [[ "${XHS_DATABASE_URL:-}" == postgres* ]]; then
   fi
   if [[ "${XHS_V2_LAUNCH:-0}" == "1" ]] || [[ "${XHS_V2_DAILY_OPS:-1}" == "1" ]]; then
     bash "$ROOT/cloud_deploy/scripts/ensure_v2_daily_ops_timer.sh" 2>/dev/null || true
+    bash "$ROOT/cloud_deploy/scripts/ensure_advisor_health_timer.sh" 2>/dev/null || true
   fi
 fi
 

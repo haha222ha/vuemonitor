@@ -391,11 +391,17 @@ def advisor_article(report_date: str, article_key: str, user: dict = Depends(cur
     if not block:
         raise HTTPException(status_code=404, detail="文章不存在")
     _log_behavior(user["id"], "advisor_article", report_date=report_date, metadata={"key": article_key})
+    refs = block.get("source_refs") if isinstance(block.get("source_refs"), list) else []
     return {
         "report_date": report_date,
         "key": article_key,
         "title": block.get("title") or article_key,
+        "summary": block.get("summary") or "",
         "content": block.get("content") or block.get("summary") or "",
+        "key_points": list(block.get("key_points") or [])[:12],
+        "category_type": str(block.get("category_type") or "").strip().lower(),
+        "source_refs": [r for r in refs if isinstance(r, dict) and r.get("id")][:40],
+        "source_ref_policy": (data.get("meta") or {}).get("source_ref_policy") or "",
     }
 
 
