@@ -128,9 +128,27 @@ def check_keyword_mapping(report_date: str) -> dict[str, Any]:
         import psycopg2
 
         conn = psycopg2.connect(dsn)
-        conn.set_session(readonly=True)
         cur = conn.cursor()
         cur.execute("SET search_path TO xhs_monitor, public")
+        cur.execute(
+            """
+            SELECT EXISTS (
+              SELECT 1 FROM information_schema.tables
+              WHERE table_schema = current_schema()
+                AND table_name = 'keyword_goods_mapping'
+            )
+            """
+        )
+        exists = bool(cur.fetchone()[0])
+        if not exists:
+            conn.close()
+            out["skipped"] = True
+            out["ok"] = True
+            out["issues"].append(
+                "云库无 keyword_goods_mapping（正常：表在本地爬虫 xhs_monitor；"
+                "请在爬虫机查今日写入并确保已重启爬虫）"
+            )
+            return out
         cur.execute(
             """
             SELECT COUNT(*), COUNT(DISTINCT keyword)
@@ -146,8 +164,14 @@ def check_keyword_mapping(report_date: str) -> dict[str, Any]:
             out["ok"] = False
             out["issues"].append("今日 keyword_goods_mapping 无写入（爬虫可能未重启/未跑）")
     except Exception as e:
-        out["ok"] = False
-        out["issues"].append(f"查询 keyword_goods_mapping 失败: {e}")
+        msg = str(e)
+        if "does not exist" in msg:
+            out["skipped"] = True
+            out["ok"] = True
+            out["issues"].append("云库无 keyword_goods_mapping（以本地爬虫库为准）")
+        else:
+            out["ok"] = False
+            out["issues"].append(f"查询 keyword_goods_mapping 失败: {e}")
     return out
 
 
