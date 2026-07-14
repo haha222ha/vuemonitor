@@ -792,6 +792,44 @@
   text-align: center;
 }
 
+/* 方向解读 — 实体/虚拟筛选 chips */
+.dir-entity-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px 4px;
+}
+.dir-entity-chip {
+  border: 1px solid var(--reader-line, #d8dee8);
+  background: #fff;
+  color: var(--reader-text2, #555);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.dir-entity-chip .count {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--reader-muted, #888);
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 0 6px;
+}
+.dir-entity-chip.active {
+  border-color: #0071e3;
+  background: #e8f2ff;
+  color: #0071e3;
+}
+.dir-entity-chip.active .count {
+  background: rgba(0, 113, 227, 0.12);
+  color: #0071e3;
+}
+
 /* 今日分析面板 — 方向解读子分组 */
 .reader-card-subgroup {
   margin-bottom: 14px;

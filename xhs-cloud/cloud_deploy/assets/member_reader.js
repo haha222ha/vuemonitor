@@ -401,13 +401,26 @@ var MemberReader = (function () {
         else uncatDirs.push(dd);
       }
 
-      html += '<div class="reader-card-group">';
+      html += '<div class="reader-card-group" id="dirCardGroup">';
       html += '<div class="reader-card-group-title">方向解读<span class="count">' + today.directions.length + '</span></div>';
+      html += '<div class="dir-entity-filters" role="tablist" aria-label="方向虚实筛选">';
+      html += '<button type="button" class="dir-entity-chip active" data-dir-filter="all">全部<span class="count">' + today.directions.length + '</span></button>';
+      if (physicalDirs.length) {
+        html += '<button type="button" class="dir-entity-chip" data-dir-filter="physical">实体<span class="count">' + physicalDirs.length + '</span></button>';
+      }
+      if (virtualDirs.length) {
+        html += '<button type="button" class="dir-entity-chip" data-dir-filter="virtual">虚拟<span class="count">' + virtualDirs.length + '</span></button>';
+      }
+      var otherDirs = mixedDirs.concat(uncatDirs);
+      if (otherDirs.length) {
+        html += '<button type="button" class="dir-entity-chip" data-dir-filter="mixed">混合<span class="count">' + otherDirs.length + '</span></button>';
+      }
+      html += '</div>';
 
       // 实体商品子分组
       if (physicalDirs.length) {
-        html += '<div class="reader-card-subgroup">';
-        html += '<div class="reader-card-subgroup-title">🏷️ 实体商品<span class="count">' + physicalDirs.length + '</span></div>';
+        html += '<div class="reader-card-subgroup" data-dir-group="physical">';
+        html += '<div class="reader-card-subgroup-title">实体商品<span class="count">' + physicalDirs.length + '</span></div>';
         html += '<div class="reader-card-grid">';
         for (var pi = 0; pi < physicalDirs.length; pi++) {
           var pd = physicalDirs[pi];
@@ -426,8 +439,8 @@ var MemberReader = (function () {
 
       // 虚拟商品子分组
       if (virtualDirs.length) {
-        html += '<div class="reader-card-subgroup">';
-        html += '<div class="reader-card-subgroup-title">💾 虚拟商品<span class="count">' + virtualDirs.length + '</span></div>';
+        html += '<div class="reader-card-subgroup" data-dir-group="virtual">';
+        html += '<div class="reader-card-subgroup-title">虚拟商品<span class="count">' + virtualDirs.length + '</span></div>';
         html += '<div class="reader-card-grid">';
         for (var vi = 0; vi < virtualDirs.length; vi++) {
           var vd = virtualDirs[vi];
@@ -445,10 +458,9 @@ var MemberReader = (function () {
       }
 
       // 混合 + 未分类子分组（合并展示，避免老报告无 category_type 时整组消失）
-      var otherDirs = mixedDirs.concat(uncatDirs);
       if (otherDirs.length) {
-        html += '<div class="reader-card-subgroup">';
-        var otherTitle = mixedDirs.length && uncatDirs.length ? '🔄 混合 / 其他' : (mixedDirs.length ? '🔄 混合商品' : '📋 方向解读');
+        html += '<div class="reader-card-subgroup" data-dir-group="mixed">';
+        var otherTitle = mixedDirs.length && uncatDirs.length ? '混合 / 其他' : (mixedDirs.length ? '混合商品' : '方向解读');
         html += '<div class="reader-card-subgroup-title">' + otherTitle + '<span class="count">' + otherDirs.length + '</span></div>';
         html += '<div class="reader-card-grid">';
         for (var oi = 0; oi < otherDirs.length; oi++) {
@@ -457,7 +469,7 @@ var MemberReader = (function () {
           if (od.key) otags.push({ text: od.key, cls: '' });
           html += buildCardCell({
             icon: '🎯',
-            badge: '方向',
+            badge: '混合',
             title: od.title || od.key,
             tags: otags,
             node: { type: 'direction', date: date, key: od.key }
@@ -535,6 +547,7 @@ var MemberReader = (function () {
     body.innerHTML = html;
 
     bindInsightCatBars(body);
+    bindDirEntityFilters(body);
 
     // 绑定卡片点击
     var cells = body.querySelectorAll('.reader-card-cell');
@@ -546,6 +559,32 @@ var MemberReader = (function () {
           key: this.getAttribute('data-key') || '',
           category: this.getAttribute('data-category') || ''
         }, true);
+      };
+    }
+  }
+
+  function bindDirEntityFilters(root) {
+    if (!root) return;
+    var chips = root.querySelectorAll('.dir-entity-chip');
+    if (!chips.length) return;
+    function applyFilter(filter) {
+      var groups = root.querySelectorAll('.reader-card-subgroup[data-dir-group]');
+      for (var i = 0; i < groups.length; i++) {
+        var g = groups[i];
+        var kind = g.getAttribute('data-dir-group') || '';
+        g.style.display = (filter === 'all' || filter === kind) ? '' : 'none';
+      }
+      for (var c = 0; c < chips.length; c++) {
+        var chip = chips[c];
+        var active = (chip.getAttribute('data-dir-filter') || '') === filter;
+        if (active) chip.classList.add('active');
+        else chip.classList.remove('active');
+      }
+    }
+    for (var j = 0; j < chips.length; j++) {
+      chips[j].onclick = function (ev) {
+        ev.preventDefault();
+        applyFilter(this.getAttribute('data-dir-filter') || 'all');
       };
     }
   }

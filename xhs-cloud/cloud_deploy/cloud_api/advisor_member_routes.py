@@ -61,6 +61,16 @@ def _advisor_root() -> str:
     return os.path.join(root, sub)
 
 
+def _enrich_advice_types(data: dict) -> dict:
+    """读时补齐 direction_advices.category_type（兼容旧 pregen 无字段）。"""
+    try:
+        from cloud_deploy.rank_engine.entity_type import enrich_advice_directions
+
+        return enrich_advice_directions(data, context=None)
+    except Exception:
+        return data
+
+
 def _load_public_advice(report_date: str) -> dict:
     path = os.path.join(_advisor_root(), report_date, "advice.json")
     if not os.path.isfile(path):
@@ -70,6 +80,7 @@ def _load_public_advice(report_date: str) -> dict:
     if isinstance(data, dict):
         data.pop("rankings", None)
         data.pop("context", None)
+        data = _enrich_advice_types(data)
     return data
 
 
@@ -111,6 +122,8 @@ def _advisor_library_items() -> list[dict]:
             try:
                 with open(advice_path, encoding="utf-8") as f:
                     advice = json.load(f)
+                if isinstance(advice, dict):
+                    advice = _enrich_advice_types(advice)
                 dirs = advice.get("direction_advices") or []
                 direction_count = len(dirs)
                 for d in dirs:
@@ -124,7 +137,7 @@ def _advisor_library_items() -> list[dict]:
                     directions.append({
                         "key": d.get("key") or "",
                         "title": (d.get("title") or d.get("key") or "维度解读")[:120],
-                        "category_type": ct or "",
+                        "category_type": ct or "mixed",
                     })
             except (OSError, json.JSONDecodeError):
                 pass
@@ -328,6 +341,7 @@ def advisor_dashboard(user: dict = Depends(current_user)):
                     "key": block.get("key") or "",
                     "title": block.get("title") or block.get("key") or "维度解读",
                     "summary": (block.get("summary") or block.get("content") or "")[:200],
+                    "category_type": str(block.get("category_type") or "mixed").lower(),
                 })
         except HTTPException:
             status = "pending"

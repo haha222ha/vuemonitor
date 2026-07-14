@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from typing import Any, Callable
 
 from cloud_deploy.rank_engine.compliance import sanitize_context, validate_advisory_output
+from cloud_deploy.rank_engine.entity_type import enrich_advice_directions, infer_category_type
 
 # 默认每个榜单送给 LLM 的最大条目数（控制 token 与成本）
 _TOP_ITEMS_PER_RANKING = 30
@@ -20,6 +21,9 @@ _TOP_ITEMS_PER_RANKING = 30
 _MAX_RANKINGS_FOR_CROSS = 12
 # LLM 主路径最多处理的榜单数（避免类目榜过多导致调用爆炸）
 _MAX_RANKINGS_FOR_LLM = 30
+# 虚实配额（在 cap 内尽量均衡）
+_MAX_PHYSICAL_FOR_LLM = 15
+_MAX_VIRTUAL_FOR_LLM = 15
 # LLM 并发调用数（5 路并发，30 榜约 72s 完成，< 180s HTTP 超时）
 _LLM_CONCURRENCY = 5
 
@@ -110,15 +114,13 @@ class AiAdvisor:
             if ctx.get("feature_summaries"):
                 try:
                     advice = self._llm_generate_b_mode(report_date, ctx)
-                    validate_advisory_output(advice)
-                    return advice
+                    return self._finalize_advice(advice, ctx)
                 except Exception as e:
                     print(f"[advisor] B 模式 LLM 失败，回退 A 模式: {e}", file=sys.stderr, flush=True)
 
             try:
                 advice = self._llm_generate(report_date, ctx)
-                validate_advisory_output(advice)
-                return advice
+                return self._finalize_advice(advice, ctx)
             except Exception as e:
                 print(f"[advisor] LLM 主路径失败，回退模板: {e}", file=sys.stderr, flush=True)
 
@@ -128,13 +130,17 @@ class AiAdvisor:
             advice = self._normalize_pregen(report_date, pre)
             if llm_enhance:
                 advice = self._maybe_llm_enhance(report_date, advice, ctx)
-            validate_advisory_output(advice)
-            return advice
+            return self._finalize_advice(advice, ctx)
 
         # 最终兜底：规则模板
         advice = self._template_generate(report_date, ctx)
         if llm_enhance:
             advice = self._maybe_llm_enhance(report_date, advice, ctx)
+        return self._finalize_advice(advice, ctx)
+
+    def _finalize_advice(self, advice: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
+        """补齐 category_type、虚实排序后做合规校验。"""
+        advice = enrich_advice_directions(advice, context=ctx)
         validate_advisory_output(advice)
         return advice
 
@@ -390,30 +396,49 @@ class AiAdvisor:
     def _select_rankings_for_llm(self, rankings: dict[str, Any]) -> dict[str, Any]:
         """从全部榜单里选出最有价值的 _MAX_RANKINGS_FOR_LLM 个送给 LLM。
 
-        优先级：全局榜 > 价格带榜 > 类目榜（按 item_count 降序取 TOP N）。
-        避免类目榜过多（如 1500+ 个 keyword）导致 LLM 调用爆炸。
+        优先级：实体专榜 / 虚拟专榜 → 全局 / 价格带 → 类目榜；
+        虚实配额约 15+15，避免全部落在 mixed。
         """
-        if len(rankings) <= _MAX_RANKINGS_FOR_LLM:
-            return rankings
+        def _score(k: str) -> int:
+            board = rankings[k] if isinstance(rankings.get(k), dict) else {}
+            return int(board.get("item_count") or len(board.get("items") or []))
 
-        global_keys = [k for k in rankings if not k.startswith("category_") and not k.startswith("price_")]
-        price_keys = [k for k in rankings if k.startswith("price_")]
-        cat_keys = [k for k in rankings if k.startswith("category_")]
-
-        # 全局榜 + 价格带榜全要
-        selected = {k: rankings[k] for k in global_keys + price_keys if k in rankings}
-
-        # 类目榜按 item_count 降序补齐
-        remaining = _MAX_RANKINGS_FOR_LLM - len(selected)
-        if remaining > 0 and cat_keys:
-            cat_sorted = sorted(
-                cat_keys,
-                key=lambda k: rankings[k].get("item_count", len(rankings[k].get("items", []))),
-                reverse=True,
+        def _ctype(k: str) -> str:
+            board = rankings.get(k) if isinstance(rankings.get(k), dict) else {}
+            ef = str((board or {}).get("entity_filter") or "")
+            return infer_category_type(
+                key=k,
+                entity_filter=ef,
+                items=(board or {}).get("items") if isinstance(board, dict) else None,
+                title=str((board or {}).get("ranking_title") or (board or {}).get("title") or ""),
             )
-            for k in cat_sorted[:remaining]:
-                selected[k] = rankings[k]
 
+        keys = list(rankings.keys())
+        if len(keys) <= _MAX_RANKINGS_FOR_LLM:
+            # 仍按虚实排序，方便下游展示稳定
+            return {k: rankings[k] for k in sorted(keys, key=lambda x: (_ctype(x) != "physical", _ctype(x) != "virtual", -_score(x)))}
+
+        phys = sorted([k for k in keys if _ctype(k) == "physical"], key=_score, reverse=True)
+        virt = sorted([k for k in keys if _ctype(k) == "virtual"], key=_score, reverse=True)
+        mixed = sorted([k for k in keys if _ctype(k) not in ("physical", "virtual")], key=_score, reverse=True)
+
+        selected: dict[str, Any] = {}
+        for k in phys[:_MAX_PHYSICAL_FOR_LLM]:
+            selected[k] = rankings[k]
+        for k in virt[:_MAX_VIRTUAL_FOR_LLM]:
+            selected[k] = rankings[k]
+        for k in mixed:
+            if len(selected) >= _MAX_RANKINGS_FOR_LLM:
+                break
+            selected[k] = rankings[k]
+        # 一侧不足时用另一侧补齐
+        for bucket in (phys[_MAX_PHYSICAL_FOR_LLM:], virt[_MAX_VIRTUAL_FOR_LLM:]):
+            for k in bucket:
+                if len(selected) >= _MAX_RANKINGS_FOR_LLM:
+                    break
+                selected[k] = rankings[k]
+            if len(selected) >= _MAX_RANKINGS_FOR_LLM:
+                break
         return selected
 
     def _llm_generate(
