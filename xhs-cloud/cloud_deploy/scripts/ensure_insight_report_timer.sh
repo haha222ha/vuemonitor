@@ -32,7 +32,7 @@ sudo cp "$ROOT/cloud_deploy/systemd/xhs-insight-report.timer" /etc/systemd/syste
 sudo systemctl daemon-reload
 sudo systemctl enable xhs-insight-report.timer
 sudo systemctl start xhs-insight-report.timer
-ok "已启用 xhs-insight-report.timer（02:30 Shadow 预生成）"
+ok "已启用 xhs-insight-report.timer（16:30 Shadow 预生成；有成功记录则跳过）"
 
 log "下次触发:"
 systemctl list-timers xhs-insight-report.timer --no-pager || true
