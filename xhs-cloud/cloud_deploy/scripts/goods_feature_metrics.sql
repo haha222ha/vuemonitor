@@ -81,7 +81,7 @@ ON CONFLICT (goods_id, snap_date) DO UPDATE SET
 UPDATE xhs_monitor.goods_feature_metrics cur
 SET acceleration = CASE
         WHEN COALESCE(prev.growth_rate, 0) != 0 AND cur.growth_rate != 0
-        THEN ROUND(cur.growth_rate - prev.growth_rate, 6)
+        THEN ROUND((cur.growth_rate - prev.growth_rate)::NUMERIC, 6)
         ELSE 0
     END,
     updated_at = to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS')
