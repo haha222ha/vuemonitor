@@ -227,37 +227,53 @@ def advisor_chat(body: AdvisorChatBody, user: dict = Depends(current_user)):
         try:
             advice = _load_public_advice(ref_date)
             ov = advice.get("daily_overview") or {}
-            context_hint = str(ov.get("summary") or ov.get("content") or "")[:1200]
+            hint_parts = []
+            if ov.get("summary"):
+                hint_parts.append(str(ov["summary"]))
+            if ov.get("content"):
+                hint_parts.append(str(ov["content"]))
+            # 追加方向解读标题列表，让 LLM 知道有哪些方向
+            directions = advice.get("directions") or []
+            if directions:
+                dir_titles = [d.get("title", "") for d in directions[:30] if d.get("title")]
+                if dir_titles:
+                    hint_parts.append("今日方向：" + " | ".join(dir_titles))
+            context_hint = "\n".join(hint_parts)[:3000]
         except HTTPException:
             context_hint = ""
 
     content = ""
+    llm_error = ""
     try:
         from cloud_deploy.reporting.insight_llm_client import LLMError, chat_json_with_usage
 
-        prompt = (
-            "你是 PA AI 选品顾问，仅基于预生成报告摘要回答，不得编造商品 ID 或店铺名。\n"
-            f"报告日期：{ref_date or '未知'}\n摘要：{context_hint or '（暂无当日摘要）'}\n"
+        system_prompt = (
+            "你是 PA AI 选品顾问，仅基于预生成报告摘要回答，不得编造商品 ID 或店铺名。"
+            "回答需简洁、具体、有数据支撑，并注明仅供参考。"
+        )
+        user_prompt = (
+            f"报告日期：{ref_date or '未知'}\n"
+            f"报告摘要：{context_hint or '（暂无当日摘要）'}\n"
             f"用户问题：{query}\n"
-            "请用简洁中文回答，并注明仅供参考。"
+            '请用简洁中文回答，返回 JSON 格式：{"content": "你的回答内容"}'
         )
         parsed, _usage = chat_json_with_usage(
-            messages=[{"role": "user", "content": prompt}],
-            response_schema=None,
-            max_tokens=800,
+            system=system_prompt,
+            user=user_prompt,
         )
         if isinstance(parsed, dict):
             content = str(parsed.get("content") or parsed.get("answer") or "")
         elif isinstance(parsed, str):
             content = parsed
-    except Exception:
+    except Exception as e:
+        llm_error = str(e)[:200]
         content = ""
 
     if not content.strip():
         content = (
-            f"基于当前已发布报告（{ref_date or '暂无'}），"
-            f"「{query}」建议结合侧栏「方向解读」与类目情报进一步阅读。"
-            "如需实时追问，请确保当日报告已发布。"
+            f"抱歉，AI 顾问暂时无法回答（报告日期：{ref_date or '暂无'}）。"
+            f"请结合侧栏「方向解读」与类目情报阅读。"
+            + (f"（调试信息：{llm_error}）" if llm_error else "")
         )
 
     quota_remaining = max(daily_limit - int(usage.get("chat_count") or 0), 0)
