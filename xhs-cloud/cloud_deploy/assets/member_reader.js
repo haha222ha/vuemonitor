@@ -812,50 +812,98 @@ var MemberReader = (function () {
       }
       groupOrder.sort().reverse(); // 最近的月份在前
 
-      // 2) 当前月份
+      // 2) 当前月份 + 最新日期（默认展开当前月的最新日期）
       var now = new Date();
       var currentYM = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      var latestDate = archiveItems.length ? (archiveItems[0].report_date || '') : '';
 
-      // 3) 渲染月份分组
+      // 3) 渲染：月份文件夹 → 日期文件夹 → 方向解读标题列表
       var html = '<div class="archive-list">';
       for (var g = 0; g < groupOrder.length; g++) {
         var ym = groupOrder[g];
         var items = groups[ym];
         var isCurrent = (ym === currentYM);
-        var expanded = isCurrent; // 当前月默认展开
+        var monthExpanded = isCurrent; // 当前月默认展开
         var ymLabel = formatMonthLabel(ym);
-        var icon = expanded ? '📂' : '📁';
-        var arrow = expanded ? '▼' : '▶';
+        var monthIcon = monthExpanded ? '📂' : '📁';
+        var monthArrow = monthExpanded ? '▼' : '▶';
+        // 月份内天数合计方向解读数
+        var totalDirs = 0;
+        for (var td = 0; td < items.length; td++) {
+          totalDirs += (items[td].direction_count || (items[td].directions || []).length || 0);
+        }
 
         html += '<div class="archive-month-group' + (isCurrent ? ' current' : '') + '">';
         html += '<div class="archive-month-head" data-ym="' + escFn(ym) + '">';
-        html += '<span class="archive-month-icon">' + icon + '</span>';
+        html += '<span class="archive-month-icon">' + monthIcon + '</span>';
         html += '<span class="archive-month-title">' + escFn(ymLabel) + '</span>';
-        html += '<span class="archive-month-count">' + items.length + ' 篇</span>';
-        html += '<span class="archive-month-arrow">' + arrow + '</span>';
+        html += '<span class="archive-month-count">' + items.length + ' 天 · ' + totalDirs + ' 篇</span>';
+        html += '<span class="archive-month-arrow">' + monthArrow + '</span>';
         html += '</div>';
-        html += '<div class="archive-month-body"' + (expanded ? '' : ' style="display:none"') + '>';
+        html += '<div class="archive-month-body"' + (monthExpanded ? '' : ' style="display:none"') + '>';
+
+        // 日期文件夹
         for (var k = 0; k < items.length; k++) {
           var it2 = items[k];
           var dayLabel = (it2.report_date || '').slice(5); // "07-14"
-          // 虚拟/实体分类徽标
+          var dirs = it2.directions || [];
+          var dirCount = it2.direction_count || dirs.length || 0;
           var physicalCnt = it2.physical_count || 0;
           var virtualCnt = it2.virtual_count || 0;
           var mixedCnt = it2.mixed_count || 0;
+          var dayExpanded = (it2.report_date === latestDate); // 最新日期默认展开
+          var dayIcon = dayExpanded ? '📂' : '📁';
+          var dayArrow = dayExpanded ? '▼' : '▶';
+
+          // 徽标
           var badges = '';
           if (physicalCnt || virtualCnt || mixedCnt) {
-            badges = '<div class="ai-cat-badges">'
-              + (physicalCnt ? '<span class="cat-badge cat-physical">🏷️ 实体 ' + physicalCnt + '</span>' : '')
-              + (virtualCnt ? '<span class="cat-badge cat-virtual">💾 虚拟 ' + virtualCnt + '</span>' : '')
-              + (mixedCnt ? '<span class="cat-badge cat-mixed">🔄 混合 ' + mixedCnt + '</span>' : '')
-              + '</div>';
+            badges = '<span class="ai-cat-badges">'
+              + (physicalCnt ? '<span class="cat-badge cat-physical">🏷️' + physicalCnt + '</span>' : '')
+              + (virtualCnt ? '<span class="cat-badge cat-virtual">💾' + virtualCnt + '</span>' : '')
+              + (mixedCnt ? '<span class="cat-badge cat-mixed">🔄' + mixedCnt + '</span>' : '')
+              + '</span>';
           }
-          html += '<div class="archive-item" data-date="' + escFn(it2.report_date) + '">'
-            + '<div><div class="ai-date">' + escFn(dayLabel) + '</div>'
-            + '<div class="ai-summary">' + escFn(it2.summary || 'AI 选品顾问报告') + '</div>'
-            + badges + '</div>'
-            + '<span class="archive-read-link">阅读 →</span></div>';
+
+          html += '<div class="archive-day-group' + (dayExpanded ? ' expanded' : '') + '">';
+          html += '<div class="archive-day-head" data-date="' + escFn(it2.report_date) + '">';
+          html += '<span class="archive-day-icon">' + dayIcon + '</span>';
+          html += '<span class="archive-day-date">' + escFn(dayLabel) + '</span>';
+          html += '<span class="archive-day-count">' + dirCount + ' 篇方向解读</span>';
+          html += badges;
+          html += '<span class="archive-day-arrow">' + dayArrow + '</span>';
+          html += '</div>';
+          html += '<div class="archive-day-body"' + (dayExpanded ? '' : ' style="display:none"') + '>';
+
+          // 整日阅读入口
+          html += '<div class="archive-day-allread" data-date="' + escFn(it2.report_date) + '">'
+            + '📄 阅读整日报告 →</div>';
+
+          // 方向解读标题列表
+          if (dirs.length) {
+            html += '<div class="archive-dir-list">';
+            for (var di = 0; di < dirs.length; di++) {
+              var dInfo = dirs[di];
+              var ct = (dInfo.category_type || '').toLowerCase();
+              var catTag = '';
+              if (ct === 'physical') catTag = '<span class="dir-cat-tag cat-physical">实体</span>';
+              else if (ct === 'virtual') catTag = '<span class="dir-cat-tag cat-virtual">虚拟</span>';
+              else if (ct === 'mixed') catTag = '<span class="dir-cat-tag cat-mixed">混合</span>';
+              html += '<div class="archive-dir-item" data-date="' + escFn(it2.report_date) + '" data-key="' + escFn(dInfo.key) + '">'
+                + '<span class="archive-dir-icon">🎯</span>'
+                + '<span class="archive-dir-title">' + escFn(dInfo.title) + '</span>'
+                + catTag
+                + '</div>';
+            }
+            html += '</div>';
+          } else {
+            html += '<div class="archive-dir-empty">该日无方向解读数据</div>';
+          }
+
+          html += '</div>'; // /archive-day-body
+          html += '</div>'; // /archive-day-group
         }
+
         html += '</div>'; // /archive-month-body
         html += '</div>'; // /archive-month-group
       }
@@ -863,20 +911,37 @@ var MemberReader = (function () {
       host.innerHTML = html;
 
       // 4) 绑定月份标题点击（展开/折叠）
-      var heads = host.querySelectorAll('.archive-month-head');
-      for (var h = 0; h < heads.length; h++) {
-        heads[h].onclick = function () {
-          toggleArchiveMonth(this);
+      var monthHeads = host.querySelectorAll('.archive-month-head');
+      for (var h = 0; h < monthHeads.length; h++) {
+        monthHeads[h].onclick = function () { toggleArchiveGroup(this, 'month'); };
+      }
+      // 5) 绑定日期标题点击（展开/折叠方向解读列表）
+      var dayHeads = host.querySelectorAll('.archive-day-head');
+      for (var dh = 0; dh < dayHeads.length; dh++) {
+        dayHeads[dh].onclick = function (e) {
+          e.stopPropagation();
+          toggleArchiveGroup(this, 'day');
         };
       }
-      // 5) 绑定日期项点击（阅读报告）
-      var rows = host.querySelectorAll('.archive-item');
-      for (var j = 0; j < rows.length; j++) {
-        rows[j].onclick = function (e) {
-          e.stopPropagation(); // 防止冒泡到月份标题
+      // 6) 绑定"整日阅读"点击
+      var allReads = host.querySelectorAll('.archive-day-allread');
+      for (var ar = 0; ar < allReads.length; ar++) {
+        allReads[ar].onclick = function (e) {
+          e.stopPropagation();
           var d = this.getAttribute('data-date');
           if (window.MemberRouter) MemberRouter.go('today');
           selectNode({ type: 'archive', date: d });
+        };
+      }
+      // 7) 绑定方向解读标题点击（进入单篇阅读）
+      var dirItems = host.querySelectorAll('.archive-dir-item');
+      for (var di2 = 0; di2 < dirItems.length; di2++) {
+        dirItems[di2].onclick = function (e) {
+          e.stopPropagation();
+          var d = this.getAttribute('data-date');
+          var key = this.getAttribute('data-key');
+          if (window.MemberRouter) MemberRouter.go('today');
+          selectNode({ type: 'direction', date: d, key: key });
         };
       }
     }).catch(function (e) {
@@ -884,21 +949,24 @@ var MemberReader = (function () {
     });
   }
 
-  function toggleArchiveMonth(headEl) {
+  // 通用折叠切换（支持 month / day 两层）
+  function toggleArchiveGroup(headEl, level) {
     var group = headEl.parentNode;
-    var body = group.querySelector('.archive-month-body');
-    var arrow = headEl.querySelector('.archive-month-arrow');
-    var icon = headEl.querySelector('.archive-month-icon');
+    var body = group.querySelector('.' + level + '-body');
     if (!body) return;
     var isOpen = body.style.display !== 'none';
+    var icon = headEl.querySelector('.archive-' + level + '-icon');
+    var arrow = headEl.querySelector('.archive-' + level + '-arrow');
     if (isOpen) {
       body.style.display = 'none';
-      if (arrow) arrow.textContent = '▶';
       if (icon) icon.textContent = '📁';
+      if (arrow) arrow.textContent = '▶';
+      group.classList.remove('expanded');
     } else {
       body.style.display = '';
-      if (arrow) arrow.textContent = '▼';
       if (icon) icon.textContent = '📂';
+      if (arrow) arrow.textContent = '▼';
+      group.classList.add('expanded');
     }
   }
 

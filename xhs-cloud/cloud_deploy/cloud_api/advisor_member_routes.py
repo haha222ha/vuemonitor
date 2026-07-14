@@ -99,10 +99,13 @@ def _advisor_library_items() -> list[dict]:
                 pass
 
         # 统计 direction_advices 的 category_type 分布（虚拟/实体分类）
+        # 同时收集每篇方向解读的轻量信息（key/title/category_type），
+        # 供前端 archive 页面按日期文件夹形式展开 30 篇方向解读。
         physical_count = 0
         virtual_count = 0
         mixed_count = 0
         direction_count = 0
+        directions: list[dict] = []
         advice_path = os.path.join(_advisor_root(), date, "advice.json")
         if os.path.isfile(advice_path):
             try:
@@ -118,6 +121,11 @@ def _advisor_library_items() -> list[dict]:
                         virtual_count += 1
                     elif ct == "mixed":
                         mixed_count += 1
+                    directions.append({
+                        "key": d.get("key") or "",
+                        "title": (d.get("title") or d.get("key") or "维度解读")[:120],
+                        "category_type": ct or "",
+                    })
             except (OSError, json.JSONDecodeError):
                 pass
 
@@ -129,6 +137,7 @@ def _advisor_library_items() -> list[dict]:
             "physical_count": physical_count,
             "virtual_count": virtual_count,
             "mixed_count": mixed_count,
+            "directions": directions,
         })
     return items
 
