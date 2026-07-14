@@ -84,9 +84,11 @@ python xhs_daily_report_pipeline.py --skip-report --skip-ingest
 
 | 改动面 | 是否 git push `vuemonitor` | 上线方式 |
 |--------|---------------------------|----------|
-| 仅 D 盘 `daily_report/`、`rank_engine/`、流水线 | 否 | `gen_report` / `xhs_daily_report_pipeline` 推 **报告 zip** |
-| `E:\vuemonitor\xhs-cloud\**` 或 `.cursor/rules/**` | **是** → `origin/main` | Agent SSH `xhs365` → `pull-and-deploy.sh` |
-| 类目：D 盘 lexicon + 云 taxonomy | 两边都做完 | 先本地报告（可上传）再 push/pull 代码；规范名必须对齐 |
+| 仅 D 盘 `daily_report/`、`rank_engine/`、流水线 | 否 | `gen_report` / `xhs_daily_report_pipeline` 推 **报告 zip（数据）** |
+| `E:\vuemonitor\xhs-cloud\**` 或 `.cursor/rules/**` | **是** → 由 **Cursor Agent** push + SSH pull | 见 `xhs-cloud-deploy.mdc`；**不要让用户或报告脚本做** |
+| 类目：D 盘 lexicon + 云 taxonomy | 两边都做完 | 报告只负责数据；代码侧 Agent 自己 push/pull |
+
+**硬约束**：选品报告流水线 **不得** 调用 `git push` / 云主机代码 pull；代码上线永远是 Cursor Agent 的事。
 
 ## Agent 注意
 

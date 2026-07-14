@@ -51,6 +51,6 @@ alwaysApply: true
 ## 代码原则
 
 - 最小 diff；匹配周边风格；能复用不造轮子。
-- **上线闭环**：本地改码 → **`git push origin main`** → Agent SSH **`xhs365` pull/deploy**（**`xhs-cloud-deploy.mdc`**）。勿默认甩给用户粘贴云主机命令。
+- **代码上线**：一律 **Cursor Agent** 执行 `git push` + SSH `xhs365` pull（**`xhs-cloud-deploy.mdc`**）。禁止甩命令给用户；禁止塞进选品报告流水线。
 - **类目标签**：本地 `category_lexicon` 与云 `category_taxonomy.yaml` 规范名同源（**`xhs-category-lexicon.mdc`**）。
-- D 盘选品日报本身不进本仓 git；报告数据包另走上传（**`xhs-daily-report.mdc`**）。
+- **选品日报**：只上传报告数据包（**`xhs-daily-report.mdc`**），不做代码 push/pull。

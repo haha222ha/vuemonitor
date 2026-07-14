@@ -14,8 +14,8 @@ alwaysApply: false
 | 层 | 位置 | 改什么 | 如何上线 |
 |----|------|--------|----------|
 | **本地爬虫 / 日报** | `D:\jiekoufenxi\小红书多设备爬虫\daily_report\` | `category_lexicon/`、`product_classify.py`、`gen_report.py`、HTML 模板 | **不进** vuemonitor git；靠日批生成 `reports\全量MMDD\` + `upload_report_cloud` 推数据包 |
-| **GitHub / 开发机仓库** | `E:\vuemonitor\xhs-cloud\` | `config/category_taxonomy.yaml`、insight 管道、`assets/index_*.html` 镜像 | Agent：**commit → `git push origin main`** |
-| **云主机** | `/opt/vuemonitor` → rsync → `/opt/xhs-cloud` | 运行中的 API / 静态页 / taxonomy | Agent：**SSH `xhs365` 执行 `pull-and-deploy.sh`**（勿甩给用户粘贴） |
+| **GitHub / 开发机仓库** | `E:\vuemonitor\xhs-cloud\` | taxonomy / insight / assets 镜像 | **Cursor Agent** commit + `git push`（不是报告脚本、不是用户） |
+| **云主机** | `/opt/vuemonitor` → `/opt/xhs-cloud` | 运行中的 API / 静态页 / taxonomy | **Cursor Agent** SSH `pull-and-deploy`（禁止甩粘贴命令） |
 
 ## 本地类目约束（D 盘）
 
@@ -56,21 +56,16 @@ alwaysApply: false
 
 ### B. 改了 `E:\vuemonitor\xhs-cloud`（taxonomy / insight / assets）
 
+**全部由 Cursor Agent 在终端执行**（不要让用户或选品报告脚本做）：
+
 ```text
-1. 只 stage 相关文件（xhs-cloud/**、.cursor/rules/**）
+1. stage 相关文件（xhs-cloud/**、.cursor/rules/**）
 2. commit + git push origin main
-3. SSH 部署（Agent 执行，不要丢给用户）：
-   ssh -o BatchMode=yes -o ConnectTimeout=20 xhs365 "bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/pull-and-deploy.sh"
-4. 告知用户 commit 短 SHA + 会员页 Ctrl+F5
+3. ssh xhs365 → pull-and-deploy.sh
+4. 回复里只报 commit 短 SHA + 提醒 Ctrl+F5（不要贴「请你上服务器执行」）
 ```
 
-可选重跑当日洞察（用户要求或改了类目逻辑后建议执行）：
-
-```powershell
-ssh -o BatchMode=yes xhs365 "cd /opt/xhs-cloud && source venv/bin/activate && export INSIGHT_PG_SOURCE=pg_items && python -m cloud_deploy.scripts.cloud_insight_report --date $(Get-Date -Format yyyy-MM-dd) --source pg_items --publish"
-```
-
-（日期按实际报告日替换；Windows 侧可把日期字面量写死。）
+改类目逻辑后如需重跑洞察：Agent 自己 SSH 执行 `cloud_insight_report`，勿甩命令。
 
 ### C. 两边都改了
 

@@ -1,5 +1,5 @@
 ---
-description: xhs-cloud 选品云端部署流程（Agent 执行 push + SSH pull，无需用户粘贴）
+description: xhs-cloud 代码上线：一律 Cursor Agent 执行 git push + SSH pull，禁止甩给用户，禁止塞进选品报告流水线
 alwaysApply: true
 ---
 
@@ -9,18 +9,27 @@ alwaysApply: true
 > 类目标签本地↔云同源： **`xhs-category-lexicon.mdc`**。  
 > 选品日报（D 盘）： **`xhs-daily-report.mdc`**。
 
+## 谁做什么（写死）
+
+| 事项 | 执行者 | 说明 |
+|------|--------|------|
+| **代码** `git commit` / `git push origin main` | **Cursor Agent** | 改完 `E:\vuemonitor\xhs-cloud`（或相关 rules）后主动做，**不要等用户说 push** |
+| **云主机** `pull-and-deploy` / host-update | **Cursor Agent** | push 成功后立刻 `ssh xhs365` 执行，**禁止**在回复里甩「请你复制下面 bash」当默认交付 |
+| **选品报告** gen / zip / ingest 上传 | 本地日批 / Agent 按日报规则跑 | 只推 **报告数据包**，**禁止**在报告流水线里 `git push` / SSH pull 代码 |
+| 用户 | 验收 / Ctrl+F5 | 用户不负责部署命令；仅 SSH 或 push **失败**时才给备用指令 |
+
+**一句话**：需要 push/pull 上线的事情 = **Cursor 做**；选品报告流水线 = **只传数据不传代码**。
+
 ## 本地 → GitHub → 云主机（强制闭环）
 
 | 步骤 | 谁执行 | 动作 |
 |------|--------|------|
 | 1. 本地改代码 | Agent | 改 `E:\vuemonitor\xhs-cloud\...`（或规则）；跑相关测试 |
-| 2. GitHub push | Agent | `git add` 仅相关文件 → `commit` → **`git push origin main`** |
-| 3. 云主机 pull | Agent | SSH **`xhs365`** 跑 `pull-and-deploy.sh`（fetch/reset + rsync `cloud_deploy/` + host-update） |
-| 4. 验收 | Agent → 用户 | 回报 commit 短 SHA；提醒会员页 **Ctrl+F5** |
+| 2. GitHub push | **Agent（必做）** | `git add` 仅相关文件 → `commit` → **`git push origin main`** |
+| 3. 云主机 pull | **Agent（必做）** | SSH **`xhs365`** 跑 `pull-and-deploy.sh` |
+| 4. 验收告知 | Agent → 用户 | 回报 commit 短 SHA + 提醒 **Ctrl+F5**（不要附大段「请你上服务器执行」） |
 
-**不要**把第 2～3 步变成「请用户自己复制粘贴」——除非 SSH/`git push` 失败再交备用指令。
-
-D 盘爬虫日报 **不走** 本仓库 git；数据包上云见 `xhs-daily-report.mdc`。若同时改了类目逻辑，顺序见 `xhs-category-lexicon.mdc` §强制流程。
+D 盘爬虫日报 **不走** 本仓库 git；报告数据包见 `xhs-daily-report.mdc`。
 
 ## 路径与 SSH
 
@@ -75,10 +84,11 @@ Windows 封装（可选）：`scripts\v2-push-and-deploy.ps1`（`$env:XHS_DEPLOY
 
 ## 禁止
 
+- **禁止**把「云主机一键指令」整块贴给用户当常规收尾（旧习惯已废止）。
+- **禁止**让选品报告 / `xhs_daily_report_pipeline` / `upload_report_cloud` 执行 `git push` 或代码 pull。
 - 不要假设「只在服务器 rsync」就能更新——必须先 git push，服务器 `/opt/vuemonitor` 才有新代码。
-- 不要直接改 `/opt/xhs-cloud`（运行目录），改 `E:\vuemonitor\xhs-cloud` 再 push + SSH pull。
+- 不要直接改 `/opt/xhs-cloud`（运行目录），改 `E:\vuemonitor\xhs-cloud` 再由 Agent push + SSH pull。
 - 不要提交 `.env`、数据库、大体积 data。
-- 不要把部署步骤甩给用户「复制粘贴到云主机」，除非 Agent SSH 不可用。
 
 ## 仅改静态页时的最快热修（可选）
 
