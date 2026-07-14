@@ -195,6 +195,7 @@ def row_to_report_item(row: dict) -> list:
         "base_hours": _f(base_hours) if base_hours not in (None, "") else 0.0,
         "base_at": _fmt_ts(row.get("base_at")),
         "anomaly": _norm_anomaly(row.get("anomaly")),
+        "category_tag": str(row.get("category_tag") or "").strip()[:64],
     }
     return [values[k] for k in REPORT_COLUMNS]
 
@@ -760,7 +761,8 @@ def _fetch_sold_daily_scan_delta_rows(
                    rdi.is_virtual AS rdi_is_virtual,
                    rdi.base_hours AS rdi_base_hours,
                    rdi.base_at AS rdi_base_at,
-                   rdi.anomaly AS rdi_anomaly
+                   rdi.anomaly AS rdi_anomaly,
+                   rdi.category_tag AS rdi_category_tag
             FROM goods_sold_daily sd
             LEFT JOIN LATERAL (
                 SELECT p.sold_num
@@ -958,6 +960,7 @@ def sold_row_to_item(row: dict, prev_sold: int | None) -> list | None:
         "base_hours": row.get("rdi_base_hours"),
         "base_at": row.get("rdi_base_at"),
         "anomaly": row.get("rdi_anomaly") or 0,
+        "category_tag": _pick_str(row.get("rdi_category_tag"), row.get("category_tag")),
     }
     return row_to_report_item(merged)
 
@@ -1061,7 +1064,8 @@ def fetch_items_from_sold_daily(conn, report_date: str, *, incremental_only: boo
                    rdi.is_virtual AS rdi_is_virtual,
                    rdi.base_hours AS rdi_base_hours,
                    rdi.base_at AS rdi_base_at,
-                   rdi.anomaly AS rdi_anomaly
+                   rdi.anomaly AS rdi_anomaly,
+                   rdi.category_tag AS rdi_category_tag
             FROM monitor_goods m
             JOIN goods_sold_daily sd ON sd.goods_id = m.goods_id AND sd.snapshot_date = %s
             LEFT JOIN goods_sold_daily sp ON sp.goods_id = m.goods_id AND sp.snapshot_date = %s
@@ -1282,7 +1286,8 @@ def fetch_monitor_items_for_period(conn, start_date: str, end_date: str) -> list
                    rdi.is_virtual AS rdi_is_virtual,
                    rdi.base_hours AS rdi_base_hours,
                    rdi.base_at AS rdi_base_at,
-                   rdi.anomaly AS rdi_anomaly
+                   rdi.anomaly AS rdi_anomaly,
+                   rdi.category_tag AS rdi_category_tag
             FROM monitor_goods m
             JOIN goods_sold_daily sd
               ON sd.goods_id = m.goods_id

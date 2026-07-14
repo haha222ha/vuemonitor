@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""选品报告 28 列常量（与 sync_service / 桌面 gen_report 对齐）。"""
+"""选品报告列常量（与 sync_service / 桌面 gen_report 对齐；末尾可扩展）。"""
 
 REPORT_COLUMNS = [
     "goods_id", "title", "price", "sold", "v1h", "v6h", "actual_v1d", "v1d",
@@ -7,6 +7,7 @@ REPORT_COLUMNS = [
     "pool", "first_seen", "store_id", "store_name", "shelf_time",
     "shop_sales", "shop_fans", "shop_fsr", "goods_fsr",
     "behavior", "is_virtual", "base_hours", "base_at", "anomaly",
+    "category_tag",
 ]
 
 COL = {name: i for i, name in enumerate(REPORT_COLUMNS)}
@@ -103,7 +104,10 @@ ARCHIVE_MONTHLY = "member_monthly_zip"
 ARCHIVE_CUSTOM = "member_custom_zip"
 
 
-def item_at(item: list, key: str, default=None):
+def item_at(item, key: str, default=None):
+    if isinstance(item, dict):
+        val = item.get(key, default)
+        return default if val is None else val
     idx = COL.get(key)
     if idx is None or not isinstance(item, (list, tuple)) or idx >= len(item):
         return default

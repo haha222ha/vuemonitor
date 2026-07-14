@@ -129,12 +129,12 @@ def write_insight_bundle(
 
 
 def pg_items_to_rows(items: list) -> list[dict[str, Any]]:
-    """28 列 report item → insight 聚合输入（仅管道内使用）。"""
+    """报告 item → insight 聚合输入（含脱敏 category_tag，与日报分层同源）。"""
     from cloud_deploy.reporting.constants import item_at
 
     rows: list[dict[str, Any]] = []
     for it in items:
-        title = (item_at(it, "title") or "").strip()
+        title = str(item_at(it, "title") or "").strip()
         if not title:
             continue
         gr = float(item_at(it, "gr") or item_at(it, "actual_gr") or 0)
@@ -142,16 +142,20 @@ def pg_items_to_rows(items: list) -> list[dict[str, Any]]:
             gr = gr / 100.0
         pool = str(item_at(it, "pool") or "")
         is_virtual = bool(item_at(it, "is_virtual"))
+        delta = float(item_at(it, "actual_v1d") or item_at(it, "delta") or 0)
+        cat = str(item_at(it, "category_tag") or item_at(it, "category") or "").strip()
         rows.append(
             {
                 "title": title,
                 "price": float(item_at(it, "price") or 0),
-                "delta": float(item_at(it, "actual_v1d") or 0),
+                "delta": delta,
                 "gr": gr,
                 "first_seen_days": 99,
                 "is_new": pool.upper() == "NEW",
                 "is_virtual": is_virtual,
                 "behavior": str(item_at(it, "behavior") or ""),
+                "category_tag": cat,
+                "category": cat,
             }
         )
     return rows

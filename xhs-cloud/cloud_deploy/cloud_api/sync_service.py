@@ -96,6 +96,13 @@ def item_to_daily_row(
     gid = str(_field(item, "goods_id", "", col_map) or "").strip()
     if not gid:
         return None
+    # 新版 gen_report 用 delta；旧版用 actual_v1d —— 入库时统一写入 actual_v1d
+    actual = _num(_field(item, "actual_v1d", col_map=col_map))
+    if actual <= 0:
+        actual = _num(_field(item, "delta", col_map=col_map))
+    v1d = _num(_field(item, "v1d", col_map=col_map))
+    if v1d <= 0:
+        v1d = actual
     return (
         report_date,
         gid,
@@ -105,10 +112,10 @@ def item_to_daily_row(
         _int(_field(item, "sold", col_map=col_map)),
         _num(_field(item, "v1h", col_map=col_map)),
         _num(_field(item, "v6h", col_map=col_map)),
-        _num(_field(item, "actual_v1d", col_map=col_map)),
-        _num(_field(item, "v1d", col_map=col_map)),
+        actual,
+        v1d,
         _num(_field(item, "actual_gr", col_map=col_map)),
-        _num(_field(item, "gr", col_map=col_map)),
+        _num(_field(item, "gr", col_map=col_map) or _field(item, "actual_gr", col_map=col_map)),
         _num(_field(item, "actual_vsr", col_map=col_map)),
         _num(_field(item, "vsr", col_map=col_map)),
         _num(_field(item, "acc", col_map=col_map)),
@@ -127,12 +134,15 @@ def item_to_daily_row(
         _num(_field(item, "base_hours", col_map=col_map)),
         _field(item, "base_at", col_map=col_map) or None,
         str(_field(item, "anomaly", col_map=col_map) or ""),
+        str(_field(item, "category_tag", col_map=col_map) or "").strip()[:64],
     )
 
 
 def qualifies_monitor_pool(item: Any, col_map: dict[str, int] | None = None) -> bool:
     v1d = _num(_field(item, "v1d", col_map=col_map))
     actual = _num(_field(item, "actual_v1d", col_map=col_map))
+    if actual <= 0:
+        actual = _num(_field(item, "delta", col_map=col_map))
     return v1d > 0 or actual > 0
 
 
@@ -210,7 +220,7 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
                        v1h, v6h, actual_v1d, v1d, actual_gr, gr, actual_vsr, vsr,
                        acc, burst, pool, first_seen, store_id, store_name, shelf_time,
                        shop_sales, shop_fans, shop_fsr, goods_fsr, behavior,
-                       is_virtual, base_hours, base_at, anomaly
+                       is_virtual, base_hours, base_at, anomaly, category_tag
                    ) VALUES %s
                    ON CONFLICT (report_date, goods_id) DO UPDATE SET
                        rank_no=EXCLUDED.rank_no, title=EXCLUDED.title, price=EXCLUDED.price,
@@ -225,7 +235,7 @@ def apply_daily_report(conn, report_date: str, meta: dict, items: list, source: 
                        shop_fsr=EXCLUDED.shop_fsr, goods_fsr=EXCLUDED.goods_fsr,
                        behavior=EXCLUDED.behavior, is_virtual=EXCLUDED.is_virtual,
                        base_hours=EXCLUDED.base_hours, base_at=EXCLUDED.base_at,
-                       anomaly=EXCLUDED.anomaly""",
+                       anomaly=EXCLUDED.anomaly, category_tag=EXCLUDED.category_tag""",
                 daily_rows,
                 page_size=500,
             )

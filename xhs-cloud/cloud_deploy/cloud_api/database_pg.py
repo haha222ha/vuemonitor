@@ -293,6 +293,7 @@ def _init_db_on_conn(conn) -> None:
                     base_hours NUMERIC(12,2),
                     base_at TIMESTAMPTZ,
                     anomaly VARCHAR(64),
+                    category_tag VARCHAR(64) DEFAULT '',
                     PRIMARY KEY (report_date, goods_id)
                 );
                 CREATE TABLE IF NOT EXISTS goods_sold_daily (
@@ -426,6 +427,9 @@ def _migrate_legacy_columns(c) -> None:
     c.execute("ALTER TABLE monitor_goods ADD COLUMN IF NOT EXISTS shop_sales INT")
     c.execute("ALTER TABLE monitor_goods ADD COLUMN IF NOT EXISTS shop_fans INT")
     c.execute("ALTER TABLE monitor_goods ADD COLUMN IF NOT EXISTS first_seen TIMESTAMPTZ")
+    c.execute(
+        "ALTER TABLE report_daily_items ADD COLUMN IF NOT EXISTS category_tag VARCHAR(64) DEFAULT ''"
+    )
     c.execute("ALTER TABLE monitor_goods ADD COLUMN IF NOT EXISTS scan_claim_by VARCHAR(64)")
     c.execute("ALTER TABLE monitor_goods ADD COLUMN IF NOT EXISTS scan_claim_until TIMESTAMPTZ")
     c.execute(
