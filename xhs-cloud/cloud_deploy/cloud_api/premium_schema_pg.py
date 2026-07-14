@@ -394,6 +394,60 @@ def init_premium_pg_schema(conn) -> None:
     c.execute("CREATE INDEX IF NOT EXISTS idx_gfm_accel ON goods_feature_metrics (snap_date, acceleration DESC)")
     c.execute("CREATE INDEX IF NOT EXISTS idx_gfm_consec ON goods_feature_metrics (snap_date, consecutive_days DESC)")
 
+    # 关键词-商品映射表（爬虫写入，记录每次扫描时关键词与商品的对应关系）
+    c.execute(
+        """
+        CREATE TABLE IF NOT EXISTS keyword_goods_mapping (
+            scan_date     TEXT NOT NULL,
+            keyword       TEXT NOT NULL,
+            goods_id      TEXT NOT NULL,
+            rank_position INTEGER,
+            batch_id      INTEGER,
+            scanned_at    TEXT DEFAULT to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'),
+            PRIMARY KEY (scan_date, keyword, goods_id)
+        )
+        """
+    )
+    c.execute("CREATE INDEX IF NOT EXISTS idx_kgm_kw ON keyword_goods_mapping (keyword, scan_date)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_kgm_date ON keyword_goods_mapping (scan_date)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_kgm_goods ON keyword_goods_mapping (goods_id)")
+
+    # 关键词重叠率结果表（计算表，与爬虫写表分离）
+    c.execute(
+        """
+        CREATE TABLE IF NOT EXISTS keyword_overlap_results (
+            scan_date       TEXT NOT NULL,
+            kw_keep         TEXT NOT NULL,
+            kw_drop         TEXT NOT NULL,
+            keep_goods_cnt  INTEGER,
+            drop_goods_cnt  INTEGER,
+            intersection    INTEGER,
+            union_cnt       INTEGER,
+            overlap_pct     DOUBLE PRECISION,
+            computed_at     TEXT DEFAULT to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'),
+            PRIMARY KEY (scan_date, kw_keep, kw_drop)
+        )
+        """
+    )
+    c.execute("CREATE INDEX IF NOT EXISTS idx_kor_date ON keyword_overlap_results (scan_date)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_kor_overlap ON keyword_overlap_results (scan_date, overlap_pct DESC)")
+
+    # 关键词优化结果表（贪心去重结果）
+    c.execute(
+        """
+        CREATE TABLE IF NOT EXISTS keyword_optimize_results (
+            scan_date       TEXT NOT NULL,
+            keyword         TEXT NOT NULL,
+            action          TEXT NOT NULL,
+            goods_count     INTEGER,
+            new_goods_count INTEGER,
+            overlap_pct     DOUBLE PRECISION,
+            computed_at     TEXT DEFAULT to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'),
+            PRIMARY KEY (scan_date, keyword)
+        )
+        """
+    )
+
     c.execute("SELECT COUNT(*) FROM keyword_batches")
     if int(c.fetchone()[0] or 0) == 0:
         c.executemany(
