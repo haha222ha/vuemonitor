@@ -1057,6 +1057,208 @@ def admin_test_insight_llm_config(_: None = Depends(verify_sync_key)):
         raise HTTPException(status_code=503, detail=f"测试失败: {e}") from e
 
 
+# ===== 会员联系配置（微信二维码） =====
+class MemberContactBody(BaseModel):
+    wechat_qr_url: str = ""
+    wechat_label: str = "扫码联系客服"
+    contact_text: str = "开通会员 / 定制分析 / 技术支持"
+    float_icon_url: str = ""
+
+
+@app.get("/api/v1/public/member-contact")
+def public_get_member_contact():
+    """公开接口 — 未登录用户读取微信二维码配置。"""
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        return {"config": {}}
+    try:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+        from cloud_deploy.cloud_api.member_contact_settings import get_public_config
+
+        init_db()
+        conn = _conn()
+        try:
+            return {"config": get_public_config(conn)}
+        finally:
+            conn.close()
+    except Exception as e:
+        return {"config": {}, "error": str(e)}
+
+
+@app.get("/api/v1/admin/member-contact")
+def admin_get_member_contact(_: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="需要 PostgreSQL")
+    try:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+        from cloud_deploy.cloud_api.member_contact_settings import get_public_config
+
+        init_db()
+        conn = _conn()
+        try:
+            return {"config": get_public_config(conn)}
+        finally:
+            conn.close()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"读取配置失败: {e}") from e
+
+
+@app.put("/api/v1/admin/member-contact")
+def admin_put_member_contact(body: MemberContactBody, _: None = Depends(verify_sync_key)):
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="需要 PostgreSQL")
+    try:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+        from cloud_deploy.cloud_api.member_contact_settings import save_config
+
+        init_db()
+        conn = _conn()
+        try:
+            cfg = save_config(conn, body.model_dump(exclude_unset=True))
+            return {"message": "已保存", "config": cfg}
+        finally:
+            conn.close()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"保存配置失败: {e}") from e
+
+
+@app.post("/api/v1/admin/member-contact/upload")
+async def admin_upload_member_contact_qr(
+    file: UploadFile = File(...),
+    _: None = Depends(verify_sync_key),
+):
+    """Admin 后台上传微信二维码图片 → 保存到 assets/uploads/，返回可访问 URL。"""
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="缺少上传文件")
+    raw = await file.read()
+    if not raw:
+        raise HTTPException(status_code=400, detail="上传文件为空")
+    if len(raw) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="图片超过 5MB 限制")
+    ext = os.path.splitext(file.filename or "")[1].lower()
+    if ext not in (".png", ".jpg", ".jpeg", ".gif", ".webp"):
+        raise HTTPException(status_code=400, detail="仅支持 png/jpg/jpeg/gif/webp 格式")
+    uploads_dir = os.path.join(_ASSETS, "uploads")
+    os.makedirs(uploads_dir, exist_ok=True)
+    ts = datetime.now().strftime("%Y%m%d%H%M%S")
+    short_ext = ext.lstrip(".") or "png"
+    filename = f"wechat_qr_{ts}.{short_ext}"
+    save_path = os.path.join(uploads_dir, filename)
+    with open(save_path, "wb") as f:
+        f.write(raw)
+    url = f"/assets/uploads/{filename}"
+    return {"url": url, "filename": filename, "size": len(raw)}
+
+
+# ========== A/B 测试指标 API ==========
+
+class AbTestScoreBody(BaseModel):
+    test_date: str = Field(..., pattern=r"^\d{4}-\d{2}-\d{2}$")
+    ranking_key: str = Field(..., min_length=1, max_length=128)
+    mode: str = Field(..., pattern=r"^[AB]$")
+    accuracy_score: int | None = Field(default=None, ge=1, le=5)
+    insight_score: int | None = Field(default=None, ge=1, le=5)
+    hallucination: int | None = Field(default=None, ge=0, le=1)
+
+
+@app.get("/api/v1/admin/ab-test/metrics")
+def admin_ab_test_metrics(
+    date_from: str | None = None,
+    date_to: str | None = None,
+    ranking_key: str | None = None,
+    mode: str | None = None,
+    limit: int = 1000,
+    _: None = Depends(verify_sync_key),
+):
+    """查询 A/B 测试指标（明细）。"""
+    try:
+        from cloud_deploy.rank_engine.ab_test import list_metrics
+
+        items = list_metrics(
+            date_from=date_from,
+            date_to=date_to,
+            ranking_key=ranking_key,
+            mode=mode,
+            limit=limit,
+        )
+        return {"items": items, "count": len(items)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"查询指标失败: {e}") from e
+
+
+@app.get("/api/v1/admin/ab-test/aggregate")
+def admin_ab_test_aggregate(
+    date_from: str | None = None,
+    date_to: str | None = None,
+    _: None = Depends(verify_sync_key),
+):
+    """A/B 测试聚合指标（按日 + 总计）。"""
+    try:
+        from cloud_deploy.rank_engine.ab_test import aggregate_daily, aggregate_total
+
+        return {
+            "daily": aggregate_daily(date_from=date_from, date_to=date_to),
+            "total": aggregate_total(date_from=date_from, date_to=date_to),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"聚合指标失败: {e}") from e
+
+
+@app.get("/api/v1/admin/ab-test/dates")
+def admin_ab_test_dates(_: None = Depends(verify_sync_key)):
+    """列出有 A/B 测试数据的日期（下拉选择用）。"""
+    try:
+        from cloud_deploy.rank_engine.ab_test import list_test_dates
+
+        return {"dates": list_test_dates(limit=60)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"列日期失败: {e}") from e
+
+
+@app.put("/api/v1/admin/ab-test/score")
+def admin_ab_test_score(body: AbTestScoreBody, _: None = Depends(verify_sync_key)):
+    """人工评分录入（准确率/洞察/幻觉标记）。"""
+    try:
+        from cloud_deploy.rank_engine.ab_test import update_quality_score
+
+        affected = update_quality_score(
+            test_date=body.test_date,
+            ranking_key=body.ranking_key,
+            mode=body.mode,
+            accuracy_score=body.accuracy_score,
+            insight_score=body.insight_score,
+            hallucination=body.hallucination,
+        )
+        return {"affected": affected, "message": "已更新" if affected else "未找到记录"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"评分录入失败: {e}") from e
+
+
+@app.get("/api/v1/admin/ab-test/report")
+def admin_ab_test_report(
+    report_date: str,
+    mode: str = "A",
+    _: None = Depends(verify_sync_key),
+):
+    """读取指定日期 + 模式的 advice.json（用于 admin 并排预览 A/B 报告）。"""
+    import re as _re
+
+    if not _re.match(r"^\d{4}-\d{2}-\d{2}$", report_date):
+        raise HTTPException(status_code=400, detail="report_date 格式应为 YYYY-MM-DD")
+    if mode not in ("A", "B"):
+        raise HTTPException(status_code=400, detail="mode 必须是 A 或 B")
+    cloud_root = os.environ.get("XHS_CLOUD_ROOT", "/opt/xhs-cloud")
+    advice_path = os.path.join(
+        cloud_root, "data", "advisor_published", report_date, f"mode_{mode.lower()}", "advice.json"
+    )
+    if not os.path.isfile(advice_path):
+        raise HTTPException(status_code=404, detail=f"未找到报告: {advice_path}")
+    try:
+        with open(advice_path, encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"读取报告失败: {e}") from e
+
+
 @app.get("/api/v1/sync/status")
 def sync_status(_: None = Depends(verify_sync_key)):
     from cloud_deploy.reporting.constants import ARCHIVE_DAILY, ARCHIVE_MONTHLY, ARCHIVE_WEEKLY

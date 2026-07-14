@@ -9,6 +9,8 @@
         <el-menu-item index="/intel-codes">情报授权码</el-menu-item>
         <el-menu-item index="/pick-member">选品会员</el-menu-item>
         <el-menu-item index="/insight-llm">情报 LLM</el-menu-item>
+        <el-menu-item index="/ab-test">A/B 测试</el-menu-item>
+        <el-menu-item index="/member-contact">会员联系配置</el-menu-item>
         <el-menu-item index="/member-feedback">用户反馈</el-menu-item>
         <el-menu-item index="/collect">采集管理</el-menu-item>
         <el-menu-item index="/proxies">代理池管理</el-menu-item>

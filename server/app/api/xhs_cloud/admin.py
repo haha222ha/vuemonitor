@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 import re
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from pydantic import BaseModel, Field
 
 from app.middleware.auth import AdminUser
@@ -322,6 +322,66 @@ async def test_insight_llm_config(
     return {"code": 0, "data": result}
 
 
+class MemberContactRequest(BaseModel):
+    wechat_qr_url: str | None = Field(default=None, max_length=512)
+    wechat_label: str | None = Field(default=None, max_length=64)
+    contact_text: str | None = Field(default=None, max_length=256)
+    float_icon_url: str | None = Field(default=None, max_length=512)
+
+
+@router.get("/member-contact")
+async def get_member_contact(
+    admin: AdminUser,
+    client: XhsCloudClient = Depends(get_xhs_cloud_client),
+):
+    del admin
+    try:
+        result = await client.get_member_contact()
+    except XhsCloudNotConfigured as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    return {"code": 0, "data": result}
+
+
+@router.put("/member-contact")
+async def save_member_contact(
+    req: MemberContactRequest,
+    admin: AdminUser,
+    client: XhsCloudClient = Depends(get_xhs_cloud_client),
+):
+    del admin
+    payload = req.model_dump(exclude_unset=True)
+    try:
+        result = await client.save_member_contact(payload)
+    except XhsCloudNotConfigured as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    return {"code": 0, "data": result}
+
+
+@router.post("/member-contact/upload")
+async def upload_member_contact_qr(
+    admin: AdminUser,
+    file: UploadFile = File(...),
+    client: XhsCloudClient = Depends(get_xhs_cloud_client),
+):
+    del admin
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="缺少上传文件")
+    content = await file.read()
+    if not content:
+        raise HTTPException(status_code=400, detail="上传文件为空")
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="图片超过 5MB 限制")
+    try:
+        result = await client.upload_member_contact_qr(
+            filename=file.filename,
+            content=content,
+            content_type=file.content_type or "image/png",
+        )
+    except XhsCloudNotConfigured as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    return {"code": 0, "data": result}
+
+
 class MemberFeedbackUpdateRequest(BaseModel):
     status: str | None = Field(default=None, max_length=16)
     admin_note: str | None = Field(default=None, max_length=2000)
@@ -386,6 +446,99 @@ async def update_member_keyword_request_admin(
     payload = req.model_dump(exclude_unset=True)
     try:
         result = await client.update_member_keyword_request(item_id, payload)
+    except XhsCloudNotConfigured as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    return {"code": 0, "data": result}
+
+
+# ========== A/B 测试指标 ==========
+
+class AbTestScoreRequest(BaseModel):
+    test_date: str = Field(..., pattern=r"^\d{4}-\d{2}-\d{2}$")
+    ranking_key: str = Field(..., min_length=1, max_length=128)
+    mode: str = Field(..., pattern=r"^[AB]$")
+    accuracy_score: int | None = Field(default=None, ge=1, le=5)
+    insight_score: int | None = Field(default=None, ge=1, le=5)
+    hallucination: int | None = Field(default=None, ge=0, le=1)
+
+
+@router.get("/ab-test/metrics")
+async def get_ab_test_metrics(
+    admin: AdminUser,
+    date_from: str | None = Query(default=None),
+    date_to: str | None = Query(default=None),
+    ranking_key: str | None = Query(default=None),
+    mode: str | None = Query(default=None),
+    limit: int = Query(default=1000, ge=1, le=5000),
+    client: XhsCloudClient = Depends(get_xhs_cloud_client),
+):
+    del admin
+    try:
+        result = await client.get_ab_test_metrics(
+            date_from=date_from,
+            date_to=date_to,
+            ranking_key=ranking_key,
+            mode=mode,
+            limit=limit,
+        )
+    except XhsCloudNotConfigured as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    return {"code": 0, "data": result}
+
+
+@router.get("/ab-test/aggregate")
+async def get_ab_test_aggregate(
+    admin: AdminUser,
+    date_from: str | None = Query(default=None),
+    date_to: str | None = Query(default=None),
+    client: XhsCloudClient = Depends(get_xhs_cloud_client),
+):
+    del admin
+    try:
+        result = await client.get_ab_test_aggregate(date_from=date_from, date_to=date_to)
+    except XhsCloudNotConfigured as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    return {"code": 0, "data": result}
+
+
+@router.get("/ab-test/dates")
+async def list_ab_test_dates(
+    admin: AdminUser,
+    client: XhsCloudClient = Depends(get_xhs_cloud_client),
+):
+    del admin
+    try:
+        result = await client.list_ab_test_dates()
+    except XhsCloudNotConfigured as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    return {"code": 0, "data": result}
+
+
+@router.put("/ab-test/score")
+async def save_ab_test_score(
+    req: AbTestScoreRequest,
+    admin: AdminUser,
+    client: XhsCloudClient = Depends(get_xhs_cloud_client),
+):
+    del admin
+    payload = req.model_dump(exclude_unset=True)
+    try:
+        result = await client.save_ab_test_score(payload)
+    except XhsCloudNotConfigured as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
+    return {"code": 0, "data": result}
+
+
+@router.get("/ab-test/report")
+async def get_ab_test_report(
+    admin: AdminUser,
+    report_date: str = Query(..., pattern=r"^\d{4}-\d{2}-\d{2}$"),
+    mode: str = Query(..., pattern=r"^[AB]$"),
+    client: XhsCloudClient = Depends(get_xhs_cloud_client),
+):
+    del admin
+    try:
+        result = await client.get_ab_test_report(report_date=report_date, mode=mode)
     except XhsCloudNotConfigured as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
     return {"code": 0, "data": result}

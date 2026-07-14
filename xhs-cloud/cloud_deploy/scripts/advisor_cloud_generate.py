@@ -74,6 +74,119 @@ def _try_rank_engine_generate(report_date: str, context: dict, *, llm_enhance: b
         return None
 
 
+def _try_rank_engine_ab_generate(report_date: str, context: dict) -> dict | None:
+    """调云侧 AiAdvisor.run_ab_batch — A/B 并行生成两份报告 + 写入指标。
+
+    返回 {report_date, mode_a, mode_b, metrics}。
+    """
+    try:
+        from cloud_deploy.rank_engine.ai_advisor import AiAdvisor
+
+        return AiAdvisor().run_ab_batch(
+            target_date=report_date,
+            context=context,
+        )
+    except ImportError as e:
+        print(f"[advisor-AB] rank_engine ImportError: {e}", file=sys.stderr)
+        return None
+    except Exception as e:
+        print(f"[advisor-AB] run_ab_batch failed: {e}", file=sys.stderr)
+        return None
+
+
+def _write_ab_publish_bundle(report_date: str, ab_result: dict) -> dict:
+    """把 A/B 两份报告分别写到 mode_a/ 和 mode_b/ 子目录，并打 zip。
+
+    返回 {"mode_a_dir": ..., "mode_b_dir": ..., "metrics": ...}
+    """
+    publish_root = _publish_dir()
+    out_a = os.path.join(publish_root, report_date, "mode_a")
+    out_b = os.path.join(publish_root, report_date, "mode_b")
+    os.makedirs(out_a, exist_ok=True)
+    os.makedirs(out_b, exist_ok=True)
+
+    advice_a = ab_result.get("mode_a") or {}
+    advice_b = ab_result.get("mode_b") or {}
+
+    # 写 advice.json
+    with open(os.path.join(out_a, "advice.json"), "w", encoding="utf-8") as f:
+        json.dump(advice_a, f, ensure_ascii=False, indent=2)
+    with open(os.path.join(out_b, "advice.json"), "w", encoding="utf-8") as f:
+        json.dump(advice_b, f, ensure_ascii=False, indent=2)
+
+    # 写 metrics.json（在父目录）
+    metrics = ab_result.get("metrics") or {}
+    metrics_path = os.path.join(publish_root, report_date, "ab_metrics.json")
+    with open(metrics_path, "w", encoding="utf-8") as f:
+        json.dump(metrics, f, ensure_ascii=False, indent=2)
+
+    # 简单 HTML 预览
+    for out_dir, advice, label in ((out_a, advice_a, "A 模式（100% AI）"),
+                                   (out_b, advice_b, "B 模式（80% 程序 + 20% AI）")):
+        html = f"""<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8">
+<title>AI 选品顾问 {report_date} — {label}</title></head><body>
+<h1>{(advice.get('daily_overview') or {}).get('title', '今日市场观察')}</h1>
+<pre style="white-space:pre-wrap;font-family:sans-serif;line-height:1.7">{
+            (advice.get('daily_overview') or {}).get('content', '')
+        }</pre>
+<p style="color:#666;font-size:12px">{advice.get('disclaimer', '')}</p>
+</body></html>"""
+        with open(os.path.join(out_dir, "advisor.html"), "w", encoding="utf-8") as f:
+            f.write(html)
+
+    return {
+        "mode_a_dir": out_a,
+        "mode_b_dir": out_b,
+        "metrics_path": metrics_path,
+        "metrics": metrics,
+    }
+
+
+def process_one_ab(report_date: str, *, dry_run: bool = False) -> dict:
+    """A/B 测试入口：同时生成 A 模式 + B 模式两份报告并写入指标。"""
+    if not _DATE_RE.match(report_date):
+        return {"report_date": report_date, "status": "error", "detail": "invalid date"}
+
+    ready = os.path.join(_incoming_dir(), f"context_{report_date}.ready")
+    if not os.path.isfile(ready):
+        return {"report_date": report_date, "status": "skipped", "detail": "no .ready marker"}
+
+    context = _load_context(report_date)
+    if not context:
+        return {"report_date": report_date, "status": "error", "detail": "context missing"}
+
+    if dry_run:
+        return {"report_date": report_date, "status": "dry-run", "detail": "context loaded",
+                "has_feature_summaries": bool(context.get("feature_summaries"))}
+
+    if not context.get("feature_summaries"):
+        return {
+            "report_date": report_date,
+            "status": "error",
+            "detail": "context 缺少 feature_summaries — A/B 测试要求 B 模式预计算已注入（请先跑 advisor_daily_pipeline.py 默认带 b_mode）",
+        }
+
+    ab_result = _try_rank_engine_ab_generate(report_date, context)
+    if not ab_result:
+        return {"report_date": report_date, "status": "error", "detail": "run_ab_batch 失败"}
+
+    bundle = _write_ab_publish_bundle(report_date, ab_result)
+    try:
+        os.remove(ready)
+    except OSError:
+        pass
+
+    totals = (ab_result.get("metrics") or {}).get("totals") or {}
+    return {
+        "report_date": report_date,
+        "status": "published_ab",
+        "mode_a_dir": bundle["mode_a_dir"],
+        "mode_b_dir": bundle["mode_b_dir"],
+        "metrics_path": bundle["metrics_path"],
+        "totals": totals,
+    }
+
+
 def _stub_advice(report_date: str, context: dict) -> dict:
     summary = str(context.get("market_summary") or context.get("summary") or "市场数据已接收，AI 全文生成待 rank_engine 部署。")
     directions = []
@@ -209,7 +322,31 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true", help="只验证 context，不写发布目录")
     ap.add_argument("--llm-enhance", action="store_true", help="（已默认开启）强制走 LLM 主路径")
     ap.add_argument("--no-llm", action="store_true", help="禁用 LLM，仅走模板兜底（调试用）")
+    ap.add_argument("--ab-test", action="store_true",
+                    help="A/B 测试模式：同时生成 A（100% AI）+ B（80%程序+20%AI）两份报告并写入指标")
     args = ap.parse_args()
+
+    if args.ab_test:
+        # A/B 测试模式
+        target = args.date
+        if not target:
+            # 自动找最新 ready 的 context
+            incoming = _incoming_dir()
+            if os.path.isdir(incoming):
+                for name in sorted(os.listdir(incoming), reverse=True):
+                    if name.startswith("context_") and name.endswith(".ready"):
+                        d = name[len("context_"):-len(".ready")]
+                        if _DATE_RE.match(d):
+                            target = d
+                            break
+        if not target:
+            print("[advisor-AB] 未找到可处理的 context_{date}.ready")
+            return 0
+        print(f"[advisor-AB] 开始 A/B 测试: {target}")
+        result = process_one_ab(target, dry_run=args.dry_run)
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+        return 0 if result.get("status") in ("published_ab", "dry-run") else 1
+
     llm_on = not args.no_llm
     results = process_pending(report_date=args.date or None, dry_run=args.dry_run, llm_enhance=llm_on)
     if not results:

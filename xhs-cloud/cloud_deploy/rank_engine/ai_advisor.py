@@ -8,8 +8,9 @@ from __future__ import annotations
 
 import json
 import sys
+import time
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Callable
 
 from cloud_deploy.rank_engine.compliance import sanitize_context, validate_advisory_output
 
@@ -17,6 +18,69 @@ from cloud_deploy.rank_engine.compliance import sanitize_context, validate_advis
 _TOP_ITEMS_PER_RANKING = 30
 # 跨榜综述最多取的榜单数
 _MAX_RANKINGS_FOR_CROSS = 12
+# LLM 主路径最多处理的榜单数（避免类目榜过多导致调用爆炸）
+_MAX_RANKINGS_FOR_LLM = 30
+# LLM 并发调用数（5 路并发，30 榜约 72s 完成，< 180s HTTP 超时）
+_LLM_CONCURRENCY = 5
+
+# DeepSeek V4 Flash 定价（参考）— 单位：CNY / 1K tokens
+# 实际成本由 ab_test.record_metric 写入，这里仅用于估算（admin 可改）
+_PRICE_PROMPT_PER_1K = 0.001   # 输入 ¥0.001 / 1K
+_PRICE_COMPLETION_PER_1K = 0.002  # 输出 ¥0.002 / 1K
+
+
+def _estimate_cost_cny(prompt_tokens: int, completion_tokens: int) -> float:
+    """根据 token 数估算 CNY 成本（DeepSeek V4 Flash 单价）。"""
+    return round(
+        prompt_tokens / 1000.0 * _PRICE_PROMPT_PER_1K
+        + completion_tokens / 1000.0 * _PRICE_COMPLETION_PER_1K,
+        6,
+    )
+
+
+class _UsageCollector:
+    """包装 chat_fn，收集每次调用的 token usage + 计时，按 ranking_key 聚合。
+
+    用法：
+        col = _UsageCollector(chat_fn)
+        parsed, _u = col.call("burst_top100", system, user, temperature=0.4)
+        col.summary  # {"burst_top100": {"prompt_tokens":.., "completion_tokens":.., "duration_ms":.., "calls":1}, ...}
+    """
+
+    def __init__(self, chat_fn: Callable):
+        self._chat_fn = chat_fn
+        self.summary: dict[str, dict[str, Any]] = {}
+
+    def call(
+        self,
+        ranking_key: str,
+        system: str,
+        user: str,
+        *,
+        temperature: float = 0.3,
+        agent: str = "",
+    ) -> tuple[dict[str, Any], Any]:
+        t0 = time.time()
+        parsed, usage = self._chat_fn(system, user, temperature=temperature, agent=agent)
+        dt_ms = int((time.time() - t0) * 1000)
+        entry = self.summary.setdefault(
+            ranking_key,
+            {
+                "prompt_tokens": 0,
+                "completion_tokens": 0,
+                "total_tokens": 0,
+                "duration_ms": 0,
+                "calls": 0,
+                "model": "",
+            },
+        )
+        entry["prompt_tokens"] += int(getattr(usage, "prompt_tokens", 0) or 0)
+        entry["completion_tokens"] += int(getattr(usage, "completion_tokens", 0) or 0)
+        entry["total_tokens"] = entry["prompt_tokens"] + entry["completion_tokens"]
+        entry["duration_ms"] += dt_ms
+        entry["calls"] += 1
+        entry["model"] = getattr(usage, "model", "") or entry["model"]
+        return parsed, usage
 
 
 class AiAdvisor:
@@ -42,6 +106,15 @@ class AiAdvisor:
 
         use_llm = llm_enhance or llm_configured()
         if use_llm and llm_configured():
+            # B 模式：context 含 feature_summaries（程序预计算 80%）→ LLM 只润色 20%
+            if ctx.get("feature_summaries"):
+                try:
+                    advice = self._llm_generate_b_mode(report_date, ctx)
+                    validate_advisory_output(advice)
+                    return advice
+                except Exception as e:
+                    print(f"[advisor] B 模式 LLM 失败，回退 A 模式: {e}", file=sys.stderr, flush=True)
+
             try:
                 advice = self._llm_generate(report_date, ctx)
                 validate_advisory_output(advice)
@@ -65,35 +138,281 @@ class AiAdvisor:
         validate_advisory_output(advice)
         return advice
 
+    # ---------- A/B 测试入口 ----------
+
+    def run_ab_batch(
+        self,
+        *,
+        target_date: str,
+        context: dict[str, Any],
+    ) -> dict[str, Any]:
+        """A/B 并行生成：同时跑 A 模式（100% AI）和 B 模式（80%程序+20%AI）。
+
+        - A 模式：从 context 去掉 feature_summaries（强制走原始 items 路径）
+        - B 模式：保留 feature_summaries（走程序预计算 + LLM 润色）
+        - 两份报告分别用 _UsageCollector 收集 token/耗时
+        - 指标写入 ab_test_metrics 表
+
+        返回：
+            {
+              "report_date": str,
+              "mode_a": advice_dict,
+              "mode_b": advice_dict,
+              "metrics": {
+                "A": {ranking_key: {prompt_tokens, completion_tokens, total_tokens, duration_ms, calls, cost_cny}, ...},
+                "B": {...},
+                "totals": {"A": {...}, "B": {...}, "savings_cny": ..., "savings_pct": ...}
+              }
+            }
+        """
+        from cloud_deploy.reporting.insight_llm_client import chat_json_with_usage, llm_configured
+
+        if not llm_configured():
+            raise RuntimeError("A/B 测试需要 LLM 已配置（admin 后台「情报 LLM」）")
+
+        ctx_full = sanitize_context(context or {})
+        report_date = str(
+            target_date
+            or (ctx_full.get("meta") or {}).get("target_date")
+            or ctx_full.get("target_date")
+            or ""
+        )[:10]
+        if not report_date:
+            raise ValueError("缺少 target_date")
+
+        # B 模式要求 ctx 含 feature_summaries；A 模式要去除（避免走 B 分支）
+        ctx_a = dict(ctx_full)
+        ctx_a.pop("feature_summaries", None)
+        ctx_a_meta = dict(ctx_a.get("meta") or {})
+        ctx_a_meta["ab_mode"] = "A"
+        ctx_a["meta"] = ctx_a_meta
+
+        ctx_b = dict(ctx_full)
+        if not ctx_b.get("feature_summaries"):
+            raise RuntimeError("A/B 测试要求 context 已注入 feature_summaries（B 模式预计算）")
+        ctx_b_meta = dict(ctx_b.get("meta") or {})
+        ctx_b_meta["ab_mode"] = "B"
+        ctx_b["meta"] = ctx_b_meta
+
+        # ---- A 模式 ----
+        col_a = _UsageCollector(chat_json_with_usage)
+        t_a_start = time.time()
+        try:
+            advice_a = self._llm_generate(report_date, ctx_a, collector=col_a)
+            validate_advisory_output(advice_a)
+        except Exception as e:
+            print(f"[advisor-AB] A 模式失败: {e}", file=sys.stderr, flush=True)
+            advice_a = None
+        duration_a_total_ms = int((time.time() - t_a_start) * 1000)
+
+        # ---- B 模式 ----
+        col_b = _UsageCollector(chat_json_with_usage)
+        t_b_start = time.time()
+        try:
+            advice_b = self._llm_generate_b_mode(report_date, ctx_b, collector=col_b)
+            validate_advisory_output(advice_b)
+        except Exception as e:
+            print(f"[advisor-AB] B 模式失败: {e}", file=sys.stderr, flush=True)
+            advice_b = None
+        duration_b_total_ms = int((time.time() - t_b_start) * 1000)
+
+        # ---- 写入 ab_test_metrics ----
+        metrics_summary = self._record_ab_metrics(
+            report_date=report_date,
+            col_a=col_a,
+            col_b=col_b,
+            duration_a_ms=duration_a_total_ms,
+            duration_b_ms=duration_b_total_ms,
+        )
+
+        return {
+            "report_date": report_date,
+            "mode_a": advice_a,
+            "mode_b": advice_b,
+            "metrics": metrics_summary,
+        }
+
+    def _record_ab_metrics(
+        self,
+        *,
+        report_date: str,
+        col_a: _UsageCollector,
+        col_b: _UsageCollector,
+        duration_a_ms: int,
+        duration_b_ms: int,
+    ) -> dict[str, Any]:
+        """把两份 collector 的累计指标写入 ab_test_metrics 表。"""
+        try:
+            from cloud_deploy.rank_engine.ab_test import record_metric
+        except ImportError as e:
+            print(f"[advisor-AB] ab_test 模块不可用，跳过指标写入: {e}", file=sys.stderr, flush=True)
+            return {"A": {}, "B": {}, "totals": {}}
+
+        def _flush(collector, mode, total_duration_ms):
+            per_key: dict[str, dict[str, Any]] = {}
+            for key, e in collector.summary.items():
+                cost = _estimate_cost_cny(e["prompt_tokens"], e["completion_tokens"])
+                try:
+                    record_metric(
+                        test_date=report_date,
+                        ranking_key=key,
+                        mode=mode,
+                        prompt_tokens=e["prompt_tokens"],
+                        completion_tokens=e["completion_tokens"],
+                        total_tokens=e["total_tokens"],
+                        cost_cny=cost,
+                        duration_ms=e["duration_ms"],
+                        model=e.get("model", ""),
+                        extra={"calls": e["calls"]},
+                    )
+                except Exception as ex:
+                    print(f"[advisor-AB] 写入指标失败 ({mode}/{key}): {ex}", file=sys.stderr, flush=True)
+                per_key[key] = {
+                    "prompt_tokens": e["prompt_tokens"],
+                    "completion_tokens": e["completion_tokens"],
+                    "total_tokens": e["total_tokens"],
+                    "duration_ms": e["duration_ms"],
+                    "calls": e["calls"],
+                    "cost_cny": cost,
+                    "model": e.get("model", ""),
+                }
+            # 写入一条「总计」行（ranking_key = "__total__"），用于整体对比
+            sum_prompt = sum(e["prompt_tokens"] for e in collector.summary.values())
+            sum_completion = sum(e["completion_tokens"] for e in collector.summary.values())
+            sum_tokens = sum_prompt + sum_completion
+            sum_cost = _estimate_cost_cny(sum_prompt, sum_completion)
+            try:
+                record_metric(
+                    test_date=report_date,
+                    ranking_key="__total__",
+                    mode=mode,
+                    prompt_tokens=sum_prompt,
+                    completion_tokens=sum_completion,
+                    total_tokens=sum_tokens,
+                    cost_cny=sum_cost,
+                    duration_ms=total_duration_ms,
+                    extra={"ranking_count": len(collector.summary)},
+                )
+            except Exception as ex:
+                print(f"[advisor-AB] 写入总计行失败 ({mode}): {ex}", file=sys.stderr, flush=True)
+            return per_key
+
+        per_a = _flush(col_a, "A", duration_a_ms)
+        per_b = _flush(col_b, "B", duration_b_ms)
+
+        totals_a = {
+            "prompt_tokens": sum(v["prompt_tokens"] for v in per_a.values()),
+            "completion_tokens": sum(v["completion_tokens"] for v in per_a.values()),
+            "total_tokens": sum(v["total_tokens"] for v in per_a.values()),
+            "duration_ms": duration_a_ms,
+            "cost_cny": round(sum(v["cost_cny"] for v in per_a.values()), 6),
+            "ranking_count": len(per_a),
+        }
+        totals_b = {
+            "prompt_tokens": sum(v["prompt_tokens"] for v in per_b.values()),
+            "completion_tokens": sum(v["completion_tokens"] for v in per_b.values()),
+            "total_tokens": sum(v["total_tokens"] for v in per_b.values()),
+            "duration_ms": duration_b_ms,
+            "cost_cny": round(sum(v["cost_cny"] for v in per_b.values()), 6),
+            "ranking_count": len(per_b),
+        }
+        savings_cny = round(totals_a["cost_cny"] - totals_b["cost_cny"], 6)
+        savings_pct = (
+            round(savings_cny / totals_a["cost_cny"] * 100, 2)
+            if totals_a["cost_cny"] > 0 else 0.0
+        )
+        return {
+            "A": per_a,
+            "B": per_b,
+            "totals": {
+                "A": totals_a,
+                "B": totals_b,
+                "savings_cny": savings_cny,
+                "savings_pct": savings_pct,
+            },
+        }
+
     # ---------- LLM 主路径 ----------
 
-    def _llm_generate(self, report_date: str, ctx: dict[str, Any]) -> dict[str, Any]:
-        """LLM 主路径：daily_overview + 每榜独立调用 + 跨榜综述。"""
+    def _select_rankings_for_llm(self, rankings: dict[str, Any]) -> dict[str, Any]:
+        """从全部榜单里选出最有价值的 _MAX_RANKINGS_FOR_LLM 个送给 LLM。
+
+        优先级：全局榜 > 价格带榜 > 类目榜（按 item_count 降序取 TOP N）。
+        避免类目榜过多（如 1500+ 个 keyword）导致 LLM 调用爆炸。
+        """
+        if len(rankings) <= _MAX_RANKINGS_FOR_LLM:
+            return rankings
+
+        global_keys = [k for k in rankings if not k.startswith("category_") and not k.startswith("price_")]
+        price_keys = [k for k in rankings if k.startswith("price_")]
+        cat_keys = [k for k in rankings if k.startswith("category_")]
+
+        # 全局榜 + 价格带榜全要
+        selected = {k: rankings[k] for k in global_keys + price_keys if k in rankings}
+
+        # 类目榜按 item_count 降序补齐
+        remaining = _MAX_RANKINGS_FOR_LLM - len(selected)
+        if remaining > 0 and cat_keys:
+            cat_sorted = sorted(
+                cat_keys,
+                key=lambda k: rankings[k].get("item_count", len(rankings[k].get("items", []))),
+                reverse=True,
+            )
+            for k in cat_sorted[:remaining]:
+                selected[k] = rankings[k]
+
+        return selected
+
+    def _llm_generate(
+        self,
+        report_date: str,
+        ctx: dict[str, Any],
+        *,
+        collector: _UsageCollector | None = None,
+    ) -> dict[str, Any]:
+        """LLM 主路径：daily_overview + 每榜独立调用 + 跨榜综述。
+
+        collector：可选的 _UsageCollector，用于 A/B 测试时按 ranking_key 收集 token 与计时。
+        """
         from cloud_deploy.reporting.insight_llm_client import chat_json_with_usage
 
+        chat_fn = collector.call if collector else chat_json_with_usage
         started_at = datetime.now(timezone.utc).isoformat()
 
         # 1) daily_overview（1 次 LLM 调用）
-        overview = self._llm_daily_overview(report_date, ctx, chat_json_with_usage)
+        overview = self._llm_daily_overview_collected(report_date, ctx, chat_fn, collector)
 
-        # 2) 每个榜单独立调用（≈30 次）
+        # 2) 每个榜单并发调用 — 限制最多 _MAX_RANKINGS_FOR_LLM 个，_LLM_CONCURRENCY 路并发
         rankings = ctx.get("rankings") or {}
+        selected = self._select_rankings_for_llm(rankings)
+        print(f"[advisor] LLM 处理 {len(selected)}/{len(rankings)} 个榜单（并发 {_LLM_CONCURRENCY}）", flush=True)
         directions: list[dict[str, Any]] = []
-        for key, ranking in rankings.items():
+        import concurrent.futures
+
+        def _process_one(key_ranking):
+            key, ranking = key_ranking
             try:
-                item = self._llm_ranking(report_date, ranking, chat_json_with_usage)
+                item = self._llm_ranking_collected(report_date, ranking, chat_fn, collector, key)
                 if item:
-                    directions.append(item)
+                    return (key, item)
             except Exception as e:
                 print(f"[advisor] ranking '{key}' LLM 失败，模板兜底: {e}", file=sys.stderr, flush=True)
                 fallback = self._template_ranking(report_date, ranking)
                 if fallback:
-                    directions.append(fallback)
+                    return (key, fallback)
+            return (key, None)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=_LLM_CONCURRENCY) as pool:
+            results = pool.map(_process_one, selected.items())
+            for key, item in results:
+                if item:
+                    directions.append(item)
+        print(f"[advisor] LLM 完成 {len(directions)}/{len(selected)} 个榜单", flush=True)
 
         # 3) 跨榜综述（1 次 LLM 调用）
         cross = None
         try:
-            cross = self._llm_cross_summary(report_date, ctx, directions, chat_json_with_usage)
+            cross = self._llm_cross_summary_collected(report_date, ctx, directions, chat_fn, collector)
         except Exception as e:
             print(f"[advisor] 跨榜综述 LLM 失败，跳过: {e}", file=sys.stderr, flush=True)
 
@@ -114,7 +433,264 @@ class AiAdvisor:
             "daily_overview": overview,
             "direction_advices": directions,
             "cross_summary": cross,
-            "disclaimer": "以上内容由 AI 基于脱敏榜单数据生成，仅供参考，不构成投资或经营建议。",
+            "disclaimer": "以上内容由 AI 基于榜单数据生成，仅供参考，不构成投资或经营建议。",
+        }
+
+    def _llm_daily_overview_collected(self, report_date, ctx, chat_fn, collector):
+        """带 collector 的 daily_overview（A 模式）。"""
+        if collector is None:
+            return self._llm_daily_overview(report_date, ctx, chat_fn)
+        # 临时包装：collector.call 已包含 chat_fn 调用与 usage 累计
+        wrapped = lambda system, user, **kw: collector.call(
+            "daily_overview", system, user, **kw
+        )
+        return self._llm_daily_overview(report_date, ctx, wrapped)
+
+    def _llm_ranking_collected(self, report_date, ranking, chat_fn, collector, key):
+        """带 collector 的单榜（A 模式）。"""
+        if collector is None:
+            return self._llm_ranking(report_date, ranking, chat_fn)
+        wrapped = lambda system, user, **kw: collector.call(key, system, user, **kw)
+        return self._llm_ranking(report_date, ranking, wrapped)
+
+    def _llm_cross_summary_collected(self, report_date, ctx, directions, chat_fn, collector):
+        """带 collector 的跨榜综述（A 模式）。"""
+        if collector is None:
+            return self._llm_cross_summary(report_date, ctx, directions, chat_fn)
+        wrapped = lambda system, user, **kw: collector.call(
+            "cross_summary", system, user, **kw
+        )
+        return self._llm_cross_summary(report_date, ctx, directions, wrapped)
+
+    # ---------- B 模式：程序预计算 80% + LLM 润色 20% ----------
+
+    def _llm_generate_b_mode(
+        self,
+        report_date: str,
+        ctx: dict[str, Any],
+        *,
+        collector: _UsageCollector | None = None,
+    ) -> dict[str, Any]:
+        """B 模式：feature_summaries 已含草稿内容 + key_points → LLM 只润色。
+
+        vs A 模式区别：
+        - A 模式：LLM 从原始 items 生成全文（重 token、重计算）
+        - B 模式：LLM 只润色草稿（轻 token、快响应、成本低）
+
+        collector：可选的 _UsageCollector，A/B 测试时按 ranking_key 收集 token 与计时。
+        """
+        from cloud_deploy.reporting.insight_llm_client import chat_json_with_usage
+
+        started_at = datetime.now(timezone.utc).isoformat()
+        summaries = ctx.get("feature_summaries") or {}
+
+        # 1) daily_overview（1 次 LLM 调用，基于预计算 brief）
+        overview = self._llm_b_mode_overview_collected(report_date, ctx, chat_json_with_usage, collector)
+
+        # 2) 每个榜单并发润色
+        print(f"[advisor-B] LLM 润色 {len(summaries)} 个榜单（并发 {_LLM_CONCURRENCY}）", flush=True)
+        directions: list[dict[str, Any]] = []
+        import concurrent.futures
+
+        def _polish_one(key_summary):
+            key, summary = key_summary
+            try:
+                item = self._llm_b_mode_ranking_collected(report_date, summary, chat_json_with_usage, collector, key)
+                if item:
+                    return (key, item)
+            except Exception as e:
+                print(f"[advisor-B] ranking '{key}' 润色失败，用草稿兜底: {e}", file=sys.stderr, flush=True)
+                # B 模式兜底：直接用程序预计算的草稿
+                fallback = {
+                    "key": key,
+                    "title": summary.get("title", key),
+                    "summary": (summary.get("draft_content") or "")[:200],
+                    "content": summary.get("draft_content") or "",
+                    "key_points": summary.get("key_points") or [],
+                }
+                return (key, fallback)
+            return (key, None)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=_LLM_CONCURRENCY) as pool:
+            results = pool.map(_polish_one, summaries.items())
+            for key, item in results:
+                if item:
+                    directions.append(item)
+        print(f"[advisor-B] LLM 完成 {len(directions)}/{len(summaries)} 个榜单", flush=True)
+
+        # 3) 跨榜综述（1 次 LLM 调用）
+        cross = None
+        try:
+            cross = self._llm_b_mode_cross_collected(report_date, ctx, directions, chat_json_with_usage, collector)
+        except Exception as e:
+            print(f"[advisor-B] 跨榜综述 LLM 失败，跳过: {e}", file=sys.stderr, flush=True)
+
+        finished_at = datetime.now(timezone.utc).isoformat()
+        return {
+            "report_date": report_date,
+            "generated_at": finished_at,
+            "meta": {
+                "target_date": report_date,
+                "mode": "b_mode",
+                "generator": "cloud_llm_b_mode",
+                "started_at": started_at,
+                "finished_at": finished_at,
+                "schema_version": "1.0",
+                "ranking_count": len(summaries),
+                "directions_count": len(directions),
+            },
+            "daily_overview": overview,
+            "direction_advices": directions,
+            "cross_summary": cross,
+            "disclaimer": "以上内容由 AI 基于榜单数据生成，仅供参考，不构成投资或经营建议。",
+        }
+
+    def _llm_b_mode_overview_collected(self, report_date, ctx, chat_fn, collector):
+        if collector is None:
+            return self._llm_b_mode_overview(report_date, ctx, chat_fn)
+        wrapped = lambda system, user, **kw: collector.call(
+            "daily_overview", system, user, **kw
+        )
+        return self._llm_b_mode_overview(report_date, ctx, wrapped)
+
+    def _llm_b_mode_ranking_collected(self, report_date, summary, chat_fn, collector, key):
+        if collector is None:
+            return self._llm_b_mode_ranking(report_date, summary, chat_fn)
+        wrapped = lambda system, user, **kw: collector.call(key, system, user, **kw)
+        return self._llm_b_mode_ranking(report_date, summary, wrapped)
+
+    def _llm_b_mode_cross_collected(self, report_date, ctx, directions, chat_fn, collector):
+        if collector is None:
+            return self._llm_b_mode_cross(report_date, ctx, directions, chat_fn)
+        wrapped = lambda system, user, **kw: collector.call(
+            "cross_summary", system, user, **kw
+        )
+        return self._llm_b_mode_cross(report_date, ctx, directions, wrapped)
+
+    def _llm_b_mode_overview(self, report_date: str, ctx: dict[str, Any], chat_fn) -> dict[str, Any]:
+        """B 模式 daily_overview：基于预计算 brief 润色。"""
+        brief = ctx.get("daily_brief") or {}
+        summaries = ctx.get("feature_summaries") or {}
+
+        # 用预计算数据构建摘要
+        ranking_titles = "\n".join(
+            f"  - {s.get('title','?')}（{s.get('item_count',0)}条，平均爆发{s.get('stats',{}).get('burst_index',{}).get('avg',0)}）"
+            for s in list(summaries.values())[:_MAX_RANKINGS_FOR_CROSS]
+        ) or "  （暂无）"
+
+        price_bands = brief.get("top_price_bands") or []
+        price_text = "\n".join(
+            f"  - {p.get('band','?')}: {p.get('count',0)} 条"
+            for p in price_bands[:5]
+        ) or "  （暂无）"
+
+        system = (
+            "你是小红书选品顾问首席分析师。基于程序预计算的市场数据，"
+            "输出一段生动、有温度的当日市场观察。\n\n"
+            "排版要求：\n"
+            "1. 用 emoji 标注重点（如 🔥 强势、💎 蓝海、⚠️ 风险、📈 增长、💰 高客单）\n"
+            "2. 用 markdown 标题分节（## / ###），每节 2-4 段\n"
+            "3. 关键数据用 **加粗** 或 `代码` 标注\n"
+            "4. 用 > 引用块突出核心洞察\n"
+            "5. 语言口语化、有节奏感，像朋友聊天而非机械报告\n\n"
+            "合规：禁止 goods_id、店铺名、商品链接、完整商品标题。\n"
+            "输出 JSON: {\"title\": str(带emoji), \"summary\": str(<=240字), \"content\": str(600-1200字markdown)}"
+        )
+        user = (
+            f"报告日期：{report_date}\n"
+            f"活跃方向数：{brief.get('active_direction_count', len(summaries))}\n"
+            f"总样本数：{brief.get('total_products', '未知')}\n"
+            f"平均爆发指数：{brief.get('avg_burst', '未知')}\n\n"
+            f"价格带分布：\n{price_text}\n\n"
+            f"今日榜单清单：\n{ranking_titles}\n\n"
+            "请输出今日市场观察：概述市场温度、识别强势价格带、点出值得关注的方向。"
+            "标题要带 emoji 且有画面感。"
+        )
+        parsed, _u = chat_fn(system, user, temperature=0.4, agent="ceo")
+        return {
+            "title": str(parsed.get("title") or "今日市场观察"),
+            "summary": str(parsed.get("summary") or "")[:240],
+            "content": str(parsed.get("content") or parsed.get("summary") or ""),
+        }
+
+    def _llm_b_mode_ranking(self, report_date: str, summary: dict[str, Any], chat_fn) -> dict[str, Any] | None:
+        """B 模式单榜润色：程序已生成草稿 + key_points → LLM 只增强表达。"""
+        title = summary.get("title") or summary.get("key") or "维度解读"
+        draft = summary.get("draft_content") or ""
+        key_points = summary.get("key_points") or []
+        item_count = summary.get("item_count", 0)
+        if not draft and not key_points:
+            return None
+
+        system = (
+            "你是小红书选品顾问分析师。程序已基于特征引擎预计算了榜单的统计数据、分布和关键洞察。"
+            "你的任务是将这些数据增强为生动、有深度的分析文章。\n\n"
+            "排版要求：\n"
+            "1. 用 emoji 标注重点（🔥 爆款、💎 蓝海、⚠️ 风险、📈 增长、🎯 精准、💡 建议）\n"
+            "2. 用 markdown 标题分节（## / ###），每节 2-3 段\n"
+            "3. key_points 每条以 emoji 开头\n"
+            "4. 关键数据用 **加粗**\n"
+            "5. 结尾用 > 引用块给出选品建议\n\n"
+            "重要：数据必须准确，不要编造新数据。只能润色表达、增强可读性。\n"
+            "合规：禁止 goods_id、店铺名、商品链接、完整商品标题。\n"
+            "输出 JSON: {\"key\": str, \"title\": str(带emoji), \"summary\": str(<=200字), "
+            "\"content\": str(400-800字markdown), \"key_points\": [str]}"
+        )
+        user = (
+            f"报告日期：{report_date}\n"
+            f"榜单：{title}\n"
+            f"条目数：{item_count}\n\n"
+            f"程序预计算草稿：\n{draft}\n\n"
+            f"已识别的关键洞察：\n" + "\n".join(f"- {p}" for p in key_points) + "\n\n"
+            "请将以上草稿增强为有洞察力的分析文章。保持数据准确，优化语言和排版。"
+            "标题要带 emoji 且有洞察力。"
+        )
+        parsed, _u = chat_fn(system, user, temperature=0.4)
+        return {
+            "key": str(summary.get("key") or parsed.get("key") or ""),
+            "title": str(parsed.get("title") or title),
+            "summary": str(parsed.get("summary") or "")[:200],
+            "content": str(parsed.get("content") or draft),
+            "key_points": list(parsed.get("key_points") or key_points)[:8],
+        }
+
+    def _llm_b_mode_cross(
+        self,
+        report_date: str,
+        ctx: dict[str, Any],
+        directions: list[dict[str, Any]],
+        chat_fn,
+    ) -> dict[str, Any] | None:
+        """B 模式跨榜综述：基于已润色的方向解读发现交集信号。"""
+        if len(directions) < 3:
+            return None
+        snippets = "\n\n".join(
+            f"【{d.get('title','?')}】\n{(d.get('summary') or d.get('content') or '')[:200]}"
+            for d in directions[:_MAX_RANKINGS_FOR_CROSS]
+        )
+        system = (
+            "你是小红书选品顾问首席分析师。基于已生成的多个方向解读，"
+            "输出跨榜综述：发现交集信号、识别矛盾点、给出综合选品方向。\n\n"
+            "排版要求：\n"
+            "1. 用 emoji 标注重点（🤝 共识、⚡ 矛盾、🎯 优先、💡 建议、✅ 行动）\n"
+            "2. 用 markdown 标题分节（## / ###）\n"
+            "3. action_items 每条以 ✅ 开头，具体到品类+价格带+操作\n"
+            "4. 关键数据用 **加粗**\n\n"
+            "合规：禁止 goods_id、店铺名、商品链接、完整商品标题。\n"
+            "输出 JSON: {\"title\": str(带emoji), \"content\": str(400-800字markdown), "
+            "\"action_items\": [str]}"
+        )
+        user = (
+            f"报告日期：{report_date}\n"
+            f"已生成 {len(directions)} 个方向解读：\n{snippets}\n\n"
+            "请输出跨榜综述：哪些方向出现共识？哪些信号冲突？中小商家应优先关注哪 2-3 个方向？"
+            "标题要带 emoji 且有总结性。"
+        )
+        parsed, _u = chat_fn(system, user, temperature=0.4, agent="ceo")
+        return {
+            "title": str(parsed.get("title") or "跨榜综述"),
+            "content": str(parsed.get("content") or ""),
+            "action_items": list(parsed.get("action_items") or [])[:6],
         }
 
     def _llm_daily_overview(self, report_date: str, ctx: dict[str, Any], chat_fn) -> dict[str, Any]:
@@ -132,10 +708,16 @@ class AiAdvisor:
         ) or "  （暂无）"
 
         system = (
-            "你是小红书选品顾问首席分析师。基于脱敏榜单 brief（不含商品 ID/店铺名/真实标题），"
-            "输出一段生动的当日市场观察。\n"
+            "你是小红书选品顾问首席分析师。基于榜单 brief（不含商品 ID/店铺名/真实标题），"
+            "输出一段生动、有温度的当日市场观察。\n\n"
+            "排版要求：\n"
+            "1. 用 emoji 标注重点（如 🔥 强势、💎 蓝海、⚠️ 风险、📈 增长、💰 高客单）\n"
+            "2. 用 markdown 标题分节（## / ###），每节 2-4 段\n"
+            "3. 关键数据用 **加粗** 或 `代码` 标注\n"
+            "4. 用 > 引用块突出核心洞察\n"
+            "5. 语言口语化、有节奏感，像朋友聊天而非机械报告\n\n"
             "合规：禁止 goods_id、店铺名、商品链接、完整商品标题；可提及类目、价格带、关注度等级。\n"
-            "输出 JSON: {\"title\": str, \"summary\": str(<=240字), \"content\": str(800-1500字markdown)}"
+            "输出 JSON: {\"title\": str(带emoji), \"summary\": str(<=240字), \"content\": str(800-1500字markdown)}"
         )
         user = (
             f"报告日期：{report_date}\n"
@@ -144,6 +726,7 @@ class AiAdvisor:
             f"TOP 类目分布：\n{cats_text}\n\n"
             f"今日榜单清单：\n{ranking_titles}\n\n"
             "请输出今日市场观察：概述市场温度、识别强势类目与价格带、点出值得关注的方向。"
+            "标题要带 emoji 且有画面感（如「🔥 送礼季引爆，50元以下成主战场」）。"
         )
         parsed, _u = chat_fn(system, user, temperature=0.5, agent="ceo")
         return {
@@ -161,18 +744,25 @@ class AiAdvisor:
 
         items_text = self._format_items_for_llm(items[:_TOP_ITEMS_PER_RANKING])
         system = (
-            "你是小红书选品顾问分析师。基于一个脱敏榜单的条目（reference_no + 抽象标签），"
-            "输出该方向的结构化解读。\n"
+            "你是小红书选品顾问分析师。基于一个榜单的条目（reference_no + 抽象标签），"
+            "输出该方向的结构化解读。\n\n"
+            "排版要求：\n"
+            "1. 用 emoji 标注重点（🔥 爆款、💎 蓝海、⚠️ 风险、📈 增长、🎯 精准、💡 建议）\n"
+            "2. 用 markdown 标题分节（## / ###），每节 2-3 段\n"
+            "3. key_points 每条以 emoji 开头（如「🔥 TOP3 集中在50元以下」）\n"
+            "4. 关键数据用 **加粗**\n"
+            "5. 结尾用 > 引用块给出选品建议\n\n"
             "合规：禁止 goods_id、店铺名、商品链接、完整商品标题；只能引用 reference_no 编号。\n"
-            "输出 JSON: {\"key\": str, \"title\": str, \"summary\": str(<=200字), "
+            "输出 JSON: {\"key\": str, \"title\": str(带emoji), \"summary\": str(<=200字), "
             "\"content\": str(600-1200字markdown), \"key_points\": [str]}"
         )
         user = (
             f"报告日期：{report_date}\n"
             f"榜单：{title}\n描述：{description}\n"
             f"条目数：{ranking.get('item_count', len(items))}\n"
-            f"TOP {min(len(items), _TOP_ITEMS_PER_RANKING)} 条脱敏数据：\n{items_text}\n\n"
+            f"TOP {min(len(items), _TOP_ITEMS_PER_RANKING)} 条数据：\n{items_text}\n\n"
             "请输出该方向的深度解读：识别共性特征、解释排序逻辑、给出可执行选品建议。"
+            "标题要带 emoji 且有洞察力（如「💎 低竞争蓝海：家居收纳的3个突破口」）。"
         )
         parsed, _u = chat_fn(system, user, temperature=0.5)
         return {
@@ -199,15 +789,21 @@ class AiAdvisor:
         )
         system = (
             "你是小红书选品顾问首席分析师。基于已生成的多个方向解读，"
-            "输出跨榜综述：发现交集信号、识别矛盾点、给出综合选品方向。\n"
+            "输出跨榜综述：发现交集信号、识别矛盾点、给出综合选品方向。\n\n"
+            "排版要求：\n"
+            "1. 用 emoji 标注重点（🤝 共识、⚡ 矛盾、🎯 优先、💡 建议、✅ 行动）\n"
+            "2. 用 markdown 标题分节（## / ###）\n"
+            "3. action_items 每条以 ✅ 开头，具体到品类+价格带+操作\n"
+            "4. 关键数据用 **加粗**\n\n"
             "合规：禁止 goods_id、店铺名、商品链接、完整商品标题。\n"
-            "输出 JSON: {\"title\": str, \"content\": str(500-1000字markdown), "
+            "输出 JSON: {\"title\": str(带emoji), \"content\": str(500-1000字markdown), "
             "\"action_items\": [str]}"
         )
         user = (
             f"报告日期：{report_date}\n"
             f"已生成 {len(directions)} 个方向解读：\n{snippets}\n\n"
             "请输出跨榜综述：哪些方向出现共识？哪些信号冲突？中小商家应优先关注哪 2-3 个方向？"
+            "标题要带 emoji 且有总结性（如「🎯 三榜共振：50元以下养猫好物成最大机会」）。"
         )
         parsed, _u = chat_fn(system, user, temperature=0.5, agent="ceo")
         return {
@@ -243,7 +839,7 @@ class AiAdvisor:
             "key": str(ranking.get("key") or ""),
             "title": title,
             "summary": f"Top3 占该榜 {len(items)} 条，呈现 {top3[0].get('trend_signal_label','变化')} 特征。",
-            "content": f"本方向共 {len(items)} 条脱敏条目。TOP3：\n" + "\n".join(lines) +
+            "content": f"本方向共 {len(items)} 条条目。TOP3：\n" + "\n".join(lines) +
                        "\n\n（本方向 LLM 调用失败，已用模板兜底，建议稍后重试生成。）",
             "key_points": [],
         }
@@ -297,7 +893,7 @@ class AiAdvisor:
         from cloud_deploy.reporting.insight_llm_client import chat_json_with_usage
 
         system = (
-            "你是小红书选品顾问。根据已有预生成报告与脱敏 context，"
+            "你是小红书选品顾问。根据已有预生成报告与榜单 context，"
             "输出一段 200 字以内的补充观察（纯文本）。"
             "禁止 goods_id、店铺名、商品链接、完整标题。"
         )
