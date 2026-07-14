@@ -65,8 +65,9 @@
 | **V2 一键部署 Runbook** | `projects/ai-market-intelligence-v2/docs/29-V2-ONECLICK-DEPLOY-RUNBOOK.md` |
 | **留存 × PG 需求** | `projects/ai-market-intelligence-v2/docs/27-RETENTION-PG-STICKINESS-REQUIREMENTS.md` |
 | Legacy 下线策略 | `projects/ai-market-intelligence-v2/docs/19-LEGACY-SUNSET-AND-V2-LAUNCH.md` |
-| 云部署 | `.cursor/rules/xhs-cloud-deploy.mdc`（Agent：**push + SSH `xhs365` pull**，勿甩给用户粘贴） |
+| 云部署 | `.cursor/rules/xhs-cloud-deploy.mdc`（Agent：**本地改 → `git push origin main` → SSH `xhs365` pull**，勿甩给用户粘贴） |
 | **本地选品日报生成**（D 盘爬虫机） | `.cursor/rules/xhs-daily-report.mdc` |
+| **类目关联库 / 标签同源** | `.cursor/rules/xhs-category-lexicon.mdc`（D 盘 lexicon + 云 taxonomy；改云侧须 push+pull） |
 
 ## UI 主题与视觉风格（必读）
 

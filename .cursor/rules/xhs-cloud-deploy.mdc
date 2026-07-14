@@ -5,7 +5,22 @@ alwaysApply: true
 
 # xhs-cloud 部署约定
 
-> 开发总纲与 V2 方向见根目录 **`AGENTS.md`** 与 **`project-core.mdc`**。
+> 开发总纲与 V2 方向见根目录 **`AGENTS.md`** 与 **`project-core.mdc`**。  
+> 类目标签本地↔云同源： **`xhs-category-lexicon.mdc`**。  
+> 选品日报（D 盘）： **`xhs-daily-report.mdc`**。
+
+## 本地 → GitHub → 云主机（强制闭环）
+
+| 步骤 | 谁执行 | 动作 |
+|------|--------|------|
+| 1. 本地改代码 | Agent | 改 `E:\vuemonitor\xhs-cloud\...`（或规则）；跑相关测试 |
+| 2. GitHub push | Agent | `git add` 仅相关文件 → `commit` → **`git push origin main`** |
+| 3. 云主机 pull | Agent | SSH **`xhs365`** 跑 `pull-and-deploy.sh`（fetch/reset + rsync `cloud_deploy/` + host-update） |
+| 4. 验收 | Agent → 用户 | 回报 commit 短 SHA；提醒会员页 **Ctrl+F5** |
+
+**不要**把第 2～3 步变成「请用户自己复制粘贴」——除非 SSH/`git push` 失败再交备用指令。
+
+D 盘爬虫日报 **不走** 本仓库 git；数据包上云见 `xhs-daily-report.mdc`。若同时改了类目逻辑，顺序见 `xhs-category-lexicon.mdc` §强制流程。
 
 ## 路径与 SSH
 

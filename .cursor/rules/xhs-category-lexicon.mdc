@@ -1,0 +1,84 @@
+---
+description: 类目标签关联库约束；本地日报与云洞察同源；改类目/报告后的 push→pull 闭环
+globs: "**/category_lexicon/**,**/category_taxonomy.*,**/product_classify.py,**/insight_llm_feed.py,**/insight_metric_engine.py,**/gen_report.py,**/index_vue.html,**/index_with_gr.html"
+alwaysApply: false
+---
+
+# 类目关联库与推送闭环
+
+> 与部署总则配合：`.cursor/rules/xhs-cloud-deploy.mdc`（GitHub push + SSH pull）。  
+> 本地日报口径：`.cursor/rules/xhs-daily-report.mdc`。
+
+## 三地角色（勿混）
+
+| 层 | 位置 | 改什么 | 如何上线 |
+|----|------|--------|----------|
+| **本地爬虫 / 日报** | `D:\jiekoufenxi\小红书多设备爬虫\daily_report\` | `category_lexicon/`、`product_classify.py`、`gen_report.py`、HTML 模板 | **不进** vuemonitor git；靠日批生成 `reports\全量MMDD\` + `upload_report_cloud` 推数据包 |
+| **GitHub / 开发机仓库** | `E:\vuemonitor\xhs-cloud\` | `config/category_taxonomy.yaml`、insight 管道、`assets/index_*.html` 镜像 | Agent：**commit → `git push origin main`** |
+| **云主机** | `/opt/vuemonitor` → rsync → `/opt/xhs-cloud` | 运行中的 API / 静态页 / taxonomy | Agent：**SSH `xhs365` 执行 `pull-and-deploy.sh`**（勿甩给用户粘贴） |
+
+## 本地类目约束（D 盘）
+
+1. **唯一真相源（本地）**：`daily_report/category_lexicon/`  
+   - 字典 + 词条：`seed_data.py`  
+   - 运行库：`lexicon.db`（gitignore，勿提交到 git）  
+   - 解析：`resolve.py` → `product_classify.resolve_category_tag`
+2. **禁止**在 `product_classify.py` 继续堆虚拟细分词表；新词进 `seed_data.py` 或 `lexicon_admin.py add`。
+3. **解析优先级**  
+   - 商品锁定 `category_goods_override`  
+   - 虚拟：词典 weight + 词长  
+   - 实体：**平台一级优先**（脏标签映射/丢弃）→ 词典兜底 → `未分类`  
+   - 虚拟未命中 → `其他虚拟`
+4. **报告生成**：`gen_report` 必须 `track_hit=True` 且结尾 `flush_category_hits()`；流水线自动 seed + mine + 晋级（`hit_count≥30`）。
+5. **模板**：`index_vue.html` / `index_with_gr.html` 必须有类目芯片；改模板后重跑 `gen_report` 才会进 `reports\全量MMDD\`。
+6. **虚实分类**：报告与顾问（`rank_engine/ranker.py`）一律 `classify_virtual` 重算，**禁止盲信** DB `is_virtual`。
+
+## 云端类目约束（vuemonitor）
+
+1. **规范名必须与日报一致**（例：`小学资料`，不要用已废弃的 `小学教辅` 作桶名）。
+2. 异名只写在 `xhs-cloud/cloud_deploy/config/category_taxonomy.yaml` → `aliases`（及 `category_taxonomy.py` 内置备份）。
+3. 洞察聚合与喂料同源：  
+   - `insight_metric_engine`：优先 `category_tag` 再 `normalize`  
+   - `filter_rows_for_category`：**先比标签**，禁止只靠标题 `infer_category`（否则空喂料）
+4. 默认 `INSIGHT_PG_SOURCE=scan_delta`；**空池必须 fallback `pg_items`**，勿让夜间管道因扫描窗无证据直接失败。
+5. 同步到云的 HTML 镜像：`xhs-cloud/cloud_deploy/assets/index_vue.html`、`index_with_gr.html`（与 D 盘模板保持功能对齐）。
+
+## Agent 改类目相关代码后的强制流程
+
+### A. 只改了 D 盘爬虫 / 日报
+
+```text
+改 daily_report/category_lexicon 或 gen_report
+  → 本地 seed / 测 test_category_lexicon.py
+  → 需要入库云报告：跑 xhs_daily_report_pipeline（或 gen_report + upload）
+  → 无需 git push vuemonitor（除非同时改了 xhs-cloud 镜像/taxonomy）
+```
+
+### B. 改了 `E:\vuemonitor\xhs-cloud`（taxonomy / insight / assets）
+
+```text
+1. 只 stage 相关文件（xhs-cloud/**、.cursor/rules/**）
+2. commit + git push origin main
+3. SSH 部署（Agent 执行，不要丢给用户）：
+   ssh -o BatchMode=yes -o ConnectTimeout=20 xhs365 "bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/pull-and-deploy.sh"
+4. 告知用户 commit 短 SHA + 会员页 Ctrl+F5
+```
+
+可选重跑当日洞察（用户要求或改了类目逻辑后建议执行）：
+
+```powershell
+ssh -o BatchMode=yes xhs365 "cd /opt/xhs-cloud && source venv/bin/activate && export INSIGHT_PG_SOURCE=pg_items && python -m cloud_deploy.scripts.cloud_insight_report --date $(Get-Date -Format yyyy-MM-dd) --source pg_items --publish"
+```
+
+（日期按实际报告日替换；Windows 侧可把日期字面量写死。）
+
+### C. 两边都改了
+
+先完成 **A（本地报告可推云）**，再完成 **B（代码上线）**；云洞察以已 ingest 的 `report_daily_items.category_tag` 为准。
+
+## 禁止
+
+- 云侧另起一套互不兼容的类目名做聚合主路径，却不写 aliases。  
+- 只在服务器改 `/opt/xhs-cloud` 而不走 git。  
+- 把「请用户自己到云主机 pull」当作默认交付（SSH 可用时必须由 Agent 跑）。  
+- 提交 `lexicon.db`、`.env`、报告大包进 git。

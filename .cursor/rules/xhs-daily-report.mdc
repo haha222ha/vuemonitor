@@ -1,12 +1,13 @@
 ---
 description: 本地选品日报生成口径、脚本路径、去重与推云流水线（爬虫开发机 D 盘）
-globs: "**/gen_report.py,**/gen_tiered_reports.py,**/xhs_daily_report_pipeline.py,**/xhs_report_scope.py,**/report_tiers.py,**/upload_report_cloud.py"
+globs: "**/gen_report.py,**/gen_tiered_reports.py,**/xhs_daily_report_pipeline.py,**/xhs_report_scope.py,**/report_tiers.py,**/upload_report_cloud.py,**/category_lexicon/**,**/product_classify.py,**/mine_category_lexicon.py,**/seed_category_lexicon.py,**/lexicon_admin.py"
 alwaysApply: false
 ---
 
 # 选品日报生成（本地爬虫机）
 
-> 代码在 **开发机 D 盘**，不在 `vuemonitor` 仓库内；改脚本后无需 git push vuemonitor，推云走本机流水线。
+> 代码在 **开发机 D 盘**，不在 `vuemonitor` 仓库内；改日报脚本**默认无需** `git push`。  
+> 若同时改了 `E:\vuemonitor\xhs-cloud`（taxonomy / insight / HTML 镜像），必须走 **push → SSH pull**：见 `xhs-cloud-deploy.mdc` + `xhs-category-lexicon.mdc`。
 
 ## 根目录与输出
 
@@ -79,8 +80,17 @@ $env:XHS_DAILY_SKIP_CLOUD_IF_PUSHED="0"
 python xhs_daily_report_pipeline.py --skip-report --skip-ingest
 ```
 
+## 本地 vs GitHub vs 云主机
+
+| 改动面 | 是否 git push `vuemonitor` | 上线方式 |
+|--------|---------------------------|----------|
+| 仅 D 盘 `daily_report/`、`rank_engine/`、流水线 | 否 | `gen_report` / `xhs_daily_report_pipeline` 推 **报告 zip** |
+| `E:\vuemonitor\xhs-cloud\**` 或 `.cursor/rules/**` | **是** → `origin/main` | Agent SSH `xhs365` → `pull-and-deploy.sh` |
+| 类目：D 盘 lexicon + 云 taxonomy | 两边都做完 | 先本地报告（可上传）再 push/pull 代码；规范名必须对齐 |
+
 ## Agent 注意
 
-- 改 HTML 模板：`daily_report\index_vue.html`、`index_with_gr.html`；需重跑 `gen_report` 才会复制进 `reports\全量MMDD\`。
+- 改 HTML 模板：`daily_report\index_vue.html`、`index_with_gr.html`；需重跑 `gen_report` 才会复制进 `reports\全量MMDD\`；若同步镜像到 `xhs-cloud/cloud_deploy/assets/`，要 **push + pull**。
 - `goods_fast` 是 PG **视图**，更新分类写 **`goods_base`**，勿 `UPDATE goods_fast`。
 - 推云成功后提醒用户云主机已 ingest；vuemonitor 侧 xhs-cloud 会员 API 读的是云端归档，不是 D 盘路径。
+- 新类目词条：改 `category_lexicon/seed_data.py` 或 `lexicon_admin.py`，**不要**往 `product_classify._VIRTUAL_TAG_RULES` 堆。
