@@ -182,12 +182,13 @@ def aggregate_items_to_insights(
                 from_report_tag=bool(cat_from_tag.get(category)),
             )
         )
-    # 日报脱敏类目标签优先；推断兜底类目（综合/虚拟综合）靠后
+    # 日报脱敏类目标签优先；标签内按样本量；推断兜底靠后
     catchall = {"综合类目", "虚拟综合", "其他", "未分类"}
     out.sort(
         key=lambda x: (
             0 if x.from_report_tag else 1,
             1 if x.category in catchall else 0,
+            -x.sample_size if x.from_report_tag else 0,
             -x.blue_ocean_score,
             -x.growth_rate_pct,
             -x.sample_size,
