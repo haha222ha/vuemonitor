@@ -37,6 +37,8 @@ def _log(msg: str) -> None:
 
 def run_compute(*, dry_run: bool = False, snap_date: str | None = None) -> dict:
     """执行 PG 端 Feature Engine 计算。"""
+    from cloud_deploy.scripts.bootstrap_env import bootstrap
+    bootstrap()
     from cloud_deploy.cloud_api.config import get_settings
 
     s = get_settings()
