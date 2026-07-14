@@ -371,6 +371,29 @@ def init_premium_pg_schema(conn) -> None:
         "CREATE INDEX IF NOT EXISTS idx_pkds_date ON premium_keyword_daily_stats (stat_date DESC)"
     )
 
+    # Feature Engine PG 改造：预计算增速/加速度/连续上榜天数（与爬虫写表分离）
+    c.execute(
+        """
+        CREATE TABLE IF NOT EXISTS goods_feature_metrics (
+            goods_id          TEXT NOT NULL,
+            snap_date         TEXT NOT NULL,
+            sold_num          INTEGER DEFAULT 0,
+            delta             INTEGER DEFAULT 0,
+            velocity_1d       DOUBLE PRECISION DEFAULT 0,
+            growth_rate       DOUBLE PRECISION DEFAULT 0,
+            acceleration      DOUBLE PRECISION DEFAULT 0,
+            consecutive_days  INTEGER DEFAULT 0,
+            updated_at        TEXT DEFAULT to_char(NOW(), 'YYYY-MM-DD HH24:MI:SS'),
+            PRIMARY KEY (goods_id, snap_date)
+        )
+        """
+    )
+    c.execute("CREATE INDEX IF NOT EXISTS idx_gfm_date ON goods_feature_metrics (snap_date)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_gfm_goods ON goods_feature_metrics (goods_id, snap_date DESC)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_gfm_growth ON goods_feature_metrics (snap_date, growth_rate DESC)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_gfm_accel ON goods_feature_metrics (snap_date, acceleration DESC)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_gfm_consec ON goods_feature_metrics (snap_date, consecutive_days DESC)")
+
     c.execute("SELECT COUNT(*) FROM keyword_batches")
     if int(c.fetchone()[0] or 0) == 0:
         c.executemany(
