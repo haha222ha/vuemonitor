@@ -879,23 +879,47 @@ var MemberReader = (function () {
           html += '<div class="archive-day-allread" data-date="' + escFn(it2.report_date) + '">'
             + '📄 阅读整日报告 →</div>';
 
-          // 方向解读标题列表
+          // 第三层：虚拟 / 实体 / 其他；其下才是方向解读列表
           if (dirs.length) {
-            html += '<div class="archive-dir-list">';
+            var buckets = { physical: [], virtual: [], other: [] };
             for (var di = 0; di < dirs.length; di++) {
               var dInfo = dirs[di];
-              var ct = (dInfo.category_type || '').toLowerCase();
-              var catTag = '';
-              if (ct === 'physical') catTag = '<span class="dir-cat-tag cat-physical">实体</span>';
-              else if (ct === 'virtual') catTag = '<span class="dir-cat-tag cat-virtual">虚拟</span>';
-              else if (ct === 'mixed') catTag = '<span class="dir-cat-tag cat-mixed">混合</span>';
-              html += '<div class="archive-dir-item" data-date="' + escFn(it2.report_date) + '" data-key="' + escFn(dInfo.key) + '">'
-                + '<span class="archive-dir-icon">🎯</span>'
-                + '<span class="archive-dir-title">' + escFn(dInfo.title) + '</span>'
-                + catTag
-                + '</div>';
+              var ct0 = (dInfo.category_type || '').toLowerCase();
+              if (ct0 === 'physical') buckets.physical.push(dInfo);
+              else if (ct0 === 'virtual') buckets.virtual.push(dInfo);
+              else buckets.other.push(dInfo);
             }
-            html += '</div>';
+            // 老报告无 category_type 时全部进 other —— 仍给出单组可点列表
+            var typeSpecs = [
+              { key: 'physical', label: '实体商品', icon: '🏷️', cls: 'cat-physical', list: buckets.physical },
+              { key: 'virtual', label: '虚拟商品', icon: '💾', cls: 'cat-virtual', list: buckets.virtual },
+              { key: 'other', label: (buckets.physical.length || buckets.virtual.length) ? '混合 / 其他' : '全部方向', icon: '📂', cls: 'cat-mixed', list: buckets.other }
+            ];
+            for (var ts = 0; ts < typeSpecs.length; ts++) {
+              var spec = typeSpecs[ts];
+              if (!spec.list.length) continue;
+              // 日期展开后，虚拟/实体分组默认打开（减少多点一次）
+              var typeExpanded = true;
+              var typeIcon = typeExpanded ? '📂' : '📁';
+              var typeArrow = typeExpanded ? '▼' : '▶';
+              html += '<div class="archive-type-group' + (typeExpanded ? ' expanded' : '') + '">';
+              html += '<div class="archive-type-head" data-type="' + spec.key + '">';
+              html += '<span class="archive-type-icon">' + typeIcon + '</span>';
+              html += '<span class="archive-type-title ' + spec.cls + '">' + spec.icon + ' ' + spec.label + '</span>';
+              html += '<span class="archive-type-count">' + spec.list.length + ' 篇</span>';
+              html += '<span class="archive-type-arrow">' + typeArrow + '</span>';
+              html += '</div>';
+              html += '<div class="archive-type-body"' + (typeExpanded ? '' : ' style="display:none"') + '>';
+              html += '<div class="archive-dir-list">';
+              for (var di2 = 0; di2 < spec.list.length; di2++) {
+                var d2 = spec.list[di2];
+                html += '<div class="archive-dir-item" data-date="' + escFn(it2.report_date) + '" data-key="' + escFn(d2.key) + '">'
+                  + '<span class="archive-dir-icon">🎯</span>'
+                  + '<span class="archive-dir-title">' + escFn(d2.title) + '</span>'
+                  + '</div>';
+              }
+              html += '</div></div></div>';
+            }
           } else {
             html += '<div class="archive-dir-empty">该日无方向解读数据</div>';
           }
@@ -923,7 +947,15 @@ var MemberReader = (function () {
           toggleArchiveGroup(this, 'day');
         };
       }
-      // 6) 绑定"整日阅读"点击
+      // 6) 绑定虚拟/实体分组标题点击
+      var typeHeads = host.querySelectorAll('.archive-type-head');
+      for (var th = 0; th < typeHeads.length; th++) {
+        typeHeads[th].onclick = function (e) {
+          e.stopPropagation();
+          toggleArchiveGroup(this, 'type');
+        };
+      }
+      // 7) 绑定"整日阅读"点击
       var allReads = host.querySelectorAll('.archive-day-allread');
       for (var ar = 0; ar < allReads.length; ar++) {
         allReads[ar].onclick = function (e) {
@@ -933,10 +965,10 @@ var MemberReader = (function () {
           selectNode({ type: 'archive', date: d });
         };
       }
-      // 7) 绑定方向解读标题点击（进入单篇阅读）
+      // 8) 绑定方向解读标题点击（进入单篇阅读）
       var dirItems = host.querySelectorAll('.archive-dir-item');
-      for (var di2 = 0; di2 < dirItems.length; di2++) {
-        dirItems[di2].onclick = function (e) {
+      for (var di3 = 0; di3 < dirItems.length; di3++) {
+        dirItems[di3].onclick = function (e) {
           e.stopPropagation();
           var d = this.getAttribute('data-date');
           var key = this.getAttribute('data-key');
@@ -949,10 +981,10 @@ var MemberReader = (function () {
     });
   }
 
-  // 通用折叠切换（支持 month / day 两层）
+  // 通用折叠切换（month / day / type）—— 选择器必须带 archive- 前缀
   function toggleArchiveGroup(headEl, level) {
     var group = headEl.parentNode;
-    var body = group.querySelector('.' + level + '-body');
+    var body = group.querySelector('.archive-' + level + '-body');
     if (!body) return;
     var isOpen = body.style.display !== 'none';
     var icon = headEl.querySelector('.archive-' + level + '-icon');

@@ -565,7 +565,61 @@
   background: rgba(0, 113, 227, 0.12);
 }
 
-/* 方向解读标题列表（第三层） */
+/* 虚拟 / 实体分区（第三层文件夹） */
+.archive-type-group {
+  margin: 6px 4px;
+  border: 1px solid var(--reader-line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fafafa;
+}
+.archive-type-group.expanded {
+  border-color: rgba(0, 113, 227, 0.25);
+  background: #fff;
+}
+.archive-type-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.archive-type-head:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+.archive-type-icon {
+  font-size: 14px;
+  flex: 0 0 auto;
+}
+.archive-type-title {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+}
+.archive-type-title.cat-physical { color: #2e7d32; }
+.archive-type-title.cat-virtual { color: #1565c0; }
+.archive-type-title.cat-mixed { color: #8a6d3b; }
+.archive-type-count {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--reader-text2);
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.archive-type-arrow {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--reader-text2);
+}
+.archive-type-body {
+  padding: 4px 6px 8px;
+}
+
+/* 方向解读标题列表（第四层） */
 .archive-dir-list {
   display: flex;
   flex-direction: column;
@@ -660,6 +714,9 @@
   .archive-dir-item { padding: 9px 10px; }
   .archive-dir-title { font-size: 12px; }
   .archive-day-arrow { margin-left: auto; }
+  .archive-type-head { padding: 9px 10px; }
+  .archive-type-title { font-size: 12px; }
+  .archive-type-body { padding: 2px 4px 6px; }
 }
 
 .reader-hero{margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
