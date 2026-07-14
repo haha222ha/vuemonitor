@@ -15,7 +15,11 @@ import statistics
 from datetime import datetime, timezone
 from typing import Any
 
-from cloud_deploy.reporting.category_taxonomy import infer_category
+from cloud_deploy.reporting.category_taxonomy import (
+    category_equivalent,
+    infer_category,
+    normalize_category_tag,
+)
 from cloud_deploy.reporting.insight_metric_engine import InsightMetrics
 
 FEED_SCHEMA_VERSION = "feed-v1.1"
@@ -28,17 +32,22 @@ def _median(values: list[float]) -> float | None:
 
 
 def filter_rows_for_category(all_rows: list[dict[str, Any]], category: str) -> list[dict[str, Any]]:
-    cat = (category or "").strip()
+    """与 aggregate 同源：优先 category_tag，再标题推断；异名经 normalize 对齐。"""
+    cat = normalize_category_tag(category) or (category or "").strip()
     if not cat:
         return []
     out: list[dict[str, Any]] = []
     for row in all_rows:
+        raw_tag = str(row.get("category_tag") or row.get("category") or "").strip()
+        if raw_tag and category_equivalent(raw_tag, cat):
+            out.append(row)
+            continue
         inferred, _sub = infer_category(
             str(row.get("title") or ""),
             behavior=str(row.get("behavior") or ""),
             is_virtual=row.get("is_virtual") if "is_virtual" in row else None,
         )
-        if inferred == cat:
+        if category_equivalent(inferred, cat) or inferred == cat:
             out.append(row)
     return out
 
@@ -301,7 +310,7 @@ def render_llm_feed_md(feed: dict[str, Any]) -> str:
         f"- 增速 {idx.get('growth_rate_pct')}% · 蓝海 {idx.get('blue_ocean_score')} · 竞争 {idx.get('competition_index')} · 热度 {idx.get('heat_score')}",
         f"- 价格带 {idx.get('price_band')} · 趋势 {idx.get('trend_label')}",
         "",
-        "## 主题词（脱敏）",
+        "## 主题词",
         "",
         ", ".join(ctx.get("keyword_themes") or []) or "—",
         "",

@@ -1,0 +1,86 @@
+---
+description: 本地选品日报生成口径、脚本路径、去重与推云流水线（爬虫开发机 D 盘）
+globs: "**/gen_report.py,**/gen_tiered_reports.py,**/xhs_daily_report_pipeline.py,**/xhs_report_scope.py,**/report_tiers.py,**/upload_report_cloud.py"
+alwaysApply: false
+---
+
+# 选品日报生成（本地爬虫机）
+
+> 代码在 **开发机 D 盘**，不在 `vuemonitor` 仓库内；改脚本后无需 git push vuemonitor，推云走本机流水线。
+
+## 根目录与输出
+
+| 角色 | 路径 |
+|------|------|
+| 爬虫 / 日报根目录 | `D:\jiekoufenxi\小红书多设备爬虫` |
+| 报告输出目录 | `D:\jiekoufenxi\小红书多设备爬虫\reports\全量MMDD\`（如 `全量0712\`） |
+| 产出文件 | `data.js` + `index_vue.html` + `index_with_gr.html` |
+| PG 配置 | `D:\xhs-data\config\portable_paths.env`（`XHS_DB_BACKEND=postgres`，库 `xhs_monitor`） |
+| 会员页（推云后） | https://monitor.xhs365.cn/member（**Ctrl+F5** 强刷） |
+
+## 核心脚本（按调用链）
+
+| 脚本 | 路径 | 作用 |
+|------|------|------|
+| **主生成** | `daily_report\gen_report.py` | 查 PG → 写 `data.js` + 复制 HTML 模板 |
+| **日批封装** | `daily_report\gen_tiered_reports.py` | 默认只跑 `TIER_DAILY`（`scan_window=1d`） |
+| **一键流水线** | `xhs_daily_report_pipeline.py` | 生成 → 精品 ingest → 打包 zip → 上传云 ingest |
+| **口径常量** | `xhs_report_scope.py` | `DEFAULT_REPORT_SCAN_WINDOW=1d`、今日 `sold_history.delta≥1` |
+| **分档定义** | `daily_report\report_tiers.py` | `TIER_DAILY`：`folder_prefix=全量`，`cloud_primary=True` |
+| **类目标签** | `daily_report\category_lexicon\` + `product_classify.py` | 关键词关联库（可 seed/挖掘/晋级）；实体千帆一级优先 → `category_tag` |
+| **推云** | `daily_report\upload_report_cloud.py` | plan_b：`全量MMDD.zip` → 云主机 `/opt/xhs-cloud` |
+| **分类校正** | `tools\classify_unknown_goods.py` | `goods_base.is_virtual=-1` → 0/1（日报候选） |
+
+## 默认筛选口径（日报）
+
+配合 **晚间 0 点起采当天数据**。三层条件：
+
+1. **增量时间窗（默认今日）**：`sold_history.snapshot_date = CURRENT_DATE` 且 `delta ≥ 1`
+2. **动销门槛**：`filter_mode=delta_only`，`min_actual=1`
+3. **扫描窗（默认）**：`--scan-window 1d` → `gf.last_seen` 日历日今日（`fresh_scan_where_goods`）
+
+可选：`--scan-window 2d` 扩到昨+今；`full` 不限 last_seen。
+
+## 类目分层（模板 + data.js）
+
+| 类型 | `category_tag` 来源 |
+|------|---------------------|
+| 虚拟 | `category_lexicon` 词典命中（seed + mine + promote）；兜底「其他虚拟」 |
+| 实体 | 平台一级（脏标签会映射/丢弃）→ 标题词典 →「未分类」 |
+
+运维：`daily_report/seed_category_lexicon.py`、`mine_category_lexicon.py`、`lexicon_admin.py`。  
+日批流水线会自动 seed + mine + 晋级（`hit_count≥30`）。  
+`index_vue.html` / `index_with_gr.html` 有类目芯片筛选。  
+云洞察异名对齐：`xhs-cloud/cloud_deploy/config/category_taxonomy.yaml` aliases。
+
+## 两层去重
+
+| 阶段 | 规则 | 说明 |
+|------|------|------|
+| SQL | `DISTINCT ON (gf.goods_id)` | 每商品 ID 一行，取今日 **delta 最大** |
+| 展示 | `dedup_by_title`（默认） | 同标题多规格合并，保留 delta 最高；`--no-dedup` 可关闭 |
+
+## 常用命令（PowerShell）
+
+```powershell
+Set-Location "D:\jiekoufenxi\小红书多设备爬虫"
+
+# 仅生成（默认 1d + 今日 delta≥1 + 标题去重）
+python daily_report/gen_report.py --velocity-mode skip --no-wait-idle
+
+# 全 SKU 不去重
+python daily_report/gen_report.py --velocity-mode skip --no-wait-idle --no-dedup
+
+# 生成 + 推云（完整日批）
+python xhs_daily_report_pipeline.py --skip-ingest
+
+# 报告已生成，仅推云
+$env:XHS_DAILY_SKIP_CLOUD_IF_PUSHED="0"
+python xhs_daily_report_pipeline.py --skip-report --skip-ingest
+```
+
+## Agent 注意
+
+- 改 HTML 模板：`daily_report\index_vue.html`、`index_with_gr.html`；需重跑 `gen_report` 才会复制进 `reports\全量MMDD\`。
+- `goods_fast` 是 PG **视图**，更新分类写 **`goods_base`**，勿 `UPDATE goods_fast`。
+- 推云成功后提醒用户云主机已 ingest；vuemonitor 侧 xhs-cloud 会员 API 读的是云端归档，不是 D 盘路径。

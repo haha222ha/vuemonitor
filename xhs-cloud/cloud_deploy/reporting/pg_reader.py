@@ -493,6 +493,7 @@ def premium_row_to_item(row: dict, *, sold_info: dict | None = None, delta_only:
         "base_hours": 0,
         "base_at": "",
         "anomaly": 0,
+        "category_tag": _pick_str(row.get("rdi_category_tag"), row.get("category_tag")),
     }
     return row_to_report_item(merged)
 
@@ -654,7 +655,8 @@ def _fetch_premium_scan_delta_rows(
                    pgd.snap_date AS pgd_snap_date,
                    pgd.sold_num AS pgd_sold, pgd.delta AS pgd_delta,
                    pgd.actual_delta AS pgd_actual_delta, pgd.velocity_1d AS pgd_velocity,
-                   prev.sold_num AS prev_sold
+                   prev.sold_num AS prev_sold,
+                   rdi.category_tag AS rdi_category_tag
             FROM premium_goods pg
             INNER JOIN premium_goods_daily pgd
                    ON pgd.goods_id = pg.goods_id
@@ -666,6 +668,8 @@ def _fetch_premium_scan_delta_rows(
                 ORDER BY p.snap_date DESC
                 LIMIT 1
             ) prev ON TRUE
+            LEFT JOIN report_daily_items rdi
+                   ON rdi.goods_id = pg.goods_id AND rdi.report_date = %s
             WHERE pg.lifecycle < 3
               AND COALESCE(pgd.delta, 0) >= %s
               AND COALESCE(pgd.sold_num, pg.sold_num, 0) <= %s
@@ -691,6 +695,7 @@ def _fetch_premium_scan_delta_rows(
             (
                 start_date,
                 end_date,
+                report_date,
                 min_delta,
                 _scan_delta_sold_cap(),
                 ts_start,
@@ -871,10 +876,20 @@ def fetch_items_from_scan_delta(
 
 
 def fetch_items_for_insight(conn, report_date: str, *, source: str | None = None) -> list:
-    """V2 情报 / feed 专用数据源（默认 scan_delta）。"""
+    """V2 情报 / feed 专用数据源（默认 scan_delta；空池自动回退 pg_items）。"""
     src = (source or os.environ.get("INSIGHT_PG_SOURCE", "scan_delta")).strip().lower()
     if src in ("scan_delta", "delta", "insight"):
-        return fetch_items_from_scan_delta(conn, report_date)
+        items = fetch_items_from_scan_delta(conn, report_date)
+        if items:
+            return items
+        # 扫描窗证据经常缺失；日报表仍有当日增量时不阻断夜间管道
+        fallback = fetch_items_from_daily_table(conn, report_date, reconcile_sold=True)
+        print(
+            f"[pg_reader] scan_delta empty → fallback pg_items "
+            f"date={report_date} n={len(fallback)}",
+            flush=True,
+        )
+        return fallback
     if src == "auto":
         return fetch_items_auto(conn, report_date)
     if src == "pg_items":

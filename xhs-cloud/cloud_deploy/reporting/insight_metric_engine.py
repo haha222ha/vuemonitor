@@ -7,7 +7,7 @@ from collections import defaultdict
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
-from cloud_deploy.reporting.category_taxonomy import infer_category
+from cloud_deploy.reporting.category_taxonomy import infer_category, normalize_category_tag
 
 
 @dataclass
@@ -113,15 +113,17 @@ def aggregate_items_to_insights(
     for it in items:
         # 优先用选品报告/脱敏推送已算好的 category_tag（与日报分层同源）
         raw_tag = str(it.get("category_tag") or it.get("category") or "").strip()
-        from_tag = bool(raw_tag and raw_tag not in ("未分类", "综合类目", "其他"))
+        norm_tag = normalize_category_tag(raw_tag) if raw_tag else ""
+        from_tag = bool(norm_tag and norm_tag not in ("未分类", "综合类目", "其他", "其他虚拟"))
         if from_tag:
-            cat, sub = raw_tag, str(it.get("sub_category") or "")
+            cat, sub = norm_tag, str(it.get("sub_category") or "")
         else:
             cat, sub = infer_category(
                 str(it.get("title") or ""),
                 behavior=str(it.get("behavior") or ""),
                 is_virtual=it.get("is_virtual") if "is_virtual" in it else None,
             )
+            cat = normalize_category_tag(cat) or cat
         buckets[cat].append(it)
         cat_sub[cat] = sub or cat_sub.get(cat, "")
         # 同一类目若有任一行来自日报标签，记为 tagged（优先展示）

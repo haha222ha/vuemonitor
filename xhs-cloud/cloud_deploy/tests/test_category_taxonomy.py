@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
-from cloud_deploy.reporting.category_taxonomy import infer_category
+from cloud_deploy.reporting.category_taxonomy import infer_category, normalize_category_tag
 from cloud_deploy.reporting.insight_compliance_gate import passes_k_anonymity
 from cloud_deploy.reporting.insight_metric_engine import aggregate_items_to_insights
 
 
 def test_infer_category_jiajiao():
     cat, sub = infer_category("小学数学暑假衔接练习册")
-    assert cat == "小学教辅"
+    assert cat == "小学资料"
     assert sub == "K12"
 
 
 def test_infer_category_shouna():
     cat, sub = infer_category("厨房收纳置物架")
-    assert cat == "家居收纳"
+    assert cat == "家居生活"
     assert sub == "家居"
 
 
@@ -27,7 +27,11 @@ def test_infer_category_meizhuang_when_taxonomy_loaded():
 
 def test_infer_virtual_fallback():
     cat, sub = infer_category("某虚拟资料", is_virtual=True)
-    assert cat in ("综合类目", "虚拟综合")
+    assert cat in ("综合类目", "其他虚拟", "虚拟综合")
+
+
+def test_alias_jiaofu():
+    assert normalize_category_tag("小学教辅") == "小学资料"
 
 
 def test_k_anonymity():
@@ -46,7 +50,7 @@ def test_aggregate_splits_categories():
     ]
     insights = aggregate_items_to_insights("2026-07-12", items, min_sample=3)
     cats = {i.category for i in insights}
-    assert "小学教辅" in cats
-    assert "家居收纳" in cats
+    assert "小学资料" in cats
+    assert "家居生活" in cats
     for ins in insights:
         assert ins.price_distribution

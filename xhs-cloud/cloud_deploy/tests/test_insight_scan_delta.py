@@ -61,21 +61,27 @@ def test_fetch_items_for_insight_default_source():
     with mock.patch.dict(os.environ, {"INSIGHT_PG_SOURCE": "scan_delta"}):
         with mock.patch(
             "cloud_deploy.reporting.pg_reader.fetch_items_from_scan_delta",
-            return_value=[],
+            return_value=[["g1"]],
         ) as fn:
-            fetch_items_for_insight(conn, "2026-07-12")
+            out = fetch_items_for_insight(conn, "2026-07-12")
+            assert out == [["g1"]]
             fn.assert_called_once()
 
 
-def test_fetch_items_for_insight_routes_local_delta():
+def test_fetch_items_for_insight_scan_delta_fallback_pg_items():
     conn = object()
     with mock.patch(
-        "cloud_deploy.reporting.pg_reader.fetch_items_from_local_delta",
-        return_value=[["g2"]],
-    ) as fn:
-        out = fetch_items_for_insight(conn, "2026-07-12", source="local_delta")
-        assert out == [["g2"]]
-        fn.assert_called_once_with(conn, "2026-07-12")
+        "cloud_deploy.reporting.pg_reader.fetch_items_from_scan_delta",
+        return_value=[],
+    ) as fn_scan:
+        with mock.patch(
+            "cloud_deploy.reporting.pg_reader.fetch_items_from_daily_table",
+            return_value=[["from_pg"]],
+        ) as fn_pg:
+            out = fetch_items_for_insight(conn, "2026-07-12", source="scan_delta")
+            assert out == [["from_pg"]]
+            fn_scan.assert_called_once()
+            fn_pg.assert_called_once()
 
 
 def test_fetch_items_for_insight_unknown():
@@ -94,5 +100,6 @@ if __name__ == "__main__":
     test_insight_scan_window_days_env()
     test_fetch_items_for_insight_routes_scan_delta()
     test_fetch_items_for_insight_default_source()
+    test_fetch_items_for_insight_scan_delta_fallback_pg_items()
     test_fetch_items_for_insight_unknown()
     print("test_insight_scan_delta OK")
