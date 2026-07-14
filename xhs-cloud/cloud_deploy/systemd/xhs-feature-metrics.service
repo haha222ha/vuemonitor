@@ -9,7 +9,7 @@ User=root
 WorkingDirectory=/opt/xhs-cloud
 Environment=PYTHONUNBUFFERED=1
 EnvironmentFile=/opt/xhs-cloud/.env
-ExecStart=/usr/bin/python3 /opt/xhs-cloud/cloud_deploy/scripts/compute_feature_metrics.py
+ExecStart=/opt/xhs-cloud/venv/bin/python3 /opt/xhs-cloud/cloud_deploy/scripts/compute_feature_metrics.py
 TimeoutStartSec=600
 StandardOutput=journal
 StandardError=journal
