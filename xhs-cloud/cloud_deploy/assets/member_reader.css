@@ -386,6 +386,135 @@
   font-weight: 700;
 }
 
+/* 月份分组折叠（archive 二级分类） */
+.archive-month-group {
+  margin-bottom: 12px;
+  border: 1px solid var(--reader-line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.archive-month-group.current {
+  border-color: var(--reader-accent);
+  background: rgba(0, 113, 227, 0.03);
+}
+.archive-month-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  background: var(--reader-surface);
+  transition: background 0.15s;
+}
+.archive-month-head:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+.archive-month-group.current .archive-month-head {
+  background: rgba(0, 113, 227, 0.06);
+}
+.archive-month-icon {
+  font-size: 18px;
+  flex: 0 0 auto;
+}
+.archive-month-title {
+  flex: 1;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--reader-text);
+}
+.archive-month-count {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--reader-text2);
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 10px;
+  border-radius: 10px;
+}
+.archive-month-group.current .archive-month-count {
+  background: rgba(0, 113, 227, 0.12);
+  color: var(--reader-accent);
+}
+.archive-month-arrow {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--reader-text2);
+  transition: transform 0.2s;
+}
+.archive-month-body {
+  padding: 4px 8px 8px;
+}
+.archive-month-body .archive-item {
+  margin-bottom: 6px;
+  border-radius: 8px;
+}
+.archive-read-link {
+  color: var(--reader-accent);
+  font-size: 13px;
+}
+
+/* archive 日期项的分类徽标 */
+.ai-cat-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.cat-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+.cat-physical {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.cat-virtual {
+  background: #e3f2fd;
+  color: #1565c0;
+}
+.cat-mixed {
+  background: #fff4e0;
+  color: #b8860b;
+}
+
+/* 今日分析面板 — 方向解读子分组 */
+.reader-card-subgroup {
+  margin-bottom: 14px;
+}
+.reader-card-subgroup:last-child {
+  margin-bottom: 0;
+}
+.reader-card-subgroup-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--reader-text2);
+  margin-bottom: 8px;
+  padding-left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.reader-card-subgroup-title .count {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--reader-text2);
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 8px;
+}
+@media (max-width: 768px) {
+  .archive-month-head { padding: 12px 12px; }
+  .archive-month-title { font-size: 14px; }
+  .archive-month-body { padding: 4px 4px 8px; }
+  .archive-month-body .archive-item { padding: 10px 12px; }
+  .archive-item .ai-date { font-size: 14px; }
+}
+
 .reader-hero{margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
 .reader-hero-block{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .reader-hero-label{font-size:11px;font-weight:700;color:var(--reader-muted);margin-right:4px}

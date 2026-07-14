@@ -97,10 +97,38 @@ def _advisor_library_items() -> list[dict]:
                 summary = str(meta.get("summary") or "")
             except (OSError, json.JSONDecodeError):
                 pass
+
+        # 统计 direction_advices 的 category_type 分布（虚拟/实体分类）
+        physical_count = 0
+        virtual_count = 0
+        mixed_count = 0
+        direction_count = 0
+        advice_path = os.path.join(_advisor_root(), date, "advice.json")
+        if os.path.isfile(advice_path):
+            try:
+                with open(advice_path, encoding="utf-8") as f:
+                    advice = json.load(f)
+                dirs = advice.get("direction_advices") or []
+                direction_count = len(dirs)
+                for d in dirs:
+                    ct = str(d.get("category_type") or "").strip().lower()
+                    if ct == "physical":
+                        physical_count += 1
+                    elif ct == "virtual":
+                        virtual_count += 1
+                    elif ct == "mixed":
+                        mixed_count += 1
+            except (OSError, json.JSONDecodeError):
+                pass
+
         items.append({
             "report_date": date,
             "summary": summary,
             "archive_type": "member_ai_advisor_zip",
+            "direction_count": direction_count,
+            "physical_count": physical_count,
+            "virtual_count": virtual_count,
+            "mixed_count": mixed_count,
         })
     return items
 

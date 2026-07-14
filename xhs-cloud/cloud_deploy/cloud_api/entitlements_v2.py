@@ -116,6 +116,14 @@ def merge_entitlements(raw: dict | None, membership_plan: str | None = None) -> 
             ent.setdefault("advisor_read", True)
             ent.setdefault("advisor_directions_per_day", 28)
             ent.setdefault("insight_categories_per_day", 5)
+            # 正式会员默认开启高级情报工具（对比/时间线/工作流/PDF）
+            ent.setdefault("insight_compare", True)
+            ent.setdefault("insight_timeline_days", 30)
+            ent.setdefault("insight_workflow", True)
+            ent.setdefault("insight_pdf_export", True)
+            ent.setdefault("insight_llm_tokens_per_day", 40_000)
+            ent.setdefault("advisor_history_days", 365)
+            ent.setdefault("advisor_chat_daily", 10)
         elif plan == "experience_3d":
             ent.setdefault("legacy_zip_enabled", False)
             ent.setdefault("insight_enabled", True)

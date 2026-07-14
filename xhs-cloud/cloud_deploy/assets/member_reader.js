@@ -286,24 +286,88 @@ var MemberReader = (function () {
       html += '</div></div>';
     }
 
-    // 方向解读分组
+    // 方向解读分组（按虚拟/实体分类分区展示）
     if (today.directions && today.directions.length) {
+      // 按 category_type 分组
+      var physicalDirs = [];
+      var virtualDirs = [];
+      var mixedDirs = [];
+      var uncatDirs = [];
+      for (var di = 0; di < today.directions.length; di++) {
+        var dd = today.directions[di];
+        var ct = (dd.category_type || '').toLowerCase();
+        if (ct === 'physical') physicalDirs.push(dd);
+        else if (ct === 'virtual') virtualDirs.push(dd);
+        else if (ct === 'mixed') mixedDirs.push(dd);
+        else uncatDirs.push(dd);
+      }
+
       html += '<div class="reader-card-group">';
       html += '<div class="reader-card-group-title">方向解读<span class="count">' + today.directions.length + '</span></div>';
-      html += '<div class="reader-card-grid">';
-      for (var i = 0; i < today.directions.length; i++) {
-        var d = today.directions[i];
-        var tags = [];
-        if (d.key) tags.push({ text: d.key, cls: '' });
-        html += buildCardCell({
-          icon: '🎯',
-          badge: '方向',
-          title: d.title || d.key,
-          tags: tags,
-          node: { type: 'direction', date: date, key: d.key }
-        });
+
+      // 实体商品子分组
+      if (physicalDirs.length) {
+        html += '<div class="reader-card-subgroup">';
+        html += '<div class="reader-card-subgroup-title">🏷️ 实体商品<span class="count">' + physicalDirs.length + '</span></div>';
+        html += '<div class="reader-card-grid">';
+        for (var pi = 0; pi < physicalDirs.length; pi++) {
+          var pd = physicalDirs[pi];
+          var ptags = [];
+          if (pd.key) ptags.push({ text: pd.key, cls: '' });
+          html += buildCardCell({
+            icon: '🎯',
+            badge: '实体',
+            title: pd.title || pd.key,
+            tags: ptags,
+            node: { type: 'direction', date: date, key: pd.key }
+          });
+        }
+        html += '</div></div>';
       }
-      html += '</div></div>';
+
+      // 虚拟商品子分组
+      if (virtualDirs.length) {
+        html += '<div class="reader-card-subgroup">';
+        html += '<div class="reader-card-subgroup-title">💾 虚拟商品<span class="count">' + virtualDirs.length + '</span></div>';
+        html += '<div class="reader-card-grid">';
+        for (var vi = 0; vi < virtualDirs.length; vi++) {
+          var vd = virtualDirs[vi];
+          var vtags = [];
+          if (vd.key) vtags.push({ text: vd.key, cls: '' });
+          html += buildCardCell({
+            icon: '🎯',
+            badge: '虚拟',
+            title: vd.title || vd.key,
+            tags: vtags,
+            node: { type: 'direction', date: date, key: vd.key }
+          });
+        }
+        html += '</div></div>';
+      }
+
+      // 混合 + 未分类子分组（合并展示，避免老报告无 category_type 时整组消失）
+      var otherDirs = mixedDirs.concat(uncatDirs);
+      if (otherDirs.length) {
+        html += '<div class="reader-card-subgroup">';
+        var otherTitle = mixedDirs.length && uncatDirs.length ? '🔄 混合 / 其他' : (mixedDirs.length ? '🔄 混合商品' : '📋 方向解读');
+        html += '<div class="reader-card-subgroup-title">' + otherTitle + '<span class="count">' + otherDirs.length + '</span></div>';
+        html += '<div class="reader-card-grid">';
+        for (var oi = 0; oi < otherDirs.length; oi++) {
+          var od = otherDirs[oi];
+          var otags = [];
+          if (od.key) otags.push({ text: od.key, cls: '' });
+          html += buildCardCell({
+            icon: '🎯',
+            badge: '方向',
+            title: od.title || od.key,
+            tags: otags,
+            node: { type: 'direction', date: date, key: od.key }
+          });
+        }
+        html += '</div></div>';
+      }
+
+      html += '</div>'; // /reader-card-group
     }
 
     // 类目情报分组
@@ -735,19 +799,81 @@ var MemberReader = (function () {
         host.innerHTML = '<div class="reader-empty">暂无历史 AI 顾问报告。类目情报请从「今日分析」阅读。</div>';
         return;
       }
-      var html = '<div class="archive-list">';
+
+      // 1) 按月份分组（YYYY-MM → items[]）
+      var groups = {};
+      var groupOrder = [];
       for (var i = 0; i < archiveItems.length; i++) {
         var it = archiveItems[i];
-        html += '<div class="archive-item" data-date="' + escFn(it.report_date) + '">'
-          + '<div><div class="ai-date">' + escFn(it.report_date) + '</div>'
-          + '<div class="ai-summary">' + escFn(it.summary || 'AI 选品顾问报告') + '</div></div>'
-          + '<span style="color:var(--reader-accent);font-size:13px">阅读 →</span></div>';
+        var ym = (it.report_date || '').slice(0, 7);
+        if (!ym) continue;
+        if (!groups[ym]) { groups[ym] = []; groupOrder.push(ym); }
+        groups[ym].push(it);
+      }
+      groupOrder.sort().reverse(); // 最近的月份在前
+
+      // 2) 当前月份
+      var now = new Date();
+      var currentYM = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+
+      // 3) 渲染月份分组
+      var html = '<div class="archive-list">';
+      for (var g = 0; g < groupOrder.length; g++) {
+        var ym = groupOrder[g];
+        var items = groups[ym];
+        var isCurrent = (ym === currentYM);
+        var expanded = isCurrent; // 当前月默认展开
+        var ymLabel = formatMonthLabel(ym);
+        var icon = expanded ? '📂' : '📁';
+        var arrow = expanded ? '▼' : '▶';
+
+        html += '<div class="archive-month-group' + (isCurrent ? ' current' : '') + '">';
+        html += '<div class="archive-month-head" data-ym="' + escFn(ym) + '">';
+        html += '<span class="archive-month-icon">' + icon + '</span>';
+        html += '<span class="archive-month-title">' + escFn(ymLabel) + '</span>';
+        html += '<span class="archive-month-count">' + items.length + ' 篇</span>';
+        html += '<span class="archive-month-arrow">' + arrow + '</span>';
+        html += '</div>';
+        html += '<div class="archive-month-body"' + (expanded ? '' : ' style="display:none"') + '>';
+        for (var k = 0; k < items.length; k++) {
+          var it2 = items[k];
+          var dayLabel = (it2.report_date || '').slice(5); // "07-14"
+          // 虚拟/实体分类徽标
+          var physicalCnt = it2.physical_count || 0;
+          var virtualCnt = it2.virtual_count || 0;
+          var mixedCnt = it2.mixed_count || 0;
+          var badges = '';
+          if (physicalCnt || virtualCnt || mixedCnt) {
+            badges = '<div class="ai-cat-badges">'
+              + (physicalCnt ? '<span class="cat-badge cat-physical">🏷️ 实体 ' + physicalCnt + '</span>' : '')
+              + (virtualCnt ? '<span class="cat-badge cat-virtual">💾 虚拟 ' + virtualCnt + '</span>' : '')
+              + (mixedCnt ? '<span class="cat-badge cat-mixed">🔄 混合 ' + mixedCnt + '</span>' : '')
+              + '</div>';
+          }
+          html += '<div class="archive-item" data-date="' + escFn(it2.report_date) + '">'
+            + '<div><div class="ai-date">' + escFn(dayLabel) + '</div>'
+            + '<div class="ai-summary">' + escFn(it2.summary || 'AI 选品顾问报告') + '</div>'
+            + badges + '</div>'
+            + '<span class="archive-read-link">阅读 →</span></div>';
+        }
+        html += '</div>'; // /archive-month-body
+        html += '</div>'; // /archive-month-group
       }
       html += '</div>';
       host.innerHTML = html;
+
+      // 4) 绑定月份标题点击（展开/折叠）
+      var heads = host.querySelectorAll('.archive-month-head');
+      for (var h = 0; h < heads.length; h++) {
+        heads[h].onclick = function () {
+          toggleArchiveMonth(this);
+        };
+      }
+      // 5) 绑定日期项点击（阅读报告）
       var rows = host.querySelectorAll('.archive-item');
       for (var j = 0; j < rows.length; j++) {
-        rows[j].onclick = function () {
+        rows[j].onclick = function (e) {
+          e.stopPropagation(); // 防止冒泡到月份标题
           var d = this.getAttribute('data-date');
           if (window.MemberRouter) MemberRouter.go('today');
           selectNode({ type: 'archive', date: d });
@@ -756,6 +882,30 @@ var MemberReader = (function () {
     }).catch(function (e) {
       host.innerHTML = '<div class="reader-empty">' + escFn(e.message || '加载失败') + '</div>';
     });
+  }
+
+  function toggleArchiveMonth(headEl) {
+    var group = headEl.parentNode;
+    var body = group.querySelector('.archive-month-body');
+    var arrow = headEl.querySelector('.archive-month-arrow');
+    var icon = headEl.querySelector('.archive-month-icon');
+    if (!body) return;
+    var isOpen = body.style.display !== 'none';
+    if (isOpen) {
+      body.style.display = 'none';
+      if (arrow) arrow.textContent = '▶';
+      if (icon) icon.textContent = '📁';
+    } else {
+      body.style.display = '';
+      if (arrow) arrow.textContent = '▼';
+      if (icon) icon.textContent = '📂';
+    }
+  }
+
+  function formatMonthLabel(ym) {
+    var parts = ym.split('-');
+    if (parts.length < 2) return ym;
+    return parts[0] + '年' + parseInt(parts[1], 10) + '月';
   }
 
   function boot() {

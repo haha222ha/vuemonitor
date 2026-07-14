@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260714w18">
+<meta name="portal-build" content="20260714w19">
 <link rel="stylesheet" href="/assets/member_theme.css?v=20260713p">
-<link rel="stylesheet" href="/assets/member_reader.css?v=20260714w12">
+<link rel="stylesheet" href="/assets/member_reader.css?v=20260714w13">
 <link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260714w14">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
@@ -100,6 +100,22 @@ th{color:var(--text2);font-weight:500;font-size:12px;white-space:nowrap}
 .demo-detail-body code{background:#f5f5f7;padding:2px 6px;border-radius:4px;font-size:13px}
 .demo-detail-body hr{border:none;border-top:1px solid var(--line);margin:12px 0}
 .demo-detail-body p{margin-bottom:10px}
+.contact-float{position:fixed;right:24px;bottom:24px;z-index:9000}
+.contact-float-toggle{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#07c160,#07c160);color:#fff;border:none;box-shadow:0 4px 16px rgba(7,193,96,.4);cursor:pointer;font-size:26px;display:flex;align-items:center;justify-content:center;transition:transform .2s;overflow:hidden}
+.contact-float-toggle:hover{transform:scale(1.08)}
+.contact-float-icon-img{width:56px;height:56px;object-fit:cover;border-radius:50%}
+.contact-float-card{position:absolute;right:0;bottom:72px;width:240px;background:#fff;border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.15);border:1px solid var(--line);padding:16px;animation:contactFadeIn .25s ease}
+@keyframes contactFadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.contact-float-close{position:absolute;top:8px;right:8px;width:24px;height:24px;border:none;background:transparent;font-size:18px;color:var(--text2);cursor:pointer;line-height:1}
+.contact-float-title{font-size:14px;font-weight:600;text-align:center;margin-bottom:10px;color:var(--text)}
+.contact-float-qr-wrap{width:200px;height:200px;margin:0 auto 10px;border-radius:8px;overflow:hidden;background:#f5f5f7;display:flex;align-items:center;justify-content:center}
+.contact-float-qr{width:100%;height:100%;object-fit:cover;display:none}
+.contact-float-qr.loaded{display:block}
+.contact-float-placeholder{font-size:12px;color:var(--text2);text-align:center;padding:20px}
+.contact-float-text{font-size:12px;color:var(--text2);text-align:center;margin-bottom:10px;line-height:1.5}
+.contact-float-cta{width:100%;padding:8px;border:none;border-radius:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+.contact-float-cta:hover{background:#0058b8}
+@media(max-width:640px){.contact-float{right:16px;bottom:16px}.contact-float-card{width:220px}}
 .demo-detail-body p{margin-bottom:12px}
 .demo-detail-body strong{color:var(--accent)}
 .demo-detail-cta{padding:16px 20px;border-top:1px solid var(--line);background:#f9f9fb;border-radius:0 0 16px 16px;text-align:center}
@@ -179,7 +195,8 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 .insight-radar-chip{cursor:pointer}
 .insight-cmp-pick{margin:4px 6px 4px 0;padding:4px 10px;border:1px solid var(--line);border-radius:16px;cursor:pointer;display:inline-block;font-size:12px}
 .insight-cmp-pick.active{background:#eef5ff;border-color:var(--accent);font-weight:600}
-.plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;margin-bottom:16px}
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+@media(min-width:768px){.plan-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}}
 .plan-card{border:1px solid var(--line);border-radius:10px;padding:14px 12px;cursor:pointer;background:#f9f9fb;text-align:center;-webkit-tap-highlight-color:transparent}
 .plan-card.active{border-color:var(--accent);background:#eef5ff;box-shadow:0 0 0 2px rgba(0,113,227,.15)}
 .plan-card .price{font-size:22px;font-weight:700;color:var(--accent);margin:6px 0 4px}
@@ -419,6 +436,24 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   </div>
   </div><!-- /portalLogin -->
   </div><!-- /guestShell -->
+
+  <!-- 悬浮微信二维码（仅未登录显示） -->
+  <div id="contactFloat" class="contact-float hidden">
+    <button type="button" class="contact-float-toggle" onclick="toggleContactFloat()" aria-label="联系客服">
+      <span class="contact-float-icon" id="contactFloatIconEmoji">💬</span>
+      <img id="contactFloatIconImg" class="contact-float-icon-img hidden" alt="" src="">
+    </button>
+    <div id="contactFloatCard" class="contact-float-card hidden">
+      <button type="button" class="contact-float-close" onclick="toggleContactFloat()" aria-label="关闭">×</button>
+      <div class="contact-float-title" id="contactFloatLabel">扫码联系客服</div>
+      <div class="contact-float-qr-wrap">
+        <img id="contactFloatQr" class="contact-float-qr" alt="微信二维码" src="">
+        <div id="contactFloatPlaceholder" class="contact-float-placeholder">二维码加载中…</div>
+      </div>
+      <div class="contact-float-text" id="contactFloatText">开通会员 / 定制分析 / 技术支持</div>
+      <button type="button" class="contact-float-cta" onclick="location.hash='#center'">立即开通 →</button>
+    </div>
+  </div>
 
   <div id="memberShell" class="member-shell hidden">
   <div id="aiGenOverlay" class="ai-gen-overlay hidden" aria-live="polite" aria-atomic="true">
@@ -722,7 +757,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 </div>
 <script src="/assets/member_portal_state.js?v=20260713p"></script>
 <script src="/assets/member_core.js?v=20260713p"></script>
-<script src="/assets/member_reader.js?v=20260714w12"></script>
+<script src="/assets/member_reader.js?v=20260714w13"></script>
 <script src="/assets/member_router.js?v=20260714w15"></script>
 <script src="/assets/member_insight.js?v=20260713w5"></script>
 <script>
@@ -1050,7 +1085,8 @@ function renderDemoCards() {
     var d = DEMO_DIRECTIONS[i];
     var unlocked = d.unlocked;
     var cls = unlocked ? 'unlocked' : 'locked';
-    var onclick = unlocked ? 'showDemoDetail(' + i + ')' : 'switchPortal(\'center\')';
+    // 加锁项也弹窗（showDemoDetail 内部判断 unlocked 状态分别渲染）
+    var onclick = 'showDemoDetail(' + i + ')';
     var tag = unlocked ? '可预览' : '会员专享';
     var icon = unlocked ? '🎯' : '🔒';
     html += '<div class="demo-card-item ' + cls + '" onclick="' + onclick + '">'
@@ -1062,6 +1098,71 @@ function renderDemoCards() {
   grid.innerHTML = html;
   var dateEl = document.getElementById('demoReportDate');
   if (dateEl) dateEl.textContent = DEMO_REPORT_DATE;
+}
+var CONTACT_CONFIG = null;
+function loadContactConfig() {
+  fetch('/api/v1/public/member-contact').then(function (r) { return r.json(); }).then(function (data) {
+    if (data && data.config) {
+      CONTACT_CONFIG = data.config;
+      updateContactFloat();
+    }
+  }).catch(function () {});
+}
+function updateContactFloat() {
+  if (!CONTACT_CONFIG) return;
+  var url = CONTACT_CONFIG.wechat_qr_url || '';
+  var iconUrl = CONTACT_CONFIG.float_icon_url || '';
+  var label = CONTACT_CONFIG.wechat_label || '扫码联系客服';
+  var text = CONTACT_CONFIG.contact_text || '开通会员 / 定制分析 / 技术支持';
+  var qr = document.getElementById('contactFloatQr');
+  var ph = document.getElementById('contactFloatPlaceholder');
+  var lbl = document.getElementById('contactFloatLabel');
+  var txt = document.getElementById('contactFloatText');
+  var iconEmoji = document.getElementById('contactFloatIconEmoji');
+  var iconImg = document.getElementById('contactFloatIconImg');
+  if (lbl) lbl.textContent = label;
+  if (txt) txt.textContent = text;
+  // 悬浮按钮图标：有图片用图片，否则用默认 💬 emoji
+  if (iconImg && iconEmoji) {
+    if (iconUrl) {
+      iconImg.src = iconUrl;
+      iconImg.classList.remove('hidden');
+      iconEmoji.classList.add('hidden');
+      iconImg.onerror = function () {
+        iconImg.classList.add('hidden');
+        iconEmoji.classList.remove('hidden');
+      };
+    } else {
+      iconImg.classList.add('hidden');
+      iconEmoji.classList.remove('hidden');
+    }
+  }
+  if (url && qr) {
+    qr.src = url;
+    qr.onload = function () {
+      qr.classList.add('loaded');
+      if (ph) ph.style.display = 'none';
+    };
+    qr.onerror = function () {
+      if (ph) ph.textContent = '二维码加载失败，请稍后重试';
+    };
+  } else if (ph) {
+    ph.textContent = '管理员尚未配置二维码';
+  }
+}
+function toggleContactFloat() {
+  var card = document.getElementById('contactFloatCard');
+  if (card) card.classList.toggle('hidden');
+}
+function showContactFloat() {
+  var cf = document.getElementById('contactFloat');
+  if (cf) cf.classList.remove('hidden');
+}
+function hideContactFloat() {
+  var cf = document.getElementById('contactFloat');
+  if (cf) cf.classList.add('hidden');
+  var card = document.getElementById('contactFloatCard');
+  if (card) card.classList.add('hidden');
 }
 function loadDemoDirections() {
   fetch('/api/v1/public/advisor-demo/directions').then(function (r) { return r.json(); }).then(function (data) {
@@ -1080,9 +1181,31 @@ function loadDemoDirections() {
 }
 function showDemoDetail(idx) {
   var d = DEMO_DIRECTIONS[idx];
-  if (!d || !d.content) return;
+  if (!d) return;
   document.getElementById('demoDetailTitle').textContent = d.title;
-  document.getElementById('demoDetailBody').innerHTML = renderMarkdown(d.content) + '<p style="color:var(--text2);font-size:13px;margin-top:16px;border-top:1px solid var(--line);padding-top:12px">⚠️ 以上为样例预览。开通会员可阅读完整 ' + DEMO_DIRECTIONS.length + ' 个方向解读。</p>';
+  var bodyEl = document.getElementById('demoDetailBody');
+  var ctaEl = document.querySelector('#demoDetailOverlay .demo-detail-cta');
+  if (d.unlocked) {
+    // 解锁项：渲染完整内容 + 样例提示
+    bodyEl.innerHTML = renderMarkdown(d.content) + '<p style="color:var(--text2);font-size:13px;margin-top:16px;border-top:1px solid var(--line);padding-top:12px">⚠️ 以上为样例预览。开通会员可阅读完整 ' + DEMO_DIRECTIONS.length + ' 个方向解读 + 每日最新 AI 分析。</p>';
+    if (ctaEl) ctaEl.style.display = '';
+  } else {
+    // 加锁项：显示会员专享引导 + 开通按钮（弹窗底部 CTA 按钮已绑定 switchPortal('center')）
+    var lockedHtml = '<div style="text-align:center;padding:32px 16px;">'
+      + '<div style="font-size:48px;margin-bottom:12px">🔒</div>'
+      + '<h3 style="font-size:18px;font-weight:700;margin-bottom:10px;color:var(--text)">本方向为会员专享内容</h3>'
+      + '<p style="color:var(--text2);font-size:14px;line-height:1.7;margin-bottom:8px">开通 <strong style="color:var(--accent)">¥9.9 体验卡（3 天）</strong> 或正式会员即可：</p>'
+      + '<ul style="text-align:left;max-width:420px;margin:12px auto;color:var(--text2);font-size:13px;line-height:1.9;list-style:none;padding:0">'
+      + '<li>✅ 解锁全部 ' + DEMO_DIRECTIONS.length + ' 个方向的 AI 深度分析</li>'
+      + '<li>✅ 每日最新 AI 选品顾问报告（30+ 方向）</li>'
+      + '<li>✅ AI 动态生成与顾问对话能力</li>'
+      + '<li>✅ 类目情报 / 机会雷达 / PDF 导出</li>'
+      + '</ul>'
+      + '<p style="color:var(--text2);font-size:12px;margin-top:12px">点击下方「开通会员」按钮立即开通。</p>'
+      + '</div>';
+    bodyEl.innerHTML = lockedHtml;
+    if (ctaEl) ctaEl.style.display = '';
+  }
   document.getElementById('demoDetailOverlay').classList.remove('hidden');
 }
 function closeDemoDetail() {
@@ -1147,11 +1270,14 @@ function updatePortalVisibility(membership, loggedIn) {
     } else {
       centerPanel.classList.add('hidden');
     }
+    hideContactFloat();
     restoreTopNavFromStorage();
     return;
   }
 
   if (guestShell) guestShell.classList.remove('hidden');
+  showContactFloat();
+  loadContactConfig();
   document.getElementById('renewBackBar')?.classList.add('hidden');
   if (reportSchedule) reportSchedule.classList.remove('hidden');
   tabs.classList.remove('hidden');
@@ -2345,5 +2471,423 @@ async function loadMemberBroadcast(membership) {
     </div>
   </div>
 </div>
+
+<!-- AI 顾问对话浮动按钮 + 对话面板 -->
+<style>
+.advisor-chat-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent, #0071e3);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 113, 227, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  z-index: 9998;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.advisor-chat-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(0, 113, 227, 0.5);
+}
+.advisor-chat-fab.hidden { display: none !important; }
+
+.advisor-chat-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 92px;
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  max-height: 560px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  z-index: 9998;
+  overflow: hidden;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.advisor-chat-panel.hidden {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  pointer-events: none;
+}
+.advisor-chat-head {
+  padding: 14px 16px;
+  background: var(--accent, #0071e3);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.advisor-chat-head .ac-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+}
+.advisor-chat-head .ac-quota {
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.advisor-chat-head .ac-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+.advisor-chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f5f5f7;
+  min-height: 200px;
+}
+.ac-msg {
+  max-width: 85%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+.ac-msg.user {
+  align-self: flex-end;
+  background: var(--accent, #0071e3);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.ac-msg.bot {
+  align-self: flex-start;
+  background: #fff;
+  color: #1d1d1f;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom-left-radius: 4px;
+}
+.ac-msg.bot .ac-disclaimer {
+  display: block;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  font-size: 11px;
+  color: #6e6e73;
+}
+.ac-empty {
+  text-align: center;
+  color: #6e6e73;
+  font-size: 13px;
+  padding: 24px 12px;
+  line-height: 1.7;
+}
+.ac-typing {
+  align-self: flex-start;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: #6e6e73;
+}
+.ac-typing .dot {
+  display: inline-block;
+  animation: acBlink 1.4s infinite;
+}
+.ac-typing .dot:nth-child(2) { animation-delay: 0.2s; }
+.ac-typing .dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes acBlink { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
+
+.advisor-chat-foot {
+  padding: 10px 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 8px;
+  background: #fff;
+}
+.advisor-chat-foot textarea {
+  flex: 1;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 13px;
+  resize: none;
+  height: 40px;
+  max-height: 80px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.advisor-chat-foot textarea:focus {
+  border-color: var(--accent, #0071e3);
+}
+.advisor-chat-foot textarea:disabled {
+  background: #f5f5f7;
+  cursor: not-allowed;
+}
+.advisor-chat-foot .ac-send {
+  background: var(--accent, #0071e3);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.advisor-chat-foot .ac-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (max-width: 768px) {
+  .advisor-chat-panel {
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  .advisor-chat-fab { right: 16px; bottom: 16px; }
+}
+</style>
+
+<button id="advisorChatFab" class="advisor-chat-fab hidden" onclick="toggleAdvisorChat()" aria-label="AI 顾问对话" title="AI 顾问对话">💬</button>
+
+<div id="advisorChatPanel" class="advisor-chat-panel hidden" role="dialog" aria-modal="false">
+  <div class="advisor-chat-head">
+    <span class="ac-title">💬 AI 顾问对话</span>
+    <span class="ac-quota" id="acQuota">— / —</span>
+    <button type="button" class="ac-close" onclick="toggleAdvisorChat()" aria-label="关闭">×</button>
+  </div>
+  <div class="advisor-chat-body" id="acBody">
+    <div class="ac-empty">👋 你好！我是 AI 选品顾问。<br>可以问我今日选品方向、类目趋势、蓝海机会等。<br><br>例如：「今天有什么蓝海品类？」「教育资料类目趋势如何？」</div>
+  </div>
+  <div class="advisor-chat-foot">
+    <textarea id="acInput" placeholder="输入你的问题…" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAdvisorChat()}"></textarea>
+    <button type="button" class="ac-send" id="acSend" onclick="sendAdvisorChat()">发送</button>
+  </div>
+</div>
+
+<script>
+var acMessages = [];
+var acSending = false;
+var acQuotaRemaining = -1; // -1 = 未知
+var acQuotaTotal = 0;
+
+function toggleAdvisorChat() {
+  var panel = document.getElementById('advisorChatPanel');
+  if (!panel) return;
+  panel.classList.toggle('hidden');
+  if (!panel.classList.contains('hidden')) {
+    // 展开时聚焦输入框
+    setTimeout(function() {
+      var input = document.getElementById('acInput');
+      if (input) input.focus();
+    }, 100);
+    // 首次展开时拉取配额
+    if (acQuotaRemaining < 0) {
+      fetchAdvisorQuota();
+    }
+  }
+}
+
+function fetchAdvisorQuota() {
+  // 通过 dashboard 接口获取配额（已有接口返回 advisor_chat_daily）
+  if (typeof api === 'function') {
+    api('/api/v1/member/advisor/dashboard', { auth: true }).then(function(d) {
+      var ent = d.entitlements || {};
+      acQuotaTotal = parseInt(ent.advisor_chat_daily || 0, 10);
+      // 剩余次数需要从后端单独获取，暂用 total 显示
+      if (acQuotaTotal > 0) {
+        updateAcQuota(acQuotaTotal); // 默认显示全部可用
+      } else {
+        updateAcQuota(0);
+        var quotaEl = document.getElementById('acQuota');
+        if (quotaEl) quotaEl.textContent = '不可用';
+      }
+    }).catch(function() {
+      var quotaEl = document.getElementById('acQuota');
+      if (quotaEl) quotaEl.textContent = '—';
+    });
+  }
+}
+
+function updateAcQuota(remaining) {
+  acQuotaRemaining = remaining;
+  var quotaEl = document.getElementById('acQuota');
+  if (quotaEl) {
+    if (acQuotaTotal > 0) {
+      quotaEl.textContent = '剩余 ' + remaining + ' / ' + acQuotaTotal;
+    } else {
+      quotaEl.textContent = remaining > 0 ? '可用' : '不可用';
+    }
+  }
+}
+
+function appendAcMsg(role, text, opts) {
+  opts = opts || {};
+  var body = document.getElementById('acBody');
+  if (!body) return;
+  // 首次发送时清空 empty 提示
+  var empty = body.querySelector('.ac-empty');
+  if (empty) empty.remove();
+  var div = document.createElement('div');
+  div.className = 'ac-msg ' + (role === 'user' ? 'user' : 'bot');
+  var html = escHtml(text);
+  if (opts.disclaimer) {
+    html += '<span class="ac-disclaimer">' + escHtml(opts.disclaimer) + '</span>';
+  }
+  div.innerHTML = html;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function escHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function showAcTyping() {
+  var body = document.getElementById('acBody');
+  if (!body) return;
+  var empty = body.querySelector('.ac-empty');
+  if (empty) empty.remove();
+  var div = document.createElement('div');
+  div.className = 'ac-typing';
+  div.id = 'acTyping';
+  div.innerHTML = 'AI 思考中<span class="dot">·</span><span class="dot">·</span><span class="dot">·</span>';
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+function hideAcTyping() {
+  var t = document.getElementById('acTyping');
+  if (t) t.remove();
+}
+
+function sendAdvisorChat() {
+  var input = document.getElementById('acInput');
+  var sendBtn = document.getElementById('acSend');
+  if (!input || acSending) return;
+  var query = input.value.trim();
+  if (!query) return;
+
+  // 配额校验
+  if (acQuotaTotal > 0 && acQuotaRemaining <= 0) {
+    appendAcMsg('bot', '⚠️ 今日 AI 对话次数已用尽，请明天再来。或升级更高级套餐获取更多次数。');
+    return;
+  }
+  if (acQuotaTotal === 0) {
+    // 套餐不支持，引导开通
+    appendAcMsg('bot', '🔒 当前套餐不支持 AI 对话。开通正式会员即可使用 AI 顾问对话能力（10 次/日）。点击下方「开通会员」立即升级。');
+    var body = document.getElementById('acBody');
+    if (body) {
+      var cta = document.createElement('div');
+      cta.className = 'ac-msg bot';
+      cta.innerHTML = '<button type="button" class="btn btn-primary" style="margin-top:8px" onclick="switchPortal(\'center\')">开通会员</button>';
+      body.appendChild(cta);
+      body.scrollTop = body.scrollHeight;
+    }
+    return;
+  }
+
+  acSending = true;
+  if (sendBtn) sendBtn.disabled = true;
+  input.value = '';
+  input.style.height = '40px';
+
+  // 显示用户消息
+  appendAcMsg('user', query);
+  // 显示 typing
+  showAcTyping();
+
+  // 调用 API
+  if (typeof api === 'function') {
+    api('/api/v1/member/advisor/chat', {
+      method: 'POST',
+      auth: true,
+      body: JSON.stringify({ query: query, context_date: '' }),
+      headers: { 'Content-Type': 'application/json' }
+    }).then(function(d) {
+      hideAcTyping();
+      acSending = false;
+      if (sendBtn) sendBtn.disabled = false;
+      if (d && d.content) {
+        appendAcMsg('bot', d.content, { disclaimer: d.disclaimer || '' });
+        if (typeof d.quota_remaining === 'number') {
+          updateAcQuota(d.quota_remaining);
+        }
+      } else {
+        appendAcMsg('bot', '抱歉，AI 暂时无法回答，请稍后重试。');
+      }
+    }).catch(function(err) {
+      hideAcTyping();
+      acSending = false;
+      if (sendBtn) sendBtn.disabled = false;
+      var msg = (err && err.message) || '请求失败';
+      if (msg.indexOf('403') >= 0 || msg.indexOf('套餐') >= 0) {
+        appendAcMsg('bot', '🔒 当前套餐不支持 AI 对话。开通正式会员即可使用（10 次/日）。');
+      } else if (msg.indexOf('429') >= 0 || msg.indexOf('用尽') >= 0 || msg.indexOf('次数') >= 0) {
+        appendAcMsg('bot', '⚠️ 今日 AI 对话次数已用尽，请明天再来。');
+      } else {
+        appendAcMsg('bot', '⚠️ ' + msg + '，请稍后重试。');
+      }
+    });
+  } else {
+    hideAcTyping();
+    acSending = false;
+    if (sendBtn) sendBtn.disabled = false;
+    appendAcMsg('bot', '⚠️ 系统未就绪，请刷新页面重试。');
+  }
+}
+
+// 会员登录后显示浮动按钮，未登录隐藏
+function showAdvisorChatFab() {
+  var fab = document.getElementById('advisorChatFab');
+  if (fab) fab.classList.remove('hidden');
+}
+function hideAdvisorChatFab() {
+  var fab = document.getElementById('advisorChatFab');
+  var panel = document.getElementById('advisorChatPanel');
+  if (fab) fab.classList.add('hidden');
+  if (panel) panel.classList.add('hidden');
+}
+
+// 监听会员登录状态
+(function() {
+  // 检查 token 是否存在
+  try {
+    var token = localStorage.getItem('xhs_member_token') || '';
+    if (token) {
+      showAdvisorChatFab();
+    }
+  } catch (e) {}
+  // 监听 storage 变化（其他标签页登录/登出）
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'xhs_member_token') {
+      if (e.newValue) showAdvisorChatFab();
+      else hideAdvisorChatFab();
+    }
+  });
+  // 监听自定义事件（同标签页登录/登出）
+  window.addEventListener('member:login', showAdvisorChatFab);
+  window.addEventListener('member:logout', hideAdvisorChatFab);
+})();
+</script>
 </body>
 </html>

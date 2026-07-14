@@ -216,13 +216,16 @@ class AiAdvisor:
             advice_b = None
         duration_b_total_ms = int((time.time() - t_b_start) * 1000)
 
-        # ---- 写入 ab_test_metrics ----
+        # ---- 写入 ab_test_metrics（含质量指标） ----
         metrics_summary = self._record_ab_metrics(
             report_date=report_date,
             col_a=col_a,
             col_b=col_b,
             duration_a_ms=duration_a_total_ms,
             duration_b_ms=duration_b_total_ms,
+            advice_a=advice_a,
+            advice_b=advice_b,
+            ctx_b=ctx_b,
         )
 
         return {
@@ -240,18 +243,51 @@ class AiAdvisor:
         col_b: _UsageCollector,
         duration_a_ms: int,
         duration_b_ms: int,
+        advice_a: dict[str, Any] | None = None,
+        advice_b: dict[str, Any] | None = None,
+        ctx_b: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """把两份 collector 的累计指标写入 ab_test_metrics 表。"""
+        """把两份 collector 的累计指标 + 质量指标写入 ab_test_metrics 表。"""
         try:
-            from cloud_deploy.rank_engine.ab_test import record_metric
+            from cloud_deploy.rank_engine.ab_test import record_metric, compute_quality_metrics
         except ImportError as e:
             print(f"[advisor-AB] ab_test 模块不可用，跳过指标写入: {e}", file=sys.stderr, flush=True)
             return {"A": {}, "B": {}, "totals": {}}
 
-        def _flush(collector, mode, total_duration_ms):
+        # 预构建 ranking_key → advice_item 映射（用于按 key 查找质量指标）
+        def _build_advice_map(advice):
+            m: dict[str, dict[str, Any]] = {}
+            if not advice:
+                return m
+            if advice.get("daily_overview"):
+                m["daily_overview"] = advice["daily_overview"]
+            for d in advice.get("direction_advices") or []:
+                k = str(d.get("key") or "")
+                if k:
+                    m[k] = d
+            if advice.get("cross_summary"):
+                m["cross_summary"] = advice["cross_summary"]
+            return m
+
+        advice_map_a = _build_advice_map(advice_a)
+        advice_map_b = _build_advice_map(advice_b)
+        # B 模式的草稿映射（ranking_key → draft_content），用于 data_accuracy
+        draft_map: dict[str, str] = {}
+        if ctx_b and ctx_b.get("feature_summaries"):
+            for k, s in ctx_b["feature_summaries"].items():
+                draft_map[k] = str(s.get("draft_content") or "")
+
+        def _flush(collector, mode, total_duration_ms, advice_map):
             per_key: dict[str, dict[str, Any]] = {}
             for key, e in collector.summary.items():
                 cost = _estimate_cost_cny(e["prompt_tokens"], e["completion_tokens"])
+                # 计算质量指标
+                advice_item = advice_map.get(key, {})
+                draft = draft_map.get(key, "") if mode == "B" else ""
+                quality = compute_quality_metrics(advice_item, draft_text=draft) if advice_item else None
+                extra = {"calls": e["calls"]}
+                if quality:
+                    extra["quality"] = quality
                 try:
                     record_metric(
                         test_date=report_date,
@@ -263,7 +299,7 @@ class AiAdvisor:
                         cost_cny=cost,
                         duration_ms=e["duration_ms"],
                         model=e.get("model", ""),
-                        extra={"calls": e["calls"]},
+                        extra=extra,
                     )
                 except Exception as ex:
                     print(f"[advisor-AB] 写入指标失败 ({mode}/{key}): {ex}", file=sys.stderr, flush=True)
@@ -275,12 +311,29 @@ class AiAdvisor:
                     "calls": e["calls"],
                     "cost_cny": cost,
                     "model": e.get("model", ""),
+                    "quality": quality,
                 }
             # 写入一条「总计」行（ranking_key = "__total__"），用于整体对比
             sum_prompt = sum(e["prompt_tokens"] for e in collector.summary.values())
             sum_completion = sum(e["completion_tokens"] for e in collector.summary.values())
             sum_tokens = sum_prompt + sum_completion
             sum_cost = _estimate_cost_cny(sum_prompt, sum_completion)
+            # 质量汇总：所有 ranking 的平均值
+            all_quality = [v["quality"] for v in per_key.values() if v.get("quality")]
+            avg_quality = None
+            if all_quality:
+                avg_quality = {
+                    "content_chars": round(sum(q["content_chars"] for q in all_quality) / len(all_quality), 1),
+                    "structure_score": round(sum(q["structure_score"] for q in all_quality) / len(all_quality), 2),
+                    "emoji_count": round(sum(q["emoji_count"] for q in all_quality) / len(all_quality), 1),
+                    "markdown_score": round(sum(q["markdown_score"] for q in all_quality) / len(all_quality), 2),
+                    "key_points_count": round(sum(q["key_points_count"] for q in all_quality) / len(all_quality), 2),
+                    "data_accuracy": (
+                        round(sum(q["data_accuracy"] for q in all_quality if q["data_accuracy"] is not None) /
+                              max(1, sum(1 for q in all_quality if q["data_accuracy"] is not None)), 4)
+                        if any(q["data_accuracy"] is not None for q in all_quality) else None
+                    ),
+                }
             try:
                 record_metric(
                     test_date=report_date,
@@ -291,14 +344,14 @@ class AiAdvisor:
                     total_tokens=sum_tokens,
                     cost_cny=sum_cost,
                     duration_ms=total_duration_ms,
-                    extra={"ranking_count": len(collector.summary)},
+                    extra={"ranking_count": len(collector.summary), "avg_quality": avg_quality},
                 )
             except Exception as ex:
                 print(f"[advisor-AB] 写入总计行失败 ({mode}): {ex}", file=sys.stderr, flush=True)
             return per_key
 
-        per_a = _flush(col_a, "A", duration_a_ms)
-        per_b = _flush(col_b, "B", duration_b_ms)
+        per_a = _flush(col_a, "A", duration_a_ms, advice_map_a)
+        per_b = _flush(col_b, "B", duration_b_ms, advice_map_b)
 
         totals_a = {
             "prompt_tokens": sum(v["prompt_tokens"] for v in per_a.values()),
@@ -507,6 +560,8 @@ class AiAdvisor:
                     "summary": (summary.get("draft_content") or "")[:200],
                     "content": summary.get("draft_content") or "",
                     "key_points": summary.get("key_points") or [],
+                    "category_type": "mixed",  # 兜底默认混合
+                    "category_tags": [],
                 }
                 return (key, fallback)
             return (key, None)
@@ -632,9 +687,14 @@ class AiAdvisor:
             "4. 关键数据用 **加粗**\n"
             "5. 结尾用 > 引用块给出选品建议\n\n"
             "重要：数据必须准确，不要编造新数据。只能润色表达、增强可读性。\n"
-            "合规：禁止 goods_id、店铺名、商品链接、完整商品标题。\n"
+            "合规：禁止 goods_id、店铺名、商品链接、完整商品标题。\n\n"
+            "分类标注：请根据榜单内容判断主要商品类型，返回 category_type 字段：\n"
+            "- physical：实体商品（需要物流发货，如服装/美妆/食品/家居/3C/宠物用品/植物/收纳袋）\n"
+            "- virtual：虚拟商品（无需物流，如教育资料/电子课程/电子书/软件序列号/会员卡/服务/设计素材）\n"
+            "- mixed：混合（实体和虚拟各占相当比例）\n\n"
             "输出 JSON: {\"key\": str, \"title\": str(带emoji), \"summary\": str(<=200字), "
-            "\"content\": str(400-800字markdown), \"key_points\": [str]}"
+            "\"content\": str(400-800字markdown), \"key_points\": [str], "
+            "\"category_type\": \"physical|virtual|mixed\", \"category_tags\": [str]}"
         )
         user = (
             f"报告日期：{report_date}\n"
@@ -644,14 +704,21 @@ class AiAdvisor:
             f"已识别的关键洞察：\n" + "\n".join(f"- {p}" for p in key_points) + "\n\n"
             "请将以上草稿增强为有洞察力的分析文章。保持数据准确，优化语言和排版。"
             "标题要带 emoji 且有洞察力。"
+            "同时请判断该榜单主要涉及实体商品还是虚拟商品，返回 category_type 字段。"
         )
         parsed, _u = chat_fn(system, user, temperature=0.4)
+        # category_type 校验：只接受 physical/virtual/mixed，其余默认 mixed
+        ct = str(parsed.get("category_type") or "").strip().lower()
+        if ct not in ("physical", "virtual", "mixed"):
+            ct = "mixed"
         return {
             "key": str(summary.get("key") or parsed.get("key") or ""),
             "title": str(parsed.get("title") or title),
             "summary": str(parsed.get("summary") or "")[:200],
             "content": str(parsed.get("content") or draft),
             "key_points": list(parsed.get("key_points") or key_points)[:8],
+            "category_type": ct,
+            "category_tags": list(parsed.get("category_tags") or [])[:5],
         }
 
     def _llm_b_mode_cross(
