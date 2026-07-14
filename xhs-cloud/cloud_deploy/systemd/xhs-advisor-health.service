@@ -1,0 +1,10 @@
+[Unit]
+Description=XHS Advisor daily health check (三问)
+After=network.target xhs-cloud-api.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/xhs-cloud
+EnvironmentFile=-/opt/xhs-cloud/.env
+ExecStart=/opt/xhs-cloud/venv/bin/python /opt/xhs-cloud/cloud_deploy/scripts/advisor_daily_health_check.py
+Nice=10

@@ -562,6 +562,7 @@ class AiAdvisor:
                     "key_points": summary.get("key_points") or [],
                     "category_type": "mixed",  # 兜底默认混合
                     "category_tags": [],
+                    "source_refs": self._source_refs_from_summary(summary),
                 }
                 return (key, fallback)
             return (key, None)
@@ -590,14 +591,15 @@ class AiAdvisor:
                 "generator": "cloud_llm_b_mode",
                 "started_at": started_at,
                 "finished_at": finished_at,
-                "schema_version": "1.0",
+                "schema_version": "1.1",
+                "source_ref_policy": "programmatic_facts_v1",
                 "ranking_count": len(summaries),
                 "directions_count": len(directions),
             },
             "daily_overview": overview,
             "direction_advices": directions,
             "cross_summary": cross,
-            "disclaimer": "以上内容由 AI 基于榜单数据生成，仅供参考，不构成投资或经营建议。",
+            "disclaimer": "以上内容由 AI 基于榜单数据生成，仅供参考，不构成投资或经营建议。数字均可对照 source_refs。",
         }
 
     def _llm_b_mode_overview_collected(self, report_date, ctx, chat_fn, collector):
@@ -668,14 +670,52 @@ class AiAdvisor:
             "content": str(parsed.get("content") or parsed.get("summary") or ""),
         }
 
+    @staticmethod
+    def _source_refs_from_summary(summary: dict[str, Any]) -> list[dict[str, Any]]:
+        """从 feature_summaries 组装可溯源事实砖块（程序权威，不信 LLM 编造）。"""
+        existing = summary.get("source_refs")
+        if isinstance(existing, list) and existing:
+            return [r for r in existing if isinstance(r, dict) and r.get("id")][:40]
+        key = str(summary.get("key") or "")
+        refs: list[dict[str, Any]] = [{
+            "id": "sr_count",
+            "label": "样本数",
+            "value": summary.get("item_count") or 0,
+            "origin": "feature_summaries",
+            "ranking_key": key,
+        }]
+        stats = summary.get("stats") or {}
+        for field in (
+            "burst_index", "blue_ocean_index", "opportunity_score",
+            "growth_rate_pct", "price", "daily_delta",
+        ):
+            st = stats.get(field) or {}
+            for metric in ("avg", "max", "median"):
+                if st.get(metric) is None:
+                    continue
+                refs.append({
+                    "id": f"sr_{field}_{metric}",
+                    "label": f"{field}.{metric}",
+                    "value": st.get(metric),
+                    "origin": "product_features.stats",
+                    "ranking_key": key,
+                })
+        return refs[:40]
+
     def _llm_b_mode_ranking(self, report_date: str, summary: dict[str, Any], chat_fn) -> dict[str, Any] | None:
         """B 模式单榜润色：程序已生成草稿 + key_points → LLM 只增强表达。"""
         title = summary.get("title") or summary.get("key") or "维度解读"
         draft = summary.get("draft_content") or ""
         key_points = summary.get("key_points") or []
         item_count = summary.get("item_count", 0)
+        source_refs = self._source_refs_from_summary(summary)
         if not draft and not key_points:
             return None
+
+        refs_text = "\n".join(
+            f"  [{r.get('id')}] {r.get('label')} = {r.get('value')} （来源:{r.get('origin')}）"
+            for r in source_refs[:20]
+        ) or "  （无）"
 
         system = (
             "你是小红书选品顾问分析师。程序已基于特征引擎预计算了榜单的统计数据、分布和关键洞察。"
@@ -684,9 +724,9 @@ class AiAdvisor:
             "1. 用 emoji 标注重点（🔥 爆款、💎 蓝海、⚠️ 风险、📈 增长、🎯 精准、💡 建议）\n"
             "2. 用 markdown 标题分节（## / ###），每节 2-3 段\n"
             "3. key_points 每条以 emoji 开头\n"
-            "4. 关键数据用 **加粗**\n"
+            "4. 关键数据用 **加粗**，并在首次出现处标注引用如 [sr_count]\n"
             "5. 结尾用 > 引用块给出选品建议\n\n"
-            "重要：数据必须准确，不要编造新数据。只能润色表达、增强可读性。\n"
+            "重要：禁止编造清单外的数字。凡出现具体数值必须能对应 source_refs 中的 id；不确定就写定性表述。\n"
             "合规：禁止 goods_id、店铺名、商品链接、完整商品标题。\n\n"
             "分类标注：请根据榜单内容判断主要商品类型，返回 category_type 字段：\n"
             "- physical：实体商品（需要物流发货，如服装/美妆/食品/家居/3C/宠物用品/植物/收纳袋）\n"
@@ -700,13 +740,14 @@ class AiAdvisor:
             f"报告日期：{report_date}\n"
             f"榜单：{title}\n"
             f"条目数：{item_count}\n\n"
+            f"可引用事实（source_refs，仅允许使用这些数字）：\n{refs_text}\n\n"
             f"程序预计算草稿：\n{draft}\n\n"
             f"已识别的关键洞察：\n" + "\n".join(f"- {p}" for p in key_points) + "\n\n"
             "请将以上草稿增强为有洞察力的分析文章。保持数据准确，优化语言和排版。"
             "标题要带 emoji 且有洞察力。"
             "同时请判断该榜单主要涉及实体商品还是虚拟商品，返回 category_type 字段。"
         )
-        parsed, _u = chat_fn(system, user, temperature=0.4)
+        parsed, _u = chat_fn(system, user, temperature=0.3)
         # category_type 校验：只接受 physical/virtual/mixed，其余默认 mixed
         ct = str(parsed.get("category_type") or "").strip().lower()
         if ct not in ("physical", "virtual", "mixed"):
@@ -719,6 +760,7 @@ class AiAdvisor:
             "key_points": list(parsed.get("key_points") or key_points)[:8],
             "category_type": ct,
             "category_tags": list(parsed.get("category_tags") or [])[:5],
+            "source_refs": source_refs,
         }
 
     def _llm_b_mode_cross(

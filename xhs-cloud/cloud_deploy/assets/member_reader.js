@@ -23,7 +23,7 @@ var MemberReader = (function () {
   };
 
   var state = 'IDLE';
-  var current = { date: '', node: null };
+  var current = { date: '', node: null, sourcePanel: 'today' };
   var dashData = { today: {}, insightTree: [] }; // 全局保存 dashboard 数据，供卡片视图使用
   var readerViewMode = 'list'; // 'list' | 'cards'
   var dashboard = null;
@@ -491,7 +491,13 @@ var MemberReader = (function () {
     if (frameWrap) frameWrap.classList.add('hidden');
     if (body) body.classList.add('hidden');
     current.node = null;
+    // 若从历史归档进入，返回到归档面板；否则留在今日分析
+    var src = current.sourcePanel || 'today';
+    current.sourcePanel = 'today';
     setState('IDLE');
+    if (src === 'archive' && window.MemberRouter) {
+      MemberRouter.go('archive');
+    }
   }
 
   function updateChrome(title, subtitle) {
@@ -640,9 +646,12 @@ var MemberReader = (function () {
     }
   }
 
-  function selectNode(node, isUserClick) {
+  function selectNode(node, isUserClick, _src) {
     current.node = node;
     current.date = node.date || '';
+    // 记录来源面板：archive 调用方传 'archive'，其余默认 'today'，
+    // 供 backToCardList 决定返回到哪个面板
+    current.sourcePanel = (typeof _src === 'string' && _src) ? _src : 'today';
     setState('LOADING');
     highlightCard(node);
 
@@ -962,7 +971,7 @@ var MemberReader = (function () {
           e.stopPropagation();
           var d = this.getAttribute('data-date');
           if (window.MemberRouter) MemberRouter.go('today');
-          selectNode({ type: 'archive', date: d });
+          selectNode({ type: 'archive', date: d }, true, 'archive');
         };
       }
       // 8) 绑定方向解读标题点击（进入单篇阅读）
@@ -973,7 +982,7 @@ var MemberReader = (function () {
           var d = this.getAttribute('data-date');
           var key = this.getAttribute('data-key');
           if (window.MemberRouter) MemberRouter.go('today');
-          selectNode({ type: 'direction', date: d, key: key });
+          selectNode({ type: 'direction', date: d, key: key }, true, 'archive');
         };
       }
     }).catch(function (e) {
@@ -1015,8 +1024,8 @@ var MemberReader = (function () {
 
   // 暴露为全局，供 HTML onclick 调用
   window.backToCardList = backToCardList;
-  window.selectNode = function (node, isUserClick) {
-    selectNode(node, isUserClick !== undefined ? isUserClick : true);
+  window.selectNode = function (node, isUserClick, _src) {
+    selectNode(node, isUserClick !== undefined ? isUserClick : true, _src);
   };
 
   return {
