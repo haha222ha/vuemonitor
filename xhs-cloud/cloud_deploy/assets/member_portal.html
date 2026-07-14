@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260714w26">
+<meta name="portal-build" content="20260714w27">
 <link rel="stylesheet" href="/assets/member_theme.css?v=20260713p">
-<link rel="stylesheet" href="/assets/member_reader.css?v=20260714w26">
+<link rel="stylesheet" href="/assets/member_reader.css?v=20260714w27">
 <link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260714w14">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
@@ -195,6 +195,13 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 .insight-radar-chip{cursor:pointer}
 .insight-cmp-pick{margin:4px 6px 4px 0;padding:4px 10px;border:1px solid var(--line);border-radius:16px;cursor:pointer;display:inline-block;font-size:12px}
 .insight-cmp-pick.active{background:#eef5ff;border-color:var(--accent);font-weight:600}
+/* 报告中心 · 类目解读筛选（对齐 index_vue cat-bar，Apple 风 --accent） */
+.cat-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0 10px;padding:0 2px}
+.cat-bar .cat-label{font-size:11px;color:var(--text2);font-weight:600;margin-right:2px;letter-spacing:.3px}
+.cat-chip{background:#f9f9fb;border:1px solid var(--line);color:var(--text2);padding:4px 10px;border-radius:14px;cursor:pointer;font-size:11px;line-height:1.3;transition:border-color .15s,color .15s,background .15s;-webkit-tap-highlight-color:transparent}
+.cat-chip:hover{border-color:var(--accent);color:var(--accent)}
+.cat-chip.active{background:#eef5ff;border-color:var(--accent);color:var(--accent);font-weight:600}
+.cat-chip .n{opacity:.7;margin-left:4px;font-size:10px;font-family:ui-monospace,monospace}
 .plan-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
 @media(min-width:768px){.plan-grid{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}}
 .plan-card{border:1px solid var(--line);border-radius:10px;padding:14px 12px;cursor:pointer;background:#f9f9fb;text-align:center;-webkit-tap-highlight-color:transparent}
@@ -746,7 +753,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 </div>
 <script src="/assets/member_portal_state.js?v=20260714w24"></script>
 <script src="/assets/member_core.js?v=20260713p"></script>
-<script src="/assets/member_reader.js?v=20260714w26"></script>
+<script src="/assets/member_reader.js?v=20260714w27"></script>
 <script src="/assets/member_router.js?v=20260714w24"></script>
 <script src="/assets/member_insight.js?v=20260714w24"></script>
 <script>

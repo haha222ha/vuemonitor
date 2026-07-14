@@ -28,6 +28,105 @@ var MemberReader = (function () {
   var readerViewMode = 'list'; // 'list' | 'cards'
   var dashboard = null;
   var archiveItems = [];
+  /** 类目解读筛选：当前视图内存态，scope → 'ALL' | category */
+  var insightCatFilters = {};
+
+  function insightCatTag(ins) {
+    var t = String((ins && ins.category) || '').trim();
+    return t || '未分类';
+  }
+
+  function buildInsightCatCounts(items) {
+    var map = {};
+    var order = [];
+    for (var i = 0; i < (items || []).length; i++) {
+      var tag = insightCatTag(items[i]);
+      if (!map[tag]) {
+        map[tag] = 0;
+        order.push(tag);
+      }
+      map[tag]++;
+    }
+    order.sort(function (a, b) {
+      try { return a.localeCompare(b, 'zh'); } catch (e) { return a < b ? -1 : a > b ? 1 : 0; }
+    });
+    var options = [];
+    for (var j = 0; j < order.length; j++) {
+      options.push({ tag: order[j], count: map[order[j]] });
+    }
+    return { total: (items || []).length, options: options };
+  }
+
+  function buildInsightCatBarHtml(items, scopeKey) {
+    var counts = buildInsightCatCounts(items);
+    if (!counts.options.length) return '';
+    var active = insightCatFilters[scopeKey] || 'ALL';
+    if (active !== 'ALL') {
+      var found = false;
+      for (var i = 0; i < counts.options.length; i++) {
+        if (counts.options[i].tag === active) { found = true; break; }
+      }
+      if (!found) {
+        active = 'ALL';
+        insightCatFilters[scopeKey] = 'ALL';
+      }
+    }
+    var html = '<div class="cat-bar" data-cat-scope="' + escFn(scopeKey) + '">';
+    html += '<span class="cat-label">类目划分</span>';
+    html += '<button type="button" class="cat-chip' + (active === 'ALL' ? ' active' : '') + '" data-cat-filter="ALL">全部<span class="n">'
+      + counts.total + '</span></button>';
+    for (var j = 0; j < counts.options.length; j++) {
+      var c = counts.options[j];
+      html += '<button type="button" class="cat-chip' + (active === c.tag ? ' active' : '') + '" data-cat-filter="'
+        + escFn(c.tag) + '">' + escFn(c.tag) + '<span class="n">' + c.count + '</span></button>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function applyInsightCatFilter(container) {
+    if (!container) return;
+    var bar = container.querySelector('.cat-bar');
+    if (!bar) return;
+    var scope = bar.getAttribute('data-cat-scope') || '';
+    var filter = insightCatFilters[scope] || 'ALL';
+    var chips = bar.querySelectorAll('.cat-chip');
+    for (var i = 0; i < chips.length; i++) {
+      chips[i].classList.toggle('active', (chips[i].getAttribute('data-cat-filter') || '') === filter);
+    }
+    var grid = container.querySelector('.reader-card-grid');
+    if (!grid) return;
+    var cells = grid.querySelectorAll('.reader-card-cell');
+    for (var k = 0; k < cells.length; k++) {
+      var cat = String(cells[k].getAttribute('data-category') || '').trim() || '未分类';
+      cells[k].style.display = (filter === 'ALL' || cat === filter) ? '' : 'none';
+    }
+  }
+
+  function bindInsightCatBar(container) {
+    if (!container) return;
+    var bar = container.querySelector('.cat-bar');
+    if (!bar) return;
+    var scope = bar.getAttribute('data-cat-scope') || '';
+    var chips = bar.querySelectorAll('.cat-chip');
+    for (var i = 0; i < chips.length; i++) {
+      chips[i].onclick = function (e) {
+        if (e && e.stopPropagation) e.stopPropagation();
+        var tag = this.getAttribute('data-cat-filter') || 'ALL';
+        insightCatFilters[scope] = tag;
+        applyInsightCatFilter(container);
+      };
+    }
+    applyInsightCatFilter(container);
+  }
+
+  function bindInsightCatBars(root) {
+    if (!root) return;
+    var bars = root.querySelectorAll('.cat-bar[data-cat-scope]');
+    for (var i = 0; i < bars.length; i++) {
+      bindInsightCatBar(bars[i].parentNode);
+    }
+  }
 
   // ===== AI 生成进度条 overlay（即使是预生成也显示，模拟实时调用） =====
   var aiGenTimers = [];
@@ -393,13 +492,18 @@ var MemberReader = (function () {
     }
 
     if (insightItems.length) {
+      var cardCatScope = 'cards:' + (date || 'latest');
       html += '<div class="reader-card-group">';
       html += '<div class="reader-card-group-title">类目情报<span class="count">' + insightItems.length + '</span></div>';
+      var cardInsList = [];
+      for (var pre = 0; pre < insightItems.length; pre++) cardInsList.push(insightItems[pre].ins);
+      html += buildInsightCatBarHtml(cardInsList, cardCatScope);
       html += '<div class="reader-card-grid">';
       for (var m = 0; m < insightItems.length; m++) {
         var item = insightItems[m];
         var ins2 = item.ins;
         var gdate2 = item.gdate;
+        var catTag2 = insightCatTag(ins2);
         var stars = ins2.stars || 0;
         var growth = ins2.growth_rate;
         var growthStr = (growth !== null && growth !== undefined && growth !== '') ? (growth + '%') : '';
@@ -413,7 +517,7 @@ var MemberReader = (function () {
         html += buildCardCell({
           icon: '📈',
           badge: stars ? ('★' + stars) : '类目',
-          title: ins2.category || '类目',
+          title: catTag2,
           tags: tags,
           node: { type: 'insight', date: gdate2, category: ins2.category || '' }
         });
@@ -429,6 +533,8 @@ var MemberReader = (function () {
       }
     }
     body.innerHTML = html;
+
+    bindInsightCatBars(body);
 
     // 绑定卡片点击
     var cells = body.querySelectorAll('.reader-card-cell');
@@ -1040,6 +1146,7 @@ var MemberReader = (function () {
           }
 
           if (dayInsights.length) {
+            var dayCatScope = 'archive:' + rd;
             dayPanelsHtml += '<div class="archive-type-group expanded">';
             dayPanelsHtml += '<div class="archive-type-head" data-type="insight">';
             dayPanelsHtml += '<span class="archive-type-icon">📂</span>';
@@ -1048,13 +1155,15 @@ var MemberReader = (function () {
             dayPanelsHtml += '<span class="archive-type-arrow">▼</span>';
             dayPanelsHtml += '</div>';
             dayPanelsHtml += '<div class="archive-type-body">';
+            dayPanelsHtml += buildInsightCatBarHtml(dayInsights, dayCatScope);
             dayPanelsHtml += '<div class="reader-card-grid">';
             for (var mi = 0; mi < dayInsights.length; mi++) {
               var ins2 = dayInsights[mi];
+              var dayCatTag = insightCatTag(ins2);
               dayPanelsHtml += buildCardCell({
                 icon: '📈',
                 badge: ins2.stars ? ('★' + ins2.stars) : '类目',
-                title: ins2.category || '类目',
+                title: dayCatTag,
                 node: { type: 'insight', date: rd, category: ins2.category || '' }
               });
             }
@@ -1074,6 +1183,8 @@ var MemberReader = (function () {
       }
       html += '</div>';
       host.innerHTML = html;
+
+      bindInsightCatBars(host);
 
       var monthHeads = host.querySelectorAll('.archive-month-head');
       for (var h = 0; h < monthHeads.length; h++) {
