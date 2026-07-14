@@ -17,14 +17,21 @@ from typing import Any
 
 
 def _get_conn():
-    """获取 PG 连接（READ COMMITTED）。"""
-    from cloud_deploy.cloud_api.config import get_settings
+    """获取 PG 连接（READ COMMITTED）。
+
+    优先使用 XHS_PREMIUM_DATABASE_URL (本地爬虫 PG)，fallback 到 XHS_DATABASE_URL。
+    """
+    import os
     import psycopg2
 
-    s = get_settings()
-    if not s.xhs_database_url or not s.xhs_database_url.startswith("postgres"):
-        raise RuntimeError("XHS_DATABASE_URL 未配置或非 PostgreSQL")
-    conn = psycopg2.connect(s.xhs_database_url)
+    db_url = os.environ.get("XHS_PREMIUM_DATABASE_URL") or os.environ.get("XHS_DATABASE_URL", "")
+    if not db_url or not db_url.startswith("postgres"):
+        from cloud_deploy.cloud_api.config import get_settings
+        s = get_settings()
+        db_url = s.xhs_database_url
+    if not db_url or not db_url.startswith("postgres"):
+        raise RuntimeError("未配置 XHS_PREMIUM_DATABASE_URL 或 XHS_DATABASE_URL")
+    conn = psycopg2.connect(db_url)
     conn.set_session(isolation_level="READ COMMITTED")
     return conn
 

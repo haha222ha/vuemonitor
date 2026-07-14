@@ -36,19 +36,29 @@ def _log(msg: str) -> None:
 
 
 def run_compute(*, dry_run: bool = False, snap_date: str | None = None) -> dict:
-    """执行 PG 端 Feature Engine 计算。"""
-    from cloud_deploy.scripts.bootstrap_env import bootstrap
-    bootstrap()
-    from cloud_deploy.cloud_api.config import get_settings
+    """执行 PG 端 Feature Engine 计算。
 
-    s = get_settings()
-    if not s.xhs_database_url or not s.xhs_database_url.startswith("postgres"):
-        raise RuntimeError("XHS_DATABASE_URL 未配置或非 PostgreSQL")
+    支持两种 PG 连接方式:
+      1. XHS_PREMIUM_DATABASE_URL (本地爬虫 PG, 优先)
+      2. XHS_DATABASE_URL (云端会员 PG, fallback)
+    """
+    import os
+    db_url = os.environ.get("XHS_PREMIUM_DATABASE_URL") or os.environ.get("XHS_DATABASE_URL", "")
+    if not db_url or not db_url.startswith("postgres"):
+        # 尝试 bootstrap 加载 .env
+        try:
+            from cloud_deploy.scripts.bootstrap_env import bootstrap
+            bootstrap()
+        except Exception:
+            pass
+        db_url = os.environ.get("XHS_PREMIUM_DATABASE_URL") or os.environ.get("XHS_DATABASE_URL", "")
+    if not db_url or not db_url.startswith("postgres"):
+        raise RuntimeError("未配置 XHS_PREMIUM_DATABASE_URL 或 XHS_DATABASE_URL")
 
     import psycopg2
 
-    _log("connecting to PostgreSQL...")
-    conn = psycopg2.connect(s.xhs_database_url)
+    _log(f"connecting to PostgreSQL... ({db_url.split('@')[1].split('/')[0]})")
+    conn = psycopg2.connect(db_url)
     conn.set_session(isolation_level="READ COMMITTED")  # 不阻塞爬虫写入
     cur = conn.cursor()
 
