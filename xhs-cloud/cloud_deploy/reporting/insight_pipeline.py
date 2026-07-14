@@ -77,9 +77,13 @@ def run_insight_pipeline(
         raise RuntimeError(f"样本不足（min_sample={min_sample}），无法生成类目情报")
 
     if len(insights) > max_categories:
-        insights = insights[:max_categories]
-        _log(f"cap categories to max={max_categories}")
-
+        tagged = [m for m in insights if getattr(m, "from_report_tag", False)]
+        inferred = [m for m in insights if not getattr(m, "from_report_tag", False)]
+        insights = (tagged + inferred)[:max_categories]
+        _log(
+            f"cap categories to max={max_categories} "
+            f"(report_tags={len(tagged)} inferred_fill={max(0, max_categories - len(tagged))})"
+        )
     insights = [m for m in insights if passes_k_anonymity(m.sample_size, k=k_anon)]
     if not insights:
         raise RuntimeError(f"无类目通过 k-匿名（k={k_anon}）")

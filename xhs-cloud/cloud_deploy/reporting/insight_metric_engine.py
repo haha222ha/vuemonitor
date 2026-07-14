@@ -28,11 +28,14 @@ class InsightMetrics:
     trend_label: str = "平稳"
     top_keywords: list[str] = field(default_factory=list)
     price_distribution: dict[str, float] = field(default_factory=dict)
+    # 是否来自选品日报 category_tag（脱敏同源）；仅管道内用，对外输出会去掉
+    from_report_tag: bool = False
 
     def to_public_dict(self) -> dict[str, Any]:
         d = asdict(self)
         d.pop("sample_size", None)
         d.pop("top_keywords", None)
+        d.pop("from_report_tag", None)
         if not d.get("price_distribution"):
             d.pop("price_distribution", None)
         d["disclaimer"] = (
@@ -106,14 +109,23 @@ def aggregate_items_to_insights(
 ) -> list[InsightMetrics]:
     buckets: dict[str, list[dict]] = defaultdict(list)
     cat_sub: dict[str, str] = {}
+    cat_from_tag: dict[str, bool] = {}
     for it in items:
-        cat, sub = infer_category(
-            str(it.get("title") or ""),
-            behavior=str(it.get("behavior") or ""),
-            is_virtual=it.get("is_virtual") if "is_virtual" in it else None,
-        )
+        # 优先用选品报告/脱敏推送已算好的 category_tag（与日报分层同源）
+        raw_tag = str(it.get("category_tag") or it.get("category") or "").strip()
+        from_tag = bool(raw_tag and raw_tag not in ("未分类", "综合类目", "其他"))
+        if from_tag:
+            cat, sub = raw_tag, str(it.get("sub_category") or "")
+        else:
+            cat, sub = infer_category(
+                str(it.get("title") or ""),
+                behavior=str(it.get("behavior") or ""),
+                is_virtual=it.get("is_virtual") if "is_virtual" in it else None,
+            )
         buckets[cat].append(it)
-        cat_sub[cat] = sub
+        cat_sub[cat] = sub or cat_sub.get(cat, "")
+        # 同一类目若有任一行来自日报标签，记为 tagged（优先展示）
+        cat_from_tag[cat] = cat_from_tag.get(cat, False) or from_tag
 
     out: list[InsightMetrics] = []
     for category, rows in buckets.items():
@@ -167,7 +179,18 @@ def aggregate_items_to_insights(
                 trend_label=trend,
                 top_keywords=_extract_keywords(titles),
                 price_distribution=_price_distribution(prices),
+                from_report_tag=bool(cat_from_tag.get(category)),
             )
         )
-    out.sort(key=lambda x: (-x.blue_ocean_score, -x.growth_rate_pct))
+    # 日报脱敏类目标签优先；推断兜底类目（综合/虚拟综合）靠后
+    catchall = {"综合类目", "虚拟综合", "其他", "未分类"}
+    out.sort(
+        key=lambda x: (
+            0 if x.from_report_tag else 1,
+            1 if x.category in catchall else 0,
+            -x.blue_ocean_score,
+            -x.growth_rate_pct,
+            -x.sample_size,
+        )
+    )
     return out

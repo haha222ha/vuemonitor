@@ -91,7 +91,11 @@ fi
 
 echo "[insight-shadow] date=$DATE shadow=1 triggered_by=$TRIGGER_BY"
 set +e
-"$PY" "$SCRIPT" --date "$DATE" --playbook full
+SRC_ARGS=()
+if [[ -n "${INSIGHT_PG_SOURCE:-}" ]]; then
+  SRC_ARGS=(--source "$INSIGHT_PG_SOURCE")
+fi
+"$PY" "$SCRIPT" --date "$DATE" --playbook full "${SRC_ARGS[@]}"
 RC=$?
 set -e
 
