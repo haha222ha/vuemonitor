@@ -549,6 +549,25 @@
 .archive-day-group.expanded {
   border-color: var(--reader-accent);
 }
+.archive-day-group.is-today {
+  border-color: rgba(0, 113, 227, 0.45);
+  box-shadow: 0 2px 12px rgba(0, 113, 227, 0.08);
+}
+.archive-today-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: var(--reader-accent, #0071e3);
+  padding: 2px 8px;
+  border-radius: 999px;
+  line-height: 1.3;
+}
+.archive-type-body .reader-card-grid,
+.archive-day-body > .reader-card-group {
+  margin: 0 0 10px;
+}
 .archive-day-head {
   display: flex;
   align-items: center;

@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260714w23">
+<meta name="portal-build" content="20260714w24">
 <link rel="stylesheet" href="/assets/member_theme.css?v=20260713p">
-<link rel="stylesheet" href="/assets/member_reader.css?v=20260714w23">
+<link rel="stylesheet" href="/assets/member_reader.css?v=20260714w24">
 <link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260714w14">
 <meta name="theme-color" content="#0071e3">
 <title>选品 AI 顾问 · 会员中心</title>
@@ -487,11 +487,8 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       </div>
       <div class="nav-section">
         <div class="nav-section-title">核心功能</div>
-        <button type="button" class="nav-item active" data-app-nav="today" onclick="switchAppPanel('today')">
-          <span class="nav-icon">📊</span><span class="nav-label">今日分析</span>
-        </button>
-        <button type="button" class="nav-item" data-app-nav="archive" onclick="switchAppPanel('archive')">
-          <span class="nav-icon">📚</span><span class="nav-label">历史归档</span>
+        <button type="button" class="nav-item active" data-app-nav="archive" onclick="switchAppPanel('archive')">
+          <span class="nav-icon">📚</span><span class="nav-label">报告中心</span>
         </button>
         <button type="button" class="nav-item" data-app-nav="watchlist" onclick="switchAppPanel('watchlist')">
           <span class="nav-icon">⭐</span><span class="nav-label">我的收藏</span>
@@ -515,34 +512,36 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       </div>
       <div class="sidebar-footer">
         <div>报告每日 18:30 更新</div>
-        <div style="margin-top:4px;opacity:0.6">build 20260713w9</div>
+        <div style="margin-top:4px;opacity:0.6">build 20260714w24</div>
       </div>
     </aside>
     <div class="app-content">
-    <div class="app-panel active" id="panelToday">
+    <!-- 兼容旧路由：today 面板保留空壳，入口已合并进报告中心 -->
+    <div class="app-panel" id="panelToday" aria-hidden="true">
+      <div id="dashInsight" class="hidden"></div>
+    </div>
+    <div class="app-panel active" id="panelArchive">
+    <div id="dashArchive">
     <div class="kpi-row" id="kpiRow">
       <div class="kpi-card"><div class="kpi-icon">📋</div><div class="kpi-label">今日榜单</div><div class="kpi-value" id="kpiRankings">—</div><div class="kpi-delta neutral" id="kpiRankingsDelta">加载中</div></div>
       <div class="kpi-card"><div class="kpi-icon">🎯</div><div class="kpi-label">方向解读</div><div class="kpi-value" id="kpiDirections">—</div><div class="kpi-delta neutral" id="kpiDirectionsDelta">加载中</div></div>
       <div class="kpi-card"><div class="kpi-icon">💎</div><div class="kpi-label">蓝海机会</div><div class="kpi-value" id="kpiBlueOcean">—</div><div class="kpi-delta neutral">方向级</div></div>
       <div class="kpi-card"><div class="kpi-icon">📈</div><div class="kpi-label">报告日期</div><div class="kpi-value" id="kpiDate" style="font-size:20px">—</div><div class="kpi-delta neutral" id="kpiMode">AI</div></div>
     </div>
-    <div id="dashInsight">
     <div class="card" style="padding:0;border:none;background:transparent;box-shadow:none">
       <section id="routeToday" class="member-route">
         <div class="reader-layout-v2">
-          <!-- 卡片列表视图（默认显示） -->
-          <div id="readerCardList" class="reader-card-list">
+          <div id="archiveBrowse" class="reader-card-list">
             <div class="reader-card-list-header">
-              <h2>📊 今日分析</h2>
-              <p id="cardListDate">加载中…</p>
+              <h2>📚 报告中心</h2>
+              <p id="cardListDate">月份 → 日期 → 虚拟 / 实体 · 今日置顶</p>
             </div>
-            <div id="readerCardListBody"></div>
+            <div id="archiveList"><div class="reader-empty">加载中…</div></div>
           </div>
-          <!-- 详情视图（点击卡片后显示） -->
           <div id="readerDetail" class="reader-detail hidden">
             <div class="reader-detail-bar">
-              <button type="button" class="reader-back-btn" onclick="backToCardList()">← 返回列表</button>
-              <header class="reader-chrome" id="readerChrome"><h2>今日分析</h2><p>加载中…</p></header>
+              <button type="button" class="reader-back-btn" onclick="backToCardList()">← 返回报告中心</button>
+              <header class="reader-chrome" id="readerChrome"><h2>报告中心</h2><p>加载中…</p></header>
             </div>
             <div id="readerLocked" class="reader-locked">
               <p style="font-size:15px;color:var(--text2)">会员已过期，请续费后阅读 AI 分析</p>
@@ -560,7 +559,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <details id="insightAdvancedTools" style="margin-top:12px">
       <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--accent);padding:8px 0">高级情报工具（对比 / 时间线 / PDF）</summary>
     <div id="insightPreviewBanner" class="insight-banner hidden">
-      类目情报请在上方阅读器侧栏选择；对比 / 时间线 / PDF 等高级工具在此展开。
+      类目情报可在报告中心展开阅读；对比 / 时间线 / PDF 等高级工具在此展开。
     </div>
     <div class="card" style="margin-top:10px">
       <div class="section-title">高级工具</div>
@@ -579,15 +578,6 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
       <div id="insightMsg" style="font-size:13px;color:var(--text2);margin-top:12px"></div>
     </div>
     </details>
-    </div>
-    </div><!-- /panelToday -->
-    <div class="app-panel" id="panelArchive">
-    <div id="dashArchive">
-    <div class="card">
-      <div class="section-title">历史归档</div>
-      <p style="font-size:13px;color:var(--text2);margin:8px 0 14px">按「月份 → 日期 → 虚拟 / 实体」分层浏览方向解读。点击文件夹展开；也可「阅读整日报告」。不含可下载表格数据包。</p>
-      <div id="archiveList"><div class="reader-empty">加载中…</div></div>
-    </div>
     </div>
     </div><!-- /panelArchive -->
     <div class="app-panel" id="panelWatchlist">
@@ -722,8 +712,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 
   </div>
   <nav id="readerMobileNav" class="reader-mobile-nav hidden" aria-label="阅读导航">
-    <button type="button" class="reader-mobile-nav-btn" data-route="today">今日</button>
-    <button type="button" class="reader-mobile-nav-btn" data-route="archive">归档</button>
+    <button type="button" class="reader-mobile-nav-btn" data-route="archive">报告</button>
     <button type="button" class="reader-mobile-nav-btn" data-route="watchlist">收藏</button>
     <button type="button" class="reader-mobile-nav-btn" data-route="account">我的</button>
   </nav>
@@ -755,11 +744,11 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
   </div>
 
 </div>
-<script src="/assets/member_portal_state.js?v=20260713p"></script>
+<script src="/assets/member_portal_state.js?v=20260714w24"></script>
 <script src="/assets/member_core.js?v=20260713p"></script>
-<script src="/assets/member_reader.js?v=20260714w23"></script>
-<script src="/assets/member_router.js?v=20260714w15"></script>
-<script src="/assets/member_insight.js?v=20260713w5"></script>
+<script src="/assets/member_reader.js?v=20260714w24"></script>
+<script src="/assets/member_router.js?v=20260714w24"></script>
+<script src="/assets/member_insight.js?v=20260714w24"></script>
 <script>
 const STORAGE = {
   token: 'xhs_member_token',
@@ -890,13 +879,14 @@ let watchlistSelected = new Set();
 // ===== 新布局 v2：左侧栏面板切换 =====
 function switchAppPanel(name) {
   var validPanels = ['today', 'archive', 'watchlist', 'account'];
-  if (validPanels.indexOf(name) < 0) name = 'today';
+  if (name === 'today' || name === 'insight' || name === 'reports') name = 'archive';
+  if (validPanels.indexOf(name) < 0) name = 'archive';
   // 更新侧栏 nav-item active
   document.querySelectorAll('.app-sidebar .nav-item[data-app-nav]').forEach(function(btn) {
     btn.classList.toggle('active', btn.getAttribute('data-app-nav') === name);
   });
   // 切换 app-panel
-  var panelMap = { today: 'panelToday', archive: 'panelArchive', watchlist: 'panelWatchlist', account: 'panelAccount' };
+  var panelMap = { today: 'panelArchive', archive: 'panelArchive', watchlist: 'panelWatchlist', account: 'panelAccount' };
   var panelId = panelMap[name];
   document.querySelectorAll('.app-panel').forEach(function(p) {
     p.classList.toggle('active', p.id === panelId);

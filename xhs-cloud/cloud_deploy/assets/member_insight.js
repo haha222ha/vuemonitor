@@ -134,6 +134,8 @@
 
 
 
+  var _entitlementsApplied = false;
+
   function applyEntitlements(m) {
 
     m = m || {};
@@ -156,7 +158,7 @@
 
 
 
-    var defaultDash = 'today';
+    var defaultDash = 'archive';
 
     if (!insight) defaultDash = 'client';
 
@@ -166,17 +168,30 @@
 
       if (saved === 'watchlist' || saved === 'client' || saved === 'archive' || saved === 'account') defaultDash = saved;
 
-      else if ((saved === 'today' || saved === 'insight') && insight) defaultDash = 'today';
+      else if ((saved === 'today' || saved === 'insight' || saved === 'reports') && insight) defaultDash = 'archive';
 
     } catch (_) {}
 
     if (typeof global.MemberRouter !== 'undefined' && global.MemberRouter.go) {
-      if (global.MemberRouter.resetBoot) global.MemberRouter.resetBoot();
-      global.MemberRouter.go(defaultDash, true);
+
+      // 只在首次加载时重置路由，避免异步回调抢回用户已手动切换的 tab
+      if (!_entitlementsApplied) {
+        _entitlementsApplied = true;
+        var currentHash = (location.hash || '').replace(/^#/, '').trim().toLowerCase();
+        var homeOk = !currentHash || currentHash === 'today' || currentHash === 'insight'
+          || currentHash === 'archive' || currentHash === 'reports';
+        if (homeOk) {
+          if (global.MemberRouter.resetBoot) global.MemberRouter.resetBoot();
+          global.MemberRouter.go(defaultDash, true);
+        }
+      }
 
     } else if (typeof global.switchDash === 'function') {
 
-      global.switchDash(defaultDash);
+      if (!_entitlementsApplied) {
+        _entitlementsApplied = true;
+        global.switchDash(defaultDash);
+      }
 
     }
 
@@ -1050,9 +1065,9 @@
   function openPreview(reportDate, category) {
     if (!reportDate || !category) return;
     _preview = { date: String(reportDate).slice(0, 10), category: category };
-    if (window.MemberRouter) MemberRouter.go('today');
+    if (window.MemberRouter) MemberRouter.go('archive');
     if (window.MemberReader && MemberReader.selectNode) {
-      MemberReader.selectNode({ type: 'insight', date: _preview.date, category: category });
+      MemberReader.selectNode({ type: 'insight', date: _preview.date, category: category }, true, 'archive');
       var details = document.getElementById('insightAdvancedTools');
       if (details) details.open = false;
       var sideBtn = document.getElementById('readerSidebarToggle');
@@ -1109,13 +1124,8 @@
 
       if (msg) msg.textContent = lib.shadow_mode ? '当前为 Shadow 预生成情报（只读）' : '';
 
-      if ((lib.items || []).length) {
-
-        var first = lib.items[0];
-
-        openPreview(first.report_date, first.category);
-
-      }
+      // 不自动 openPreview：避免覆盖用户在侧栏已点击的「今日简报」/「方向解读」
+      // 首选内容由 MemberReader.boot() → loadDashboard() 负责选中
 
     }).catch(function (e) {
 

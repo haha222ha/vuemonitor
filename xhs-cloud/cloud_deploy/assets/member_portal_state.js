@@ -97,7 +97,7 @@
     }
 
     if (state === 'member_active') {
-      box.innerHTML = '<button type="button" class="btn btn-ghost ss-btn" onclick="switchDash(\'today\')">今日分析</button>'
+      box.innerHTML = '<button type="button" class="btn btn-ghost ss-btn" onclick="switchDash(\'archive\')">报告中心</button>'
         + '<button type="button" class="btn btn-ghost ss-btn" onclick="switchDash(\'account\')">账户</button>'
         + '<button type="button" class="btn btn-ghost ss-btn" onclick="openBuyFromDash()">续费</button>';
       return;

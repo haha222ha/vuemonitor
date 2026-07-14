@@ -23,7 +23,7 @@ var MemberReader = (function () {
   };
 
   var state = 'IDLE';
-  var current = { date: '', node: null, sourcePanel: 'today' };
+  var current = { date: '', node: null, sourcePanel: 'archive' };
   var dashData = { today: {}, insightTree: [] }; // 全局保存 dashboard 数据，供卡片视图使用
   var readerViewMode = 'list'; // 'list' | 'cards'
   var dashboard = null;
@@ -149,7 +149,7 @@ var MemberReader = (function () {
       body.innerHTML = '<div class="reader-empty">' + escFn(msg || '今日 AI 分析尚未发布，请稍后再来。类目情报将在右侧树中展示。') + '</div>';
     }
     var chrome = el('readerChrome');
-    if (chrome) chrome.innerHTML = '<h2>今日分析</h2><p>等待云端发布…</p>';
+    if (chrome) chrome.innerHTML = '<h2>报告中心</h2><p>等待云端发布…</p>';
     setState('IDLE');
   }
 
@@ -163,7 +163,7 @@ var MemberReader = (function () {
     var chrome = el('readerChrome');
     if (chrome) {
       var hero = chrome.getAttribute('data-hero-html') || '';
-      chrome.innerHTML = hero + '<h2>今日分析</h2><p>生成中 · 预计 18:30 前更新</p>';
+      chrome.innerHTML = hero + '<h2>报告中心</h2><p>生成中 · 预计 18:30 前更新</p>';
     }
   }
 
@@ -234,7 +234,7 @@ var MemberReader = (function () {
     var chrome = el('readerChrome');
     if (!chrome) return;
     var hero = chrome.getAttribute('data-hero-html') || '';
-    chrome.innerHTML = hero + '<h2>' + escFn(title || 'AI 选品分析') + '</h2>'
+    chrome.innerHTML = hero + '<h2>' + escFn(title || '报告中心') + '</h2>'
       + (subtitle ? '<p>' + escFn(subtitle) + '</p>' : '');
     chrome.querySelectorAll('.reader-hero-chip').forEach(function (btn) {
       btn.onclick = function () {
@@ -458,44 +458,43 @@ var MemberReader = (function () {
   }
 
   function highlightCard(node) {
-    var body = el('readerCardListBody');
-    if (!body) return;
-    var cells = body.querySelectorAll('.reader-card-cell');
-    for (var i = 0; i < cells.length; i++) {
-      var btn = cells[i];
-      var match = btn.getAttribute('data-node') === node.type
-        && (btn.getAttribute('data-date') || '') === (node.date || '');
-      if (node.type === 'direction') match = match && btn.getAttribute('data-key') === node.key;
-      if (node.type === 'insight') match = match && btn.getAttribute('data-category') === node.category;
-      btn.classList.toggle('active', match);
+    var roots = [el('archiveList'), el('readerCardListBody')].filter(Boolean);
+    if (!roots.length) return;
+    for (var r = 0; r < roots.length; r++) {
+      var cells = roots[r].querySelectorAll('.reader-card-cell');
+      for (var i = 0; i < cells.length; i++) {
+        var btn = cells[i];
+        var match = btn.getAttribute('data-node') === node.type
+          && (btn.getAttribute('data-date') || '') === (node.date || '');
+        if (node.type === 'direction') match = match && btn.getAttribute('data-key') === node.key;
+        if (node.type === 'insight') match = match && btn.getAttribute('data-category') === node.category;
+        btn.classList.toggle('active', match);
+      }
     }
   }
 
-  // 切换到详情视图
+  // 切换到详情视图（报告中心 browse ↔ detail）
   function showDetailView() {
-    var list = el('readerCardList');
+    var browse = el('archiveBrowse') || el('readerCardList');
     var detail = el('readerDetail');
-    if (list) list.classList.add('hidden');
+    if (browse) browse.classList.add('hidden');
     if (detail) detail.classList.remove('hidden');
   }
 
-  // 返回卡片列表
+  // 返回报告中心网格
   function backToCardList() {
-    var list = el('readerCardList');
+    var browse = el('archiveBrowse') || el('readerCardList');
     var detail = el('readerDetail');
     if (detail) detail.classList.add('hidden');
-    if (list) list.classList.remove('hidden');
-    // 重置详情视图状态
+    if (browse) browse.classList.remove('hidden');
     var frameWrap = el('readerFrameWrap');
     var body = el('readerBody');
     if (frameWrap) frameWrap.classList.add('hidden');
     if (body) body.classList.add('hidden');
     current.node = null;
-    // 若从历史归档进入，返回到归档面板；否则留在今日分析
-    var src = current.sourcePanel || 'today';
-    current.sourcePanel = 'today';
+    current.sourcePanel = 'archive';
     setState('IDLE');
-    if (src === 'archive' && window.MemberRouter) {
+    if (window.MemberRouter && MemberRouter.current() !== 'archive') {
       MemberRouter.go('archive');
     }
   }
@@ -672,9 +671,8 @@ var MemberReader = (function () {
   function selectNode(node, isUserClick, _src) {
     current.node = node;
     current.date = node.date || '';
-    // 记录来源面板：archive 调用方传 'archive'，其余默认 'today'，
-    // 供 backToCardList 决定返回到哪个面板
-    current.sourcePanel = (typeof _src === 'string' && _src) ? _src : 'today';
+    // 统一入口为报告中心；兼容旧调用传入的 sourcePanel
+    current.sourcePanel = (typeof _src === 'string' && _src) ? _src : 'archive';
     setState('LOADING');
     highlightCard(node);
 
@@ -811,7 +809,7 @@ var MemberReader = (function () {
       // 渲染横排卡片瀑布流列表（今日简报 / 方向解读 / 类目情报）
       renderCardList(bundle.data.today || {}, bundle.data.insight_tree || []);
       var today = bundle.data.today || {};
-      applyChrome('今日分析', today.report_date ? '报告日期 ' + today.report_date : '');
+      applyChrome('报告中心', today.report_date ? '报告日期 ' + today.report_date : '');
       updateKPIs(bundle.data);
       hideAiGenOverlay();
       return bundle.data;
@@ -824,15 +822,20 @@ var MemberReader = (function () {
   function loadArchive() {
     var host = el('archiveList');
     if (!host) return Promise.resolve();
+    // 正在阅读详情时勿刷列表（从收藏/账户切回也不会中断）
+    var detail = el('readerDetail');
+    if (detail && !detail.classList.contains('hidden') && current.node) {
+      return Promise.resolve();
+    }
     host.innerHTML = '<div class="reader-empty">加载中…</div>';
     return apiFn('/api/v1/member/advisor/library', { auth: true }).then(function (data) {
       archiveItems = data.items || [];
       if (!archiveItems.length) {
-        host.innerHTML = '<div class="reader-empty">暂无历史 AI 顾问报告。类目情报请从「今日分析」阅读。</div>';
+        host.innerHTML = '<div class="reader-empty">暂无 AI 顾问报告，生成后会在此置顶展示。</div>';
         return;
       }
 
-      // 1) 按月份分组（YYYY-MM → items[]）
+      // 1) 按月份分组（YYYY-MM → items[]），月份内按日期新→旧
       var groups = {};
       var groupOrder = [];
       for (var i = 0; i < archiveItems.length; i++) {
@@ -842,31 +845,48 @@ var MemberReader = (function () {
         if (!groups[ym]) { groups[ym] = []; groupOrder.push(ym); }
         groups[ym].push(it);
       }
-      groupOrder.sort().reverse(); // 最近的月份在前
+      groupOrder.sort().reverse();
+      for (var gs = 0; gs < groupOrder.length; gs++) {
+        groups[groupOrder[gs]].sort(function (a, b) {
+          return String(b.report_date || '').localeCompare(String(a.report_date || ''));
+        });
+      }
 
-      // 2) 当前月份 + 最新日期（默认展开当前月的最新日期）
       var now = new Date();
-      var currentYM = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
-      var latestDate = archiveItems.length ? (archiveItems[0].report_date || '') : '';
+      var todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+      var currentYM = todayStr.slice(0, 7);
+      var latestDate = archiveItems[0] ? (archiveItems[0].report_date || '') : '';
+      // 有「今天」的报告则置顶展开今天；否则展开最新一日
+      var pinDate = '';
+      for (var pi = 0; pi < archiveItems.length; pi++) {
+        if (archiveItems[pi].report_date === todayStr) { pinDate = todayStr; break; }
+      }
+      if (!pinDate) pinDate = latestDate;
 
-      // 3) 渲染：月份文件夹 → 日期文件夹 → 方向解读标题列表
+      var dateEl = el('cardListDate');
+      if (dateEl) {
+        dateEl.textContent = pinDate === todayStr
+          ? ('今日 ' + todayStr + ' 已置顶 · 月份 → 日期 → 虚拟 / 实体')
+          : ('最新 ' + (pinDate || '—') + ' · 月份 → 日期 → 虚拟 / 实体');
+      }
+
+      // 2) 月份 → 日期 → 虚拟/实体 → 电商网格卡片
       var html = '<div class="archive-list">';
       for (var g = 0; g < groupOrder.length; g++) {
-        var ym = groupOrder[g];
-        var items = groups[ym];
-        var isCurrent = (ym === currentYM);
-        var monthExpanded = isCurrent; // 当前月默认展开
-        var ymLabel = formatMonthLabel(ym);
+        var ymKey = groupOrder[g];
+        var items = groups[ymKey];
+        var isCurrent = (ymKey === currentYM);
+        var monthExpanded = isCurrent || g === 0;
+        var ymLabel = formatMonthLabel(ymKey);
         var monthIcon = monthExpanded ? '📂' : '📁';
         var monthArrow = monthExpanded ? '▼' : '▶';
-        // 月份内天数合计方向解读数
         var totalDirs = 0;
         for (var td = 0; td < items.length; td++) {
           totalDirs += (items[td].direction_count || (items[td].directions || []).length || 0);
         }
 
         html += '<div class="archive-month-group' + (isCurrent ? ' current' : '') + '">';
-        html += '<div class="archive-month-head" data-ym="' + escFn(ym) + '">';
+        html += '<div class="archive-month-head" data-ym="' + escFn(ymKey) + '">';
         html += '<span class="archive-month-icon">' + monthIcon + '</span>';
         html += '<span class="archive-month-title">' + escFn(ymLabel) + '</span>';
         html += '<span class="archive-month-count">' + items.length + ' 天 · ' + totalDirs + ' 篇</span>';
@@ -874,20 +894,20 @@ var MemberReader = (function () {
         html += '</div>';
         html += '<div class="archive-month-body"' + (monthExpanded ? '' : ' style="display:none"') + '>';
 
-        // 日期文件夹
         for (var k = 0; k < items.length; k++) {
           var it2 = items[k];
-          var dayLabel = (it2.report_date || '').slice(5); // "07-14"
+          var rd = it2.report_date || '';
+          var dayLabel = rd.slice(5);
           var dirs = it2.directions || [];
           var dirCount = it2.direction_count || dirs.length || 0;
           var physicalCnt = it2.physical_count || 0;
           var virtualCnt = it2.virtual_count || 0;
           var mixedCnt = it2.mixed_count || 0;
-          var dayExpanded = (it2.report_date === latestDate); // 最新日期默认展开
+          var isToday = (rd === todayStr);
+          var dayExpanded = (rd === pinDate);
           var dayIcon = dayExpanded ? '📂' : '📁';
           var dayArrow = dayExpanded ? '▼' : '▶';
 
-          // 徽标
           var badges = '';
           if (physicalCnt || virtualCnt || mixedCnt) {
             badges = '<span class="ai-cat-badges">'
@@ -897,21 +917,29 @@ var MemberReader = (function () {
               + '</span>';
           }
 
-          html += '<div class="archive-day-group' + (dayExpanded ? ' expanded' : '') + '">';
-          html += '<div class="archive-day-head" data-date="' + escFn(it2.report_date) + '">';
+          html += '<div class="archive-day-group' + (dayExpanded ? ' expanded' : '') + (isToday ? ' is-today' : '') + '">';
+          html += '<div class="archive-day-head" data-date="' + escFn(rd) + '">';
           html += '<span class="archive-day-icon">' + dayIcon + '</span>';
           html += '<span class="archive-day-date">' + escFn(dayLabel) + '</span>';
-          html += '<span class="archive-day-count">' + dirCount + ' 篇方向解读</span>';
+          if (isToday) html += '<span class="archive-today-badge">今日</span>';
+          html += '<span class="archive-day-count">' + dirCount + ' 篇</span>';
           html += badges;
           html += '<span class="archive-day-arrow">' + dayArrow + '</span>';
           html += '</div>';
           html += '<div class="archive-day-body"' + (dayExpanded ? '' : ' style="display:none"') + '>';
 
-          // 整日阅读入口
-          html += '<div class="archive-day-allread" data-date="' + escFn(it2.report_date) + '">'
-            + '📄 阅读整日报告 →</div>';
+          // 整日简报：网格卡片（与方向解读同风格）
+          html += '<div class="reader-card-group">';
+          html += '<div class="reader-card-group-title">整日报告<span class="count">1</span></div>';
+          html += '<div class="reader-card-grid">';
+          html += buildCardCell({
+            icon: '📄',
+            badge: isToday ? '今日' : '整日',
+            title: isToday ? '今日整日报告' : (dayLabel + ' 整日报告'),
+            node: { type: 'archive', date: rd }
+          });
+          html += '</div></div>';
 
-          // 第三层：虚拟 / 实体 / 其他；其下才是方向解读列表
           if (dirs.length) {
             var buckets = { physical: [], virtual: [], other: [] };
             for (var di = 0; di < dirs.length; di++) {
@@ -921,7 +949,6 @@ var MemberReader = (function () {
               else if (ct0 === 'virtual') buckets.virtual.push(dInfo);
               else buckets.other.push(dInfo);
             }
-            // 老报告无 category_type 时全部进 other —— 仍给出单组可点列表
             var typeSpecs = [
               { key: 'physical', label: '实体商品', icon: '🏷️', cls: 'cat-physical', list: buckets.physical },
               { key: 'virtual', label: '虚拟商品', icon: '💾', cls: 'cat-virtual', list: buckets.virtual },
@@ -930,25 +957,26 @@ var MemberReader = (function () {
             for (var ts = 0; ts < typeSpecs.length; ts++) {
               var spec = typeSpecs[ts];
               if (!spec.list.length) continue;
-              // 日期展开后，虚拟/实体分组默认打开（减少多点一次）
               var typeExpanded = true;
-              var typeIcon = typeExpanded ? '📂' : '📁';
-              var typeArrow = typeExpanded ? '▼' : '▶';
-              html += '<div class="archive-type-group' + (typeExpanded ? ' expanded' : '') + '">';
+              var typeIcon = '📂';
+              var typeArrow = '▼';
+              html += '<div class="archive-type-group expanded">';
               html += '<div class="archive-type-head" data-type="' + spec.key + '">';
               html += '<span class="archive-type-icon">' + typeIcon + '</span>';
               html += '<span class="archive-type-title ' + spec.cls + '">' + spec.icon + ' ' + spec.label + '</span>';
               html += '<span class="archive-type-count">' + spec.list.length + ' 篇</span>';
               html += '<span class="archive-type-arrow">' + typeArrow + '</span>';
               html += '</div>';
-              html += '<div class="archive-type-body"' + (typeExpanded ? '' : ' style="display:none"') + '>';
-              html += '<div class="archive-dir-list">';
+              html += '<div class="archive-type-body">';
+              html += '<div class="reader-card-grid">';
               for (var di2 = 0; di2 < spec.list.length; di2++) {
                 var d2 = spec.list[di2];
-                html += '<div class="archive-dir-item" data-date="' + escFn(it2.report_date) + '" data-key="' + escFn(d2.key) + '">'
-                  + '<span class="archive-dir-icon">🎯</span>'
-                  + '<span class="archive-dir-title">' + escFn(d2.title) + '</span>'
-                  + '</div>';
+                html += buildCardCell({
+                  icon: '🎯',
+                  badge: spec.label,
+                  title: d2.title || d2.key,
+                  node: { type: 'direction', date: rd, key: d2.key }
+                });
               }
               html += '</div></div></div>';
             }
@@ -956,22 +984,18 @@ var MemberReader = (function () {
             html += '<div class="archive-dir-empty">该日无方向解读数据</div>';
           }
 
-          html += '</div>'; // /archive-day-body
-          html += '</div>'; // /archive-day-group
+          html += '</div></div>'; // day-body / day-group
         }
 
-        html += '</div>'; // /archive-month-body
-        html += '</div>'; // /archive-month-group
+        html += '</div></div>'; // month-body / month-group
       }
       html += '</div>';
       host.innerHTML = html;
 
-      // 4) 绑定月份标题点击（展开/折叠）
       var monthHeads = host.querySelectorAll('.archive-month-head');
       for (var h = 0; h < monthHeads.length; h++) {
         monthHeads[h].onclick = function () { toggleArchiveGroup(this, 'month'); };
       }
-      // 5) 绑定日期标题点击（展开/折叠方向解读列表）
       var dayHeads = host.querySelectorAll('.archive-day-head');
       for (var dh = 0; dh < dayHeads.length; dh++) {
         dayHeads[dh].onclick = function (e) {
@@ -979,7 +1003,6 @@ var MemberReader = (function () {
           toggleArchiveGroup(this, 'day');
         };
       }
-      // 6) 绑定虚拟/实体分组标题点击
       var typeHeads = host.querySelectorAll('.archive-type-head');
       for (var th = 0; th < typeHeads.length; th++) {
         typeHeads[th].onclick = function (e) {
@@ -987,25 +1010,17 @@ var MemberReader = (function () {
           toggleArchiveGroup(this, 'type');
         };
       }
-      // 7) 绑定"整日阅读"点击
-      var allReads = host.querySelectorAll('.archive-day-allread');
-      for (var ar = 0; ar < allReads.length; ar++) {
-        allReads[ar].onclick = function (e) {
+      // 电商网格卡片：点击进入阅读（不离开报告中心）
+      var cells = host.querySelectorAll('.reader-card-cell');
+      for (var c = 0; c < cells.length; c++) {
+        cells[c].onclick = function (e) {
           e.stopPropagation();
-          var d = this.getAttribute('data-date');
-          if (window.MemberRouter) MemberRouter.go('today');
-          selectNode({ type: 'archive', date: d }, true, 'archive');
-        };
-      }
-      // 8) 绑定方向解读标题点击（进入单篇阅读）
-      var dirItems = host.querySelectorAll('.archive-dir-item');
-      for (var di3 = 0; di3 < dirItems.length; di3++) {
-        dirItems[di3].onclick = function (e) {
-          e.stopPropagation();
-          var d = this.getAttribute('data-date');
-          var key = this.getAttribute('data-key');
-          if (window.MemberRouter) MemberRouter.go('today');
-          selectNode({ type: 'direction', date: d, key: key }, true, 'archive');
+          selectNode({
+            type: this.getAttribute('data-node'),
+            date: this.getAttribute('data-date') || '',
+            key: this.getAttribute('data-key') || '',
+            category: this.getAttribute('data-category') || ''
+          }, true, 'archive');
         };
       }
     }).catch(function (e) {
