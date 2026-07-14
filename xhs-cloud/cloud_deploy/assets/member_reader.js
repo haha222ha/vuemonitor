@@ -828,10 +828,55 @@ var MemberReader = (function () {
       return Promise.resolve();
     }
     host.innerHTML = '<div class="reader-empty">加载中…</div>';
-    return apiFn('/api/v1/member/advisor/library', { auth: true }).then(function (data) {
+    return Promise.all([
+      apiFn('/api/v1/member/advisor/library', { auth: true }),
+      apiFn('/api/v1/member/insight/library', { auth: true }).catch(function () { return { items: [] }; })
+    ]).then(function (results) {
+      var data = results[0] || {};
+      var insightLib = results[1] || {};
       archiveItems = data.items || [];
+
+      // 类目解读（原「今日分析」类目情报）按日期汇总
+      var insightsByDate = {};
+      var insightItems = insightLib.items || [];
+      for (var ii = 0; ii < insightItems.length; ii++) {
+        var ins0 = insightItems[ii];
+        var idate = String(ins0.report_date || '').slice(0, 10);
+        if (!idate) continue;
+        if (!insightsByDate[idate]) insightsByDate[idate] = [];
+        insightsByDate[idate].push(ins0);
+      }
+      var insightDates = Object.keys(insightsByDate);
+      for (var is = 0; is < insightDates.length; is++) {
+        insightsByDate[insightDates[is]].sort(function (a, b) {
+          return (b.stars || 0) - (a.stars || 0);
+        });
+      }
+
+      // 仅有类目、无顾问的日期，补进报告中心
+      var seenDates = {};
+      for (var ai = 0; ai < archiveItems.length; ai++) {
+        seenDates[archiveItems[ai].report_date || ''] = true;
+      }
+      for (var id2 = 0; id2 < insightDates.length; id2++) {
+        var dOnly = insightDates[id2];
+        if (seenDates[dOnly]) continue;
+        archiveItems.push({
+          report_date: dOnly,
+          directions: [],
+          direction_count: 0,
+          physical_count: 0,
+          virtual_count: 0,
+          mixed_count: 0,
+          insight_only: true
+        });
+      }
+      archiveItems.sort(function (a, b) {
+        return String(b.report_date || '').localeCompare(String(a.report_date || ''));
+      });
+
       if (!archiveItems.length) {
-        host.innerHTML = '<div class="reader-empty">暂无 AI 顾问报告，生成后会在此置顶展示。</div>';
+        host.innerHTML = '<div class="reader-empty">暂无报告与类目解读，生成后会在此置顶展示。</div>';
         return;
       }
 
@@ -866,8 +911,8 @@ var MemberReader = (function () {
       var dateEl = el('cardListDate');
       if (dateEl) {
         dateEl.textContent = pinDate === todayStr
-          ? ('今日 ' + todayStr + ' 已置顶 · 月份 → 日期 → 虚拟 / 实体')
-          : ('最新 ' + (pinDate || '—') + ' · 月份 → 日期 → 虚拟 / 实体');
+          ? ('今日 ' + todayStr + ' 已置顶 · 方向解读 + 类目解读')
+          : ('最新 ' + (pinDate || '—') + ' · 月份 → 日期 → 方向 / 类目');
       }
 
       // 2) 月份 → 日期 → 虚拟/实体 → 电商网格卡片
@@ -900,6 +945,8 @@ var MemberReader = (function () {
           var dayLabel = rd.slice(5);
           var dirs = it2.directions || [];
           var dirCount = it2.direction_count || dirs.length || 0;
+          var dayInsights = insightsByDate[rd] || [];
+          var insightCount = dayInsights.length;
           var physicalCnt = it2.physical_count || 0;
           var virtualCnt = it2.virtual_count || 0;
           var mixedCnt = it2.mixed_count || 0;
@@ -909,36 +956,44 @@ var MemberReader = (function () {
           var dayArrow = dayExpanded ? '▼' : '▶';
 
           var badges = '';
-          if (physicalCnt || virtualCnt || mixedCnt) {
+          if (physicalCnt || virtualCnt || mixedCnt || insightCount) {
             badges = '<span class="ai-cat-badges">'
               + (physicalCnt ? '<span class="cat-badge cat-physical">🏷️' + physicalCnt + '</span>' : '')
               + (virtualCnt ? '<span class="cat-badge cat-virtual">💾' + virtualCnt + '</span>' : '')
               + (mixedCnt ? '<span class="cat-badge cat-mixed">🔄' + mixedCnt + '</span>' : '')
+              + (insightCount ? '<span class="cat-badge cat-insight">📈' + insightCount + '</span>' : '')
               + '</span>';
           }
+
+          var countLabel = [];
+          if (dirCount) countLabel.push(dirCount + ' 方向');
+          if (insightCount) countLabel.push(insightCount + ' 类目');
+          if (!countLabel.length) countLabel.push('暂无内容');
 
           html += '<div class="archive-day-group' + (dayExpanded ? ' expanded' : '') + (isToday ? ' is-today' : '') + '">';
           html += '<div class="archive-day-head" data-date="' + escFn(rd) + '">';
           html += '<span class="archive-day-icon">' + dayIcon + '</span>';
           html += '<span class="archive-day-date">' + escFn(dayLabel) + '</span>';
           if (isToday) html += '<span class="archive-today-badge">今日</span>';
-          html += '<span class="archive-day-count">' + dirCount + ' 篇</span>';
+          html += '<span class="archive-day-count">' + countLabel.join(' · ') + '</span>';
           html += badges;
           html += '<span class="archive-day-arrow">' + dayArrow + '</span>';
           html += '</div>';
           html += '<div class="archive-day-body"' + (dayExpanded ? '' : ' style="display:none"') + '>';
 
-          // 整日简报：网格卡片（与方向解读同风格）
-          html += '<div class="reader-card-group">';
-          html += '<div class="reader-card-group-title">整日报告<span class="count">1</span></div>';
-          html += '<div class="reader-card-grid">';
-          html += buildCardCell({
-            icon: '📄',
-            badge: isToday ? '今日' : '整日',
-            title: isToday ? '今日整日报告' : (dayLabel + ' 整日报告'),
-            node: { type: 'archive', date: rd }
-          });
-          html += '</div></div>';
+          // 整日简报（仅有顾问包时展示）
+          if (!it2.insight_only) {
+            html += '<div class="reader-card-group">';
+            html += '<div class="reader-card-group-title">整日报告<span class="count">1</span></div>';
+            html += '<div class="reader-card-grid">';
+            html += buildCardCell({
+              icon: '📄',
+              badge: isToday ? '今日' : '整日',
+              title: isToday ? '今日整日报告' : (dayLabel + ' 整日报告'),
+              node: { type: 'archive', date: rd }
+            });
+            html += '</div></div>';
+          }
 
           if (dirs.length) {
             var buckets = { physical: [], virtual: [], other: [] };
@@ -957,15 +1012,12 @@ var MemberReader = (function () {
             for (var ts = 0; ts < typeSpecs.length; ts++) {
               var spec = typeSpecs[ts];
               if (!spec.list.length) continue;
-              var typeExpanded = true;
-              var typeIcon = '📂';
-              var typeArrow = '▼';
               html += '<div class="archive-type-group expanded">';
               html += '<div class="archive-type-head" data-type="' + spec.key + '">';
-              html += '<span class="archive-type-icon">' + typeIcon + '</span>';
+              html += '<span class="archive-type-icon">📂</span>';
               html += '<span class="archive-type-title ' + spec.cls + '">' + spec.icon + ' ' + spec.label + '</span>';
               html += '<span class="archive-type-count">' + spec.list.length + ' 篇</span>';
-              html += '<span class="archive-type-arrow">' + typeArrow + '</span>';
+              html += '<span class="archive-type-arrow">▼</span>';
               html += '</div>';
               html += '<div class="archive-type-body">';
               html += '<div class="reader-card-grid">';
@@ -980,8 +1032,31 @@ var MemberReader = (function () {
               }
               html += '</div></div></div>';
             }
-          } else {
+          } else if (!it2.insight_only) {
             html += '<div class="archive-dir-empty">该日无方向解读数据</div>';
+          }
+
+          // 类目解读（原今日分析「类目情报」网格）
+          if (dayInsights.length) {
+            html += '<div class="archive-type-group expanded">';
+            html += '<div class="archive-type-head" data-type="insight">';
+            html += '<span class="archive-type-icon">📂</span>';
+            html += '<span class="archive-type-title cat-insight">📈 类目解读</span>';
+            html += '<span class="archive-type-count">' + dayInsights.length + ' 篇</span>';
+            html += '<span class="archive-type-arrow">▼</span>';
+            html += '</div>';
+            html += '<div class="archive-type-body">';
+            html += '<div class="reader-card-grid">';
+            for (var mi = 0; mi < dayInsights.length; mi++) {
+              var ins2 = dayInsights[mi];
+              html += buildCardCell({
+                icon: '📈',
+                badge: ins2.stars ? ('★' + ins2.stars) : '类目',
+                title: ins2.category || '类目',
+                node: { type: 'insight', date: rd, category: ins2.category || '' }
+              });
+            }
+            html += '</div></div></div>';
           }
 
           html += '</div></div>'; // day-body / day-group
