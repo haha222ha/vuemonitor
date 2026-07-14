@@ -21,10 +21,10 @@ from cloud_deploy.reporting.constants import COL, REPORT_COLUMNS
 
 
 def _parse_report_payload(text: str) -> dict:
-    """兼容 gen_report 产出：末尾可有/无分号。"""
-    m = re.search(r"var\s+REPORT_DATA\s*=\s*(\{.*\})\s*;?\s*$", text, re.S)
+    """兼容 gen_report 产出：var/无 var、末尾可有/无分号。"""
+    m = re.search(r"(?:var\s+)?REPORT_DATA\s*=\s*(\{.*\})\s*;?\s*$", text, re.S)
     if not m:
-        m = re.search(r"var\s+REPORT_DATA\s*=\s*(\{.*\})", text, re.S)
+        m = re.search(r"(?:var\s+)?REPORT_DATA\s*=\s*(\{.*\})", text, re.S)
     if not m:
         raise RuntimeError("无法解析 REPORT_DATA JSON")
     return json.loads(m.group(1))
