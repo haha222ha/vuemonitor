@@ -538,20 +538,55 @@
   color: #b8860b;
 }
 
-/* archive 日期文件夹（第二层） */
-.archive-day-group {
-  margin: 6px 0;
-  border: 1px solid var(--reader-line);
-  border-radius: 10px;
-  overflow: hidden;
-  background: var(--reader-surface);
+/* archive 日期横排网格（第二层） */
+.archive-day-picker {
+  margin-bottom: 8px;
 }
-.archive-day-group.expanded {
-  border-color: var(--reader-accent);
+.archive-day-grid {
+  margin-bottom: 4px;
 }
-.archive-day-group.is-today {
+.archive-day-cell {
+  min-height: 110px;
+}
+.archive-day-cell.is-today {
   border-color: rgba(0, 113, 227, 0.45);
-  box-shadow: 0 2px 12px rgba(0, 113, 227, 0.08);
+}
+.archive-day-cell .archive-today-badge {
+  margin: 4px auto 0;
+}
+.archive-day-cell-meta {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--reader-text2, #86868b);
+  line-height: 1.3;
+}
+.archive-day-cell-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+.archive-day-panels {
+  margin-top: 4px;
+}
+.archive-day-panel {
+  border: 1px solid var(--reader-line);
+  border-radius: 12px;
+  padding: 10px 12px 12px;
+  background: var(--reader-surface, #fff);
+}
+.archive-day-panel.expanded {
+  border-color: rgba(0, 113, 227, 0.35);
+}
+.archive-day-panel-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--reader-text);
+  margin: 0 0 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--reader-line);
 }
 .archive-today-badge {
   display: inline-flex;
@@ -565,7 +600,7 @@
   line-height: 1.3;
 }
 .archive-type-body .reader-card-grid,
-.archive-day-body > .reader-card-group {
+.archive-day-panel > .reader-card-group {
   margin: 0 0 10px;
 }
 .archive-day-head {

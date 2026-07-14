@@ -911,8 +911,8 @@ var MemberReader = (function () {
       var dateEl = el('cardListDate');
       if (dateEl) {
         dateEl.textContent = pinDate === todayStr
-          ? ('今日 ' + todayStr + ' 已置顶 · 方向解读 + 类目解读')
-          : ('最新 ' + (pinDate || '—') + ' · 月份 → 日期 → 方向 / 类目');
+          ? ('今日 ' + todayStr + ' 已置顶 · 点选日期卡片查看报告')
+          : ('最新 ' + (pinDate || '—') + ' · 月份 → 日期网格 → 方向 / 类目');
       }
 
       // 2) 月份 → 日期 → 虚拟/实体 → 电商网格卡片
@@ -939,6 +939,9 @@ var MemberReader = (function () {
         html += '</div>';
         html += '<div class="archive-month-body"' + (monthExpanded ? '' : ' style="display:none"') + '>';
 
+        // 日期横排网格（电商列表风格）+ 下方展开选中日内容
+        var dayGridHtml = '';
+        var dayPanelsHtml = '';
         for (var k = 0; k < items.length; k++) {
           var it2 = items[k];
           var rd = it2.report_date || '';
@@ -952,47 +955,47 @@ var MemberReader = (function () {
           var mixedCnt = it2.mixed_count || 0;
           var isToday = (rd === todayStr);
           var dayExpanded = (rd === pinDate);
-          var dayIcon = dayExpanded ? '📂' : '📁';
-          var dayArrow = dayExpanded ? '▼' : '▶';
 
-          var badges = '';
-          if (physicalCnt || virtualCnt || mixedCnt || insightCount) {
-            badges = '<span class="ai-cat-badges">'
+          var metaBits = [];
+          if (dirCount) metaBits.push(dirCount + '方向');
+          if (insightCount) metaBits.push(insightCount + '类目');
+          if (!metaBits.length) metaBits.push('暂无');
+
+          dayGridHtml += '<button type="button" class="reader-card-cell archive-day-cell'
+            + (dayExpanded ? ' active' : '')
+            + (isToday ? ' is-today' : '')
+            + '" data-date="' + escFn(rd) + '">';
+          dayGridHtml += '<div class="rcc-icon">' + (isToday ? '📅' : '🗂') + '</div>';
+          dayGridHtml += '<div class="rcc-title">' + escFn(dayLabel) + '</div>';
+          if (isToday) dayGridHtml += '<div class="archive-today-badge">今日</div>';
+          dayGridHtml += '<div class="archive-day-cell-meta">' + escFn(metaBits.join(' · ')) + '</div>';
+          if (physicalCnt || virtualCnt || insightCount) {
+            dayGridHtml += '<div class="archive-day-cell-badges">'
               + (physicalCnt ? '<span class="cat-badge cat-physical">🏷️' + physicalCnt + '</span>' : '')
               + (virtualCnt ? '<span class="cat-badge cat-virtual">💾' + virtualCnt + '</span>' : '')
-              + (mixedCnt ? '<span class="cat-badge cat-mixed">🔄' + mixedCnt + '</span>' : '')
               + (insightCount ? '<span class="cat-badge cat-insight">📈' + insightCount + '</span>' : '')
-              + '</span>';
+              + '</div>';
           }
+          dayGridHtml += '</button>';
 
-          var countLabel = [];
-          if (dirCount) countLabel.push(dirCount + ' 方向');
-          if (insightCount) countLabel.push(insightCount + ' 类目');
-          if (!countLabel.length) countLabel.push('暂无内容');
+          dayPanelsHtml += '<div class="archive-day-panel' + (dayExpanded ? ' expanded' : '') + '"'
+            + ' data-date="' + escFn(rd) + '"'
+            + (dayExpanded ? '' : ' style="display:none"') + '>';
+          dayPanelsHtml += '<div class="archive-day-panel-title">'
+            + (isToday ? '今日 ' : '') + escFn(rd) + ' 报告'
+            + '</div>';
 
-          html += '<div class="archive-day-group' + (dayExpanded ? ' expanded' : '') + (isToday ? ' is-today' : '') + '">';
-          html += '<div class="archive-day-head" data-date="' + escFn(rd) + '">';
-          html += '<span class="archive-day-icon">' + dayIcon + '</span>';
-          html += '<span class="archive-day-date">' + escFn(dayLabel) + '</span>';
-          if (isToday) html += '<span class="archive-today-badge">今日</span>';
-          html += '<span class="archive-day-count">' + countLabel.join(' · ') + '</span>';
-          html += badges;
-          html += '<span class="archive-day-arrow">' + dayArrow + '</span>';
-          html += '</div>';
-          html += '<div class="archive-day-body"' + (dayExpanded ? '' : ' style="display:none"') + '>';
-
-          // 整日简报（仅有顾问包时展示）
           if (!it2.insight_only) {
-            html += '<div class="reader-card-group">';
-            html += '<div class="reader-card-group-title">整日报告<span class="count">1</span></div>';
-            html += '<div class="reader-card-grid">';
-            html += buildCardCell({
+            dayPanelsHtml += '<div class="reader-card-group">';
+            dayPanelsHtml += '<div class="reader-card-group-title">整日报告<span class="count">1</span></div>';
+            dayPanelsHtml += '<div class="reader-card-grid">';
+            dayPanelsHtml += buildCardCell({
               icon: '📄',
               badge: isToday ? '今日' : '整日',
               title: isToday ? '今日整日报告' : (dayLabel + ' 整日报告'),
               node: { type: 'archive', date: rd }
             });
-            html += '</div></div>';
+            dayPanelsHtml += '</div></div>';
           }
 
           if (dirs.length) {
@@ -1012,55 +1015,60 @@ var MemberReader = (function () {
             for (var ts = 0; ts < typeSpecs.length; ts++) {
               var spec = typeSpecs[ts];
               if (!spec.list.length) continue;
-              html += '<div class="archive-type-group expanded">';
-              html += '<div class="archive-type-head" data-type="' + spec.key + '">';
-              html += '<span class="archive-type-icon">📂</span>';
-              html += '<span class="archive-type-title ' + spec.cls + '">' + spec.icon + ' ' + spec.label + '</span>';
-              html += '<span class="archive-type-count">' + spec.list.length + ' 篇</span>';
-              html += '<span class="archive-type-arrow">▼</span>';
-              html += '</div>';
-              html += '<div class="archive-type-body">';
-              html += '<div class="reader-card-grid">';
+              dayPanelsHtml += '<div class="archive-type-group expanded">';
+              dayPanelsHtml += '<div class="archive-type-head" data-type="' + spec.key + '">';
+              dayPanelsHtml += '<span class="archive-type-icon">📂</span>';
+              dayPanelsHtml += '<span class="archive-type-title ' + spec.cls + '">' + spec.icon + ' ' + spec.label + '</span>';
+              dayPanelsHtml += '<span class="archive-type-count">' + spec.list.length + ' 篇</span>';
+              dayPanelsHtml += '<span class="archive-type-arrow">▼</span>';
+              dayPanelsHtml += '</div>';
+              dayPanelsHtml += '<div class="archive-type-body">';
+              dayPanelsHtml += '<div class="reader-card-grid">';
               for (var di2 = 0; di2 < spec.list.length; di2++) {
                 var d2 = spec.list[di2];
-                html += buildCardCell({
+                dayPanelsHtml += buildCardCell({
                   icon: '🎯',
                   badge: spec.label,
                   title: d2.title || d2.key,
                   node: { type: 'direction', date: rd, key: d2.key }
                 });
               }
-              html += '</div></div></div>';
+              dayPanelsHtml += '</div></div></div>';
             }
           } else if (!it2.insight_only) {
-            html += '<div class="archive-dir-empty">该日无方向解读数据</div>';
+            dayPanelsHtml += '<div class="archive-dir-empty">该日无方向解读数据</div>';
           }
 
-          // 类目解读（原今日分析「类目情报」网格）
           if (dayInsights.length) {
-            html += '<div class="archive-type-group expanded">';
-            html += '<div class="archive-type-head" data-type="insight">';
-            html += '<span class="archive-type-icon">📂</span>';
-            html += '<span class="archive-type-title cat-insight">📈 类目解读</span>';
-            html += '<span class="archive-type-count">' + dayInsights.length + ' 篇</span>';
-            html += '<span class="archive-type-arrow">▼</span>';
-            html += '</div>';
-            html += '<div class="archive-type-body">';
-            html += '<div class="reader-card-grid">';
+            dayPanelsHtml += '<div class="archive-type-group expanded">';
+            dayPanelsHtml += '<div class="archive-type-head" data-type="insight">';
+            dayPanelsHtml += '<span class="archive-type-icon">📂</span>';
+            dayPanelsHtml += '<span class="archive-type-title cat-insight">📈 类目解读</span>';
+            dayPanelsHtml += '<span class="archive-type-count">' + dayInsights.length + ' 篇</span>';
+            dayPanelsHtml += '<span class="archive-type-arrow">▼</span>';
+            dayPanelsHtml += '</div>';
+            dayPanelsHtml += '<div class="archive-type-body">';
+            dayPanelsHtml += '<div class="reader-card-grid">';
             for (var mi = 0; mi < dayInsights.length; mi++) {
               var ins2 = dayInsights[mi];
-              html += buildCardCell({
+              dayPanelsHtml += buildCardCell({
                 icon: '📈',
                 badge: ins2.stars ? ('★' + ins2.stars) : '类目',
                 title: ins2.category || '类目',
                 node: { type: 'insight', date: rd, category: ins2.category || '' }
               });
             }
-            html += '</div></div></div>';
+            dayPanelsHtml += '</div></div></div>';
           }
 
-          html += '</div></div>'; // day-body / day-group
+          dayPanelsHtml += '</div>'; // /archive-day-panel
         }
+
+        html += '<div class="reader-card-group archive-day-picker">';
+        html += '<div class="reader-card-group-title">日期<span class="count">' + items.length + '</span></div>';
+        html += '<div class="reader-card-grid archive-day-grid">' + dayGridHtml + '</div>';
+        html += '</div>';
+        html += '<div class="archive-day-panels">' + dayPanelsHtml + '</div>';
 
         html += '</div></div>'; // month-body / month-group
       }
@@ -1071,11 +1079,29 @@ var MemberReader = (function () {
       for (var h = 0; h < monthHeads.length; h++) {
         monthHeads[h].onclick = function () { toggleArchiveGroup(this, 'month'); };
       }
-      var dayHeads = host.querySelectorAll('.archive-day-head');
-      for (var dh = 0; dh < dayHeads.length; dh++) {
-        dayHeads[dh].onclick = function (e) {
+      // 日期网格：点击切换下方该日内容（同月内单选）
+      var dayCells = host.querySelectorAll('.archive-day-cell');
+      for (var dh = 0; dh < dayCells.length; dh++) {
+        dayCells[dh].onclick = function (e) {
           e.stopPropagation();
-          toggleArchiveGroup(this, 'day');
+          var date = this.getAttribute('data-date') || '';
+          var monthBody = this.closest ? this.closest('.archive-month-body') : null;
+          if (!monthBody) {
+            var p = this.parentNode;
+            while (p && !(p.className && String(p.className).indexOf('archive-month-body') >= 0)) p = p.parentNode;
+            monthBody = p;
+          }
+          if (!monthBody) return;
+          var cellsInMonth = monthBody.querySelectorAll('.archive-day-cell');
+          for (var ci = 0; ci < cellsInMonth.length; ci++) {
+            cellsInMonth[ci].classList.toggle('active', cellsInMonth[ci].getAttribute('data-date') === date);
+          }
+          var panels = monthBody.querySelectorAll('.archive-day-panel');
+          for (var pi2 = 0; pi2 < panels.length; pi2++) {
+            var show = panels[pi2].getAttribute('data-date') === date;
+            panels[pi2].style.display = show ? '' : 'none';
+            panels[pi2].classList.toggle('expanded', show);
+          }
         };
       }
       var typeHeads = host.querySelectorAll('.archive-type-head');
@@ -1085,8 +1111,8 @@ var MemberReader = (function () {
           toggleArchiveGroup(this, 'type');
         };
       }
-      // 电商网格卡片：点击进入阅读（不离开报告中心）
-      var cells = host.querySelectorAll('.reader-card-cell');
+      // 内容卡片：进入阅读（排除日期选择格）
+      var cells = host.querySelectorAll('.reader-card-cell:not(.archive-day-cell)');
       for (var c = 0; c < cells.length; c++) {
         cells[c].onclick = function (e) {
           e.stopPropagation();
