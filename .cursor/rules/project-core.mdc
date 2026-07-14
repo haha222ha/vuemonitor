@@ -1,0 +1,54 @@
+---
+description: vuemonitor 总纲 — 通用约束、子系统地图、Python 自适应、V2 方向（每次开发必读）
+alwaysApply: true
+---
+
+# vuemonitor 开发总纲
+
+## 动手前
+
+1. 读根目录 **`AGENTS.md`** 与任务相关 doc（见该文件表格）。
+2. 需求不明 **先问**；改代码前 **先读** 现有实现与目录边界。
+3. 第三方 API / 加密 / 协议不熟 → 查文档或抓包，勿猜。
+
+## 子系统（勿混用）
+
+| 路径 | 角色 |
+|------|------|
+| `server/` | SaaS FastAPI + PG + Redis（`/opt/vuemonitor`） |
+| `xhs-cloud/` | 选品会员 API + PG（`/opt/xhs-cloud`，与 server 分离） |
+| `client/` | PC 端 Electron + Vue + Element Plus |
+| `projects/ai-market-intelligence-v2/` | V2 实验室；合并目标 `xhs-cloud` |
+| `D:\jiekoufenxi\小红书多设备爬虫\` | 本地爬虫 + **选品日报**（`gen_report.py` → `reports\全量MMDD\`）见 **`xhs-daily-report.mdc`** |
+
+**不是 Django 项目**；**PC 主客户端不是 PyQt**。
+
+## Python 版本 — 自适应
+
+- 以子目录 **`requirements*.txt`**、**现有 venv**、**deploy 脚本**为准。
+- `server/` → 现网 **3.11**（`deploy.sh`）；`xhs-cloud/` → 云主机 **`python3` + venv**。
+- **禁止**在无关改动中升级/降级 Python 或改 requirements 大版本。
+
+## PostgreSQL
+
+- 选品 / Legacy：`XHS_DATABASE_URL`（`database_pg.py`）
+- V2 Lab 可选：`INSIGHT_PG_DSN`（无则 mock）
+- 不动 `.env`、不提交密钥
+
+## V2 方向
+
+- 新会员 → V2 情报；老会员 Legacy 至 `expires_at`；最终 **同 URL `/member`**。
+- **复用** `xhs-cloud` 支付 / JWT / 授权码 / PG — 见 `docs/17-XHS-CLOUD-BASE-REUSE.md`。
+- Phase 0～2：**不改**现网 `member_portal.html`，除非用户要求合并。
+- AI 降本：预生成 + 缓存 — 见 `docs/22-INSIGHT-PRECOMPUTE-CACHE-DESIGN.md`。
+
+## UI 主题（必读）
+
+- PyQt GUI **四选一**：fusion_dark / qdarkstyle / qt-material / qfluentwidgets — 详见 **`ui-theme-style.mdc`**。
+- `client/` → Element Plus + `useTheme`；会员/V2 Web → Apple 风 `#0071e3`。
+- **禁止**同一子项目混用多套主题库。
+
+## 代码原则
+
+- 最小 diff；匹配周边风格；能复用不造轮子。
+- xhs-cloud 部署完成后见 **`xhs-cloud-deploy.mdc`**（Agent 自己 **commit + push + SSH `xhs365` pull**，勿甩命令给用户）。

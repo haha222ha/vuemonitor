@@ -1,5 +1,5 @@
 ---
-description: xhs-cloud 选品云端部署流程（本地 push + 云主机一键 pull）
+description: xhs-cloud 选品云端部署流程（Agent 执行 push + SSH pull，无需用户粘贴）
 alwaysApply: true
 ---
 
@@ -7,60 +7,64 @@ alwaysApply: true
 
 > 开发总纲与 V2 方向见根目录 **`AGENTS.md`** 与 **`project-core.mdc`**。
 
-## 路径
+## 路径与 SSH
 
-| 角色 | 路径 |
-|------|------|
+| 角色 | 路径 / 别名 |
+|------|-------------|
 | 开发机仓库 | `E:\vuemonitor` |
 | 云主机 git 克隆 | `/opt/vuemonitor` |
 | 云主机运行目录 | `/opt/xhs-cloud` |
+| SSH Host（开发机已配置） | **`xhs365`**（用户一般为 `admin`，可用 `BatchMode`） |
 | 会员页 | https://monitor.xhs365.cn/member |
 
 ## Agent 必须做的事（完成 xhs-cloud 改动后）
 
+**不要把「云主机命令」丢给用户自己跑**——开发机 **push** 与主机 **pull/deploy** 均由 Agent 用 Shell 完成。
+
 1. **只提交相关文件**（例如 `xhs-cloud/**`、`.cursor/rules/**`），不要混入无关的 client/web-user 改动。
-2. **主动 commit + push 到 `origin/main`**，无需用户再次提醒「帮我 push」。
-3. push 成功后，**把下面「云主机一键指令」原样发给用户**（整块复制粘贴），并提醒浏览器 **Ctrl+F5** 强刷会员页。
-4. 若用户说「部署 / 上线 / pull」，先确认本地已 push，再给出云主机指令；未 push 则先 push。
+2. **主动 commit + `git push origin main`**，无需用户再说「帮我 push」。
+3. **push 成功后立刻 SSH 部署**（默认 host-update，见下）。
+4. 部署成功后简短告知用户：已上线的 commit、提醒会员页 **Ctrl+F5**。仅当 SSH 失败时，才把失败原因和备用指令发给用户。
+5. 若用户说「部署 / 上线 / pull」而本地尚未 push：先 push，再 SSH 部署。
 
-## 云主机一键指令（给用户复制粘贴）
+## Agent 默认执行（host-update）
 
-**V2 全链路（推荐：pull + PG 08/09 + host-update + health + smoke）**
+在开发机（Windows）用非交互 SSH：
 
-```bash
-export XHS_MEMBER_TOKEN='...'    # 浏览器 localStorage xhs_member_token
-export XHS_SMOKE_EXPECT=legacy_dual
-bash /opt/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh
+```powershell
+ssh -o BatchMode=yes -o ConnectTimeout=20 xhs365 "bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/pull-and-deploy.sh"
+```
+
+该脚本会：`git fetch/reset origin/main` → `rsync …/xhs-cloud/cloud_deploy/ → /opt/xhs-cloud/cloud_deploy/` → `host-update.sh`。
+
+**正确 rsync 路径**：只同步 `cloud_deploy/` 子目录（见 `pull-and-deploy.sh`）。  
+**禁止**再用旧写法把整个 `xhs-cloud/`（含错误 `--delete`）盖到 `/opt/xhs-cloud/`，易触发权限错误。
+
+验证可选：
+
+```powershell
+ssh -o BatchMode=yes xhs365 "cd /opt/vuemonitor && git rev-parse --short HEAD; grep portal-build /opt/xhs-cloud/cloud_deploy/assets/member_portal.html | head -1"
+```
+
+## V2 全链路（迁移 + 冒烟，需会员 token）
+
+仅当用户明确要求 smoke / 一键全链路时再跑：
+
+```powershell
+ssh -o BatchMode=yes xhs365 "export XHS_MEMBER_TOKEN='用户提供的token'; export XHS_SMOKE_EXPECT=legacy_dual; bash /opt/xhs-cloud/cloud_deploy/scripts/v2-oneclick-deploy.sh"
 ```
 
 手册：`projects/ai-market-intelligence-v2/docs/29-V2-ONECLICK-DEPLOY-RUNBOOK.md`
 
-**仅 host-update（无迁移/冒烟）**
-
-```bash
-cd /opt/vuemonitor && git fetch origin main && git reset --hard origin/main && rsync -a /opt/vuemonitor/xhs-cloud/ /opt/xhs-cloud/ --delete --exclude data --exclude venv --exclude .env && cd /opt/xhs-cloud && bash cloud_deploy/scripts/host-update.sh
-```
-
-等价：`bash /opt/vuemonitor/xhs-cloud/cloud_deploy/scripts/pull-and-deploy.sh`
-
-**开发机 push + 远程一键（Windows，需 SSH）**
-
-```powershell
-$env:XHS_DEPLOY_SSH='root@你的ECS'
-$env:XHS_MEMBER_TOKEN='eyJ...'
-powershell -ExecutionPolicy Bypass -File scripts\v2-push-and-deploy.ps1 -Message "fix: ..."
-```
+Windows 封装（可选）：`scripts\v2-push-and-deploy.ps1`（`$env:XHS_DEPLOY_SSH='xhs365'`）。
 
 ## 禁止
 
 - 不要假设「只在服务器 rsync」就能更新——必须先 git push，服务器 `/opt/vuemonitor` 才有新代码。
-- 不要直接改 `/opt/xhs-cloud`（运行目录），改 `E:\vuemonitor\xhs-cloud` 再 push。
+- 不要直接改 `/opt/xhs-cloud`（运行目录），改 `E:\vuemonitor\xhs-cloud` 再 push + SSH pull。
 - 不要提交 `.env`、数据库、大体积 data。
+- 不要把部署步骤甩给用户「复制粘贴到云主机」，除非 Agent SSH 不可用。
 
-## 仅改静态页时的最快热修（可选，跳过 git）
+## 仅改静态页时的最快热修（可选）
 
-```powershell
-scp E:\vuemonitor\xhs-cloud\cloud_deploy\assets\member_portal.html root@ECS_IP:/opt/xhs-cloud/cloud_deploy/assets/
-```
-
-服务器：`sudo systemctl restart xhs-cloud-api`
+Agent 仍可 `scp` 后 SSH `systemctl restart xhs-cloud-api`（需要的话）；常规流程优先走 git push + `pull-and-deploy.sh`。
