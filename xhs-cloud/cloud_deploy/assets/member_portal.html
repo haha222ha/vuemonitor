@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="portal-build" content="20260715r1">
+<meta name="portal-build" content="20260715r2">
 <link rel="stylesheet" href="/assets/member_theme.css?v=20260713p">
 <link rel="stylesheet" href="/assets/member_reader.css?v=20260714w28">
 <link rel="stylesheet" href="/assets/member_portal_themes.css?v=20260714w14">
@@ -753,7 +753,7 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
 </div>
 <script src="/assets/member_portal_state.js?v=20260714w24"></script>
 <script src="/assets/member_core.js?v=20260713p"></script>
-<script src="/assets/member_reader.js?v=20260715r1"></script>
+<script src="/assets/member_reader.js?v=20260715r2"></script>
 <script src="/assets/member_router.js?v=20260714w24"></script>
 <script src="/assets/member_insight.js?v=20260714w24"></script>
 <script>
@@ -1082,10 +1082,12 @@ function renderDemoCards() {
     var d = DEMO_DIRECTIONS[i];
     var unlocked = d.unlocked;
     var cls = unlocked ? 'unlocked' : 'locked';
-    // 加锁项也弹窗（showDemoDetail 内部判断 unlocked 状态分别渲染）
     var onclick = 'showDemoDetail(' + i + ')';
-    var tag = unlocked ? '可预览' : '会员专享';
-    var icon = unlocked ? '🎯' : '🔒';
+    var tag = unlocked ? (d.opportunity_score != null ? ('机会 ' + d.opportunity_score) : '可预览') : '会员专享';
+    if (unlocked && d.signal_track && d.signal_track !== '综合机会') {
+      tag = d.signal_track + ' · ' + tag;
+    }
+    var icon = unlocked ? '✨' : '🔒';
     html += '<div class="demo-card-item ' + cls + '" onclick="' + onclick + '">'
       + '<div class="demo-card-icon">' + icon + '</div>'
       + '<div class="demo-card-title">' + d.title + '</div>'
@@ -1184,19 +1186,18 @@ function showDemoDetail(idx) {
   var ctaEl = document.querySelector('#demoDetailOverlay .demo-detail-cta');
   if (d.unlocked) {
     // 解锁项：渲染完整内容 + 样例提示
-    bodyEl.innerHTML = renderMarkdown(d.content) + '<p style="color:var(--text2);font-size:13px;margin-top:16px;border-top:1px solid var(--line);padding-top:12px">⚠️ 以上为样例预览。开通会员可阅读完整 ' + DEMO_DIRECTIONS.length + ' 个方向解读 + 每日最新 AI 分析。</p>';
+    bodyEl.innerHTML = renderMarkdown(d.content) + '<p style="color:var(--text2);font-size:13px;margin-top:16px;border-top:1px solid var(--line);padding-top:12px">⚠️ 以上为脱敏研究样例。开通会员可阅读全部机会卡（含高增速/高加速度轨道）+ 每日最新 AI 研究。</p>';
     if (ctaEl) ctaEl.style.display = '';
   } else {
-    // 加锁项：显示会员专享引导 + 开通按钮（弹窗底部 CTA 按钮已绑定 switchPortal('center')）
     var lockedHtml = '<div style="text-align:center;padding:32px 16px;">'
       + '<div style="font-size:48px;margin-bottom:12px">🔒</div>'
-      + '<h3 style="font-size:18px;font-weight:700;margin-bottom:10px;color:var(--text)">本方向为会员专享内容</h3>'
+      + '<h3 style="font-size:18px;font-weight:700;margin-bottom:10px;color:var(--text)">本机会为会员专享</h3>'
       + '<p style="color:var(--text2);font-size:14px;line-height:1.7;margin-bottom:8px">开通 <strong style="color:var(--accent)">¥9.9 体验卡（3 天）</strong> 或正式会员即可：</p>'
       + '<ul style="text-align:left;max-width:420px;margin:12px auto;color:var(--text2);font-size:13px;line-height:1.9;list-style:none;padding:0">'
-      + '<li>✅ 解锁全部 ' + DEMO_DIRECTIONS.length + ' 个方向的 AI 深度分析</li>'
-      + '<li>✅ 每日最新 AI 选品顾问报告（30+ 方向）</li>'
-      + '<li>✅ AI 动态生成与顾问对话能力</li>'
-      + '<li>✅ 类目情报 / 机会雷达 / PDF 导出</li>'
+      + '<li>✅ 解锁全部 AI 机会卡与决策简报</li>'
+      + '<li>✅ 高增速 / 高加速度研究轨道</li>'
+      + '<li>✅ 每日最新选品研究（非全量原始数据）</li>'
+      + '<li>✅ AI 顾问对话能力</li>'
       + '</ul>'
       + '<p style="color:var(--text2);font-size:12px;margin-top:12px">点击下方「开通会员」按钮立即开通。</p>'
       + '</div>';

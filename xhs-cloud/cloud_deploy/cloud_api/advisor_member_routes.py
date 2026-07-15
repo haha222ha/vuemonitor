@@ -356,6 +356,9 @@ def advisor_dashboard(user: dict = Depends(current_user)):
                     "competition_level": card.get("competition_level") or "",
                     "lifecycle_stage": card.get("lifecycle_stage") or "",
                     "trend_label": card.get("trend_label") or "",
+                    "signal_track": card.get("signal_track") or "综合机会",
+                    "growth_band": card.get("growth_band") or "",
+                    "accel_band": card.get("accel_band") or "",
                     "price_band": card.get("price_band") or "",
                     "entity_class": str(card.get("entity_class") or "mixed").lower(),
                     "summary": (card.get("why_now") or "")[:160],
@@ -437,16 +440,18 @@ def advisor_article(report_date: str, article_key: str, user: dict = Depends(cur
         content = (
             f"## {card.get('concept_name')}\n\n"
             f"**机会指数**：{card.get('opportunity_score')}　"
+            f"**轨道**：{card.get('signal_track') or '综合机会'}　"
             f"**竞争**：{card.get('competition_level')}　"
-            f"**生命周期**：{card.get('lifecycle_stage')}　"
-            f"**趋势**：{card.get('trend_label')}\n\n"
+            f"**生命周期**：{card.get('lifecycle_stage')}\n\n"
+            f"**增速档**：{card.get('growth_band') or card.get('trend_label') or '—'}　"
+            f"**加速度档**：{card.get('accel_band') or '—'}　"
             f"**价格带**：{card.get('price_band')}　"
             f"**建议进入**：{card.get('suggested_entry_window')}\n\n"
             f"### 为什么现在\n{card.get('why_now') or ''}\n\n"
             f"### 怎么做\n{card.get('how_to_act') or ''}\n\n"
             f"### 适合谁\n{profiles or '中小商家'}\n\n"
             f"### 风险提示\n{risk_txt or '- 请自行验证供需'}\n\n"
-            f"> 研究结论基于脱敏聚合信号，不指向具体平台商品。"
+            f"> 研究结论基于脱敏聚合信号（含 PG 增速/加速度档位），不指向具体平台商品。"
         )
         _log_behavior(user["id"], "advisor_opportunity", report_date=report_date, metadata={"key": article_key})
         return {

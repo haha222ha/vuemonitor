@@ -396,6 +396,9 @@ var MemberReader = (function () {
         var op = opportunities[oi];
         var otags = [];
         if (op.opportunity_score != null) otags.push({ text: '指数 ' + op.opportunity_score, cls: 'stars' });
+        if (op.signal_track && op.signal_track !== '综合机会') otags.push({ text: op.signal_track, cls: '' });
+        if (op.growth_band) otags.push({ text: op.growth_band, cls: 'growth-up' });
+        if (op.accel_band) otags.push({ text: op.accel_band, cls: '' });
         if (op.competition_level) otags.push({ text: '竞争' + op.competition_level, cls: '' });
         if (op.lifecycle_stage) otags.push({ text: op.lifecycle_stage, cls: '' });
         if (op.price_band) otags.push({ text: op.price_band, cls: '' });

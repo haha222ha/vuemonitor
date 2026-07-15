@@ -27,6 +27,7 @@ _TITLE_SLICE_RE = re.compile(r"[·•]\s*[\u4e00-\u9fffA-Za-z]{8,}")
 OPPORTUNITY_WHITELIST = frozenset({
     "opportunity_id", "concept_name", "category_cluster", "entity_class",
     "opportunity_score", "competition_level", "lifecycle_stage", "trend_label",
+    "signal_track", "growth_band", "accel_band",
     "price_band", "suggested_entry_window", "suggested_seller_profile",
     "why_now", "how_to_act", "risks", "confidence", "evidence_摘要",
     "cluster_key",
