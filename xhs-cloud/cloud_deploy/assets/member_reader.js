@@ -387,30 +387,58 @@ var MemberReader = (function () {
       html += '</div></div>';
     }
 
-    // 机会卡（doc 49 主卖点）
+    // 机会卡（doc 49 主卖点：综合 / 高增速 / 高加速度）
     if (opportunities.length) {
+      var trackAll = [];
+      var trackGrowth = [];
+      var trackAccel = [];
+      var trackOverall = [];
+      for (var ti = 0; ti < opportunities.length; ti++) {
+        var t0 = opportunities[ti];
+        var st = t0.signal_track || '综合机会';
+        if (st === '高增速') trackGrowth.push(t0);
+        else if (st === '高加速度') trackAccel.push(t0);
+        else trackOverall.push(t0);
+        trackAll.push(t0);
+      }
       html += '<div class="reader-card-group" id="oppCardGroup">';
       html += '<div class="reader-card-group-title">今日机会<span class="count">' + opportunities.length + '</span></div>';
-      html += '<div class="reader-card-grid">';
-      for (var oi = 0; oi < opportunities.length; oi++) {
-        var op = opportunities[oi];
-        var otags = [];
-        if (op.opportunity_score != null) otags.push({ text: '指数 ' + op.opportunity_score, cls: 'stars' });
-        if (op.signal_track && op.signal_track !== '综合机会') otags.push({ text: op.signal_track, cls: '' });
-        if (op.growth_band) otags.push({ text: op.growth_band, cls: 'growth-up' });
-        if (op.accel_band) otags.push({ text: op.accel_band, cls: '' });
-        if (op.competition_level) otags.push({ text: '竞争' + op.competition_level, cls: '' });
-        if (op.lifecycle_stage) otags.push({ text: op.lifecycle_stage, cls: '' });
-        if (op.price_band) otags.push({ text: op.price_band, cls: '' });
-        html += buildCardCell({
-          icon: '✨',
-          badge: (op.entity_class === 'virtual') ? '虚拟' : '实体',
-          title: op.concept_name || op.opportunity_id,
-          tags: otags,
-          node: { type: 'opportunity', date: date, key: op.opportunity_id }
-        });
-      }
-      html += '</div></div>';
+      html += '<div class="dir-entity-filters opp-track-filters" role="tablist" aria-label="机会轨道筛选">';
+      html += '<button type="button" class="dir-entity-chip active" data-opp-filter="all">全部<span class="count">' + trackAll.length + '</span></button>';
+      if (trackOverall.length) html += '<button type="button" class="dir-entity-chip" data-opp-filter="综合机会">综合<span class="count">' + trackOverall.length + '</span></button>';
+      if (trackGrowth.length) html += '<button type="button" class="dir-entity-chip" data-opp-filter="高增速">高增速<span class="count">' + trackGrowth.length + '</span></button>';
+      if (trackAccel.length) html += '<button type="button" class="dir-entity-chip" data-opp-filter="高加速度">高加速度<span class="count">' + trackAccel.length + '</span></button>';
+      html += '</div>';
+
+      var renderOppSub = function (list, groupKey, title) {
+        if (!list.length) return '';
+        var h = '<div class="reader-card-subgroup" data-opp-group="' + groupKey + '">';
+        h += '<div class="reader-card-subgroup-title">' + title + '<span class="count">' + list.length + '</span></div>';
+        h += '<div class="reader-card-grid">';
+        for (var i = 0; i < list.length; i++) {
+          var op = list[i];
+          var otags = [];
+          if (op.opportunity_score != null) otags.push({ text: '指数 ' + op.opportunity_score, cls: 'stars' });
+          if (op.signal_track && op.signal_track !== '综合机会') otags.push({ text: op.signal_track, cls: '' });
+          if (op.growth_band) otags.push({ text: op.growth_band, cls: 'growth-up' });
+          if (op.accel_band) otags.push({ text: op.accel_band, cls: '' });
+          if (op.competition_level) otags.push({ text: '竞争' + op.competition_level, cls: '' });
+          if (op.price_band) otags.push({ text: op.price_band, cls: '' });
+          h += buildCardCell({
+            icon: '✨',
+            badge: (op.entity_class === 'virtual') ? '虚拟' : '实体',
+            title: op.concept_name || op.opportunity_id,
+            tags: otags,
+            node: { type: 'opportunity', date: date, key: op.opportunity_id }
+          });
+        }
+        h += '</div></div>';
+        return h;
+      };
+      html += renderOppSub(trackOverall, '综合机会', '综合机会');
+      html += renderOppSub(trackGrowth, '高增速', '高增速 TOP');
+      html += renderOppSub(trackAccel, '高加速度', '高加速度 TOP');
+      html += '</div>';
     }
 
     // 决策简报（原方向解读）
@@ -576,6 +604,7 @@ var MemberReader = (function () {
 
     bindInsightCatBars(body);
     bindDirEntityFilters(body);
+    bindOppTrackFilters(body);
 
     // 绑定卡片点击
     var cells = body.querySelectorAll('.reader-card-cell');
@@ -617,8 +646,44 @@ var MemberReader = (function () {
     }
   }
 
+  function bindOppTrackFilters(root) {
+    if (!root) return;
+    var chips = root.querySelectorAll('.opp-track-filters .dir-entity-chip');
+    if (!chips.length) return;
+    function applyFilter(filter) {
+      var groups = root.querySelectorAll('#oppCardGroup .reader-card-subgroup[data-opp-group]');
+      for (var i = 0; i < groups.length; i++) {
+        var g = groups[i];
+        var kind = g.getAttribute('data-opp-group') || '';
+        g.style.display = (filter === 'all' || filter === kind) ? '' : 'none';
+      }
+      for (var c = 0; c < chips.length; c++) {
+        var chip = chips[c];
+        var active = (chip.getAttribute('data-opp-filter') || '') === filter;
+        if (active) chip.classList.add('active');
+        else chip.classList.remove('active');
+      }
+    }
+    for (var j = 0; j < chips.length; j++) {
+      chips[j].onclick = function (ev) {
+        ev.preventDefault();
+        applyFilter(this.getAttribute('data-opp-filter') || 'all');
+      };
+    }
+  }
+
   function buildCardCell(opts) {
     var node = opts.node || {};
+    var tags = opts.tags || [];
+    var tagHtml = '';
+    if (tags.length) {
+      tagHtml = '<div class="rcc-tags">';
+      for (var t = 0; t < tags.length && t < 4; t++) {
+        var tg = tags[t] || {};
+        tagHtml += '<span class="rcc-tag ' + escFn(tg.cls || '') + '">' + escFn(String(tg.text || '')) + '</span>';
+      }
+      tagHtml += '</div>';
+    }
     return '<button type="button" class="reader-card-cell"'
       + ' data-node="' + escFn(node.type || '') + '"'
       + ' data-date="' + escFn(node.date || '') + '"'
@@ -627,6 +692,7 @@ var MemberReader = (function () {
       + '>'
       + '<div class="rcc-icon">' + opts.icon + '</div>'
       + '<div class="rcc-title">' + escFn(opts.title) + '</div>'
+      + tagHtml
       + '</button>';
   }
 

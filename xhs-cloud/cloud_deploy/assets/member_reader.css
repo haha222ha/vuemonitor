@@ -143,6 +143,30 @@
   justify-content: center;
 }
 
+.reader-card-cell .rcc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 8px;
+}
+.reader-card-cell .rcc-tag {
+  font-size: 10px;
+  line-height: 1.2;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--reader-muted, #6e6e73);
+}
+.reader-card-cell .rcc-tag.stars {
+  color: #0071e3;
+  background: rgba(0, 113, 227, 0.1);
+}
+.reader-card-cell .rcc-tag.growth-up {
+  color: #1a7f37;
+  background: rgba(26, 127, 55, 0.1);
+}
+
 /* 详情视图 */
 .reader-detail {
   background: var(--reader-surface, #fff);
