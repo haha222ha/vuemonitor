@@ -80,6 +80,12 @@ def _load_public_advice(report_date: str) -> dict:
     if isinstance(data, dict):
         data.pop("rankings", None)
         data.pop("context", None)
+        try:
+            from cloud_deploy.rank_engine.compliance import public_trim_advice
+
+            data = public_trim_advice(data)
+        except Exception:
+            pass
         data = _enrich_advice_types(data)
     return data
 
@@ -322,6 +328,7 @@ def advisor_dashboard(user: dict = Depends(current_user)):
     advisor_date = dates[0] if dates else ""
     overview = None
     directions: list[dict] = []
+    opportunities: list[dict] = []
     status = "pending"
 
     if advisor_date:
@@ -329,17 +336,36 @@ def advisor_dashboard(user: dict = Depends(current_user)):
             advice = _load_public_advice(advisor_date)
             status = "published"
             ov = advice.get("daily_overview") or {}
+            n_opp = len(advice.get("opportunity_cards") or [])
             overview = {
-                "title": ov.get("title") or "今日市场观察",
+                "title": ov.get("title") or "今日选品研究",
                 "summary": (ov.get("summary") or ov.get("content") or "")[:240],
                 "read_url": f"/api/v1/member/advisor/{advisor_date}/articles/overview",
+                "opportunity_count": n_opp,
             }
+            for card in advice.get("opportunity_cards") or []:
+                if not isinstance(card, dict):
+                    continue
+                oid = str(card.get("opportunity_id") or "")
+                if not oid:
+                    continue
+                opportunities.append({
+                    "opportunity_id": oid,
+                    "concept_name": card.get("concept_name") or oid,
+                    "opportunity_score": card.get("opportunity_score"),
+                    "competition_level": card.get("competition_level") or "",
+                    "lifecycle_stage": card.get("lifecycle_stage") or "",
+                    "trend_label": card.get("trend_label") or "",
+                    "price_band": card.get("price_band") or "",
+                    "entity_class": str(card.get("entity_class") or "mixed").lower(),
+                    "summary": (card.get("why_now") or "")[:160],
+                })
             for block in advice.get("direction_advices") or []:
                 if not isinstance(block, dict):
                     continue
                 directions.append({
                     "key": block.get("key") or "",
-                    "title": block.get("title") or block.get("key") or "维度解读",
+                    "title": block.get("title") or block.get("key") or "决策简报",
                     "summary": (block.get("summary") or block.get("content") or "")[:200],
                     "category_type": str(block.get("category_type") or "mixed").lower(),
                 })
@@ -370,6 +396,7 @@ def advisor_dashboard(user: dict = Depends(current_user)):
             "report_date": report_date,
             "status": status,
             "overview": overview,
+            "opportunities": opportunities,
             "directions": directions,
             "insights": insights,
         },
@@ -397,6 +424,43 @@ def advisor_article(report_date: str, article_key: str, user: dict = Depends(cur
     data = _load_public_advice(report_date)
     if article_key == "overview":
         block = data.get("daily_overview")
+    elif str(article_key).startswith("opp_"):
+        card = next(
+            (c for c in data.get("opportunity_cards", []) if c.get("opportunity_id") == article_key),
+            None,
+        )
+        if not card:
+            raise HTTPException(status_code=404, detail="机会卡不存在")
+        risks = card.get("risks") or []
+        risk_txt = "\n".join(f"- {r}" for r in risks)
+        profiles = "、".join(card.get("suggested_seller_profile") or [])
+        content = (
+            f"## {card.get('concept_name')}\n\n"
+            f"**机会指数**：{card.get('opportunity_score')}　"
+            f"**竞争**：{card.get('competition_level')}　"
+            f"**生命周期**：{card.get('lifecycle_stage')}　"
+            f"**趋势**：{card.get('trend_label')}\n\n"
+            f"**价格带**：{card.get('price_band')}　"
+            f"**建议进入**：{card.get('suggested_entry_window')}\n\n"
+            f"### 为什么现在\n{card.get('why_now') or ''}\n\n"
+            f"### 怎么做\n{card.get('how_to_act') or ''}\n\n"
+            f"### 适合谁\n{profiles or '中小商家'}\n\n"
+            f"### 风险提示\n{risk_txt or '- 请自行验证供需'}\n\n"
+            f"> 研究结论基于脱敏聚合信号，不指向具体平台商品。"
+        )
+        _log_behavior(user["id"], "advisor_opportunity", report_date=report_date, metadata={"key": article_key})
+        return {
+            "report_date": report_date,
+            "key": article_key,
+            "title": card.get("concept_name") or article_key,
+            "summary": (card.get("why_now") or "")[:200],
+            "content": content,
+            "key_points": [],
+            "category_type": str(card.get("entity_class") or "").strip().lower(),
+            "opportunity": card,
+            "source_refs": [],
+            "source_ref_policy": "",
+        }
     else:
         block = next(
             (d for d in data.get("direction_advices", []) if d.get("key") == article_key),

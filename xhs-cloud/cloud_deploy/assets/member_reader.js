@@ -369,23 +369,48 @@ var MemberReader = (function () {
 
     var html = '';
     var seenInsight = {};
+    var opportunities = today.opportunities || [];
 
-    // 今日简报分组
+    // 今日研究简报
     if (today.overview) {
+      var oppN = today.overview.opportunity_count || opportunities.length || 0;
       html += '<div class="reader-card-group">';
-      html += '<div class="reader-card-group-title">今日简报<span class="count">1</span></div>';
+      html += '<div class="reader-card-group-title">今日研究<span class="count">1</span></div>';
       html += '<div class="reader-card-grid">';
       html += buildCardCell({
         icon: '📊',
-        badge: '简报',
-        title: today.overview.title || '市场观察',
-        tags: [{ text: 'AI 选品', cls: '' }],
+        badge: '研究',
+        title: today.overview.title || '今日选品研究',
+        tags: oppN ? [{ text: oppN + ' 个机会', cls: '' }] : [{ text: 'AI 研究', cls: '' }],
         node: { type: 'overview', date: date }
       });
       html += '</div></div>';
     }
 
-    // 方向解读分组（按虚拟/实体分类分区展示）
+    // 机会卡（doc 49 主卖点）
+    if (opportunities.length) {
+      html += '<div class="reader-card-group" id="oppCardGroup">';
+      html += '<div class="reader-card-group-title">今日机会<span class="count">' + opportunities.length + '</span></div>';
+      html += '<div class="reader-card-grid">';
+      for (var oi = 0; oi < opportunities.length; oi++) {
+        var op = opportunities[oi];
+        var otags = [];
+        if (op.opportunity_score != null) otags.push({ text: '指数 ' + op.opportunity_score, cls: 'stars' });
+        if (op.competition_level) otags.push({ text: '竞争' + op.competition_level, cls: '' });
+        if (op.lifecycle_stage) otags.push({ text: op.lifecycle_stage, cls: '' });
+        if (op.price_band) otags.push({ text: op.price_band, cls: '' });
+        html += buildCardCell({
+          icon: '✨',
+          badge: (op.entity_class === 'virtual') ? '虚拟' : '实体',
+          title: op.concept_name || op.opportunity_id,
+          tags: otags,
+          node: { type: 'opportunity', date: date, key: op.opportunity_id }
+        });
+      }
+      html += '</div></div>';
+    }
+
+    // 决策简报（原方向解读）
     if (today.directions && today.directions.length) {
       // 按 category_type 分组
       var physicalDirs = [];
@@ -402,8 +427,8 @@ var MemberReader = (function () {
       }
 
       html += '<div class="reader-card-group" id="dirCardGroup">';
-      html += '<div class="reader-card-group-title">方向解读<span class="count">' + today.directions.length + '</span></div>';
-      html += '<div class="dir-entity-filters" role="tablist" aria-label="方向虚实筛选">';
+      html += '<div class="reader-card-group-title">决策简报<span class="count">' + today.directions.length + '</span></div>';
+      html += '<div class="dir-entity-filters" role="tablist" aria-label="简报虚实筛选">';
       html += '<button type="button" class="dir-entity-chip active" data-dir-filter="all">全部<span class="count">' + today.directions.length + '</span></button>';
       if (physicalDirs.length) {
         html += '<button type="button" class="dir-entity-chip" data-dir-filter="physical">实体<span class="count">' + physicalDirs.length + '</span></button>';
@@ -611,7 +636,7 @@ var MemberReader = (function () {
         var btn = cells[i];
         var match = btn.getAttribute('data-node') === node.type
           && (btn.getAttribute('data-date') || '') === (node.date || '');
-        if (node.type === 'direction') match = match && btn.getAttribute('data-key') === node.key;
+        if (node.type === 'direction' || node.type === 'opportunity') match = match && btn.getAttribute('data-key') === node.key;
         if (node.type === 'insight') match = match && btn.getAttribute('data-category') === node.category;
         btn.classList.toggle('active', match);
       }
@@ -853,7 +878,7 @@ var MemberReader = (function () {
       return;
     }
 
-    if (node.type === 'direction' && node.date && node.key) {
+    if ((node.type === 'direction' || node.type === 'opportunity') && node.date && node.key) {
       apiFn('/api/v1/member/advisor/' + encodeURIComponent(node.date) + '/articles/' + encodeURIComponent(node.key), { auth: true })
         .then(function (data) { renderMarkdownArticle(data, node); })
         .then(function () { if (isUserClick) hideAiGenOverlay(); })

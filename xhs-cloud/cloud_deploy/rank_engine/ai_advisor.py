@@ -105,12 +105,32 @@ class AiAdvisor:
         if not report_date:
             raise ValueError("缺少 target_date")
 
-        # 主路径：LLM 真实生成（llm_enhance=True 或 LLM 已配置时自动启用）
         from cloud_deploy.reporting.insight_llm_client import llm_configured
 
+        # doc 49：研究包 / 本地预生成机会卡为发布主路径（LLM 仅可选润色）
+        research = ctx.get("research_pack") if isinstance(ctx.get("research_pack"), dict) else {}
+        pre = ctx.get("pre_analysis") or ctx.get("advice")
+        if isinstance(pre, dict) and (
+            pre.get("opportunity_cards")
+            or pre.get("daily_overview")
+            or pre.get("direction_advices")
+        ):
+            advice = self._normalize_pregen(report_date, pre)
+            if research.get("opportunity_cards") and not advice.get("opportunity_cards"):
+                advice["opportunity_cards"] = research.get("opportunity_cards")
+            if llm_enhance and llm_configured():
+                advice = self._maybe_llm_enhance_opportunities(report_date, advice, ctx)
+            return self._finalize_advice(advice, ctx)
+
+        if research.get("opportunity_cards"):
+            advice = self._advice_from_research_pack(report_date, research)
+            if llm_enhance and llm_configured():
+                advice = self._maybe_llm_enhance_opportunities(report_date, advice, ctx)
+            return self._finalize_advice(advice, ctx)
+
+        # 兼容旧路径：无研究包时才走全量榜单 LLM
         use_llm = llm_enhance or llm_configured()
         if use_llm and llm_configured():
-            # B 模式：context 含 feature_summaries（程序预计算 80%）→ LLM 只润色 20%
             if ctx.get("feature_summaries"):
                 try:
                     advice = self._llm_generate_b_mode(report_date, ctx)
@@ -124,17 +144,8 @@ class AiAdvisor:
             except Exception as e:
                 print(f"[advisor] LLM 主路径失败，回退模板: {e}", file=sys.stderr, flush=True)
 
-        # 兼容旧路径：本地预生成 advice（随 context 上传）
-        pre = ctx.get("pre_analysis") or ctx.get("advice")
-        if isinstance(pre, dict) and (pre.get("daily_overview") or pre.get("direction_advices")):
-            advice = self._normalize_pregen(report_date, pre)
-            if llm_enhance:
-                advice = self._maybe_llm_enhance(report_date, advice, ctx)
-            return self._finalize_advice(advice, ctx)
-
-        # 最终兜底：规则模板
         advice = self._template_generate(report_date, ctx)
-        if llm_enhance:
+        if llm_enhance and llm_configured():
             advice = self._maybe_llm_enhance(report_date, advice, ctx)
         return self._finalize_advice(advice, ctx)
 
@@ -1021,26 +1032,144 @@ class AiAdvisor:
     def _normalize_pregen(self, report_date: str, pre: dict[str, Any]) -> dict[str, Any]:
         meta = pre.get("meta") or {}
         overview = pre.get("daily_overview") or {}
-        directions = pre.get("direction_advices") or []
+        directions = pre.get("direction_advices") or pre.get("decision_briefs") or []
+        cards = pre.get("opportunity_cards") or []
         return {
             "report_date": report_date,
             "generated_at": meta.get("finished_at") or datetime.now(timezone.utc).isoformat(),
             "meta": {
                 "target_date": report_date,
-                "mode": meta.get("mode") or "pregen",
+                "mode": meta.get("mode") or "pregen_research",
                 "generator": meta.get("generator") or "local_pregen",
                 "finished_at": meta.get("finished_at"),
-                "schema_version": meta.get("schema_version") or "1.0",
+                "schema_version": meta.get("schema_version") or ("2.0" if cards else "1.0"),
+                "pack_type": meta.get("pack_type") or ("research_v1" if cards else ""),
+                "opportunity_count": len(cards),
             },
             "daily_overview": {
-                "title": overview.get("title") or "今日市场观察",
+                "title": overview.get("title") or "今日选品研究",
                 "summary": (overview.get("summary") or overview.get("content") or "")[:240],
                 "content": overview.get("content") or overview.get("summary") or "",
             },
+            "opportunity_cards": cards,
             "direction_advices": directions,
+            "decision_briefs": directions,
             "disclaimer": pre.get("disclaimer") or "仅供参考，不构成投资建议。",
             "dynamic": pre.get("dynamic"),
         }
+
+    def _advice_from_research_pack(self, report_date: str, research: dict[str, Any]) -> dict[str, Any]:
+        """无本地 advice 时，直接从 research_pack 组装会员可读结构。"""
+        cards = list(research.get("opportunity_cards") or [])
+        briefs = []
+        for d in research.get("directions") or []:
+            keys = set(d.get("cluster_keys") or [])
+            picked = [c for c in cards if c.get("cluster_key") in keys][:6]
+            if not picked:
+                continue
+            top = picked[0]
+            lines = [
+                f"一、核心判断\n「{d.get('title')}」优先概念「{top.get('concept_name')}」"
+                f"（指数 {top.get('opportunity_score')}）。",
+                "二、机会清单",
+            ]
+            for c in picked:
+                lines.append(
+                    f"- {c.get('concept_name')}｜指数{c.get('opportunity_score')}｜"
+                    f"{c.get('price_band')}｜竞争{c.get('competition_level')}"
+                )
+            lines.append(f"三、怎么做\n{top.get('how_to_act') or ''}")
+            lines.append("四、风险")
+            for r in (top.get("risks") or [])[:3]:
+                lines.append(f"- {r}")
+            briefs.append({
+                "key": d.get("key"),
+                "title": f"{d.get('title')}解读",
+                "summary": (top.get("why_now") or "")[:200],
+                "content": "\n".join(lines),
+                "category_type": top.get("entity_class") or "mixed",
+            })
+        heads = "、".join(f"{c.get('concept_name')}({c.get('opportunity_score')})" for c in cards[:3]) or "暂无"
+        overview = (
+            f"一、核心结论\n{report_date} 共筛选 {len(cards)} 个研究机会概念。头条：{heads}。\n\n"
+            f"二、操作提示\n优先阅读指数≥80且竞争为「低」的机会卡。\n\n"
+            f"三、免责声明\n仅供参考，不构成投资建议。"
+        )
+        return {
+            "report_date": report_date,
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "meta": {
+                "target_date": report_date,
+                "mode": "research_pack",
+                "schema_version": "2.0",
+                "pack_type": "research_v1",
+                "opportunity_count": len(cards),
+            },
+            "daily_overview": {
+                "title": "今日选品研究",
+                "summary": overview.split("\n\n")[0][:240],
+                "content": overview,
+            },
+            "opportunity_cards": cards,
+            "direction_advices": briefs,
+            "decision_briefs": briefs,
+            "disclaimer": "仅供参考，不构成投资建议。",
+        }
+
+    def _maybe_llm_enhance_opportunities(
+        self, report_date: str, advice: dict[str, Any], ctx: dict[str, Any]
+    ) -> dict[str, Any]:
+        """仅对前若干机会卡润色 why/how/risk（不回写标题/销量）。"""
+        cards = list(advice.get("opportunity_cards") or [])
+        if not cards:
+            return self._maybe_llm_enhance(report_date, advice, ctx)
+        try:
+            from cloud_deploy.reporting.insight_llm_client import chat_json_with_usage
+
+            payload = [
+                {
+                    "opportunity_id": c.get("opportunity_id"),
+                    "concept_name": c.get("concept_name"),
+                    "opportunity_score": c.get("opportunity_score"),
+                    "competition_level": c.get("competition_level"),
+                    "lifecycle_stage": c.get("lifecycle_stage"),
+                    "price_band": c.get("price_band"),
+                }
+                for c in cards[:8]
+            ]
+            system = (
+                "你是电商选品研究顾问。根据机会概念特征，为每张卡生成 why_now/how_to_act/risks。"
+                "禁止商品ID、店铺名、链接、完整标题、绝对销量数字。返回 JSON："
+                '{"cards":[{"opportunity_id":"...","why_now":"...","how_to_act":"...","risks":["..."]}]}'
+            )
+            user = json.dumps({"report_date": report_date, "cards": payload}, ensure_ascii=False)[:12000]
+            parsed, _ = chat_json_with_usage(system, user, temperature=0.35, agent="ceo")
+            enrich_map = {}
+            if isinstance(parsed, dict):
+                for row in parsed.get("cards") or []:
+                    if isinstance(row, dict) and row.get("opportunity_id"):
+                        enrich_map[str(row["opportunity_id"])] = row
+            if enrich_map:
+                advice = dict(advice)
+                new_cards = []
+                for c in cards:
+                    row = enrich_map.get(str(c.get("opportunity_id")))
+                    if row:
+                        c = dict(c)
+                        if row.get("why_now"):
+                            c["why_now"] = str(row["why_now"])[:500]
+                        if row.get("how_to_act"):
+                            c["how_to_act"] = str(row["how_to_act"])[:500]
+                        if isinstance(row.get("risks"), list) and row["risks"]:
+                            c["risks"] = [str(x)[:120] for x in row["risks"][:4]]
+                    new_cards.append(c)
+                advice["opportunity_cards"] = new_cards
+                meta = dict(advice.get("meta") or {})
+                meta["llm_opportunity_polish"] = True
+                advice["meta"] = meta
+        except Exception as e:
+            print(f"[advisor] opportunity polish skipped: {e}", file=sys.stderr, flush=True)
+        return advice
 
     def _maybe_llm_enhance(self, report_date: str, advice: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
         """旧路径可选 LLM 补充（保留以兼容老调用方）。"""
@@ -1065,12 +1194,18 @@ class AiAdvisor:
         from cloud_deploy.reporting.insight_llm_client import chat_json_with_usage
 
         system = (
-            "你是小红书选品顾问。根据已有预生成报告与榜单 context，"
-            "输出一段 200 字以内的补充观察（纯文本）。"
-            "禁止 goods_id、店铺名、商品链接、完整标题。"
+            "你是选品研究顾问。根据已有研究摘要，输出 200 字以内补充观察。"
+            "禁止 goods_id、店铺名、商品链接、完整标题、绝对销量子段。"
         )
         user = json.dumps(
-            {"report_date": report_date, "overview": advice.get("daily_overview"), "brief": ctx.get("daily_brief")},
+            {
+                "report_date": report_date,
+                "overview": advice.get("daily_overview"),
+                "opportunities": [
+                    {"concept": c.get("concept_name"), "score": c.get("opportunity_score")}
+                    for c in (advice.get("opportunity_cards") or [])[:8]
+                ],
+            },
             ensure_ascii=False,
         )[:8000]
         parsed, _ = chat_json_with_usage(system, user, temperature=0.3, agent="ceo")
@@ -1079,7 +1214,7 @@ class AiAdvisor:
         return ""
 
     def _template_generate(self, report_date: str, ctx: dict[str, Any]) -> dict[str, Any]:
-        summary = str(ctx.get("market_summary") or ctx.get("summary") or "市场数据已接收，系统正在生成完整 AI 解读。")
+        summary = str(ctx.get("market_summary") or ctx.get("summary") or "研究数据已接收，正在生成解读。")
         directions = []
         for block in ctx.get("direction_advices") or ctx.get("directions") or ctx.get("direction_blocks") or []:
             if not isinstance(block, dict):
@@ -1094,14 +1229,24 @@ class AiAdvisor:
                 "summary": text[:200],
                 "content": text or block.get("summary") or "",
             })
+        cards = []
+        research = ctx.get("research_pack") if isinstance(ctx.get("research_pack"), dict) else {}
+        if research.get("opportunity_cards"):
+            cards = list(research["opportunity_cards"])
         return {
             "report_date": report_date,
             "generated_at": datetime.now(timezone.utc).isoformat(),
+            "meta": {
+                "schema_version": "2.0" if cards else "1.0",
+                "pack_type": "research_v1" if cards else "",
+                "opportunity_count": len(cards),
+            },
             "daily_overview": {
-                "title": "今日市场观察",
+                "title": "今日选品研究",
                 "summary": summary[:240],
                 "content": summary,
             },
+            "opportunity_cards": cards,
             "direction_advices": directions[:8],
             "disclaimer": "仅供参考，不构成投资建议。",
         }
