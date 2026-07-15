@@ -352,6 +352,9 @@ def advisor_dashboard(user: dict = Depends(current_user)):
                 opportunities.append({
                     "opportunity_id": oid,
                     "concept_name": card.get("concept_name") or oid,
+                    "decision_verdict": card.get("decision_verdict") or "",
+                    "core_direction": card.get("core_direction") or "",
+                    "fulfillment_mode": card.get("fulfillment_mode") or "",
                     "opportunity_score": card.get("opportunity_score"),
                     "competition_level": card.get("competition_level") or "",
                     "lifecycle_stage": card.get("lifecycle_stage") or "",
@@ -361,7 +364,7 @@ def advisor_dashboard(user: dict = Depends(current_user)):
                     "accel_band": card.get("accel_band") or "",
                     "price_band": card.get("price_band") or "",
                     "entity_class": str(card.get("entity_class") or "mixed").lower(),
-                    "summary": (card.get("why_now") or "")[:160],
+                    "summary": (card.get("decision_verdict") or card.get("why_now") or "")[:160],
                 })
             for block in advice.get("direction_advices") or []:
                 if not isinstance(block, dict):
@@ -439,6 +442,10 @@ def advisor_article(report_date: str, article_key: str, user: dict = Depends(cur
         profiles = "、".join(card.get("suggested_seller_profile") or [])
         content = (
             f"## {card.get('concept_name')}\n\n"
+            f"> **决策结论**：{card.get('decision_verdict') or card.get('core_direction') or card.get('concept_name')}\n\n"
+            f"**履约形态**：{card.get('fulfillment_mode') or ('虚拟' if card.get('entity_class')=='virtual' else '实体')}　"
+            f"**虚实**：{'虚拟培训/数字交付' if card.get('entity_class')=='virtual' else '实体供应'}　"
+            f"**类目簇**：{card.get('category_cluster') or '—'}\n\n"
             f"**机会指数**：{card.get('opportunity_score')}　"
             f"**轨道**：{card.get('signal_track') or '综合机会'}　"
             f"**竞争**：{card.get('competition_level')}　"
@@ -447,11 +454,12 @@ def advisor_article(report_date: str, article_key: str, user: dict = Depends(cur
             f"**加速度档**：{card.get('accel_band') or '—'}　"
             f"**价格带**：{card.get('price_band')}　"
             f"**建议进入**：{card.get('suggested_entry_window')}\n\n"
+            f"### 核心方向\n{card.get('core_direction') or ''}\n\n"
             f"### 为什么现在\n{card.get('why_now') or ''}\n\n"
             f"### 怎么做\n{card.get('how_to_act') or ''}\n\n"
             f"### 适合谁\n{profiles or '中小商家'}\n\n"
             f"### 风险提示\n{risk_txt or '- 请自行验证供需'}\n\n"
-            f"> 研究结论基于脱敏聚合信号（含 PG 增速/加速度档位），不指向具体平台商品。"
+            f"> 输出为细分**研究方向**决策，不是平台商品链接；不提供可定位 SKU。"
         )
         _log_behavior(user["id"], "advisor_opportunity", report_date=report_date, metadata={"key": article_key})
         return {

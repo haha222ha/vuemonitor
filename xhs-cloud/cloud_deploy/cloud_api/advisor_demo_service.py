@@ -49,8 +49,12 @@ def _card_to_content(card: dict[str, Any]) -> str:
     risks = card.get("risks") or []
     risk_txt = "\n".join(f"- {r}" for r in risks) or "- 请自行验证供需"
     profiles = "、".join(card.get("suggested_seller_profile") or []) or "中小商家"
+    verdict = card.get("decision_verdict") or card.get("core_direction") or ""
     return (
         f"## {card.get('concept_name')}\n\n"
+        f"> **决策结论**：{verdict}\n\n"
+        f"**履约**：{card.get('fulfillment_mode') or '—'}　"
+        f"**虚实**：{'虚拟培训/数字交付' if card.get('entity_class')=='virtual' else '实体供应'}\n\n"
         f"**机会指数**：{card.get('opportunity_score')}　"
         f"**轨道**：{card.get('signal_track') or '综合机会'}　"
         f"**竞争**：{card.get('competition_level')}　"
@@ -58,11 +62,12 @@ def _card_to_content(card: dict[str, Any]) -> str:
         f"**增速档**：{card.get('growth_band') or card.get('trend_label') or '—'}　"
         f"**加速度档**：{card.get('accel_band') or '—'}　"
         f"**价格带**：{card.get('price_band')}\n\n"
+        f"### 核心方向\n{card.get('core_direction') or ''}\n\n"
         f"### 为什么现在\n{card.get('why_now') or ''}\n\n"
         f"### 怎么做\n{card.get('how_to_act') or ''}\n\n"
         f"### 适合谁\n{profiles}\n\n"
         f"### 风险提示\n{risk_txt}\n\n"
-        f"> 样例为脱敏研究概念，不指向可定位平台商品。"
+        f"> 样例为细分研究方向决策，不指向可定位平台商品。"
     )
 
 
