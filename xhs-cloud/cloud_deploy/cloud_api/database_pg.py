@@ -973,9 +973,12 @@ def purge_all_member_reports(*, dry_run: bool = False) -> dict:
                 items_deleted = int(c.rowcount or 0)
                 c.execute("DELETE FROM report_daily_meta")
                 meta_deleted = int(c.rowcount or 0)
-                # 兜底清理归档目录残留 zip
+                # 兜底清理归档目录：仅选品报告 zip（勿删 ai_advisor / insight）
                 if archive_dir and os.path.isdir(archive_dir):
                     for zp in _glob.glob(os.path.join(archive_dir, "*.zip")):
+                        base = os.path.basename(zp)
+                        if not base.startswith(("全量", "周报", "月报", "定制")):
+                            continue
                         try:
                             os.remove(zp)
                             if zp not in files_removed:
