@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import secrets
 import threading
 import time
@@ -918,6 +919,95 @@ def upsert_report_archive(
                 ),
             )
         conn.commit()
+    finally:
+        conn.close()
+
+
+def purge_all_member_reports(*, dry_run: bool = False) -> dict:
+    """删除会员页全部选品报告归档（zip + PG 登记 + 日报行）。"""
+    import glob as _glob
+
+    from cloud_deploy.cloud_api.config import get_settings
+
+    archive_types = [
+        "member_daily_zip",
+        "member_weekly_zip",
+        "member_monthly_zip",
+        "member_custom_zip",
+    ]
+    settings = get_settings()
+    archive_dir = settings.xhs_report_archive_dir
+    conn = _conn()
+    files_removed: list[str] = []
+    try:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as c:
+            c.execute("SET search_path TO xhs_monitor, public")
+            c.execute(
+                """SELECT report_date, archive_type, storage_path, file_name, row_count
+                   FROM report_archives
+                   WHERE archive_type = ANY(%s)
+                   ORDER BY report_date DESC""",
+                (archive_types,),
+            )
+            rows = list(c.fetchall())
+            c.execute("SELECT COUNT(*) AS n FROM report_daily_items")
+            items_n = int((c.fetchone() or {}).get("n") or 0)
+            c.execute("SELECT COUNT(*) AS n FROM report_daily_meta")
+            meta_n = int((c.fetchone() or {}).get("n") or 0)
+
+            if not dry_run:
+                for r in rows:
+                    path = (r.get("storage_path") or "").strip()
+                    if path and os.path.isfile(path):
+                        try:
+                            os.remove(path)
+                            files_removed.append(path)
+                        except OSError:
+                            pass
+                c.execute(
+                    "DELETE FROM report_archives WHERE archive_type = ANY(%s)",
+                    (archive_types,),
+                )
+                archives_deleted = int(c.rowcount or 0)
+                c.execute("DELETE FROM report_daily_items")
+                items_deleted = int(c.rowcount or 0)
+                c.execute("DELETE FROM report_daily_meta")
+                meta_deleted = int(c.rowcount or 0)
+                # 兜底清理归档目录残留 zip
+                if archive_dir and os.path.isdir(archive_dir):
+                    for zp in _glob.glob(os.path.join(archive_dir, "*.zip")):
+                        try:
+                            os.remove(zp)
+                            if zp not in files_removed:
+                                files_removed.append(zp)
+                        except OSError:
+                            pass
+                conn.commit()
+            else:
+                archives_deleted = len(rows)
+                items_deleted = items_n
+                meta_deleted = meta_n
+        return {
+            "dry_run": dry_run,
+            "archives_matched": len(rows),
+            "archives_deleted": archives_deleted,
+            "report_daily_items_deleted": items_deleted,
+            "report_daily_meta_deleted": meta_deleted,
+            "files_removed": files_removed,
+            "archives": [
+                {
+                    "report_date": (
+                        r["report_date"].isoformat()
+                        if hasattr(r["report_date"], "isoformat")
+                        else str(r.get("report_date") or "")[:10]
+                    ),
+                    "archive_type": r.get("archive_type"),
+                    "file_name": r.get("file_name"),
+                    "row_count": r.get("row_count"),
+                }
+                for r in rows
+            ],
+        }
     finally:
         conn.close()
 

@@ -830,6 +830,14 @@ def public_advisor_demo_view(date: str = "", category: str = ""):
     return demo_view_response(date, category)
 
 
+@app.get("/api/v1/public/advisor-demo/advice")
+def public_advisor_demo_advice():
+    """返回静态样例 advice.json（后 15 方向内容替换为加锁文案）。"""
+    from cloud_deploy.cloud_api.advisor_demo_service import demo_advice_response
+
+    return demo_advice_response()
+
+
 @app.post("/api/v1/admin/auth-codes")
 def admin_generate_codes(body: GenerateCodesBody, _: None = Depends(verify_sync_key)):
     codes = db.generate_auth_codes(
@@ -1350,7 +1358,22 @@ async def sync_report_upload(
     file: UploadFile = File(...),
     _: None = Depends(verify_sync_key),
 ):
-    """方案 B：本地 gen_report 打包 zip 上传 → 解压 ingest → 会员可下载。"""
+    """方案 B：本地 gen_report 打包 zip 上传 → 解压 ingest → 会员可下载。
+
+    产品策略：默认拒绝选品报告上传（XHS_REPORT_UPLOAD_DISABLED=1，默认开启）。
+    紧急恢复：服务器设 XHS_REPORT_UPLOAD_DISABLED=0。
+    """
+    disabled = os.environ.get("XHS_REPORT_UPLOAD_DISABLED", "1").strip().lower() not in (
+        "0",
+        "false",
+        "no",
+        "off",
+    )
+    if disabled:
+        raise HTTPException(
+            status_code=403,
+            detail="选品报告上传已关闭（会员页不再提供全量日报下载）",
+        )
     from cloud_deploy.cloud_api.ingest_guard import ingest_force_enabled
 
     if not file.filename:

@@ -1,5 +1,5 @@
 ---
-description: 本地选品日报生成口径、脚本路径、去重与推云流水线（爬虫开发机 D 盘）
+description: 本地选品日报生成口径、脚本路径（仅本地，禁止推云）
 globs: "**/gen_report.py,**/gen_tiered_reports.py,**/xhs_daily_report_pipeline.py,**/xhs_report_scope.py,**/report_tiers.py,**/upload_report_cloud.py,**/category_lexicon/**,**/product_classify.py,**/mine_category_lexicon.py,**/seed_category_lexicon.py,**/lexicon_admin.py"
 alwaysApply: false
 ---
@@ -17,7 +17,18 @@ alwaysApply: false
 | 报告输出目录 | `D:\jiekoufenxi\小红书多设备爬虫\reports\全量MMDD\`（如 `全量0712\`） |
 | 产出文件 | `data.js` + `index_vue.html` + `index_with_gr.html` |
 | PG 配置 | `D:\xhs-data\config\portable_paths.env`（`XHS_DB_BACKEND=postgres`，库 `xhs_monitor`） |
-| 会员页（推云后） | https://monitor.xhs365.cn/member（**Ctrl+F5** 强刷） |
+
+## 硬策略：禁止推云
+
+| 项 | 说明 |
+|----|------|
+| **默认** | 选品报告（日/周/月）**只留本地** `reports/`，**禁止**上传会员页 |
+| 本地开关 | `report_meta.report_cloud_upload_enabled()`；需紧急上传时才设 `XHS_ALLOW_REPORT_CLOUD_UPLOAD=1` |
+| 云端拒收 | API `/api/v1/sync/report-upload` 默认 `XHS_REPORT_UPLOAD_DISABLED=1` → 403 |
+| 流水线 | `xhs_daily_report_pipeline.py` 自动 `skip_cloud`，挂机日批成功不依赖推云 |
+| 清空云归档 | 云主机：`python -m cloud_deploy.scripts.purge_member_reports` |
+
+**禁止**：把「推云 / upload-bundle」当作日批常规步骤；**禁止**在报告流水线里 `git push` / SSH 代码 pull。
 
 ## 核心脚本（按调用链）
 
@@ -25,12 +36,12 @@ alwaysApply: false
 |------|------|------|
 | **主生成** | `daily_report\gen_report.py` | 查 PG → 写 `data.js` + 复制 HTML 模板 |
 | **日批封装** | `daily_report\gen_tiered_reports.py` | 默认只跑 `TIER_DAILY`（`scan_window=1d`） |
-| **一键流水线** | `xhs_daily_report_pipeline.py` | 生成 → 精品 ingest → 打包 zip → 上传云 ingest |
+| **一键流水线** | `xhs_daily_report_pipeline.py` | 生成 →（可选精品 ingest）→ **不再推云** |
 | **口径常量** | `xhs_report_scope.py` | `DEFAULT_REPORT_SCAN_WINDOW=1d`、今日 `sold_history.delta≥1` |
-| **分档定义** | `daily_report\report_tiers.py` | `TIER_DAILY`：`folder_prefix=全量`，`cloud_primary=True` |
-| **类目标签** | `daily_report\category_lexicon\` + `product_classify.py` | 关键词关联库（可 seed/挖掘/晋级）；实体千帆一级优先 → `category_tag` |
-| **推云** | `daily_report\upload_report_cloud.py` | plan_b：`全量MMDD.zip` → 云主机 `/opt/xhs-cloud` |
-| **分类校正** | `tools\classify_unknown_goods.py` | `goods_base.is_virtual=-1` → 0/1（日报候选） |
+| **分档定义** | `daily_report\report_tiers.py` | `TIER_DAILY`：`folder_prefix=全量` |
+| **类目标签** | `daily_report\category_lexicon\` + `product_classify.py` | 关键词关联库 |
+| **推云（已禁用）** | `daily_report\upload_report_cloud.py` | 默认抛错拦截；勿再日常调用 |
+| **分类校正** | `tools\classify_unknown_goods.py` | `goods_base.is_virtual=-1` → 0/1 |
 
 ## 默认筛选口径（日报）
 
@@ -51,8 +62,6 @@ alwaysApply: false
 
 运维：`daily_report/seed_category_lexicon.py`、`mine_category_lexicon.py`、`lexicon_admin.py`。  
 日批流水线会自动 seed + mine + 晋级（`hit_count≥30`）。  
-`index_vue.html` / `index_with_gr.html` 有类目芯片筛选。  
-云洞察异名对齐：`xhs-cloud/cloud_deploy/config/category_taxonomy.yaml` aliases。
 
 ## 两层去重
 
@@ -72,27 +81,21 @@ python daily_report/gen_report.py --velocity-mode skip --no-wait-idle
 # 全 SKU 不去重
 python daily_report/gen_report.py --velocity-mode skip --no-wait-idle --no-dedup
 
-# 生成 + 推云（完整日批）
+# 日批流水线（生成；不会推云）
 python xhs_daily_report_pipeline.py --skip-ingest
-
-# 报告已生成，仅推云
-$env:XHS_DAILY_SKIP_CLOUD_IF_PUSHED="0"
-python xhs_daily_report_pipeline.py --skip-report --skip-ingest
 ```
 
 ## 本地 vs GitHub vs 云主机
 
 | 改动面 | 是否 git push `vuemonitor` | 上线方式 |
 |--------|---------------------------|----------|
-| 仅 D 盘 `daily_report/`、`rank_engine/`、流水线 | 否 | `gen_report` / `xhs_daily_report_pipeline` 推 **报告 zip（数据）** |
-| `E:\vuemonitor\xhs-cloud\**` 或 `.cursor/rules/**` | **是** → 由 **Cursor Agent** push + SSH pull | 见 `xhs-cloud-deploy.mdc`；**不要让用户或报告脚本做** |
-| 类目：D 盘 lexicon + 云 taxonomy | 两边都做完 | 报告只负责数据；代码侧 Agent 自己 push/pull |
-
-**硬约束**：选品报告流水线 **不得** 调用 `git push` / 云主机代码 pull；代码上线永远是 Cursor Agent 的事。
+| 仅 D 盘 `daily_report/`、流水线 | 否 | 本地 `gen_report` / pipeline，**不传报告 zip** |
+| `E:\vuemonitor\xhs-cloud\**` 或 `.cursor\rules\**` | **是** → Cursor Agent push + SSH pull | 见 `xhs-cloud-deploy.mdc` |
+| 类目：D 盘 lexicon + 云 taxonomy | 两边都做完 | 报告只负责本地数据 |
 
 ## Agent 注意
 
-- 改 HTML 模板：`daily_report\index_vue.html`、`index_with_gr.html`；需重跑 `gen_report` 才会复制进 `reports\全量MMDD\`；若同步镜像到 `xhs-cloud/cloud_deploy/assets/`，要 **push + pull**。
+- 改 HTML 模板：`daily_report\index_vue.html`、`index_with_gr.html`；需重跑 `gen_report` 才会复制进 `reports\全量MMDD\`。
 - `goods_fast` 是 PG **视图**，更新分类写 **`goods_base`**，勿 `UPDATE goods_fast`。
-- 推云成功后提醒用户云主机已 ingest；vuemonitor 侧 xhs-cloud 会员 API 读的是云端归档，不是 D 盘路径。
+- **不要**提醒用户「推云后 Ctrl+F5 看会员页日报」——会员页不再提供全量选品包下载。
 - 新类目词条：改 `category_lexicon/seed_data.py` 或 `lexicon_admin.py`，**不要**往 `product_classify._VIRTUAL_TAG_RULES` 堆。
