@@ -1425,6 +1425,19 @@ def _psyche_cookie_ok(request: Request) -> bool:
     return bool(got) and hmac.compare_digest(got, _psyche_board_token())
 
 
+try:
+    from cloud_deploy.cloud_api.psyche_intel_api import register_psyche_intel_routes
+
+    register_psyche_intel_routes(
+        app,
+        get_settings=get_settings,
+        cookie_ok=_psyche_cookie_ok,
+        board_token=_psyche_board_token,
+        board_password=_psyche_board_password,
+    )
+except Exception:
+    pass
+
 @app.post("/api/v1/sync/psyche-board-upload")
 async def sync_psyche_board_upload(
     file: UploadFile = File(...),
@@ -1463,7 +1476,7 @@ async def sync_psyche_board_upload(
         marker_path = os.path.join(report_dir, "psyche_board.json")
         with open(marker_path, encoding="utf-8") as f:
             marker = json.load(f)
-        report_date = str(marker.get("report_date") or "")[:10]
+        report_date = str(marker.get("report_date") or marker.get("scan_date") or "")[:10]
         if not report_date:
             report_date = datetime.now().strftime("%Y-%m-%d")
 
@@ -1536,8 +1549,8 @@ input{width:100%;padding:12px;border-radius:10px;border:1px solid #2a3542;backgr
 button{margin-top:12px;width:100%;padding:11px;border:0;border-radius:10px;background:#3d9cf0;color:#fff;font-weight:700;cursor:pointer}
 .err{color:#f07178;font-size:12px;min-height:18px;margin-top:8px}
 </style></head><body><div class="box">
-<h1>测评每日选品看板</h1>
-<p>私密入口 · 仅本人可见</p>
+<h1>心理测评情报 OS</h1>
+<p>私密入口 · 选品情报驾驶舱</p>
 <form method="post" action="/psyche/login">
 <input name="password" type="password" placeholder="访问密码" autofocus/>
 <button type="submit">进入</button>
@@ -1592,7 +1605,10 @@ def psyche_board_files(request: Request, path: str = ""):
         return RedirectResponse(url="/psyche/", status_code=302)
     root = os.path.join(_psyche_boards_root(), "latest")
     if not os.path.isdir(root):
-        raise HTTPException(status_code=404, detail="暂无看板，请先推送当日测评看板")
+        raise HTTPException(
+            status_code=404,
+            detail="暂无情报看板，请本机运行 gen_psyche_intel_board.py 后推送",
+        )
     rel = (path or "index.html").lstrip("/\\")
     if ".." in rel.replace("\\", "/").split("/"):
         raise HTTPException(status_code=400, detail="非法路径")
