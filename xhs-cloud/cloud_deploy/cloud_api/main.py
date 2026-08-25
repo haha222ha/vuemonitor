@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
+import json
 import os
 import sys
 import zipfile
@@ -1395,6 +1396,212 @@ async def sync_report_upload(
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"ingest 失败: {e}") from e
+
+
+def _psyche_board_password() -> str:
+    return (
+        os.environ.get("XHS_PSYCHE_BOARD_PASSWORD")
+        or os.environ.get("XHS_PRIVATE_BOARD_PASSWORD")
+        or "psyche2026"
+    ).strip()
+
+
+def _psyche_board_token(password: str = "") -> str:
+    import hashlib
+
+    raw = (password or _psyche_board_password()).strip()
+    return hashlib.sha256(f"xhs-psyche-board|{raw}".encode("utf-8")).hexdigest()
+
+
+def _psyche_boards_root() -> str:
+    s = get_settings()
+    return os.path.join(s.xhs_data_dir, "psyche_boards")
+
+
+def _psyche_cookie_ok(request: Request) -> bool:
+    import hmac
+
+    got = request.cookies.get("psyche_board_auth") or ""
+    return bool(got) and hmac.compare_digest(got, _psyche_board_token())
+
+
+@app.post("/api/v1/sync/psyche-board-upload")
+async def sync_psyche_board_upload(
+    file: UploadFile = File(...),
+    _: None = Depends(verify_sync_key),
+):
+    """接收测评私密选品看板 zip，解压到 data/psyche_boards/{date}/。"""
+    import hashlib
+    import shutil
+    import tempfile
+
+    from cloud_deploy.reporting.constants import ARCHIVE_PSYCHE_BOARD
+
+    filename = os.path.basename(file.filename or "psyche-board.zip")
+    if not filename.lower().endswith(".zip"):
+        raise HTTPException(status_code=400, detail="仅支持 zip")
+
+    tmp_dir = tempfile.mkdtemp(prefix="xhs-psyche-board-")
+    zip_path = os.path.join(tmp_dir, filename)
+    try:
+        with open(zip_path, "wb") as out:
+            shutil.copyfileobj(file.file, out)
+
+        extract_root = os.path.join(tmp_dir, "extract")
+        os.makedirs(extract_root, exist_ok=True)
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            zf.extractall(extract_root)
+
+        report_dir = ""
+        for root, _dirs, files in os.walk(extract_root):
+            if "index.html" in files and "psyche_board.json" in files and "data.js" in files:
+                report_dir = root
+                break
+        if not report_dir:
+            raise HTTPException(status_code=400, detail="zip 内未找到测评看板目录")
+
+        marker_path = os.path.join(report_dir, "psyche_board.json")
+        with open(marker_path, encoding="utf-8") as f:
+            marker = json.load(f)
+        report_date = str(marker.get("report_date") or "")[:10]
+        if not report_date:
+            report_date = datetime.now().strftime("%Y-%m-%d")
+
+        boards_root = _psyche_boards_root()
+        dest_live = os.path.join(boards_root, report_date)
+        os.makedirs(boards_root, exist_ok=True)
+        if os.path.isdir(dest_live):
+            shutil.rmtree(dest_live)
+        shutil.copytree(report_dir, dest_live)
+
+        latest = os.path.join(boards_root, "latest")
+        if os.path.isdir(latest):
+            shutil.rmtree(latest)
+        shutil.copytree(dest_live, latest)
+
+        archive_dir = get_settings().xhs_report_archive_dir
+        os.makedirs(archive_dir, exist_ok=True)
+        dest_zip = os.path.join(archive_dir, f"psyche_board_{report_date.replace('-', '')}.zip")
+        shutil.copy2(zip_path, dest_zip)
+        h = hashlib.sha256()
+        with open(dest_zip, "rb") as f:
+            for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                h.update(chunk)
+
+        db.init_db()
+        row_count = int(marker.get("psyche_goods") or 0)
+        db.upsert_report_archive(
+            report_date=report_date,
+            archive_type=ARCHIVE_PSYCHE_BOARD,
+            storage_path=dest_zip,
+            file_name=os.path.basename(dest_zip),
+            file_size=int(os.path.getsize(dest_zip)),
+            sha256=h.hexdigest(),
+            row_count=row_count,
+            meta={
+                "report_kind": "psyche_select_board",
+                "private": True,
+                "view_path": "/psyche/",
+                **marker,
+            },
+        )
+        return {
+            "ok": True,
+            "report_date": report_date,
+            "archive_type": ARCHIVE_PSYCHE_BOARD,
+            "view_url": "/psyche/",
+            "live_dir": dest_live,
+            "row_count": row_count,
+        }
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+@app.get("/psyche", response_class=HTMLResponse)
+@app.get("/psyche/", response_class=HTMLResponse)
+def psyche_board_gate(request: Request):
+    """测评看板密码门；通过后跳到 /psyche/board/。"""
+    if _psyche_cookie_ok(request):
+        from fastapi.responses import RedirectResponse
+
+        return RedirectResponse(url="/psyche/board/", status_code=302)
+    return HTMLResponse(
+        """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
+<title>测评看板入口</title>
+<style>
+body{font-family:Segoe UI,Microsoft YaHei,sans-serif;background:#0f1419;color:#e8eef4;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}
+.box{width:360px;padding:28px;background:#1a222c;border:1px solid #2a3542;border-radius:14px}
+h1{font-size:20px;margin:0 0 8px}p{color:#8b9aab;font-size:13px}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #2a3542;background:#0c1117;color:#fff;box-sizing:border-box}
+button{margin-top:12px;width:100%;padding:11px;border:0;border-radius:10px;background:#3d9cf0;color:#fff;font-weight:700;cursor:pointer}
+.err{color:#f07178;font-size:12px;min-height:18px;margin-top:8px}
+</style></head><body><div class="box">
+<h1>测评每日选品看板</h1>
+<p>私密入口 · 仅本人可见</p>
+<form method="post" action="/psyche/login">
+<input name="password" type="password" placeholder="访问密码" autofocus/>
+<button type="submit">进入</button>
+</form>
+<div class="err"></div>
+</div></body></html>"""
+    )
+
+
+@app.post("/psyche/login")
+async def psyche_board_login(request: Request):
+    import hmac
+
+    from fastapi.responses import RedirectResponse
+
+    ctype = (request.headers.get("content-type") or "").lower()
+    password = ""
+    if "application/json" in ctype:
+        try:
+            body = await request.json()
+            password = str((body or {}).get("password") or "")
+        except Exception:
+            password = ""
+    else:
+        form = await request.form()
+        password = str(form.get("password") or "")
+
+    if not hmac.compare_digest(_psyche_board_token(password), _psyche_board_token()):
+        return HTMLResponse(
+            "<html><body style='font-family:sans-serif;background:#0f1419;color:#f07178;padding:40px'>"
+            "密码错误 · <a href='/psyche/' style='color:#3d9cf0'>返回</a></body></html>",
+            status_code=401,
+        )
+    resp = RedirectResponse(url="/psyche/board/", status_code=302)
+    resp.set_cookie(
+        key="psyche_board_auth",
+        value=_psyche_board_token(),
+        httponly=True,
+        samesite="lax",
+        max_age=7 * 24 * 3600,
+    )
+    return resp
+
+
+@app.get("/psyche/board/{path:path}")
+@app.get("/psyche/board")
+@app.get("/psyche/board/")
+def psyche_board_files(request: Request, path: str = ""):
+    if not _psyche_cookie_ok(request):
+        from fastapi.responses import RedirectResponse
+
+        return RedirectResponse(url="/psyche/", status_code=302)
+    root = os.path.join(_psyche_boards_root(), "latest")
+    if not os.path.isdir(root):
+        raise HTTPException(status_code=404, detail="暂无看板，请先推送当日测评看板")
+    rel = (path or "index.html").lstrip("/\\")
+    if ".." in rel.replace("\\", "/").split("/"):
+        raise HTTPException(status_code=400, detail="非法路径")
+    target = os.path.join(root, rel)
+    if os.path.isdir(target):
+        target = os.path.join(target, "index.html")
+    if not os.path.isfile(target):
+        raise HTTPException(status_code=404, detail="文件不存在")
+    return FileResponse(target)
 
 
 @app.post("/api/v1/sync/sold-history")

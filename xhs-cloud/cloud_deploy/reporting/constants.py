@@ -102,6 +102,8 @@ ARCHIVE_DAILY = "member_daily_zip"
 ARCHIVE_WEEKLY = "member_weekly_zip"
 ARCHIVE_MONTHLY = "member_monthly_zip"
 ARCHIVE_CUSTOM = "member_custom_zip"
+# 私密 · 测评每日选品看板（密码门，仅本人）
+ARCHIVE_PSYCHE_BOARD = "private_psyche_board_zip"
 
 
 def item_at(item, key: str, default=None):
