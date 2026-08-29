@@ -47,11 +47,12 @@ header select,header button{padding:6px 10px;border-radius:6px;border:0}
   <h1>云端人工筛选（OCR 通过）</h1>
   <select id="batchSel"></select>
   <button id="reloadBtn">刷新</button>
-  <button id="saveBtn">保存本批筛选</button>
+  <button id="saveBtn">保存并放入上架队列</button>
   <button id="allRmBtn">全标删除</button>
   <button id="clearRmBtn">清除删除</button>
 </header>
 <div class="stat" id="stat">加载中…</div>
+<p class="stat" style="padding-top:0;color:#666">未勾「删除」= 通过。点「保存并放入上架队列」后，闲鱼主机会用 Sync-Key 轮询 <code>/api/v1/sync/listing-claim</code> 领取（主键=小红书商品 ID）。</p>
 <div class="grid" id="grid"></div>
 <script>
 const state = {};
@@ -115,11 +116,12 @@ function render() {
         <div class="title" title="${esc(it.title||'')}">${esc(it.title||'')}</div>
         <div class="meta"><span class="price">¥${esc(it.price)}</span>
           <a href="${esc(it.detail_url||'#')}" target="_blank" rel="noopener">详情</a></div>
-        <div class="ops"><label><input type="checkbox" data-id="${esc(id)}" ${st==='removed'?'checked':''}> 删除</label></div>
+        <div class="ops" style="color:#666;word-break:break-all">ID ${esc(id)}</div>
+        <div class="ops"><label><input type="checkbox" data-id="${esc(id)}" ${st==='removed'?'checked':''}> 删除（不进上架队列）</label></div>
       </div>`;
     grid.appendChild(card);
   });
-  $('#stat').textContent = `第${curBatch.no}批：将保留 ${will} · 删除 ${rm} · 共 ${curItems.length}（保存后本地可拉回决策再上架）`;
+  $('#stat').textContent = `第${curBatch.no}批：将通过 ${will}（进闲鱼领任务） · 删除 ${rm} · 共 ${curItems.length}`;
   grid.querySelectorAll('input[type=checkbox]').forEach(cb => {
     cb.onchange = () => { state[cb.dataset.id] = cb.checked ? 'removed' : 'pending'; render(); };
   });
@@ -138,7 +140,7 @@ async function saveReview() {
     body: JSON.stringify({keep, remove})
   });
   if (!r.ok) return alert(r.error||JSON.stringify(r));
-  alert(`已保存：保留 ${r.kept} · 删除 ${r.removed}`);
+  alert(`已保存：通过 ${r.kept} 条已进上架队列 · 删除 ${r.removed}\n闲鱼主机可轮询 listing-claim 领取（字段 source_product_id）`);
   loadBatches();
 }
 

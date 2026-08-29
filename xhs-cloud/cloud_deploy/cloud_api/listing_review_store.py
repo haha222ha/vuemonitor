@@ -211,14 +211,18 @@ def apply_review(no: int, keep: list[str], remove: list[str]) -> dict[str, Any]:
                 it["review"] = "removed"
                 it["review_reason"] = it.get("review_reason") or "cloud_human"
                 it["cloud_reviewed"] = True
+                it["listing_status"] = "skip"
                 n_rm += 1
             elif gid in keep_s:
                 it["review"] = "keep"
                 it["cloud_reviewed"] = True
+                # 进入闲鱼主机领任务队列
+                if _listing_status(it) not in ("listed", "listing"):
+                    it["listing_status"] = "ready"
                 n_keep += 1
         b["status"] = "approved"
         save_ledger(led)
-        return {"ok": True, "kept": n_keep, "removed": n_rm}
+        return {"ok": True, "kept": n_keep, "removed": n_rm, "queue_hint": "listing-claim"}
 
 
 def export_decisions() -> dict[str, Any]:
