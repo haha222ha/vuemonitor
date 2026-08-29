@@ -1711,7 +1711,8 @@ def listing_review_gate(request: Request):
         err = "<p style='color:#c00'>密码错误</p>"
     return HTMLResponse(
         f"""<!doctype html><html><head><meta charset=utf-8>
-<title>闲鱼选品云审核</title>
+<title>闲鱼选品 · 云端人工筛选</title>
+<script>(function killHostileSW(){{try{{if("serviceWorker" in navigator){{navigator.serviceWorker.getRegistrations().then(function(rs){{rs.forEach(function(r){{r.unregister();}});}}).catch(function(){{}});}}if(window.caches&&caches.keys){{caches.keys().then(function(keys){{keys.forEach(function(k){{caches.delete(k);}});}}).catch(function(){{}});}}}}catch(e){{}}}})();</script>
 <style>body{{font-family:system-ui;max-width:420px;margin:60px auto;padding:0 16px}}
 input,button{{font-size:16px;padding:8px 12px;width:100%;box-sizing:border-box;margin:6px 0}}
 </style></head><body>
@@ -1722,7 +1723,11 @@ input,button{{font-size:16px;padding:8px 12px;width:100%;box-sizing:border-box;m
 <input type="password" name="password" placeholder="审核密码" autofocus>
 <button type="submit">进入</button>
 </form>
-</body></html>"""
+</body></html>""",
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "X-Listing-Review": "1",
+        },
     )
 
 
@@ -1755,7 +1760,13 @@ def listing_review_app(request: Request, path: str = ""):
         target = os.path.join(_ASSETS, "listing_review_cloud.html")
         if rel != "index.html" or not os.path.isfile(target):
             raise HTTPException(status_code=404, detail="审核页未部署")
-    return FileResponse(target)
+    return FileResponse(
+        target,
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "X-Listing-Review": "1",
+        },
+    )
 
 
 @app.get("/psyche", response_class=HTMLResponse)
