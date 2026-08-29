@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>闲鱼选品 · 云端人工筛选</title>
+<style>
+:root { --bg:#f6f7f9; --card:#fff; --line:#e5e7eb; --ok:#1b7f4a; --rm:#8b1a1a; }
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,sans-serif;background:var(--bg);color:#111}
+header{position:sticky;top:0;z-index:10;background:#111;color:#fff;padding:10px 14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+header h1{font-size:15px;margin:0;font-weight:600}
+header select,header button{padding:6px 10px;border-radius:6px;border:0}
+.stat{padding:8px 14px;font-size:13px;color:#444}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;padding:0 14px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.card.removed{opacity:.4}
+.thumb{aspect-ratio:1;background:#ddd;position:relative}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.body{padding:8px}
+.title{font-size:12px;line-height:1.35;height:2.7em;overflow:hidden}
+.meta{display:flex;justify-content:space-between;font-size:12px;margin-top:4px}
+.price{color:#c2410c;font-weight:600}
+.ops{margin-top:6px;font-size:12px}
+.mark{position:absolute;top:6px;left:6px;background:var(--ok);color:#fff;font-size:11px;padding:2px 6px;border-radius:4px}
+.mark.rm{background:var(--rm)}
+</style>
+</head>
+<body>
+<header>
+  <h1>云端人工筛选（OCR 通过）</h1>
+  <select id="batchSel"></select>
+  <button id="reloadBtn">刷新</button>
+  <button id="saveBtn">保存本批筛选</button>
+  <button id="allRmBtn">全标删除</button>
+  <button id="clearRmBtn">清除删除</button>
+</header>
+<div class="stat" id="stat">加载中…</div>
+<div class="grid" id="grid"></div>
+<script>
+const state = {};
+let curBatch = null;
+let curItems = [];
+
+async function api(p, opt) {
+  const r = await fetch(p, opt);
+  try { return await r.json(); } catch { return { ok:false, error:'bad json '+r.status }; }
+}
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+async function loadBatches() {
+  const r = await api('/api/v1/listing-review/batches');
+  if (!r.ok) { $('#stat').textContent = r.error || '未登录'; return; }
+  const sel = $('#batchSel');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  (r.batches||[]).forEach(b => {
+    const o = document.createElement('option');
+    o.value = b.no;
+    o.textContent = `第${b.no}批 · ${b.count}条 · 待筛${b.pending} · 删${b.removed}`;
+    sel.appendChild(o);
+  });
+  if (prev) sel.value = prev;
+  if (sel.value) loadBatch();
+  else $('#stat').textContent = '暂无推送批次';
+}
+
+async function loadBatch() {
+  const no = $('#batchSel').value;
+  if (!no) return;
+  const r = await api('/api/v1/listing-review/batch/' + no);
+  if (!r.ok) { alert(r.error||'加载失败'); return; }
+  curBatch = r;
+  curItems = r.items || [];
+  curItems.forEach(it => {
+    const id = it.source_product_id;
+    if (!(id in state)) state[id] = it.review || 'pending';
+  });
+  render();
+}
+
+function render() {
+  const grid = $('#grid');
+  grid.innerHTML = '';
+  let will = 0, rm = 0;
+  curItems.forEach(it => {
+    const id = it.source_product_id;
+    const st = state[id] || it.review || 'pending';
+    if (st === 'removed') rm++; else will++;
+    const card = document.createElement('div');
+    card.className = 'card' + (st==='removed'?' removed':'');
+    const img = it.image_url || '';
+    card.innerHTML = `
+      <div class="thumb">
+        ${img?`<img loading="lazy" src="${esc(img)}" alt="">`:'<div style="width:100%;height:100%"></div>'}
+        ${st==='removed'?'<span class="mark rm">删除</span>':'<span class="mark">OCR过</span>'}
+      </div>
+      <div class="body">
+        <div class="title" title="${esc(it.title||'')}">${esc(it.title||'')}</div>
+        <div class="meta"><span class="price">¥${esc(it.price)}</span>
+          <a href="${esc(it.detail_url||'#')}" target="_blank" rel="noopener">详情</a></div>
+        <div class="ops"><label><input type="checkbox" data-id="${esc(id)}" ${st==='removed'?'checked':''}> 删除</label></div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  $('#stat').textContent = `第${curBatch.no}批：将保留 ${will} · 删除 ${rm} · 共 ${curItems.length}（保存后本地可拉回决策再上架）`;
+  grid.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.onchange = () => { state[cb.dataset.id] = cb.checked ? 'removed' : 'pending'; render(); };
+  });
+}
+
+async function saveReview() {
+  if (!curBatch) return;
+  const keep=[], remove=[];
+  curItems.forEach(it => {
+    const id = it.source_product_id;
+    const st = state[id] || 'pending';
+    (st==='removed'?remove:keep).push(id);
+  });
+  const r = await api('/api/v1/listing-review/batch/'+curBatch.no+'/review', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({keep, remove})
+  });
+  if (!r.ok) return alert(r.error||JSON.stringify(r));
+  alert(`已保存：保留 ${r.kept} · 删除 ${r.removed}`);
+  loadBatches();
+}
+
+function $(s){ return document.querySelector(s); }
+$('#reloadBtn').onclick = () => loadBatches();
+$('#saveBtn').onclick = () => saveReview();
+$('#batchSel').onchange = () => loadBatch();
+$('#allRmBtn').onclick = () => { curItems.forEach(it => state[it.source_product_id]='removed'); render(); };
+$('#clearRmBtn').onclick = () => { curItems.forEach(it => state[it.source_product_id]='pending'); render(); };
+loadBatches();
+</script>
+</body>
+</html>

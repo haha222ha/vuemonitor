@@ -1438,6 +1438,7 @@ try:
 except Exception:
     pass
 
+
 @app.post("/api/v1/sync/psyche-board-upload")
 async def sync_psyche_board_upload(
     file: UploadFile = File(...),
@@ -1530,6 +1531,233 @@ async def sync_psyche_board_upload(
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
+# ---------- 闲鱼选品云端人工审核（本地 OCR 通过后推送） ----------
+
+def _listing_review_password() -> str:
+    return (
+        os.environ.get("XHS_LISTING_REVIEW_PASSWORD")
+        or os.environ.get("XHS_PSYCHE_BOARD_PASSWORD")
+        or get_settings().xhs_cloud_admin_pass
+        or ""
+    )
+
+
+def _listing_cookie_ok(request: Request) -> bool:
+    pw = _listing_review_password()
+    if not pw:
+        return False
+    return request.cookies.get("xhs_listing_review") == pw
+
+
+@app.post("/api/v1/sync/listing-review-upload")
+async def sync_listing_review_upload(
+    file: UploadFile = File(...),
+    _: None = Depends(verify_sync_key),
+):
+    """接收本地 OCR 通过批次 zip（内含 ledger_slice.json）。"""
+    import shutil
+    import tempfile
+    import zipfile
+
+    from cloud_deploy.cloud_api import listing_review_store as lrs
+
+    filename = os.path.basename(file.filename or "listing-review.zip")
+    if not filename.lower().endswith(".zip"):
+        raise HTTPException(status_code=400, detail="仅支持 zip")
+
+    tmp_dir = tempfile.mkdtemp(prefix="xhs-listing-review-")
+    zip_path = os.path.join(tmp_dir, filename)
+    try:
+        with open(zip_path, "wb") as out:
+            shutil.copyfileobj(file.file, out)
+        extract_root = os.path.join(tmp_dir, "extract")
+        os.makedirs(extract_root, exist_ok=True)
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            zf.extractall(extract_root)
+
+        slice_path = ""
+        for root, _dirs, files in os.walk(extract_root):
+            if "ledger_slice.json" in files:
+                slice_path = os.path.join(root, "ledger_slice.json")
+                break
+        if not slice_path:
+            raise HTTPException(status_code=400, detail="zip 内未找到 ledger_slice.json")
+
+        with open(slice_path, encoding="utf-8") as f:
+            slice_data = json.load(f)
+        if not isinstance(slice_data, dict):
+            raise HTTPException(status_code=400, detail="ledger_slice.json 格式错误")
+
+        os.makedirs(lrs._root(), exist_ok=True)
+        arch = os.path.join(
+            lrs._root(),
+            f"upload_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip",
+        )
+        shutil.copy2(zip_path, arch)
+
+        result = lrs.merge_upload_slice(slice_data)
+        result["archive"] = os.path.basename(arch)
+        result["view_url"] = "/listing-review/"
+        return result
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+@app.get("/api/v1/sync/listing-review-pull")
+def sync_listing_review_pull(_: None = Depends(verify_sync_key)):
+    from cloud_deploy.cloud_api import listing_review_store as lrs
+
+    return lrs.export_decisions()
+
+
+@app.get("/api/v1/sync/listing-queue")
+def sync_listing_queue(
+    limit: int = 50,
+    batch_no: int | None = None,
+    _: None = Depends(verify_sync_key),
+):
+    """上架 worker：查看人工 keep 且可领的队列。"""
+    from cloud_deploy.cloud_api import listing_review_store as lrs
+
+    return lrs.list_ready_for_listing(limit=limit, batch_no=batch_no)
+
+
+class ListingClaimBody(BaseModel):
+    worker_id: str = "worker"
+    item_ids: list[str] = Field(default_factory=list)
+    limit: int = 10
+    ttl_sec: int = 1800
+
+
+@app.post("/api/v1/sync/listing-claim")
+def sync_listing_claim(body: ListingClaimBody, _: None = Depends(verify_sync_key)):
+    """上架 worker：原子领任务。"""
+    from cloud_deploy.cloud_api import listing_review_store as lrs
+
+    return lrs.claim_for_listing(
+        worker_id=body.worker_id,
+        item_ids=body.item_ids or None,
+        limit=body.limit,
+        ttl_sec=body.ttl_sec,
+    )
+
+
+class ListingResultBody(BaseModel):
+    item_id: str
+    worker_id: str = ""
+    xianyu_item_id: str = ""
+    ok: bool = True
+    error: str = ""
+
+
+@app.post("/api/v1/sync/listing-result")
+def sync_listing_result(body: ListingResultBody, _: None = Depends(verify_sync_key)):
+    """上架 worker：回写成功/失败。"""
+    from cloud_deploy.cloud_api import listing_review_store as lrs
+
+    return lrs.mark_listed(
+        item_id=body.item_id,
+        worker_id=body.worker_id,
+        xianyu_item_id=body.xianyu_item_id,
+        ok=body.ok,
+        error=body.error,
+    )
+
+
+@app.get("/api/v1/listing-review/batches")
+def listing_review_batches(request: Request):
+    if not _listing_cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录审核台")
+    from cloud_deploy.cloud_api import listing_review_store as lrs
+
+    return {"ok": True, "batches": lrs.list_batches()}
+
+
+@app.get("/api/v1/listing-review/batch/{no}")
+def listing_review_batch(no: int, request: Request):
+    if not _listing_cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录审核台")
+    from cloud_deploy.cloud_api import listing_review_store as lrs
+
+    b = lrs.get_batch(no)
+    if not b:
+        raise HTTPException(status_code=404, detail="no batch")
+    return {"ok": True, **b}
+
+
+class ListingReviewBody(BaseModel):
+    keep: list[str] = Field(default_factory=list)
+    remove: list[str] = Field(default_factory=list)
+
+
+@app.post("/api/v1/listing-review/batch/{no}/review")
+def listing_review_save(no: int, body: ListingReviewBody, request: Request):
+    if not _listing_cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录审核台")
+    from cloud_deploy.cloud_api import listing_review_store as lrs
+
+    return lrs.apply_review(no, body.keep, body.remove)
+
+
+@app.get("/listing-review", response_class=HTMLResponse)
+@app.get("/listing-review/", response_class=HTMLResponse)
+def listing_review_gate(request: Request):
+    if _listing_cookie_ok(request):
+        from fastapi.responses import RedirectResponse
+
+        return RedirectResponse(url="/listing-review/app/", status_code=302)
+    err = ""
+    if request.query_params.get("e") == "1":
+        err = "<p style='color:#c00'>密码错误</p>"
+    return HTMLResponse(
+        f"""<!doctype html><html><head><meta charset=utf-8>
+<title>闲鱼选品云审核</title>
+<style>body{{font-family:system-ui;max-width:420px;margin:60px auto;padding:0 16px}}
+input,button{{font-size:16px;padding:8px 12px;width:100%;box-sizing:border-box;margin:6px 0}}
+</style></head><body>
+<h1>闲鱼选品 · 云端人工筛选</h1>
+<p>仅显示本地 OCR 通过后推送的批次。</p>
+{err}
+<form method="post" action="/listing-review/login">
+<input type="password" name="password" placeholder="审核密码" autofocus>
+<button type="submit">进入</button>
+</form>
+</body></html>"""
+    )
+
+
+@app.post("/listing-review/login")
+async def listing_review_login(request: Request):
+    from fastapi.responses import RedirectResponse
+
+    form = await request.form()
+    pw = str(form.get("password") or "")
+    expect = _listing_review_password()
+    if not expect or pw != expect:
+        return RedirectResponse(url="/listing-review/?e=1", status_code=302)
+    resp = RedirectResponse(url="/listing-review/app/", status_code=302)
+    resp.set_cookie("xhs_listing_review", expect, httponly=True, max_age=7 * 86400)
+    return resp
+
+
+@app.get("/listing-review/app/")
+@app.get("/listing-review/app/{path:path}")
+def listing_review_app(request: Request, path: str = ""):
+    if not _listing_cookie_ok(request):
+        from fastapi.responses import RedirectResponse
+
+        return RedirectResponse(url="/listing-review/", status_code=302)
+    rel = (path or "index.html").lstrip("/\\") or "index.html"
+    if ".." in rel.replace("\\", "/").split("/"):
+        raise HTTPException(status_code=400, detail="非法路径")
+    target = os.path.join(_ASSETS, "listing_review_cloud", rel)
+    if not os.path.isfile(target):
+        target = os.path.join(_ASSETS, "listing_review_cloud.html")
+        if rel != "index.html" or not os.path.isfile(target):
+            raise HTTPException(status_code=404, detail="审核页未部署")
+    return FileResponse(target)
+
+
 @app.get("/psyche", response_class=HTMLResponse)
 @app.get("/psyche/", response_class=HTMLResponse)
 def psyche_board_gate(request: Request):
@@ -1603,6 +1831,11 @@ def psyche_board_files(request: Request, path: str = ""):
         from fastapi.responses import RedirectResponse
 
         return RedirectResponse(url="/psyche/", status_code=302)
+    # 无尾斜杠时相对 script(src="data.js") 会解析成 /psyche/data.js → 404
+    if request.url.path.rstrip("/") == "/psyche/board" and not (path or "").strip():
+        from fastapi.responses import RedirectResponse
+
+        return RedirectResponse(url="/psyche/board/", status_code=302)
     root = os.path.join(_psyche_boards_root(), "latest")
     if not os.path.isdir(root):
         raise HTTPException(
@@ -1617,7 +1850,22 @@ def psyche_board_files(request: Request, path: str = ""):
         target = os.path.join(target, "index.html")
     if not os.path.isfile(target):
         raise HTTPException(status_code=404, detail="文件不存在")
-    return FileResponse(target)
+    media = None
+    low = rel.lower()
+    if low.endswith(".js"):
+        media = "application/javascript; charset=utf-8"
+    elif low.endswith(".json"):
+        media = "application/json; charset=utf-8"
+    elif low.endswith(".html"):
+        media = "text/html; charset=utf-8"
+    return FileResponse(
+        target,
+        media_type=media,
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "Pragma": "no-cache",
+        },
+    )
 
 
 @app.post("/api/v1/sync/sold-history")
