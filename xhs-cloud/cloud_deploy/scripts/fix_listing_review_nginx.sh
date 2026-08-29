@@ -108,9 +108,11 @@ systemctl reload nginx
 echo "== 6) 验收 =="
 sleep 1
 echo "--- local :8080 ---"
-curl -sI http://127.0.0.1:8080/listing-review/ | head -15
+curl -sI http://127.0.0.1:8080/listing-review/ | head -15 || true
+curl -s -o /dev/null -w "local_GET=%{http_code}\n" http://127.0.0.1:8080/listing-review/
 echo "--- public ---"
-curl -sI https://monitor.xhs365.cn/listing-review/ | head -20
+curl -sI https://monitor.xhs365.cn/listing-review/ | head -20 || true
+curl -s -o /dev/null -w "public_GET=%{http_code}\n" https://monitor.xhs365.cn/listing-review/
 echo "--- body title ---"
 curl -s https://monitor.xhs365.cn/listing-review/ | grep -oE '<title>[^<]+</title>' | head -3
 echo "--- sw ---"

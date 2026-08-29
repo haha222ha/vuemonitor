@@ -1701,7 +1701,17 @@ def listing_review_save(no: int, body: ListingReviewBody, request: Request):
 
 @app.get("/listing-review", response_class=HTMLResponse)
 @app.get("/listing-review/", response_class=HTMLResponse)
+@app.head("/listing-review")
+@app.head("/listing-review/")
 def listing_review_gate(request: Request):
+    if request.method == "HEAD":
+        return HTMLResponse(
+            content="",
+            headers={
+                "Cache-Control": "no-store, no-cache, must-revalidate",
+                "X-Listing-Review": "1",
+            },
+        )
     if _listing_cookie_ok(request):
         from fastapi.responses import RedirectResponse
 
