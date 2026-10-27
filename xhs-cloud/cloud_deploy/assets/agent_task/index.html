@@ -185,12 +185,7 @@
       const box = $("list");
       const fp = listFingerprint(tasks);
       // 内容完全没变则禁止整表重绘，否则会把 .result / 页面滚动位清零
-      if (fp === _listFp && box.childElementCount) {
-        // #region agent log
-        fetch('http://127.0.0.1:7544/ingest/f49d850b-4afa-4d85-829a-671166a5072c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'719bb1'},body:JSON.stringify({sessionId:'719bb1',runId:'post-fix',hypothesisId:'A',location:'agent_task/index.html:render-skip',message:'skip unchanged list render',data:{cards:box.childElementCount},timestamp:Date.now()})}).catch(()=>{});
-        // #endregion
-        return;
-      }
+      if (fp === _listFp && box.childElementCount) return;
       const winY = window.scrollY || 0;
       const scrollById = Object.create(null);
       box.querySelectorAll(".card[data-tid] .result").forEach((el) => {
@@ -223,9 +218,6 @@
         if (id && scrollById[id] != null) el.scrollTop = scrollById[id];
       });
       if (winY > 0) window.scrollTo(0, winY);
-      // #region agent log
-      fetch('http://127.0.0.1:7544/ingest/f49d850b-4afa-4d85-829a-671166a5072c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'719bb1'},body:JSON.stringify({sessionId:'719bb1',runId:'post-fix',hypothesisId:'A',location:'agent_task/index.html:render',message:'full render with scroll restore',data:{n:tasks.length,restored:Object.keys(scrollById).length,winY},timestamp:Date.now()})}).catch(()=>{});
-      // #endregion
     }
     function escapeHtml(s) {
       return String(s)
