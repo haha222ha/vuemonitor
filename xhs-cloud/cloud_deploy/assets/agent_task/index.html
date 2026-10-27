@@ -95,7 +95,7 @@
   <p class="sub">提交后由本机 worker 领取执行，结果回写到这里。</p>
   <textarea id="prompt" placeholder="例如：总结今天热库增量情况，给 5 条要点"></textarea>
   <button id="send" type="button">提交任务</button>
-  <p class="hint">保持本机 <code>agent_task_worker.py</code> 在跑；本页约每 5 秒刷新列表。</p>
+  <p class="hint">保持本机 worker 在跑。列表 <b>2 秒</b>刷新；排队超过约 1 分钟仍不变 → 看本机 worker 日志是否 SSL/领取失败。</p>
   <div class="list" id="list"></div>
   <div class="toast" id="toast"></div>
   <script>
@@ -125,11 +125,12 @@
       box.innerHTML = tasks.map((t) => {
         const body = t.status === "error"
           ? (t.error || t.result || "")
-          : (t.result || (t.status === "running" ? "…" : ""));
+          : (t.result || (t.status === "running" ? "本机 Cursor 执行中（RPA 粘贴后写结果文件）…" : (t.status === "pending" ? "等待本机 worker 领取…" : "")));
+        const who = t.claimed_by ? ` · ${t.claimed_by}` : "";
         return `<div class="card">
           <div class="meta">
             <span class="${stClass(t.status)}">${stLabel(t.status)}</span>
-            <span>${t.created_at || ""} · ${t.id}</span>
+            <span>${t.created_at || ""} · ${t.id}${who}</span>
           </div>
           <div class="prompt">${escapeHtml(t.prompt || "")}</div>
           ${body ? `<div class="result">${escapeHtml(body)}</div>` : ""}
@@ -178,7 +179,17 @@
       }
     };
     loadList();
-    setInterval(loadList, 5000);
+    // 手机端更快看到 pending→running→done；有进行中任务时 2s，空闲 5s
+    let _iv = setInterval(loadList, 2000);
+    setInterval(async () => {
+      try {
+        const r = await fetch("/api/v1/agent-task/list?limit=5", { credentials: "same-origin" });
+        const j = await r.json();
+        const busy = (j.tasks || []).some((t) => t.status === "pending" || t.status === "running");
+        clearInterval(_iv);
+        _iv = setInterval(loadList, busy ? 2000 : 5000);
+      } catch (_) {}
+    }, 15000);
   </script>
 </body>
 </html>
