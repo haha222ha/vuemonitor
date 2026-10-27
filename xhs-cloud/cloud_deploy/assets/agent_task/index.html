@@ -175,9 +175,30 @@
         if (id) seenStatus[id] = st;
       });
     }
+    let _listFp = "";
+    function listFingerprint(tasks) {
+      return JSON.stringify((tasks || []).map((t) => [
+        t.id, t.status, t.result || "", t.error || "", t.claimed_by || "", t.created_at || "",
+      ]));
+    }
     function render(tasks) {
       const box = $("list");
+      const fp = listFingerprint(tasks);
+      // 内容完全没变则禁止整表重绘，否则会把 .result / 页面滚动位清零
+      if (fp === _listFp && box.childElementCount) {
+        // #region agent log
+        fetch('http://127.0.0.1:7544/ingest/f49d850b-4afa-4d85-829a-671166a5072c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'719bb1'},body:JSON.stringify({sessionId:'719bb1',runId:'post-fix',hypothesisId:'A',location:'agent_task/index.html:render-skip',message:'skip unchanged list render',data:{cards:box.childElementCount},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+        return;
+      }
+      const winY = window.scrollY || 0;
+      const scrollById = Object.create(null);
+      box.querySelectorAll(".card[data-tid] .result").forEach((el) => {
+        const id = el.closest(".card").getAttribute("data-tid") || "";
+        if (id) scrollById[id] = el.scrollTop;
+      });
       if (!tasks.length) {
+        _listFp = fp;
         box.innerHTML = '<div class="card"><div class="meta">暂无任务</div></div>';
         return;
       }
@@ -186,7 +207,8 @@
           ? (t.error || t.result || "")
           : (t.result || (t.status === "running" ? "本机 Cursor 执行中（RPA 粘贴后写结果文件）…" : (t.status === "pending" ? "等待本机 worker 领取…" : "")));
         const who = t.claimed_by ? ` · ${t.claimed_by}` : "";
-        return `<div class="card">
+        const tid = escapeHtml(t.id || "");
+        return `<div class="card" data-tid="${tid}">
           <div class="meta">
             <span class="${stClass(t.status)}">${stLabel(t.status)}</span>
             <span>${t.created_at || ""} · ${t.id}${who}</span>
@@ -195,6 +217,15 @@
           ${body ? `<div class="result">${escapeHtml(body)}</div>` : ""}
         </div>`;
       }).join("");
+      _listFp = fp;
+      box.querySelectorAll(".card[data-tid] .result").forEach((el) => {
+        const id = el.closest(".card").getAttribute("data-tid") || "";
+        if (id && scrollById[id] != null) el.scrollTop = scrollById[id];
+      });
+      if (winY > 0) window.scrollTo(0, winY);
+      // #region agent log
+      fetch('http://127.0.0.1:7544/ingest/f49d850b-4afa-4d85-829a-671166a5072c',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'719bb1'},body:JSON.stringify({sessionId:'719bb1',runId:'post-fix',hypothesisId:'A',location:'agent_task/index.html:render',message:'full render with scroll restore',data:{n:tasks.length,restored:Object.keys(scrollById).length,winY},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
     }
     function escapeHtml(s) {
       return String(s)
