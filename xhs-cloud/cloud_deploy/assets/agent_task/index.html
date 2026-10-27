@@ -100,12 +100,56 @@
   <div class="toast" id="toast"></div>
   <script>
     const $ = (id) => document.getElementById(id);
+    const seenStatus = Object.create(null); // id -> last status
+    let audioUnlocked = false;
+    let audioCtx = null;
+
     function toast(msg) {
       const el = $("toast");
       el.textContent = msg;
       el.style.display = "block";
       clearTimeout(toast._t);
       toast._t = setTimeout(() => { el.style.display = "none"; }, 2200);
+    }
+    function unlockAudio() {
+      if (audioUnlocked) return;
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        audioCtx = audioCtx || new AC();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        // 极短静音解锁 iOS/Android 手势限制
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        g.gain.value = 0.0001;
+        o.connect(g); g.connect(audioCtx.destination);
+        o.start(); o.stop(audioCtx.currentTime + 0.01);
+        audioUnlocked = true;
+      } catch (_) {}
+    }
+    /** 任务完成/失败提示音（浏览器端可听，含手机） */
+    function playDoneChime(ok) {
+      try {
+        unlockAudio();
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        audioCtx = audioCtx || new AC();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const freqs = ok ? [880, 1174, 1568] : [392, 311];
+        freqs.forEach((f, i) => {
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = "sine";
+          o.frequency.value = f;
+          g.gain.setValueAtTime(0.0001, now);
+          g.gain.exponentialRampToValueAtTime(0.18, now + 0.02 + i * 0.12);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + 0.28 + i * 0.12);
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start(now + i * 0.12);
+          o.stop(now + 0.35 + i * 0.12);
+        });
+      } catch (_) {}
     }
     function stClass(s) {
       if (s === "done") return "st-done";
@@ -115,6 +159,21 @@
     }
     function stLabel(s) {
       return ({ pending: "排队中", running: "执行中", done: "完成", error: "失败" })[s] || s;
+    }
+    function maybeNotify(tasks) {
+      (tasks || []).forEach((t) => {
+        const id = t.id || "";
+        const st = t.status || "";
+        const prev = seenStatus[id];
+        if (prev && prev !== st && (st === "done" || st === "error")) {
+          playDoneChime(st === "done");
+          toast(st === "done" ? "任务已完成 ✓" : "任务失败");
+          try {
+            if (navigator.vibrate) navigator.vibrate(st === "done" ? [40, 40, 80] : [120, 60, 120]);
+          } catch (_) {}
+        }
+        if (id) seenStatus[id] = st;
+      });
     }
     function render(tasks) {
       const box = $("list");
@@ -151,9 +210,12 @@
         return;
       }
       const j = await r.json();
-      render(j.tasks || []);
+      const tasks = j.tasks || [];
+      maybeNotify(tasks);
+      render(tasks);
     }
     $("send").onclick = async () => {
+      unlockAudio();
       const prompt = $("prompt").value.trim();
       if (!prompt) { toast("请输入任务"); return; }
       $("send").disabled = true;
@@ -178,8 +240,9 @@
         $("send").disabled = false;
       }
     };
+    // 任意点击也解锁音频（方便只盯列表时）
+    document.addEventListener("pointerdown", unlockAudio, { once: true });
     loadList();
-    // 手机端更快看到 pending→running→done；有进行中任务时 2s，空闲 5s
     let _iv = setInterval(loadList, 2000);
     setInterval(async () => {
       try {
