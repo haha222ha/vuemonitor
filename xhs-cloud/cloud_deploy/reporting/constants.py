@@ -106,6 +106,8 @@ ARCHIVE_CUSTOM = "member_custom_zip"
 ARCHIVE_PSYCHE_BOARD = "private_psyche_board_zip"
 # 私密 · 选题承接复盘看板（密码门，仅本人）
 ARCHIVE_TAKEON_BOARD = "private_takeon_board_zip"
+# 私密 · 增量商品库/渠道选品看板（密码门，仅本人）
+ARCHIVE_CHANNEL_BOARD = "private_channel_board_zip"
 
 
 def item_at(item, key: str, default=None):

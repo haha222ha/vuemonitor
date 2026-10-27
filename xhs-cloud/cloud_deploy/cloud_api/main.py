@@ -49,6 +49,7 @@ from cloud_deploy.cloud_api.insight_routes import router as insight_router
 from cloud_deploy.cloud_api.advisor_member_routes import router as advisor_member_router
 from cloud_deploy.cloud_api.advisor_routes import router as advisor_internal_router
 from cloud_deploy.cloud_api.takeon_board_routes import router as takeon_board_router
+from cloud_deploy.cloud_api.channel_board_routes import router as channel_board_router
 from cloud_deploy.cloud_api.member_entitlements import enrich_member_profile
 
 _ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
@@ -58,6 +59,7 @@ app.include_router(insight_router)
 app.include_router(advisor_member_router)
 app.include_router(advisor_internal_router)
 app.include_router(takeon_board_router)
+app.include_router(channel_board_router)
 
 
 @app.on_event("startup")
