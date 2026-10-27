@@ -1668,6 +1668,167 @@ def sync_listing_result(body: ListingResultBody, _: None = Depends(verify_sync_k
     )
 
 
+def _agent_task_password() -> str:
+    return (
+        os.environ.get("XHS_AGENT_TASK_PASSWORD")
+        or os.environ.get("XHS_LISTING_REVIEW_PASSWORD")
+        or os.environ.get("XHS_PSYCHE_BOARD_PASSWORD")
+        or get_settings().xhs_cloud_admin_pass
+        or ""
+    )
+
+
+def _agent_task_cookie_ok(request: Request) -> bool:
+    pw = _agent_task_password()
+    if not pw:
+        return False
+    return request.cookies.get("xhs_agent_task") == pw
+
+
+class AgentTaskSubmitBody(BaseModel):
+    prompt: str = Field(..., min_length=1, max_length=20000)
+
+
+class AgentTaskClaimBody(BaseModel):
+    worker_id: str = "cursor-worker"
+    limit: int = 1
+    ttl_sec: int = 3600
+
+
+class AgentTaskResultBody(BaseModel):
+    task_id: str
+    worker_id: str = ""
+    ok: bool = True
+    result: str = ""
+    error: str = ""
+
+
+@app.post("/api/v1/agent-task/submit")
+def agent_task_submit(body: AgentTaskSubmitBody, request: Request):
+    """手机页提交任务（cookie 鉴权）。"""
+    if not _agent_task_cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录遥控台")
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    out = ats.submit(body.prompt, source="web")
+    if not out.get("ok"):
+        raise HTTPException(status_code=400, detail=out.get("error") or "submit failed")
+    return out
+
+
+@app.get("/api/v1/agent-task/list")
+def agent_task_list(request: Request, limit: int = 30):
+    if not _agent_task_cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录遥控台")
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    return {"ok": True, "tasks": ats.list_tasks(limit=limit)}
+
+
+@app.get("/api/v1/agent-task/{task_id}")
+def agent_task_get(task_id: str, request: Request):
+    if not _agent_task_cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录遥控台")
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    row = ats.get_task(task_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="no task")
+    return {"ok": True, "task": row}
+
+
+@app.post("/api/v1/sync/agent-task-claim")
+def sync_agent_task_claim(body: AgentTaskClaimBody, _: None = Depends(verify_sync_key)):
+    """本机 Cursor worker：领取任务。"""
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    return ats.claim(worker_id=body.worker_id, limit=body.limit, ttl_sec=body.ttl_sec)
+
+
+@app.post("/api/v1/sync/agent-task-result")
+def sync_agent_task_result(body: AgentTaskResultBody, _: None = Depends(verify_sync_key)):
+    """本机 Cursor worker：回写结果。"""
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    return ats.mark_result(
+        task_id=body.task_id,
+        worker_id=body.worker_id,
+        ok=body.ok,
+        result=body.result,
+        error=body.error,
+    )
+
+
+@app.get("/agent-task", response_class=HTMLResponse)
+@app.get("/agent-task/", response_class=HTMLResponse)
+def agent_task_gate(request: Request):
+    if _agent_task_cookie_ok(request):
+        from fastapi.responses import RedirectResponse
+
+        return RedirectResponse(url="/agent-task/app/", status_code=302)
+    err = ""
+    if request.query_params.get("e") == "1":
+        err = "<p style='color:#f07178'>密码错误</p>"
+    return HTMLResponse(
+        f"""<!doctype html><html lang="zh-CN"><head><meta charset=utf-8>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Cursor 遥控 · 登录</title>
+<style>
+body{{font-family:system-ui,Microsoft YaHei,sans-serif;background:#0f1419;color:#e8eef4;
+display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}}
+.box{{width:min(420px,92vw);padding:28px;background:#1a222c;border:1px solid #2a3542;border-radius:14px}}
+h1{{font-size:20px;margin:0 0 8px}}p{{color:#8b9aab;font-size:13px}}
+input,button{{width:100%;padding:12px;border-radius:10px;border:1px solid #2a3542;
+background:#0c1117;color:#fff;box-sizing:border-box;font-size:16px;margin:6px 0}}
+button{{border:0;background:#3d9cf0;font-weight:700;cursor:pointer}}
+</style></head><body><div class="box">
+<h1>Cursor 遥控</h1>
+<p>密码与审核台相同（或设 XHS_AGENT_TASK_PASSWORD）。</p>
+{err}
+<form method="post" action="/agent-task/login">
+<input type="password" name="password" placeholder="访问密码" autofocus>
+<button type="submit">进入</button>
+</form>
+</div></body></html>"""
+    )
+
+
+@app.post("/agent-task/login")
+async def agent_task_login(request: Request):
+    from fastapi.responses import RedirectResponse
+
+    form = await request.form()
+    pw = str(form.get("password") or "")
+    expect = _agent_task_password()
+    if not expect or pw != expect:
+        return RedirectResponse(url="/agent-task/?e=1", status_code=302)
+    resp = RedirectResponse(url="/agent-task/app/", status_code=302)
+    resp.set_cookie("xhs_agent_task", expect, httponly=True, max_age=7 * 86400)
+    return resp
+
+
+@app.get("/agent-task/app/")
+@app.get("/agent-task/app/{path:path}")
+def agent_task_app(request: Request, path: str = ""):
+    if not _agent_task_cookie_ok(request):
+        from fastapi.responses import RedirectResponse
+
+        return RedirectResponse(url="/agent-task/", status_code=302)
+    rel = (path or "index.html").lstrip("/\\") or "index.html"
+    if ".." in rel.replace("\\", "/").split("/"):
+        raise HTTPException(status_code=400, detail="非法路径")
+    target = os.path.join(_ASSETS, "agent_task", rel)
+    if not os.path.isfile(target):
+        raise HTTPException(status_code=404, detail="遥控页未部署")
+    return FileResponse(
+        target,
+        headers={
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "X-Agent-Task": "1",
+        },
+    )
+
+
 @app.get("/api/v1/listing-review/batches")
 def listing_review_batches(request: Request):
     if not _listing_cookie_ok(request):

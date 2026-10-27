@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Cursor 遥控</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --card: #1a222c;
+      --line: #2a3542;
+      --text: #e8eef4;
+      --muted: #8b9aab;
+      --accent: #3d9cf0;
+      --ok: #7fd99a;
+      --err: #f07178;
+      --run: #e6c07b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      padding-bottom: 40px;
+    }
+    h1 { font-size: 1.25rem; margin: 0 0 4px; }
+    .sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 16px; }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0c1117;
+      color: var(--text);
+      font-size: 16px;
+      resize: vertical;
+    }
+    button {
+      margin-top: 10px;
+      width: 100%;
+      padding: 12px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .list { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+    .meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+    .st-pending { color: var(--muted); }
+    .st-running { color: var(--run); }
+    .st-done { color: var(--ok); }
+    .st-error { color: var(--err); }
+    .prompt {
+      margin: 8px 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 14px;
+    }
+    .result {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--line);
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 13px;
+      color: #c9d4df;
+      max-height: 280px;
+      overflow: auto;
+    }
+    .toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+      background: #243040; border: 1px solid var(--line);
+      padding: 10px 14px; border-radius: 999px; font-size: 13px;
+      display: none; z-index: 9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cursor 遥控</h1>
+  <p class="sub">提交后由本机 worker 领取执行，结果回写到这里。</p>
+  <textarea id="prompt" placeholder="例如：总结今天热库增量情况，给 5 条要点"></textarea>
+  <button id="send" type="button">提交任务</button>
+  <p class="hint">保持本机 <code>agent_task_worker.py</code> 在跑；本页约每 5 秒刷新列表。</p>
+  <div class="list" id="list"></div>
+  <div class="toast" id="toast"></div>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    function toast(msg) {
+      const el = $("toast");
+      el.textContent = msg;
+      el.style.display = "block";
+      clearTimeout(toast._t);
+      toast._t = setTimeout(() => { el.style.display = "none"; }, 2200);
+    }
+    function stClass(s) {
+      if (s === "done") return "st-done";
+      if (s === "error") return "st-error";
+      if (s === "running") return "st-running";
+      return "st-pending";
+    }
+    function stLabel(s) {
+      return ({ pending: "排队中", running: "执行中", done: "完成", error: "失败" })[s] || s;
+    }
+    function render(tasks) {
+      const box = $("list");
+      if (!tasks.length) {
+        box.innerHTML = '<div class="card"><div class="meta">暂无任务</div></div>';
+        return;
+      }
+      box.innerHTML = tasks.map((t) => {
+        const body = t.status === "error"
+          ? (t.error || t.result || "")
+          : (t.result || (t.status === "running" ? "…" : ""));
+        return `<div class="card">
+          <div class="meta">
+            <span class="${stClass(t.status)}">${stLabel(t.status)}</span>
+            <span>${t.created_at || ""} · ${t.id}</span>
+          </div>
+          <div class="prompt">${escapeHtml(t.prompt || "")}</div>
+          ${body ? `<div class="result">${escapeHtml(body)}</div>` : ""}
+        </div>`;
+      }).join("");
+    }
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+    async function loadList() {
+      const r = await fetch("/api/v1/agent-task/list?limit=20", { credentials: "same-origin" });
+      if (r.status === 401) {
+        location.href = "/agent-task/?e=1";
+        return;
+      }
+      const j = await r.json();
+      render(j.tasks || []);
+    }
+    $("send").onclick = async () => {
+      const prompt = $("prompt").value.trim();
+      if (!prompt) { toast("请输入任务"); return; }
+      $("send").disabled = true;
+      try {
+        const r = await fetch("/api/v1/agent-task/submit", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.ok) {
+          toast(j.detail || j.error || ("提交失败 " + r.status));
+          return;
+        }
+        $("prompt").value = "";
+        toast("已提交 " + (j.task && j.task.id));
+        await loadList();
+      } catch (e) {
+        toast(String(e));
+      } finally {
+        $("send").disabled = false;
+      }
+    };
+    loadList();
+    setInterval(loadList, 5000);
+  </script>
+</body>
+</html>
