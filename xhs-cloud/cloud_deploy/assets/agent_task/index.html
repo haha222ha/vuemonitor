@@ -65,6 +65,20 @@
     .st-running { color: var(--run); }
     .st-done { color: var(--ok); }
     .st-error { color: var(--err); }
+    .st-cancelled { color: #b8a0c8; }
+    .btn-cancel {
+      margin-top: 8px;
+      width: auto;
+      min-width: 88px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--err);
+      border: 1px solid #5a3038;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .btn-cancel:disabled { opacity: 0.45; }
     .prompt {
       margin: 8px 0;
       white-space: pre-wrap;
@@ -95,7 +109,7 @@
   <p class="sub">提交后由本机 worker 领取执行，结果回写到这里。</p>
   <textarea id="prompt" placeholder="例如：总结今天热库增量情况，给 5 条要点"></textarea>
   <button id="send" type="button">提交任务</button>
-  <p class="hint">保持本机 worker 在跑。列表 <b>2 秒</b>刷新；排队超过约 1 分钟仍不变 → 看本机 worker 日志是否 SSL/领取失败。</p>
+  <p class="hint">保持本机 worker 在跑。列表约 2 秒刷新。排队/执行中可点 <b>撤销</b>：本机停止等落盘，立刻领下一单。</p>
   <div class="list" id="list"></div>
   <div class="toast" id="toast"></div>
   <script>
@@ -154,20 +168,31 @@
     function stClass(s) {
       if (s === "done") return "st-done";
       if (s === "error") return "st-error";
+      if (s === "cancelled") return "st-cancelled";
       if (s === "running") return "st-running";
       return "st-pending";
     }
     function stLabel(s) {
-      return ({ pending: "排队中", running: "执行中", done: "完成", error: "失败" })[s] || s;
+      return ({
+        pending: "排队中",
+        running: "执行中",
+        done: "完成",
+        error: "失败",
+        cancelled: "已撤销",
+      })[s] || s;
     }
     function maybeNotify(tasks) {
       (tasks || []).forEach((t) => {
         const id = t.id || "";
         const st = t.status || "";
         const prev = seenStatus[id];
-        if (prev && prev !== st && (st === "done" || st === "error")) {
+        if (prev && prev !== st && (st === "done" || st === "error" || st === "cancelled")) {
           playDoneChime(st === "done");
-          toast(st === "done" ? "任务已完成 ✓" : "任务失败");
+          toast(
+            st === "done" ? "任务已完成 ✓"
+              : st === "cancelled" ? "已撤销，worker 将继续下一单"
+              : "任务失败"
+          );
           try {
             if (navigator.vibrate) navigator.vibrate(st === "done" ? [40, 40, 80] : [120, 60, 120]);
           } catch (_) {}
@@ -200,9 +225,15 @@
       box.innerHTML = tasks.map((t) => {
         const body = t.status === "error"
           ? (t.error || t.result || "")
-          : (t.result || (t.status === "running" ? "本机 Cursor 执行中（RPA 粘贴后写结果文件）…" : (t.status === "pending" ? "等待本机 worker 领取…" : "")));
+          : t.status === "cancelled"
+            ? (t.result || t.error || "已撤销")
+            : (t.result || (t.status === "running" ? "本机 Cursor 执行中（RPA 粘贴后写结果文件）…" : (t.status === "pending" ? "等待本机 worker 领取…" : "")));
         const who = t.claimed_by ? ` · ${t.claimed_by}` : "";
         const tid = escapeHtml(t.id || "");
+        const canCancel = t.status === "pending" || t.status === "running";
+        const cancelBtn = canCancel
+          ? `<button type="button" class="btn-cancel" data-cancel="${tid}">撤销</button>`
+          : "";
         return `<div class="card" data-tid="${tid}">
           <div class="meta">
             <span class="${stClass(t.status)}">${stLabel(t.status)}</span>
@@ -210,6 +241,7 @@
           </div>
           <div class="prompt">${escapeHtml(t.prompt || "")}</div>
           ${body ? `<div class="result">${escapeHtml(body)}</div>` : ""}
+          ${cancelBtn}
         </div>`;
       }).join("");
       _listFp = fp;
@@ -237,6 +269,32 @@
       maybeNotify(tasks);
       render(tasks);
     }
+    $("list").addEventListener("click", async (ev) => {
+      const btn = ev.target && ev.target.closest ? ev.target.closest("[data-cancel]") : null;
+      if (!btn) return;
+      const tid = btn.getAttribute("data-cancel") || "";
+      if (!tid) return;
+      if (!confirm("撤销该任务？执行中将停止等落盘，worker 去领下一单。")) return;
+      btn.disabled = true;
+      try {
+        const r = await fetch("/api/v1/agent-task/" + encodeURIComponent(tid) + "/cancel", {
+          method: "POST",
+          credentials: "same-origin",
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.ok) {
+          toast(j.detail || j.error || ("撤销失败 " + r.status));
+          btn.disabled = false;
+          return;
+        }
+        toast("已撤销 " + tid);
+        _listFp = "";
+        loadList();
+      } catch (e) {
+        toast(String(e));
+        btn.disabled = false;
+      }
+    });
     $("send").onclick = async () => {
       unlockAudio();
       const prompt = $("prompt").value.trim();
@@ -256,7 +314,25 @@
         }
         $("prompt").value = "";
         toast("已提交 " + (j.task && j.task.id));
-        await loadList();
+        // 提交响应已含 task：立刻上屏，避免再 await 一轮慢 list
+        if (j.task && j.task.id) {
+          const box = $("list");
+          const tid = String(j.task.id);
+          if (!box.querySelector(`.card[data-tid="${CSS.escape(tid)}"]`)) {
+            const head = `<div class="card" data-tid="${escapeHtml(tid)}">
+              <div class="meta">
+                <span class="${stClass(j.task.status || "pending")}">${stLabel(j.task.status || "pending")}</span>
+                <span>${escapeHtml(j.task.created_at || "")} · ${escapeHtml(tid)}</span>
+              </div>
+              <div class="prompt">${escapeHtml(j.task.prompt || "")}</div>
+              <div class="result">等待本机 worker 领取…</div>
+            </div>`;
+            box.insertAdjacentHTML("afterbegin", head);
+          }
+          _listFp = "";
+          seenStatus[tid] = j.task.status || "pending";
+        }
+        loadList(); // 不 await：后台校准
       } catch (e) {
         toast(String(e));
       } finally {
@@ -273,7 +349,8 @@
         const j = await r.json();
         const busy = (j.tasks || []).some((t) => t.status === "pending" || t.status === "running");
         clearInterval(_iv);
-        _iv = setInterval(loadList, busy ? 2000 : 5000);
+        // 有排队/执行时 1.5s 刷；空闲 4s（略快于旧 5s）
+        _iv = setInterval(loadList, busy ? 1500 : 4000);
       } catch (_) {}
     }, 15000);
   </script>

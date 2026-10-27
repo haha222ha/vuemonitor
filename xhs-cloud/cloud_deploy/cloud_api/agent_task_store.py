@@ -125,10 +125,12 @@ def claim(*, worker_id: str, limit: int = 1, ttl_sec: int = 3600) -> dict[str, A
             if not row:
                 continue
             st = str(row.get("status") or "")
+            if st in ("cancelled", "done", "error"):
+                continue
             if st == "pending":
                 pass
             elif st == "running" and float(row.get("claim_expires_at") or 0) <= now:
-                # 认领超时，可重新领取
+                # 认领超时，可重新领取（已撤销的不会进这里）
                 pass
             else:
                 continue
@@ -150,6 +152,34 @@ def claim(*, worker_id: str, limit: int = 1, ttl_sec: int = 3600) -> dict[str, A
     }
 
 
+def cancel(task_id: str, *, reason: str = "cancelled_by_user") -> dict[str, Any]:
+    """撤销排队中 / 执行中任务；worker 轮询到后停止等落盘，继续下一单。"""
+    tid = str(task_id or "").strip()
+    if not tid:
+        return {"ok": False, "error": "empty task_id"}
+    with _lock:
+        data = load()
+        row = (data.get("tasks") or {}).get(tid)
+        if not row:
+            return {"ok": False, "error": "no task"}
+        st = str(row.get("status") or "")
+        if st in ("done", "error", "cancelled"):
+            return {
+                "ok": True,
+                "already_finished": True,
+                "task": _public(row),
+            }
+        if st not in ("pending", "running"):
+            return {"ok": False, "error": f"cannot cancel status={st}"}
+        row["status"] = "cancelled"
+        row["error"] = str(reason or "cancelled_by_user")[:500]
+        row["result"] = row.get("result") or "已撤销：worker 将停止等待落盘并领取后续任务"
+        row["finished_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+        row.pop("claim_expires_at", None)
+        save(data)
+        return {"ok": True, "task": _public(row)}
+
+
 def mark_result(
     *,
     task_id: str,
@@ -164,6 +194,9 @@ def mark_result(
         row = (data.get("tasks") or {}).get(tid)
         if not row:
             return {"ok": False, "error": "no task"}
+        # 已撤销：不覆盖为 done/error，避免 worker 迟到回写把撤销冲掉
+        if str(row.get("status") or "") == "cancelled":
+            return {"ok": True, "already_cancelled": True, "task": _public(row)}
         row["finished_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
         row.pop("claim_expires_at", None)
         if worker_id:

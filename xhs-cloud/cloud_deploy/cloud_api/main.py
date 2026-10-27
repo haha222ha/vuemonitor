@@ -1737,12 +1737,36 @@ def agent_task_get(task_id: str, request: Request):
     return {"ok": True, "task": row}
 
 
+@app.post("/api/v1/agent-task/{task_id}/cancel")
+def agent_task_cancel(task_id: str, request: Request):
+    """遥控页撤销：排队中直接取消；执行中通知本机 worker 停止等落盘。"""
+    if not _agent_task_cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录遥控台")
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    out = ats.cancel(task_id)
+    if not out.get("ok"):
+        raise HTTPException(status_code=400, detail=out.get("error") or "cancel failed")
+    return out
+
+
 @app.post("/api/v1/sync/agent-task-claim")
 def sync_agent_task_claim(body: AgentTaskClaimBody, _: None = Depends(verify_sync_key)):
     """本机 Cursor worker：领取任务。"""
     from cloud_deploy.cloud_api import agent_task_store as ats
 
     return ats.claim(worker_id=body.worker_id, limit=body.limit, ttl_sec=body.ttl_sec)
+
+
+@app.get("/api/v1/sync/agent-task/{task_id}")
+def sync_agent_task_get(task_id: str, _: None = Depends(verify_sync_key)):
+    """本机 worker：查任务状态（用于检测遥控页「撤销」）。"""
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    row = ats.get_task(task_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="no task")
+    return {"ok": True, "task": row}
 
 
 @app.post("/api/v1/sync/agent-task-result")
