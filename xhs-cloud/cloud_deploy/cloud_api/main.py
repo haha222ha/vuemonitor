@@ -1703,6 +1703,16 @@ class AgentTaskResultBody(BaseModel):
     error: str = ""
 
 
+class AgentTaskWorkerStatusBody(BaseModel):
+    phase: str = "idle"
+    worker_id: str = ""
+    task_id: str = ""
+    hint: str = ""
+    message: str = ""
+    chain: int = 0
+    detail: str = ""
+
+
 @app.post("/api/v1/agent-task/submit")
 def agent_task_submit(body: AgentTaskSubmitBody, request: Request):
     """手机页提交任务（cookie 鉴权）。"""
@@ -1723,6 +1733,16 @@ def agent_task_list(request: Request, limit: int = 30):
     from cloud_deploy.cloud_api import agent_task_store as ats
 
     return {"ok": True, "tasks": ats.list_tasks(limit=limit)}
+
+
+@app.get("/api/v1/agent-task/worker-status")
+def agent_task_worker_status(request: Request):
+    """手机遥控页：本机正在跑 / 等你下一步指令。"""
+    if not _agent_task_cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录遥控台")
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    return ats.get_worker_status()
 
 
 @app.get("/api/v1/agent-task/{task_id}")
@@ -1780,6 +1800,24 @@ def sync_agent_task_result(body: AgentTaskResultBody, _: None = Depends(verify_s
         ok=body.ok,
         result=body.result,
         error=body.error,
+    )
+
+
+@app.post("/api/v1/sync/agent-task-worker-status")
+def sync_agent_task_worker_status(
+    body: AgentTaskWorkerStatusBody, _: None = Depends(verify_sync_key)
+):
+    """本机 worker：上报相位（执行中 / 等下一步指令）。"""
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    return ats.set_worker_status(
+        phase=body.phase,
+        worker_id=body.worker_id,
+        task_id=body.task_id,
+        hint=body.hint,
+        message=body.message,
+        chain=body.chain,
+        detail=body.detail,
     )
 
 

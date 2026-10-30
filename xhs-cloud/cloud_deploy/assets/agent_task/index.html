@@ -102,14 +102,67 @@
       padding: 10px 14px; border-radius: 999px; font-size: 13px;
       display: none; z-index: 9;
     }
+    .phase-banner {
+      margin: 0 0 14px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: #15202b;
+    }
+    .phase-banner .phase-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin: 0 0 4px;
+      line-height: 1.35;
+    }
+    .phase-banner .phase-action {
+      font-size: 0.9rem;
+      margin: 0 0 6px;
+      color: var(--text);
+    }
+    .phase-banner .phase-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.4;
+    }
+    .phase-banner.ph-wait_user {
+      border-color: #3d9cf0;
+      background: linear-gradient(135deg, #15283a, #1a222c);
+    }
+    .phase-banner.ph-wait_user .phase-title { color: var(--accent); }
+    .phase-banner.ph-task_running,
+    .phase-banner.ph-auto_running {
+      border-color: #8a7040;
+      background: linear-gradient(135deg, #2a2418, #1a222c);
+    }
+    .phase-banner.ph-task_running .phase-title,
+    .phase-banner.ph-auto_running .phase-title { color: var(--run); }
+    .phase-banner.ph-idle {
+      border-color: #2f5a40;
+      background: linear-gradient(135deg, #15261c, #1a222c);
+    }
+    .phase-banner.ph-idle .phase-title { color: var(--ok); }
+    .phase-banner.ph-offline,
+    .phase-banner.ph-error {
+      border-color: #6a3038;
+      background: linear-gradient(135deg, #2a181c, #1a222c);
+    }
+    .phase-banner.ph-offline .phase-title,
+    .phase-banner.ph-error .phase-title { color: var(--err); }
   </style>
 </head>
 <body>
   <h1>Cursor 遥控</h1>
   <p class="sub">提交后由本机 worker 领取执行，结果回写到这里。</p>
+  <div class="phase-banner ph-offline" id="phaseBanner" aria-live="polite">
+    <p class="phase-title" id="phaseTitle">正在读取本机状态…</p>
+    <p class="phase-action" id="phaseAction">请稍候</p>
+    <p class="phase-meta" id="phaseMeta"></p>
+  </div>
   <textarea id="prompt" placeholder="例如：总结今天热库增量情况，给 5 条要点"></textarea>
   <button id="send" type="button">提交任务</button>
-  <p class="hint">保持本机 worker 在跑。列表约 2 秒刷新。排队/执行中可点 <b>撤销</b>：本机停止等落盘，立刻领下一单。</p>
+  <p class="hint">顶部条会告诉你：自动执行中，还是已经结束、等你下一步指令。列表约 2 秒刷新。排队/执行中可点 <b>撤销</b>。</p>
   <div class="list" id="list"></div>
   <div class="toast" id="toast"></div>
   <script>
@@ -258,6 +311,36 @@
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
     }
+    function renderPhase(w) {
+      const banner = $("phaseBanner");
+      const phase = (w && w.phase) || "offline";
+      banner.className = "phase-banner ph-" + phase;
+      $("phaseTitle").textContent = (w && (w.title || w.message)) || "本机状态未知";
+      $("phaseAction").textContent = (w && w.phone_action) || "";
+      const bits = [];
+      if (w && w.hint) bits.push(w.hint);
+      if (w && w.task_id) bits.push("任务 " + w.task_id);
+      if (w && w.chain) bits.push("自动续跑第 " + w.chain + " 步");
+      if (w && w.updated_at) bits.push("更新 " + w.updated_at);
+      $("phaseMeta").textContent = bits.join(" · ");
+    }
+    async function loadPhase() {
+      try {
+        const r = await fetch("/api/v1/agent-task/worker-status", { credentials: "same-origin" });
+        if (r.status === 401) {
+          location.href = "/agent-task/?e=1";
+          return;
+        }
+        const j = await r.json();
+        renderPhase(j.worker || {});
+      } catch (_) {
+        renderPhase({
+          phase: "offline",
+          title: "状态拉取失败",
+          phone_action: "请检查网络后刷新",
+        });
+      }
+    }
     async function loadList() {
       const r = await fetch("/api/v1/agent-task/list?limit=20", { credentials: "same-origin" });
       if (r.status === 401) {
@@ -268,6 +351,7 @@
       const tasks = j.tasks || [];
       maybeNotify(tasks);
       render(tasks);
+      loadPhase();
     }
     $("list").addEventListener("click", async (ev) => {
       const btn = ev.target && ev.target.closest ? ev.target.closest("[data-cancel]") : null;

@@ -226,3 +226,103 @@ def _public(row: dict[str, Any]) -> dict[str, Any]:
         "error": row.get("error") or "",
         "finished_at": row.get("finished_at") or "",
     }
+
+
+def _worker_status_path() -> str:
+    return os.path.join(_root(), "worker_status.json")
+
+
+# 手机遥控页可见相位（写死）
+_PHASE_MSG = {
+    "idle": "本机空闲，可以提交新任务",
+    "task_running": "Cursor 正在执行当前任务，请稍等",
+    "auto_running": "脚本自动续跑中（无需你点确认），请稍等",
+    "wait_user": "阶段已结束，请下达下一步指令",
+    "error": "执行出错，请看任务详情或下达新指令",
+}
+
+
+def set_worker_status(
+    *,
+    phase: str,
+    worker_id: str = "",
+    task_id: str = "",
+    hint: str = "",
+    message: str = "",
+    chain: int = 0,
+    detail: str = "",
+) -> dict[str, Any]:
+    """本机 worker 心跳/阶段状态 → 手机遥控页顶部条。"""
+    phase = str(phase or "idle").strip().lower()
+    if phase not in _PHASE_MSG:
+        phase = "idle"
+    msg = (message or "").strip() or _PHASE_MSG[phase]
+    row = {
+        "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "updated_ts": time.time(),
+        "phase": phase,
+        "title": msg,
+        "message": msg,
+        "hint": str(hint or "")[:500],
+        "detail": str(detail or "")[:800],
+        "task_id": str(task_id or "")[:80],
+        "chain": int(chain or 0),
+        "worker_id": str(worker_id or "")[:80],
+        "phone_action": (
+            "请下达下一步指令"
+            if phase == "wait_user"
+            else (
+                "请等待，无需操作"
+                if phase in ("task_running", "auto_running")
+                else ("可提交新任务" if phase == "idle" else "请查看错误并下新指令")
+            )
+        ),
+    }
+    with _lock:
+        os.makedirs(_root(), exist_ok=True)
+        path = _worker_status_path()
+        tmp = path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(row, f, ensure_ascii=False, indent=2)
+        os.replace(tmp, path)
+    return {"ok": True, "worker": row}
+
+
+def get_worker_status(*, stale_sec: float = 120.0) -> dict[str, Any]:
+    """手机读本机相位；超时未心跳 → offline。"""
+    path = _worker_status_path()
+    if not os.path.isfile(path):
+        return {
+            "ok": True,
+            "worker": {
+                "phase": "offline",
+                "title": "本机尚未上报状态",
+                "message": "本机尚未上报状态（worker 可能未启动）",
+                "phone_action": "请确认本机 worker 在跑",
+                "hint": "",
+                "task_id": "",
+                "chain": 0,
+                "updated_at": "",
+                "stale": True,
+            },
+        }
+    try:
+        with open(path, encoding="utf-8") as f:
+            row = json.load(f)
+    except Exception:
+        row = {}
+    ts = float(row.get("updated_ts") or 0)
+    stale = (time.time() - ts) > float(stale_sec or 120) if ts else True
+    if stale and str(row.get("phase") or "") not in ("wait_user",):
+        # wait_user 允许稍旧：用户可能隔很久才回；其它相位过期当 offline
+        row = {
+            **row,
+            "phase": "offline",
+            "title": "本机状态超时未更新",
+            "message": "本机状态超时未更新（worker 可能卡住或已停）",
+            "phone_action": "请检查本机 worker / Cursor",
+            "stale": True,
+        }
+    else:
+        row = {**row, "stale": bool(stale)}
+    return {"ok": True, "worker": row}
