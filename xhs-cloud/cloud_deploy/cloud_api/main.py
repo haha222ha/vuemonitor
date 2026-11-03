@@ -1687,6 +1687,8 @@ def _agent_task_cookie_ok(request: Request) -> bool:
 
 class AgentTaskSubmitBody(BaseModel):
     prompt: str = Field(..., min_length=1, max_length=20000)
+    target_device_id: str = Field(default="", max_length=80)
+    target_label: str = Field(default="", max_length=64)
 
 
 class AgentTaskClaimBody(BaseModel):
@@ -1711,16 +1713,23 @@ class AgentTaskWorkerStatusBody(BaseModel):
     message: str = ""
     chain: int = 0
     detail: str = ""
+    device_label: str = ""
+    hostname: str = ""
 
 
 @app.post("/api/v1/agent-task/submit")
 def agent_task_submit(body: AgentTaskSubmitBody, request: Request):
-    """手机页提交任务（cookie 鉴权）。"""
+    """手机页提交任务（cookie 鉴权）；可指定 target_device_id。"""
     if not _agent_task_cookie_ok(request):
         raise HTTPException(status_code=401, detail="未登录遥控台")
     from cloud_deploy.cloud_api import agent_task_store as ats
 
-    out = ats.submit(body.prompt, source="web")
+    out = ats.submit(
+        body.prompt,
+        source="web",
+        target_device_id=body.target_device_id,
+        target_label=body.target_label,
+    )
     if not out.get("ok"):
         raise HTTPException(status_code=400, detail=out.get("error") or "submit failed")
     return out
@@ -1735,9 +1744,19 @@ def agent_task_list(request: Request, limit: int = 30):
     return {"ok": True, "tasks": ats.list_tasks(limit=limit)}
 
 
+@app.get("/api/v1/agent-task/devices")
+def agent_task_devices(request: Request):
+    """手机遥控页：在线/离线设备列表，用于指定发单。"""
+    if not _agent_task_cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录遥控台")
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    return ats.list_devices()
+
+
 @app.get("/api/v1/agent-task/worker-status")
 def agent_task_worker_status(request: Request):
-    """手机遥控页：本机正在跑 / 等你下一步指令。"""
+    """手机遥控页：本机正在跑 / 等你下一步指令（含多机 devices）。"""
     if not _agent_task_cookie_ok(request):
         raise HTTPException(status_code=401, detail="未登录遥控台")
     from cloud_deploy.cloud_api import agent_task_store as ats
@@ -1818,6 +1837,8 @@ def sync_agent_task_worker_status(
         message=body.message,
         chain=body.chain,
         detail=body.detail,
+        device_label=body.device_label,
+        hostname=body.hostname,
     )
 
 

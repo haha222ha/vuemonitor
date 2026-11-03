@@ -53,6 +53,30 @@
     }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
     .hint { color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .device-row {
+      margin: 10px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .device-row label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .device-row select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #0c1117;
+      color: var(--text);
+      font-size: 16px;
+    }
+    .device-chip {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
     .list { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
     .card {
       background: var(--card);
@@ -154,15 +178,22 @@
 </head>
 <body>
   <h1>Cursor 遥控</h1>
-  <p class="sub">提交后由本机 worker 领取执行，结果回写到这里。</p>
+  <p class="sub">多台电脑可同时挂机；提交时可指定设备 ID，或让任意在线机领取。</p>
   <div class="phase-banner ph-offline" id="phaseBanner" aria-live="polite">
-    <p class="phase-title" id="phaseTitle">正在读取本机状态…</p>
+    <p class="phase-title" id="phaseTitle">正在读取设备状态…</p>
     <p class="phase-action" id="phaseAction">请稍候</p>
     <p class="phase-meta" id="phaseMeta"></p>
   </div>
+  <div class="device-row">
+    <label for="targetDevice">执行设备</label>
+    <select id="targetDevice">
+      <option value="">任意在线设备</option>
+    </select>
+    <div class="device-chip" id="deviceChip">设备列表加载中…</div>
+  </div>
   <textarea id="prompt" placeholder="例如：总结今天热库增量情况，给 5 条要点"></textarea>
   <button id="send" type="button">提交任务</button>
-  <p class="hint">顶部条会告诉你：自动执行中，还是已经结束、等你下一步指令。列表约 2 秒刷新。排队/执行中可点 <b>撤销</b>。</p>
+  <p class="hint">先选设备再提交。顶部条看在线台数与相位；列表可 <b>撤销</b>。设备 ID 在各机 worker 配置里。</p>
   <div class="list" id="list"></div>
   <div class="toast" id="toast"></div>
   <script>
@@ -257,7 +288,32 @@
     function listFingerprint(tasks) {
       return JSON.stringify((tasks || []).map((t) => [
         t.id, t.status, t.result || "", t.error || "", t.claimed_by || "", t.created_at || "",
+        t.target_device_id || "", t.target_label || "",
       ]));
+    }
+    let _devices = [];
+    function renderDeviceSelect(devices) {
+      _devices = devices || [];
+      const sel = $("targetDevice");
+      const prev = sel.value;
+      const online = _devices.filter((d) => d.online);
+      const offline = _devices.filter((d) => !d.online);
+      const opts = ['<option value="">任意在线设备</option>'];
+      online.forEach((d) => {
+        const lab = escapeHtml(d.label || d.device_id);
+        const id = escapeHtml(d.device_id);
+        opts.push(`<option value="${id}">🟢 ${lab}（${id}）</option>`);
+      });
+      offline.forEach((d) => {
+        const lab = escapeHtml(d.label || d.device_id);
+        const id = escapeHtml(d.device_id);
+        opts.push(`<option value="${id}">⚪ ${lab}（离线·${id}）</option>`);
+      });
+      sel.innerHTML = opts.join("");
+      if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
+      $("deviceChip").textContent =
+        `在线 ${online.length}/${_devices.length}` +
+        (online.length ? " · " + online.map((d) => d.label || d.device_id).join("、") : " · 请启动电脑 worker");
     }
     function render(tasks) {
       const box = $("list");
@@ -281,7 +337,10 @@
           : t.status === "cancelled"
             ? (t.result || t.error || "已撤销")
             : (t.result || (t.status === "running" ? "本机 Cursor 执行中（RPA 粘贴后写结果文件）…" : (t.status === "pending" ? "等待本机 worker 领取…" : "")));
-        const who = t.claimed_by ? ` · ${t.claimed_by}` : "";
+        const who = t.claimed_by ? ` · 领取 ${t.claimed_by}` : "";
+        const tgt = t.target_device_id
+          ? ` · 指定 ${t.target_label || t.target_device_id}`
+          : " · 任意设备";
         const tid = escapeHtml(t.id || "");
         const canCancel = t.status === "pending" || t.status === "running";
         const cancelBtn = canCancel
@@ -290,7 +349,7 @@
         return `<div class="card" data-tid="${tid}">
           <div class="meta">
             <span class="${stClass(t.status)}">${stLabel(t.status)}</span>
-            <span>${t.created_at || ""} · ${t.id}${who}</span>
+            <span>${t.created_at || ""} · ${t.id}${tgt}${who}</span>
           </div>
           <div class="prompt">${escapeHtml(t.prompt || "")}</div>
           ${body ? `<div class="result">${escapeHtml(body)}</div>` : ""}
@@ -333,6 +392,7 @@
         }
         const j = await r.json();
         renderPhase(j.worker || {});
+        if (j.devices) renderDeviceSelect(j.devices);
       } catch (_) {
         renderPhase({
           phase: "offline",
@@ -340,6 +400,14 @@
           phone_action: "请检查网络后刷新",
         });
       }
+    }
+    async function loadDevices() {
+      try {
+        const r = await fetch("/api/v1/agent-task/devices", { credentials: "same-origin" });
+        if (r.status === 401) return;
+        const j = await r.json();
+        renderDeviceSelect(j.devices || []);
+      } catch (_) {}
     }
     async function loadList() {
       const r = await fetch("/api/v1/agent-task/list?limit=20", { credentials: "same-origin" });
@@ -383,13 +451,22 @@
       unlockAudio();
       const prompt = $("prompt").value.trim();
       if (!prompt) { toast("请输入任务"); return; }
+      const target_device_id = ($("targetDevice").value || "").trim();
+      const opt = $("targetDevice").selectedOptions[0];
+      let target_label = "";
+      if (target_device_id && opt) {
+        target_label = String(opt.textContent || "")
+          .replace(/^.\s*/, "")
+          .replace(/（.*$/, "")
+          .trim();
+      }
       $("send").disabled = true;
       try {
         const r = await fetch("/api/v1/agent-task/submit", {
           method: "POST",
           credentials: "same-origin",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt }),
+          body: JSON.stringify({ prompt, target_device_id, target_label }),
         });
         const j = await r.json().catch(() => ({}));
         if (!r.ok || !j.ok) {
@@ -397,34 +474,37 @@
           return;
         }
         $("prompt").value = "";
-        toast("已提交 " + (j.task && j.task.id));
-        // 提交响应已含 task：立刻上屏，避免再 await 一轮慢 list
+        const where = target_device_id ? ("→ " + (target_label || target_device_id)) : "→ 任意设备";
+        toast("已提交 " + (j.task && j.task.id) + " " + where);
         if (j.task && j.task.id) {
           const box = $("list");
           const tid = String(j.task.id);
           if (!box.querySelector(`.card[data-tid="${CSS.escape(tid)}"]`)) {
+            const tgt = j.task.target_device_id
+              ? ` · 指定 ${escapeHtml(j.task.target_label || j.task.target_device_id)}`
+              : " · 任意设备";
             const head = `<div class="card" data-tid="${escapeHtml(tid)}">
               <div class="meta">
                 <span class="${stClass(j.task.status || "pending")}">${stLabel(j.task.status || "pending")}</span>
-                <span>${escapeHtml(j.task.created_at || "")} · ${escapeHtml(tid)}</span>
+                <span>${escapeHtml(j.task.created_at || "")} · ${escapeHtml(tid)}${tgt}</span>
               </div>
               <div class="prompt">${escapeHtml(j.task.prompt || "")}</div>
-              <div class="result">等待本机 worker 领取…</div>
+              <div class="result">等待目标设备 worker 领取…</div>
             </div>`;
             box.insertAdjacentHTML("afterbegin", head);
           }
           _listFp = "";
           seenStatus[tid] = j.task.status || "pending";
         }
-        loadList(); // 不 await：后台校准
+        loadList();
       } catch (e) {
         toast(String(e));
       } finally {
         $("send").disabled = false;
       }
     };
-    // 任意点击也解锁音频（方便只盯列表时）
     document.addEventListener("pointerdown", unlockAudio, { once: true });
+    loadDevices();
     loadList();
     let _iv = setInterval(loadList, 2000);
     setInterval(async () => {

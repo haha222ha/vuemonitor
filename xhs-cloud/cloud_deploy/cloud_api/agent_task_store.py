@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""云端 Cursor 遥控任务队列（手机提交 → 本机 worker claim → 回写结果）。"""
+"""云端 Cursor 遥控任务队列（手机提交 → 多机 worker 按设备申领 → 回写结果）。"""
 from __future__ import annotations
 
 import json
@@ -13,6 +13,7 @@ from cloud_deploy.cloud_api.config import get_settings
 
 _lock = threading.RLock()
 _MAX_TASKS = 200
+_DEVICE_STALE_SEC = 120.0
 
 
 def _root() -> str:
@@ -21,6 +22,10 @@ def _root() -> str:
 
 def _path() -> str:
     return os.path.join(_root(), "queue.json")
+
+
+def _devices_path() -> str:
+    return os.path.join(_root(), "devices.json")
 
 
 def _empty() -> dict[str, Any]:
@@ -57,7 +62,27 @@ def _trim(data: dict[str, Any]) -> None:
     data["tasks"] = tasks
 
 
-def submit(prompt: str, *, source: str = "web") -> dict[str, Any]:
+def _norm_target(raw: str | None) -> str:
+    t = str(raw or "").strip()
+    if not t or t in ("*", "any", "ANY", "任意", "任意设备", "任意在线设备"):
+        return ""
+    return t[:80]
+
+
+def _target_matches(row: dict[str, Any], worker_id: str) -> bool:
+    target = _norm_target(row.get("target_device_id"))
+    if not target:
+        return True
+    return target == worker_id
+
+
+def submit(
+    prompt: str,
+    *,
+    source: str = "web",
+    target_device_id: str = "",
+    target_label: str = "",
+) -> dict[str, Any]:
     prompt = (prompt or "").strip()
     if not prompt:
         return {"ok": False, "error": "empty prompt"}
@@ -65,12 +90,16 @@ def submit(prompt: str, *, source: str = "web") -> dict[str, Any]:
         return {"ok": False, "error": "prompt too long"}
     tid = uuid.uuid4().hex[:12]
     now = time.strftime("%Y-%m-%d %H:%M:%S")
+    target = _norm_target(target_device_id)
+    label = str(target_label or "").strip()[:64]
     row = {
         "id": tid,
         "prompt": prompt,
         "status": "pending",
         "source": str(source or "web")[:40],
         "created_at": now,
+        "target_device_id": target,
+        "target_label": label,
         "claimed_by": "",
         "claimed_at": "",
         "claim_expires_at": 0,
@@ -130,9 +159,10 @@ def claim(*, worker_id: str, limit: int = 1, ttl_sec: int = 3600) -> dict[str, A
             if st == "pending":
                 pass
             elif st == "running" and float(row.get("claim_expires_at") or 0) <= now:
-                # 认领超时，可重新领取（已撤销的不会进这里）
                 pass
             else:
+                continue
+            if not _target_matches(row, worker_id):
                 continue
             row["status"] = "running"
             row["claimed_by"] = worker_id
@@ -194,7 +224,6 @@ def mark_result(
         row = (data.get("tasks") or {}).get(tid)
         if not row:
             return {"ok": False, "error": "no task"}
-        # 已撤销：不覆盖为 done/error，避免 worker 迟到回写把撤销冲掉
         if str(row.get("status") or "") == "cancelled":
             return {"ok": True, "already_cancelled": True, "task": _public(row)}
         row["finished_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -220,6 +249,8 @@ def _public(row: dict[str, Any]) -> dict[str, Any]:
         "status": row.get("status") or "",
         "source": row.get("source") or "",
         "created_at": row.get("created_at") or "",
+        "target_device_id": row.get("target_device_id") or "",
+        "target_label": row.get("target_label") or "",
         "claimed_by": row.get("claimed_by") or "",
         "claimed_at": row.get("claimed_at") or "",
         "result": row.get("result") or "",
@@ -230,6 +261,100 @@ def _public(row: dict[str, Any]) -> dict[str, Any]:
 
 def _worker_status_path() -> str:
     return os.path.join(_root(), "worker_status.json")
+
+
+def _load_devices() -> dict[str, Any]:
+    path = _devices_path()
+    if not os.path.isfile(path):
+        return {"version": 1, "devices": {}}
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        return {"version": 1, "devices": {}}
+    data.setdefault("devices", {})
+    return data
+
+
+def _save_devices(data: dict[str, Any]) -> None:
+    os.makedirs(_root(), exist_ok=True)
+    data["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    tmp = _devices_path() + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, _devices_path())
+
+
+def upsert_device(
+    *,
+    device_id: str,
+    device_label: str = "",
+    hostname: str = "",
+    phase: str = "idle",
+    task_id: str = "",
+    hint: str = "",
+    message: str = "",
+    chain: int = 0,
+) -> dict[str, Any]:
+    did = str(device_id or "").strip()[:80]
+    if not did:
+        return {"ok": False, "error": "empty device_id"}
+    now = time.time()
+    with _lock:
+        data = _load_devices()
+        devices = data.setdefault("devices", {})
+        prev = devices.get(did) or {}
+        label = str(device_label or "").strip()[:64] or str(prev.get("label") or "") or did
+        devices[did] = {
+            "device_id": did,
+            "label": label,
+            "hostname": str(hostname or prev.get("hostname") or "")[:120],
+            "phase": str(phase or "idle")[:40],
+            "task_id": str(task_id or "")[:80],
+            "hint": str(hint or "")[:500],
+            "message": str(message or "")[:500],
+            "chain": int(chain or 0),
+            "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "updated_ts": now,
+        }
+        # 防止无限膨胀：只留最近 40 台
+        if len(devices) > 40:
+            ordered = sorted(
+                devices.items(),
+                key=lambda kv: float((kv[1] or {}).get("updated_ts") or 0),
+                reverse=True,
+            )
+            data["devices"] = dict(ordered[:40])
+        _save_devices(data)
+        return {"ok": True, "device": data["devices"].get(did)}
+
+
+def list_devices(*, stale_sec: float | None = None) -> dict[str, Any]:
+    stale_sec = float(stale_sec if stale_sec is not None else _DEVICE_STALE_SEC)
+    now = time.time()
+    with _lock:
+        data = _load_devices()
+        items = []
+        for did, row in (data.get("devices") or {}).items():
+            ts = float((row or {}).get("updated_ts") or 0)
+            online = bool(ts and (now - ts) <= stale_sec)
+            items.append(
+                {
+                    "device_id": did,
+                    "label": (row or {}).get("label") or did,
+                    "hostname": (row or {}).get("hostname") or "",
+                    "phase": (row or {}).get("phase") or "offline",
+                    "task_id": (row or {}).get("task_id") or "",
+                    "hint": (row or {}).get("hint") or "",
+                    "message": (row or {}).get("message") or "",
+                    "chain": int((row or {}).get("chain") or 0),
+                    "updated_at": (row or {}).get("updated_at") or "",
+                    "online": online,
+                }
+            )
+        items.sort(key=lambda x: (not x["online"], str(x.get("label") or "")))
+        online_n = sum(1 for x in items if x["online"])
+        return {"ok": True, "devices": items, "online_n": online_n, "total_n": len(items)}
 
 
 # 手机遥控页可见相位（写死）
@@ -251,12 +376,15 @@ def set_worker_status(
     message: str = "",
     chain: int = 0,
     detail: str = "",
+    device_label: str = "",
+    hostname: str = "",
 ) -> dict[str, Any]:
-    """本机 worker 心跳/阶段状态 → 手机遥控页顶部条。"""
+    """本机 worker 心跳/阶段状态 → 手机遥控页；并写入多机 devices 表。"""
     phase = str(phase or "idle").strip().lower()
     if phase not in _PHASE_MSG:
         phase = "idle"
     msg = (message or "").strip() or _PHASE_MSG[phase]
+    wid = str(worker_id or "")[:80]
     row = {
         "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
         "updated_ts": time.time(),
@@ -267,7 +395,7 @@ def set_worker_status(
         "detail": str(detail or "")[:800],
         "task_id": str(task_id or "")[:80],
         "chain": int(chain or 0),
-        "worker_id": str(worker_id or "")[:80],
+        "worker_id": wid,
         "phone_action": (
             "请下达下一步指令"
             if phase == "wait_user"
@@ -285,26 +413,51 @@ def set_worker_status(
         with open(tmp, "w", encoding="utf-8") as f:
             json.dump(row, f, ensure_ascii=False, indent=2)
         os.replace(tmp, path)
-    return {"ok": True, "worker": row}
+    if wid:
+        upsert_device(
+            device_id=wid,
+            device_label=device_label,
+            hostname=hostname,
+            phase=phase,
+            task_id=task_id,
+            hint=hint,
+            message=msg,
+            chain=chain,
+        )
+    devices = list_devices()
+    return {"ok": True, "worker": row, "devices": devices.get("devices") or [], "online_n": devices.get("online_n")}
 
 
 def get_worker_status(*, stale_sec: float = 120.0) -> dict[str, Any]:
-    """手机读本机相位；超时未心跳 → offline。"""
+    """手机读相位；附带多机设备列表。"""
+    devices_payload = list_devices(stale_sec=stale_sec)
     path = _worker_status_path()
     if not os.path.isfile(path):
+        online = devices_payload.get("online_n") or 0
         return {
             "ok": True,
             "worker": {
-                "phase": "offline",
-                "title": "本机尚未上报状态",
-                "message": "本机尚未上报状态（worker 可能未启动）",
-                "phone_action": "请确认本机 worker 在跑",
+                "phase": "offline" if online <= 0 else "idle",
+                "title": (
+                    f"已有 {online} 台设备在线"
+                    if online
+                    else "尚无设备上报（请启动各机 worker）"
+                ),
+                "message": (
+                    f"已有 {online} 台设备在线，可在下方选择设备发单"
+                    if online
+                    else "尚无设备上报（请启动各机 worker）"
+                ),
+                "phone_action": "可提交新任务" if online else "请在电脑上启动 worker 安装包",
                 "hint": "",
                 "task_id": "",
                 "chain": 0,
                 "updated_at": "",
-                "stale": True,
+                "stale": online <= 0,
+                "worker_id": "",
             },
+            "devices": devices_payload.get("devices") or [],
+            "online_n": online,
         }
     try:
         with open(path, encoding="utf-8") as f:
@@ -313,16 +466,33 @@ def get_worker_status(*, stale_sec: float = 120.0) -> dict[str, Any]:
         row = {}
     ts = float(row.get("updated_ts") or 0)
     stale = (time.time() - ts) > float(stale_sec or 120) if ts else True
+    online = int(devices_payload.get("online_n") or 0)
     if stale and str(row.get("phase") or "") not in ("wait_user",):
-        # wait_user 允许稍旧：用户可能隔很久才回；其它相位过期当 offline
-        row = {
-            **row,
-            "phase": "offline",
-            "title": "本机状态超时未更新",
-            "message": "本机状态超时未更新（worker 可能卡住或已停）",
-            "phone_action": "请检查本机 worker / Cursor",
-            "stale": True,
-        }
+        if online > 0:
+            row = {
+                **row,
+                "phase": "idle",
+                "title": f"{online} 台设备在线，可指定设备发单",
+                "message": f"{online} 台设备在线，可指定设备发单",
+                "phone_action": "选择设备后提交任务",
+                "stale": False,
+            }
+        else:
+            row = {
+                **row,
+                "phase": "offline",
+                "title": "本机状态超时未更新",
+                "message": "本机状态超时未更新（worker 可能卡住或已停）",
+                "phone_action": "请检查本机 worker / Cursor",
+                "stale": True,
+            }
     else:
         row = {**row, "stale": bool(stale)}
-    return {"ok": True, "worker": row}
+        if online > 1 and row.get("phase") == "idle":
+            row["title"] = f"{online} 台在线 · " + str(row.get("title") or "")
+    return {
+        "ok": True,
+        "worker": row,
+        "devices": devices_payload.get("devices") or [],
+        "online_n": online,
+    }
