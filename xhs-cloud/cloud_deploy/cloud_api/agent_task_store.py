@@ -363,14 +363,14 @@ _PHASE_MSG = {
     "idle": "本机空闲，可以提交新任务",
     "task_running": "Cursor 正在执行当前任务，请稍等",
     "auto_running": "脚本自动续跑中（无需你点确认），请稍等",
-    "wait_user": "阶段已结束；空闲队列将自动推下一刀（无需手机确认）",
+    "wait_user": "本方向收口；约1～2分钟空闲队列自动推下一刀（无需你输入）",
     "error": "执行出错，请看任务详情或下达新指令",
 }
 _PHASE_PHONE_ACTION = {
     "idle": "可提交新任务",
     "task_running": "请等待，无需操作",
     "auto_running": "请等待，无需操作",
-    "wait_user": "无需操作·空闲队列自动续",
+    "wait_user": "无需操作·不要发下一条·队列自动续",
     "error": "请查看错误并下新指令",
 }
 
@@ -399,11 +399,17 @@ def set_worker_status(
         or "等待你输入" in msg
         or "等待你在遥控页" in msg
         or "等你输入" in msg
+        or "输入下一条" in msg
+        or "等待你在遥控器" in msg
+        or msg.strip() in ("阶段完成", "本阶段完成")
     ):
         msg = _PHASE_MSG["wait_user"]
     wid = str(worker_id or "")[:80]
     pa = (phone_action or "").strip() or _PHASE_PHONE_ACTION.get(phase, "")
-    if phase == "wait_user" and ("下达" in pa or "输入" in pa):
+    # 「输入」字样一律盖掉，避免手机误以为要发下一条
+    if phase == "wait_user" and (
+        "下达" in pa or "输入" in pa or "请发" in pa or "下一条" in pa
+    ):
         pa = _PHASE_PHONE_ACTION["wait_user"]
     row = {
         "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
