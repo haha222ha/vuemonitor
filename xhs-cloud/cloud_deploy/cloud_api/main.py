@@ -1715,6 +1715,7 @@ class AgentTaskWorkerStatusBody(BaseModel):
     detail: str = ""
     device_label: str = ""
     hostname: str = ""
+    phone_action: str = ""
 
 
 @app.post("/api/v1/agent-task/submit")
@@ -1839,6 +1840,7 @@ def sync_agent_task_worker_status(
         detail=body.detail,
         device_label=body.device_label,
         hostname=body.hostname,
+        phone_action=body.phone_action,
     )
 
 

@@ -358,12 +358,20 @@ def list_devices(*, stale_sec: float | None = None) -> dict[str, Any]:
 
 
 # 手机遥控页可见相位（写死）
+# wait_user = 本方向收口(NEXT_STEP:no)；空闲队列会自动推下一刀，禁止再暗示「必须等人输入」
 _PHASE_MSG = {
     "idle": "本机空闲，可以提交新任务",
     "task_running": "Cursor 正在执行当前任务，请稍等",
     "auto_running": "脚本自动续跑中（无需你点确认），请稍等",
-    "wait_user": "阶段已结束，请下达下一步指令",
+    "wait_user": "阶段已结束；空闲队列将自动推下一刀（无需手机确认）",
     "error": "执行出错，请看任务详情或下达新指令",
+}
+_PHASE_PHONE_ACTION = {
+    "idle": "可提交新任务",
+    "task_running": "请等待，无需操作",
+    "auto_running": "请等待，无需操作",
+    "wait_user": "无需操作·空闲队列自动续",
+    "error": "请查看错误并下新指令",
 }
 
 
@@ -378,13 +386,25 @@ def set_worker_status(
     detail: str = "",
     device_label: str = "",
     hostname: str = "",
+    phone_action: str = "",
 ) -> dict[str, Any]:
     """本机 worker 心跳/阶段状态 → 手机遥控页；并写入多机 devices 表。"""
     phase = str(phase or "idle").strip().lower()
     if phase not in _PHASE_MSG:
         phase = "idle"
     msg = (message or "").strip() or _PHASE_MSG[phase]
+    # 纠偏：旧本机仍可能推「请下达下一步指令」；云端统一盖成无人值守口径
+    if phase == "wait_user" and (
+        "请下达下一步" in msg
+        or "等待你输入" in msg
+        or "等待你在遥控页" in msg
+        or "等你输入" in msg
+    ):
+        msg = _PHASE_MSG["wait_user"]
     wid = str(worker_id or "")[:80]
+    pa = (phone_action or "").strip() or _PHASE_PHONE_ACTION.get(phase, "")
+    if phase == "wait_user" and ("下达" in pa or "输入" in pa):
+        pa = _PHASE_PHONE_ACTION["wait_user"]
     row = {
         "updated_at": time.strftime("%Y-%m-%d %H:%M:%S"),
         "updated_ts": time.time(),
@@ -396,15 +416,7 @@ def set_worker_status(
         "task_id": str(task_id or "")[:80],
         "chain": int(chain or 0),
         "worker_id": wid,
-        "phone_action": (
-            "请下达下一步指令"
-            if phase == "wait_user"
-            else (
-                "请等待，无需操作"
-                if phase in ("task_running", "auto_running")
-                else ("可提交新任务" if phase == "idle" else "请查看错误并下新指令")
-            )
-        ),
+        "phone_action": pa[:120],
     }
     with _lock:
         os.makedirs(_root(), exist_ok=True)
