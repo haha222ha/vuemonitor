@@ -374,8 +374,24 @@
       const banner = $("phaseBanner");
       const phase = (w && w.phase) || "offline";
       banner.className = "phase-banner ph-" + phase;
-      $("phaseTitle").textContent = (w && (w.title || w.message)) || "本机状态未知";
-      $("phaseAction").textContent = (w && w.phone_action) || "";
+      let title = (w && (w.title || w.message)) || "本机状态未知";
+      let action = (w && w.phone_action) || "";
+      // 旧文案纠偏：wait_user ≠ 等你输入；有备注「空闲队列」就不要手发下一条
+      if (phase === "wait_user") {
+        const bad =
+          /等待你|等你输入|输入下一条|请下达|请在遥控/.test(title) ||
+          title === "阶段完成" ||
+          title === "本阶段完成";
+        if (bad) {
+          title = "本方向收口；空闲队列将自动推下一刀（无需你输入）";
+        }
+        if (/下达|输入|请发|下一条/.test(action)) {
+          action = "无需操作·不要发下一条·队列自动续";
+        }
+        if (!action) action = "无需操作·不要发下一条·队列自动续";
+      }
+      $("phaseTitle").textContent = title;
+      $("phaseAction").textContent = action;
       const bits = [];
       if (w && w.hint) bits.push(w.hint);
       if (w && w.task_id) bits.push("任务 " + w.task_id);
