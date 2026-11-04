@@ -74,7 +74,7 @@ from pathlib import Path
 p = Path("/opt/digit-hub/apps/web/sw.js")
 t = p.read_text(encoding="utf-8")
 old = 'if (u.pathname.startsWith("/xianyu/")) return;'
-new = '''const BYPASS = ["/xianyu/", "/listing-review/", "/psyche/", "/api/"];
+new = '''const BYPASS = ["/xianyu/", "/listing-review/", "/channel/", "/psyche/", "/api/", "/agent-task/"];
     if (BYPASS.some((p) => u.pathname.startsWith(p))) return;'''
 if old not in t:
     # 宽松匹配
