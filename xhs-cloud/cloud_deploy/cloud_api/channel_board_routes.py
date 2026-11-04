@@ -11,12 +11,22 @@ import tempfile
 import zipfile
 from datetime import datetime
 
+from typing import Any
+
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
+from pydantic import BaseModel, Field
 
 from cloud_deploy.cloud_api.auth import verify_sync_key
 
 router = APIRouter(tags=["channel-board"])
+
+
+class BoardInventoryUpsertBody(BaseModel):
+    batch_id: str = ""
+    rows: list[dict[str, Any]] = Field(default_factory=list)
+    meta: dict[str, Any] = Field(default_factory=dict)
+    final_batch: bool = False
 
 
 def _password() -> str:
@@ -134,6 +144,54 @@ async def sync_channel_board_upload(
         }
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+@router.post("/api/v1/sync/board-inventory-upsert")
+def sync_board_inventory_upsert(
+    body: BoardInventoryUpsertBody,
+    _: None = Depends(verify_sync_key),
+):
+    """本机 board_inventory_goods → 云端 PG（同构；禁止搬热库全表）。"""
+    import os
+
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    if not body.rows and not body.final_batch and not body.meta:
+        raise HTTPException(status_code=400, detail="rows 为空")
+    if len(body.rows) > 5000:
+        raise HTTPException(status_code=400, detail="单批最多 5000 行")
+
+    from cloud_deploy.cloud_api.board_inventory_sync_service import apply_board_inventory_batch
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+
+    init_db()
+    conn = _conn()
+    try:
+        return apply_board_inventory_batch(
+            conn,
+            body.rows,
+            meta=body.meta or None,
+            final_batch=bool(body.final_batch),
+        )
+    finally:
+        conn.close()
+
+
+@router.get("/api/v1/sync/board-inventory-stats")
+def sync_board_inventory_stats(_: None = Depends(verify_sync_key)):
+    import os
+
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    from cloud_deploy.cloud_api.board_inventory_sync_service import board_inventory_stats
+    from cloud_deploy.cloud_api.database_pg import _conn, init_db
+
+    init_db()
+    conn = _conn()
+    try:
+        return board_inventory_stats(conn)
+    finally:
+        conn.close()
 
 
 @router.get("/channel", response_class=HTMLResponse)

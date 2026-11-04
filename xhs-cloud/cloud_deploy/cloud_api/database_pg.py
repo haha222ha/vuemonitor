@@ -378,6 +378,44 @@ def _init_db_on_conn(conn) -> None:
                 CREATE INDEX IF NOT EXISTS idx_gss_time ON goods_sold_snapshots(snapshot_time);
                 CREATE INDEX IF NOT EXISTS idx_gss_goods ON goods_sold_snapshots(goods_id, snapshot_time DESC);
                 CREATE INDEX IF NOT EXISTS idx_ma_goods ON monitor_alerts(goods_id, created_at DESC);
+                CREATE TABLE IF NOT EXISTS board_inventory_goods (
+                    goods_id TEXT PRIMARY KEY,
+                    title TEXT,
+                    store_name TEXT,
+                    sold_num INTEGER,
+                    deal_price DOUBLE PRECISION,
+                    is_virtual SMALLINT DEFAULT 1,
+                    keyword TEXT,
+                    image_url TEXT,
+                    first_snap DATE,
+                    last_snap DATE,
+                    snap_days INTEGER,
+                    sum_delta_all BIGINT,
+                    sum_delta_7d BIGINT,
+                    sum_delta_30d BIGINT,
+                    active_days_all INTEGER,
+                    active_days_30d INTEGER,
+                    lane_hint TEXT,
+                    scene_l1 TEXT,
+                    scene_l2 TEXT,
+                    scene_l3 TEXT,
+                    scene_source TEXT,
+                    abc_class TEXT,
+                    xyz_class TEXT,
+                    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
+                );
+                ALTER TABLE board_inventory_goods ADD COLUMN IF NOT EXISTS image_url TEXT;
+                CREATE INDEX IF NOT EXISTS idx_board_inv_lane ON board_inventory_goods(lane_hint);
+                CREATE INDEX IF NOT EXISTS idx_board_inv_s7 ON board_inventory_goods(sum_delta_7d DESC NULLS LAST);
+                CREATE INDEX IF NOT EXISTS idx_board_inv_s30 ON board_inventory_goods(sum_delta_30d DESC NULLS LAST);
+                CREATE INDEX IF NOT EXISTS idx_board_inv_sall ON board_inventory_goods(sum_delta_all DESC NULLS LAST);
+                CREATE INDEX IF NOT EXISTS idx_board_inv_scene2 ON board_inventory_goods(scene_l2);
+                CREATE INDEX IF NOT EXISTS idx_board_inv_abc ON board_inventory_goods(abc_class);
+                CREATE INDEX IF NOT EXISTS idx_board_inv_last ON board_inventory_goods(last_snap DESC NULLS LAST);
+                CREATE TABLE IF NOT EXISTS board_inventory_meta (
+                    key TEXT PRIMARY KEY,
+                    value TEXT
+                );
                 """
             )
             _migrate_legacy_columns(c)
