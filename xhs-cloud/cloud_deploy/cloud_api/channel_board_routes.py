@@ -107,17 +107,17 @@ h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
 </style></head><body><div class="wrap">
 <div class="eyebrow">一门一密 · 私密作战台</div>
 <h1>选品作战台</h1>
-<p class="lead">同一密码进入。左边看增量商品库列表与销量时间轴；右边看任务台今日推荐与分类榜（云端只读快照）。</p>
+<p class="lead">记一句就够：<b>左比货 · 右拍板</b>。同一密码；跟品 / 上品 / 日报不进这里。</p>
 <div class="grid">
   <a class="card" href="/channel/board/">
-    <span class="tag">增量商品库</span>
-    <h2>列表 · 时间轴 · 深挖</h2>
-    <p>作战短名单 / 增量深挖；行内 14 日销量 spark；证据卡采集日 | 销量 | 增量。</p>
+    <span class="tag">左 · 增量比货库</span>
+    <h2>列表 · 销量时间轴</h2>
+    <p>横比形状用行内 14 日 spark；点开证据卡看「采集日 | 销量 | 增量」。默认列表模式。</p>
   </a>
   <a class="card" href="/channel/workbench/">
-    <span class="tag">选品任务台</span>
+    <span class="tag">右 · 选品任务台</span>
     <h2>今日拍板 · 分类榜</h2>
-    <p>本机 8765 同源静态快照；首屏推荐与大类覆盖。人判写入仍回本机。</p>
+    <p>先看今日推荐，再锁大类看榜。云端只读快照；人判 / 可搬写入请回本机 8765。</p>
   </a>
 </div>
 <p class="foot">入口 https://monitor.xhs365.cn/channel/ · 密码与原先增量库相同</p>
