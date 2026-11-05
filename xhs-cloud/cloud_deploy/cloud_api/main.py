@@ -2103,7 +2103,8 @@ def psyche_board_files(request: Request, path: str = ""):
 
         return RedirectResponse(url="/psyche/", status_code=302)
     # 无尾斜杠时相对 script(src="data.js") 会解析成 /psyche/data.js → 404
-    if request.url.path.rstrip("/") == "/psyche/board" and not (path or "").strip():
+    # 仅无尾斜杠时补 /；勿 rstrip(/channel/board/) 否则 ERR_TOO_MANY_REDIRECTS
+    if request.url.path == "/psyche/board" and not (path or "").strip():
         from fastapi.responses import RedirectResponse
 
         return RedirectResponse(url="/psyche/board/", status_code=302)

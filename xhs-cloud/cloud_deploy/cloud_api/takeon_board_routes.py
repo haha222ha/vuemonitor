@@ -191,7 +191,8 @@ async def takeon_login(request: Request):
 def takeon_board_files(request: Request, path: str = ""):
     if not _cookie_ok(request):
         return RedirectResponse(url="/takeon/", status_code=302)
-    if request.url.path.rstrip("/") == "/takeon/board" and not (path or "").strip():
+    # 仅无尾斜杠时补 /；勿 rstrip 否则 /takeon/board/ 会 302 死循环
+    if request.url.path == "/takeon/board" and not (path or "").strip():
         return RedirectResponse(url="/takeon/board/", status_code=302)
     root = os.path.join(_boards_root(), "latest")
     if not os.path.isdir(root):

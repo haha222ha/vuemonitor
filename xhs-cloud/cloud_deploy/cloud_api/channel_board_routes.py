@@ -256,7 +256,8 @@ async def channel_login(request: Request):
 def channel_board_files(request: Request, path: str = ""):
     if not _cookie_ok(request):
         return RedirectResponse(url="/channel/", status_code=302)
-    if request.url.path.rstrip("/") == "/channel/board" and not (path or "").strip():
+    # 仅无尾斜杠时补 /；勿对 /channel/board/ 再用 rstrip 判断，否则会 302 死循环
+    if request.url.path == "/channel/board" and not (path or "").strip():
         return RedirectResponse(url="/channel/board/", status_code=302)
     root = os.path.join(_boards_root(), "latest")
     if not os.path.isdir(root):
