@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
-# 云主机一键：挂上 /channel/ nginx 反代 + 修 sw.js（防心象测劫持）
+# 云主机一键：挂上 /channel/ + /takeon/ nginx 反代 + 修 sw.js（防心象测劫持）
 # 用法: sudo bash /opt/xhs-cloud/cloud_deploy/scripts/fix_channel_board_nginx.sh
 set -euo pipefail
 
 SNIP_SRC="/opt/xhs-cloud/cloud_deploy/deploy/snippets/channel_board.conf"
 SNIP_DST="/etc/nginx/snippets/channel_board.conf"
+TAKEON_SRC="/opt/xhs-cloud/cloud_deploy/deploy/snippets/takeon_board.conf"
+TAKEON_DST="/etc/nginx/snippets/takeon_board.conf"
 SW="/opt/digit-hub/apps/web/sw.js"
 
 echo "== 1) 安装 snippet =="
 [ -f "$SNIP_SRC" ] || { echo "缺少 $SNIP_SRC"; exit 1; }
 cp -a "$SNIP_SRC" "$SNIP_DST"
 echo "ok $SNIP_DST"
+if [ -f "$TAKEON_SRC" ]; then
+  cp -a "$TAKEON_SRC" "$TAKEON_DST"
+  echo "ok $TAKEON_DST"
+else
+  echo "WARN: 缺 $TAKEON_SRC（跳过 takeon）"
+fi
 
 echo "== 2) 定位 monitor.xhs365.cn 配置 =="
 mapfile -t CONFS < <(grep -Rl 'server_name.*monitor\.xhs365\.cn' /etc/nginx 2>/dev/null || true)
@@ -73,7 +81,20 @@ if [ -f /opt/xhs-cloud/cloud_deploy/deploy/snippets/listing_review.conf ]; then
   fi
 fi
 
-grep -n 'channel_board\|listing_review\|xianyu_board' "$TARGET" | head -30
+# /takeon/ 防劫持
+if [ -f "$TAKEON_DST" ]; then
+  if grep -q 'snippets/takeon_board.conf' "$TARGET"; then
+    echo "已有 takeon_board include，跳过插入"
+  else
+    sed -i '/snippets\/channel_board.conf/a\    include /etc/nginx/snippets/takeon_board.conf;' "$TARGET" || true
+    if ! grep -q 'snippets/takeon_board.conf' "$TARGET"; then
+      sed -i '/snippets\/listing_review.conf/a\    include /etc/nginx/snippets/takeon_board.conf;' "$TARGET" || true
+    fi
+    echo "已插入 takeon_board include"
+  fi
+fi
+
+grep -n 'channel_board\|takeon_board\|listing_review\|xianyu_board' "$TARGET" | head -40
 
 echo "== 4) 修 sw.js bypass =="
 if [ -f "$SW" ]; then
@@ -83,7 +104,7 @@ from pathlib import Path
 import re
 p = Path("/opt/digit-hub/apps/web/sw.js")
 t = p.read_text(encoding="utf-8")
-need = ["/xianyu/", "/listing-review/", "/channel/", "/psyche/", "/api/", "/agent-task/"]
+need = ["/xianyu/", "/listing-review/", "/channel/", "/takeon/", "/psyche/", "/api/", "/agent-task/"]
 # 已有 BYPASS 数组则合并
 m = re.search(r'const BYPASS\s*=\s*\[([^\]]*)\]', t)
 if m:
@@ -100,7 +121,7 @@ if m:
 elif 'pathname.startsWith("/xianyu/")' in t:
     old = 'if (u.pathname.startsWith("/xianyu/")) return;'
     new = (
-        'const BYPASS = ["/xianyu/", "/listing-review/", "/channel/", "/psyche/", "/api/", "/agent-task/"];\n'
+        'const BYPASS = ["/xianyu/", "/listing-review/", "/channel/", "/takeon/", "/psyche/", "/api/", "/agent-task/"];\n'
         "    if (BYPASS.some((p) => u.pathname.startsWith(p))) return;"
     )
     if old in t:
@@ -139,4 +160,7 @@ curl -sI https://monitor.xhs365.cn/channel/ | head -20 || true
 curl -s https://monitor.xhs365.cn/channel/ | grep -oE '<title>[^<]+</title>|增量商品库|心象测' | head -5
 echo "--- public /listing-review/ ---"
 curl -s https://monitor.xhs365.cn/listing-review/ | grep -oE '<title>[^<]+</title>|闲鱼|心象测|筛选' | head -5
+echo "--- public /takeon/ ---"
+curl -sI https://monitor.xhs365.cn/takeon/ | tr -d '\r' | grep -iE 'HTTP/|X-Takeon-Board' | head -5 || true
+curl -s https://monitor.xhs365.cn/takeon/ | grep -oE '<title>[^<]+</title>|takeon|跟品|心象测|密码' | head -5
 echo "DONE"
