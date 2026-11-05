@@ -111,8 +111,8 @@ h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
 <div class="grid">
   <a class="card" href="/channel/board/">
     <span class="tag">左 · 增量比货库</span>
-    <h2>列表 · 销量时间轴</h2>
-    <p>横比形状用行内 14 日 spark；点开证据卡看「采集日 | 销量 | 增量」。默认列表模式。</p>
+    <h2>销量时间矩阵</h2>
+    <p>商品行 × 采集日列 · 格内直接销量；顶栏日期悬浮。默认「时间矩阵」，可切卡片。</p>
   </a>
   <a class="card" href="/channel/workbench/">
     <span class="tag">右 · 选品任务台</span>
