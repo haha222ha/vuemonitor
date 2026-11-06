@@ -163,7 +163,7 @@ h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
 </style></head><body><div class="wrap">
 <div class="eyebrow">一门一密 · 私密作战台</div>
 <h1>选品作战台</h1>
-<p class="lead">记一句就够：<b>左比货 · 中全量包 · 右拍板</b>。中入口对接 ProductAnalyzer 整包上云；跟品 / 上品另走专用页。</p>
+<p class="lead">记一句就够：<b>左比货 · 中数据包 · 右拍板</b>。中入口 = 会员多用户数据包（在线看 / 下载 / ProductAnalyzer 同步）。</p>
 __STAMP__
 <div class="grid">
   <a class="card" href="/channel/board/">
@@ -171,10 +171,10 @@ __STAMP__
     <h2>销量时间矩阵</h2>
     <p>商品行 × 采集日列 · 格内直接销量；顶栏日期悬浮。默认「时间矩阵」，可切卡片。</p>
   </a>
-  <a class="card" href="/channel/report/">
-    <span class="tag">中 · 全量数据包</span>
-    <h2>整包上云 · PA 打开</h2>
-    <p>周期选品报告完整 data.js zip（member_custom_zip）。本页可下；ProductAnalyzer → 云端报告库 → 定制 Tab 同步打开。</p>
+  <a class="card" href="/member#datapacks">
+    <span class="tag">中 · 选品数据包</span>
+    <h2>在线看 · 下载 · PA</h2>
+    <p>多用户会员库：网页在线预览整包，可下 zip；ProductAnalyzer 云端报告库同步同套包到本地打开。</p>
   </a>
   <a class="card" href="/channel/workbench/">
     <span class="tag">右 · 选品任务台</span>

@@ -497,6 +497,9 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
         <button type="button" class="nav-item active" data-app-nav="archive" onclick="switchAppPanel('archive')">
           <span class="nav-icon">📚</span><span class="nav-label">报告中心</span>
         </button>
+        <button type="button" class="nav-item" data-app-nav="datapacks" onclick="switchAppPanel('datapacks')">
+          <span class="nav-icon">📦</span><span class="nav-label">选品数据包</span>
+        </button>
         <button type="button" class="nav-item" data-app-nav="watchlist" onclick="switchAppPanel('watchlist')">
           <span class="nav-icon">⭐</span><span class="nav-label">我的收藏</span>
         </button>
@@ -526,6 +529,23 @@ th.check-col,td.check-col{width:42px;text-align:center;padding-left:8px;padding-
     <!-- 兼容旧路由：today 面板保留空壳，入口已合并进报告中心 -->
     <div class="app-panel" id="panelToday" aria-hidden="true">
       <div id="dashInsight" class="hidden"></div>
+    </div>
+    <div class="app-panel" id="panelDatapacks">
+      <div class="card" style="margin:0 0 14px">
+        <div class="section-title">选品数据包（在线看 · 下载 · ProductAnalyzer）</div>
+        <p style="margin:0 0 10px;color:var(--text2);font-size:13px;line-height:1.55">
+          多用户会员库：网页可<strong>在线预览</strong>整包，也可<strong>下载 zip</strong>。
+          ProductAnalyzer 登录同一账号后，在「云端报告库」同步同套包到本地打开。
+        </p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <button type="button" class="btn btn-ghost btn-sm" data-pack-kind="custom" onclick="loadDataPacks('custom')">定制 / 周期</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-pack-kind="daily" onclick="loadDataPacks('daily')">日报</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-pack-kind="weekly" onclick="loadDataPacks('weekly')">周报</button>
+          <button type="button" class="btn btn-ghost btn-sm" data-pack-kind="monthly" onclick="loadDataPacks('monthly')">月报</button>
+          <button type="button" class="btn btn-primary btn-sm" onclick="loadDataPacks()">刷新</button>
+        </div>
+        <div id="datapackList"><div class="reader-empty">打开本页后自动加载…</div></div>
+      </div>
     </div>
     <div class="app-panel active" id="panelArchive">
     <div id="dashArchive">
@@ -885,26 +905,83 @@ let watchlistSelected = new Set();
 
 // ===== 新布局 v2：左侧栏面板切换 =====
 function switchAppPanel(name) {
-  var validPanels = ['today', 'archive', 'watchlist', 'account'];
+  var validPanels = ['today', 'archive', 'datapacks', 'watchlist', 'account'];
   if (name === 'today' || name === 'insight' || name === 'reports') name = 'archive';
+  if (name === 'packs' || name === 'zip') name = 'datapacks';
   if (validPanels.indexOf(name) < 0) name = 'archive';
-  // 更新侧栏 nav-item active
   document.querySelectorAll('.app-sidebar .nav-item[data-app-nav]').forEach(function(btn) {
     btn.classList.toggle('active', btn.getAttribute('data-app-nav') === name);
   });
-  // 切换 app-panel
-  var panelMap = { today: 'panelArchive', archive: 'panelArchive', watchlist: 'panelWatchlist', account: 'panelAccount' };
+  var panelMap = {
+    today: 'panelArchive',
+    archive: 'panelArchive',
+    datapacks: 'panelDatapacks',
+    watchlist: 'panelWatchlist',
+    account: 'panelAccount'
+  };
   var panelId = panelMap[name];
   document.querySelectorAll('.app-panel').forEach(function(p) {
     p.classList.toggle('active', p.id === panelId);
   });
-  // 保存当前 tab
   try { localStorage.setItem('xhs_member_dash_tab', name); } catch(_) {}
-  // 路由同步：MemberRouter.go → applyRoute 负责数据加载（archive/watchlist/account/profile）
-  // 不在此处重复调用 loadArchive/loadWatchlist/loadProfile，避免与 applyRoute 双触发
+  if (name === 'datapacks') {
+    loadDataPacks(window._datapackKind || 'custom');
+    return;
+  }
   if (window.MemberRouter && typeof MemberRouter.go === 'function') {
     MemberRouter.go(name);
   }
+}
+
+window._datapackKind = 'custom';
+async function loadDataPacks(kind) {
+  if (kind) window._datapackKind = kind;
+  kind = window._datapackKind || 'custom';
+  document.querySelectorAll('[data-pack-kind]').forEach(function(b) {
+    b.classList.toggle('btn-primary', b.getAttribute('data-pack-kind') === kind);
+    b.classList.toggle('btn-ghost', b.getAttribute('data-pack-kind') !== kind);
+  });
+  var box = document.getElementById('datapackList');
+  if (!box) return;
+  box.innerHTML = '<div class="reader-empty">加载数据包库…</div>';
+  try {
+    var data = await api('/api/v1/member/library', { auth: true });
+    var lib = (data && data.library) || {};
+    var items = lib[kind] || [];
+    if (!items.length) {
+      box.innerHTML = '<div class="reader-empty">该分类暂无数据包。定制/周期包上传后会出现在「定制 / 周期」。ProductAnalyzer 也可同步同库。</div>';
+      return;
+    }
+    var html = '<div style="display:grid;gap:10px">';
+    items.forEach(function(it) {
+      var date = String(it.report_date || it.date || '').slice(0, 10);
+      var at = it.archive_type || ({
+        custom: 'member_custom_zip', daily: 'member_daily_zip',
+        weekly: 'member_weekly_zip', monthly: 'member_monthly_zip'
+      }[kind] || 'member_custom_zip');
+      var label = it.summary || it.file_name || date;
+      var rows = it.row_count != null ? (' · ' + Number(it.row_count).toLocaleString() + ' 条') : '';
+      var preview = '/member/preview?date=' + encodeURIComponent(date)
+        + '&archive_type=' + encodeURIComponent(at);
+      var dl = '/api/v1/member/reports/' + encodeURIComponent(date)
+        + '/download?archive_type=' + encodeURIComponent(at)
+        + '&access_token=' + encodeURIComponent(localStorage.getItem('xhs_member_token') || '');
+      html += '<div style="display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff">'
+        + '<div><div style="font-weight:700">' + esc(label) + '</div>'
+        + '<div style="font-size:12px;color:var(--text2);margin-top:4px">' + esc(date) + rows + ' · ' + esc(at) + '</div></div>'
+        + '<div style="display:flex;gap:8px;flex-shrink:0">'
+        + '<a class="btn btn-primary btn-sm" href="' + preview + '">在线看</a>'
+        + '<a class="btn btn-ghost btn-sm" href="' + dl + '">下载 zip</a>'
+        + '</div></div>';
+    });
+    html += '</div>';
+    box.innerHTML = html;
+  } catch (e) {
+    box.innerHTML = '<div class="reader-empty" style="color:var(--danger)">加载失败：' + esc((e && e.message) || e) + '</div>';
+  }
+}
+if (location.hash === '#datapacks' || location.hash === '#packs') {
+  document.addEventListener('DOMContentLoaded', function() { switchAppPanel('datapacks'); });
 }
 
 // ===== 使用说明 / 合规 Modal =====

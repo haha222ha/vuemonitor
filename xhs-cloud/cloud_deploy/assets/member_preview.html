@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>选品数据包 · 在线预览</title>
+<style>
+:root{
+  --bg:#f4f7fb;--bar:#ffffff;--text:#1a2332;--muted:#5b6b7c;
+  --accent:#14708f;--accent-soft:#e6f4f8;--line:#d7e2ec;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:linear-gradient(180deg,#eef6fb,#f7fafc);color:var(--text);
+  font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.topbar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bar);
+  border-bottom:1px solid var(--line);flex-wrap:wrap;box-shadow:0 1px 3px rgba(16,24,40,.04)}
+.topbar .title{font-size:13px;font-weight:600;color:var(--muted);margin-right:auto;
+  max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{font-size:11px;font-weight:700;color:#0f5a73;background:var(--accent-soft);
+  border:1px solid #b7dbe6;border-radius:999px;padding:2px 8px;margin-right:6px}
+.seg{display:flex;gap:6px;align-items:center}
+.seg button,.btn{padding:7px 12px;border-radius:10px;border:1px solid var(--line);
+  background:#fff;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;text-decoration:none}
+.seg button.active,.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+iframe{display:block;width:100%;height:calc(100vh - 52px);border:0;background:#fff}
+.empty{padding:48px 24px;text-align:center;color:var(--muted);line-height:1.6}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="tag">数据包</span>
+  <span class="title" id="title">在线预览</span>
+  <div class="seg" id="viewSeg">
+    <button type="button" data-entry="index.html" class="active" onclick="setEntry('index.html')">入口</button>
+    <button type="button" data-entry="_view_table.html" onclick="setEntry('_view_table.html')">表格</button>
+    <button type="button" data-entry="_view_cards.html" onclick="setEntry('_view_cards.html')">卡片</button>
+  </div>
+  <button class="btn primary" type="button" onclick="downloadZip()">下载 zip</button>
+  <a class="btn" href="/member#datapacks">返回数据包库</a>
+  <a class="btn" href="/member">会员中心</a>
+</div>
+<iframe id="frame" title="报告内容"></iframe>
+<div class="empty hidden" id="empty">无法加载预览，请重新登录会员中心</div>
+<script>
+const STORAGE = { token: 'xhs_member_token', viewMode: 'xhs_member_pack_view' };
+const params = new URLSearchParams(location.search);
+const reportDate = (params.get('date') || '').slice(0, 10);
+const archiveType = params.get('archive_type') || 'member_custom_zip';
+let entry = params.get('entry') || localStorage.getItem(STORAGE.viewMode) || 'index.html';
+
+function token() { return localStorage.getItem(STORAGE.token) || ''; }
+
+function setEntry(ent) {
+  entry = ent || 'index.html';
+  localStorage.setItem(STORAGE.viewMode, entry);
+  document.querySelectorAll('#viewSeg button').forEach(b => b.classList.toggle('active', b.dataset.entry === entry));
+  loadFrame();
+}
+
+function viewUrl(ent) {
+  const t = token();
+  return '/api/v1/member/reports/' + encodeURIComponent(reportDate)
+    + '/view/' + encodeURIComponent(ent || entry)
+    + '?archive_type=' + encodeURIComponent(archiveType)
+    + '&access_token=' + encodeURIComponent(t);
+}
+
+function loadFrame() {
+  const t = token();
+  const frame = document.getElementById('frame');
+  const empty = document.getElementById('empty');
+  if (!t || !reportDate) {
+    frame.classList.add('hidden');
+    empty.classList.remove('hidden');
+    empty.textContent = '请先登录会员中心后再预览。ProductAnalyzer 可在「云端报告库」直接下载打开。';
+    return;
+  }
+  empty.classList.add('hidden');
+  frame.classList.remove('hidden');
+  frame.src = viewUrl(entry);
+}
+
+function downloadZip() {
+  const t = token();
+  if (!t || !reportDate) return;
+  const url = '/api/v1/member/reports/' + encodeURIComponent(reportDate)
+    + '/download?archive_type=' + encodeURIComponent(archiveType)
+    + '&access_token=' + encodeURIComponent(t);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+document.getElementById('title').textContent =
+  '在线预览 · ' + (reportDate || '') + ' · ' + archiveType;
+document.querySelectorAll('#viewSeg button').forEach(b =>
+  b.classList.toggle('active', b.dataset.entry === entry));
+loadFrame();
+</script>
+</body>
+</html>

@@ -664,6 +664,60 @@ def download_report(
     )
 
 
+@app.get("/member/preview", response_class=HTMLResponse)
+def member_preview_page():
+    """多用户在线看整包（iframe）；下载走同套 /reports/{date}/download。"""
+    path = os.path.join(_ASSETS, "member_preview.html")
+    if not os.path.isfile(path):
+        raise HTTPException(status_code=404, detail="预览页未部署")
+    return FileResponse(
+        path,
+        media_type="text/html; charset=utf-8",
+        headers={"Cache-Control": "no-store, must-revalidate"},
+    )
+
+
+@app.get("/api/v1/member/reports/{report_date}/view/{file_path:path}")
+def member_report_view_file(
+    report_date: str,
+    file_path: str,
+    archive_type: str = "member_daily_zip",
+    access_token: str = "",
+    request: Request = None,
+    cred: HTTPAuthorizationCredentials | None = Depends(security),
+):
+    """在线预览 zip 内静态文件（供 /member/preview iframe + 旧客户端）。"""
+    from cloud_deploy.cloud_api.auth import member_from_token
+    from cloud_deploy.cloud_api.member_report_preview import read_member_report_file
+
+    token = (cred.credentials if cred else None) or (access_token or "").strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="需要登录")
+    user = member_from_token(token)
+    assert_legacy_zip_allowed(user["id"], archive_type)
+    if not db.member_can_download_report(user["id"], report_date, archive_type):
+        raise HTTPException(status_code=403, detail="无权预览该报告")
+    try:
+        path, media_type, rewritten = read_member_report_file(
+            report_date,
+            archive_type,
+            file_path,
+            access_token=token,
+        )
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e) or "文件不存在") from e
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    ip = request.client.host if request and request.client else ""
+    try:
+        db.log_download(user["id"], report_date, archive_type, ip)
+    except Exception:
+        pass
+    if rewritten is not None:
+        return HTMLResponse(content=rewritten, media_type=media_type)
+    return FileResponse(path, media_type=media_type)
+
+
 @app.get("/api/v1/member/library")
 def member_library(user: dict = Depends(current_user)):
     """全部历史报告库（含定制全量包 → ProductAnalyzer）。"""

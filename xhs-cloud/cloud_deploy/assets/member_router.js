@@ -10,6 +10,9 @@ var MemberRouter = (function () {
     today: 'archive',
     insight: 'archive',
     archive: 'archive',
+    datapacks: 'datapacks',
+    packs: 'datapacks',
+    zip: 'datapacks',
     watchlist: 'watchlist',
     client: 'client',
     account: 'account',
@@ -66,11 +69,20 @@ var MemberRouter = (function () {
       btn.classList.toggle('active', btn.getAttribute('data-app-nav') === current);
     });
 
-    var panelMap = { today: 'panelArchive', archive: 'panelArchive', watchlist: 'panelWatchlist', account: 'panelAccount' };
+    var panelMap = {
+      today: 'panelArchive',
+      archive: 'panelArchive',
+      datapacks: 'panelDatapacks',
+      watchlist: 'panelWatchlist',
+      account: 'panelAccount'
+    };
     var panelId = panelMap[current];
     document.querySelectorAll('.app-panel').forEach(function (p) {
       p.classList.toggle('active', p.id === panelId);
     });
+    if (current === 'datapacks' && typeof loadDataPacks === 'function') {
+      loadDataPacks(window._datapackKind || 'custom');
+    }
 
     // 同步移动端底部导航 active
     document.querySelectorAll('.reader-mobile-nav-btn[data-route]').forEach(function (btn) {
