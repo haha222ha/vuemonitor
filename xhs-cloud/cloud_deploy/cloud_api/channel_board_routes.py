@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""私密 · 选品作战台（一门一密）：增量商品库 + 选品任务台（8765 静态镜像）。"""
+"""私密 · 选品作战台：SaaS 会员鉴权（账号/授权码）+ 运维密码兜底；增量库 + 任务台只读镜像。"""
 from __future__ import annotations
 
 import hashlib
@@ -17,7 +17,11 @@ from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from pydantic import BaseModel, Field
 
-from cloud_deploy.cloud_api.auth import verify_sync_key
+from cloud_deploy.cloud_api.auth import (
+    resolve_member_token,
+    user_from_token,
+    verify_sync_key,
+)
 
 router = APIRouter(tags=["channel-board"])
 
@@ -45,9 +49,56 @@ def _token(password: str = "") -> str:
     return hashlib.sha256(f"xhs-channel-board|{raw}".encode("utf-8")).hexdigest()
 
 
-def _cookie_ok(request: Request) -> bool:
+def _ops_cookie_ok(request: Request) -> bool:
+    """运维一门一密（兼容旧 cookie）。"""
     got = request.cookies.get("channel_board_auth") or ""
     return bool(got) and hmac.compare_digest(got, _token())
+
+
+def _member_channel_allowed(user_id: int) -> bool:
+    """在期会员默认可进；note 显式 channel_board_enabled=false 则拒。
+
+    设 XHS_CHANNEL_REQUIRE_ENTITLEMENT=1 时，必须 entitlements.channel_board_enabled
+    或 products.channel_board.enabled 为真（便于只给指定授权码开通道）。
+    """
+    from cloud_deploy.cloud_api import database as db
+    from cloud_deploy.cloud_api.member_entitlements import enrich_member_profile
+
+    profile = db.get_active_member(user_id)
+    if not profile:
+        return False
+    enriched = enrich_member_profile(profile, user_id) or {}
+    ent = enriched.get("entitlements") or {}
+    if ent.get("channel_board_enabled") is False:
+        return False
+    products = ent.get("products") if isinstance(ent.get("products"), dict) else {}
+    ch = products.get("channel_board") if isinstance(products.get("channel_board"), dict) else {}
+    if ch.get("enabled") is False:
+        return False
+    require = (os.environ.get("XHS_CHANNEL_REQUIRE_ENTITLEMENT") or "").strip() == "1"
+    if require:
+        return bool(ent.get("channel_board_enabled") or ch.get("enabled"))
+    return True
+
+
+def _member_ok(request: Request) -> bool:
+    """SaaS 底座会员会话（与 /member 同一 Cookie / JWT）。"""
+    token = resolve_member_token(None, request)
+    if not token:
+        return False
+    try:
+        user = user_from_token(token)
+        return _member_channel_allowed(int(user["id"]))
+    except Exception:
+        return False
+
+
+def _access_ok(request: Request) -> bool:
+    return _ops_cookie_ok(request) or _member_ok(request)
+
+
+# 旧名兼容（内部若有引用）
+_cookie_ok = _access_ok
 
 
 def _boards_root() -> str:
@@ -122,7 +173,7 @@ __STAMP__
     <p>先看今日推荐，再锁大类看榜。云端只读快照；人判 / 可搬写入请回本机 8765。</p>
   </a>
 </div>
-<p class="foot">入口 https://monitor.xhs365.cn/channel/ · 密码与原先增量库相同</p>
+<p class="foot">入口 https://monitor.xhs365.cn/channel/ · 会员账号 / 授权码登录（与 SaaS 底座同一套）</p>
 </div></body></html>"""
 
 
@@ -185,20 +236,136 @@ def _gate_html() -> str:
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>选品作战台</title>
 <style>
-body{font-family:Segoe UI,Microsoft YaHei,sans-serif;background:#eef3f8;color:#101828;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;
-background-image:radial-gradient(900px 360px at 12% -10%,rgba(20,112,143,.10),transparent 55%),linear-gradient(180deg,#f7fafc,#eef3f8)}
-.box{width:400px;padding:28px;background:#fff;border:1px solid #c5d0dc;border-radius:14px;box-shadow:0 10px 28px rgba(16,24,40,.06)}
-h1{font-size:20px;margin:0 0 8px}p{color:#3d4f63;font-size:13px;line-height:1.5}
-input{width:100%;padding:12px;border-radius:10px;border:1px solid #c5d0dc;background:#f8fbfd;color:#101828;box-sizing:border-box}
-button{margin-top:12px;width:100%;padding:11px;border:0;border-radius:10px;background:#14708f;color:#fff;font-weight:700;cursor:pointer}
+:root{--bg:#eef3f8;--card:#fff;--text:#101828;--muted:#3d4f63;--line:#c5d0dc;--accent:#14708f;--accent-soft:#e2f3f8;--danger:#b12e3c}
+*{box-sizing:border-box}
+body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(900px 360px at 12% -10%,rgba(20,112,143,.10),transparent 55%),linear-gradient(180deg,#f7fafc,#eef3f8);color:var(--text);display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;padding:24px}
+.box{width:420px;max-width:100%;padding:28px 24px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 28px rgba(16,24,40,.06)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--accent);margin:0 0 6px}
+h1{font-size:22px;margin:0 0 8px;letter-spacing:-.02em}
+.lead{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 16px}
+.tabs{display:flex;gap:6px;margin:0 0 14px}
+.tabs button{flex:1;margin:0;padding:9px 8px;border:1px solid var(--line);border-radius:10px;background:#f8fbfd;color:var(--muted);font-weight:600;font-size:13px;cursor:pointer}
+.tabs button.active{background:var(--accent-soft);border-color:rgba(20,112,143,.35);color:#0a4f66}
+.pane{display:none}.pane.active{display:block}
+label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin:0 0 6px}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#f8fbfd;color:var(--text);margin:0 0 12px}
+.btn{width:100%;padding:11px;border:0;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer;margin-top:4px}
+.btn:disabled{opacity:.6;cursor:wait}
+.err{display:none;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:#fdecee;border:1px solid #f3c4cb;color:var(--danger);font-size:13px;line-height:1.4}
+.err.show{display:block}
+.hint{margin:14px 0 0;font-size:12px;color:var(--muted);line-height:1.5}
+.hint a{color:var(--accent);font-weight:600;text-decoration:none}
+details{margin-top:16px;border-top:1px solid var(--line);padding-top:12px}
+summary{cursor:pointer;color:var(--muted);font-size:12px;font-weight:600}
 </style></head><body><div class="box">
+<div class="eyebrow">SaaS 会员 · 共用授权</div>
 <h1>选品作战台</h1>
-<p>一门一密 · 增量商品库 + 选品任务台（本机 8765 云端只读镜像）</p>
-<form method="post" action="/channel/login">
-<input name="password" type="password" placeholder="访问密码" autofocus/>
-<button type="submit">进入</button>
-</form>
-</div></body></html>"""
+<p class="lead">用会员账号或授权码进入；与官网会员中心同一套登录。增量比货库 + 选品任务台（云端只读）。</p>
+<div id="err" class="err" role="alert"></div>
+<div class="tabs" role="tablist">
+  <button type="button" class="active" data-tab="account" id="tabAccount">账号登录</button>
+  <button type="button" data-tab="code" id="tabCode">授权码</button>
+</div>
+<div class="pane active" id="paneAccount">
+  <label for="username">用户名</label>
+  <input id="username" autocomplete="username" placeholder="会员用户名"/>
+  <label for="password">密码</label>
+  <input id="password" type="password" autocomplete="current-password" placeholder="登录密码" onkeydown="if(event.key==='Enter')doAccount()"/>
+  <button class="btn" type="button" id="btnAccount" onclick="doAccount()">登录进入</button>
+</div>
+<div class="pane" id="paneCode">
+  <label for="authCode">授权码</label>
+  <input id="authCode" autocomplete="off" placeholder="XHS-XXXX-XXXX-XXXX" onkeydown="if(event.key==='Enter')doCode()"/>
+  <button class="btn" type="button" id="btnCode" onclick="doCode()">授权码进入</button>
+</div>
+<p class="hint">没有账号？可先到 <a href="/member" target="_blank" rel="noopener">会员中心</a> 开通；客服发的授权码也可直接在此登录。</p>
+<details>
+  <summary>运维密码（本机内部兜底）</summary>
+  <form method="post" action="/channel/login" style="margin-top:12px">
+    <label for="opsPassword">访问密码</label>
+    <input id="opsPassword" name="password" type="password" placeholder="运维一门一密" autocomplete="off"/>
+    <button class="btn" type="submit">密码进入</button>
+  </form>
+</details>
+</div>
+<script>
+(function(){
+  var KEY='xhs_channel_device_id';
+  function uid(){
+    try{
+      var raw=localStorage.getItem(KEY);
+      if(!raw||raw.length<8){
+        raw=(window.crypto&&crypto.randomUUID)?crypto.randomUUID().replace(/-/g,'').slice(0,32).toUpperCase()
+          :(Date.now().toString(36)+Math.random().toString(36).slice(2)).replace(/[^A-Z0-9]/gi,'').slice(0,32).toUpperCase();
+        localStorage.setItem(KEY,raw);
+      }
+      return 'web:'+String(raw).toUpperCase();
+    }catch(e){ return 'web:CHANNEL'+String(Date.now()); }
+  }
+  function showErr(msg){
+    var el=document.getElementById('err');
+    if(!el) return;
+    el.textContent=msg||'登录失败';
+    el.classList.add('show');
+  }
+  function clearErr(){
+    var el=document.getElementById('err');
+    if(!el) return;
+    el.textContent='';
+    el.classList.remove('show');
+  }
+  function setBusy(btn, on){
+    if(!btn) return;
+    btn.disabled=!!on;
+    btn.textContent=on?'登录中…':(btn.id==='btnCode'?'授权码进入':'登录进入');
+  }
+  document.querySelectorAll('.tabs button').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.tabs button').forEach(function(x){ x.classList.remove('active'); });
+      document.querySelectorAll('.pane').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      var pane=document.getElementById(b.dataset.tab==='code'?'paneCode':'paneAccount');
+      if(pane) pane.classList.add('active');
+      clearErr();
+    });
+  });
+  async function postLogin(url, body, btn){
+    clearErr();
+    setBusy(btn, true);
+    try{
+      var r=await fetch(url,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        credentials:'same-origin',
+        body:JSON.stringify(Object.assign({device_id:uid(), device_label:'选品作战台网页'}, body))
+      });
+      var data=null;
+      try{ data=await r.json(); }catch(_e){}
+      if(!r.ok){
+        var detail=(data&&(data.detail||data.message))||('HTTP '+r.status);
+        if(Array.isArray(detail)) detail=detail.map(function(x){return x.msg||JSON.stringify(x);}).join('; ');
+        throw new Error(String(detail));
+      }
+      location.href='/channel/hub/';
+    }catch(e){
+      showErr(e&&e.message?e.message:'登录失败');
+      setBusy(btn, false);
+    }
+  }
+  window.doAccount=function(){
+    var u=(document.getElementById('username')||{}).value||'';
+    var p=(document.getElementById('password')||{}).value||'';
+    if(!u.trim()||!p){ showErr('请输入用户名和密码'); return; }
+    postLogin('/api/v1/auth/login',{username:u.trim(),password:p}, document.getElementById('btnAccount'));
+  };
+  window.doCode=function(){
+    var c=(document.getElementById('authCode')||{}).value||'';
+    if(c.trim().length<8){ showErr('请输入有效授权码'); return; }
+    postLogin('/api/v1/auth/login-code',{auth_code:c.trim()}, document.getElementById('btnCode'));
+  };
+})();
+</script>
+</body></html>"""
 
 
 @router.post("/api/v1/sync/channel-board-upload")
