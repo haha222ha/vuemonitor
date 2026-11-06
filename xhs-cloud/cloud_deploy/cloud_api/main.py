@@ -50,7 +50,10 @@ from cloud_deploy.cloud_api.advisor_member_routes import router as advisor_membe
 from cloud_deploy.cloud_api.advisor_routes import router as advisor_internal_router
 from cloud_deploy.cloud_api.takeon_board_routes import router as takeon_board_router
 from cloud_deploy.cloud_api.channel_board_routes import router as channel_board_router
-from cloud_deploy.cloud_api.member_entitlements import enrich_member_profile
+from cloud_deploy.cloud_api.member_entitlements import (
+    assert_legacy_zip_allowed,
+    enrich_member_profile,
+)
 
 _ASSETS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets")
 
@@ -619,24 +622,51 @@ def member_bind_email(body: BindEmailBody, user: dict = Depends(current_user)):
 
 
 @app.get("/api/v1/member/reports")
-def member_reports_legacy_gone(
+def member_reports(
     archive_type: str = "member_daily_zip",
     user: dict = Depends(current_member),
 ):
-    """Legacy 表格数据包列表已下线。"""
-    raise HTTPException(
-        status_code=410,
-        detail={
-            "detail": "表格数据包已下线，请使用 AI 选品分析中心阅读最新报告",
-            "migration_url": "/member#today",
-            "archive_type": archive_type,
-        },
+    """报告列表（ProductAnalyzer / 旧客户端）。custom 全量包始终可列；日周月受 legacy 门控。"""
+    assert_legacy_zip_allowed(user["id"], archive_type)
+    return {"items": db.list_archives(archive_type=archive_type), "user": user["username"]}
+
+
+@app.get("/api/v1/member/reports/{report_date}/download")
+def download_report(
+    report_date: str,
+    archive_type: str = "member_daily_zip",
+    access_token: str = "",
+    request: Request = None,
+    cred: HTTPAuthorizationCredentials | None = Depends(security),
+):
+    """方案 B 整包下载 — ProductAnalyzer cloud_client.download_report_zip 主入口。"""
+    from cloud_deploy.cloud_api.auth import member_from_token
+
+    token = (cred.credentials if cred else None) or (access_token or "").strip()
+    if not token:
+        raise HTTPException(status_code=401, detail="需要登录")
+    user = member_from_token(token)
+    assert_legacy_zip_allowed(user["id"], archive_type)
+    if not db.member_can_download_report(user["id"], report_date, archive_type):
+        raise HTTPException(
+            status_code=403,
+            detail="体验授权码仅可下载指定报告，请联系管理员开通完整会员",
+        )
+    path = db.get_archive_path(report_date, archive_type)
+    if not path or not os.path.isfile(path):
+        raise HTTPException(status_code=404, detail="报告不存在")
+    ip = request.client.host if request and request.client else ""
+    db.log_download(user["id"], report_date, archive_type, ip)
+    return FileResponse(
+        path,
+        media_type="application/zip",
+        filename=os.path.basename(path),
     )
 
 
 @app.get("/api/v1/member/library")
 def member_library(user: dict = Depends(current_user)):
-    """全部历史报告库（日报 + 周报 + 月报）。"""
+    """全部历史报告库（含定制全量包 → ProductAnalyzer）。"""
     import logging
 
     logger = logging.getLogger(__name__)
@@ -1363,21 +1393,28 @@ async def sync_report_upload(
     file: UploadFile = File(...),
     _: None = Depends(verify_sync_key),
 ):
-    """方案 B：本地 gen_report 打包 zip 上传 → 解压 ingest → 会员可下载。
+    """方案 B：本地 zip → ingest → 会员/ProductAnalyzer 可下载。
 
-    产品策略：默认拒绝选品报告上传（XHS_REPORT_UPLOAD_DISABLED=1，默认开启）。
-    紧急恢复：服务器设 XHS_REPORT_UPLOAD_DISABLED=0。
+    - 默认拒绝（防误推全量日报）。
+    - 全量数据包：请求头 X-Upload-Full-Pack=1 放行（Sync-Key 已校验）。
+    - 紧急全开：XHS_REPORT_UPLOAD_DISABLED=0。
     """
+    full_pack = (request.headers.get("X-Upload-Full-Pack") or "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
     disabled = os.environ.get("XHS_REPORT_UPLOAD_DISABLED", "1").strip().lower() not in (
         "0",
         "false",
         "no",
         "off",
     )
-    if disabled:
+    if disabled and not full_pack:
         raise HTTPException(
             status_code=403,
-            detail="选品报告上传已关闭（会员页不再提供全量日报下载）",
+            detail="选品报告上传已关闭；全量数据包请带 X-Upload-Full-Pack=1，或设 XHS_REPORT_UPLOAD_DISABLED=0",
         )
     from cloud_deploy.cloud_api.ingest_guard import ingest_force_enabled
 
@@ -1386,14 +1423,18 @@ async def sync_report_upload(
     raw = await file.read()
     if not raw:
         raise HTTPException(status_code=400, detail="上传文件为空")
-    max_mb = int(os.environ.get("XHS_REPORT_UPLOAD_MAX_MB", "200") or 200)
+    default_max = "400" if full_pack else "200"
+    max_mb = int(os.environ.get("XHS_REPORT_UPLOAD_MAX_MB", default_max) or default_max)
     if len(raw) > max_mb * 1024 * 1024:
         raise HTTPException(status_code=413, detail=f"文件超过 {max_mb}MB 限制")
-    force = ingest_force_enabled(header_value=request.headers.get("X-Upload-Force", ""))
+    force = ingest_force_enabled(header_value=request.headers.get("X-Upload-Force", "")) or full_pack
     try:
         from cloud_deploy.cloud_api.report_upload_service import ingest_report_upload_bytes
 
-        return ingest_report_upload_bytes(raw, filename=file.filename or "report.zip", force=force)
+        result = ingest_report_upload_bytes(raw, filename=file.filename or "report.zip", force=force)
+        if isinstance(result, dict):
+            result["full_pack"] = full_pack
+        return result
     except zipfile.BadZipFile as e:
         raise HTTPException(status_code=400, detail=f"无效 zip: {e}") from e
     except ValueError as e:

@@ -70,6 +70,25 @@ def pack_register_sync(
 
     data_js = os.path.join(report_dir, "data.js")
     meta = parse_meta_from_data_js(data_js) if os.path.isfile(data_js) else {}
+    # 全量数据包 sidecar（周期 → ProductAnalyzer 定制库展示名）
+    for side_name in ("cycle_report_full_cloud.json", "cycle_report_cloud.json"):
+        side = os.path.join(report_dir, side_name)
+        if not os.path.isfile(side):
+            continue
+        try:
+            with open(side, "r", encoding="utf-8") as f:
+                marker = json.load(f) or {}
+            if isinstance(marker, dict):
+                for key in ("title", "filter_label", "source_name", "report_kind", "product"):
+                    if marker.get(key) and not meta.get(key):
+                        meta[key] = marker[key]
+                if marker.get("full_count") and not meta.get("count"):
+                    meta["count"] = int(marker["full_count"])
+                if marker.get("report_date") and not meta.get("date"):
+                    meta["date"] = str(marker["report_date"])[:10]
+        except Exception:
+            pass
+        break
     row_count = int(meta.get("count") or 0)
     report_date = str(meta.get("date") or datetime.now().strftime("%Y-%m-%d"))[:10]
     effective_force = force or ingest_force_enabled()

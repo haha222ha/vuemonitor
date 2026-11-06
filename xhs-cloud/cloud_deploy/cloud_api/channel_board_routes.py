@@ -163,7 +163,7 @@ h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
 </style></head><body><div class="wrap">
 <div class="eyebrow">一门一密 · 私密作战台</div>
 <h1>选品作战台</h1>
-<p class="lead">记一句就够：<b>左比货 · 中报告 · 右拍板</b>。同一密码；跟品 / 上品 / 会员全量日报不进这里。</p>
+<p class="lead">记一句就够：<b>左比货 · 中全量包 · 右拍板</b>。中入口对接 ProductAnalyzer 整包上云；跟品 / 上品另走专用页。</p>
 __STAMP__
 <div class="grid">
   <a class="card" href="/channel/board/">
@@ -172,9 +172,9 @@ __STAMP__
     <p>商品行 × 采集日列 · 格内直接销量；顶栏日期悬浮。默认「时间矩阵」，可切卡片。</p>
   </a>
   <a class="card" href="/channel/report/">
-    <span class="tag">中 · 周期选品报告</span>
-    <h2>在线看 · 可下载</h2>
-    <p>同套选品报告 HTML；云端为增量 TopN 浏览包（完整入选在本机）。页内可下 zip。</p>
+    <span class="tag">中 · 全量数据包</span>
+    <h2>整包上云 · PA 打开</h2>
+    <p>周期选品报告完整 data.js zip（member_custom_zip）。本页可下；ProductAnalyzer → 云端报告库 → 定制 Tab 同步打开。</p>
   </a>
   <a class="card" href="/channel/workbench/">
     <span class="tag">右 · 选品任务台</span>
@@ -205,13 +205,16 @@ def _hub_stamp_html() -> str:
                 funnel = raw
         except Exception:
             continue
-    report_marker_path = os.path.join(_cycle_report_root(), "latest", "cycle_report_cloud.json")
-    if os.path.isfile(report_marker_path):
+    for _mk in ("cycle_report_full_cloud.json", "cycle_report_cloud.json"):
+        report_marker_path = os.path.join(_cycle_report_root(), "latest", _mk)
+        if not os.path.isfile(report_marker_path):
+            continue
         try:
             with open(report_marker_path, encoding="utf-8") as f:
                 raw = json.load(f) or {}
             if isinstance(raw, dict):
                 report_marker = raw
+                break
         except Exception:
             pass
     imported = (
@@ -581,7 +584,11 @@ async def sync_channel_cycle_report_upload(
     file: UploadFile = File(...),
     _: None = Depends(verify_sync_key),
 ):
-    """本机周期选品报告云浏览瘦包 → /channel/report/（在线看 + zip 下载）。"""
+    """周期全量数据包落地页 → /channel/report/（下载 zip；对接 ProductAnalyzer）。
+
+    zip 根下 cycle_report/：index.html + data.js + cycle_report_full_cloud.json
+    （或兼容 cycle_report_cloud.json）+ 可选全量 *.zip。
+    """
     from cloud_deploy.cloud_api import database as db
     from cloud_deploy.cloud_api.config import get_settings
     from cloud_deploy.reporting.constants import ARCHIVE_CYCLE_REPORT
@@ -603,16 +610,21 @@ async def sync_channel_cycle_report_upload(
 
         report_dir = ""
         for root, _dirs, files in os.walk(extract_root):
-            if "index.html" in files and "data.js" in files and "cycle_report_cloud.json" in files:
+            has_marker = (
+                "cycle_report_full_cloud.json" in files or "cycle_report_cloud.json" in files
+            )
+            if "index.html" in files and "data.js" in files and has_marker:
                 report_dir = root
                 break
         if not report_dir:
             raise HTTPException(
                 status_code=400,
-                detail="zip 内未找到周期报告浏览包（需 index.html + data.js + cycle_report_cloud.json）",
+                detail="zip 内未找到全量包落地（需 index.html + data.js + cycle_report_*cloud.json）",
             )
 
-        marker_path = os.path.join(report_dir, "cycle_report_cloud.json")
+        marker_path = os.path.join(report_dir, "cycle_report_full_cloud.json")
+        if not os.path.isfile(marker_path):
+            marker_path = os.path.join(report_dir, "cycle_report_cloud.json")
         with open(marker_path, encoding="utf-8") as f:
             marker = json.load(f) or {}
         if not isinstance(marker, dict):
@@ -625,13 +637,20 @@ async def sync_channel_cycle_report_upload(
         marker["cloud_imported_at"] = server_imported
         marker["report_date"] = report_date
         marker["view_path"] = "/channel/report/"
+        marker["product"] = marker.get("product") or "productanalyzer_full_pack"
         with open(marker_path, "w", encoding="utf-8") as f:
             json.dump(marker, f, ensure_ascii=False, indent=2)
+        # 双写兼容
+        compat = os.path.join(report_dir, "cycle_report_cloud.json")
+        if os.path.abspath(compat) != os.path.abspath(marker_path):
+            with open(compat, "w", encoding="utf-8") as f:
+                json.dump(marker, f, ensure_ascii=False, indent=2)
 
-        # 确保浏览包内有可下的 zip（若客户端未塞入则用本次上传副本）
-        embedded_zip = os.path.join(report_dir, "cycle_report_cloud.zip")
-        if not os.path.isfile(embedded_zip):
-            shutil.copy2(zip_path, embedded_zip)
+        dl_name = str(marker.get("download_name") or "cycle_report_cloud.zip")
+        embedded_zip = os.path.join(report_dir, dl_name)
+        fallback_zip = os.path.join(report_dir, "cycle_report_cloud.zip")
+        if not os.path.isfile(embedded_zip) and not os.path.isfile(fallback_zip):
+            shutil.copy2(zip_path, fallback_zip)
 
         cr_root = _cycle_report_root()
         dest_live = os.path.join(cr_root, report_date)
@@ -647,10 +666,15 @@ async def sync_channel_cycle_report_upload(
 
         archive_dir = get_settings().xhs_report_archive_dir
         os.makedirs(archive_dir, exist_ok=True)
+        # hub 私有归档（落地 zip）；真正 PA 用的 member_custom 走 report-upload
         dest_zip = os.path.join(
-            archive_dir, f"cycle_report_{report_date.replace('-', '')}.zip"
+            archive_dir, f"cycle_report_hub_{report_date.replace('-', '')}.zip"
         )
-        shutil.copy2(zip_path, dest_zip)
+        src_full = embedded_zip if os.path.isfile(embedded_zip) else fallback_zip
+        if os.path.isfile(src_full):
+            shutil.copy2(src_full, dest_zip)
+        else:
+            shutil.copy2(zip_path, dest_zip)
         h = hashlib.sha256()
         with open(dest_zip, "rb") as f:
             for chunk in iter(lambda: f.read(1024 * 1024), b""):
@@ -664,25 +688,30 @@ async def sync_channel_cycle_report_upload(
             file_name=os.path.basename(dest_zip),
             file_size=int(os.path.getsize(dest_zip)),
             sha256=h.hexdigest(),
-            row_count=int(marker.get("cloud_count") or 0),
+            row_count=int(marker.get("full_count") or marker.get("cloud_count") or 0),
             meta={
-                "report_kind": "cycle_report_cloud_view",
+                "report_kind": "cycle_report_full_pack",
                 "private": True,
                 "view_path": "/channel/report/",
+                "product": "productanalyzer_full_pack",
                 **marker,
             },
         )
+        download_url = f"/channel/report/{dl_name}" if os.path.isfile(
+            os.path.join(dest_live, dl_name)
+        ) else "/channel/report/cycle_report_cloud.zip"
         return {
             "ok": True,
             "report_date": report_date,
             "imported_at": server_imported,
             "view_url": "/channel/report/",
             "hub_url": "/channel/hub/",
-            "download_url": "/channel/report/cycle_report_cloud.zip",
+            "download_url": download_url,
             "live_dir": dest_live,
-            "cloud_count": int(marker.get("cloud_count") or 0),
+            "cloud_count": int(marker.get("cloud_count") or marker.get("full_count") or 0),
             "full_count": int(marker.get("full_count") or 0),
             "source_name": marker.get("source_name") or "",
+            "product": "productanalyzer_full_pack",
         }
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
@@ -867,7 +896,7 @@ def channel_cycle_report_files(request: Request, path: str = ""):
     if not os.path.isdir(root):
         return HTMLResponse(
             "<h3>周期报告浏览包尚未上传</h3>"
-            "<p>请本机运行 <code>python tools/publish_cycle_report_cloud.py</code></p>"
+            "<p>请本机运行 <code>python tools/publish_cycle_report_cloud.py</code>（全量数据包 → ProductAnalyzer）</p>"
             "<p><a href='/channel/hub/'>返回入口</a></p>",
             status_code=404,
         )

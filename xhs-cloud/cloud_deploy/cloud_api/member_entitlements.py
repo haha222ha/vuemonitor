@@ -19,6 +19,40 @@ def legacy_zip_globally_disabled() -> bool:
     return os.environ.get("XHS_LEGACY_ZIP_DISABLED", "1") == "1"
 
 
+def assert_legacy_zip_allowed(user_id: int, archive_type: str = "member_daily_zip") -> dict:
+    """ProductAnalyzer / 会员 zip 下载门控。
+
+    - member_custom_zip（周期全量数据包等）：不受 XHS_LEGACY_ZIP_DISABLED 全局下线影响，
+      仍需有效会员；体验码若限制 archive_types 则继续尊重。
+    - 日/周/月：全局下线时 410；否则按套餐 legacy_zip_enabled。
+    """
+    profile = db.get_member_profile(user_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="用户不存在")
+    if not profile.get("is_active"):
+        raise HTTPException(status_code=402, detail="会员已过期，请续费后下载数据包")
+
+    at = (archive_type or "member_daily_zip").strip()
+    enriched = enrich_member_profile(profile, user_id) or {}
+    ent = enriched.get("entitlements") or resolve_entitlements(user_id, profile)
+
+    if at == "member_custom_zip":
+        return ent
+
+    if legacy_zip_globally_disabled():
+        raise HTTPException(
+            status_code=410,
+            detail={
+                "detail": LEGACY_ZIP_OFFLINE_DETAIL,
+                "migration_url": LEGACY_ZIP_MIGRATION_URL,
+                "archive_type": at,
+            },
+        )
+    if not enriched.get("legacy_zip_enabled"):
+        raise HTTPException(status_code=403, detail=LEGACY_ZIP_DENIED)
+    return ent
+
+
 def resolve_entitlements(user_id: int, profile: dict | None) -> dict:
     """合并 auth_codes.note 与 memberships.plan_code 为规范 entitlements。"""
     profile = profile or {}
@@ -57,6 +91,24 @@ def enrich_member_profile(profile: dict | None, user_id: int) -> dict | None:
     except Exception:
         out["custom_analysis_credits"] = 0
     return out
+
+
+def assess_access_for_user(user_id: int, skin_id: str = "") -> dict:
+    """心象测完整报告门控。"""
+    profile = db.get_member_profile(user_id)
+    if not profile:
+        return {"allowed": False, "reason": "user_not_found", "entitlements": {}}
+    enriched = enrich_member_profile(profile, user_id) or {}
+    ent = enriched.get("entitlements") or {}
+    products = ent.get("products") if isinstance(ent.get("products"), dict) else {}
+    assess = products.get("assess") if isinstance(products.get("assess"), dict) else {}
+    enabled = bool(ent.get("assess_enabled") or assess.get("enabled"))
+    if not enabled:
+        return {"allowed": False, "reason": "no_assess_entitlement", "entitlements": ent, "skin_id": skin_id}
+    skins = list(assess.get("skins") or ["*"])
+    if skin_id and ("*" not in skins) and (skin_id not in skins):
+        return {"allowed": False, "reason": "skin_not_covered", "entitlements": ent, "skin_id": skin_id}
+    return {"allowed": True, "reason": "ok", "entitlements": ent, "skin_id": skin_id}
 
 
 def assert_insight_allowed(user_id: int) -> dict:

@@ -22,6 +22,7 @@ def _archive_type_for_folder(folder_name: str) -> str:
         return ARCHIVE_MONTHLY
     if folder_name.startswith("全量"):
         return ARCHIVE_DAILY
+    # 周期* / 定制* / 其它 → ProductAnalyzer 定制库
     return ARCHIVE_CUSTOM
 
 
@@ -73,6 +74,7 @@ def ingest_report_zip_file(zip_path: str, *, force: bool = False) -> dict:
     )
     result["report_dir"] = report_dir
     result["mode"] = "plan_b_upload"
+    result["folder"] = folder
     return result
 
 
