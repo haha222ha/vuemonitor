@@ -83,8 +83,7 @@ def _media_type(rel: str) -> str | None:
     return None
 
 
-def _hub_html() -> str:
-    return """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
+_HUB_HTML_TMPL = """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>选品作战台</title>
 <style>
@@ -103,11 +102,14 @@ h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
 .card .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--accent-deep);background:var(--accent-soft);border:1px solid rgba(20,112,143,.25);border-radius:999px;padding:3px 10px;margin-bottom:10px}
 .card h2{margin:0 0 8px;font-size:1.25rem}
 .card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.stamp{margin:0 0 20px;padding:10px 12px;background:var(--accent-soft);border:1px solid rgba(20,112,143,.22);border-radius:10px;font-size:13px;color:var(--accent-deep);line-height:1.45}
+.stamp b{font-family:ui-monospace,Consolas,monospace;font-weight:700}
 .foot{margin-top:28px;font-size:12px;color:var(--muted)}
 </style></head><body><div class="wrap">
 <div class="eyebrow">一门一密 · 私密作战台</div>
 <h1>选品作战台</h1>
 <p class="lead">记一句就够：<b>左比货 · 右拍板</b>。同一密码；跟品 / 上品 / 日报不进这里。</p>
+__STAMP__
 <div class="grid">
   <a class="card" href="/channel/board/">
     <span class="tag">左 · 增量比货库</span>
@@ -122,6 +124,60 @@ h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
 </div>
 <p class="foot">入口 https://monitor.xhs365.cn/channel/ · 密码与原先增量库相同</p>
 </div></body></html>"""
+
+
+def _hub_stamp_html() -> str:
+    """读 latest 标记，展示导入时间 / 周期漏斗摘要。"""
+    latest = os.path.join(_boards_root(), "latest")
+    marker: dict[str, Any] = {}
+    funnel: dict[str, Any] = {}
+    for name in ("channel_board.json", "cycle_funnel.json"):
+        path = os.path.join(latest, name)
+        if not os.path.isfile(path):
+            continue
+        try:
+            with open(path, encoding="utf-8") as f:
+                raw = json.load(f) or {}
+            if name == "channel_board.json" and isinstance(raw, dict):
+                marker = raw
+            elif isinstance(raw, dict):
+                funnel = raw
+        except Exception:
+            continue
+    imported = (
+        marker.get("cloud_imported_at")
+        or marker.get("imported_at")
+        or funnel.get("cloud_imported_at")
+        or funnel.get("imported_at")
+        or ""
+    )
+    window = marker.get("cycle_window") or funnel.get("cycle_window") or ""
+    cf = marker.get("cycle_funnel") if isinstance(marker.get("cycle_funnel"), dict) else None
+    if cf is None and isinstance(funnel.get("cycle_funnel"), dict):
+        cf = funnel["cycle_funnel"]
+    bits = []
+    if imported:
+        bits.append(f"导入时间 <b>{imported}</b>")
+    if window:
+        bits.append(f"周期窗 {window}")
+    if isinstance(cf, dict):
+        try:
+            touched = int(cf.get("touched_virtual") or 0)
+            delta = int(cf.get("delta_ge1_unique") or 0)
+            pool = int(cf.get("opportunity_pool") or 0)
+            if touched or delta or pool:
+                bits.append(
+                    f"触达虚品 {touched:,} · 正增量 {delta:,} · 入选 {pool:,}"
+                )
+        except Exception:
+            pass
+    if not bits:
+        return ""
+    return f'<div class="stamp">{" · ".join(bits)}</div>'
+
+
+def _hub_html() -> str:
+    return _HUB_HTML_TMPL.replace("__STAMP__", _hub_stamp_html())
 
 
 def _gate_html() -> str:
@@ -183,9 +239,30 @@ async def sync_channel_board_upload(
 
         with open(os.path.join(report_dir, "channel_board.json"), encoding="utf-8") as f:
             marker = json.load(f)
+        if not isinstance(marker, dict):
+            marker = {}
         report_date = str(marker.get("report_date") or "")[:10]
         if not report_date:
             report_date = datetime.now().strftime("%Y-%m-%d")
+        # 云端导入时间（服务器钟）：写入标记，供 hub / 面板展示
+        server_imported = datetime.now().isoformat(timespec="seconds")
+        marker["imported_at"] = server_imported
+        marker["cloud_imported_at"] = server_imported
+        marker["report_date"] = report_date
+        with open(os.path.join(report_dir, "channel_board.json"), "w", encoding="utf-8") as f:
+            json.dump(marker, f, ensure_ascii=False, indent=2)
+        funnel_path = os.path.join(report_dir, "cycle_funnel.json")
+        if os.path.isfile(funnel_path):
+            try:
+                with open(funnel_path, encoding="utf-8") as f:
+                    funnel_obj = json.load(f) or {}
+            except Exception:
+                funnel_obj = {}
+            if isinstance(funnel_obj, dict):
+                funnel_obj["imported_at"] = server_imported
+                funnel_obj["cloud_imported_at"] = server_imported
+                with open(funnel_path, "w", encoding="utf-8") as f:
+                    json.dump(funnel_obj, f, ensure_ascii=False, indent=2)
 
         boards_root = _boards_root()
         dest_live = os.path.join(boards_root, report_date)
@@ -229,9 +306,12 @@ async def sync_channel_board_upload(
         return {
             "ok": True,
             "report_date": report_date,
+            "imported_at": server_imported,
             "view_url": "/channel/hub/",
             "live_dir": dest_live,
             "row_count": int(marker.get("items_exported") or 0),
+            "cycle_window": marker.get("cycle_window") or "",
+            "funnel_kind": marker.get("funnel_kind") or "",
         }
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
