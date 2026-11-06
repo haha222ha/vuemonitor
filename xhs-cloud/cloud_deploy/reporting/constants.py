@@ -108,6 +108,8 @@ ARCHIVE_PSYCHE_BOARD = "private_psyche_board_zip"
 ARCHIVE_TAKEON_BOARD = "private_takeon_board_zip"
 # 私密 · 增量商品库/渠道选品看板（密码门，仅本人）
 ARCHIVE_CHANNEL_BOARD = "private_channel_board_zip"
+# 私密 · 周期选品报告云端浏览瘦包（hub 第三入口 /channel/report/）
+ARCHIVE_CYCLE_REPORT = "private_cycle_report_zip"
 
 
 def item_at(item, key: str, default=None):

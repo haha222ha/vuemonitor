@@ -111,6 +111,10 @@ def _workbench_root() -> str:
     return os.path.join(_boards_root(), "workbench")
 
 
+def _cycle_report_root() -> str:
+    return os.path.join(_boards_root(), "cycle_report")
+
+
 def _safe_file(root: str, rel: str) -> str:
     rel = (rel or "").strip().lstrip("/").replace("\\", "/")
     if not rel or rel.endswith("/"):
@@ -159,13 +163,18 @@ h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
 </style></head><body><div class="wrap">
 <div class="eyebrow">一门一密 · 私密作战台</div>
 <h1>选品作战台</h1>
-<p class="lead">记一句就够：<b>左比货 · 右拍板</b>。同一密码；跟品 / 上品 / 日报不进这里。</p>
+<p class="lead">记一句就够：<b>左比货 · 中报告 · 右拍板</b>。同一密码；跟品 / 上品 / 会员全量日报不进这里。</p>
 __STAMP__
 <div class="grid">
   <a class="card" href="/channel/board/">
     <span class="tag">左 · 增量比货库</span>
     <h2>销量时间矩阵</h2>
     <p>商品行 × 采集日列 · 格内直接销量；顶栏日期悬浮。默认「时间矩阵」，可切卡片。</p>
+  </a>
+  <a class="card" href="/channel/report/">
+    <span class="tag">中 · 周期选品报告</span>
+    <h2>在线看 · 可下载</h2>
+    <p>同套选品报告 HTML；云端为增量 TopN 浏览包（完整入选在本机）。页内可下 zip。</p>
   </a>
   <a class="card" href="/channel/workbench/">
     <span class="tag">右 · 选品任务台</span>
@@ -178,10 +187,11 @@ __STAMP__
 
 
 def _hub_stamp_html() -> str:
-    """读 latest 标记，展示导入时间 / 周期漏斗摘要。"""
+    """读 latest 标记，展示导入时间 / 周期漏斗摘要 / 报告浏览包。"""
     latest = os.path.join(_boards_root(), "latest")
     marker: dict[str, Any] = {}
     funnel: dict[str, Any] = {}
+    report_marker: dict[str, Any] = {}
     for name in ("channel_board.json", "cycle_funnel.json"):
         path = os.path.join(latest, name)
         if not os.path.isfile(path):
@@ -195,11 +205,22 @@ def _hub_stamp_html() -> str:
                 funnel = raw
         except Exception:
             continue
+    report_marker_path = os.path.join(_cycle_report_root(), "latest", "cycle_report_cloud.json")
+    if os.path.isfile(report_marker_path):
+        try:
+            with open(report_marker_path, encoding="utf-8") as f:
+                raw = json.load(f) or {}
+            if isinstance(raw, dict):
+                report_marker = raw
+        except Exception:
+            pass
     imported = (
         marker.get("cloud_imported_at")
         or marker.get("imported_at")
         or funnel.get("cloud_imported_at")
         or funnel.get("imported_at")
+        or report_marker.get("cloud_imported_at")
+        or report_marker.get("imported_at")
         or ""
     )
     window = marker.get("cycle_window") or funnel.get("cycle_window") or ""
@@ -222,6 +243,13 @@ def _hub_stamp_html() -> str:
                 )
         except Exception:
             pass
+    try:
+        cloud_n = int(report_marker.get("cloud_count") or 0)
+        full_n = int(report_marker.get("full_count") or report_marker.get("opportunity_pool") or 0)
+        if cloud_n or full_n:
+            bits.append(f"报告浏览包 Top{cloud_n:,} / 完整入选 {full_n:,}")
+    except Exception:
+        pass
     if not bits:
         return ""
     return f'<div class="stamp">{" · ".join(bits)}</div>'
@@ -548,6 +576,118 @@ async def sync_channel_workbench_upload(
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
+@router.post("/api/v1/sync/channel-cycle-report-upload")
+async def sync_channel_cycle_report_upload(
+    file: UploadFile = File(...),
+    _: None = Depends(verify_sync_key),
+):
+    """本机周期选品报告云浏览瘦包 → /channel/report/（在线看 + zip 下载）。"""
+    from cloud_deploy.cloud_api import database as db
+    from cloud_deploy.cloud_api.config import get_settings
+    from cloud_deploy.reporting.constants import ARCHIVE_CYCLE_REPORT
+
+    filename = os.path.basename(file.filename or "cycle_report_cloud.zip")
+    if not filename.lower().endswith(".zip"):
+        raise HTTPException(status_code=400, detail="仅支持 zip")
+
+    tmp_dir = tempfile.mkdtemp(prefix="xhs-cycle-report-")
+    zip_path = os.path.join(tmp_dir, filename)
+    try:
+        with open(zip_path, "wb") as out:
+            shutil.copyfileobj(file.file, out)
+
+        extract_root = os.path.join(tmp_dir, "extract")
+        os.makedirs(extract_root, exist_ok=True)
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            zf.extractall(extract_root)
+
+        report_dir = ""
+        for root, _dirs, files in os.walk(extract_root):
+            if "index.html" in files and "data.js" in files and "cycle_report_cloud.json" in files:
+                report_dir = root
+                break
+        if not report_dir:
+            raise HTTPException(
+                status_code=400,
+                detail="zip 内未找到周期报告浏览包（需 index.html + data.js + cycle_report_cloud.json）",
+            )
+
+        marker_path = os.path.join(report_dir, "cycle_report_cloud.json")
+        with open(marker_path, encoding="utf-8") as f:
+            marker = json.load(f) or {}
+        if not isinstance(marker, dict):
+            marker = {}
+        report_date = str(marker.get("report_date") or "")[:10]
+        if not report_date:
+            report_date = datetime.now().strftime("%Y-%m-%d")
+        server_imported = datetime.now().isoformat(timespec="seconds")
+        marker["imported_at"] = server_imported
+        marker["cloud_imported_at"] = server_imported
+        marker["report_date"] = report_date
+        marker["view_path"] = "/channel/report/"
+        with open(marker_path, "w", encoding="utf-8") as f:
+            json.dump(marker, f, ensure_ascii=False, indent=2)
+
+        # 确保浏览包内有可下的 zip（若客户端未塞入则用本次上传副本）
+        embedded_zip = os.path.join(report_dir, "cycle_report_cloud.zip")
+        if not os.path.isfile(embedded_zip):
+            shutil.copy2(zip_path, embedded_zip)
+
+        cr_root = _cycle_report_root()
+        dest_live = os.path.join(cr_root, report_date)
+        os.makedirs(cr_root, exist_ok=True)
+        if os.path.isdir(dest_live):
+            shutil.rmtree(dest_live)
+        shutil.copytree(report_dir, dest_live)
+
+        latest = os.path.join(cr_root, "latest")
+        if os.path.isdir(latest):
+            shutil.rmtree(latest)
+        shutil.copytree(dest_live, latest)
+
+        archive_dir = get_settings().xhs_report_archive_dir
+        os.makedirs(archive_dir, exist_ok=True)
+        dest_zip = os.path.join(
+            archive_dir, f"cycle_report_{report_date.replace('-', '')}.zip"
+        )
+        shutil.copy2(zip_path, dest_zip)
+        h = hashlib.sha256()
+        with open(dest_zip, "rb") as f:
+            for chunk in iter(lambda: f.read(1024 * 1024), b""):
+                h.update(chunk)
+
+        db.init_db()
+        db.upsert_report_archive(
+            report_date=report_date,
+            archive_type=ARCHIVE_CYCLE_REPORT,
+            storage_path=dest_zip,
+            file_name=os.path.basename(dest_zip),
+            file_size=int(os.path.getsize(dest_zip)),
+            sha256=h.hexdigest(),
+            row_count=int(marker.get("cloud_count") or 0),
+            meta={
+                "report_kind": "cycle_report_cloud_view",
+                "private": True,
+                "view_path": "/channel/report/",
+                **marker,
+            },
+        )
+        return {
+            "ok": True,
+            "report_date": report_date,
+            "imported_at": server_imported,
+            "view_url": "/channel/report/",
+            "hub_url": "/channel/hub/",
+            "download_url": "/channel/report/cycle_report_cloud.zip",
+            "live_dir": dest_live,
+            "cloud_count": int(marker.get("cloud_count") or 0),
+            "full_count": int(marker.get("full_count") or 0),
+            "source_name": marker.get("source_name") or "",
+        }
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
 @router.post("/api/v1/sync/board-inventory-upsert")
 def sync_board_inventory_upsert(
     body: BoardInventoryUpsertBody,
@@ -712,3 +852,36 @@ def channel_workbench_files(request: Request, path: str = ""):
         media_type=_media_type(rel),
         headers={**_NO_STORE, "X-Channel-Board": "1"},
     )
+
+
+@router.get("/channel/report/{path:path}")
+@router.get("/channel/report")
+@router.get("/channel/report/")
+def channel_cycle_report_files(request: Request, path: str = ""):
+    """周期选品报告云浏览瘦包：同套报告 HTML，TopN data.js + zip 下载。"""
+    if not _cookie_ok(request):
+        return RedirectResponse(url="/channel/", status_code=302)
+    if request.url.path == "/channel/report" and not (path or "").strip():
+        return RedirectResponse(url="/channel/report/", status_code=302)
+    root = os.path.join(_cycle_report_root(), "latest")
+    if not os.path.isdir(root):
+        return HTMLResponse(
+            "<h3>周期报告浏览包尚未上传</h3>"
+            "<p>请本机运行 <code>python tools/publish_cycle_report_cloud.py</code></p>"
+            "<p><a href='/channel/hub/'>返回入口</a></p>",
+            status_code=404,
+        )
+    rel = (path or "").strip().lstrip("/")
+    if not rel or rel.endswith("/"):
+        rel = "index.html"
+    target = _safe_file(root, rel)
+    if not os.path.isfile(target):
+        raise HTTPException(status_code=404, detail="not found")
+    low = rel.lower()
+    media = _media_type(rel)
+    if low.endswith(".zip"):
+        media = "application/zip"
+    headers = {**_NO_STORE, "X-Channel-Board": "1"}
+    if low.endswith(".zip"):
+        headers["Content-Disposition"] = f'attachment; filename="{os.path.basename(target)}"'
+    return FileResponse(target, media_type=media, headers=headers)
