@@ -216,6 +216,18 @@
       background: #c45c26;
       box-shadow: 0 0 0 2px rgba(196, 92, 38, 0.35);
     }
+    button#voiceHeadset {
+      flex: 0 0 auto;
+      width: auto;
+      min-width: 108px;
+      padding: 12px 10px;
+      background: #2a3542;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    button#voiceHeadset.is-on {
+      background: #2f5a40;
+    }
     #voiceStatus {
       margin-top: 8px;
       min-height: 1.2em;
@@ -254,9 +266,10 @@
       <h2>语音输入</h2>
       <div class="voice-row">
         <button id="voiceHold" type="button">开始识别</button>
+        <button id="voiceHeadset" type="button" title="占用媒体会话，让蓝牙耳机播放键控制识别">启用耳机键</button>
       </div>
       <div id="voiceStatus">语音模块加载中…</div>
-      <p class="panel-hint">点「开始识别」→ 说话 → 再点「结束识别」写入上方文字框，再点提交。浏览器自带识别，无需申请 SDK；建议手机 Chrome。</p>
+      <p class="panel-hint">屏幕：点「开始识别」→ 说 → 再点「结束识别」。耳机：先点「启用耳机键」，再用蓝牙耳机<strong>播放/暂停键</strong>切换开始/结束（与音乐 App 同逻辑）。建议手机 Chrome；微信内置浏览器多半无效。</p>
     </section>
   </div>
   <p class="hint">先选设备再提交。顶部条看在线台数与相位；列表可 <b>撤销</b>。设备 ID 在各机 worker 配置里。</p>
@@ -264,6 +277,7 @@
   <div class="toast" id="toast"></div>
   <script src="input_text.js?v=2"></script>
   <script src="input_voice.js?v=3"></script>
+  <script src="input_voice_headset.js?v=1"></script>
   <script>
     const $ = (id) => document.getElementById(id);
     const seenStatus = Object.create(null); // id -> last status
@@ -293,9 +307,10 @@
       return true;
     }
 
-    // —— 两个独立输入模块（文字 / 语音互不依赖）——
+    // —— 独立模块：文字 / 语音 / 耳机键 ——
     let textInput = null;
     let voiceInput = null;
+    let headsetBridge = null;
     try {
       textInput = window.AgentTaskTextInput.mount({ textareaId: "prompt" });
     } catch (e) {
@@ -306,15 +321,17 @@
         voiceInput = AgentTaskVoiceInput.mount({
           buttonId: "voiceHold",
           statusId: "voiceStatus",
-          onPartial: function (t) {
-            // 仅状态条展示；结束时再正式写入，避免边说边改框
-          },
+          onPartial: function () {},
           onFinal: function (t) {
             const ok = writeVoiceToBox(t);
             toast(ok ? "语音已写入文字框" : "写入失败，请手动复制状态栏文字");
+            if (headsetBridge) headsetBridge.syncListening(false);
           },
           onError: function (msg) {
             if (msg && msg !== "unsupported") toast(String(msg));
+          },
+          onState: function (st) {
+            if (headsetBridge) headsetBridge.syncListening(!!(st && st.listening));
           },
         });
       } else {
@@ -324,6 +341,57 @@
     } catch (e) {
       console.warn(e);
       $("voiceStatus").textContent = "语音模块初始化失败，请用文字输入";
+    }
+
+    // 蓝牙耳机播放键 ↔ 语音 toggle（Media Session，音乐 App 同款）
+    try {
+      const hsBtn = $("voiceHeadset");
+      if (window.AgentTaskVoiceHeadset && AgentTaskVoiceHeadset.isAvailable() && voiceInput) {
+        headsetBridge = AgentTaskVoiceHeadset.mount({
+          getListening: function () {
+            return !!(voiceInput && voiceInput.isListening && voiceInput.isListening());
+          },
+          onToggle: function () {
+            unlockAudio();
+            if (voiceInput && voiceInput.toggle) voiceInput.toggle();
+            toast(
+              voiceInput && voiceInput.isListening && voiceInput.isListening()
+                ? "耳机键：开始识别"
+                : "耳机键：结束识别"
+            );
+          },
+          onError: function (msg) {
+            if (msg === "unsupported") {
+              hsBtn.disabled = true;
+              hsBtn.textContent = "耳机键不可用";
+            } else if (msg) toast(String(msg));
+          },
+          onState: function (st) {
+            hsBtn.classList.toggle("is-on", !!(st && st.enabled));
+            hsBtn.textContent = st && st.enabled ? "耳机键已开" : "启用耳机键";
+          },
+        });
+        hsBtn.onclick = async function () {
+          unlockAudio();
+          if (headsetBridge.isEnabled()) {
+            headsetBridge.disable();
+            toast("已关闭耳机键控制");
+            return;
+          }
+          const ok = await headsetBridge.enable();
+          toast(ok ? "耳机键已启用：用播放/暂停键切换识别" : "启用失败，请用屏幕按钮");
+        };
+      } else if (hsBtn) {
+        hsBtn.disabled = true;
+        hsBtn.textContent = "耳机键不可用";
+      }
+    } catch (e) {
+      console.warn(e);
+      const hsBtn = $("voiceHeadset");
+      if (hsBtn) {
+        hsBtn.disabled = true;
+        hsBtn.textContent = "耳机键不可用";
+      }
     }
 
     function toast(msg) {
