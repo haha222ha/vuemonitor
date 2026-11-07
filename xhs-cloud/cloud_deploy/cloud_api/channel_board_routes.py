@@ -115,6 +115,50 @@ def _cycle_report_root() -> str:
     return os.path.join(_boards_root(), "cycle_report")
 
 
+def _vertical_landing_html() -> str:
+    """④ 垂类入口：云端先给可导航落地页；深挖写回仍回本机 8765/vertical。"""
+    return """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>垂类多卖家 · 选品作战台</title>
+<style>
+:root{--bg:#eef3f8;--card:#fff;--text:#101828;--muted:#3d4f63;--line:#c5d0dc;--accent:#14708f;--accent-soft:#e2f3f8;--accent-deep:#0a4f66}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);min-height:100vh;background:linear-gradient(180deg,#f7fafc,var(--bg))}
+.wrap{max-width:720px;margin:0 auto;padding:40px 24px 64px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin:0 0 8px}
+h1{margin:0 0 10px;font-size:1.75rem}
+.lead{color:var(--muted);line-height:1.55;margin:0 0 20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:0 0 14px;box-shadow:0 1px 3px rgba(16,24,40,.05)}
+.card h2{margin:0 0 8px;font-size:1.05rem}
+.card p,.card li{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+.card ul{margin:8px 0 0;padding-left:1.2rem}
+.nav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.nav a{display:inline-block;padding:9px 14px;border-radius:999px;border:1px solid rgba(20,112,143,.28);background:var(--accent-soft);color:var(--accent-deep);font-weight:700;font-size:13px;text-decoration:none}
+.nav a.primary{background:var(--accent);color:#fff;border-color:transparent}
+</style></head><body><div class="wrap">
+<div class="eyebrow">四看板 · ① 垂类多卖家</div>
+<h1>垂类搜词 · 多卖家对照</h1>
+<p class="lead">云端这一页是导航与口径说明。带热库搜词挂载的深挖表仍在本机任务台 <code>/vertical/</code>（8765），避免云端直连热库。</p>
+<div class="card">
+  <h2>本入口做什么</h2>
+  <ul>
+    <li>锁一个垂类词 → 看多卖家表与增长曲线</li>
+    <li>挂词组 <code>vertical_niche_probe</code>；本机命令：<code>python tools/pin_vertical_niche_keywords.py --niche … --apply</code></li>
+    <li>与增量比货 / 任务台 / 周期包同一视觉世界，不另起主题</li>
+  </ul>
+</div>
+<div class="card">
+  <h2>接下来去哪</h2>
+  <div class="nav">
+    <a class="primary" href="/channel/hub/">回四看板入口</a>
+    <a href="/channel/board/">② 增量比货库</a>
+    <a href="/channel/workbench/">③ 选品任务台</a>
+    <a href="/channel/report/">④ 周期完整包</a>
+  </div>
+</div>
+</div></body></html>"""
+
+
 def _safe_file(root: str, rel: str) -> str:
     rel = (rel or "").strip().lstrip("/").replace("\\", "/")
     if not rel or rel.endswith("/"):
@@ -147,42 +191,49 @@ _HUB_HTML_TMPL = """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8
 body{margin:0;font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);min-height:100vh;background:
   radial-gradient(900px 360px at 12% -10%,rgba(20,112,143,.10),transparent 55%),
   linear-gradient(180deg,#f7fafc 0%,var(--bg) 40%,#e8eef5 100%)}
-.wrap{max-width:920px;margin:0 auto;padding:48px 24px 64px}
+.wrap{max-width:1080px;margin:0 auto;padding:48px 24px 64px}
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin:0 0 8px}
 h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
-.lead{margin:0 0 28px;color:var(--muted);font-size:15px;line-height:1.55;max-width:36rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.lead{margin:0 0 28px;color:var(--muted);font-size:15px;line-height:1.55;max-width:42rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
 .card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;box-shadow:0 1px 3px rgba(16,24,40,.06);transition:border-color .15s,box-shadow .15s,transform .15s}
 .card:hover{border-color:rgba(20,112,143,.45);box-shadow:0 10px 28px rgba(20,112,143,.12);transform:translateY(-1px)}
 .card .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--accent-deep);background:var(--accent-soft);border:1px solid rgba(20,112,143,.25);border-radius:999px;padding:3px 10px;margin-bottom:10px}
-.card h2{margin:0 0 8px;font-size:1.25rem}
+.card h2{margin:0 0 8px;font-size:1.2rem}
 .card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
 .stamp{margin:0 0 20px;padding:10px 12px;background:var(--accent-soft);border:1px solid rgba(20,112,143,.22);border-radius:10px;font-size:13px;color:var(--accent-deep);line-height:1.45}
 .stamp b{font-family:ui-monospace,Consolas,monospace;font-weight:700}
-.foot{margin-top:28px;font-size:12px;color:var(--muted)}
+.foot{margin-top:28px;font-size:12px;color:var(--muted);line-height:1.6}
+.foot a{color:var(--accent);font-weight:700;text-decoration:none}
 </style></head><body><div class="wrap">
-<div class="eyebrow">一门一密 · 私密作战台</div>
+<div class="eyebrow">一门一密 · 四看板同世界</div>
 <h1>选品作战台</h1>
-<p class="lead">记一句就够：<b>左比货 · 中数据包 · 右拍板</b>。中入口 = 会员多用户数据包（在线看 / 下载 / ProductAnalyzer 同步）。</p>
+<p class="lead">四入口对齐本机：<b>垂类多卖家 · 增量比货 · 选品任务台 · 周期完整包</b>。会员数据包仍在会员中心，不占用看板卡位。</p>
 __STAMP__
 <div class="grid">
-  <a class="card" href="/channel/board/">
-    <span class="tag">左 · 增量比货库</span>
-    <h2>销量时间矩阵</h2>
-    <p>商品行 × 采集日列 · 格内直接销量；顶栏日期悬浮。默认「时间矩阵」，可切卡片。</p>
+  <a class="card" href="/channel/vertical/">
+    <span class="tag">① 垂类多卖家</span>
+    <h2>垂类搜词 · 多卖家表</h2>
+    <p>锁垂类词看多卖家对照与曲线。云端为只读镜像；深挖写回请用本机 8765/vertical。</p>
   </a>
-  <a class="card" href="/member#datapacks">
-    <span class="tag">中 · 选品数据包</span>
-    <h2>在线看 · 下载 · PA</h2>
-    <p>多用户会员库：网页在线预览整包，可下 zip；ProductAnalyzer 云端报告库同步同套包到本地打开。</p>
+  <a class="card" href="/channel/board/">
+    <span class="tag">② 增量比货库</span>
+    <h2>销量时间矩阵</h2>
+    <p>商品行 × 采集日列 · 格内销量；顶栏日期悬浮。默认「时间矩阵」，可切卡片。</p>
   </a>
   <a class="card" href="/channel/workbench/">
-    <span class="tag">右 · 选品任务台</span>
+    <span class="tag">③ 选品任务台</span>
     <h2>今日拍板 · 分类榜</h2>
     <p>先看今日推荐，再锁大类看榜。云端只读快照；人判 / 可搬写入请回本机 8765。</p>
   </a>
+  <a class="card" href="/channel/report/">
+    <span class="tag">④ 周期完整包</span>
+    <h2>关键词周期选品报告</h2>
+    <p>整轮采集结论：漏斗 · 榜单 · 曲线。可在线看 / 下 zip；对接 ProductAnalyzer。</p>
+  </a>
 </div>
-<p class="foot">入口 https://monitor.xhs365.cn/channel/ · 会员账号 / 授权码登录（与 SaaS 底座同一套）</p>
+<p class="foot">入口 https://monitor.xhs365.cn/channel/ · 会员账号 / 授权码登录<br/>
+数据包（多用户预览 / PA 同步）：<a href="/member#datapacks">会员中心 · 选品数据包</a></p>
 </div></body></html>"""
 
 
@@ -879,6 +930,18 @@ def channel_workbench_files(request: Request, path: str = ""):
     return FileResponse(
         target,
         media_type=_media_type(rel),
+        headers={**_NO_STORE, "X-Channel-Board": "1"},
+    )
+
+
+@router.get("/channel/vertical")
+@router.get("/channel/vertical/")
+def channel_vertical_landing(request: Request):
+    """四看板①：垂类多卖家（云端导航落地；深挖回本机）。"""
+    if not _cookie_ok(request):
+        return RedirectResponse(url="/channel/", status_code=302)
+    return HTMLResponse(
+        _vertical_landing_html(),
         headers={**_NO_STORE, "X-Channel-Board": "1"},
     )
 
