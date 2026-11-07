@@ -216,15 +216,6 @@
       background: #c45c26;
       box-shadow: 0 0 0 2px rgba(196, 92, 38, 0.35);
     }
-    button#voiceMode {
-      flex: 0 0 auto;
-      width: auto;
-      min-width: 96px;
-      padding: 12px 10px;
-      background: #2a3542;
-      font-weight: 600;
-      font-size: 13px;
-    }
     #voiceStatus {
       margin-top: 8px;
       min-height: 1.2em;
@@ -262,23 +253,45 @@
     <section class="input-panel" id="panelVoice" aria-label="语音输入">
       <h2>语音输入</h2>
       <div class="voice-row">
-        <button id="voiceHold" type="button">按住说话</button>
-        <button id="voiceMode" type="button" title="切换按住 / 连麦">连麦关</button>
+        <button id="voiceHold" type="button">开始识别</button>
       </div>
       <div id="voiceStatus">语音模块加载中…</div>
-      <p class="panel-hint">独立模块 · 浏览器自带识别，<b>不用申请 SDK</b>。识别结果写入上方文字框，再点提交；建议手机 Chrome。</p>
+      <p class="panel-hint">点「开始识别」→ 说话 → 再点「结束识别」写入上方文字框，再点提交。浏览器自带识别，无需申请 SDK；建议手机 Chrome。</p>
     </section>
   </div>
   <p class="hint">先选设备再提交。顶部条看在线台数与相位；列表可 <b>撤销</b>。设备 ID 在各机 worker 配置里。</p>
   <div class="list" id="list"></div>
   <div class="toast" id="toast"></div>
-  <script src="input_text.js"></script>
-  <script src="input_voice.js"></script>
+  <script src="input_text.js?v=2"></script>
+  <script src="input_voice.js?v=3"></script>
   <script>
     const $ = (id) => document.getElementById(id);
     const seenStatus = Object.create(null); // id -> last status
     let audioUnlocked = false;
     let audioCtx = null;
+
+    function writeVoiceToBox(t) {
+      const text = String(t || "").trim();
+      if (!text) return false;
+      try {
+        if (textInput && typeof textInput.append === "function") {
+          textInput.append(text);
+          textInput.focus && textInput.focus();
+          return true;
+        }
+      } catch (e) {
+        console.warn("textInput.append", e);
+      }
+      const ta = $("prompt");
+      if (!ta) return false;
+      const cur = String(ta.value || "").trim();
+      ta.value = cur ? cur + "\n" + text : text;
+      try {
+        ta.dispatchEvent(new Event("input", { bubbles: true }));
+      } catch (_) {}
+      try { ta.focus(); } catch (_) {}
+      return true;
+    }
 
     // —— 两个独立输入模块（文字 / 语音互不依赖）——
     let textInput = null;
@@ -293,30 +306,19 @@
         voiceInput = AgentTaskVoiceInput.mount({
           buttonId: "voiceHold",
           statusId: "voiceStatus",
-          mode: "hold",
-          onPartial: function () {},
+          onPartial: function (t) {
+            // 仅状态条展示；结束时再正式写入，避免边说边改框
+          },
           onFinal: function (t) {
-            if (textInput) textInput.append(t);
-            else {
-              const ta = $("prompt");
-              if (ta) ta.value = (ta.value ? ta.value.trim() + "\n" : "") + t;
-            }
-            toast("语音已写入文字框");
+            const ok = writeVoiceToBox(t);
+            toast(ok ? "语音已写入文字框" : "写入失败，请手动复制状态栏文字");
           },
           onError: function (msg) {
             if (msg && msg !== "unsupported") toast(String(msg));
           },
         });
-        $("voiceMode").onclick = function () {
-          if (!voiceInput) return;
-          const next = voiceInput.getMode() === "hold" ? "continuous" : "hold";
-          voiceInput.setMode(next);
-          $("voiceMode").textContent = next === "continuous" ? "连麦开" : "连麦关";
-          toast(next === "continuous" ? "已开连麦：点「开始连麦」持续听" : "已关连麦：改回按住说话");
-        };
       } else {
         $("voiceHold").disabled = true;
-        $("voiceMode").disabled = true;
         $("voiceStatus").textContent = "本浏览器不支持语音识别，请用手机 Chrome（仍可用文字输入）";
       }
     } catch (e) {

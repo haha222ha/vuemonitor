@@ -1,20 +1,8 @@
 /**
  * 遥控 · 语音输入模块（独立）
- * 使用浏览器 Web Speech API，无需申请阿里/讯飞等 SDK。
- * 不读写 textarea；只通过回调吐出识别文本（由页面接到文字模块或直接提交）。
- *
- * 用法：
- *   const voice = AgentTaskVoiceInput.mount({
- *     buttonId: "voiceHold",
- *     statusId: "voiceStatus",
- *     onPartial: (t) => {},
- *     onFinal: (t) => {},
- *     onError: (msg) => {},
- *   });
- *
- * 模式：
- *   - hold（默认，阶段 B）：按住说话，松开结束并出最终句
- *   - continuous（阶段 A）：点一下开麦持续听，再点停止；停顿出句走 onFinal
+ * 浏览器 Web Speech API，无需申请 SDK。
+ * 默认：点击「开始识别」→ 再说 → 再点「结束识别」写入文字。
+ * 不直接改 textarea，只回调 onPartial / onFinal（由页面接到文字模块）。
  */
 (function (global) {
   "use strict";
@@ -24,8 +12,8 @@
   }
 
   function pickLang() {
-    // Android Chrome 对 zh-CN 偶发不认；优先 cmn-Hans-CN，再 zh-CN / zh
-    const ua = String(navigator.userAgent || "");
+    var ua = String(navigator.userAgent || "");
+    // Android Chrome：cmn-Hans-CN / zh 比 zh-CN 稳
     if (/Android/i.test(ua)) return "cmn-Hans-CN";
     return "zh-CN";
   }
@@ -36,23 +24,27 @@
 
   function mount(opts) {
     opts = opts || {};
-    const btn = document.getElementById(opts.buttonId || "voiceHold");
-    const statusEl = document.getElementById(opts.statusId || "voiceStatus");
-    const onPartial = typeof opts.onPartial === "function" ? opts.onPartial : function () {};
-    const onFinal = typeof opts.onFinal === "function" ? opts.onFinal : function () {};
-    const onError = typeof opts.onError === "function" ? opts.onError : function () {};
-    const onState = typeof opts.onState === "function" ? opts.onState : function () {};
+    var btn = document.getElementById(opts.buttonId || "voiceHold");
+    var statusEl = document.getElementById(opts.statusId || "voiceStatus");
+    var onPartial = typeof opts.onPartial === "function" ? opts.onPartial : function () {};
+    var onFinal = typeof opts.onFinal === "function" ? opts.onFinal : function () {};
+    var onError = typeof opts.onError === "function" ? opts.onError : function () {};
+    var onState = typeof opts.onState === "function" ? opts.onState : function () {};
 
-    if (!btn) {
-      throw new Error("AgentTaskVoiceInput: missing button");
-    }
+    if (!btn) throw new Error("AgentTaskVoiceInput: missing button");
 
-    let mode = opts.mode === "continuous" ? "continuous" : "hold";
-    let rec = null;
-    let listening = false;
-    let wantListen = false;
-    let lastFinal = "";
-    let restartTimer = null;
+    // continuousMulti：结束后自动再开一轮（多句连说）；默认 false = 点一次说一段
+    var multi = !!opts.continuousMulti;
+    var rec = null;
+    var listening = false;
+    var wantListen = false;
+    var sessionFinals = []; // 本轮已确认句
+    var draftInterim = ""; // 本轮未确认草稿
+    var flushed = false;
+    var restartTimer = null;
+    var gen = 0; // 防止旧 recognition 的 onend 干扰
+    var langTry = 0;
+    var langs = [opts.lang || pickLang(), "zh-CN", "zh", "cmn-Hans-CN"];
 
     function setStatus(msg) {
       if (statusEl) statusEl.textContent = msg || "";
@@ -62,80 +54,109 @@
       listening = !!on;
       btn.classList.toggle("is-listening", listening);
       btn.setAttribute("aria-pressed", listening ? "true" : "false");
-      if (mode === "hold") {
-        btn.textContent = listening ? "松开结束" : "按住说话";
-      } else {
-        btn.textContent = listening ? "停止连麦" : "开始连麦";
-      }
-      onState({ listening: listening, mode: mode });
+      btn.textContent = listening ? "结束识别" : "开始识别";
+      onState({ listening: listening, multi: multi });
     }
 
-    function destroyRec() {
+    function clearSession() {
+      sessionFinals = [];
+      draftInterim = "";
+      flushed = false;
+    }
+
+    function combinedText() {
+      var parts = sessionFinals.slice();
+      var d = String(draftInterim || "").trim();
+      if (d) parts.push(d);
+      return parts.join("").replace(/\s+/g, " ").trim();
+    }
+
+    function flushToFinal(reason) {
+      if (flushed) return "";
+      var text = combinedText();
+      flushed = true;
+      draftInterim = "";
+      if (!text) {
+        setStatus(reason || "未识别到内容，请再说一次");
+        return "";
+      }
+      try {
+        onFinal(text);
+      } catch (e) {
+        onError(String(e && e.message ? e.message : e));
+      }
+      setStatus("已写入：" + text);
+      return text;
+    }
+
+    function teardownRec(abort) {
       if (restartTimer) {
         clearTimeout(restartTimer);
         restartTimer = null;
       }
       if (!rec) return;
-      try {
-        rec.onresult = null;
-        rec.onerror = null;
-        rec.onend = null;
-        rec.abort();
-      } catch (_) {}
+      var r = rec;
       rec = null;
+      try {
+        r.onresult = null;
+        r.onerror = null;
+        // 保留 onend 会乱；直接摘掉，由调用方决定是否 flush
+        r.onend = null;
+        r.onstart = null;
+        if (abort) r.abort();
+        else r.stop();
+      } catch (_) {}
     }
 
-    function emitFinal(text) {
-      const t = String(text || "").trim();
-      if (!t) return;
-      lastFinal = t;
-      onFinal(t);
-    }
-
-    function makeRec() {
-      const Ctor = SpeechCtor();
+    function makeRec(myGen) {
+      var Ctor = SpeechCtor();
       if (!Ctor) {
         onError("当前浏览器不支持语音识别（请用手机 Chrome）");
         setStatus("不支持语音：请用 Chrome");
         return null;
       }
-      const r = new Ctor();
-      r.lang = opts.lang || pickLang();
+      var r = new Ctor();
+      r.lang = langs[langTry % langs.length];
       r.interimResults = true;
       r.maxAlternatives = 1;
-      r.continuous = mode === "continuous";
+      // 点按一轮内允许多段；浏览器会自己 end，由 wantListen 决定是否续
+      r.continuous = true;
 
       r.onstart = function () {
+        if (myGen !== gen) return;
         setListeningUi(true);
-        setStatus(mode === "continuous" ? "连麦中… 说完一句会自动出字" : "正在听…");
+        setStatus("识别中… 说完再点「结束识别」");
       };
 
       r.onresult = function (ev) {
-        let interim = "";
-        let finals = [];
-        for (let i = ev.resultIndex; i < ev.results.length; i++) {
-          const row = ev.results[i];
-          const piece = (row[0] && row[0].transcript) || "";
-          if (row.isFinal) finals.push(piece);
-          else interim += piece;
-        }
-        if (interim) {
-          onPartial(interim);
-          setStatus("识别中：" + interim);
-        }
-        if (finals.length) {
-          const joined = finals.join("").trim();
-          if (joined) {
-            emitFinal(joined);
-            setStatus("已识别：" + joined);
+        if (myGen !== gen) return;
+        var interim = "";
+        var i;
+        for (i = ev.resultIndex; i < ev.results.length; i++) {
+          var row = ev.results[i];
+          var piece = (row[0] && row[0].transcript) || "";
+          if (!piece) continue;
+          if (row.isFinal) {
+            sessionFinals.push(piece);
+            draftInterim = "";
+          } else {
+            interim += piece;
           }
+        }
+        if (interim) draftInterim = interim;
+        var live = combinedText();
+        if (live) {
+          onPartial(live);
+          setStatus("识别中：" + live);
         }
       };
 
       r.onerror = function (ev) {
-        const code = (ev && ev.error) || "error";
-        if (code === "aborted" || code === "no-speech") {
-          // 松开/静音属正常
+        if (myGen !== gen) return;
+        var code = (ev && ev.error) || "error";
+        if (code === "aborted") return;
+        if (code === "no-speech") {
+          setStatus("没听到声音，请靠近麦克风再说");
           return;
         }
         if (code === "not-allowed" || code === "service-not-allowed") {
@@ -145,9 +166,14 @@
           setListeningUi(false);
           return;
         }
+        if (code === "language-not-supported") {
+          langTry += 1;
+          setStatus("切换识别语言重试…");
+          return;
+        }
         if (code === "network") {
-          onError("语音服务网络异常（Web Speech 依赖系统/Google 服务）");
-          setStatus("网络异常，稍后重试");
+          onError("语音服务网络异常");
+          setStatus("网络异常（Web Speech 需能访问系统语音服务）");
           return;
         }
         onError("语音识别：" + code);
@@ -155,33 +181,47 @@
       };
 
       r.onend = function () {
-        setListeningUi(false);
-        // continuous：用户仍要听 → 自动续开（浏览器常在一小段后自行 end）
-        if (wantListen && mode === "continuous") {
-          restartTimer = setTimeout(function () {
-            if (!wantListen) return;
-            startListen();
-          }, 280);
-          setStatus("连麦续听中…");
+        if (myGen !== gen) return;
+        // 用户已点结束：把草稿一并写入（含仅有 interim、没有 isFinal 的情况）
+        if (!wantListen) {
+          setListeningUi(false);
+          flushToFinal();
           return;
         }
-        if (!lastFinal) setStatus(mode === "hold" ? "按住说话，松开填入文字" : "已停止连麦");
+        // 仍要听：自动续开（Chrome 常会中途 end）
+        setListeningUi(true);
+        restartTimer = setTimeout(function () {
+          if (!wantListen || myGen !== gen) return;
+          startListen(true);
+        }, 220);
+        setStatus("继续听… " + (combinedText() || ""));
       };
 
       return r;
     }
 
-    function startListen() {
-      destroyRec();
-      rec = makeRec();
+    function startListen(isRestart) {
+      if (!isRestart) clearSession();
+      gen += 1;
+      var myGen = gen;
+      teardownRec(true);
+      rec = makeRec(myGen);
       if (!rec) return;
       try {
         rec.start();
       } catch (e) {
-        onError(String(e && e.message ? e.message : e));
-        setStatus("无法启动麦克风");
-        wantListen = false;
-        setListeningUi(false);
+        // InvalidStateError：稍后再试
+        setTimeout(function () {
+          if (!wantListen || myGen !== gen) return;
+          try {
+            if (rec) rec.start();
+          } catch (e2) {
+            onError(String(e2 && e2.message ? e2.message : e2));
+            setStatus("无法启动麦克风");
+            wantListen = false;
+            setListeningUi(false);
+          }
+        }, 300);
       }
     }
 
@@ -193,97 +233,81 @@
       }
       if (!rec) {
         setListeningUi(false);
+        flushToFinal();
         return;
       }
       try {
-        rec.stop();
+        // 先 stop 拿最后结果；若无 onend，超时兜底 flush
+        var r = rec;
+        r.stop();
+        setTimeout(function () {
+          if (!flushed) {
+            setListeningUi(false);
+            flushToFinal();
+            if (rec === r) {
+              try {
+                r.onend = null;
+              } catch (_) {}
+              rec = null;
+            }
+          }
+        }, 600);
       } catch (_) {
-        try {
-          rec.abort();
-        } catch (__) {}
         setListeningUi(false);
+        flushToFinal();
+        teardownRec(true);
       }
     }
 
-    function bindHold() {
-      const startEv = function (ev) {
-        if (ev.cancelable) ev.preventDefault();
-        wantListen = true;
-        lastFinal = "";
-        startListen();
-      };
-      const endEv = function (ev) {
-        if (ev && ev.cancelable) ev.preventDefault();
+    function toggle() {
+      if (listening || wantListen) {
         stopListen();
-      };
-      btn.addEventListener("pointerdown", startEv);
-      btn.addEventListener("pointerup", endEv);
-      btn.addEventListener("pointercancel", endEv);
-      btn.addEventListener("pointerleave", function (ev) {
-        if (listening) endEv(ev);
-      });
-      // 防止长按弹出系统菜单
-      btn.addEventListener("contextmenu", function (ev) {
-        ev.preventDefault();
-      });
+      } else {
+        wantListen = true;
+        startListen(false);
+      }
     }
 
-    function bindToggle() {
-      btn.addEventListener("click", function () {
-        if (listening || wantListen) {
-          stopListen();
-          setStatus("已停止连麦");
-        } else {
-          wantListen = true;
-          lastFinal = "";
-          startListen();
-        }
-      });
-    }
-
-    function setMode(next) {
-      const m = next === "continuous" ? "continuous" : "hold";
-      if (m === mode) return;
-      stopListen();
-      mode = m;
-      setListeningUi(false);
-      setStatus(
-        mode === "continuous"
-          ? "连麦模式：点开始，说完一句自动出字"
-          : "按住说话，松开填入文字"
-      );
-      // 换模式后按钮文案
-      btn.textContent = mode === "continuous" ? "开始连麦" : "按住说话";
+    function setContinuousMulti(on) {
+      multi = !!on;
+      // multi 仅影响「结束后是否自动再开」；当前默认仍手动点结束
     }
 
     if (!isAvailable()) {
       btn.disabled = true;
       setStatus("本浏览器不支持语音（建议手机 Chrome）");
       onError("unsupported");
-    } else if (mode === "continuous") {
-      bindToggle();
-      btn.textContent = "开始连麦";
-      setStatus("连麦模式：点开始，说完一句自动出字");
     } else {
-      bindHold();
-      btn.textContent = "按住说话";
-      setStatus("按住说话，松开填入文字（无需申请 SDK）");
+      btn.addEventListener("click", function (ev) {
+        if (ev && ev.cancelable) ev.preventDefault();
+        toggle();
+      });
+      btn.addEventListener("contextmenu", function (ev) {
+        ev.preventDefault();
+      });
+      btn.textContent = "开始识别";
+      setStatus("点「开始识别」说话，再说完点「结束识别」写入输入框");
     }
 
     return {
       kind: "voice",
       isAvailable: isAvailable,
-      setMode: setMode,
-      getMode: function () {
-        return mode;
-      },
       start: function () {
         wantListen = true;
-        startListen();
+        startListen(false);
       },
       stop: stopListen,
+      toggle: toggle,
       isListening: function () {
         return listening;
+      },
+      setContinuousMulti: setContinuousMulti,
+      // 兼容旧页
+      setMode: function (m) {
+        setContinuousMulti(m === "continuous");
+      },
+      getMode: function () {
+        return multi ? "continuous" : "toggle";
       },
     };
   }
