@@ -195,12 +195,16 @@ body{margin:0;font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
 .eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin:0 0 8px}
 h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
 .lead{margin:0 0 28px;color:var(--muted);font-size:15px;line-height:1.55;max-width:42rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-.card{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;box-shadow:0 1px 3px rgba(16,24,40,.06);transition:border-color .15s,box-shadow .15s,transform .15s}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;box-shadow:0 1px 3px rgba(16,24,40,.06);transition:border-color .15s,box-shadow .15s,transform .15s;min-height:100%}
 .card:hover{border-color:rgba(20,112,143,.45);box-shadow:0 10px 28px rgba(20,112,143,.12);transform:translateY(-1px)}
-.card .tag{display:inline-block;font-size:11px;font-weight:700;color:var(--accent-deep);background:var(--accent-soft);border:1px solid rgba(20,112,143,.25);border-radius:999px;padding:3px 10px;margin-bottom:10px}
-.card h2{margin:0 0 8px;font-size:1.2rem}
-.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.card .tag{display:inline-block;align-self:flex-start;font-size:11px;font-weight:700;color:var(--accent-deep);background:var(--accent-soft);border:1px solid rgba(20,112,143,.25);border-radius:999px;padding:3px 10px}
+.card h2{margin:0;font-size:1.2rem}
+.role{margin:0;padding:8px 10px;border-radius:10px;background:#f4f8fb;border:1px solid #d7e3ec;font-size:13px;line-height:1.45;color:var(--accent-deep);font-weight:700}
+.role span{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--accent);margin:0 0 4px}
+.card ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.card li{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+.card li b{color:var(--text);font-weight:700}
 .stamp{margin:0 0 20px;padding:10px 12px;background:var(--accent-soft);border:1px solid rgba(20,112,143,.22);border-radius:10px;font-size:13px;color:var(--accent-deep);line-height:1.45}
 .stamp b{font-family:ui-monospace,Consolas,monospace;font-weight:700}
 .foot{margin-top:28px;font-size:12px;color:var(--muted);line-height:1.6}
@@ -208,28 +212,48 @@ h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
 </style></head><body><div class="wrap">
 <div class="eyebrow">一门一密 · 四看板同世界</div>
 <h1>选品作战台</h1>
-<p class="lead">四入口对齐本机：<b>垂类多卖家 · 增量比货 · 选品任务台 · 周期完整包</b>。会员数据包仍在会员中心，不占用看板卡位。</p>
+<p class="lead">总入口只做一件事：告诉你<strong>每个看板负责什么</strong>。四块各司其职，不合并、不抢戏。主业是<strong>虚拟资料</strong>选品。会员数据包仍在会员中心，不占用看板卡位。</p>
 __STAMP__
 <div class="grid">
   <a class="card" href="/channel/vertical/">
     <span class="tag">① 垂类多卖家</span>
     <h2>垂类搜词 · 多卖家表</h2>
-    <p>锁垂类词看多卖家对照与曲线。云端为只读镜像；深挖写回请用本机 8765/vertical。</p>
+    <p class="role"><span>功能定位</span>同品多卖家红海对照：锁一个垂类词，横看谁在卖、卖得怎样。</p>
+    <ul>
+      <li><b>做什么：</b>搜垂类词 → 多卖家表 → 点行看走势与各日增量</li>
+      <li><b>什么时候用：</b>已经盯上某个方向，想比「同类货谁更猛」</li>
+      <li><b>不做什么：</b>不做全库展览、不做今日拍板；云端只读，写回请用本机 8765/vertical</li>
+    </ul>
   </a>
   <a class="card" href="/channel/board/">
     <span class="tag">② 增量比货库</span>
     <h2>销量时间矩阵</h2>
-    <p>商品行 × 采集日列 · 格内销量；顶栏日期悬浮。默认「时间矩阵」，可切卡片。</p>
+    <p class="role"><span>功能定位</span>增量比货主战场：筛后横比销量形状，用时间矩阵找证据。</p>
+    <ul>
+      <li><b>做什么：</b>方向舱锁 L2 → 商品行×采集日矩阵 → 点格/点行看曲线</li>
+      <li><b>什么时候用：</b>候选已经缩过，要认真比货、看持续动销</li>
+      <li><b>不做什么：</b>不是全库浏览器；帽≈短名单，≠几十万行一次塞进页面</li>
+    </ul>
   </a>
   <a class="card" href="/channel/workbench/">
     <span class="tag">③ 选品任务台</span>
     <h2>今日拍板 · 分类榜</h2>
-    <p>先看今日推荐，再锁大类看榜。云端只读快照；人判 / 可搬写入请回本机 8765。</p>
+    <p class="role"><span>功能定位</span>日常决策台：先拍板看谁，再按大类找货、扩词反哺。</p>
+    <ul>
+      <li><b>做什么：</b>今日推荐 → 锁大类 → 分类榜；可看可搬/观察池</li>
+      <li><b>什么时候用：</b>每天开工「先看谁、按类逛」</li>
+      <li><b>不做什么：</b>首屏不堆时间矩阵；云端只读，人判/可搬写入请回本机 8765</li>
+    </ul>
   </a>
   <a class="card" href="/channel/report/">
     <span class="tag">④ 周期完整包</span>
-    <h2>关键词周期选品报告</h2>
-    <p>整轮采集结论：漏斗 · 榜单 · 曲线。可在线看 / 下 zip；对接 ProductAnalyzer。</p>
+    <h2>选品报告归档</h2>
+    <p class="role"><span>功能定位</span>整轮采集的离线决策包：漏斗、榜单、曲线归档可回看。</p>
+    <ul>
+      <li><b>做什么：</b>在线看 / 下 zip；漏斗·榜单·曲线；可对接 ProductAnalyzer</li>
+      <li><b>什么时候用：</b>要复盘一整轮、导出给人对齐结论</li>
+      <li><b>不做什么：</b>不代替②比货、不代替③今日拍板</li>
+    </ul>
   </a>
 </div>
 <p class="foot">入口 https://monitor.xhs365.cn/channel/ · 会员账号 / 授权码登录<br/>
