@@ -187,44 +187,46 @@ _HUB_HTML_TMPL = """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8
 <title>选品作战台 · 四看板</title>
 <script src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js"></script>
 <style>
-:root{--bg:#eef3f8;--elev:#fff;--text:#101828;--muted:#3d4f63;--line:#c5d0dc;--accent:#14708f;--accent-soft:#e2f3f8;--accent-deep:#0a4f66;--v1:#0a4f66;--v2:#14708f;--v3:#0d7a5f;--v4:#8a5a12;--ease:cubic-bezier(.4,0,.2,1)}
+:root{--bg:#eef3f8;--elev:#fff;--text:#101828;--muted:#3d4f63;--line:#c5d0dc;--accent:#14708f;--accent-soft:#e2f3f8;--accent-deep:#0a4f66;--v1:#0a4f66;--v2:#14708f;--v3:#0d7a5f;--v4:#8a5a12;--ease:cubic-bezier(.4,0,.2,1);--dur:180ms}
 *{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden}
 body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
 #app{display:flex;flex-direction:column;height:100%}
-.topbar{flex-shrink:0;padding:12px 20px 0;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:10}
-.top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.topbar{flex-shrink:0;padding:12px 20px 10px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:10}
+.top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
 .brand .eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin:0 0 4px}
 .brand h1{margin:0;font-size:1.35rem;letter-spacing:-.02em;font-weight:780}
 .brand .lead{margin:4px 0 0;font-size:12.5px;color:var(--muted);line-height:1.45;max-width:46rem}
 .stamp{margin:0;padding:6px 10px;border-radius:8px;background:var(--accent-soft);border:1px solid rgba(20,112,143,.22);font-size:12px;color:var(--accent-deep);line-height:1.4;max-width:26rem}
 .stamp:empty{display:none}.stamp b{font-family:ui-monospace,Consolas,monospace;font-weight:700}
-.view-tabs{display:flex;gap:0;border-bottom:2px solid var(--line);overflow-x:auto}
-.view-tabs button{appearance:none;background:transparent;border:none;color:var(--muted);padding:11px 18px;font-size:13.5px;font-weight:650;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;white-space:nowrap;transition:color .2s var(--ease),border-color .2s var(--ease)}
-.view-tabs button:hover{color:var(--text)}.view-tabs button.active{font-weight:780}
-.view-tabs button[data-view="vertical"].active{color:var(--v1);border-bottom-color:var(--v1)}
-.view-tabs button[data-view="ops"].active{color:var(--v2);border-bottom-color:var(--v2)}
-.view-tabs button[data-view="workbench"].active{color:var(--v3);border-bottom-color:var(--v3)}
-.view-tabs button[data-view="cycle"].active{color:var(--v4);border-bottom-color:var(--v4)}
-.hint{font-size:11px;color:var(--muted);padding:5px 0 8px;line-height:1.4}
-.topbar.compact{padding:8px 16px 0}.topbar.compact h1{font-size:1.05rem}.topbar.compact .lead,.topbar.compact .stamp{display:none}.topbar.compact .view-tabs button{padding:8px 14px;font-size:13px}.topbar.compact .hint{display:none}
+.view-menu{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;background:#e4ebf3;border:1px solid var(--line);border-radius:12px;max-width:100%}
+.view-menu button{appearance:none;border:1px solid transparent;background:transparent;color:var(--muted);padding:9px 16px;font-size:13.5px;font-weight:650;cursor:pointer;border-radius:9px;font-family:inherit;white-space:nowrap;transition:color var(--dur) var(--ease),background var(--dur) var(--ease),border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+.view-menu button:hover{color:var(--text);background:rgba(255,255,255,.55)}
+.view-menu button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.view-menu button.active{background:var(--elev);color:var(--accent-deep);font-weight:780;border-color:rgba(20,112,143,.22);box-shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.04)}
+.view-menu button[data-view="vertical"].active{color:var(--v1);border-color:rgba(10,79,102,.28)}
+.view-menu button[data-view="ops"].active{color:var(--v2);border-color:rgba(20,112,143,.28)}
+.view-menu button[data-view="workbench"].active{color:var(--v3);border-color:rgba(13,122,95,.28)}
+.view-menu button[data-view="cycle"].active{color:var(--v4);border-color:rgba(138,90,18,.28)}
+.hint{font-size:11px;color:var(--muted);padding:8px 0 0;line-height:1.4}
+.topbar.compact{padding:8px 16px}.topbar.compact h1{font-size:1.05rem}.topbar.compact .lead,.topbar.compact .stamp{display:none}.topbar.compact .top-row{margin-bottom:8px}.topbar.compact .view-menu button{padding:7px 12px;font-size:13px}.topbar.compact .hint{display:none}
 .frame-wrap{flex:1;min-height:0;position:relative;background:#e8eef5}
-.frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--elev);opacity:0;pointer-events:none;transition:opacity .18s var(--ease)}
+.frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--elev);opacity:0;pointer-events:none;transition:opacity var(--dur) var(--ease)}
 .frame-wrap iframe.is-active{opacity:1;pointer-events:auto}.frame-wrap iframe.is-loading{opacity:.35}
 .foot-mini{position:absolute;right:12px;bottom:8px;z-index:5;font-size:11px;color:var(--muted);background:rgba(255,255,255,.85);padding:4px 8px;border-radius:6px;border:1px solid var(--line)}
 .foot-mini a{color:var(--accent);font-weight:700;text-decoration:none}
-@media (prefers-reduced-motion:reduce){.view-tabs button,.frame-wrap iframe{transition:none}}
+@media (prefers-reduced-motion:reduce){.view-menu button,.frame-wrap iframe{transition:none}}
 </style></head><body>
 <div id="app">
   <div class="topbar" :class="{compact: compact}">
     <div class="top-row">
       <div class="brand">
-        <div class="eyebrow">一门一密 · 四看板同世界</div>
+        <div class="eyebrow">一门一密 · 菜单切换</div>
         <h1>选品作战台</h1>
-        <p class="lead">标签切换进对应看板；四块仍各司其职。主业虚拟资料。会员数据包在会员中心。</p>
+        <p class="lead">四个菜单按钮切换看板；业务仍分四页。主业虚拟资料。会员数据包在会员中心。</p>
       </div>
       __STAMP__
     </div>
-    <div class="view-tabs" role="tablist" aria-label="四看板">
+    <div class="view-menu" role="tablist" aria-label="四看板菜单">
       <button v-for="t in tabs" :key="t.id" type="button" role="tab" :data-view="t.id" :class="{active: view===t.id}" :aria-selected="view===t.id" @click="switchView(t.id)">{{ t.label }}</button>
     </div>
     <div class="hint">{{ hint }}</div>
