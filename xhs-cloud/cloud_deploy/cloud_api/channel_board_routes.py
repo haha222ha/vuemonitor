@@ -191,24 +191,25 @@ _HUB_HTML_TMPL = """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8
 *{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden}
 body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
 #app{display:flex;flex-direction:column;height:100%}
-.topbar{flex-shrink:0;padding:12px 20px 10px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:10}
-.top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
-.brand .eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin:0 0 4px}
-.brand h1{margin:0;font-size:1.35rem;letter-spacing:-.02em;font-weight:780}
-.brand .lead{margin:4px 0 0;font-size:12.5px;color:var(--muted);line-height:1.45;max-width:46rem}
-.stamp{margin:0;padding:6px 10px;border-radius:8px;background:var(--accent-soft);border:1px solid rgba(20,112,143,.22);font-size:12px;color:var(--accent-deep);line-height:1.4;max-width:26rem}
+.topbar{flex-shrink:0;padding:8px 16px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:10}
+.top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;min-width:0}
+.brand .eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin:0}
+.brand h1{margin:0;font-size:1.05rem;letter-spacing:-.02em;font-weight:780}
+.stamp{margin:0;padding:4px 8px;border-radius:8px;background:var(--accent-soft);border:1px solid rgba(20,112,143,.22);font-size:11px;color:var(--accent-deep);line-height:1.35;max-width:22rem}
 .stamp:empty{display:none}.stamp b{font-family:ui-monospace,Consolas,monospace;font-weight:700}
+.kbd-hint{font-size:11px;color:var(--muted);white-space:nowrap}
+.kbd-hint kbd{display:inline-block;padding:1px 5px;margin:0 1px;border:1px solid var(--line);border-radius:4px;background:#f4f7fb;font-size:10px;font-family:ui-monospace,Consolas,monospace}
 .view-menu{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;background:#e4ebf3;border:1px solid var(--line);border-radius:12px;max-width:100%}
-.view-menu button{appearance:none;border:1px solid transparent;background:transparent;color:var(--muted);padding:9px 16px;font-size:13.5px;font-weight:650;cursor:pointer;border-radius:9px;font-family:inherit;white-space:nowrap;transition:color var(--dur) var(--ease),background var(--dur) var(--ease),border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+.view-menu button{appearance:none;border:1px solid transparent;background:transparent;color:var(--muted);padding:7px 14px;font-size:13px;font-weight:650;cursor:pointer;border-radius:9px;font-family:inherit;white-space:nowrap;transition:color var(--dur) var(--ease),background var(--dur) var(--ease),border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
 .view-menu button:hover{color:var(--text);background:rgba(255,255,255,.55)}
 .view-menu button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .view-menu button.active{background:var(--elev);color:var(--accent-deep);font-weight:780;border-color:rgba(20,112,143,.22);box-shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.04)}
-.view-menu button[data-view="vertical"].active{color:var(--v1);border-color:rgba(10,79,102,.28)}
-.view-menu button[data-view="ops"].active{color:var(--v2);border-color:rgba(20,112,143,.28)}
 .view-menu button[data-view="workbench"].active{color:var(--v3);border-color:rgba(13,122,95,.28)}
+.view-menu button[data-view="ops"].active{color:var(--v2);border-color:rgba(20,112,143,.28)}
+.view-menu button[data-view="vertical"].active{color:var(--v1);border-color:rgba(10,79,102,.28)}
 .view-menu button[data-view="cycle"].active{color:var(--v4);border-color:rgba(138,90,18,.28)}
-.hint{font-size:11px;color:var(--muted);padding:8px 0 0;line-height:1.4}
-.topbar.compact{padding:8px 16px}.topbar.compact h1{font-size:1.05rem}.topbar.compact .lead,.topbar.compact .stamp{display:none}.topbar.compact .top-row{margin-bottom:8px}.topbar.compact .view-menu button{padding:7px 12px;font-size:13px}.topbar.compact .hint{display:none}
+.hint{font-size:11px;color:var(--muted);padding:6px 0 0;line-height:1.4}
 .frame-wrap{flex:1;min-height:0;position:relative;background:#e8eef5}
 .frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--elev);opacity:0;pointer-events:none;transition:opacity var(--dur) var(--ease)}
 .frame-wrap iframe.is-active{opacity:1;pointer-events:auto}.frame-wrap iframe.is-loading{opacity:.35}
@@ -217,14 +218,16 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
 @media (prefers-reduced-motion:reduce){.view-menu button,.frame-wrap iframe{transition:none}}
 </style></head><body>
 <div id="app">
-  <div class="topbar" :class="{compact: compact}">
+  <div class="topbar">
     <div class="top-row">
       <div class="brand">
-        <div class="eyebrow">一门一密 · 菜单切换</div>
+        <div class="eyebrow">一门一密</div>
         <h1>选品作战台</h1>
-        <p class="lead">四个菜单按钮切换看板；业务仍分四页。主业虚拟资料。会员数据包在会员中心。</p>
       </div>
-      __STAMP__
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end">
+        __STAMP__
+        <div class="kbd-hint">快捷 <kbd>1</kbd>–<kbd>4</kbd> · <kbd>←</kbd><kbd>→</kbd></div>
+      </div>
     </div>
     <div class="view-menu" role="tablist" aria-label="四看板菜单">
       <button v-for="t in tabs" :key="t.id" type="button" role="tab" :data-view="t.id" :class="{active: view===t.id}" :aria-selected="view===t.id" @click="switchView(t.id)">{{ t.label }}</button>
@@ -232,7 +235,7 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
     <div class="hint">{{ hint }}</div>
   </div>
   <div class="frame-wrap">
-    <iframe v-for="t in tabs" :key="t.id" :id="'frame-'+t.id" :title="t.label" :class="{'is-active': view===t.id, 'is-loading': loading[t.id]}" :src="loaded[t.id] ? frameSrc(t) : 'about:blank'" @load="onFrameLoad(t.id)"></iframe>
+    <iframe v-for="t in tabs" :key="t.id" :data-view="t.id" :title="t.label" :class="{'is-active': view===t.id, 'is-loading': loading[t.id]}" :src="loaded[t.id] ? frameSrc(t) : 'about:blank'" @load="onFrameLoad(t.id)"></iframe>
     <div class="foot-mini">数据包：<a href="/member#datapacks">会员中心</a></div>
   </div>
 </div>
@@ -240,14 +243,16 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
 (function(){
   var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1",vertical:"/channel/vertical/?embed=1",cycle:"/channel/report/?embed=1"};
   var TABS=[
-    {id:"workbench",label:"③ 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
-    {id:"ops",label:"② 比货",hint:"增量短名单 · 销量时间矩阵"},
-    {id:"vertical",label:"① 垂类",hint:"垂类多卖家对照 · 云端导航落地"},
-    {id:"cycle",label:"④ 周期包",hint:"周期报告归档 · 在线看 / zip"}
+    {id:"workbench",label:"1 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
+    {id:"ops",label:"2 比货",hint:"增量短名单 · 销量时间矩阵"},
+    {id:"vertical",label:"3 垂类",hint:"垂类多卖家对照 · 云端导航落地"},
+    {id:"cycle",label:"4 周期包",hint:"周期报告归档 · 在线看 / zip"}
   ];
-  var ALIAS={workbench:"workbench",home:"workbench",task:"workbench","3":"workbench",ops:"ops",board:"ops",matrix:"ops","2":"ops",vertical:"vertical",niche:"vertical","1":"vertical",cycle:"cycle",report:"cycle","4":"cycle"};
+  var TAB_IDS=TABS.map(function(t){return t.id});
+  var ALIAS={workbench:"workbench",home:"workbench",task:"workbench",ops:"ops",board:"ops",matrix:"ops",vertical:"vertical",niche:"vertical",cycle:"cycle",report:"cycle","1":"workbench","2":"ops","3":"vertical","4":"cycle"};
   function resolveView(raw){var k=String(raw||"").replace(/^#/,"").toLowerCase();return ALIAS[k]||null}
   function initialView(){try{var q=new URLSearchParams(location.search).get("view")||new URLSearchParams(location.search).get("tab");var a=resolveView(q);if(a)return a;var b=resolveView(location.hash);if(b)return b}catch(e){}return "workbench"}
+  function isTypingTarget(el){if(!el||!el.tagName)return false;var tag=el.tagName.toUpperCase();return tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT"||!!el.isContentEditable}
   var createApp=Vue.createApp,reactive=Vue.reactive,computed=Vue.computed,ref=Vue.ref;
   createApp({setup:function(){
     var view=ref(initialView());
@@ -255,17 +260,54 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
     var loading=reactive({workbench:false,ops:false,vertical:false,cycle:false});
     loaded[view.value]=true;loading[view.value]=true;
     var hint=computed(function(){var t=TABS.find(function(x){return x.id===view.value});return t?t.hint:""});
-    var compact=computed(function(){return view.value!=="workbench"});
     function frameSrc(t){return PATHS[t.id]||PATHS.workbench}
     function switchView(id){if(!PATHS[id])id="workbench";view.value=id;if(!loaded[id]){loaded[id]=true;loading[id]=true}try{var url=new URL(location.href);url.searchParams.set("view",id);url.hash="";history.replaceState(null,"",url.toString())}catch(e){}}
-    function onFrameLoad(id){loading[id]=false}
+    function stepView(delta){var i=TAB_IDS.indexOf(view.value);if(i<0)i=0;switchView(TAB_IDS[(i+delta+TAB_IDS.length)%TAB_IDS.length])}
+    function onHubKey(e){if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey||isTypingTarget(e.target))return;var k=e.key;if(k>="1"&&k<="4"){var id=ALIAS[k];if(id){e.preventDefault();switchView(id)}return}if(k==="ArrowLeft"){e.preventDefault();stepView(-1);return}if(k==="ArrowRight"){e.preventDefault();stepView(1)}}
+    function bindFrameKeys(id){try{var el=document.querySelector('iframe[data-view="'+id+'"]');if(!el||!el.contentWindow||el.contentWindow.__hubKeysBound)return;el.contentWindow.addEventListener("keydown",onHubKey);el.contentWindow.__hubKeysBound=true}catch(e){}}
+    function onFrameLoad(id){loading[id]=false;bindFrameKeys(id)}
     switchView(view.value);
+    window.addEventListener("keydown",onHubKey);
     window.addEventListener("hashchange",function(){var v=resolveView(location.hash);if(v)switchView(v)});
-    return {tabs:TABS,view:view,loaded:loaded,loading:loading,hint:hint,compact:compact,frameSrc:frameSrc,switchView:switchView,onFrameLoad:onFrameLoad};
+    return {tabs:TABS,view:view,loaded:loaded,loading:loading,hint:hint,frameSrc:frameSrc,switchView:switchView,onFrameLoad:onFrameLoad};
   }}).mount("#app");
 })();
 </script>
 </body></html>"""
+
+_CYCLE_EMBED_SNIPPET = """<script>(function(){
+try{
+  var emb=/(?:\\?|&)embed=1(?:&|$)/.test(location.search)||(window.self!==window.top);
+  if(!emb)return;
+  document.documentElement.classList.add('hub-embed');
+  var css=document.createElement('style');
+  css.textContent=[
+    'html.hub-embed header .nav,html.hub-embed .nav,html.hub-embed .hub-nav{display:none!important}',
+    'html.hub-embed header{padding:8px 16px!important}',
+    'html.hub-embed header h1,.hub-embed .topbar h1{font-size:1.05rem!important}',
+    'html.hub-embed header .sub,html.hub-embed .topbar .lead,html.hub-embed .view-tabs,html.hub-embed .hint{display:none!important}',
+    'html.hub-embed .topbar{padding:6px 12px 0!important}'
+  ].join('');
+  document.head.appendChild(css);
+}catch(_){}
+})();</script>"""
+
+
+def _inject_cycle_embed_chrome(raw: bytes) -> bytes:
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        text = raw.decode("utf-8", errors="ignore")
+    if "hub-embed" in text and "CYCLE_EMBED" in text:
+        return text.encode("utf-8")
+    snip = "<!--CYCLE_EMBED-->" + _CYCLE_EMBED_SNIPPET
+    low = text.lower()
+    idx = low.find("</head>")
+    if idx >= 0:
+        text = text[:idx] + snip + text[idx:]
+    else:
+        text = snip + text
+    return text.encode("utf-8")
 
 
 def _hub_stamp_html() -> str:
@@ -1007,4 +1049,17 @@ def channel_cycle_report_files(request: Request, path: str = ""):
     headers = {**_NO_STORE, "X-Channel-Board": "1"}
     if low.endswith(".zip"):
         headers["Content-Disposition"] = f'attachment; filename="{os.path.basename(target)}"'
+    # hub iframe ?embed=1：报告壳藏顶栏标签，避免双导航
+    embed = (request.query_params.get("embed") or "") == "1"
+    if embed and low.endswith((".html", ".htm")):
+        try:
+            with open(target, "rb") as f:
+                raw = f.read()
+            return HTMLResponse(
+                _inject_cycle_embed_chrome(raw).decode("utf-8", errors="ignore"),
+                media_type=media or "text/html; charset=utf-8",
+                headers=headers,
+            )
+        except Exception:
+            pass
     return FileResponse(target, media_type=media, headers=headers)
