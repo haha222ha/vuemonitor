@@ -174,6 +174,55 @@
     }
     .phase-banner.ph-offline .phase-title,
     .phase-banner.ph-error .phase-title { color: var(--err); }
+    .device-status-list {
+      margin: 10px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .device-status {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #121a22;
+    }
+    .device-status .ds-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+    }
+    .device-status .ds-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .device-status .ds-phase {
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .device-status .ds-msg {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .device-status .ds-meta {
+      margin: 4px 0 0;
+      font-size: 11px;
+      color: #6f7f90;
+    }
+    .device-status.ds-idle .ds-phase { color: var(--ok); }
+    .device-status.ds-task_running .ds-phase,
+    .device-status.ds-auto_running .ds-phase { color: var(--run); }
+    .device-status.ds-wait_user .ds-phase { color: var(--accent); }
+    .device-status.ds-error .ds-phase,
+    .device-status.ds-offline .ds-phase { color: var(--err); }
+    .device-status.ds-offline { opacity: 0.72; }
+    .device-status.is-focus {
+      border-color: #3d6a90;
+      box-shadow: inset 0 0 0 1px rgba(61, 156, 240, 0.18);
+    }
     .input-panels {
       display: flex;
       flex-direction: column;
@@ -243,9 +292,10 @@
   <h1>Cursor 遥控</h1>
   <p class="sub">多台电脑可同时挂机；提交时可指定设备 ID，或让任意在线机领取。</p>
   <div class="phase-banner ph-offline" id="phaseBanner" aria-live="polite">
-    <p class="phase-title" id="phaseTitle">正在读取设备状态…</p>
+    <p class="phase-title" id="phaseTitle">正在读取各机状态…</p>
     <p class="phase-action" id="phaseAction">请稍候</p>
     <p class="phase-meta" id="phaseMeta"></p>
+    <div class="device-status-list" id="deviceStatusList"></div>
   </div>
   <div class="device-row">
     <label for="targetDevice">执行设备</label>
@@ -272,7 +322,7 @@
       <p class="panel-hint">屏幕：点「开始识别」→ 说 → 再点「结束识别」。耳机：先点「启用耳机键」，再用蓝牙耳机<strong>播放/暂停键</strong>切换开始/结束（与音乐 App 同逻辑）。建议手机 Chrome；微信内置浏览器多半无效。</p>
     </section>
   </div>
-  <p class="hint">先选设备再提交。顶部条看在线台数与相位；列表可 <b>撤销</b>。设备 ID 在各机 worker 配置里。</p>
+  <p class="hint">先选设备再提交。顶部可看<strong>每台电脑</strong>运行相位；列表可 <b>撤销</b>。设备 ID 在各机 worker 配置里。</p>
   <div class="list" id="list"></div>
   <div class="toast" id="toast"></div>
   <script src="input_text.js?v=2"></script>
@@ -562,11 +612,49 @@
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
     }
-    function renderPhase(w) {
+    function phaseShort(p) {
+      return ({
+        idle: "空闲",
+        task_running: "执行中",
+        auto_running: "自动续跑",
+        wait_user: "本向收口",
+        error: "出错",
+        offline: "离线",
+      })[p] || p || "?";
+    }
+    function renderDeviceStatuses(devices, worker) {
+      const box = $("deviceStatusList");
+      if (!box) return;
+      const list = devices || [];
+      if (!list.length) {
+        box.innerHTML = '<div class="device-status ds-offline"><div class="ds-top"><span class="ds-name">尚无登记设备</span><span class="ds-phase">离线</span></div><p class="ds-msg">各机启动 worker 并上报后，这里会并列显示每台状态。</p></div>';
+        return;
+      }
+      const focusId = (worker && (worker.focus_device_id || worker.worker_id)) || "";
+      box.innerHTML = list.map((d) => {
+        const phase = d.online ? (d.phase || "idle") : "offline";
+        const name = escapeHtml(d.label || d.device_id || "设备");
+        const id = escapeHtml(d.device_id || "");
+        const pl = escapeHtml(d.phase_label || phaseShort(phase));
+        const msg = escapeHtml(d.message || d.hint || "");
+        const bits = [];
+        if (d.task_id) bits.push("任务 " + d.task_id);
+        if (d.chain) bits.push("续跑第 " + d.chain + " 步");
+        if (d.updated_at) bits.push(d.updated_at);
+        if (d.hostname) bits.push(d.hostname);
+        const focus = focusId && d.device_id === focusId ? " is-focus" : "";
+        return `<div class="device-status ds-${escapeHtml(phase)}${focus}" data-device="${id}">
+          <div class="ds-top"><span class="ds-name">${name}</span><span class="ds-phase">${pl}</span></div>
+          ${msg ? `<p class="ds-msg">${msg}</p>` : ""}
+          ${bits.length ? `<p class="ds-meta">${escapeHtml(bits.join(" · "))}</p>` : ""}
+        </div>`;
+      }).join("");
+    }
+    function renderPhase(w, devices) {
       const banner = $("phaseBanner");
       const phase = (w && w.phase) || "offline";
       banner.className = "phase-banner ph-" + phase;
-      let title = (w && (w.title || w.message)) || "本机状态未知";
+      let title = (w && (w.title || w.message)) || "设备状态未知";
       let action = (w && w.phone_action) || "";
       // 旧文案纠偏：wait_user ≠ 等你输入；有备注「空闲队列」就不要手发下一条
       if (phase === "wait_user") {
@@ -583,13 +671,21 @@
         if (!action) action = "无需操作·不要发下一条·队列自动续";
       }
       $("phaseTitle").textContent = title;
-      $("phaseAction").textContent = action;
+      const onlineN = (w && w.online_n != null) ? w.online_n : ((devices || []).filter((d) => d.online).length);
+      const others = (w && w.others_brief) ? ("其它：" + w.others_brief) : "";
+      const actionBits = [];
+      if (action) actionBits.push(action);
+      if (onlineN > 1) actionBits.push("在线 " + onlineN + " 台（下方逐台）");
+      if (others) actionBits.push(others);
+      $("phaseAction").textContent = actionBits.join(" · ");
       const bits = [];
+      if (w && w.focus_label) bits.push("焦点 " + w.focus_label);
       if (w && w.hint) bits.push(w.hint);
       if (w && w.task_id) bits.push("任务 " + w.task_id);
       if (w && w.chain) bits.push("自动续跑第 " + w.chain + " 步");
       if (w && w.updated_at) bits.push("更新 " + w.updated_at);
       $("phaseMeta").textContent = bits.join(" · ");
+      renderDeviceStatuses(devices || _devices || [], w || {});
     }
     async function loadPhase() {
       try {
@@ -599,14 +695,14 @@
           return;
         }
         const j = await r.json();
-        renderPhase(j.worker || {});
         if (j.devices) renderDeviceSelect(j.devices);
+        renderPhase(j.worker || {}, j.devices || _devices || []);
       } catch (_) {
         renderPhase({
           phase: "offline",
           title: "状态拉取失败",
           phone_action: "请检查网络后刷新",
-        });
+        }, _devices || []);
       }
     }
     async function loadDevices() {

@@ -329,34 +329,6 @@ def upsert_device(
         return {"ok": True, "device": data["devices"].get(did)}
 
 
-def list_devices(*, stale_sec: float | None = None) -> dict[str, Any]:
-    stale_sec = float(stale_sec if stale_sec is not None else _DEVICE_STALE_SEC)
-    now = time.time()
-    with _lock:
-        data = _load_devices()
-        items = []
-        for did, row in (data.get("devices") or {}).items():
-            ts = float((row or {}).get("updated_ts") or 0)
-            online = bool(ts and (now - ts) <= stale_sec)
-            items.append(
-                {
-                    "device_id": did,
-                    "label": (row or {}).get("label") or did,
-                    "hostname": (row or {}).get("hostname") or "",
-                    "phase": (row or {}).get("phase") or "offline",
-                    "task_id": (row or {}).get("task_id") or "",
-                    "hint": (row or {}).get("hint") or "",
-                    "message": (row or {}).get("message") or "",
-                    "chain": int((row or {}).get("chain") or 0),
-                    "updated_at": (row or {}).get("updated_at") or "",
-                    "online": online,
-                }
-            )
-        items.sort(key=lambda x: (not x["online"], str(x.get("label") or "")))
-        online_n = sum(1 for x in items if x["online"])
-        return {"ok": True, "devices": items, "online_n": online_n, "total_n": len(items)}
-
-
 # 手机遥控页可见相位（写死）
 # wait_user = 本方向收口(NEXT_STEP:no)；空闲队列会自动推下一刀，禁止再暗示「必须等人输入」
 _PHASE_MSG = {
@@ -373,6 +345,151 @@ _PHASE_PHONE_ACTION = {
     "wait_user": "无需操作·不要发下一条·队列自动续",
     "error": "请查看错误并下新指令",
 }
+_PHASE_SHORT = {
+    "idle": "空闲",
+    "task_running": "执行中",
+    "auto_running": "自动续跑",
+    "wait_user": "本向收口",
+    "error": "出错",
+    "offline": "离线",
+}
+# 焦点优先级：数字越小越优先展示（多机时顶部摘要跟最要紧的那台）
+_PHASE_FOCUS_RANK = {
+    "error": 0,
+    "wait_user": 1,
+    "task_running": 2,
+    "auto_running": 2,
+    "idle": 3,
+    "offline": 9,
+}
+
+
+def _normalize_device_phase(phase: str, *, online: bool) -> str:
+    p = str(phase or "").strip().lower()
+    if not online:
+        return "offline"
+    if p not in _PHASE_MSG and p != "offline":
+        return "idle"
+    return p or "idle"
+
+
+def _enrich_device_item(row: dict[str, Any], *, online: bool) -> dict[str, Any]:
+    phase = _normalize_device_phase((row or {}).get("phase") or "", online=online)
+    msg = str((row or {}).get("message") or "").strip()
+    if phase == "wait_user" and (
+        "请下达下一步" in msg
+        or "等待你输入" in msg
+        or "等待你在遥控页" in msg
+        or "等你输入" in msg
+        or "输入下一条" in msg
+        or msg.strip() in ("阶段完成", "本阶段完成")
+    ):
+        msg = _PHASE_MSG["wait_user"]
+    if not msg:
+        msg = _PHASE_MSG.get(phase, _PHASE_MSG["idle"]) if phase != "offline" else "设备离线或心跳超时"
+    return {
+        "device_id": (row or {}).get("device_id") or "",
+        "label": (row or {}).get("label") or (row or {}).get("device_id") or "",
+        "hostname": (row or {}).get("hostname") or "",
+        "phase": phase,
+        "phase_label": _PHASE_SHORT.get(phase, phase),
+        "task_id": (row or {}).get("task_id") or "",
+        "hint": (row or {}).get("hint") or "",
+        "message": msg[:500],
+        "phone_action": _PHASE_PHONE_ACTION.get(phase, ""),
+        "chain": int((row or {}).get("chain") or 0),
+        "updated_at": (row or {}).get("updated_at") or "",
+        "online": bool(online),
+    }
+
+
+def list_devices(*, stale_sec: float | None = None) -> dict[str, Any]:
+    stale_sec = float(stale_sec if stale_sec is not None else _DEVICE_STALE_SEC)
+    now = time.time()
+    with _lock:
+        data = _load_devices()
+        items = []
+        for did, row in (data.get("devices") or {}).items():
+            ts = float((row or {}).get("updated_ts") or 0)
+            online = bool(ts and (now - ts) <= stale_sec)
+            base = dict(row or {})
+            base["device_id"] = did
+            items.append(_enrich_device_item(base, online=online))
+        # 在线优先；同在线按焦点相位（出错/执行中靠前）再按标签
+        items.sort(
+            key=lambda x: (
+                not x["online"],
+                int(_PHASE_FOCUS_RANK.get(str(x.get("phase") or ""), 8)),
+                str(x.get("label") or ""),
+            )
+        )
+        online_n = sum(1 for x in items if x["online"])
+        return {"ok": True, "devices": items, "online_n": online_n, "total_n": len(items)}
+
+
+def _aggregate_worker_from_devices(devices: list[dict[str, Any]], online_n: int) -> dict[str, Any]:
+    """多机时顶部摘要：跟最要紧的那台；文案带在线台数。"""
+    online = [d for d in (devices or []) if d.get("online")]
+    if not online:
+        return {
+            "phase": "offline",
+            "title": "尚无设备在线",
+            "message": "尚无设备上报（请启动各机 worker）",
+            "phone_action": "请在电脑上启动 worker 安装包",
+            "hint": "",
+            "task_id": "",
+            "chain": 0,
+            "updated_at": "",
+            "stale": True,
+            "worker_id": "",
+            "focus_device_id": "",
+            "focus_label": "",
+            "multi": True,
+            "online_n": 0,
+        }
+    focus = sorted(
+        online,
+        key=lambda d: (
+            int(_PHASE_FOCUS_RANK.get(str(d.get("phase") or ""), 8)),
+            -int(bool(d.get("task_id"))),
+            str(d.get("label") or ""),
+        ),
+    )[0]
+    phase = str(focus.get("phase") or "idle")
+    label = str(focus.get("label") or focus.get("device_id") or "")
+    short = _PHASE_SHORT.get(phase, phase)
+    base_msg = str(focus.get("message") or _PHASE_MSG.get(phase, short)).strip()
+    # 避免「执行中 · 执行中」重复
+    if not base_msg or base_msg == short or base_msg.startswith(short):
+        core = base_msg or short
+    else:
+        core = f"{short} · {base_msg}"
+    title = f"「{label}」{core}" if label else core
+    others = [
+        f"{d.get('label') or d.get('device_id')}:{_PHASE_SHORT.get(str(d.get('phase') or ''), '?')}"
+        for d in online
+        if str(d.get("device_id") or "") != str(focus.get("device_id") or "")
+    ]
+    others_brief = " · ".join(others)
+    if online_n > 1:
+        title = f"{online_n} 台在线 · {title}"
+    return {
+        "phase": phase,
+        "title": title[:220],
+        "message": title[:220],
+        "phone_action": str(focus.get("phone_action") or _PHASE_PHONE_ACTION.get(phase, "")),
+        "hint": str(focus.get("hint") or "")[:500],
+        "task_id": str(focus.get("task_id") or "")[:80],
+        "chain": int(focus.get("chain") or 0),
+        "updated_at": str(focus.get("updated_at") or ""),
+        "stale": False,
+        "worker_id": str(focus.get("device_id") or "")[:80],
+        "focus_device_id": str(focus.get("device_id") or "")[:80],
+        "focus_label": label[:64],
+        "multi": online_n > 1,
+        "online_n": online_n,
+        "others_brief": others_brief,
+    }
 
 
 def set_worker_status(
@@ -447,35 +564,44 @@ def set_worker_status(
 
 
 def get_worker_status(*, stale_sec: float = 120.0) -> dict[str, Any]:
-    """手机读相位；附带多机设备列表。"""
+    """手机读相位：优先按 devices 多机聚合（避免全局 worker_status 被最后一台心跳盖掉）。"""
     devices_payload = list_devices(stale_sec=stale_sec)
+    devices = devices_payload.get("devices") or []
+    online = int(devices_payload.get("online_n") or 0)
+
+    # 有设备登记时：顶部摘要永远从各机相位聚合（多机并列可见）
+    if devices:
+        agg = _aggregate_worker_from_devices(devices, online)
+        return {
+            "ok": True,
+            "worker": agg,
+            "devices": devices,
+            "online_n": online,
+            "total_n": int(devices_payload.get("total_n") or len(devices)),
+        }
+
+    # 兼容：尚无 devices 表时回退旧单文件 worker_status.json
     path = _worker_status_path()
     if not os.path.isfile(path):
-        online = devices_payload.get("online_n") or 0
         return {
             "ok": True,
             "worker": {
-                "phase": "offline" if online <= 0 else "idle",
-                "title": (
-                    f"已有 {online} 台设备在线"
-                    if online
-                    else "尚无设备上报（请启动各机 worker）"
-                ),
-                "message": (
-                    f"已有 {online} 台设备在线，可在下方选择设备发单"
-                    if online
-                    else "尚无设备上报（请启动各机 worker）"
-                ),
-                "phone_action": "可提交新任务" if online else "请在电脑上启动 worker 安装包",
+                "phase": "offline",
+                "title": "尚无设备上报（请启动各机 worker）",
+                "message": "尚无设备上报（请启动各机 worker）",
+                "phone_action": "请在电脑上启动 worker 安装包",
                 "hint": "",
                 "task_id": "",
                 "chain": 0,
                 "updated_at": "",
-                "stale": online <= 0,
+                "stale": True,
                 "worker_id": "",
+                "multi": False,
+                "online_n": 0,
             },
-            "devices": devices_payload.get("devices") or [],
-            "online_n": online,
+            "devices": [],
+            "online_n": 0,
+            "total_n": 0,
         }
     try:
         with open(path, encoding="utf-8") as f:
@@ -484,33 +610,23 @@ def get_worker_status(*, stale_sec: float = 120.0) -> dict[str, Any]:
         row = {}
     ts = float(row.get("updated_ts") or 0)
     stale = (time.time() - ts) > float(stale_sec or 120) if ts else True
-    online = int(devices_payload.get("online_n") or 0)
     if stale and str(row.get("phase") or "") not in ("wait_user",):
-        if online > 0:
-            row = {
-                **row,
-                "phase": "idle",
-                "title": f"{online} 台设备在线，可指定设备发单",
-                "message": f"{online} 台设备在线，可指定设备发单",
-                "phone_action": "选择设备后提交任务",
-                "stale": False,
-            }
-        else:
-            row = {
-                **row,
-                "phase": "offline",
-                "title": "本机状态超时未更新",
-                "message": "本机状态超时未更新（worker 可能卡住或已停）",
-                "phone_action": "请检查本机 worker / Cursor",
-                "stale": True,
-            }
+        row = {
+            **row,
+            "phase": "offline",
+            "title": "本机状态超时未更新",
+            "message": "本机状态超时未更新（worker 可能卡住或已停）",
+            "phone_action": "请检查本机 worker / Cursor",
+            "stale": True,
+        }
     else:
         row = {**row, "stale": bool(stale)}
-        if online > 1 and row.get("phase") == "idle":
-            row["title"] = f"{online} 台在线 · " + str(row.get("title") or "")
+    row.setdefault("multi", False)
+    row.setdefault("online_n", 0)
     return {
         "ok": True,
         "worker": row,
-        "devices": devices_payload.get("devices") or [],
-        "online_n": online,
+        "devices": [],
+        "online_n": 0,
+        "total_n": 0,
     }
