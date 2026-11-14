@@ -32,24 +32,89 @@ def _empty() -> dict[str, Any]:
     return {"version": 1, "updated_at": "", "order": [], "tasks": {}}
 
 
+def _flock_exclusive(lock_file):
+    """跨进程互斥（多 worker / 并发写 queue 时防坏 JSON）。Linux 用 fcntl；其它平台空操作。"""
+    try:
+        import fcntl  # type: ignore
+
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        return True
+    except Exception:
+        return False
+
+
+def _flock_unlock(lock_file) -> None:
+    try:
+        import fcntl  # type: ignore
+
+        fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+    except Exception:
+        pass
+
+
 def load() -> dict[str, Any]:
     path = _path()
     if not os.path.isfile(path):
+        bak = path + ".bak"
+        if os.path.isfile(bak):
+            path = bak
+        else:
+            return _empty()
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        # 坏文件：挪走，避免提交/申领连环 500
+        bad = f"{_path()}.bad.{int(time.time())}"
+        try:
+            if os.path.isfile(_path()):
+                os.replace(_path(), bad)
+        except Exception:
+            pass
+        bak = _path() + ".bak"
+        if os.path.isfile(bak):
+            try:
+                with open(bak, encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception as e2:
+                raise RuntimeError(f"queue.json corrupt and bak unreadable: {e}; bak={e2}") from e2
+        else:
+            raise RuntimeError(f"queue.json corrupt (moved to {bad}): {e}") from e
+    if not isinstance(data, dict):
         return _empty()
-    with open(path, encoding="utf-8") as f:
-        data = json.load(f)
     data.setdefault("order", [])
     data.setdefault("tasks", {})
+    if not isinstance(data["order"], list):
+        data["order"] = []
+    if not isinstance(data["tasks"], dict):
+        data["tasks"] = {}
     return data
 
 
 def save(data: dict[str, Any]) -> None:
     os.makedirs(_root(), exist_ok=True)
     data["updated_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
-    tmp = _path() + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    os.replace(tmp, _path())
+    path = _path()
+    tmp = path + ".tmp"
+    lock_path = path + ".lock"
+    with open(lock_path, "a+", encoding="utf-8") as lf:
+        _flock_exclusive(lf)
+        try:
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+                f.flush()
+                os.fsync(f.fileno())
+            # 成功后留一份 bak，坏文件时可回滚
+            if os.path.isfile(path):
+                try:
+                    import shutil
+
+                    shutil.copy2(path, path + ".bak")
+                except Exception:
+                    pass
+            os.replace(tmp, path)
+        finally:
+            _flock_unlock(lf)
 
 
 def _trim(data: dict[str, Any]) -> None:

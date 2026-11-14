@@ -1820,12 +1820,15 @@ def agent_task_submit(body: AgentTaskSubmitBody, request: Request):
         raise HTTPException(status_code=401, detail="未登录遥控台")
     from cloud_deploy.cloud_api import agent_task_store as ats
 
-    out = ats.submit(
-        body.prompt,
-        source="web",
-        target_device_id=body.target_device_id,
-        target_label=body.target_label,
-    )
+    try:
+        out = ats.submit(
+            body.prompt,
+            source="web",
+            target_device_id=body.target_device_id,
+            target_label=body.target_label,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"提交写队列失败: {e}") from e
     if not out.get("ok"):
         raise HTTPException(status_code=400, detail=out.get("error") or "submit failed")
     return out
@@ -1882,6 +1885,25 @@ def agent_task_cancel(task_id: str, request: Request):
     out = ats.cancel(task_id)
     if not out.get("ok"):
         raise HTTPException(status_code=400, detail=out.get("error") or "cancel failed")
+    return out
+
+
+@app.post("/api/v1/sync/agent-task-submit")
+def sync_agent_task_submit(body: AgentTaskSubmitBody, _: None = Depends(verify_sync_key)):
+    """本机/脚本用 Sync Key 代提交（网页 500 时的兜底通道）。"""
+    from cloud_deploy.cloud_api import agent_task_store as ats
+
+    try:
+        out = ats.submit(
+            body.prompt,
+            source="sync",
+            target_device_id=body.target_device_id,
+            target_label=body.target_label,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"提交写队列失败: {e}") from e
+    if not out.get("ok"):
+        raise HTTPException(status_code=400, detail=out.get("error") or "submit failed")
     return out
 
 

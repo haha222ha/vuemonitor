@@ -774,9 +774,18 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ prompt, target_device_id, target_label }),
         });
-        const j = await r.json().catch(() => ({}));
+        const raw = await r.text();
+        let j = {};
+        try { j = raw ? JSON.parse(raw) : {}; } catch (_) { j = {}; }
         if (!r.ok || !j.ok) {
-          toast(j.detail || j.error || ("提交失败 " + r.status));
+          let detail = j.detail || j.error;
+          if (Array.isArray(detail)) {
+            detail = detail.map((x) => (x && x.msg) || JSON.stringify(x)).join("; ");
+          }
+          if (!detail) {
+            detail = ("提交失败 " + r.status + (raw ? (" · " + raw.slice(0, 160)) : ""));
+          }
+          toast(String(detail));
           return;
         }
         if (textInput) textInput.clear();
