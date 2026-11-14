@@ -184,81 +184,86 @@ def _media_type(rel: str) -> str | None:
 
 _HUB_HTML_TMPL = """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>选品作战台</title>
+<title>选品作战台 · 四看板</title>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js"></script>
 <style>
-:root{--bg:#eef3f8;--card:#fff;--text:#101828;--muted:#3d4f63;--line:#c5d0dc;--accent:#14708f;--accent-soft:#e2f3f8;--accent-deep:#0a4f66}
-*{box-sizing:border-box}
-body{margin:0;font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);min-height:100vh;background:
-  radial-gradient(900px 360px at 12% -10%,rgba(20,112,143,.10),transparent 55%),
-  linear-gradient(180deg,#f7fafc 0%,var(--bg) 40%,#e8eef5 100%)}
-.wrap{max-width:1080px;margin:0 auto;padding:48px 24px 64px}
-.eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin:0 0 8px}
-h1{margin:0 0 8px;font-size:2rem;letter-spacing:-.02em}
-.lead{margin:0 0 28px;color:var(--muted);font-size:15px;line-height:1.55;max-width:42rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
-.card{display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;box-shadow:0 1px 3px rgba(16,24,40,.06);transition:border-color .15s,box-shadow .15s,transform .15s;min-height:100%}
-.card:hover{border-color:rgba(20,112,143,.45);box-shadow:0 10px 28px rgba(20,112,143,.12);transform:translateY(-1px)}
-.card .tag{display:inline-block;align-self:flex-start;font-size:11px;font-weight:700;color:var(--accent-deep);background:var(--accent-soft);border:1px solid rgba(20,112,143,.25);border-radius:999px;padding:3px 10px}
-.card h2{margin:0;font-size:1.2rem}
-.role{margin:0;padding:8px 10px;border-radius:10px;background:#f4f8fb;border:1px solid #d7e3ec;font-size:13px;line-height:1.45;color:var(--accent-deep);font-weight:700}
-.role span{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--accent);margin:0 0 4px}
-.card ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
-.card li{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
-.card li b{color:var(--text);font-weight:700}
-.stamp{margin:0 0 20px;padding:10px 12px;background:var(--accent-soft);border:1px solid rgba(20,112,143,.22);border-radius:10px;font-size:13px;color:var(--accent-deep);line-height:1.45}
-.stamp b{font-family:ui-monospace,Consolas,monospace;font-weight:700}
-.foot{margin-top:28px;font-size:12px;color:var(--muted);line-height:1.6}
-.foot a{color:var(--accent);font-weight:700;text-decoration:none}
-</style></head><body><div class="wrap">
-<div class="eyebrow">一门一密 · 四看板同世界</div>
-<h1>选品作战台</h1>
-<p class="lead">总入口只做一件事：告诉你<strong>每个看板负责什么</strong>。四块各司其职，不合并、不抢戏。主业是<strong>虚拟资料</strong>选品。会员数据包仍在会员中心，不占用看板卡位。</p>
-__STAMP__
-<div class="grid">
-  <a class="card" href="/channel/vertical/">
-    <span class="tag">① 垂类多卖家</span>
-    <h2>垂类搜词 · 多卖家表</h2>
-    <p class="role"><span>功能定位</span>同品多卖家红海对照：锁一个垂类词，横看谁在卖、卖得怎样。</p>
-    <ul>
-      <li><b>做什么：</b>搜垂类词 → 多卖家表 → 点行看走势与各日增量</li>
-      <li><b>什么时候用：</b>已经盯上某个方向，想比「同类货谁更猛」</li>
-      <li><b>不做什么：</b>不做全库展览、不做今日拍板；云端只读，写回请用本机 8765/vertical</li>
-    </ul>
-  </a>
-  <a class="card" href="/channel/board/">
-    <span class="tag">② 增量比货库</span>
-    <h2>销量时间矩阵</h2>
-    <p class="role"><span>功能定位</span>增量比货主战场：筛后横比销量形状，用时间矩阵找证据。</p>
-    <ul>
-      <li><b>做什么：</b>方向舱锁 L2 → 商品行×采集日矩阵 → 点格/点行看曲线</li>
-      <li><b>什么时候用：</b>候选已经缩过，要认真比货、看持续动销</li>
-      <li><b>不做什么：</b>不是全库浏览器；帽≈短名单，≠几十万行一次塞进页面</li>
-    </ul>
-  </a>
-  <a class="card" href="/channel/workbench/">
-    <span class="tag">③ 选品任务台</span>
-    <h2>今日拍板 · 分类榜</h2>
-    <p class="role"><span>功能定位</span>日常决策台：先拍板看谁，再按大类找货、扩词反哺。</p>
-    <ul>
-      <li><b>做什么：</b>今日推荐 → 锁大类 → 分类榜；可看可搬/观察池</li>
-      <li><b>什么时候用：</b>每天开工「先看谁、按类逛」</li>
-      <li><b>不做什么：</b>首屏不堆时间矩阵；云端只读，人判/可搬写入请回本机 8765</li>
-    </ul>
-  </a>
-  <a class="card" href="/channel/report/">
-    <span class="tag">④ 周期完整包</span>
-    <h2>选品报告归档</h2>
-    <p class="role"><span>功能定位</span>整轮采集的离线决策包：漏斗、榜单、曲线归档可回看。</p>
-    <ul>
-      <li><b>做什么：</b>在线看 / 下 zip；漏斗·榜单·曲线；可对接 ProductAnalyzer</li>
-      <li><b>什么时候用：</b>要复盘一整轮、导出给人对齐结论</li>
-      <li><b>不做什么：</b>不代替②比货、不代替③今日拍板</li>
-    </ul>
-  </a>
+:root{--bg:#eef3f8;--elev:#fff;--text:#101828;--muted:#3d4f63;--line:#c5d0dc;--accent:#14708f;--accent-soft:#e2f3f8;--accent-deep:#0a4f66;--v1:#0a4f66;--v2:#14708f;--v3:#0d7a5f;--v4:#8a5a12;--ease:cubic-bezier(.4,0,.2,1)}
+*{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden}
+body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+#app{display:flex;flex-direction:column;height:100%}
+.topbar{flex-shrink:0;padding:12px 20px 0;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);z-index:10}
+.top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.brand .eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin:0 0 4px}
+.brand h1{margin:0;font-size:1.35rem;letter-spacing:-.02em;font-weight:780}
+.brand .lead{margin:4px 0 0;font-size:12.5px;color:var(--muted);line-height:1.45;max-width:46rem}
+.stamp{margin:0;padding:6px 10px;border-radius:8px;background:var(--accent-soft);border:1px solid rgba(20,112,143,.22);font-size:12px;color:var(--accent-deep);line-height:1.4;max-width:26rem}
+.stamp:empty{display:none}.stamp b{font-family:ui-monospace,Consolas,monospace;font-weight:700}
+.view-tabs{display:flex;gap:0;border-bottom:2px solid var(--line);overflow-x:auto}
+.view-tabs button{appearance:none;background:transparent;border:none;color:var(--muted);padding:11px 18px;font-size:13.5px;font-weight:650;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;white-space:nowrap;transition:color .2s var(--ease),border-color .2s var(--ease)}
+.view-tabs button:hover{color:var(--text)}.view-tabs button.active{font-weight:780}
+.view-tabs button[data-view="vertical"].active{color:var(--v1);border-bottom-color:var(--v1)}
+.view-tabs button[data-view="ops"].active{color:var(--v2);border-bottom-color:var(--v2)}
+.view-tabs button[data-view="workbench"].active{color:var(--v3);border-bottom-color:var(--v3)}
+.view-tabs button[data-view="cycle"].active{color:var(--v4);border-bottom-color:var(--v4)}
+.hint{font-size:11px;color:var(--muted);padding:5px 0 8px;line-height:1.4}
+.topbar.compact{padding:8px 16px 0}.topbar.compact h1{font-size:1.05rem}.topbar.compact .lead,.topbar.compact .stamp{display:none}.topbar.compact .view-tabs button{padding:8px 14px;font-size:13px}.topbar.compact .hint{display:none}
+.frame-wrap{flex:1;min-height:0;position:relative;background:#e8eef5}
+.frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--elev);opacity:0;pointer-events:none;transition:opacity .18s var(--ease)}
+.frame-wrap iframe.is-active{opacity:1;pointer-events:auto}.frame-wrap iframe.is-loading{opacity:.35}
+.foot-mini{position:absolute;right:12px;bottom:8px;z-index:5;font-size:11px;color:var(--muted);background:rgba(255,255,255,.85);padding:4px 8px;border-radius:6px;border:1px solid var(--line)}
+.foot-mini a{color:var(--accent);font-weight:700;text-decoration:none}
+@media (prefers-reduced-motion:reduce){.view-tabs button,.frame-wrap iframe{transition:none}}
+</style></head><body>
+<div id="app">
+  <div class="topbar" :class="{compact: compact}">
+    <div class="top-row">
+      <div class="brand">
+        <div class="eyebrow">一门一密 · 四看板同世界</div>
+        <h1>选品作战台</h1>
+        <p class="lead">标签切换进对应看板；四块仍各司其职。主业虚拟资料。会员数据包在会员中心。</p>
+      </div>
+      __STAMP__
+    </div>
+    <div class="view-tabs" role="tablist" aria-label="四看板">
+      <button v-for="t in tabs" :key="t.id" type="button" role="tab" :data-view="t.id" :class="{active: view===t.id}" :aria-selected="view===t.id" @click="switchView(t.id)">{{ t.label }}</button>
+    </div>
+    <div class="hint">{{ hint }}</div>
+  </div>
+  <div class="frame-wrap">
+    <iframe v-for="t in tabs" :key="t.id" :id="'frame-'+t.id" :title="t.label" :class="{'is-active': view===t.id, 'is-loading': loading[t.id]}" :src="loaded[t.id] ? frameSrc(t) : 'about:blank'" @load="onFrameLoad(t.id)"></iframe>
+    <div class="foot-mini">数据包：<a href="/member#datapacks">会员中心</a></div>
+  </div>
 </div>
-<p class="foot">入口 https://monitor.xhs365.cn/channel/ · 会员账号 / 授权码登录<br/>
-数据包（多用户预览 / PA 同步）：<a href="/member#datapacks">会员中心 · 选品数据包</a></p>
-</div></body></html>"""
+<script>
+(function(){
+  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1",vertical:"/channel/vertical/?embed=1",cycle:"/channel/report/?embed=1"};
+  var TABS=[
+    {id:"workbench",label:"③ 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
+    {id:"ops",label:"② 比货",hint:"增量短名单 · 销量时间矩阵"},
+    {id:"vertical",label:"① 垂类",hint:"垂类多卖家对照 · 云端导航落地"},
+    {id:"cycle",label:"④ 周期包",hint:"周期报告归档 · 在线看 / zip"}
+  ];
+  var ALIAS={workbench:"workbench",home:"workbench",task:"workbench","3":"workbench",ops:"ops",board:"ops",matrix:"ops","2":"ops",vertical:"vertical",niche:"vertical","1":"vertical",cycle:"cycle",report:"cycle","4":"cycle"};
+  function resolveView(raw){var k=String(raw||"").replace(/^#/,"").toLowerCase();return ALIAS[k]||null}
+  function initialView(){try{var q=new URLSearchParams(location.search).get("view")||new URLSearchParams(location.search).get("tab");var a=resolveView(q);if(a)return a;var b=resolveView(location.hash);if(b)return b}catch(e){}return "workbench"}
+  var createApp=Vue.createApp,reactive=Vue.reactive,computed=Vue.computed,ref=Vue.ref;
+  createApp({setup:function(){
+    var view=ref(initialView());
+    var loaded=reactive({workbench:false,ops:false,vertical:false,cycle:false});
+    var loading=reactive({workbench:false,ops:false,vertical:false,cycle:false});
+    loaded[view.value]=true;loading[view.value]=true;
+    var hint=computed(function(){var t=TABS.find(function(x){return x.id===view.value});return t?t.hint:""});
+    var compact=computed(function(){return view.value!=="workbench"});
+    function frameSrc(t){return PATHS[t.id]||PATHS.workbench}
+    function switchView(id){if(!PATHS[id])id="workbench";view.value=id;if(!loaded[id]){loaded[id]=true;loading[id]=true}try{var url=new URL(location.href);url.searchParams.set("view",id);url.hash="";history.replaceState(null,"",url.toString())}catch(e){}}
+    function onFrameLoad(id){loading[id]=false}
+    switchView(view.value);
+    window.addEventListener("hashchange",function(){var v=resolveView(location.hash);if(v)switchView(v)});
+    return {tabs:TABS,view:view,loaded:loaded,loading:loading,hint:hint,compact:compact,frameSrc:frameSrc,switchView:switchView,onFrameLoad:onFrameLoad};
+  }}).mount("#app");
+})();
+</script>
+</body></html>"""
 
 
 def _hub_stamp_html() -> str:
