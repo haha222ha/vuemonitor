@@ -185,7 +185,6 @@ def _media_type(rel: str) -> str | None:
 _HUB_HTML_TMPL = """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>选品作战台 · 四看板</title>
-<script src="https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.prod.js"></script>
 <style>
 :root{--bg:#eef3f8;--elev:#fff;--text:#101828;--muted:#3d4f63;--line:#c5d0dc;--accent:#14708f;--accent-soft:#e2f3f8;--accent-deep:#0a4f66;--v1:#0a4f66;--v2:#14708f;--v3:#0d7a5f;--v4:#8a5a12;--ease:cubic-bezier(.4,0,.2,1);--dur:180ms}
 *{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden}
@@ -229,13 +228,10 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
         <div class="kbd-hint">快捷 <kbd>1</kbd>–<kbd>4</kbd> · <kbd>←</kbd><kbd>→</kbd></div>
       </div>
     </div>
-    <div class="view-menu" role="tablist" aria-label="四看板菜单">
-      <button v-for="t in tabs" :key="t.id" type="button" role="tab" :data-view="t.id" :class="{active: view===t.id}" :aria-selected="view===t.id" @click="switchView(t.id)">{{ t.label }}</button>
-    </div>
-    <div class="hint">{{ hint }}</div>
+    <div class="view-menu" role="tablist" aria-label="四看板菜单" id="viewMenu"></div>
+    <div class="hint" id="hint"></div>
   </div>
-  <div class="frame-wrap">
-    <iframe v-for="t in tabs" :key="t.id" :data-view="t.id" :title="t.label" :class="{'is-active': view===t.id, 'is-loading': loading[t.id]}" :src="loaded[t.id] ? frameSrc(t) : 'about:blank'" @load="onFrameLoad(t.id)"></iframe>
+  <div class="frame-wrap" id="frameWrap">
     <div class="foot-mini">数据包：<a href="/member#datapacks">会员中心</a></div>
   </div>
 </div>
@@ -244,33 +240,56 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
   var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1",vertical:"/channel/vertical/?embed=1",cycle:"/channel/report/?embed=1"};
   var TABS=[
     {id:"workbench",label:"1 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
-    {id:"ops",label:"2 比货",hint:"增量短名单 · 销量时间矩阵"},
+    {id:"ops",label:"2 比货",hint:"增量名单 · 销量时间矩阵"},
     {id:"vertical",label:"3 垂类",hint:"垂类多卖家对照 · 云端导航落地"},
     {id:"cycle",label:"4 周期包",hint:"周期报告归档 · 在线看 / zip"}
   ];
   var TAB_IDS=TABS.map(function(t){return t.id});
   var ALIAS={workbench:"workbench",home:"workbench",task:"workbench",ops:"ops",board:"ops",matrix:"ops",vertical:"vertical",niche:"vertical",cycle:"cycle",report:"cycle","1":"workbench","2":"ops","3":"vertical","4":"cycle"};
+  var loaded={},view="workbench",buttons={},frames={};
+  var menu=document.getElementById("viewMenu"),wrap=document.getElementById("frameWrap"),hintEl=document.getElementById("hint");
   function resolveView(raw){var k=String(raw||"").replace(/^#/,"").toLowerCase();return ALIAS[k]||null}
   function initialView(){try{var q=new URLSearchParams(location.search).get("view")||new URLSearchParams(location.search).get("tab");var a=resolveView(q);if(a)return a;var b=resolveView(location.hash);if(b)return b}catch(e){}return "workbench"}
   function isTypingTarget(el){if(!el||!el.tagName)return false;var tag=el.tagName.toUpperCase();return tag==="INPUT"||tag==="TEXTAREA"||tag==="SELECT"||!!el.isContentEditable}
-  var createApp=Vue.createApp,reactive=Vue.reactive,computed=Vue.computed,ref=Vue.ref;
-  createApp({setup:function(){
-    var view=ref(initialView());
-    var loaded=reactive({workbench:false,ops:false,vertical:false,cycle:false});
-    var loading=reactive({workbench:false,ops:false,vertical:false,cycle:false});
-    loaded[view.value]=true;loading[view.value]=true;
-    var hint=computed(function(){var t=TABS.find(function(x){return x.id===view.value});return t?t.hint:""});
-    function frameSrc(t){return PATHS[t.id]||PATHS.workbench}
-    function switchView(id){if(!PATHS[id])id="workbench";view.value=id;if(!loaded[id]){loaded[id]=true;loading[id]=true}try{var url=new URL(location.href);url.searchParams.set("view",id);url.hash="";history.replaceState(null,"",url.toString())}catch(e){}}
-    function stepView(delta){var i=TAB_IDS.indexOf(view.value);if(i<0)i=0;switchView(TAB_IDS[(i+delta+TAB_IDS.length)%TAB_IDS.length])}
-    function onHubKey(e){if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey||isTypingTarget(e.target))return;var k=e.key;if(k>="1"&&k<="4"){var id=ALIAS[k];if(id){e.preventDefault();switchView(id)}return}if(k==="ArrowLeft"){e.preventDefault();stepView(-1);return}if(k==="ArrowRight"){e.preventDefault();stepView(1)}}
-    function bindFrameKeys(id){try{var el=document.querySelector('iframe[data-view="'+id+'"]');if(!el||!el.contentWindow||el.contentWindow.__hubKeysBound)return;el.contentWindow.addEventListener("keydown",onHubKey);el.contentWindow.__hubKeysBound=true}catch(e){}}
-    function onFrameLoad(id){loading[id]=false;bindFrameKeys(id)}
-    switchView(view.value);
-    window.addEventListener("keydown",onHubKey);
-    window.addEventListener("hashchange",function(){var v=resolveView(location.hash);if(v)switchView(v)});
-    return {tabs:TABS,view:view,loaded:loaded,loading:loading,hint:hint,frameSrc:frameSrc,switchView:switchView,onFrameLoad:onFrameLoad};
-  }}).mount("#app");
+  function ensureFrame(id){
+    if(frames[id])return frames[id];
+    var iframe=document.createElement("iframe");
+    iframe.setAttribute("data-view",id);
+    iframe.title=(TABS.find(function(t){return t.id===id})||{}).label||id;
+    iframe.src="about:blank";
+    iframe.addEventListener("load",function(){
+      iframe.classList.remove("is-loading");
+      try{var win=iframe.contentWindow;if(win&&!win.__hubKeysBound){win.addEventListener("keydown",onHubKey);win.__hubKeysBound=true}}catch(e){}
+    });
+    wrap.insertBefore(iframe, wrap.firstChild);
+    frames[id]=iframe;
+    return iframe;
+  }
+  function switchView(id){
+    if(!PATHS[id])id="workbench";
+    view=id;
+    if(!loaded[id]){loaded[id]=true;var fr=ensureFrame(id);fr.classList.add("is-loading");fr.src=PATHS[id]}
+    else{ensureFrame(id)}
+    TAB_IDS.forEach(function(tid){
+      var btn=buttons[tid],fr=frames[tid];
+      if(btn){var on=tid===id;btn.classList.toggle("active",on);btn.setAttribute("aria-selected",on?"true":"false")}
+      if(fr)fr.classList.toggle("is-active",tid===id);
+    });
+    var tab=TABS.find(function(t){return t.id===id});
+    if(hintEl)hintEl.textContent=tab?tab.hint:"";
+    try{var url=new URL(location.href);url.searchParams.set("view",id);url.hash="";history.replaceState(null,"",url.toString())}catch(e){}
+  }
+  function stepView(delta){var i=TAB_IDS.indexOf(view);if(i<0)i=0;switchView(TAB_IDS[(i+delta+TAB_IDS.length)%TAB_IDS.length])}
+  function onHubKey(e){if(e.defaultPrevented||e.altKey||e.ctrlKey||e.metaKey||isTypingTarget(e.target))return;var k=e.key;if(k>="1"&&k<="4"){var id=ALIAS[k];if(id){e.preventDefault();switchView(id)}return}if(k==="ArrowLeft"){e.preventDefault();stepView(-1);return}if(k==="ArrowRight"){e.preventDefault();stepView(1)}}
+  TABS.forEach(function(t){
+    var btn=document.createElement("button");
+    btn.type="button";btn.setAttribute("role","tab");btn.setAttribute("data-view",t.id);btn.textContent=t.label;
+    btn.addEventListener("click",function(){switchView(t.id)});
+    menu.appendChild(btn);buttons[t.id]=btn;
+  });
+  window.addEventListener("keydown",onHubKey);
+  window.addEventListener("hashchange",function(){var v=resolveView(location.hash);if(v)switchView(v)});
+  switchView(initialView());
 })();
 </script>
 </body></html>"""
