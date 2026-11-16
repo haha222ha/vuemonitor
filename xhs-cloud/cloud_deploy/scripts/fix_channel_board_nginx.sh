@@ -96,6 +96,20 @@ fi
 
 grep -n 'channel_board\|takeon_board\|listing_review\|xianyu_board' "$TARGET" | head -40
 
+echo "== 3b) server 级 client_max_body_size（全量看板 zip≈30MB） =="
+if ! grep -qE 'client_max_body_size\s+(6[4-9]|[7-9][0-9]|[1-9][0-9]{2,})m' "$TARGET"; then
+  if grep -q 'client_max_body_size' "$TARGET"; then
+    sed -i -E 's/client_max_body_size[[:space:]]+[0-9]+m;/client_max_body_size 128m;/' "$TARGET"
+  else
+    sed -i '/server_name.*monitor\.xhs365\.cn/a\    client_max_body_size 128m;' "$TARGET" || \
+      sed -i '0,/listen/{s/listen \(80\|443\).*/&\n    client_max_body_size 128m;/}' "$TARGET"
+  fi
+  echo "已设 client_max_body_size 128m"
+else
+  echo "client_max_body_size 已足够大，跳过"
+fi
+grep -n 'client_max_body_size\|channel-board-upload' "$TARGET" /etc/nginx/snippets/channel_board.conf 2>/dev/null | head -20
+
 echo "== 4) 修 sw.js bypass =="
 if [ -f "$SW" ]; then
   cp -a "$SW" "${SW}.bak.$(date +%Y%m%d%H%M%S)"
