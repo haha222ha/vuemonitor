@@ -251,12 +251,12 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
 </div>
 <script>
 (function(){
-  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1",vertical:"/channel/vertical/?embed=1",cycle:"/channel/report/?embed=1"};
+  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1",vertical:"/channel/board/vertical_niche.html?embed=1",cycle:"/channel/board/cycle_static/hub.html?embed=1"};
   var TABS=[
     {id:"workbench",label:"1 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
     {id:"ops",label:"2 比货",hint:"增量名单 · 销量时间矩阵"},
-    {id:"vertical",label:"3 垂类",hint:"垂类多卖家对照 · 云端导航落地"},
-    {id:"cycle",label:"4 周期包",hint:"周期报告归档 · 在线看 / zip"}
+    {id:"vertical",label:"3 垂类",hint:"vertical_snap 静态 · 多卖家对照"},
+    {id:"cycle",label:"4 周期包",hint:"cycle_static 轻包 · 完整 data.js 深链/预览"}
   ];
   var TAB_IDS=TABS.map(function(t){return t.id});
   var ALIAS={workbench:"workbench",home:"workbench",task:"workbench",ops:"ops",board:"ops",matrix:"ops",vertical:"vertical",niche:"vertical",cycle:"cycle",report:"cycle","1":"workbench","2":"ops","3":"vertical","4":"cycle"};
@@ -416,6 +416,21 @@ def _hub_stamp_html() -> str:
 
 
 def _hub_html() -> str:
+    """优先读看板 latest/hub.html（本机 publish 即可改入口）；缺则用内置模板。"""
+    latest_hub = os.path.join(_boards_root(), "latest", "hub.html")
+    if os.path.isfile(latest_hub):
+        try:
+            with open(latest_hub, encoding="utf-8") as f:
+                text = f.read()
+            stamp = _hub_stamp_html()
+            if stamp and "__STAMP__" in text:
+                text = text.replace("__STAMP__", stamp)
+            elif stamp and 'id="hint"' in text and "stamp" not in text[:800].lower():
+                # 静态 hub 无 stamp 槽时不硬塞，避免破坏布局
+                pass
+            return text
+        except Exception:
+            pass
     return _HUB_HTML_TMPL.replace("__STAMP__", _hub_stamp_html())
 
 
@@ -1279,14 +1294,23 @@ def channel_workbench_files(request: Request, path: str = ""):
 
 @router.get("/channel/vertical")
 @router.get("/channel/vertical/")
-def channel_vertical_landing(request: Request):
-    """四看板①：垂类多卖家（云端导航落地；深挖回本机）。"""
+@router.get("/channel/vertical/{path:path}")
+def channel_vertical_landing(request: Request, path: str = ""):
+    """四看板①：垂类多卖家 — 优先最新 vertical_niche.html + vertical_snap。"""
     if not _cookie_ok(request):
         return RedirectResponse(url="/channel/", status_code=302)
-    return HTMLResponse(
-        _vertical_landing_html(),
-        headers={**_NO_STORE, "X-Channel-Board": "1"},
-    )
+    # 兼容旧链：直接 302 到看板静态页（带 snap，不再空壳）
+    rel = (path or "").strip().lstrip("/")
+    if not rel or rel.endswith("/"):
+        target = "/channel/board/vertical_niche.html"
+        q = request.url.query
+        if q:
+            target = f"{target}?{q}"
+        elif (request.query_params.get("embed") or "") == "1":
+            target = f"{target}?embed=1"
+        return RedirectResponse(url=target, status_code=302)
+    # 其余子路径若有人误链，仍回垂类页
+    return RedirectResponse(url="/channel/board/vertical_niche.html", status_code=302)
 
 
 @router.get("/channel/report/{path:path}")
