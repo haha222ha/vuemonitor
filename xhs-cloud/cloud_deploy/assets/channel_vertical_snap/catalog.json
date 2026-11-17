@@ -1,0 +1,209 @@
+{
+  "ok": true,
+  "snap": true,
+  "snap_at": "2026-11-17T17:58:00",
+  "n": 25,
+  "items": [
+    {
+      "niche": "测评",
+      "slug": "测评",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 33,
+      "file": "vertical_snap/测评.json"
+    },
+    {
+      "niche": "拼豆",
+      "slug": "拼豆",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 14,
+      "file": "vertical_snap/拼豆.json"
+    },
+    {
+      "niche": "ChatGPT提示词管理",
+      "slug": "ChatGPT提示词管理",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 26,
+      "file": "vertical_snap/ChatGPT提示词管理.json"
+    },
+    {
+      "niche": "FastGPT搭建",
+      "slug": "FastGPT搭建",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 11,
+      "file": "vertical_snap/FastGPT搭建.json"
+    },
+    {
+      "niche": "本地知识库AI",
+      "slug": "本地知识库AI",
+      "ok": true,
+      "items_n": 49,
+      "sellers_n": 4,
+      "file": "vertical_snap/本地知识库AI.json"
+    },
+    {
+      "niche": "批量处理表格",
+      "slug": "批量处理表格",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 11,
+      "file": "vertical_snap/批量处理表格.json"
+    },
+    {
+      "niche": "批量摘要工具",
+      "slug": "批量摘要工具",
+      "ok": true,
+      "items_n": 69,
+      "sellers_n": 16,
+      "file": "vertical_snap/批量摘要工具.json"
+    },
+    {
+      "niche": "文档结构化解析",
+      "slug": "文档结构化解析",
+      "ok": true,
+      "items_n": 57,
+      "sellers_n": 9,
+      "file": "vertical_snap/文档结构化解析.json"
+    },
+    {
+      "niche": "Dify部署教程",
+      "slug": "Dify部署教程",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 17,
+      "file": "vertical_snap/Dify部署教程.json"
+    },
+    {
+      "niche": "LLM网关",
+      "slug": "LLM网关",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 8,
+      "file": "vertical_snap/LLM网关.json"
+    },
+    {
+      "niche": "OpenRouter",
+      "slug": "OpenRouter",
+      "ok": true,
+      "items_n": 15,
+      "sellers_n": 2,
+      "file": "vertical_snap/OpenRouter.json"
+    },
+    {
+      "niche": "PDF表格提取工具",
+      "slug": "PDF表格提取工具",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 16,
+      "file": "vertical_snap/PDF表格提取工具.json"
+    },
+    {
+      "niche": "PDF转CSV工具",
+      "slug": "PDF转CSV工具",
+      "ok": true,
+      "items_n": 62,
+      "sellers_n": 1,
+      "file": "vertical_snap/PDF转CSV工具.json"
+    },
+    {
+      "niche": "RAGFlow",
+      "slug": "RAGFlow",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 3,
+      "file": "vertical_snap/RAGFlow.json"
+    },
+    {
+      "niche": "标书解析工具",
+      "slug": "标书解析工具",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 20,
+      "file": "vertical_snap/标书解析工具.json"
+    },
+    {
+      "niche": "表格批量AI处理",
+      "slug": "表格批量AI处理",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 16,
+      "file": "vertical_snap/表格批量AI处理.json"
+    },
+    {
+      "niche": "大模型API中转",
+      "slug": "大模型API中转",
+      "ok": true,
+      "items_n": 37,
+      "sellers_n": 2,
+      "file": "vertical_snap/大模型API中转.json"
+    },
+    {
+      "niche": "大模型代理平台",
+      "slug": "大模型代理平台",
+      "ok": true,
+      "items_n": 72,
+      "sellers_n": 25,
+      "file": "vertical_snap/大模型代理平台.json"
+    },
+    {
+      "niche": "电商批量文案生成",
+      "slug": "电商批量文案生成",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 7,
+      "file": "vertical_snap/电商批量文案生成.json"
+    },
+    {
+      "niche": "电商提示词库",
+      "slug": "电商提示词库",
+      "ok": true,
+      "items_n": 15,
+      "sellers_n": 3,
+      "file": "vertical_snap/电商提示词库.json"
+    },
+    {
+      "niche": "批量提取文本",
+      "slug": "批量提取文本",
+      "ok": true,
+      "items_n": 74,
+      "sellers_n": 5,
+      "file": "vertical_snap/批量提取文本.json"
+    },
+    {
+      "niche": "批量文案生成工具",
+      "slug": "批量文案生成工具",
+      "ok": true,
+      "items_n": 0,
+      "sellers_n": 0,
+      "file": "vertical_snap/批量文案生成工具.json"
+    },
+    {
+      "niche": "批量文档解析",
+      "slug": "批量文档解析",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 2,
+      "file": "vertical_snap/批量文档解析.json"
+    },
+    {
+      "niche": "企业文档问答",
+      "slug": "企业文档问答",
+      "ok": true,
+      "items_n": 64,
+      "sellers_n": 5,
+      "file": "vertical_snap/企业文档问答.json"
+    },
+    {
+      "niche": "提示词调试工具",
+      "slug": "提示词调试工具",
+      "ok": true,
+      "items_n": 27,
+      "sellers_n": 5,
+      "file": "vertical_snap/提示词调试工具.json"
+    }
+  ],
+  "note": "垂类静态短名单 · 首屏读 vertical_snap；翻页/新词可降级 API"
+}
