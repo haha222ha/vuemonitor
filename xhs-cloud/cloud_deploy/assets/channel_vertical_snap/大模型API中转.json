@@ -1,0 +1,575 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "大模型API中转"
+    ],
+    "niche": "大模型API中转"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 0,
+    "active_n": 0,
+    "drive_keywords": [
+      "大模型API中转"
+    ],
+    "pinned": [],
+    "candidates": [],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 2,
+    "sku_n": 37,
+    "sum_delta": 136,
+    "median_price": 24.0,
+    "niche": "大模型API中转",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 36,
+      "sum_delta": 136,
+      "sum_sold": 1929,
+      "top_title": "AI大模型课程学习课件",
+      "top_delta": 136
+    },
+    {
+      "store_name": "68b01aede20e2b001554d8b4",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 59,
+      "top_title": "用AI提取屏幕或短信中楼栋、快递柜、取件码的iPhone快捷指令",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a81edd5b7d66f0001e433a8",
+      "title": "AI大模型课程学习课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 1448,
+      "delta": 136,
+      "actual_gr": 10.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a17e8bff78f5c000146c396",
+      "title": "AI产品经理入门公开课2h",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 239,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a70801e89d8ff00012efc88",
+      "title": "AI大模型面试题笔试题RAG面试AI Agent强化学习LLM Deepseek",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.8,
+      "sold": 157,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "69032e721b78790001ae088b",
+      "title": "用AI提取屏幕或短信中楼栋、快递柜、取件码的iPhone快捷指令",
+      "store_name": "68b01aede20e2b001554d8b4",
+      "store_id": "68b01aede20e2b001554d8b4",
+      "price": 7.9,
+      "sold": 59,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "685bd0c07590770001aa6bdf",
+      "title": "AI大模型全套面试题，带你搞定面试难题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 30,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "68d7bb314daabe00014099d1",
+      "title": "OpenAI Triton自制类vLLM大模型推理框架",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 499.0,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6aa3c38af5fcb10001bf04f0",
+      "title": "Rekep算法（IsaacSim仿真下用多模态大模型控制机械臂）视频+文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 752.15,
+      "sold": 14,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a604edbe3af990015b03182",
+      "title": "AI漫剧工作流comfyui远程部署AI真人漫剧工教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.0,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "683174f6beccb1001598f287",
+      "title": "deepseek版安卓苹果ai大型模型深度思考本地部署",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a6f220ce179b500014d5a82",
+      "title": "Workbuddy接入Agnes模型保姆级手册",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "67345c5134179e0001b7012c",
+      "title": "(02)超越智能：大模型的力量与未来",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "68ff77d5ae1c17000115e03e",
+      "title": "AI大模型PC端12页项目实战对话式AI大模型交互高保真原型图RP文件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.66,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a41d282c4c16c0001f39023",
+      "title": "AI大模型面试内参",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 129.0,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a50b177e371ff0001edc749",
+      "title": "《EmbodiedGPT具身多模态大模型架构与评测》",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "69a6c857c0b0790015a4d47f",
+      "title": "liblib哩布哩布ai教.程电商s课.程LORA模型训练工作流SD+ComfyUl",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a65a594884646000118f9f5",
+      "title": "deepseek API使用教程课件，有问必回包售后",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a35a7389d3bb600010dd75f",
+      "title": "ai大模型人工智能课程零基础入门到精通Agent智能体开发实战教程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.32,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a474a9277049500153faf00",
+      "title": "Web API设计原则通过API和微服务实现价值交付（美）詹姆斯·希",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 80.88,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a54ee6b7308b500016fbe9c",
+      "title": "《CUDA Occupancy API与动态共享内存配置》",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 99.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a56ff2b01c1af00017418ee",
+      "title": "优秀大模型AI开发简历和大模型项目难亮点实践",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a7142beb847760015e7effd",
+      "title": "2025comfyui整合包秋叶安装赠sdxl模型lora模型comfyui教程资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.55,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6aa6a44edcf5ff0001c46d40",
+      "title": "数学建模AI资料包 13技能15脚本案例 大学生竞赛必备",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "684f8d5ee17b8a0001c014c0",
+      "title": "鸿蒙项目界面，arkts语言，api12，无数据库逻辑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "685cfecc835e2500015137bc",
+      "title": "【官方正版】API设计模式",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 102.4,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "68b2ce423f78410001fbfee8",
+      "title": "漫爵 OpenAI API 开发手册 旗标 施威铭研究室 台版图书 进口原版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 166.84,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "68c3c350c728400001cc8b91",
+      "title": "AI大模型实战课程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1080.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "68f8bc854a000000018ce6a4",
+      "title": "2025年 端侧AI 大模型 Lot Ai硬件专题市场研究分析行业报告合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "695bd9aa44a5020001dd437e",
+      "title": "AI大模型学习资料全集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6974567feb0d9a00014e449a",
+      "title": "SpaceX REST API 用于发射、火箭、核心、太空舱、星链、发射台开",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6979d07bc3771c0015380c48",
+      "title": "API设计模式 软硬件技术",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 83.1,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "697c92bb78d8d5000125f2dc",
+      "title": "AI大模型实战课程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "698f614df89e9d00155b602c",
+      "title": "精通API架构 设计、运维与演进 网络技术",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 59.4,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "69e3a27bd528ea001531ad96",
+      "title": "AI人工智能技术LLM大模型DeepSeek智能客服数字化转型解决方案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "69ed9a54bd8c35000123cb83",
+      "title": "AI人工智能大模型应用场景转型AIGC行业产业发展数字员工应用框架",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a05b904721fd30001856827",
+      "title": "博学谷AI大模型训练营 三期，视频+资料齐全",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a0816217b0d9c0001996973",
+      "title": "丁师兄AI大模型训练营课程，无加密，已完结，",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 23.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    },
+    {
+      "goods_id": "6a0bc63a87c1860015a78b17",
+      "title": "大模型工程化 AI驱动下的数据体系 数据库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 61.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型API中转"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "大模型API中转",
+  "slug": "大模型API中转"
+}

@@ -1,0 +1,1586 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "考研"
+    ],
+    "niche": "考研"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 23,
+    "active_n": 23,
+    "drive_keywords": [
+      "AI考研",
+      "工作考研",
+      "考研冲刺",
+      "考研复习计划",
+      "考研政治素材",
+      "考研8电子资料",
+      "2025考研网课",
+      "考研课件电子资料",
+      "考研政治电子资料",
+      "控制原理考研资料",
+      "历年考研电子资料",
+      "考研信息差电子资料",
+      "考研法硕刷题电子资料",
+      "考研数学必备电子资料",
+      "考研阅读中背单词·通",
+      "考研择校择专业数据解",
+      "考研政治刷题电子资料",
+      "全套考研冲刺电子资料",
+      "全套考研复试电子资料",
+      "考研英语 模板电子资料",
+      "考研英语思维导图刷题包",
+      "全套考研PDF电子资料",
+      "考研英语各题型课程电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "AI考研",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "value_mining_opt_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "工作考研",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "vm_sa_remain_20261013_224711",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研冲刺",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "yield_top1000_15d|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_kw_cross_opt_demote",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研复习计划",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研政治素材",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "恢复831拓展·每日main合并周期|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研8电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "report_dir_fill_20261009_175658",
+        "role": "candidate"
+      },
+      {
+        "keyword": "2025考研网课",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "热库全量48日报告抽词精炼（全库非近3日） | scrub_wangke_20260902",
+        "source": "virt_kw_ledger_boost",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研课件电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研政治电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "控制原理考研资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "value_mining_opt_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "历年考研电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_outside_probe_yield_20260812",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研信息差电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "all_reports_dir_fill_20261009_185652",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研法硕刷题电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_saas_tier_delta_core_20260812",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研数学必备电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "report_dir_fill_20261009_175658",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研阅读中背单词·通",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "补齐每日主队列至3000·20260901|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研择校择专业数据解",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研政治刷题电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_saas_tier_delta_core_20260812",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "全套考研冲刺电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_saas_tier_delta_core_20260812",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "全套考研复试电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研英语 模板电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研英语思维导图刷题包",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "longtail_from:考研英语思维导图|exam_kaoyan_gongkao|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "yield_rank_fill_20261009_114352",
+        "role": "candidate"
+      },
+      {
+        "keyword": "全套考研PDF电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "日增Top1000清洗·虚拟方向词·去券去重|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_kw_cross_opt_demote",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研英语各题型课程电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "report_dir_fill_20261009_175658",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 26,
+    "sku_n": 80,
+    "sum_delta": 110005,
+    "median_price": 4.5,
+    "niche": "考研",
+    "drive_kw_n": 23
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 53,
+      "sum_delta": 84007,
+      "sum_sold": 741003,
+      "top_title": "古早萌少女oc盲盒ppl 狸猫牌（头像壁纸）",
+      "top_delta": 4666
+    },
+    {
+      "store_name": "元气小桃兔兔冲考研的店",
+      "sku_n": 2,
+      "sum_delta": 2000,
+      "sum_sold": 34000,
+      "top_title": "28/29考研双非择校211择校择专业全程解析",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "考研择校宝的店",
+      "sku_n": 2,
+      "sum_delta": 2000,
+      "sum_sold": 22000,
+      "top_title": "考研历年真题考研英语考研数学考研政治199管综408计算机等",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "等双休的派大星的店",
+      "sku_n": 1,
+      "sum_delta": 1785,
+      "sum_sold": 5730,
+      "top_title": "RPI恋爱占有欲指数双视角性格分析测试",
+      "top_delta": 1785
+    },
+    {
+      "store_name": "糯米罐头的店",
+      "sku_n": 1,
+      "sum_delta": 1674,
+      "sum_sold": 9967,
+      "top_title": "【原创】你体内藏着哪种危险人格？趣味娱乐问答",
+      "top_delta": 1674
+    },
+    {
+      "store_name": "6846f25658fd850015aa7a1f",
+      "sku_n": 1,
+      "sum_delta": 1530,
+      "sum_sold": 8248,
+      "top_title": "2027小黑政治理论+常识判断全家桶公考事业编三支一扶【送网课】",
+      "top_delta": 1530
+    },
+    {
+      "store_name": "62651dfa82ea840001cee907",
+      "sku_n": 1,
+      "sum_delta": 1116,
+      "sum_sold": 2894,
+      "top_title": "靳焕一老师一心刷考点讲义",
+      "top_delta": 1116
+    },
+    {
+      "store_name": "渡研择校规划的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 13000,
+      "top_title": "全国硕士院校拟录取名单复试名单分数线专业目录",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "四海公考的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 13000,
+      "top_title": "【仅题本无解析】资料分析600题 | 公考国省考事业单位行测",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "炒粉炒面翻译的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 26000,
+      "top_title": "【英硕自制】27考研英语作文模板（原创）（电子资料拍下不退不换",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "说瘦就瘦的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 26000,
+      "top_title": "27考研英语外刊 精读笔记句式模板",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "凑和开个店吧的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 36000,
+      "top_title": "2026新款海怪 吹石 东东 procreatePS画世界pro天生会画全套笔刷",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "千帆丨图书的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 35000,
+      "top_title": "《公考特刊》27国省考事业编 人民时评 时政 热点 申论 合订本",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "华图的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 31000,
+      "top_title": "27年新版李梦娇11.0常识速记口诀88条公务员事业单位考试专用书",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "考编小布丁的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 31000,
+      "top_title": "【日更+秒发】26，27年考公考编/国央企/高校/教师招聘信息汇总表",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "性格探索屋的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 31000,
+      "top_title": "你最像哪个历史人物测评链接模板  在线测试 自动发货",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "浮云的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 27000,
+      "top_title": "你体内藏着哪种罪恶or美德倾向？七宗罪VS七美德测试报告模板",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "高途英语的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 19000,
+      "top_title": "4天成人英语口语直播方法课+【日常口语1200句】实体书",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "657a9c83e48da4000175fd93",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 18000,
+      "top_title": "全部胶片滤镜丨照片视频实况胶片滤镜氛围感调色预设素材模板",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "夏小小不打烊的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 18000,
+      "top_title": "2026年考英语四六级（真题+解析+音频）电子PDF百度网盘",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "学姐的资料库",
+      "sku_n": 1,
+      "sum_delta": 560,
+      "sum_sold": 6371,
+      "top_title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "top_delta": 560
+    },
+    {
+      "store_name": "学姐的资料库的店",
+      "sku_n": 1,
+      "sum_delta": 545,
+      "sum_sold": 6378,
+      "top_title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "top_delta": 545
+    },
+    {
+      "store_name": "一二在读研的店",
+      "sku_n": 1,
+      "sum_delta": 512,
+      "sum_sold": 3516,
+      "top_title": "27考研英语大小作文高分万能填词模板_英二英一通用_含主题词预测",
+      "top_delta": 512
+    },
+    {
+      "store_name": "背背备考的店",
+      "sku_n": 1,
+      "sum_delta": 468,
+      "sum_sold": 1910,
+      "top_title": "考研政治历年真题及答案解析（1994-2026）电子资源",
+      "top_delta": 468
+    },
+    {
+      "store_name": "月亮不打烊吖的店",
+      "sku_n": 1,
+      "sum_delta": 441,
+      "sum_sold": 9870,
+      "top_title": "A3思维导图草稿纸横线本可撕横板考研学生拍纸本",
+      "top_delta": 441
+    },
+    {
+      "store_name": "693ced641d8c99001576ea05",
+      "sku_n": 1,
+      "sum_delta": 367,
+      "sum_sold": 3588,
+      "top_title": "考研历年真题考研英语考研数学考研政治199管综408计算机306西综",
+      "top_delta": 367
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "681d7c4e81f9bc0001469217",
+      "title": "全国硕士院校拟录取名单复试名单分数线专业目录",
+      "store_name": "渡研择校规划的店",
+      "store_id": "67c7cbf6295b0300157d1cc0",
+      "price": 3.0,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研法硕刷题电子资料",
+        "全套考研PDF电子资料",
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "65a22d134207d30001c83398",
+      "title": "2027考研英语真题英语一英语二历年真题试卷管综西综数学政治刷题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.8,
+      "sold": 55000,
+      "delta": 1000,
+      "actual_gr": 1.85,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研冲刺",
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "68006b41a7524b0001e4f7d5",
+      "title": "28/29考研双非择校211择校择专业全程解析",
+      "store_name": "元气小桃兔兔冲考研的店",
+      "store_id": "6784ce76a3b2f900153ae860",
+      "price": 4.0,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研英语 模板电子资料",
+        "全套考研复试电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aba31abfe948000016cdece",
+      "title": "27版考研英语词汇资料包（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研阅读中背单词·通",
+        "考研择校择专业数据解"
+      ]
+    },
+    {
+      "goods_id": "6aac161c15012e000167c4bd",
+      "title": "27高照理论3+2资料分析夸夸刷资料分析超大杯资料分析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.66,
+      "sold": 6834,
+      "delta": 1868,
+      "actual_gr": 37.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研课件电子资料",
+        "考研阅读中背单词·通"
+      ]
+    },
+    {
+      "goods_id": "68f58d83ae1c170001b4149d",
+      "title": "【仅题本无解析】资料分析600题 | 公考国省考事业单位行测",
+      "store_name": "四海公考的店",
+      "store_id": "664ae528a57f5800010ebd8a",
+      "price": 13.2,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2025考研网课",
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "6826e8a3d6ff4d00011e06ea",
+      "title": "《初中数学低分重建》 基础知识+案例题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.0,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研课件电子资料",
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a80456a09b4f200017fd94d",
+      "title": "初中阅读理解必备 《核心考点每日一练》《答题模板每日一背》",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 38.0,
+      "sold": 2794,
+      "delta": 377,
+      "actual_gr": 15.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研英语 模板电子资料",
+        "考研英语思维导图刷题包"
+      ]
+    },
+    {
+      "goods_id": "6ab939767dbca2000120f87b",
+      "title": "2026新版初一小四门电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.9,
+      "sold": 1999,
+      "delta": 370,
+      "actual_gr": 22.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研数学必备电子资料",
+        "全套考研复试电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a54a84e7308b50001684cd3",
+      "title": "27版考研英语词汇资料包（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 12000,
+      "delta": 2000,
+      "actual_gr": 20.0,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研英语思维导图刷题包"
+      ]
+    },
+    {
+      "goods_id": "6a54a84e7308b50001684cf7",
+      "title": "27版考研英语词汇资料包（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 12000,
+      "delta": 2000,
+      "actual_gr": 20.0,
+      "token_hits": 1,
+      "touch_keywords": [
+        "AI考研"
+      ]
+    },
+    {
+      "goods_id": "691b29b9e8b9d4000173e87f",
+      "title": "【英硕自制】27考研英语作文模板（原创）（电子资料拍下不退不换",
+      "store_name": "炒粉炒面翻译的店",
+      "store_id": "66b1f4e868165d001669782c",
+      "price": 9.99,
+      "sold": 26000,
+      "delta": 1000,
+      "actual_gr": 4.0,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研英语 模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "689c59950991b400011e4e39",
+      "title": "27考研英语外刊 精读笔记句式模板",
+      "store_name": "说瘦就瘦的店",
+      "store_id": "65fbe060dbd5d90001346b0e",
+      "price": 38.0,
+      "sold": 26000,
+      "delta": 1000,
+      "actual_gr": 4.0,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研择校择专业数据解"
+      ]
+    },
+    {
+      "goods_id": "6ad1e6b2b7c60900017a2bce",
+      "title": "【扇贝考研会员】考研英语政治数学专业课题库带背刷题批改",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 45.0,
+      "sold": 18000,
+      "delta": 1000,
+      "actual_gr": 5.88,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研课件电子资料"
+      ]
+    },
+    {
+      "goods_id": "68006b41a7524b0001e4f7d8",
+      "title": "28/29考研双非择校211择校择专业全程解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研课件电子资料"
+      ]
+    },
+    {
+      "goods_id": "682997c847f0f10001608e2f",
+      "title": "28/29考研双非择校211择校择专业全程解析",
+      "store_name": "元气小桃兔兔冲考研的店",
+      "store_id": "6784ce76a3b2f900153ae860",
+      "price": 4.0,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 1,
+      "touch_keywords": [
+        "历年考研电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a54a84e7308b50001684cfa",
+      "title": "27版考研英语词汇资料包（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a57479211bb8700013052e1",
+      "title": "27考研政治刷题小程序  含肖1000徐腿苏米孔张等18位名师习题笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研法硕刷题电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a54a84e7308b50001684cf4",
+      "title": "27版考研英语词汇资料包（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研8电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a54a84e7308b50001684cee",
+      "title": "27版考研英语词汇资料包（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 1,
+      "touch_keywords": [
+        "全套考研PDF电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9984976b3996000148840a",
+      "title": "27版考研英语词汇资料包（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 1,
+      "touch_keywords": [
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "6936943b02483f0001246930",
+      "title": "考研历年真题考研英语考研数学考研政治199管综408计算机等",
+      "store_name": "考研择校宝的店",
+      "store_id": "68ac25d4b9e5490015ae3f44",
+      "price": 1.8,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a54a84e7308b50001684d09",
+      "title": "27版考研英语词汇资料包（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 1,
+      "touch_keywords": [
+        "AI考研"
+      ]
+    },
+    {
+      "goods_id": "6936943b02483f0001246933",
+      "title": "考研历年真题考研英语考研数学考研政治199管综408计算机等",
+      "store_name": "考研择校宝的店",
+      "store_id": "68ac25d4b9e5490015ae3f44",
+      "price": 1.8,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 1,
+      "touch_keywords": [
+        "全套考研复试电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a93f84628ea59000118bbf7",
+      "title": "27考研英语速成笔记电子版pdf（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 3964,
+      "delta": 829,
+      "actual_gr": 26.44,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研复习计划"
+      ]
+    },
+    {
+      "goods_id": "6ad03cfbf010070001b8ecf2",
+      "title": "【扇贝考研作文批改】30天无限次！英语作文拍照批改纠错润色素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 1141,
+      "delta": 605,
+      "actual_gr": 112.87,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "688128764f80eb00012cc76c",
+      "title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "store_name": "学姐的资料库",
+      "store_id": "66f59ab9a9bf3400163b0b7d",
+      "price": 1.99,
+      "sold": 6371,
+      "delta": 560,
+      "actual_gr": 9.64,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研英语思维导图刷题包"
+      ]
+    },
+    {
+      "goods_id": "6a3a2121e503360001eb91e6",
+      "title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "store_name": "学姐的资料库的店",
+      "store_id": "66f59ab9a9bf3400163b0b7d",
+      "price": 1.99,
+      "sold": 6378,
+      "delta": 545,
+      "actual_gr": 9.34,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研政治刷题电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a70a405de083800013dda74",
+      "title": "27考研英语大小作文高分万能填词模板_英二英一通用_含主题词预测",
+      "store_name": "一二在读研的店",
+      "store_id": "699dad9ff7d76900151fa4d1",
+      "price": 19.9,
+      "sold": 3516,
+      "delta": 512,
+      "actual_gr": 17.04,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研英语思维导图刷题包"
+      ]
+    },
+    {
+      "goods_id": "6a63139024f0440001b75bd5",
+      "title": "考研政治历年真题及答案解析（1994-2026）电子资源",
+      "store_name": "背背备考的店",
+      "store_id": "6a2ac277bf130800158a46a5",
+      "price": 0.9,
+      "sold": 1910,
+      "delta": 468,
+      "actual_gr": 32.45,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e798adf9b6f10001212de9",
+      "title": "A3思维导图草稿纸横线本可撕横板考研学生拍纸本",
+      "store_name": "月亮不打烊吖的店",
+      "store_id": "69beb4c3bdd3cd00152bce8e",
+      "price": 8.9,
+      "sold": 9870,
+      "delta": 441,
+      "actual_gr": 4.68,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研英语思维导图刷题包"
+      ]
+    },
+    {
+      "goods_id": "6a979a125e65130001e66545",
+      "title": "考研雅思四六级高中英语原创故事带音频背单词多端同步网页版课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 924,
+      "delta": 438,
+      "actual_gr": 90.12,
+      "token_hits": 1,
+      "touch_keywords": [
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d65471da5d200001c93a1e",
+      "title": "考研历年真题考研英语考研数学考研政治199管综408计算机306西综",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 3587,
+      "delta": 384,
+      "actual_gr": 11.99,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研法硕刷题电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5e1e3c24f04400013f4d25",
+      "title": "英二考研作文万能模板，大小作文一篇搞定所有类型，只需填主题词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 865,
+      "delta": 380,
+      "actual_gr": 78.35,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研英语 模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d65471da5d200001c939fa",
+      "title": "考研历年真题考研英语考研数学考研政治199管综408计算机306西综",
+      "store_name": "693ced641d8c99001576ea05",
+      "store_id": "693ced641d8c99001576ea05",
+      "price": 1.0,
+      "sold": 3588,
+      "delta": 367,
+      "actual_gr": 11.39,
+      "token_hits": 1,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "6accbbc75fb71500019a77a0",
+      "title": "古早萌少女oc盲盒ppl 狸猫牌（头像壁纸）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 8309,
+      "delta": 4666,
+      "actual_gr": 128.08,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研英语思维导图刷题包"
+      ]
+    },
+    {
+      "goods_id": "6abd0673bb8a9a00015c9ae3",
+      "title": "27全新大小作文速成模板&翻译指南（小众，原创，旱区高分）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 4569,
+      "delta": 3266,
+      "actual_gr": 250.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ac25dc7018c6a0001eb57d7",
+      "title": "狸猫牌oc盲盒可爱白菜[自己取图 不可退换]头像壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 8695,
+      "delta": 3248,
+      "actual_gr": 59.63,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d5c4fa10b42d000171cb9f",
+      "title": "修图p图婚纱照精修摄影写真情侣旅游跟拍照专业人像精修psd模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.5,
+      "sold": 104000,
+      "delta": 3000,
+      "actual_gr": 2.97,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研政治刷题电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9d14fa5152e50001203e03",
+      "title": "原创定制水印头像壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.5,
+      "sold": 30000,
+      "delta": 3000,
+      "actual_gr": 11.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研政治电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7b00b2c9142a00017078b3",
+      "title": "ins拉丝手写水印壁纸 下单前请看详情页",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.5,
+      "sold": 28000,
+      "delta": 3000,
+      "actual_gr": 12.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab75cfe7e1073000193a7e1",
+      "title": "性格测试CP匹配测试趣味测试城市测试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 11000,
+      "delta": 2755,
+      "actual_gr": 33.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "历年考研电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab4293b57ccfc00018d4fd8",
+      "title": "26年12月四六级备考资料  四六级真题+解析+听力+词汇+作文+翻译",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 6202,
+      "delta": 2480,
+      "actual_gr": 66.63,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab4293b57ccfc00018d4fc9",
+      "title": "26年12月四六级备考资料  四六级真题+解析+听力+词汇+作文+翻译",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 6279,
+      "delta": 2466,
+      "actual_gr": 64.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研阅读中背单词·通"
+      ]
+    },
+    {
+      "goods_id": "6aa66c857116f00001b2f27b",
+      "title": "26秋一年级上册语文单元测试卷 期中测试卷 期末测试卷pdf电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 3902,
+      "delta": 2385,
+      "actual_gr": 157.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研英语 模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6c46bdcef2250001b2633d",
+      "title": "2027小黑政治理论常识判断速学冲刺 上岸村强化500题 专项十套卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.4,
+      "sold": 2763,
+      "delta": 2243,
+      "actual_gr": 431.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研阅读中背单词·通"
+      ]
+    },
+    {
+      "goods_id": "69aa4b331166fe0001645264",
+      "title": "过刊杂志清仓2024年小国学 少年版 作文素材 中小学生课外阅读",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.8,
+      "sold": 3957,
+      "delta": 2145,
+      "actual_gr": 118.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a97142c8443c40001271e2d",
+      "title": "2027小黑政治理论+常识判断全家桶公考事业编三支一扶【送网课】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 8194,
+      "delta": 2123,
+      "actual_gr": 34.97,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研阅读中背单词·通"
+      ]
+    },
+    {
+      "goods_id": "6ab0dce9dea5ea00010e45b3",
+      "title": "你体内藏着哪种危险人格？危险人格个性化网页报告课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.97,
+      "sold": 7381,
+      "delta": 2086,
+      "actual_gr": 39.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "历年考研电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab24834a0b6bb0001c2e8c6",
+      "title": "【升级版】2026动物塑测试12种动物原型性格测试挖掘真实色彩",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 9040,
+      "delta": 2039,
+      "actual_gr": 29.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "历年考研电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a054e365a83230001dfb608",
+      "title": "2026初一初二初三学习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 48000,
+      "delta": 2000,
+      "actual_gr": 4.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "全套考研复试电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0595d2213e27000158d2b3",
+      "title": "2026秋小学语文阅读理解答题模板/技巧训练/配套练习/电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 14000,
+      "delta": 2000,
+      "actual_gr": 16.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "692ebfe4d4363c0001059774",
+      "title": "新版初一精品练习题电子资料包，最新教程版本，永久免费更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 13000,
+      "delta": 2000,
+      "actual_gr": 18.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研政治素材"
+      ]
+    },
+    {
+      "goods_id": "6a58df6c01c1af00019fe6d2",
+      "title": "2026年中级经济师教科书经济基础金融工商人力建筑财税教材真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 38.0,
+      "sold": 2965,
+      "delta": 1947,
+      "actual_gr": 191.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2025考研网课"
+      ]
+    },
+    {
+      "goods_id": "6ab3e157918e030001b6fecb",
+      "title": "性格城市匹配趣味测试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 2583,
+      "delta": 1908,
+      "actual_gr": 282.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "历年考研电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4afdddfcf4ce0001785558",
+      "title": "RPI恋爱占有欲指数双视角性格分析测试",
+      "store_name": "等双休的派大星的店",
+      "store_id": "697e8b34c8d10300150edd2f",
+      "price": 0.85,
+      "sold": 5730,
+      "delta": 1785,
+      "actual_gr": 45.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "历年考研电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6af8d0def92a00016badd0",
+      "title": "【原创】你体内藏着哪种危险人格？趣味娱乐问答",
+      "store_name": "糯米罐头的店",
+      "store_id": "6a685e9d61e7180015a892a5",
+      "price": 1.98,
+      "sold": 9967,
+      "delta": 1674,
+      "actual_gr": 20.19,
+      "token_hits": 0,
+      "touch_keywords": [
+        "历年考研电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a60e5a88846460001b35892",
+      "title": "2027省考申论大作文-各省本土特色案例写作素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 6743,
+      "delta": 1601,
+      "actual_gr": 31.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a27ab412055620001a0a5fa",
+      "title": "2027小黑政治理论+常识判断全家桶公考事业编三支一扶【送网课】",
+      "store_name": "6846f25658fd850015aa7a1f",
+      "store_id": "6846f25658fd850015aa7a1f",
+      "price": 28.8,
+      "sold": 8248,
+      "delta": 1530,
+      "actual_gr": 22.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa8f20ba0b6bb0001a2ff47",
+      "title": "【2027国省考】花生笔记总结本逻辑判断推理数量资料分析笔记总结",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.8,
+      "sold": 4813,
+      "delta": 1261,
+      "actual_gr": 35.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研课件电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a66b6ce11bb87000113145a",
+      "title": "靳焕一老师一心刷考点讲义",
+      "store_name": "62651dfa82ea840001cee907",
+      "store_id": "62651dfa82ea840001cee907",
+      "price": 0.1,
+      "sold": 2894,
+      "delta": 1116,
+      "actual_gr": 62.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2025考研网课"
+      ]
+    },
+    {
+      "goods_id": "6abb1336918e030001148d2c",
+      "title": "27国考超格早自习政治理论笔记合集pdf（非常详细，24h内更新）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2676,
+      "delta": 1080,
+      "actual_gr": 67.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研8电子资料"
+      ]
+    },
+    {
+      "goods_id": "69de811ccaa21f0001ea5cce",
+      "title": "小学1-6年级道德与法治知识点汇总/课件/教案/PPT/一课一练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 7921,
+      "delta": 1035,
+      "actual_gr": 15.03,
+      "token_hits": 0,
+      "touch_keywords": [
+        "工作考研"
+      ]
+    },
+    {
+      "goods_id": "6a82cab40020da00016672cb",
+      "title": "【前1000单22.9】高频8000外贸商务英语词汇随身带外教朗读音频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.9,
+      "sold": 1903,
+      "delta": 1022,
+      "actual_gr": 116.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研阅读中背单词·通"
+      ]
+    },
+    {
+      "goods_id": "69a6d9162b49ce000162cda9",
+      "title": "2026新款海怪 吹石 东东 procreatePS画世界pro天生会画全套笔刷",
+      "store_name": "凑和开个店吧的店",
+      "store_id": "69a68f52bd117d001533402f",
+      "price": 6.9,
+      "sold": 36000,
+      "delta": 1000,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研政治电子资料"
+      ]
+    },
+    {
+      "goods_id": "68416d84e9389a0001486733",
+      "title": "2026秋季新版一二三四五六上语文单元专项期中期末复习课件资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.8,
+      "sold": 36000,
+      "delta": 1000,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "工作考研"
+      ]
+    },
+    {
+      "goods_id": "6986fb427db7d2000142d58b",
+      "title": "《公考特刊》27国省考事业编 人民时评 时政 热点 申论 合订本",
+      "store_name": "千帆丨图书的店",
+      "store_id": "686f28b1676f970015e5f06d",
+      "price": 36.0,
+      "sold": 35000,
+      "delta": 1000,
+      "actual_gr": 2.94,
+      "token_hits": 0,
+      "touch_keywords": [
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "656e988fa34f28000132d952",
+      "title": "27年新版李梦娇11.0常识速记口诀88条公务员事业单位考试专用书",
+      "store_name": "华图的店",
+      "store_id": "6565b2c44a0cd60001ab5214",
+      "price": 9.9,
+      "sold": 31000,
+      "delta": 1000,
+      "actual_gr": 3.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a7d6012b49ce0001770a15",
+      "title": "【日更+秒发】26，27年考公考编/国央企/高校/教师招聘信息汇总表",
+      "store_name": "考编小布丁的店",
+      "store_id": "69a6688fa786a000159ef56d",
+      "price": 4.9,
+      "sold": 31000,
+      "delta": 1000,
+      "actual_gr": 3.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5f08ab8c0a3e000174177d",
+      "title": "27年新版李梦娇11.0常识速记口诀88条公务员事业单位考试专用书",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 46.8,
+      "sold": 31000,
+      "delta": 1000,
+      "actual_gr": 3.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "工作考研"
+      ]
+    },
+    {
+      "goods_id": "68e91f4217d80800018d8c36",
+      "title": "你最像哪个历史人物测评链接模板  在线测试 自动发货",
+      "store_name": "性格探索屋的店",
+      "store_id": "67a85110b16a06001560af75",
+      "price": 0.99,
+      "sold": 31000,
+      "delta": 1000,
+      "actual_gr": 3.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研数学必备电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7092ab2bf2dc00013c111c",
+      "title": "你体内藏着哪种罪恶or美德倾向？七宗罪VS七美德测试报告模板",
+      "store_name": "浮云的店",
+      "store_id": "69ac1cd480ebb10015869af1",
+      "price": 0.99,
+      "sold": 27000,
+      "delta": 1000,
+      "actual_gr": 3.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研8电子资料"
+      ]
+    },
+    {
+      "goods_id": "68bed47cf38f970001d8c3d3",
+      "title": "2026电子版初一初二初三语文数学英语生物化史地道法知识点",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.7,
+      "sold": 26000,
+      "delta": 1000,
+      "actual_gr": 4.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "全套考研复试电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ccc08bfb0cef00013d20db",
+      "title": "每日30分钟小学英语阅读118篇小学3-6年级英语课外阅读书",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 23000,
+      "delta": 1000,
+      "actual_gr": 4.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研阅读中背单词·通"
+      ]
+    },
+    {
+      "goods_id": "666d86af7d94b20001e7a20a",
+      "title": "4天成人英语口语直播方法课+【日常口语1200句】实体书",
+      "store_name": "高途英语的店",
+      "store_id": "65095a39796c030001e1c900",
+      "price": 6.0,
+      "sold": 19000,
+      "delta": 1000,
+      "actual_gr": 5.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1e78d9c40951000167f7cf",
+      "title": "全部胶片滤镜丨照片视频实况胶片滤镜氛围感调色预设素材模板",
+      "store_name": "657a9c83e48da4000175fd93",
+      "store_id": "657a9c83e48da4000175fd93",
+      "price": 4.99,
+      "sold": 18000,
+      "delta": 1000,
+      "actual_gr": 5.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研英语思维导图刷题包"
+      ]
+    },
+    {
+      "goods_id": "69664101eb2ffb0001aa39db",
+      "title": "2026年考英语四六级（真题+解析+音频）电子PDF百度网盘",
+      "store_name": "夏小小不打烊的店",
+      "store_id": "693ced641d8c99001576ea05",
+      "price": 1.0,
+      "sold": 18000,
+      "delta": 1000,
+      "actual_gr": 5.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研阅读中背单词·通"
+      ]
+    },
+    {
+      "goods_id": "663f2ca58953a50001cd96cc",
+      "title": "（初中/高中）英语教资面试/笔试（逐字稿+知识点+思维导图）PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "全套考研冲刺电子资料"
+      ]
+    },
+    {
+      "goods_id": "68a456ea1745f6000118eaa8",
+      "title": "（初中/高中）英语教资面试/笔试（逐字稿+知识点+思维导图）PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 66.88,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研英语思维导图刷题包"
+      ]
+    },
+    {
+      "goods_id": "6a11686d69ff6a0001681b64",
+      "title": "小学1-6年级全科电子版教材辅导学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研课件电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "考研",
+  "slug": "考研"
+}

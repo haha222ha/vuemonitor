@@ -1,0 +1,1330 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "标书解析工具"
+    ],
+    "niche": "标书解析工具"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "标书解析工具电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "标书解析工具电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "cycle_kw_optimize_20261009_111339",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 20,
+    "sku_n": 80,
+    "sum_delta": 797,
+    "median_price": 5.99,
+    "niche": "标书解析工具",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 58,
+      "sum_delta": 670,
+      "sum_sold": 110395,
+      "top_title": "链条发光中文字素水印背景图壁纸",
+      "top_delta": 131
+    },
+    {
+      "store_name": "CareerNaming的店",
+      "sku_n": 1,
+      "sum_delta": 39,
+      "sum_sold": 127,
+      "top_title": "英文名英文名起名丨含电子版",
+      "top_delta": 39
+    },
+    {
+      "store_name": "命名星野的店",
+      "sku_n": 1,
+      "sum_delta": 25,
+      "sum_sold": 500,
+      "top_title": "英文名取名·英文名定制·个性化英文名定制",
+      "top_delta": 25
+    },
+    {
+      "store_name": "重组设计",
+      "sku_n": 1,
+      "sum_delta": 12,
+      "sum_sold": 244,
+      "top_title": "超全中英文字体排版模板壁纸电脑手机聊天背景图合集",
+      "top_delta": 12
+    },
+    {
+      "store_name": "66ea6e0ce5994b0016f75f58",
+      "sku_n": 1,
+      "sum_delta": 11,
+      "sum_sold": 644,
+      "top_title": "英文手稿笔刷ps天生会画世界procreate手写签名花体水印手帐",
+      "top_delta": 11
+    },
+    {
+      "store_name": "择校调剂宝的店",
+      "sku_n": 1,
+      "sum_delta": 10,
+      "sum_sold": 226,
+      "top_title": "314数学农真题考研真题考研必备314数农真题",
+      "top_delta": 10
+    },
+    {
+      "store_name": "艾创素材的店",
+      "sku_n": 2,
+      "sum_delta": 8,
+      "sum_sold": 459,
+      "top_title": "Procreate手写英文字体包下载飘逸纤细连笔婚礼ps艺术字库合集ai",
+      "top_delta": 4
+    },
+    {
+      "store_name": "游野的店",
+      "sku_n": 2,
+      "sum_delta": 5,
+      "sum_sold": 1030,
+      "top_title": "游野的美工设计50张可商用冬季水色风背景图（聊天框自动发货）",
+      "top_delta": 5
+    },
+    {
+      "store_name": "64eb70498265a10001d5d676",
+      "sku_n": 2,
+      "sum_delta": 5,
+      "sum_sold": 211,
+      "top_title": "婉约细款 手写定制 约字头像壁纸电子资源",
+      "top_delta": 3
+    },
+    {
+      "store_name": "你好 Design！的店",
+      "sku_n": 1,
+      "sum_delta": 4,
+      "sum_sold": 67,
+      "top_title": "10款手写英文字体【含封面字体】自动发货|可商用全新",
+      "top_delta": 4
+    },
+    {
+      "store_name": "691484809b93c500154bc614",
+      "sku_n": 1,
+      "sum_delta": 3,
+      "sum_sold": 121,
+      "top_title": "130款可商用格子布字母电子图片素材",
+      "top_delta": 3
+    },
+    {
+      "store_name": "剧实惠的店",
+      "sku_n": 1,
+      "sum_delta": 2,
+      "sum_sold": 993,
+      "top_title": "2025年全国大学生数学竞赛非数学类解析资料送历年真题备考攻略",
+      "top_delta": 2
+    },
+    {
+      "store_name": "叁泗设计的店",
+      "sku_n": 1,
+      "sum_delta": 2,
+      "sum_sold": 229,
+      "top_title": "8款松弛感手写英文字体 免费商用字体包 mac Ai/PS/procreate字体",
+      "top_delta": 2
+    },
+    {
+      "store_name": "顾惜.（顾惜字坊）的店",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 272,
+      "top_title": "【古风字组2500字】顾惜の古风字组2.0（完结版）‖自动发货",
+      "top_delta": 1
+    },
+    {
+      "store_name": "考研小鲤梦的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 18000,
+      "top_title": "27/28考研择校择专业课程技巧解析",
+      "top_delta": 0
+    },
+    {
+      "store_name": "睿妈环创铺的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 2248,
+      "top_title": "标题字设计【高清电子素材】图文结合形式",
+      "top_delta": 0
+    },
+    {
+      "store_name": "fanting的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1753,
+      "top_title": "全国高校保研夏令营/预推免/考研材料模板（包括目录，封面模板）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "孜孜不倔的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1566,
+      "top_title": "33款免费商用卡通可爱英文字体（一）ps Ai procreate",
+      "top_delta": 0
+    },
+    {
+      "store_name": "幽灵刺青U0TATTOO的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1008,
+      "top_title": "花体字贴纸创意英文手绘潮流笔记本装饰素材",
+      "top_delta": 0
+    },
+    {
+      "store_name": "鲁森视觉",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 596,
+      "top_title": "20款超好看的高级感衬线英文字体（自动发货-秒发)",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a64341ab710e60001301483",
+      "title": "链条发光中文字素水印背景图壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.6,
+      "sold": 3465,
+      "delta": 131,
+      "actual_gr": 3.93,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a372f7b963c4c0001de73ac",
+      "title": "定制玻璃款亮晶晶 手写小水印约字电子资源原创设计（几个字拍几",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.0,
+      "sold": 2441,
+      "delta": 109,
+      "actual_gr": 4.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a06e94f304f460001840977",
+      "title": "手写金色水印ID防盗古风飘逸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 2000,
+      "delta": 80,
+      "actual_gr": 4.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a673f8755f0ca00010d2382",
+      "title": "帅气手写水印/简约帅气壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.2,
+      "sold": 4089,
+      "delta": 71,
+      "actual_gr": 1.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7bda650020da0001a9b650",
+      "title": "水墨飒风书写水印爆款站姐风防抠图",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.6,
+      "sold": 700,
+      "delta": 49,
+      "actual_gr": 7.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6987f488eb0d9a00015314f3",
+      "title": "英文名英文名起名丨含电子版",
+      "store_name": "CareerNaming的店",
+      "store_id": "695f36f1ac88c300154baf59",
+      "price": 19.9,
+      "sold": 127,
+      "delta": 39,
+      "actual_gr": 44.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6916e52fcba79f0001ce01d9",
+      "title": "【手写名片】主页都可选（买三送一付款后直接甩约的图和署名！）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.0,
+      "sold": 2769,
+      "delta": 38,
+      "actual_gr": 1.39,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a112fee2d684c00015a95ba",
+      "title": "英文浮雕简约视频图片通用水印头像壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 1881,
+      "delta": 30,
+      "actual_gr": 1.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3b582540cf29000195cc8a",
+      "title": "英文名取名·英文名定制·个性化英文名定制",
+      "store_name": "命名星野的店",
+      "store_id": "6a38a42607e4b6001510d1cf",
+      "price": 9.9,
+      "sold": 500,
+      "delta": 25,
+      "actual_gr": 5.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a75c8628bb06b0001f2202b",
+      "title": "54款白色欧式复古哥特英文字素免扣电子素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.37,
+      "sold": 66,
+      "delta": 25,
+      "actual_gr": 60.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cd0ee6450d060001d8c053",
+      "title": "2026年中考化学备考虚拟资料包人教版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.88,
+      "sold": 1556,
+      "delta": 24,
+      "actual_gr": 1.57,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6f15df67db570001feeb42",
+      "title": "电子手写拉丝水印/id/签名定制简约防盗图追星专用沈妍",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 40.0,
+      "sold": 65,
+      "delta": 13,
+      "actual_gr": 25.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69fd4d1915602900012d9cf5",
+      "title": "超全中英文字体排版模板壁纸电脑手机聊天背景图合集",
+      "store_name": "重组设计",
+      "store_id": "67cc1c98abaee00015554fad",
+      "price": 9.9,
+      "sold": 244,
+      "delta": 12,
+      "actual_gr": 5.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68540435e874f20001bc664c",
+      "title": "英文手稿笔刷ps天生会画世界procreate手写签名花体水印手帐",
+      "store_name": "66ea6e0ce5994b0016f75f58",
+      "store_id": "66ea6e0ce5994b0016f75f58",
+      "price": 5.8,
+      "sold": 644,
+      "delta": 11,
+      "actual_gr": 1.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1d36b36114660001e3956b",
+      "title": "创意签名头像可爱手绘卡通图案装饰贴纸水印｜酱鱼出品风格七",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 286,
+      "delta": 11,
+      "actual_gr": 4.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1ff9ac421f8e0001768ed3",
+      "title": "16款可爱松弛有调性手绘英文字体丨免费可商用 设计素材 PPT素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 254,
+      "delta": 11,
+      "actual_gr": 4.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "691edb9d4a176600013367f1",
+      "title": "314数学农真题考研真题考研必备314数农真题",
+      "store_name": "择校调剂宝的店",
+      "store_id": "6692462fac19fd0001958c9c",
+      "price": 1.9,
+      "sold": 226,
+      "delta": 10,
+      "actual_gr": 4.63,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0552a37b710e00012ec6ea",
+      "title": "24款高端奢侈品牌LOGO英文字体 奢华优雅无衬线字体  PPT素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 108,
+      "delta": 9,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6937d9487ca56300011b9034",
+      "title": "2026小学数学思维培优讲义训练（练习题+答案+解析）电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 63,
+      "delta": 7,
+      "actual_gr": 12.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "687df927e58d07000182ab14",
+      "title": "432p美工透明底原创手写字素壁纸素材包可商",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 321,
+      "delta": 6,
+      "actual_gr": 1.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9a1f516c13960001d4d0ab",
+      "title": "语数英考试答题卡通用电子模版（可修改）语文答题卡模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.48,
+      "sold": 34,
+      "delta": 6,
+      "actual_gr": 21.43,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a00a62fca011e00014d0119",
+      "title": "「红线手写小水印」",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.0,
+      "sold": 26,
+      "delta": 6,
+      "actual_gr": 30.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6912044c3b8fe8000105fde8",
+      "title": "秀图可爱手绘小水印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 238,
+      "delta": 5,
+      "actual_gr": 2.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69815f26ab9b8800013c754d",
+      "title": "游野的美工设计50张可商用冬季水色风背景图（聊天框自动发货）",
+      "store_name": "游野的店",
+      "store_id": "67a35ea07482650015350c9e",
+      "price": 9.9,
+      "sold": 204,
+      "delta": 5,
+      "actual_gr": 2.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a55b6607308b50001802beb",
+      "title": "透明玻璃水印定制-粗款 约字题字设计头像",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 57,
+      "delta": 5,
+      "actual_gr": 9.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "676592d9b1267e0001b012a8",
+      "title": "Procreate手写英文字体包下载飘逸纤细连笔婚礼ps艺术字库合集ai",
+      "store_name": "艾创素材的店",
+      "store_id": "67558fd35163890015dc94e4",
+      "price": 7.9,
+      "sold": 274,
+      "delta": 4,
+      "actual_gr": 1.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68bd4bbe5d276600017b259e",
+      "title": "免费商用英文字体高级轻奢衬线风格ai procreate字库ps字体包下载",
+      "store_name": "艾创素材的店",
+      "store_id": "67558fd35163890015dc94e4",
+      "price": 8.9,
+      "sold": 185,
+      "delta": 4,
+      "actual_gr": 2.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a16e4652d684c000196393a",
+      "title": "10款手写英文字体【含封面字体】自动发货|可商用全新",
+      "store_name": "你好 Design！的店",
+      "store_id": "668f535f1a9cab0001082338",
+      "price": 14.9,
+      "sold": 67,
+      "delta": 4,
+      "actual_gr": 6.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67d3f46fbb9b9d0001741cf7",
+      "title": "80支英文字素procreate笔刷饭圈美工设计美化手账绘画装饰可商素",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 422,
+      "delta": 3,
+      "actual_gr": 0.72,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "697ddcf83067f40001b9dae4",
+      "title": "【手写体小水印】蹭图秀图体验卡黑素小水印原创头像稿件防盗展示",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 190,
+      "delta": 3,
+      "actual_gr": 1.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a50b2cc40226b0001936061",
+      "title": "婉约细款 手写定制 约字头像壁纸电子资源",
+      "store_name": "64eb70498265a10001d5d676",
+      "store_id": "64eb70498265a10001d5d676",
+      "price": 4.0,
+      "sold": 188,
+      "delta": 3,
+      "actual_gr": 1.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "689162098fe3470001218bde",
+      "title": "手写英文字体签名水印婚礼视频vlog剪辑procreate ps字体包下载",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 166,
+      "delta": 3,
+      "actual_gr": 1.84,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69686ae89727930001f3edea",
+      "title": "130款可商用格子布字母电子图片素材",
+      "store_name": "691484809b93c500154bc614",
+      "store_id": "691484809b93c500154bc614",
+      "price": 16.8,
+      "sold": 121,
+      "delta": 3,
+      "actual_gr": 2.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ec2e970511b500013429b6",
+      "title": "【神奇】苹果丝带 冰雨 美化水印美工素材 网盘png自动发货不退换",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.0,
+      "sold": 58,
+      "delta": 3,
+      "actual_gr": 5.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cd4f5a37527100018a5c52",
+      "title": "主页非定制字素商用打包（未来更新涨价无需补差）头像",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.0,
+      "sold": 12,
+      "delta": 3,
+      "actual_gr": 33.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1fd29d410f520015d1e4dc",
+      "title": "复古早撕纸边角碎裂英文字素电子手帐拼贴纸PNG免抠饭圈美工素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.8,
+      "sold": 8,
+      "delta": 3,
+      "actual_gr": 60.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f197d8c753610001058248",
+      "title": "2025年全国大学生数学竞赛非数学类解析资料送历年真题备考攻略",
+      "store_name": "剧实惠的店",
+      "store_id": "66ebba64a9bf340015152271",
+      "price": 6.99,
+      "sold": 993,
+      "delta": 2,
+      "actual_gr": 0.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "66f3c1b8694a9100015e2983",
+      "title": "8款松弛感手写英文字体 免费商用字体包 mac Ai/PS/procreate字体",
+      "store_name": "叁泗设计的店",
+      "store_id": "66497afac3a6a9000183f1fe",
+      "price": 7.65,
+      "sold": 229,
+      "delta": 2,
+      "actual_gr": 0.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8041c15ed32c0001828efe",
+      "title": "* 手写定制/约字/字体设计/壁纸头像/明信片台卡名卡",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 30.0,
+      "sold": 72,
+      "delta": 2,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f05e11faf00200011ff779",
+      "title": "原创手写宝宝周岁礼百日宴纪实文案水印png/psd双格式可编辑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 66,
+      "delta": 2,
+      "actual_gr": 3.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2fb4d81dbcb8000115ca0f",
+      "title": "签名水印摄影水印模板 可永久使用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.0,
+      "sold": 62,
+      "delta": 2,
+      "actual_gr": 3.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d901175ec08800019aeb1a",
+      "title": "雪与蝶-动态水印改字模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.0,
+      "sold": 56,
+      "delta": 2,
+      "actual_gr": 3.7,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2cfb5f8bca040001efc048",
+      "title": "凝の玻璃手写小水印2.0（58张模板）自行添加数字ID",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 38,
+      "delta": 2,
+      "actual_gr": 5.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a753c612fbfa60001daa8f0",
+      "title": "古风手写印章水印定制 落款约字电子资源设计",
+      "store_name": "64eb70498265a10001d5d676",
+      "store_id": "64eb70498265a10001d5d676",
+      "price": 5.0,
+      "sold": 23,
+      "delta": 2,
+      "actual_gr": 9.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "686516580f178b0001cd12a3",
+      "title": "游野的可商用英文字素混拍1（自动发货 图2领取教程）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 540,
+      "delta": 1,
+      "actual_gr": 0.19,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67fccb1304afe3000101f2f2",
+      "title": "考研报班各个辅导班比对分析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 443,
+      "delta": 1,
+      "actual_gr": 0.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "66e716ca6caced0001dc9aaf",
+      "title": "【古风字组2500字】顾惜の古风字组2.0（完结版）‖自动发货",
+      "store_name": "顾惜.（顾惜字坊）的店",
+      "store_id": "662740f77d1a500001034c80",
+      "price": 27.0,
+      "sold": 272,
+      "delta": 1,
+      "actual_gr": 0.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67ab22ce8252370001cb393f",
+      "title": "手绘风水印原创自制ps笔刷procreate笔刷可爱手写全屏发光水印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 225,
+      "delta": 1,
+      "actual_gr": 0.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a92a808cc9be300014401e2",
+      "title": "中英混写/水印防盗/壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.0,
+      "sold": 24,
+      "delta": 1,
+      "actual_gr": 4.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9a088dee83f20001e6dbfc",
+      "title": "手写宋词古诗50首透明底文字古风素材美工背景壁纸可商素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 9,
+      "delta": 1,
+      "actual_gr": 12.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a76e98da4f71c0001d88a60",
+      "title": "【特殊刷英写】英文水印丨头像壁纸剪辑装饰水印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.0,
+      "sold": 6,
+      "delta": 1,
+      "actual_gr": 20.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "660e639388aa5c0001ce3fd7",
+      "title": "28考研择校/29考研择校全程技巧解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 19000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "661e4bae1294510001c39031",
+      "title": "27/28考研择校择专业课程技巧解析",
+      "store_name": "考研小鲤梦的店",
+      "store_id": "65671f517b366c0001c039bb",
+      "price": 4.0,
+      "sold": 18000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5ae8ea24f0440001f70318",
+      "title": "链式字母水印定制站姐风",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.6,
+      "sold": 14000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a96be1120796100015c3240",
+      "title": "拉丝手写水印定制ID【48小时发货】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 9376,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6a3607bf81ab0001dedeff",
+      "title": "站姐风小水印定制 可纯字 透明底",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.6,
+      "sold": 6013,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6874c0084485460001e69c06",
+      "title": "多维全练同步版 高中数学PDF+word基础提分",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 5932,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68dc2baace94ee0001f6b9f6",
+      "title": "字体设计板写约字水印设计字素几个字拍几个拍完备注内容",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.0,
+      "sold": 4794,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6842665d22c82c0001f31826",
+      "title": "手写水印电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 4517,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "694a5524ef368800012a1259",
+      "title": "28/29考研择校择专业院校数据解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 3551,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "673f44a1ea10700001613da4",
+      "title": "小棉的 procreate素材线上线下可商用美工笔刷模板文字3（24h发",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.2,
+      "sold": 3228,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69901a42f7a09d0001de9477",
+      "title": "恶魔小猫浮雕水印透明水印灰底透明底可爱定制",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.25,
+      "sold": 2674,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a466c5d3e43a00001e9ea4d",
+      "title": "古风大字水印定制字素",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 2397,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "65435cae9e6e5500018dad56",
+      "title": "标题字设计【高清电子素材】图文结合形式",
+      "store_name": "睿妈环创铺的店",
+      "store_id": "650106a2a5c63e000149872c",
+      "price": 9.0,
+      "sold": 2248,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a467d3c72cfc70001d30a01",
+      "title": "红色字母加白色中文小水印定制",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.8,
+      "sold": 2170,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ba44108c331700010440b7",
+      "title": "全国高校保研夏令营/预推免/考研材料模板（包括目录，封面模板）",
+      "store_name": "fanting的店",
+      "store_id": "687b15062e47830015dfd136",
+      "price": 5.0,
+      "sold": 1753,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6693a7afa3f69e000146b581",
+      "title": "33款免费商用卡通可爱英文字体（一）ps Ai procreate",
+      "store_name": "孜孜不倔的店",
+      "store_id": "65f6f3de148a6f000128d1fe",
+      "price": 9.99,
+      "sold": 1566,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0b32bd1123b9000156de5b",
+      "title": "定制约字|||几个字拍几单",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 1532,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4dde56f99fca00012d5d8a",
+      "title": "手绘图案小水印定制 追星女孩同款",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.2,
+      "sold": 1528,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a25754fb2a4ab00011213f1",
+      "title": "(全)研究生保研考研复试自我介绍ppt预推免1",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.88,
+      "sold": 1419,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68cee0f734db2a00018088b9",
+      "title": "【全版本】新版七年级上下册全科知识点背默｜期中期末月考可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 1403,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "642eba2caf0b250001c1259b",
+      "title": "花体字贴纸创意英文手绘潮流笔记本装饰素材",
+      "store_name": "幽灵刺青U0TATTOO的店",
+      "store_id": "642105d9970ed30001de1b49",
+      "price": 15.0,
+      "sold": 1008,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "696115552c7c420001a492f4",
+      "title": "饭圈美工设计｜游野的可商用长英文和短英文各100个盐系排版素材",
+      "store_name": "游野的店",
+      "store_id": "67a35ea07482650015350c9e",
+      "price": 6.0,
+      "sold": 826,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a320f7c40cf290001c7416e",
+      "title": "「私人稿件小水印」展示稿件oc百搭 小水印 仅供展示加署名",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.2,
+      "sold": 809,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a315c049d3bb60001b3de06",
+      "title": "「私人稿件小水印」稿件oc百搭 小水印 防盗小水印加署名仅供展示",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.2,
+      "sold": 759,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a606f528cb63f0001d8f30e",
+      "title": "定制！玻璃手写小水印 几字几份叠拍 署名备注！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.8,
+      "sold": 646,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68dceaef7d3b3f0001cde628",
+      "title": "XX057黑板报云朵字/国风主题字/定制  电子图片，不发快递",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 638,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68afbd2a3f78410001e7cda1",
+      "title": "2027管综力工1v1择校服务（不想招收了所以涨价，能接受拍）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 621,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67bd5a1129b9f70001b33067",
+      "title": "20款超好看的高级感衬线英文字体（自动发货-秒发)",
+      "store_name": "鲁森视觉",
+      "store_id": "67814c2476a94100151017de",
+      "price": 11.98,
+      "sold": 596,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8d65b070b3560001c0aa8e",
+      "title": "「VastFlow-w」の特价合集-2 下单请看详情须知",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.5,
+      "sold": 572,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "标书解析工具电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "标书解析工具",
+  "slug": "标书解析工具"
+}

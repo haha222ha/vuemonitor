@@ -1,0 +1,1325 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "公考资料"
+    ],
+    "niche": "公考资料"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 20,
+    "active_n": 0,
+    "drive_keywords": [
+      "公考资料",
+      "结构化公考资料",
+      "无领导公考资料",
+      "公考资料分析笔记",
+      "公考资料分析课件",
+      "公考资料分析试卷",
+      "公考资料分析押题",
+      "公考资料分析资料",
+      "判断推理公考资料",
+      "数量关系公考资料",
+      "言语理解公考资料",
+      "资料分析公考资料",
+      "公考资料分析PDF",
+      "公考资料分析电子版",
+      "公考资料分析面试题",
+      "公考资料分析视频课",
+      "公考资料分析说课稿",
+      "公考资料分析备考资料",
+      "公考资料分析冲刺资料",
+      "公考资料分析结构化面试题"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "公考资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": " [force_suffix_old_0727]",
+        "source": "all_reports_dir_fill_20261009_185652",
+        "role": "candidate"
+      },
+      {
+        "keyword": "结构化公考资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "无领导公考资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析笔记",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析课件",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析试卷",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析押题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "判断推理公考资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "数量关系公考资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "言语理解公考资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "资料分析公考资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析PDF",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析电子版",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析面试题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析视频课",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析说课稿",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析备考资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析冲刺资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料分析结构化面试题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 5,
+    "sku_n": 76,
+    "sum_delta": 133,
+    "median_price": 10.99,
+    "niche": "公考资料",
+    "drive_kw_n": 20
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 72,
+      "sum_delta": 120,
+      "sum_sold": 18922,
+      "top_title": "2027中国电信笔试真题电信笔试考试资料校招社招真题题库刷题APP",
+      "top_delta": 43
+    },
+    {
+      "store_name": "六都书店的店",
+      "sku_n": 1,
+      "sum_delta": 7,
+      "sum_sold": 458,
+      "top_title": "新27软考高级初级中级系统集成考试计算机软考课程直播课录播课",
+      "top_delta": 7
+    },
+    {
+      "store_name": "Raina.AI测试的店",
+      "sku_n": 1,
+      "sum_delta": 5,
+      "sum_sold": 2321,
+      "top_title": "Raina测试知识库&软件测试学习笔记",
+      "top_delta": 5
+    },
+    {
+      "store_name": "Claire的英语屋的店",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 25,
+      "top_title": "新版think-1级学习周报1-12单元含测试阅读口语精听词汇等",
+      "top_delta": 1
+    },
+    {
+      "store_name": "66d6d932d550aa0015e2a500",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 3,
+      "top_title": "卡斯柯笔试电子学习资料其他兴趣教育看下面详情再拍",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "68c812e439f90c0001f9c4dc",
+      "title": "2027中国电信笔试真题电信笔试考试资料校招社招真题题库刷题APP",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 45.0,
+      "sold": 688,
+      "delta": 43,
+      "actual_gr": 6.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "688c8fbf47d5bd0001f2352c",
+      "title": "2026秋小学语文3-6年级阅读理解答题模板与解题技巧练习题版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 8813,
+      "delta": 40,
+      "actual_gr": 0.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "693e7cc53753f7000154bb6e",
+      "title": "【下单秒发】大学学习资料合集《801-1200》",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 722,
+      "delta": 12,
+      "actual_gr": 1.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a85578109b4f20001090892",
+      "title": "27考研专业课刷题小程序含统考非统考计算机教育学法学经济学题库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 367,
+      "delta": 10,
+      "actual_gr": 2.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a8bb6ec73bbe50001cf8a96",
+      "title": "小学1-6年级全科电子版学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 56,
+      "delta": 10,
+      "actual_gr": 21.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69c4ae009c146500013d045e",
+      "title": "新27软考高级初级中级系统集成考试计算机软考课程直播课录播课",
+      "store_name": "六都书店的店",
+      "store_id": "682d8e6927ece700156e1e63",
+      "price": 16.8,
+      "sold": 458,
+      "delta": 7,
+      "actual_gr": 1.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "682d9338e0a2f5000138d8cd",
+      "title": "Raina测试知识库&软件测试学习笔记",
+      "store_name": "Raina.AI测试的店",
+      "store_id": "65f665ea7916650001e2093d",
+      "price": 49.9,
+      "sold": 2321,
+      "delta": 5,
+      "actual_gr": 0.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a36435d413f35000162ba16",
+      "title": "软件测试26期末复习考点知识点总结试卷题库章节题答案高分笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.6,
+      "sold": 4,
+      "delta": 4,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69ccddc79347b10001f55dd5",
+      "title": "新版think-1级学习周报1-12单元含测试阅读口语精听词汇等",
+      "store_name": "Claire的英语屋的店",
+      "store_id": "68c56aa46f413d0015dd3d36",
+      "price": 29.9,
+      "sold": 25,
+      "delta": 1,
+      "actual_gr": 4.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a9e25a4a3924100016a861a",
+      "title": "小学1-6年级语数英学习电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.98,
+      "sold": 15,
+      "delta": 1,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "67d83edce15c910001447d9c",
+      "title": "大学生实习周记范文（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 3935,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a9bc838b993210001ccf3b8",
+      "title": "幻兽学院AI效率办公软件实操课程教程课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 768,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6aa27e3d0f06300001653b56",
+      "title": "很好的自动安/卓弹琴教程学习包/教程课件模板学习手抄报",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.0,
+      "sold": 489,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69003cd6c192ac0001e6d890",
+      "title": "嵌入式软件知识库学习路线 面试笔试 项目推荐 MCU&Linux",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 138.8,
+      "sold": 380,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69eb81fee4ac610001a947fb",
+      "title": "02 嵌入式全栈学习路线套餐（全栈学习路线及时间规划&项目推荐）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 166.0,
+      "sold": 362,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69f31eb630d0860001e7d8c6",
+      "title": "2026房地产经纪人/房地产经纪人协理练习刷题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 295,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a0683abf3ef8300019c1ec7",
+      "title": "2026秋小学语文3-6年级阅读理解答题模板解题技巧练习题含答案PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 284,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a8977e088b5b80001ebbe95",
+      "title": "小学语文3-6年级语文阅读理解专项训练电子版资料可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 266,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6ac7adbf3491140001570d6d",
+      "title": "26年9月计算机二级 MS/WPS",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 174,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "68a0257a4dbac20001c3d84c",
+      "title": "高中数学GGB课件动图全套724个（含免费软件+全套视频教程）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.0,
+      "sold": 173,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "689c34ff66d44d0001dbe25c",
+      "title": "消防设施操作员初级中级高级证书刷题软件维保监控考试题库APP",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.8,
+      "sold": 158,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6645800c25f23200013441ac",
+      "title": "软件测试常用功能性能测试报告模版 学习方法/技巧述职报告模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.9,
+      "sold": 144,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a7eb3dbc9142a0001ca46f1",
+      "title": "小学1-6年级全科语文 数学 英语 科学 道法电子版学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.5,
+      "sold": 131,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a98d7046c1396000172570b",
+      "title": "【自动发货】2004-2027全套电子版可下载设计教程课件学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.8,
+      "sold": 128,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a748b3909b4f20001cf8bd7",
+      "title": "1--6年级小学全科学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 111,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6aa5398768ec340001a52bda",
+      "title": "26执业药师【润+鸭+医】全家桶网课视频电子教材资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.99,
+      "sold": 96,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a13f78ac40951000177676e",
+      "title": "2026最新版小学语文一二三四五六年级上下册电子版资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.6,
+      "sold": 81,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "695b9a009138010015ad4284",
+      "title": "2026版小学一二三四五六年级教辅资料合集长期更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 62,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "694a7c1d110a7f0001a55f7b",
+      "title": "英语机构APP-3天试用版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 50,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a4b45c67d09bf00010a376f",
+      "title": "26新版小学语数英1-6年级复习预习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 37,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a83e57dc9a36100018485fc",
+      "title": "2026人教版小学1-6年级全科电子版资料可下载可打印复习预习讲义",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.8,
+      "sold": 29,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a607e6d4382e200015bf18d",
+      "title": "【强烈推荐】26新版原创小学1-6年级语数英全册资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 36.41,
+      "sold": 25,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a709394d85585000165282c",
+      "title": "最新1-6年级语数英学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a1948747c56550001edc49d",
+      "title": "新版Think1学习周报含阅读口语精听阶段测试+视频思维导图作业纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.8,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa40ec3a949500010baca6",
+      "title": "最新1-6年级语数英学习电子资料大全",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.01,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6638710fe2da560001a5c3f4",
+      "title": "小学学习资料1-6年级上下册语文电子档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a6747d974bf0000014a8a48",
+      "title": "2026年1-6年级语数英全科学习资料新版本持续更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.9,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a2bcf818330830001b31a18",
+      "title": "【笔记同款】软件测试课件资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 26.8,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6ac2a1512c3f8b00019f74f2",
+      "title": "26【实践赛刷题题库】网络+云+基础软件电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a969ad45946f400014f5fc7",
+      "title": "新版小学1～6年级语数英学习资料电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.8,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa506668ec340001f169fc",
+      "title": "小学 1-6 年级全科电子版学习资料 语数英辅导练习素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.41,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6903433fdcedc700010209f1",
+      "title": "卡斯柯笔试电子学习资料其他兴趣教育看下面详情再拍",
+      "store_name": "66d6d932d550aa0015e2a500",
+      "store_id": "66d6d932d550aa0015e2a500",
+      "price": 18.0,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a4239c88cb63f000182bc11",
+      "title": "小学1-6年级全部科目各科电子版教材辅助学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "68f4d330e379430001403d0c",
+      "title": "车载测试工程师岗位100道面试预测题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69e317e0891c6a0015be27db",
+      "title": "2026软件测试开发教程视频零基础网课Python自动化性能测试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 21.21,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6aa68662083884000156de27",
+      "title": "小学1-6年级全科电子版学习资料 · 1-6年级全部",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.8,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6aa0bbb11b60640001fb7eda",
+      "title": "沉浸式K线强化练习学习课程(1个月)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.2,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69ead78e0511b5000112e1b1",
+      "title": "新凯来测评笔试资料包电子版历年真题附答案解析题库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 100.0,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a31795ce2951e00010b86a5",
+      "title": "2026作业帮中考语数物化密训班【完结】中考复习推荐",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 26.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a4b7029f764ee0001e4d5fe",
+      "title": "理想汽车测试软件开发实习生面试解题思路考点分析＋答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a3227abe5033600013b5603",
+      "title": "小学1-6年级全科电子版学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a18f79a6bc69c0001fa3e52",
+      "title": "新凯来测评笔试资料包电子版历年真题附答案解析题库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 163.6,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a171f3548fd3d00019d1ec6",
+      "title": "软件测试技术期末知识重点学习笔记总结归纳考试题答案复习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69e5da72fb672a001586e6dc",
+      "title": "软件测试期末考试复习知识点总结习题题库资料PDF电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.93,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a8d55217388ed000173d505",
+      "title": "小学1-6年级辅导题集重点知识精选电子版|网盘提取|持续更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a9009245482980001339109",
+      "title": "2026小学语文数学英语全科电子版教材辅导资料（1-6年级）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69e2edfe933b030001822a2b",
+      "title": "新凯来测评笔试资料包电子版历年真题附答案解析题库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 125.84,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69ce208cca15480001174ec3",
+      "title": "新凯来测评笔试资料包电子版历年真题附答案解析题库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 125.84,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a9a05e3d1a36f0001a0e32e",
+      "title": "【新版】小学1-6年级语数英电子资料包 · 全部学科多版本选择】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.6,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a9a262bd1a36f0001a4242c",
+      "title": "最新小学学习资料  I  1-6年级语数英全科资料合集(持续更新)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.5,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "69ce1187069e7b0001695737",
+      "title": "新凯来测评笔试资料包电子版历年真题附答案解析题库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 125.84,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6975fa42d0b05c0001647834",
+      "title": "软件测试课程性能测试接口测试自动化测试项目实战测试工程师",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 27.73,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "694bac488ff5d4000125a8ae",
+      "title": "软件测试丨知识重点学习笔记总结归纳考试题答案复习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 27.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6943afdf1f22d200017c4cfa",
+      "title": "软件测试策略 软件测试策略",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 69.3,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6aa618a2083884000145ca42",
+      "title": "小学1-6年级语数英全科电子资料 包更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6aa62e8550825c00016c74c4",
+      "title": "小学1-6年级全科电子版教材辅导学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.46,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6ac83a689eacf000018003a2",
+      "title": "软件测试超高频面试题电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.76,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6911527bc34eef001549f3cf",
+      "title": "63道七十迈助理软件测试工程师（校招）岗位面试题库及参考回答（",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "690516c6956aac00159d4979",
+      "title": "pc端电脑专业搜索神器 检索资料 查找软件 学习教程资源助手永久",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.95,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6ab5ef87c6ed5c000165f7e4",
+      "title": "小学1-6年级全科学习资料 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "68f66cdbba5a830015a1e78b",
+      "title": "软件测试开发教程 2022软件测试项目实战培训课程 基础入门到精通",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.95,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "68e47ec75cb63500151c70c7",
+      "title": "英伟达测试笔试题综合能力测试题库数字IC笔试题电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a5f8f374f6fde0001bf549d",
+      "title": "AI测试工程师完整教程PDF学习笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 26.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a58f51c964c0f00159b6d93",
+      "title": "韦氏儿童智力智商测评学龄测试电子版资料工具素材试题解析量表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a56fa4be9f0b1000133e986",
+      "title": "软件测试技术期末知识重点学习笔记总结归纳考试题答案复习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    },
+    {
+      "goods_id": "6a5484a5e371ff00013c19a6",
+      "title": "小学1-6年级全科电子教辅资料同步练习题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "公考资料",
+  "slug": "公考资料"
+}

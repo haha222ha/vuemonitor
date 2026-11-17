@@ -1,0 +1,1258 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "批量处理表格"
+    ],
+    "niche": "批量处理表格"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "批量处理表格电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "批量处理表格电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 11,
+    "sku_n": 80,
+    "sum_delta": 89,
+    "median_price": 9.9,
+    "niche": "批量处理表格",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 70,
+      "sum_delta": 49,
+      "sum_sold": 15787,
+      "top_title": "新高一阅读16周专项练习含解析电子版PDF即拍即发",
+      "top_delta": 32
+    },
+    {
+      "store_name": "Orange English的店",
+      "sku_n": 1,
+      "sum_delta": 37,
+      "sum_sold": 1333,
+      "top_title": "高考英语阅读理解CD篇八大主题高频词共488个电子版教案",
+      "top_delta": 37
+    },
+    {
+      "store_name": "子墨爱学习的店",
+      "sku_n": 1,
+      "sum_delta": 3,
+      "sum_sold": 497,
+      "top_title": "2026年大学英语四级备考资料包·电子版",
+      "top_delta": 3
+    },
+    {
+      "store_name": "Zachary的英语视界的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 10000,
+      "top_title": "六级作文万能模板＋30篇真题套用示范（电子材料）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "艾想惠说language的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 553,
+      "top_title": "Emy英语外刊精读课程",
+      "top_delta": 0
+    },
+    {
+      "store_name": "她生活无限的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 219,
+      "top_title": "自研英文语料学习阅读库-各类外刊语料-双语精读练阅读听力",
+      "top_delta": 0
+    },
+    {
+      "store_name": "momoibc的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 71,
+      "top_title": "Englishpod小册子",
+      "top_delta": 0
+    },
+    {
+      "store_name": "66e9a92b0a7699001557e06e",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 44,
+      "top_title": "小北同款英语文章-57篇（附上详细目录，电子版发货）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "三可文成图书的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 35,
+      "top_title": "外刊精读点津 中英对照双语阅读英文报刊精华集萃",
+      "top_delta": 0
+    },
+    {
+      "store_name": "68fa30aa360b3500156c64be",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1,
+      "top_title": "40篇短文搞定初高中英语3500词汇",
+      "top_delta": 0
+    },
+    {
+      "store_name": "网课甄选（下单自动发货）的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "【外刊英语】彭老师英语外刊精读课【完结】",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a0bf79de80a7b0001e0072a",
+      "title": "高考英语阅读理解CD篇八大主题高频词共488个电子版教案",
+      "store_name": "Orange English的店",
+      "store_id": "665999a4e5b8e60001264d63",
+      "price": 2.99,
+      "sold": 1333,
+      "delta": 37,
+      "actual_gr": 2.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4fb69fd36a810001d809d8",
+      "title": "新高一阅读16周专项练习含解析电子版PDF即拍即发",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 241,
+      "delta": 32,
+      "actual_gr": 15.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ad1091b8f9830001911bf7",
+      "title": "2026中考英语写作进阶资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 661,
+      "delta": 9,
+      "actual_gr": 1.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a388b5d40cf29000154bb5f",
+      "title": "英语时文阅读2026第30期 PDF可打印 含音频 小升初到高考",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.8,
+      "sold": 44,
+      "delta": 4,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1dc56c97469d0001e2dece",
+      "title": "2026年大学英语四级备考资料包·电子版",
+      "store_name": "子墨爱学习的店",
+      "store_id": "68fb29cce97abb0015e89bc7",
+      "price": 2.98,
+      "sold": 497,
+      "delta": 3,
+      "actual_gr": 0.61,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8663b20020da0001c553de",
+      "title": "【英语时文】26版高中高考初中英语真题外刊同源阅读理解年度甄选",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.8,
+      "sold": 1527,
+      "delta": 2,
+      "actual_gr": 0.13,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7ec11279b57b000163607c",
+      "title": "少年环球视野30年会员英语时文外刊合集，适合小初高英语学习，",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 54.9,
+      "sold": 15,
+      "delta": 1,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e2718ec3604d0015ffbb72",
+      "title": "【考研英语同源外刊】2025英语外刊精读雅思托福考研英专生阅读",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 1,
+      "delta": 1,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7d58276e8d37000144bb29",
+      "title": "老师推荐2026最新官方正版新高中英语词汇（套餐可选）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 116.6,
+      "sold": 11000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f0c8d0933b030001adea6f",
+      "title": "六级作文万能模板＋30篇真题套用示范（电子材料）",
+      "store_name": "Zachary的英语视界的店",
+      "store_id": "64ccefef6b0df000010fa624",
+      "price": 16.9,
+      "sold": 10000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "667e4a94d52fff0001f5cef1",
+      "title": "Emy英语外刊精读课程",
+      "store_name": "艾想惠说language的店",
+      "store_id": "65a4eb9dd5a11d0001eceff2",
+      "price": 169.0,
+      "sold": 553,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6710e330fe85310001fc43d4",
+      "title": "27年全新大刊牛文 英语外刊精读班",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1199.0,
+      "sold": 467,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "67d966875102a40001197ba2",
+      "title": "2027 高考英语外刊时文阅读练习题热点主题时文话题语篇阅读拓展",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.51,
+      "sold": 302,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8561f95ed32c00010d645d",
+      "title": "小学英语开学第一课【年级自选】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 277,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b6c4dbe175160001915956",
+      "title": "自研英文语料学习阅读库-各类外刊语料-双语精读练阅读听力",
+      "store_name": "她生活无限的店",
+      "store_id": "692bb94d70644e0015f80c16",
+      "price": 39.9,
+      "sold": 219,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "673065dc4a98650001785b00",
+      "title": "高中英语外刊阅读语篇精选1-4（可以分开购买）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.0,
+      "sold": 176,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8b30171316ee0001c1afc3",
+      "title": "外研社新五年级上册英语开学第一课 课件PPT (多规格可选",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.9,
+      "sold": 164,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3a8a04413f350001c58bba",
+      "title": "2026上海SSP英语外刊阅读语篇精选",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.0,
+      "sold": 152,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "66f949f7eb6ef200011981dd",
+      "title": "高中英语外刊+练习+答案(电子版)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 147,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "686089d256ddbd00010dca84",
+      "title": "英语时文阅读提分训练3+Xssp上海学生英文报初一二三原版外刊阅读",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.0,
+      "sold": 108,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a368d6ee2951e000177b65d",
+      "title": "小学英语暑假练习词汇默写",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 79,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a46670e55f46a0001ca022c",
+      "title": "Englishpod小册子",
+      "store_name": "momoibc的店",
+      "store_id": "6a2ec198acc30e00151ff390",
+      "price": 49.9,
+      "sold": 71,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "66e9d008bb33ad00010e3ad2",
+      "title": "小北同款英语文章-57篇（附上详细目录，电子版发货）",
+      "store_name": "66e9a92b0a7699001557e06e",
+      "store_id": "66e9a92b0a7699001557e06e",
+      "price": 15.9,
+      "sold": 44,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f05bceed3b2f00015f86dc",
+      "title": "英语中译英翻译练习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 42,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6bfcc867db570001b4a5b5",
+      "title": "2026中考英语时文阅读训练-阅读理解+完形填空+话题素材+热点外刊",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 38,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "64fbfeceafc84400018e80f1",
+      "title": "外刊精读点津 中英对照双语阅读英文报刊精华集萃",
+      "store_name": "三可文成图书的店",
+      "store_id": "641c23393a4a690001e1eb65",
+      "price": 36.8,
+      "sold": 35,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a992b84ef95630001984734",
+      "title": "外刊写作英语级别写作地道表达+写作高级替换词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 33,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6750fb11bdb59000019a5809",
+      "title": "高中英语外刊 The week junior",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 31,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6bfd6ceb49fe00015cc554",
+      "title": "2026中考英语时文阅读训练-阅读理解+完形填空+话题素材+热点外刊",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.8,
+      "sold": 25,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a02d924f3ef830001473c63",
+      "title": "中考英语·时文阅读训练-阅读理解+话题素材+完形填空+热点外刊",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.8,
+      "sold": 24,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b900ee9c14650001cff1b7",
+      "title": "高考英语外刊核心词汇精讲+专项阅读练习电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.9,
+      "sold": 22,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6604b04452f3000165ae8c",
+      "title": "高中英语外刊精读第一期",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.99,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "685a14024083e600152fe31f",
+      "title": "2025考研英语外刊精读每天一篇经济人流利学说双语阅读电子版pdf",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a7b6e2d2bf800001c6f6e0",
+      "title": "【26春新版】上海小学五年级下册一卷搞定语数英资料电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 18,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69318955137a3b000120eb24",
+      "title": "六年级上册阅读理解答题模板+考点归纳电子版可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.88,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1e52d3f2340f0001224663",
+      "title": "2026上海ssp英语报小初高中考高考专刊25.9-26.6持续更新电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.0,
+      "sold": 13,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a94e5d45482980001b27d47",
+      "title": "2026初中英语时文阅读ssp第3辑，电子档，高清无水印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 11,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa7ddb6f6632a000173d34f",
+      "title": "外刊精读纸质版：考研英语、雅思托福、专四专八等送配套小程序",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 396.0,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c36994d95b5a00013a45fc",
+      "title": "ssp中考时文外刊（基础版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6975f38391380100159da999",
+      "title": "新高考英语外刊精读阅读理解练习题资料电子版阅读理解7选5完形填",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.8,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6bfc7467db570001b49b12",
+      "title": "2026中考英语时文阅读训练-阅读理解+完形填空+话题素材+热点外刊",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.8,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa3c5661e46ae00018f69b1",
+      "title": "2026中考英语时文阅读训练-阅读理解+完形填空+热点外刊+话题素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a782cd5c9142a000128de71",
+      "title": "《精撰高中英语语法填空专题训练》（电子版资料，不退不换）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 50.0,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "68edf36cf71ffd0015c315b4",
+      "title": "冰雹英语外刊精读课英语精听口语视频课高频词长难句发音系统课程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.4,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "68da44e1f8d1f0000133ddeb",
+      "title": "初中英语时文阅读教辅电子版合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa951bd6f8d96000131c9b9",
+      "title": "上海初高中英语SSP阅读语篇精选基础进阶高阶 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "66f94a5594f7580001ae4eea",
+      "title": "中考高频词520个背诵版+默写版（电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c2c67e16b37a0015a2176b",
+      "title": "趣味英语配音校本电影配音教学计划配音素材英文英语电影动画片段",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69df471fc13d0f0015c22b0f",
+      "title": "2026英语三级笔译catti真题教材网课热词电子PDF资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.32,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a47ce76fcf4ce00013a903f",
+      "title": "SSP初中英语外刊课程+讲义合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "687d02d379bc47000107f697",
+      "title": "英语外刊阅读-TED 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "695398c9be1ced0015d9ef7d",
+      "title": "[英语原版] Reader‘s Digest [USA] 读者文摘杂志 2013-2025年订",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 21.79,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a65efabab4daa0001478cac",
+      "title": "【26年英语外刊精读】四六级 考研 专四专八 CATTI阅读",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cf22e0c6fcf5000169e556",
+      "title": "25年英语外刊精读电子版四六级考研专四专八catti阅读",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.72,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "67bc8256f65889000124a3d4",
+      "title": "英语学习资料包（词汇/语法/托福/雅思/外刊）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7541f0eb8eff0015699fa3",
+      "title": "2026届北京人大附中高考英语复习词汇 写作阅读 高三一轮",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59b5cdb81403001551a1f8",
+      "title": "60篇外刊阅读搞定小学必备核心词电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69be563e7c9c8f0001121ba9",
+      "title": "2026英语外刊精读阅读（电子版可打印）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.88,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69dcf6af49c41d00012943b5",
+      "title": "27考研英语外刊精读考研【2020-2026】课件电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.98,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "68467e3efab3990001b104cf",
+      "title": "准高三快码 25高考英语外刊同源 完整版附翻译",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "686e34060bb40800016282f3",
+      "title": "《中学英语外刊语篇精选》2025-2",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "686e41ad5b41e8000167f6c4",
+      "title": "《中学英语外刊语篇精选》2025-5",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.8,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6963b40a05a37f00011e2b50",
+      "title": "40篇短文搞定初高中英语3500词汇",
+      "store_name": "68fa30aa360b3500156c64be",
+      "store_id": "68fa30aa360b3500156c64be",
+      "price": 5.99,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b6f3a6e175160001959ff2",
+      "title": "Soren外刊精读英语电子版学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d66f64d528ea00156988ae",
+      "title": "上海中考英语SSP外刊阅读151篇pdf带详细解析  标准  标准",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5677058cb63f0001fd2a2e",
+      "title": "丸子tina英语外刊精读课【完结】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a76f99e79b57b0001a81112",
+      "title": "中考英语时文阅读专项训练阅读理解+话题素材+完形填空+热点外刊",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8be58c2fe0cd000192b57b",
+      "title": "2027考研英语外刊丨外刊精读英专生阅读音频电子版汇总教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.92,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9db47cab3c8500155e018a",
+      "title": "60篇外刊阅读搞定高考必备核心词PDF电子版无视频 · 60篇外刊阅",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a475b6b72cfc70001e128dc",
+      "title": "英语课件：英语外刊精读合集/英语时态保姆级教学",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a47a52abf15d20001811b2b",
+      "title": "人大附中初中英语外刊阅读试题电子版 配套答案解析 原版外刊阅读",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 26.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a47c0b80857710001cca933",
+      "title": "【外刊英语】彭老师英语外刊精读课【完结】",
+      "store_name": "网课甄选（下单自动发货）的店",
+      "store_id": "69509f4acc48350015de2b7e",
+      "price": 16.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e98e1419f8df0015f87dd7",
+      "title": "27考研英语外刊精读全套资料电子版四六级考研专四专八catti阅读",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.25,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69db3ec6c586eb000175aa77",
+      "title": "Soren外刊精读英语电子版学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.82,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ca7021f6cbe500154811ea",
+      "title": "2025版同源外刊初中英语时文阅读理解专项训练ABCD版热点电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5730136cbefa0001e7fddf",
+      "title": "英语课件：英语外刊精读合集/英语时态保姆级教学",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.66,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d9b61a747e9700016ed883",
+      "title": "SSP上海英文报200句子填空200句翻译资料电子版复盘3500词外刊",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c6101c7bbc820015702b75",
+      "title": "2026年英语外刊精读考研电子版经纪人双语ted精读计划演讲文字稿",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 21.16,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c099f7a20c210001b8141f",
+      "title": "初中英语作文句型专项练习+高级替换表达",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.88,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6b23a0ab42de00150a01bf",
+      "title": "英语外刊精读资料包1800篇精选2020-2026教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.81,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量处理表格电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "批量处理表格",
+  "slug": "批量处理表格"
+}

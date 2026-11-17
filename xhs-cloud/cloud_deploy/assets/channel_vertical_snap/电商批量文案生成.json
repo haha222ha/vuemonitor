@@ -1,0 +1,1226 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "电商批量文案生成"
+    ],
+    "niche": "电商批量文案生成"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "电商批量文案生成电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "电商批量文案生成电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 7,
+    "sku_n": 80,
+    "sum_delta": 2068,
+    "median_price": 8.9,
+    "niche": "电商批量文案生成",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 74,
+      "sum_delta": 2013,
+      "sum_sold": 23560,
+      "top_title": "新版初一精品练习题电子资料包，最新教程版本，永久免费更新",
+      "top_delta": 2000
+    },
+    {
+      "store_name": "美森教育旗舰店",
+      "sku_n": 1,
+      "sum_delta": 38,
+      "sum_sold": 7097,
+      "top_title": "【赠音频+五彩学习计划表】跨境电商英语口语交际大全外贸商务书",
+      "top_delta": 38
+    },
+    {
+      "store_name": "65e737d9bf7fb600014b3734",
+      "sku_n": 1,
+      "sum_delta": 12,
+      "sum_sold": 1313,
+      "top_title": "065超爸带娃弟子规大字版注音幼儿童国学启蒙早教PDF电子档非实物",
+      "top_delta": 12
+    },
+    {
+      "store_name": "66c41967afee22001542ffd6",
+      "sku_n": 1,
+      "sum_delta": 3,
+      "sum_sold": 7,
+      "top_title": "《有我》成人舞蹈完整视频+背景视频+音频电子资料包。",
+      "top_delta": 3
+    },
+    {
+      "store_name": "6943fc78ee0c080015670880",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 9,
+      "top_title": "视频音频-幼儿分级英语启蒙动画《女王带你唱读Raz》340课4级别",
+      "top_delta": 1
+    },
+    {
+      "store_name": "665d744ba275880001358dc9",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 4,
+      "top_title": "IGCSE英语ESL资料合集电子资料包|教材+真题+听力+词汇语法电子版",
+      "top_delta": 1
+    },
+    {
+      "store_name": "邵鑫读书星成旷野专卖店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 154,
+      "top_title": "邵鑫精读《四大名著》 600讲 （视频课+音频课）",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "692ebfe4d4363c0001059765",
+      "title": "新版初一精品练习题电子资料包，最新教程版本，永久免费更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 13000,
+      "delta": 2000,
+      "actual_gr": 18.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c242d7ca64b30001dfac39",
+      "title": "【赠音频+五彩学习计划表】跨境电商英语口语交际大全外贸商务书",
+      "store_name": "美森教育旗舰店",
+      "store_id": "661662e1745579000158dcea",
+      "price": 27.81,
+      "sold": 7097,
+      "delta": 38,
+      "actual_gr": 0.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "66d816b10b841f0001768ad0",
+      "title": "065超爸带娃弟子规大字版注音幼儿童国学启蒙早教PDF电子档非实物",
+      "store_name": "65e737d9bf7fb600014b3734",
+      "store_id": "65e737d9bf7fb600014b3734",
+      "price": 5.9,
+      "sold": 1313,
+      "delta": 12,
+      "actual_gr": 0.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b913585e5f050001fa34b2",
+      "title": "上海初三英语听说测试备考模拟卷考试指南专题特训含音频电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 268,
+      "delta": 5,
+      "actual_gr": 1.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a767c55a4f71c0001cc640e",
+      "title": "《精忠报国》舞蹈电子资料包，完整视频+音频。",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 8,
+      "delta": 5,
+      "actual_gr": 166.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a74826295cfc0000151419c",
+      "title": "《有我》成人舞蹈完整视频+背景视频+音频电子资料包。",
+      "store_name": "66c41967afee22001542ffd6",
+      "store_id": "66c41967afee22001542ffd6",
+      "price": 9.9,
+      "sold": 7,
+      "delta": 3,
+      "actual_gr": 75.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1e582b3ce96d0001d8fd85",
+      "title": "思辨1级教学资料包电子教材练习册出门测音频伴学伴读",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 158.0,
+      "sold": 34,
+      "delta": 2,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ef8f006acf67001501b8f1",
+      "title": "视频音频-幼儿分级英语启蒙动画《女王带你唱读Raz》340课4级别",
+      "store_name": "6943fc78ee0c080015670880",
+      "store_id": "6943fc78ee0c080015670880",
+      "price": 5.9,
+      "sold": 9,
+      "delta": 1,
+      "actual_gr": 12.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6153d355f0ca00018c0b9f",
+      "title": "IGCSE英语ESL资料合集电子资料包|教材+真题+听力+词汇语法电子版",
+      "store_name": "665d744ba275880001358dc9",
+      "store_id": "665d744ba275880001358dc9",
+      "price": 16.0,
+      "sold": 4,
+      "delta": 1,
+      "actual_gr": 33.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a88095e71204c0001a69285",
+      "title": "2026新版广州教科版五年级上册英语预习资料包电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.52,
+      "sold": 3,
+      "delta": 1,
+      "actual_gr": 50.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "68a9aeaaec7fed0001d40dc3",
+      "title": "【人教版信息科技】三年级任一课 讲课资料包 | 点击购买选择课程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 2155,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "68cfccfdd1f7b8000173e98e",
+      "title": "疯狂练耳音乐升原创练耳有声题库练习百度网盘极速",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 35.9,
+      "sold": 1444,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4b6d3ca1b436000112c96f",
+      "title": "【人教版】小学英语全册音频MP3",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.5,
+      "sold": 1155,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a87c9c6f551f500018793f2",
+      "title": "2026新版高中英语单词音频课文音频词汇音频mp3电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 704,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "65276cc2f02f860001df47ab",
+      "title": "宜读经典：邵鑫选讲10本名著（视频课+音频课）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 499.0,
+      "sold": 513,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4b51678879a0000189d717",
+      "title": "音频格式一键转换教程 零基础音频文件处理教学课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.88,
+      "sold": 437,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a167b7c6e37310001ea17a9",
+      "title": "酷狗音乐转MP3 kgm kgma转mp3 flac无损批量 电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 325,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3d039cdb862b0001ffeafc",
+      "title": "2026秋教科版英语五年级上册预习zi料电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.96,
+      "sold": 295,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a700d586cbefa00019513eb",
+      "title": "26秋一年级上册语文练习课件素材PDF电子版可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 246,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3e6b2d88d1c10001abff9d",
+      "title": "信息科技三年级整册《在线学习与生活》课件包任选一课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.8,
+      "sold": 228,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "688dc36479bc4700012177eb",
+      "title": "人音版初中音乐七八九年级上下册 配套教案课件PPT 电子版资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 223,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "694ada6b8bd70d00018fcf68",
+      "title": "Super Minds 0-6册精品课件，练习题，音频视频剑桥",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 181,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "692e8a8214b5260001ca9396",
+      "title": "人教PEP版英语一年级下册课件教案朗读音视频动画练习知识点总结",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.59,
+      "sold": 164,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ba9ab9c1222100015a71f1",
+      "title": "新版花城版三年级上册音乐课件+教案+音频+视频资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 163,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6874786c6fea660001d18a8d",
+      "title": "邵鑫精读《四大名著》 600讲 （视频课+音频课）",
+      "store_name": "邵鑫读书星成旷野专卖店",
+      "store_id": "64f9564d5b50f70001d92ee0",
+      "price": 2499.0,
+      "sold": 154,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ecc5305e77db00157263f8",
+      "title": "2027年考前冲刺联考2026各省音乐统考练耳真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.8,
+      "sold": 132,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6935693aaf71c300012fc060",
+      "title": "沪教上海版小学英语12345年级上下册课件PPT教案音频试题试卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.98,
+      "sold": 118,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a85b9648bb06b00018c20ec",
+      "title": "音乐格式转换 支持mgg mflac ogg ncm kgg kgm kwm转mp3 批量操作",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.88,
+      "sold": 115,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4e600caa62b50001929a50",
+      "title": "2026新沪教牛津六上英语63制预习备课资料包【电子版发网盘】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 107,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "69439d668a7838001560680e",
+      "title": "沪教牛津版小学英语音频MP3课文朗读听力录音3456年级上下册全套",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.86,
+      "sold": 104,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6958b73808cd900001c019f3",
+      "title": "【26春精通四下】全册完整版电子资料包视频+音频+PDF资料教案PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.8,
+      "sold": 89,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a426d55654b390001f8a051",
+      "title": "2026新外研六年级上册英语预习备课资料包【电子版发网盘】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 85,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "684634fb1b910d0015f8adcc",
+      "title": "2026年音乐学科知识笔刷题库新任教师招聘考编制小学初高中电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 83,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3bdd631a148300018551a1",
+      "title": "单词音频生成器 英语单词短语转音频 MP3 文本朗读合成音频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.0,
+      "sold": 77,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "689efd327313330001a4d3d8",
+      "title": "2025冀教四年级上册英语学科辅导定制资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 74,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6940b1cebe1ced001587bb82",
+      "title": "部编人教版小学语文课文朗读mp3音频123456年级资料word素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.91,
+      "sold": 73,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a15f172080aa000155c51a",
+      "title": "冀教版四年级下册英语学科辅导定制资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 72,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a067c8d30d08600011e1653",
+      "title": "笔记同款阅读模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 64,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a50c9fc24f04400011f359e",
+      "title": "2026重大六年级上册英语预习备课资料包【电子版发网盘】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 53,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a355631590e61000138ce31",
+      "title": "外研版英语3456年级上册下册音频动画",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.0,
+      "sold": 52,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c697f4c728400001de00b3",
+      "title": "老人与海 英语有声书音频mp3+中英对照版pdf电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 45,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a586b5124f0440001c47cd3",
+      "title": "2026新版高中英语单词音频课文音频词汇音频mp3电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 34.8,
+      "sold": 43,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7abedc5bea4e0001d9a247",
+      "title": "2026秋人音版一上音乐精品课件+教案+大单元 备课资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 42,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "684242f1317c90000190042b",
+      "title": "音乐东北大秧歌音乐MP3网盘锣鼓唢呐歌曲中老年户外舞曲高音",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 39,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "68a0c03133fcf80001699cb0",
+      "title": "2025PET官方真题资料包【含电子书+音频+答案】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.0,
+      "sold": 38,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9fd6fd88012e000147271d",
+      "title": "新课标人音版小学音乐1-6年级上下册课件教案PPT音频资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.46,
+      "sold": 30,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59a87c8846460001dd5ddb",
+      "title": "2027广州教科版小学英语音频课文朗读MP3单词听力三四五六年级全",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 30,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3e8459f7c8040001d1f965",
+      "title": "2026译林版八年级上册英语预习备课资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 29,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a64b81f6cbefa000172b6cf",
+      "title": "2026秋闽教版英语六年级上册课文单词朗读音频视频PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 28,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a50af016cbefa00015eafec",
+      "title": "SIELE西班牙语备考资料包，听说读写全套2026年6月整理版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 27,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6889c2088fe3470001cfa738",
+      "title": "OET全套资料音频 题库阅读 写作 口语 听力资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.88,
+      "sold": 25,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "692da185137a3b0001694797",
+      "title": "单声部视唱教程上下册全集 电子版PDF版 网盘发",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.0,
+      "sold": 24,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6c05f924f0440001b48af1",
+      "title": "视频/音频转文字神器 语音识别准确快速导出5种格式word TXT MD等",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.0,
+      "sold": 23,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "68dcb6a1e0f3b20001dc1278",
+      "title": "26人教新起点小学123456年级英语上下册课文单词朗读MP3听力音频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.6,
+      "sold": 23,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "697c8a795b50a30001dbd20d",
+      "title": "未泱yang妈中英文阅读营LO到L5RAZ阅读营启蒙小学1-6年级视音频WY",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 42.2,
+      "sold": 23,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3d44c639d60d0001aeab64",
+      "title": "2026译林版四上英语备课预习资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 19,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "67ab5dd429b9f70001abe422",
+      "title": "新外研三下电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 18,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a70475124f044000113abe1",
+      "title": "2026年税w师550题三色笔记轻一轻二轻三椰子冲刺PDF电子版资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.99,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "68eb1752f8d1f000018e7c73",
+      "title": "原创英语自拼小资料（领取电子文件包内无水印）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.6,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a13ab4e1153580015181f30",
+      "title": "高中语文课文朗读MP3音频高一高二必修上下选修上中下word素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.0,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a045b0c58e1b10001b74b83",
+      "title": "【发网盘】26年英语四六级核心高频词1500词汇 高清PDF电子",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c0eb2b7c9c8f0001496d69",
+      "title": "新版上海沪教版小学音乐一二三四五六年级上下册课件ppt电子教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6971876bdd51620001467052",
+      "title": "【精通三下】全册完整版电子资料包 视频+音频+PDF资料 课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.8,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "690ec2b81b3cbb00154a773c",
+      "title": "外研社版小学英语三起点三四五六年级上下册听力朗读音频素材MP3",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.76,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "697821ef06c7230001a2ef94",
+      "title": "德福25年3月最新真题德福考试必备资料包德福海内外真题德福最新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 14,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59a91924f0440001dd934f",
+      "title": "2027人教大同版小学英语音频课文朗读MP3单词听力三四五六年级全",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7d33f88bb06b00019df9a1",
+      "title": "2026秋沪教版五年级上册英语预习复习备课资料包电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.8,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3366aa9cf097000163255d",
+      "title": "TED演讲精华全集视频音频学习资料包（1984-2024）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.41,
+      "sold": 11,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a86b59cb2b3a30001c95416",
+      "title": "歌曲全集下载MP3无损网盘音乐合集歌曲mp3网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "691c2c34ccb9e00001b3d07f",
+      "title": "合唱团必备！《如愿》二声部超全电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.9,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa5f76b083884000140a7d9",
+      "title": "2026新版接力版小学英语课件PPT教案配套资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.0,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7ed0075ed32c000159662c",
+      "title": "26新人教八上英语课件教案教参音频笔记练习教辅全套资料包电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7d3dd7c9142a0001a36c55",
+      "title": "2026秋译林版六年级上册英语预习复习备课资料包电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.8,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a633e966cbefa0001513bcc",
+      "title": "语音视频录音提取文字文本工具 准确率高 专业识别 文案提取神器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.88,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a98c0f5feda090001f76870",
+      "title": "2026秋新外研版六上英语课文同步PPT教学课件电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "68650b51bc668f00151e49f6",
+      "title": "地理新版ReachHigher1-6pdf电子版练习册素材word音频PPT课件资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 33.0,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5d625601c1af0001fb221c",
+      "title": "2026秋人教版初中英语九年级上册课件PPT同步练习课本音频资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6f7a3f2bf2dc00012726d7",
+      "title": "新版现代西班牙语1-4册电子版资料包张帆西班牙语语非课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "67ca40e929b9f700011ad889",
+      "title": "牛津沪教版六年级下册英语电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a37e436cde0db0001545ddf",
+      "title": "26中会椰子思维导图pdf三科冲刺电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "电商批量文案生成电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "电商批量文案生成",
+  "slug": "电商批量文案生成"
+}

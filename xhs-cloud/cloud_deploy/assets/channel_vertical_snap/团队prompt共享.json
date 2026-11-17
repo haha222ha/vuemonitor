@@ -1,0 +1,94 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "团队prompt共享"
+    ],
+    "niche": "团队prompt共享"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "团队prompt共享电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "团队prompt共享电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 2,
+    "sku_n": 2,
+    "sum_delta": 0,
+    "median_price": 2.99,
+    "niche": "团队prompt共享",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "桃渊明素材",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 34,
+      "top_title": "宝藏小店!刀鞘电子版完整复盘组织者手册剧本线索售后资料",
+      "top_delta": 0
+    },
+    {
+      "store_name": "（未知店）",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 2,
+      "top_title": "《开局一个碗》剧本杀电子版全员剧本开本手册线索售后资料完整版",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "69d61a9028de7400158180da",
+      "title": "宝藏小店!刀鞘电子版完整复盘组织者手册剧本线索售后资料",
+      "store_name": "桃渊明素材",
+      "store_id": "6964e19a42f8640015f2b5be",
+      "price": 1.12,
+      "sold": 34,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "团队prompt共享电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa216c5889a2200010cb04a",
+      "title": "《开局一个碗》剧本杀电子版全员剧本开本手册线索售后资料完整版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "团队prompt共享电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "团队prompt共享",
+  "slug": "团队prompt共享"
+}

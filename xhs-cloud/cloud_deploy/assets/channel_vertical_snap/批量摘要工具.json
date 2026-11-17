@@ -1,0 +1,1144 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "批量摘要工具"
+    ],
+    "niche": "批量摘要工具"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "批量摘要工具电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "批量摘要工具电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 16,
+    "sku_n": 69,
+    "sum_delta": 1376,
+    "median_price": 28.8,
+    "niche": "批量摘要工具",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 54,
+      "sum_delta": 1307,
+      "sum_sold": 69091,
+      "top_title": "2027考研英语真题英语一英语二历年真题试卷管综西综数学政治刷题",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "子悠学姐（资料版）的店",
+      "sku_n": 1,
+      "sum_delta": 24,
+      "sum_sold": 1997,
+      "top_title": "26下教资笔试资料包",
+      "top_delta": 24
+    },
+    {
+      "store_name": "67fc41cc4d46980015a9c2af",
+      "sku_n": 1,
+      "sum_delta": 12,
+      "sum_sold": 399,
+      "top_title": "新1+新2全套资料包（手绘笔记+语法讲义+课后练习+默写小纸条，",
+      "top_delta": 12
+    },
+    {
+      "store_name": "艾米老师资料库的店",
+      "sku_n": 1,
+      "sum_delta": 12,
+      "sum_sold": 207,
+      "top_title": "新1册－4册课文精读笔记，包含默写和音频，PDF版本",
+      "top_delta": 12
+    },
+    {
+      "store_name": "69303fb0b5ee13001589484e",
+      "sku_n": 1,
+      "sum_delta": 9,
+      "sum_sold": 414,
+      "top_title": "【笔记同款】专升本教育学心理学资料包电子版 学习复习资料课件",
+      "top_delta": 9
+    },
+    {
+      "store_name": "6889d4a87184a900151a4351",
+      "sku_n": 1,
+      "sum_delta": 5,
+      "sum_sold": 449,
+      "top_title": "26成人本科学位英语全国通用 课件精讲+习题+笔记 一年有效",
+      "top_delta": 5
+    },
+    {
+      "store_name": "育甲图书旗舰店",
+      "sku_n": 1,
+      "sum_delta": 5,
+      "sum_sold": 59,
+      "top_title": "陶大3.0新版 陶然Free高考英语阅读和七选五精讲100篇全国通用",
+      "top_delta": 5
+    },
+    {
+      "store_name": "66e37877081fe50015b932ff",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 325,
+      "top_title": "［电子资料不退不换］石lp30个功能句笔记和主题词笔记电子资料包",
+      "top_delta": 1
+    },
+    {
+      "store_name": "叙意.的店",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 228,
+      "top_title": "重庆师范大学学科英语824自用备考资料包",
+      "top_delta": 1
+    },
+    {
+      "store_name": "684c37724db8540015f42b68",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1125,
+      "top_title": "03-最新MAP资料包",
+      "top_delta": 0
+    },
+    {
+      "store_name": "拾光素材研习社的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 329,
+      "top_title": "2026年上海市名区教育职称考试真题中级高级电子版资料包",
+      "top_delta": 0
+    },
+    {
+      "store_name": "64fe21df57eb8e0001df1c9f",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 171,
+      "top_title": "《Circle Time 英文话术1000句子全指南》",
+      "top_delta": 0
+    },
+    {
+      "store_name": "小佳爱学习丨锦意的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 119,
+      "top_title": "powerup在家省娃自学一周课程",
+      "top_delta": 0
+    },
+    {
+      "store_name": "689abeaff07d210015c3f9d5",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 45,
+      "top_title": "剑桥 Prepare 第2版 教学资料包 2.0全面版（PDF资料，先看后买）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "汤姆先生教英语的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 20,
+      "top_title": "千万别学英语整套资料包",
+      "top_delta": 0
+    },
+    {
+      "store_name": "672c9ec53eb510001535dbcd",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "维品荟招聘在线测评校招笔试真题网申测评资料社招入职测试电子版",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "687378673f6e4500015e4ecc",
+      "title": "2027考研英语真题英语一英语二历年真题试卷管综西综数学政治刷题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 69.8,
+      "sold": 55000,
+      "delta": 1000,
+      "actual_gr": 1.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "697ef6104937e700019edae1",
+      "title": "新人教版初中英语课件PPT教案教学设计讲义试卷(七八九年级)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 4378,
+      "delta": 187,
+      "actual_gr": 4.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7483302fbfa60001d036ec",
+      "title": "适配Oxford Discover第二版学习资料小学英语思维导图知识点练习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 623,
+      "delta": 32,
+      "actual_gr": 5.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "698c3e1084b90b00015bd1d0",
+      "title": "26下教资笔试资料包",
+      "store_name": "子悠学姐（资料版）的店",
+      "store_id": "6715f8ce7f3e1d00154dbc75",
+      "price": 4.9,
+      "sold": 1997,
+      "delta": 24,
+      "actual_gr": 1.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6ae1f7def92a0001682e15",
+      "title": "2026外研社杯全国中学生外语素养大赛历年题库视频第23届资料PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 66,
+      "delta": 24,
+      "actual_gr": 57.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a138134d1dca0001b4d970",
+      "title": "Ameplus+上海英语新教材重点笔记(电子资料包)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 1091,
+      "delta": 16,
+      "actual_gr": 1.49,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0db9254bc2410001c9ff43",
+      "title": "新1+新2全套资料包（手绘笔记+语法讲义+课后练习+默写小纸条，",
+      "store_name": "67fc41cc4d46980015a9c2af",
+      "store_id": "67fc41cc4d46980015a9c2af",
+      "price": 58.8,
+      "sold": 399,
+      "delta": 12,
+      "actual_gr": 3.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f81632a9784500017afab0",
+      "title": "新1册－4册课文精读笔记，包含默写和音频，PDF版本",
+      "store_name": "艾米老师资料库的店",
+      "store_id": "67fc41cc4d46980015a9c2af",
+      "price": 9.9,
+      "sold": 207,
+      "delta": 12,
+      "actual_gr": 6.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9cc0f48cb7b80001c2ad33",
+      "title": "四年级第9课 二维码伴我生活 全套资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.8,
+      "sold": 132,
+      "delta": 11,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d736350fb9470001bac108",
+      "title": "天津中高级教师职称考试中小学语文数学英语各学科学习资料汇总",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 175,
+      "delta": 10,
+      "actual_gr": 6.06,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6932a444af1ec70001df5683",
+      "title": "【笔记同款】专升本教育学心理学资料包电子版 学习复习资料课件",
+      "store_name": "69303fb0b5ee13001589484e",
+      "store_id": "69303fb0b5ee13001589484e",
+      "price": 12.0,
+      "sold": 414,
+      "delta": 9,
+      "actual_gr": 2.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3fc66108577100012267ba",
+      "title": "高中英语二卷资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.0,
+      "sold": 46,
+      "delta": 7,
+      "actual_gr": 17.95,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5891816cbefa00010755a7",
+      "title": "26成人本科学位英语全国通用 课件精讲+习题+笔记 一年有效",
+      "store_name": "6889d4a87184a900151a4351",
+      "store_id": "6889d4a87184a900151a4351",
+      "price": 6.9,
+      "sold": 449,
+      "delta": 5,
+      "actual_gr": 1.13,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6965d9bf54fb9e0001915e15",
+      "title": "陶大3.0新版 陶然Free高考英语阅读和七选五精讲100篇全国通用",
+      "store_name": "育甲图书旗舰店",
+      "store_id": "6302ecd16c7ba8000125110d",
+      "price": 59.1,
+      "sold": 59,
+      "delta": 5,
+      "actual_gr": 9.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a882404cc9be300016877e4",
+      "title": "26秋新人教精通版英语小学四五六年级上册英语预习备课复习资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 21.9,
+      "sold": 233,
+      "delta": 4,
+      "actual_gr": 1.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a959e5fc61bcd0001fffd03",
+      "title": "人教版六年级上册英语学习资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.9,
+      "sold": 92,
+      "delta": 4,
+      "actual_gr": 4.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a50c9fc24f04400011f358f",
+      "title": "2026重大六年级上册英语练习备课资料包【电子版发网盘】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.9,
+      "sold": 74,
+      "delta": 3,
+      "actual_gr": 4.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6d6af6def92a0001a07195",
+      "title": "国际邮轮海乘英语资料包！ 面试+在岗口语零基础可用【带音频】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 120,
+      "delta": 2,
+      "actual_gr": 1.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3fc40e7d09bf000119ecdd",
+      "title": "高中英语一卷资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.0,
+      "sold": 44,
+      "delta": 2,
+      "actual_gr": 4.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ee035d29904900011715cd",
+      "title": "外研社版高中必修一英语课堂笔记备课教材1~6单元电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.8,
+      "sold": 36,
+      "delta": 2,
+      "actual_gr": 5.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa91509f660cd00016e19de",
+      "title": "2026新疆教师业务考试资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 714,
+      "delta": 1,
+      "actual_gr": 0.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67e5f0db43af9100013b345e",
+      "title": "［电子资料不退不换］石lp30个功能句笔记和主题词笔记电子资料包",
+      "store_name": "66e37877081fe50015b932ff",
+      "store_id": "66e37877081fe50015b932ff",
+      "price": 2.99,
+      "sold": 325,
+      "delta": 1,
+      "actual_gr": 0.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68354ae7d5fe8c000147d245",
+      "title": "重庆师范大学学科英语824自用备考资料包",
+      "store_name": "叙意.的店",
+      "store_id": "676b7bc07b25e60015e35b15",
+      "price": 49.9,
+      "sold": 228,
+      "delta": 1,
+      "actual_gr": 0.44,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "681e616b80956a00014ffc04",
+      "title": "听歌学英语巧记3500单词练习课件电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 34.9,
+      "sold": 80,
+      "delta": 1,
+      "actual_gr": 1.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3e89797d09bf0001ff644e",
+      "title": "雅思写作大作文小作文批改skill",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 135.0,
+      "sold": 17,
+      "delta": 1,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "688dc94902d7b0000118709c",
+      "title": "03-最新MAP资料包",
+      "store_name": "684c37724db8540015f42b68",
+      "store_id": "684c37724db8540015f42b68",
+      "price": 16.91,
+      "sold": 1125,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0ffe242d684c00013c1dd7",
+      "title": "南京七上数学真题整理语文英语作业本笔记本月考期中期末",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 43.8,
+      "sold": 917,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a64d7565b7eff0001ecadc8",
+      "title": "美甲师必备！实用美甲英语，从入门到精通（国外可用）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 729,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d4fbc2b4722c000150943b",
+      "title": "2026幼小衔接全套资料 拼音古诗数学阅读国学英语PPT课件教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 611,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8fc94fc61bcd0001617ad2",
+      "title": "2026译林版7-9年级初中英语周周练含答案赠单词短语句式默写本",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.99,
+      "sold": 498,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69089fa7c6a9770001e8dde9",
+      "title": "2026春新八下人教英语笔记&练习&作文&音频电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.99,
+      "sold": 491,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6836e87bf1a0740001c6e67e",
+      "title": "2026译林版七上英语同步预习复习备课资料包课件教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 474,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7be94195cfc00001d84d4e",
+      "title": "26秋人教版PEP小学英语六年级上册教学资料包 课件+教案+知识清单",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.99,
+      "sold": 399,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6674419e98e3350001f097ce",
+      "title": "杰米英语跟读课 + 阅读笔记：从零基础到KET!",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 78.0,
+      "sold": 341,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69077cacbecfcc000197bca6",
+      "title": "2026年上海市名区教育职称考试真题中级高级电子版资料包",
+      "store_name": "拾光素材研习社的店",
+      "store_id": "68ec9d002f3ef000157a914e",
+      "price": 28.8,
+      "sold": 329,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a950c81e1ea8c00019e1f0e",
+      "title": "2026人教七八九年级上下册英语周末培优特训综合练习题带答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.99,
+      "sold": 329,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aae86cf2054db000167f813",
+      "title": "八上语文资料汇总",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 285,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a61cc5884b8ee000131d55d",
+      "title": "2026新外研版高中英语必修一选必修四资料包+知识点清单",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.88,
+      "sold": 183,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "692cd7a047579d000171ea4b",
+      "title": "《Circle Time 英文话术1000句子全指南》",
+      "store_name": "64fe21df57eb8e0001df1c9f",
+      "store_id": "64fe21df57eb8e0001df1c9f",
+      "price": 6.99,
+      "sold": 171,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa02dde5152e50001177b13",
+      "title": "广东省高校教师两学考试核心资料包（含必考知识点）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.9,
+      "sold": 126,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a213e18c2c13f000104faca",
+      "title": "powerup在家省娃自学一周课程",
+      "store_name": "小佳爱学习丨锦意的店",
+      "store_id": "6912e0b2a0f8db001598ace4",
+      "price": 9.9,
+      "sold": 119,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9135b828ea590001cc9de2",
+      "title": "26新版小学六上人教PEP版英语学习资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 119,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2963749fe0a80001d723b8",
+      "title": "九年级上册英语新译林unit1-8手写笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 78.0,
+      "sold": 84,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9d70c9baea3b00017901da",
+      "title": "2026秋新外研英语七上全册完整教案电子版【高清可打印】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 78,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a749b76042a9b000185e855",
+      "title": "新沪教四年级上册英语资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 21.09,
+      "sold": 71,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c3c7bd55f59b0001ec701e",
+      "title": "【纯正英音】独白朗读资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.9,
+      "sold": 60,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67c12b11f6588900014f19b3",
+      "title": "散文精读资料包（进阶版）~需要word格式同步原文的拍",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 59.8,
+      "sold": 53,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a703b8974bf00000111f6c3",
+      "title": "新沪教五年级英语上册资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 21.09,
+      "sold": 46,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5a66a08c0a3e000110d190",
+      "title": "苍蝇小子flyguy知识清单+精读笔记+ppt等全套资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 59.9,
+      "sold": 46,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f05bceed3b2f00015f86e2",
+      "title": "英语中译英翻译练习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 45,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a637d8d74bf000001f8d629",
+      "title": "剑桥 Prepare 第2版 教学资料包 2.0全面版（PDF资料，先看后买）",
+      "store_name": "689abeaff07d210015c3f9d5",
+      "store_id": "689abeaff07d210015c3f9d5",
+      "price": 120.0,
+      "sold": 45,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6826bb402b28ce0001107c7a",
+      "title": "2026中考英语时文精选、时事热点英语阅读理解36篇 电子版资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 47.9,
+      "sold": 42,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9916e320796100017f1423",
+      "title": "精品趣味英语配音社团资料包（送配音教学视频 限前10单）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 33.15,
+      "sold": 28,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4b509f654b390001afe97e",
+      "title": "2026秋外研版八上课文精读资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.8,
+      "sold": 27,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "695b777d7d28460001185b14",
+      "title": "新版人教版八上英语教材笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 69.9,
+      "sold": 25,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67d5341652503c0001953fb1",
+      "title": "英语学习之生活大爆炸资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6937fe57daf9270001445d51",
+      "title": "千万别学英语整套资料包",
+      "store_name": "汤姆先生教英语的店",
+      "store_id": "680307dfa6f4e400156f8093",
+      "price": 8.41,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3fcb6335beb1000160ff22",
+      "title": "26 秋新人教版九上英语备课资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.0,
+      "sold": 13,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a46366ff764ee00017b70b4",
+      "title": "英皇乐理5级录播课+真题练习资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 599.0,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8304b095cfc00001992561",
+      "title": "七上外研整套资源包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 38.88,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7ed0075ed32c0001596632",
+      "title": "26新人教八上英语课件教案教参音频笔记练习教辅全套资料包电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9fa3e7769a3d00018b5b46",
+      "title": "学士学位英语速记背诵资料刷题提分课程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 40.54,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a673e7b88464600013b7d0f",
+      "title": "26秋人教大同版英语三年全套资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.8,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9bb13db993210001c9760d",
+      "title": "26秋-新教材 5年级英语资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 36.25,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a6b31fbefcbd00010946d5",
+      "title": "2026年北师大版小学英语新教材解读培训视频图文笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9fabe74c56fb00017d5180",
+      "title": "学士学位英语速记背诵+刷题练习课程包含重难考点",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.1,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68be89cafe39ac001569d0f6",
+      "title": "维品荟招聘在线测评校招笔试真题网申测评资料社招入职测试电子版",
+      "store_name": "672c9ec53eb510001535dbcd",
+      "store_id": "672c9ec53eb510001535dbcd",
+      "price": 11.07,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f021036eeaf700014592e8",
+      "title": "最新蓉漂人才荟面经含参考回答(电子版)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68be861dec5b4300151385d7",
+      "title": "维品荟招聘在线测评校招笔试真题网申测评资料社招入职测试电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.07,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量摘要工具电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "批量摘要工具",
+  "slug": "批量摘要工具"
+}

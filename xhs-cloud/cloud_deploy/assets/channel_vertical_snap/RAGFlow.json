@@ -1,0 +1,1194 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "RAGFlow"
+    ],
+    "niche": "RAGFlow"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "RAGFlow电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "RAGFlow电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 3,
+    "sku_n": 80,
+    "sum_delta": 1146,
+    "median_price": 7.41,
+    "niche": "RAGFlow",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 78,
+      "sum_delta": 1143,
+      "sum_sold": 55731,
+      "top_title": "26学士学位学位英语全套笔记冲刺课程资料练习！",
+      "top_delta": 699
+    },
+    {
+      "store_name": "北京师范唐老师的店",
+      "sku_n": 1,
+      "sum_delta": 3,
+      "sum_sold": 800,
+      "top_title": "2026期末模拟试卷高一高二下学期语数英物化生政史地原卷版解析版",
+      "top_delta": 3
+    },
+    {
+      "store_name": "64e31a632d77a8000122d690",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 94,
+      "top_title": "2026成人高考专升本考试政治英语高数二课程纸质历年真题模拟卷",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a51dff0d09fb6000142f8bf",
+      "title": "26学士学位学位英语全套笔记冲刺课程资料练习！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 3535,
+      "delta": 699,
+      "actual_gr": 24.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d9fb2247a2e20001b51eb1",
+      "title": "2026届湖南长沙四大名校试卷历年真题月考期中期末真题模拟卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 526,
+      "delta": 101,
+      "actual_gr": 23.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a90f6c5c61bcd00018191bc",
+      "title": "KET真题和模拟资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.9,
+      "sold": 162,
+      "delta": 71,
+      "actual_gr": 78.02,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6945136a9650820001e53ed5",
+      "title": "2026高中各科学考会考合格考总复习专题讲义真题汇编模拟卷.",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 2192,
+      "delta": 66,
+      "actual_gr": 3.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69451898bd92f50001cf51fe",
+      "title": "2027高考英语语法练习课件PPT讲义专项训练一轮二轮复习练习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 1340,
+      "delta": 52,
+      "actual_gr": 4.04,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f6016c6eeaf700012198e9",
+      "title": "26届高考英语4月各题型专项练习合集（PDF+WORD版）含答案解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 3227,
+      "delta": 27,
+      "actual_gr": 0.84,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e35f54b7a2ed00011c7b6a",
+      "title": "2026年上海高考真题及一二轮模拟试卷练习题数学英语文生物理政治",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.0,
+      "sold": 205,
+      "delta": 16,
+      "actual_gr": 8.47,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3ce05f0320760001a1db03",
+      "title": "2026广东省高考历年真题试卷语文数学英语物理化学历史政治电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 435,
+      "delta": 14,
+      "actual_gr": 3.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4241cc085771000158380e",
+      "title": "（电子资料自动发货）2026北京高考英语听口E听说模拟题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 228,
+      "delta": 12,
+      "actual_gr": 5.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9a213d7ece3500010e4b36",
+      "title": "体育单招高考真题卷+模拟卷 语文数学英语政治习题资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 103,
+      "delta": 11,
+      "actual_gr": 11.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c92350fb75bf0001778a2e",
+      "title": "小升初英语语法专项练习短语模拟卷复习资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 385,
+      "delta": 8,
+      "actual_gr": 2.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4083aabf15d20001e2d744",
+      "title": "成人高考-高起专/本，电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 877,
+      "delta": 7,
+      "actual_gr": 0.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "67bad31997592600018b4225",
+      "title": "港澳台联考真题答案模拟题华侨生历年真题电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 412,
+      "delta": 7,
+      "actual_gr": 1.73,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e36253a1dd7800019f4447",
+      "title": "2026年天津高考真题及一二轮模拟试卷练习题数学英语文生物理政治",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.0,
+      "sold": 492,
+      "delta": 6,
+      "actual_gr": 1.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a708d69eb49fe0001c9bed6",
+      "title": "2026秋小升初入学分班考试语文数学英语模拟试卷电子版资料含解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 197,
+      "delta": 5,
+      "actual_gr": 2.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7c039a532d7700018e4dad",
+      "title": "2027高考英语题型分类专项训练真题模拟题汇总全国通用电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 97,
+      "delta": 5,
+      "actual_gr": 5.43,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "689dad17e53c1000158cc109",
+      "title": "浙江省大学英语三级历年真题及答案解析 预测模拟 pdf电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 157,
+      "delta": 4,
+      "actual_gr": 2.61,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8507150020da00019e90c1",
+      "title": "广东省春季高考语数英真题卷+模拟卷+复习资料【普高+职高适用】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 87,
+      "delta": 4,
+      "actual_gr": 4.82,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6861e8cd6256090001ced56e",
+      "title": "2026年全国公共英语等级考试三级PETS3教材历年真题词汇听力模拟",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 95.8,
+      "sold": 2358,
+      "delta": 3,
+      "actual_gr": 0.13,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2d180a4610970001f9121f",
+      "title": "2026期末模拟试卷高一高二下学期语数英物化生政史地原卷版解析版",
+      "store_name": "北京师范唐老师的店",
+      "store_id": "68779aee0c699900153f19e4",
+      "price": 2.6,
+      "sold": 800,
+      "delta": 3,
+      "actual_gr": 0.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cc9ff4a4db7c00011c0f1d",
+      "title": "2026全国通用版 九年级•最后一次大型的考试*复习资料合集（看规",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 178,
+      "delta": 3,
+      "actual_gr": 1.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d486a701e19300014a4624",
+      "title": "中考英语选词填空做题技巧+30篇电子档（广东省各市模拟真题）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 173,
+      "delta": 3,
+      "actual_gr": 1.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6a10992bf2dc0001acabd6",
+      "title": "DSE牛津英语模拟题51套2014-2026阅读听力写作真题合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.0,
+      "sold": 6,
+      "delta": 3,
+      "actual_gr": 100.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6937f98015fdcf0001a0b871",
+      "title": "广东春季高考语文数学英语真题试卷普高职高复习资料【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 331,
+      "delta": 2,
+      "actual_gr": 0.61,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f5de18a5715f000177806f",
+      "title": "2026小升初英语总复习资料（课件+真题模拟+专项+知识点梳理）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 236,
+      "delta": 2,
+      "actual_gr": 0.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b50fee9b4aae00014f385c",
+      "title": "2026年同等学力申硕APP题库章节练习历年真题模拟试题英语西医综",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.5,
+      "sold": 75,
+      "delta": 2,
+      "actual_gr": 2.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a27f91b60bfcd000190a10c",
+      "title": "2026年Catti全国翻译专业资格考证备考刷题资料历年真题模拟试卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 45,
+      "delta": 2,
+      "actual_gr": 4.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e12c8557d5bd000106c511",
+      "title": "英语考研2026模拟卷试题答案解析黄皮书PDF高清25套英一英二资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.6,
+      "sold": 17,
+      "delta": 2,
+      "actual_gr": 13.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa91509f660cd00016e19de",
+      "title": "2026新疆教师业务考试资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 714,
+      "delta": 1,
+      "actual_gr": 0.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "693275697ca5630001d4b504",
+      "title": "备考26年12月考】刘晓艳四六级单词+项技巧配套视频四六级考试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 165.0,
+      "sold": 697,
+      "delta": 1,
+      "actual_gr": 0.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "685fd1b662138500017daa23",
+      "title": "2026年英语阅读理解中考真题100篇（带答案解析）网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 657,
+      "delta": 1,
+      "actual_gr": 0.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "696c4b513db79c000150850e",
+      "title": "2026南京中考特长生真题电子版南京名校中考特长生加试真题资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 426,
+      "delta": 1,
+      "actual_gr": 0.24,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6804388c4336c4000192ba24",
+      "title": "2025最新小升初英语 模拟卷+真题卷+专项训练试卷｜共18套 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 121,
+      "delta": 1,
+      "actual_gr": 0.83,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a657d3bf1ffda000176a7ed",
+      "title": "零基础到精通2026年高中英语完形填空3500词真题模拟题合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 2,
+      "delta": 1,
+      "actual_gr": 100.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69aac7cac125ae0001a3bb13",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 7680,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6944f92d6a3f3f0001e579a4",
+      "title": "考研英语】新版2027考研张剑考研英语黄皮书英一英二真题逐词逐句",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 36.8,
+      "sold": 6990,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "682400a658da9f000119f9d3",
+      "title": "新版2027年高职单招考试复习资料书中职生对口升学考试总复习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.76,
+      "sold": 3965,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6870c77d448546000192fa93",
+      "title": "新人教版高中英语PPT课件教案高一高二高三试卷音频导学案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.88,
+      "sold": 2399,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "678e5e3e75ca3a00012e5f2a",
+      "title": "2023-2026年江苏省苏州市中考一模二模试卷【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 1261,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "669721838f65230001b88823",
+      "title": "2027版高考必刷卷3年5年十年10年真题卷42套模拟含2026高考真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 34.27,
+      "sold": 1045,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d3211f4ee72d0001131d82",
+      "title": "2026陕西中考英语新题型（适用27届中考）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 982,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e8dc989dea2d00014cdada",
+      "title": "2026中考英语热点和中国文化精选题｜模拟题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.0,
+      "sold": 885,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6901d1820dfa750001372b66",
+      "title": "2025年高中语文数学英语物化生政史地高一高二期中期末模拟考试卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 744,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2aa934461097000101acf6",
+      "title": "大学英语六级备考资料  新品特惠前100名 6折",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 702,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0c4ccca1a66400013b1694",
+      "title": "2026新江苏小升初真题卷语文数学英语科学总复习讲练测专项带答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.8,
+      "sold": 637,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "692ed57ee4338c0001a29544",
+      "title": "2025年高中学业水平合格性考试专题复习真题分类汇编训【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 620,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d3949f8c33b900017d9c6f",
+      "title": "2027体育单招英语店铺资料合集电子版可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.68,
+      "sold": 605,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "693a8583a454e80001511a9c",
+      "title": "高中英语完形填空专项训练合集电子版+名校模拟题+完形高频词汇表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 38.0,
+      "sold": 603,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a547ee411bb870001ede57b",
+      "title": "26年下教资笔试中学科三预测密押模拟卷每科10-20套",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 558,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "67af588bdb1dc10001e9059a",
+      "title": "2023-2026年江苏省常州市中考一模二模试卷【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 473,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "692aeaf6b644e40001ae4a26",
+      "title": "2027版辽宁单招资料知识手册真题试卷练习册语数英职测",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.24,
+      "sold": 432,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "699eddf3c9f5da00018877d3",
+      "title": "2026年江苏中考英语译林版多轮复习讲义练习模拟卷真题汇编电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.9,
+      "sold": 377,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0d2e04234d2b000119d546",
+      "title": "2026年西安五大名校中考模拟卷持续更新电子版全套课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.41,
+      "sold": 333,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "695d2f23d0c58a00012e5e2f",
+      "title": "2026高一期末模拟卷Word电子版可编辑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 325,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69fae0a554fc7500012e0310",
+      "title": "26.12】刘晓艳英语四六级真题急救班真题详解试卷模拟预测快刷抢",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.8,
+      "sold": 299,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6948c1d24423c30001e3de65",
+      "title": "广东省春季高考语数英真题卷+模拟卷+复习资料【普高+职高适用】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.8,
+      "sold": 280,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6ef5cf84b8ee0001ee8a17",
+      "title": "26学士学位英语全套冲刺视频课程资料练习等！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 274,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "67ff40a24167bc000135914f",
+      "title": "2026词达人加油包 真题模拟题 英专非英专高职高专研究生",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 204,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "653365e91f0c29000189e033",
+      "title": "2026年全国公共英语等级考试四级PETS4教材模拟指导历年词汇语法",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 175.0,
+      "sold": 170,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6871e7280e13d500015fe18b",
+      "title": "26高考英语阅读理解方法技巧/考点解码/三阶训练/真题模拟",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 94.0,
+      "sold": 159,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bfd0cce6196b0001010bc6",
+      "title": "高中英语真题模拟卷专项",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 154,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7837ef5ed32c0001b39c61",
+      "title": "26届8月/9月高三模拟考专项合集含答案解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 150,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d64cc97c1a03000106621b",
+      "title": "26版广东高职高考中职生3+证书考试全真模拟试卷汇编语数英中职菌",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 59.9,
+      "sold": 139,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a142c642ce00000120e04b",
+      "title": "考研英语一完形填空模拟题【30篇】（27/28考研均适用）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 131,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1e8c9386eddf000139ba0b",
+      "title": "高一高二九科期末模拟卷语数英物化生政史地习题（电子版可打印）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.06,
+      "sold": 130,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8a7f1161bc11000101f226",
+      "title": "2027届高三英语名校卷8/9月模拟考（可编辑）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 124,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "696a01fea8e07e0001a9760a",
+      "title": "2026广东省近年初三中考模拟试卷一模二模三模语文数学英语电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.95,
+      "sold": 116,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "68b7e5695e5b2f000105bc8d",
+      "title": "备战2026中考英语语法/语法填空百题分类专项训练真题模拟题练习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 107,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69918269f7a09d0001f186f9",
+      "title": "2026澳门四校联考历年真题数学中文英文葡语真题试卷含答案模拟题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.0,
+      "sold": 105,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bf286e15bd74000166dd90",
+      "title": "2026江苏中考英语听力30套模拟题可下载打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 105,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aacab797f340c00012b3bbf",
+      "title": "27高考英语七选五满分特训/考法点拨/技巧突破/真题+模拟/全解",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 84.93,
+      "sold": 105,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "680898ae2f8716001580e5ab",
+      "title": "现货速发2027河南统招专升本考试新版教材模拟试卷必刷题历年真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 136.17,
+      "sold": 103,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6987490978d8d500014bd7f6",
+      "title": "剑桥英语pet真题模拟题试卷12青少版标准版校园版官方听力",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.8,
+      "sold": 94,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ea43e943360b000108923c",
+      "title": "2026成人高考专升本考试政治英语高数二课程纸质历年真题模拟卷",
+      "store_name": "64e31a632d77a8000122d690",
+      "store_id": "64e31a632d77a8000122d690",
+      "price": 72.0,
+      "sold": 94,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c4854020b4e20001f52f05",
+      "title": "2026届浙江省高三英语一月份首次模拟考试卷（附答案及祥解）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 88,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69831faa78d8d50001e26913",
+      "title": "上海市高考一二三模试卷语数英物化生政史地近三年模拟卷电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 84,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1e35d89ca722000192814c",
+      "title": "【26中考前模拟英语真题】成都名校合集4套（含3套听力）另赠3套",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.39,
+      "sold": 81,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7ad1bdee44d90001895fbe",
+      "title": "2026秋小升初分班考试试卷语文数学英语模拟试卷电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.0,
+      "sold": 76,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3dbd9324d4bb000127fea9",
+      "title": "2026春重庆七龙珠初中试卷电子版PDF即拍即发虚拟发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 74,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e4a383b113e40015a31eb2",
+      "title": "昆明市小升初历年真题分班语文数学英语模拟测考试卷电子版总复习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.41,
+      "sold": 70,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "RAGFlow电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "RAGFlow",
+  "slug": "RAGFlow"
+}

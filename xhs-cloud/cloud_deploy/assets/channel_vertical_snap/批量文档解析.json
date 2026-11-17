@@ -1,0 +1,1186 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "批量文档解析"
+    ],
+    "niche": "批量文档解析"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "批量文档解析电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "批量文档解析电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "report_dir_fill_20261009_175658",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 2,
+    "sku_n": 80,
+    "sum_delta": 349,
+    "median_price": 9.9,
+    "niche": "批量文档解析",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 79,
+      "sum_delta": 289,
+      "sum_sold": 91161,
+      "top_title": "职规赛ppt压缩作品集pdf压缩ppt压缩简历挑战杯ppt压缩自动发货",
+      "top_delta": 218
+    },
+    {
+      "store_name": "天枢云智资料库的店",
+      "sku_n": 1,
+      "sum_delta": 60,
+      "sum_sold": 1690,
+      "top_title": "【北京专用】高考试题分类汇编一模二模试卷重难点抢分训练电子版",
+      "top_delta": 60
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a959303a9bd770001448208",
+      "title": "职规赛ppt压缩作品集pdf压缩ppt压缩简历挑战杯ppt压缩自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 2314,
+      "delta": 218,
+      "actual_gr": 10.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "67fa9466ec1374000140b3e0",
+      "title": "【北京专用】高考试题分类汇编一模二模试卷重难点抢分训练电子版",
+      "store_name": "天枢云智资料库的店",
+      "store_id": "67d13c7d37a215001523ce6b",
+      "price": 44.9,
+      "sold": 1690,
+      "delta": 60,
+      "actual_gr": 3.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a88fbc271204c0001bc9064",
+      "title": "25种思辨记叙文精解！2026年各省地中考真题解析·实战电子文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 35.0,
+      "sold": 31,
+      "delta": 19,
+      "actual_gr": 158.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69402b8c266b95000177fc46",
+      "title": "会计准则与实务案例Notion数据库-前四大经理近十年用心萃取搭建",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 100.0,
+      "sold": 47,
+      "delta": 17,
+      "actual_gr": 56.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68fa4204cdf9d600012e1309",
+      "title": "高中自然地理地理选择题100题 （带答案解析）网盘发货电子文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 273,
+      "delta": 12,
+      "actual_gr": 4.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3e611840cf290001f58ffe",
+      "title": "26届上海四校分复附浦东高考英语数学化学政治学霸笔记电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.0,
+      "sold": 142,
+      "delta": 6,
+      "actual_gr": 4.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "67af173feef1820001f74c05",
+      "title": "小升初病句修改100题（24年真题汇编带答案解析）电子文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 592,
+      "delta": 5,
+      "actual_gr": 0.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c9532ae3af990015bda7bb",
+      "title": "2026解题觉醒高中数学物理化学语文英语大招电子版素材 · 全套资",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 6,
+      "delta": 3,
+      "actual_gr": 100.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69880a79a5576f00017037d1",
+      "title": "2026中考语文数英物化政史地总复习资料【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2132,
+      "delta": 2,
+      "actual_gr": 0.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c20de5e6196b0001426f5c",
+      "title": "2026新版本六年级小升初语文数学英语知识点总结电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 934,
+      "delta": 2,
+      "actual_gr": 0.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1801b461fef900016cf228",
+      "title": "2026新版二三四年级语文数学英语期末测试卷复习资料人教版电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 889,
+      "delta": 2,
+      "actual_gr": 0.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2982e88bca0400011031ae",
+      "title": "2026成人高考专升本/高起本/高起专成考备考重点资料电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 851,
+      "delta": 1,
+      "actual_gr": 0.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "67a5f8e57e87ac0001b871f1",
+      "title": "高中语文论述类阅读94篇带答案解析（由易到难顺序）电子文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 148,
+      "delta": 1,
+      "actual_gr": 0.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68993ce08fe34700016d44ec",
+      "title": "PDF批量添加水印工具-办公神器|支持苹果系统",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 40,
+      "delta": 1,
+      "actual_gr": 2.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "693642a351b8c00001f05548",
+      "title": "2026新课堂笔记1-6年级语数英人教版课本讲解预习书随堂",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 95.4,
+      "sold": 43000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4c5676c117ac000129d543",
+      "title": "考研历年真题考研英语考研数学考研政治199管综408计算机等",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 10000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69747f5f43eb760001e315eb",
+      "title": "Wind数据库数据查找金融财务经济宏观年鉴上市公司实证面板数据集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 100.0,
+      "sold": 3955,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3a38e96f59ca00012db0a0",
+      "title": "2026人教版初中英语暑假衔接辅导资料七八九年级【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.6,
+      "sold": 3242,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6974c2d48a6b8a0001532493",
+      "title": "wind数据库csmar行业公司金融财务宏观年鉴贸易实证面板数据查找",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 2300,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a688b98de083800018d8d6e",
+      "title": "2026年成人高考专升本高起本高起专资料刷题app网课电子课件ppt",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.98,
+      "sold": 2295,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68661ad7a57c680001568978",
+      "title": "新人教版高中暑假衔接讲义高中语文数学英语物理化学新高一高二",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 2173,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5241478c0a3e00015df054",
+      "title": "无实物A3人教版英语听力专项三四五六年级上下册单元期期末小升初",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.99,
+      "sold": 1671,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2c8c0839d60d0001e01dee",
+      "title": "26秋季人教上册数学同步练习电子版pdf",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.88,
+      "sold": 1241,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "66962f83674183000165c466",
+      "title": "【高一月考卷】2027版百校联盟高中测试卷语文数学物理必修选修",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 133.28,
+      "sold": 1239,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6698ee565cf22c0001a69c70",
+      "title": "游戏化人生管理Notion模板喵星探险记，不仅仅是第二大脑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 128.0,
+      "sold": 1216,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6893458ae08d4d00011091c8",
+      "title": "2026小学数学同步重点讲义 电子版（拍下时选择年级版本）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.9,
+      "sold": 877,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6826a376d6ff4d00011b990f",
+      "title": "2025年江苏省小升初语文数学英语必刷历年真题试卷教案电子版A039",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 869,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4e0ab75705e100010adafb",
+      "title": "（电子版）三四五六年级上册-译林版知识点总结(背诵+默写版)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.98,
+      "sold": 710,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a24048149caaf0001fbd987",
+      "title": "26语文数学英语1-6年级一课一练 全册试卷 XB01",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 657,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a48f8208cb63f0001128c41",
+      "title": "笔记同款--1-6年级语文数学英语练习 有答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 599,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69fbfe9c81bc0100017c8c2f",
+      "title": "成人高考、电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 527,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a95390b45b76700010f7ab1",
+      "title": "2026电子版初一初二初三语文数学英语生物化史地道法知识点",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 489,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "682ade84ded4b10001b1de65",
+      "title": "天津市小升初电子版语文数学英语必刷历年真题试卷教案电子A051",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 447,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a63129e74bf000001f025d8",
+      "title": "2027年高考总复习资料电子版高三一轮二轮复习课件PPT讲义练习题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 401,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "67d422845fc3f700010627ad",
+      "title": "HK香港dse高中真题数学语文英语经济物理化学经济考试资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.9,
+      "sold": 365,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69abc128ac2e190001f8b42a",
+      "title": "2026新版小升初语文数学英语总复习讲义全国通用版电子资料8012",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 336,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2d6b951dbcb80001d84737",
+      "title": "小学语文数学英语原创学习资料·单个资料·电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.98,
+      "sold": 318,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "684f8ff99d4a5500011a0959",
+      "title": "贵州省小升初必刷真题试卷小学语文数学英语复习电子版教案A130",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 278,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f947df30d086000168cf6a",
+      "title": "【2026暑假预习】初中7-9年级上册语文数学英语各版本电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 272,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68cb59f93d54c50001dcada5",
+      "title": "【五四制】6-9年级上下册语文数学英语各版本课本同步电子版资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 263,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "698441ea6d22e700012cc002",
+      "title": "2026重庆中职普高对口高考春招语文数学英语对口历年真题答案解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.8,
+      "sold": 236,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "66fd18224ae187000167c000",
+      "title": "【电子版】每日阅读文档资料PPT课件-电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 48.5,
+      "sold": 204,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6792cd36068b24000171e07d",
+      "title": "【Reddit英语热帖阅览室】北美论坛热帖整理翻译 英语学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 197,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "696b94e8f79d4000011492f1",
+      "title": "2022-2026年深圳市多地中考语文数学英语物理一模二模试卷电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.95,
+      "sold": 175,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "65c5fe37ec781c000105892d",
+      "title": "2024年一模古文一解析版、挖空版上海市16区更新完毕",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.0,
+      "sold": 162,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3bc4b865e82f000140a5de",
+      "title": "2026七年级上册全科教辅资料电子版语数英政史地生",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 159,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "686753f4a57c6800016c53bc",
+      "title": "【暑假预习】三年级上册语文数学英语电子版资料讲义",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 126,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "682d2516243bf800010e6481",
+      "title": "湖北省小升初必刷真题试卷小学语文数学英语复习电子教案A060",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 124,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6834dd8442360a0001b999a3",
+      "title": "吉林省小升初电子版语文数学英语必刷历年真题试卷含答案教案A078",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 121,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "658bf185ff7b5100019805c2",
+      "title": "反馈表电子版模板一份",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.41,
+      "sold": 119,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bf5de7d95b5a0001b3e886",
+      "title": "2026小升初总复习语文数学英语知识梳理课件讲义练习题电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.8,
+      "sold": 117,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bf85d4e60de20001b67a95",
+      "title": "2026小升初复习语数英专项训练知识梳理模拟试卷分层精炼电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 105,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a41f74ff7c804000116a4d0",
+      "title": "新三升四语文数学英语暑假衔接资料包预复习默写计算小四门电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.89,
+      "sold": 94,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a43204d3a26b0001887393",
+      "title": "2026春新版｜小学1-6年级数学英语同步辅导资料｜电子版PDF可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 86,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "687517b2f7fa4e00010f24e8",
+      "title": "Cadence Virtuoso 环境配置系统课程 | 持续更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 299.0,
+      "sold": 80,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68273fd727139f0001b70b52",
+      "title": "Notion人生管理器（升级plus版）｜个人体系｜第二大脑｜重启人生",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.9,
+      "sold": 77,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "67e7c2b650201700018f3fb7",
+      "title": "幼小衔接数学拼音识字英语全套资料 可选择 电子版自行打印非实物",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.9,
+      "sold": 67,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68281ebda687560001db34fd",
+      "title": "原创定制：重大版英语3-6年级上册资料（电子资料）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.0,
+      "sold": 64,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "67bc2261cb5e4200012578bf",
+      "title": "中考总复习资料电子版数学英语语文地理政治历史化学物理",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 62,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69fc2df2f888bb0001590097",
+      "title": "小升初语文数学英语总复习全国通用学生版教师版电子资料支持打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 59,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e4a3f8c13d0f0015ecc64f",
+      "title": "徐州市小升初历年真题分班语文数学英语模拟测考试卷电子版总复习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 53,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2f5cdd9456a5000185b3de",
+      "title": "小学三科语文数学英语暑假衔接讲义知识归纳电子版可打印举一反三",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 46,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5b951ae9f0b100019a9fad",
+      "title": "2026年新小升初语文数学英语分班考七年级入学电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 45,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68fb99d57d3b3f000189a022",
+      "title": "最新广东省广州市小学语文数学科学英语试卷期中期末复习资料试题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.25,
+      "sold": 43,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "694acf07b1e666000178b4ba",
+      "title": "21-26浙江文中考言文真题33篇（WORD+PDF电子档）真题+答案解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 39,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2aad47cf6c7d0001b8907b",
+      "title": "小升初总复习资料电子版语文数学英语知识点汇总专项训练小升初",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 36,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6c106af3369d0001bf0492",
+      "title": "2026初一入学分班考试语文数学英语模拟试卷电子版资料含答案解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 34,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3fc87ad0e6f2000169aa58",
+      "title": "小升初总复习资料电子版语文数学英语知识点汇总专项训练小升初",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.98,
+      "sold": 32,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a053ac1dd034c0001a1f8fd",
+      "title": "2026高考作文最新11道创新性作文题+范文解析 电子版pdf文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.5,
+      "sold": 31,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1baa6bcf37170015aeaba3",
+      "title": "保山市小升初历真题试卷答案解析分班考试语文数学英语电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 27,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "67a460e4bac2510001bc5c10",
+      "title": "小学资料1-6年级上下册语文数学英语电子版资料各科全套学习模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 26,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa2ce1fdcf5ff00014ecf30",
+      "title": "2027春新改版外研版英语九年级下册外研版英语kb电子资料手抄报",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 25,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6767a91fcfd9800001fad577",
+      "title": "2026扁平风全年月周日计划电子手账goodnotes无纸化日程效率模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 27.2,
+      "sold": 22,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "673da0ef2c4aba0001a97a49",
+      "title": "[Notion模板]项目、任务及计时器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f46c7cc4f8910001834c10",
+      "title": "小升初总复习资料电子版语文数学英语知识点集训专项练习考前复习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0a803da0ff6f00017242fd",
+      "title": "【直播专属AI升级版】新概念英语网课中教外教视频录播零基础",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1595.0,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6822d7326aec030015d716a2",
+      "title": "小升初总复习资料电子版语文数学英语知识点汇总专项训练小升初",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.8,
+      "sold": 18,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2e30f93222c60001e58a75",
+      "title": "小学一年级到六年级上下册语文数学英语期中期末复习资料电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 18,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1bab1fc875390015b08abe",
+      "title": "海口市小升初历真题试卷答案解析分班考试语文数学英语电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68179a6570bae10001e876ba",
+      "title": "一二三四五六年级上下册语文数学英语电子版课程素材小学学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量文档解析电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "批量文档解析",
+  "slug": "批量文档解析"
+}

@@ -1,0 +1,1378 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "ChatGPT提示词管理"
+    ],
+    "niche": "ChatGPT提示词管理"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "ChatGPT提示词管理电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "ChatGPT提示词管理电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 26,
+    "sku_n": 80,
+    "sum_delta": 150,
+    "median_price": 8.88,
+    "niche": "ChatGPT提示词管理",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "超辩表达课堂的店",
+      "sku_n": 1,
+      "sum_delta": 81,
+      "sum_sold": 2130,
+      "top_title": "黄执中亲授成事关键在表达4天精讲+表达人格测评+《开口之后》",
+      "top_delta": 81
+    },
+    {
+      "store_name": "（未知店）",
+      "sku_n": 54,
+      "sum_delta": 45,
+      "sum_sold": 9313,
+      "top_title": "陈朝辉老师-汉字智慧·三日觉醒学习课程",
+      "top_delta": 21
+    },
+    {
+      "store_name": "淼子潮玩的店",
+      "sku_n": 2,
+      "sum_delta": 12,
+      "sum_sold": 872,
+      "top_title": "秒发9000+剧本杀电子版合集 超高清无水印剧本线索卡手册复盘资料",
+      "top_delta": 6
+    },
+    {
+      "store_name": "小溪老师要练字（制作字帖版）的店",
+      "sku_n": 1,
+      "sum_delta": 9,
+      "sum_sold": 221,
+      "top_title": "荆霄鹏整套电子版字帖（ PDF 文件）",
+      "top_delta": 9
+    },
+    {
+      "store_name": "拖鞋哥新传考研咨询的店",
+      "sku_n": 1,
+      "sum_delta": 3,
+      "sum_sold": 187,
+      "top_title": "拖鞋哥新传考研 真题网站大会员",
+      "top_delta": 3
+    },
+    {
+      "store_name": "卡丘的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1521,
+      "top_title": "小汤+大汤 约翰·汤普森钢琴谱1-8册电子版PDF教程高清可打印",
+      "top_delta": 0
+    },
+    {
+      "store_name": "悲伤小土豆子的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 689,
+      "top_title": "桃李不言污水版。",
+      "top_delta": 0
+    },
+    {
+      "store_name": "自学练字的小夜子",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 674,
+      "top_title": "电子档《楷书快写》视频和字帖资料网盘",
+      "top_delta": 0
+    },
+    {
+      "store_name": "6556d82344e2740001177337",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 489,
+      "top_title": "杨奇函老师 《奇技语文状元学习法》",
+      "top_delta": 0
+    },
+    {
+      "store_name": "蒋晖电商管理的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 471,
+      "top_title": "电商企业管理，全岗位薪酬方案",
+      "top_delta": 0
+    },
+    {
+      "store_name": "闻野教育｜闻子学姐的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 369,
+      "top_title": "2026招标采购从业人员考试题库法律法规实务题库软件app刷题资料",
+      "top_delta": 0
+    },
+    {
+      "store_name": "月亮老师🌙的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 215,
+      "top_title": "世界大师名画高清素材合集",
+      "top_delta": 0
+    },
+    {
+      "store_name": "湘江北岸的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 125,
+      "top_title": "医学伦理学知识提纲（Word电子版共28页可打印编辑）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "6963aa5bd149a400154f2590",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 85,
+      "top_title": "针灸资料（一二轮）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "老杨教音乐的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 45,
+      "top_title": "小汤1-8册电子版教案 约翰汤普森钢琴教程伴奏 高清可打印、",
+      "top_delta": 0
+    },
+    {
+      "store_name": "一只CoCo的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 44,
+      "top_title": "天马微电子AI面试题带解析参考答案面经电子版",
+      "top_delta": 0
+    },
+    {
+      "store_name": "上岸老学长的上岸小店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 39,
+      "top_title": "2026老牟深算牟立志速算大练兵PDF电子版+高清视频网课超格高照",
+      "top_delta": 0
+    },
+    {
+      "store_name": "湘江北岸",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 32,
+      "top_title": "分享循证医学学习及习题集（扫描电子版137页）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "潘潘美食配方的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 18,
+      "top_title": "摆摊爆款风味茄子配方教程！网红小吃技术电子课件资料！",
+      "top_delta": 0
+    },
+    {
+      "store_name": "68d77516ed6c7900155b18d4",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 12,
+      "top_title": "1+北电考研百艺9本复习资料（彩色高清电子版本）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "694b7113d8d6aa0015be8657",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 10,
+      "top_title": "电子资源阴影测试模版",
+      "top_delta": 0
+    },
+    {
+      "store_name": "68603e80b0932e0015f0930b",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 8,
+      "top_title": "中国经典老菜谱12册合集（电子资料包PDF发网盘）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "6975cb1ac52ca30015c36ed2",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 6,
+      "top_title": "【5色】四线三格模板 电子版/可编辑可打印",
+      "top_delta": 0
+    },
+    {
+      "store_name": "6422cdd19a611c00019e9f1a",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 6,
+      "top_title": "AIGC影视视听语言",
+      "top_delta": 0
+    },
+    {
+      "store_name": "68e6981c3e003000152b74f9",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 3,
+      "top_title": "于小冬讲速写课件1.37G（高清电子资料）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "Elo菌的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 3,
+      "top_title": "能量场城市匹配测试（测试类商品不退不换）",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "69381d773753f70001dfbb2d",
+      "title": "黄执中亲授成事关键在表达4天精讲+表达人格测评+《开口之后》",
+      "store_name": "超辩表达课堂的店",
+      "store_id": "66d173eeb208fa0015946e32",
+      "price": 59.9,
+      "sold": 2130,
+      "delta": 81,
+      "actual_gr": 3.95,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2fdd4028ad270001350eb1",
+      "title": "陈朝辉老师-汉字智慧·三日觉醒学习课程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 798,
+      "delta": 21,
+      "actual_gr": 2.7,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa81c990e3e870001ea7cf4",
+      "title": "资料编号A2 高清电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 37,
+      "delta": 18,
+      "actual_gr": 94.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69097f6a9de01f0001412f6f",
+      "title": "荆霄鹏整套电子版字帖（ PDF 文件）",
+      "store_name": "小溪老师要练字（制作字帖版）的店",
+      "store_id": "663e4988a57f5800010e4440",
+      "price": 5.99,
+      "sold": 221,
+      "delta": 9,
+      "actual_gr": 4.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68dbaed84daabe000157ff9c",
+      "title": "秒发9000+剧本杀电子版合集 超高清无水印剧本线索卡手册复盘资料",
+      "store_name": "淼子潮玩的店",
+      "store_id": "67a1794ce195c300158edc35",
+      "price": 16.9,
+      "sold": 551,
+      "delta": 6,
+      "actual_gr": 1.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69737e20226ff5000195f0fd",
+      "title": "秒发《求己》剧本杀电子版全员剧本开本手册售后资料线索复盘资料",
+      "store_name": "淼子潮玩的店",
+      "store_id": "67a1794ce195c300158edc35",
+      "price": 3.99,
+      "sold": 321,
+      "delta": 6,
+      "actual_gr": 1.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "687f13fdf9d7c8000179ec16",
+      "title": "拖鞋哥新传考研 真题网站大会员",
+      "store_name": "拖鞋哥新传考研咨询的店",
+      "store_id": "65d17c60de7c970001f90aa0",
+      "price": 99.0,
+      "sold": 187,
+      "delta": 3,
+      "actual_gr": 1.63,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a65c0baf1ffda00017e2e6a",
+      "title": "大笔杆子耿彦波讲话汇编102篇52万字Word版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 46,
+      "delta": 3,
+      "actual_gr": 6.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9a49607ece35000114e5e9",
+      "title": "【皇名月大师作品集】4600张高清电子版美术绘画临摹图片素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.08,
+      "sold": 44,
+      "delta": 3,
+      "actual_gr": 7.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a12b2e10012710001f2420d",
+      "title": "硕博六年总结：各种方法学资料+实验protocol（电子版资料）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 2967,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d28c8e8aa5760001dd425d",
+      "title": "小汤+大汤 约翰·汤普森钢琴谱1-8册电子版PDF教程高清可打印",
+      "store_name": "卡丘的店",
+      "store_id": "66f25572162d110016887ff8",
+      "price": 3.2,
+      "sold": 1521,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1e63879ca72200019a98fa",
+      "title": "大同研学手册PDF电子版华严寺悬空云冈石窟大同旅游攻略古建课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.99,
+      "sold": 788,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "677f4f177ddbbf0001e9b1de",
+      "title": "桃李不言污水版。",
+      "store_name": "悲伤小土豆子的店",
+      "store_id": "677f4ccae7a9bf001592fb5c",
+      "price": 1.0,
+      "sold": 689,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6682e584e401d60001c5257f",
+      "title": "电子档《楷书快写》视频和字帖资料网盘",
+      "store_name": "自学练字的小夜子",
+      "store_id": "65745154d528e000012bb56f",
+      "price": 9.98,
+      "sold": 674,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "689b5c7f2a871c00017f93cb",
+      "title": "棋类区域游戏电子素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.49,
+      "sold": 563,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a83aeb1d37c890001209c00",
+      "title": "桥本甲减甲亢降抗手册（电子虚拟版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 492,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6c8aa084b8ee0001ba941f",
+      "title": "杨奇函老师 《奇技语文状元学习法》",
+      "store_name": "6556d82344e2740001177337",
+      "store_id": "6556d82344e2740001177337",
+      "price": 299.0,
+      "sold": 489,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4351af654b3900010942e6",
+      "title": "电商企业管理，全岗位薪酬方案",
+      "store_name": "蒋晖电商管理的店",
+      "store_id": "6a42023523114200155b995e",
+      "price": 39.0,
+      "sold": 471,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7a5daeaf4c2b000145e634",
+      "title": "秒发《璃火》剧本杀电子版高清手册剧本线索卡复盘可打印完整资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.9,
+      "sold": 443,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69975ded1dbf920001d4abff",
+      "title": "2026招标采购从业人员考试题库法律法规实务题库软件app刷题资料",
+      "store_name": "闻野教育｜闻子学姐的店",
+      "store_id": "670e540bea230b00154d59d7",
+      "price": 6.0,
+      "sold": 369,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6c70316cbefa00014b41c5",
+      "title": "向太；资产永动的秘密(店铺专属)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 59.0,
+      "sold": 347,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68008a9da7524b0001e6b83b",
+      "title": "鲨鱼一家子电子资料-发百度网盘链接",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.22,
+      "sold": 331,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a3f40ca39d65000173bb6e",
+      "title": "20天零基础学粤语全能班（广州+香港版 达自由交流级）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 499.0,
+      "sold": 326,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cd0ce0069e7b000148c700",
+      "title": "数学分类《阿婆的菜园》动态PPT+希沃版+教案+逐字稿  中班/大班",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 316,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8a83a1b2b3a3000130f007",
+      "title": "PDF格式转换器工具 在线操作",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.98,
+      "sold": 280,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "685673433a11a800010cd0a5",
+      "title": "世界大师名画高清素材合集",
+      "store_name": "月亮老师🌙的店",
+      "store_id": "66d6543502383e00153683a3",
+      "price": 1.8,
+      "sold": 215,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68778182071cdc00010c2b07",
+      "title": "纳瓦尔知识库 访谈、演讲、播客、文稿 纳瓦尔宝典 纳瓦尔合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 38.9,
+      "sold": 211,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a58538e8cb63f000124e17d",
+      "title": "2026年38节大师兄虚ni经济百年危机债务吃现金流模型视频教案合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 167,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "688ed90847d5bd0001078b79",
+      "title": "医学伦理学知识提纲（Word电子版共28页可打印编辑）",
+      "store_name": "湘江北岸的店",
+      "store_id": "65f6964a0d7eaa0001212947",
+      "price": 4.5,
+      "sold": 125,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69031144c091e300012762b7",
+      "title": "认知觉醒108个思维框架看详情页获取高清PDF文字版（非纸质版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 99.0,
+      "sold": 122,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a99372a6b399600013ef36c",
+      "title": "花少2测试报告 自动发货 测完秒出",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.2,
+      "sold": 105,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68baa15395220f0001f9ced7",
+      "title": "中文审稿意见回复 |完整版资料 |自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 93,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "696a4a5804796b0001066ec5",
+      "title": "其他1合集PPT模板（成品可编辑可修改）售后不支持退换货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.19,
+      "sold": 85,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a04895630d0860001f3a3d6",
+      "title": "针灸资料（一二轮）",
+      "store_name": "6963aa5bd149a400154f2590",
+      "store_id": "6963aa5bd149a400154f2590",
+      "price": 3699.0,
+      "sold": 85,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68e9f14dc67e4700017ff02c",
+      "title": "【王戎不取道旁李】公开课板贴板书电子版PDF版不支持编辑调整",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 83,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "698347888dc4b30001348d4f",
+      "title": "数位表电子版线稿/A4/A3/8K/4K/非实物不邮寄",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.8,
+      "sold": 74,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a290aa1833083000167e77c",
+      "title": "天道强势文化拆解课｜什么是「天道」｜强势文化vs弱势文化",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 60,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "692710a3b29258001580700e",
+      "title": "流芳剧本杀电子版高清无水印剧本组织者手册线索卡复盘资料完整版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 55,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6877597a94b9070015552463",
+      "title": "张至顺视频全集教程中yi养生讲座炁体源流电子版资料全集网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.8,
+      "sold": 53,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "65d2c3ca23a2f100010e0017",
+      "title": "子不语: 珍藏版 夏达经典成名作1-3册",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 72.0,
+      "sold": 48,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ba66a0fe4ff500156032b6",
+      "title": "小汤1-8册电子版教案 约翰汤普森钢琴教程伴奏 高清可打印、",
+      "store_name": "老杨教音乐的店",
+      "store_id": "68b44d1879bad30015521938",
+      "price": 18.9,
+      "sold": 45,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ccf2b6c33f610001775cd8",
+      "title": "天马微电子AI面试题带解析参考答案面经电子版",
+      "store_name": "一只CoCo的店",
+      "store_id": "68566c8591b137001584ad7e",
+      "price": 6.9,
+      "sold": 44,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6959e755bd92f500017180eb",
+      "title": "2026老牟深算牟立志速算大练兵PDF电子版+高清视频网课超格高照",
+      "store_name": "上岸老学长的上岸小店",
+      "store_id": "692d4dd3e3ea240015006b9a",
+      "price": 5.6,
+      "sold": 39,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6731e503ec68d700014fd7de",
+      "title": "《中国传统康复技术》复习笔记知识点多套题库期末复习资料合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.98,
+      "sold": 35,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9cecd77be1f6000156aef6",
+      "title": "Evan Moor全系列 600多本高清电子版 25GB",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.55,
+      "sold": 35,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ca023255f59b000112752a",
+      "title": "手机使用指南，教老人爸爸妈妈爷爷奶奶使用手机（有水印）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 33,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "661603b56a084a00012b7b92",
+      "title": "分享循证医学学习及习题集（扫描电子版137页）",
+      "store_name": "湘江北岸",
+      "store_id": "65f6964a0d7eaa0001212947",
+      "price": 8.0,
+      "sold": 32,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6657ec4bb4ff490001017b0c",
+      "title": "27保研080903微电子学与固体电子学专业面经典题答案（电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 48.0,
+      "sold": 31,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69af8e574a35340001309999",
+      "title": "潘潘英语老师2026 72速记法助力小初英语轻松记单词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 36.8,
+      "sold": 27,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a97e059bbde7c00015a4164",
+      "title": "办公室主任服务领导100个心眼子电子版办公室工作答疑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.9,
+      "sold": 24,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "694c0d7f6a3f3f00018dd30c",
+      "title": "日语必记词根大全单词背诵逻辑巧妙记忆拆结构抓本义有效背诵繁体",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 21,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e0a188ddd16500015e57de",
+      "title": "郭春林哲学二合一智慧与人生思考唤醒心力重构心智普通人破局密码",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 19,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f07714d3eed200016ee4a4",
+      "title": "摆摊爆款风味茄子配方教程！网红小吃技术电子课件资料！",
+      "store_name": "潘潘美食配方的店",
+      "store_id": "6885c0249239c70015d8ee99",
+      "price": 6.8,
+      "sold": 18,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ea18f93f37a900014e1f6d",
+      "title": "罗胖子函数平面直角坐标系初中几何代数反比例函数核电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 34.2,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cdcf354ae1e70001fcbb35",
+      "title": "郝万山资料大合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69272eb34977f3000116d112",
+      "title": "秒发《当杀意渐起之时》剧本杀电子版高清剧本手册线索卡完整资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f49cfec074c50001e3698d",
+      "title": "【中柱练习】简体中文 入门高清电子资料 Pdf",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.91,
+      "sold": 14,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6934f8c1bd92f50001df63d5",
+      "title": "1+北电考研百艺9本复习资料（彩色高清电子版本）",
+      "store_name": "68d77516ed6c7900155b18d4",
+      "store_id": "68d77516ed6c7900155b18d4",
+      "price": 30.0,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ecebc7fb672a0015c4b839",
+      "title": "DK时间线上的全球史-高清电子版 · 如图所示",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 11,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "697210c53d52b200011accdc",
+      "title": "《明清旅行日记》",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.99,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a34f4dd963c4c0001b037b2",
+      "title": "电子资源阴影测试模版",
+      "store_name": "694b7113d8d6aa0015be8657",
+      "store_id": "694b7113d8d6aa0015be8657",
+      "price": 5.9,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "699c6b1bc9f5da00014cb71b",
+      "title": "中国民族问题资料档案集成",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.88,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69fc4f7354fc75000153b81c",
+      "title": "梦窗词集校笺、全6册、吴文英、繁体竖排、pdf",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f32d734272610001f4b502",
+      "title": "中国经典老菜谱12册合集（电子资料包PDF发网盘）",
+      "store_name": "68603e80b0932e0015f0930b",
+      "store_id": "68603e80b0932e0015f0930b",
+      "price": 8.99,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69dde0e8c41f7e0001179cc5",
+      "title": "Visio2021专业版/2019/2016/2013远程2024安装包永久激活学习教程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.14,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a800fef6806b0001617dac",
+      "title": "成长认知人性思维 (PDF电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.88,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5b79b67308b500010132f7",
+      "title": "【5色】四线三格模板 电子版/可编辑可打印",
+      "store_name": "6975cb1ac52ca30015c36ed2",
+      "store_id": "6975cb1ac52ca30015c36ed2",
+      "price": 2.88,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a574eddaa62b50001a21704",
+      "title": "AIGC影视视听语言",
+      "store_name": "6422cdd19a611c00019e9f1a",
+      "store_id": "6422cdd19a611c00019e9f1a",
+      "price": 52.0,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa278751b606400015e6661",
+      "title": "现代汉yu问答 忽略标题后面的字 成人教育求职留学",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.88,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "689092c7ebefca0001c5a498",
+      "title": "笔记同款-学钩针编织系列PDF电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f19178a54aee00012d53f9",
+      "title": "2026高考志愿填报资料包｜电子版PDF，︱持续更新︱高考解惑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69711484b2247900010bcf7d",
+      "title": "郎咸平经济思维课程资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 53.99,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c21d6aca64b30001d54c43",
+      "title": "徐默线描人物2本合集（高清电子资料）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d907b7749cf20001f8fc98",
+      "title": "针灸大成笔记高清电子版 学习超方便电子版备考资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a79f0e7af4c2b00013f2c5a",
+      "title": "电子科技大学832微电子器件考研初试电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ba037e9c14650001efd60a",
+      "title": "于小冬讲速写课件1.37G（高清电子资料）",
+      "store_name": "68e6981c3e003000152b74f9",
+      "store_id": "68e6981c3e003000152b74f9",
+      "price": 5.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5c5cbb437d3400015e7c2a",
+      "title": "能量矩阵：调整身心频率，九步吸引理想生活状态电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a648d1f5b7eff0001e85bdf",
+      "title": "能量场城市匹配测试（测试类商品不退不换）",
+      "store_name": "Elo菌的店",
+      "store_id": "6a448fbc5b408900153685ec",
+      "price": 1.98,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a568a7b8cb63f0001feacd2",
+      "title": "全套英文阅读 READING FUTURE 教学课件ppt 高清教学资料电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.42,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    },
+    {
+      "goods_id": "695f3bc9aae2940001a5b43b",
+      "title": "【新课】夏鹏老师 认知换脑四件套 道德经太傻天书 洞见系统之美",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.98,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "ChatGPT提示词管理电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "ChatGPT提示词管理",
+  "slug": "ChatGPT提示词管理"
+}

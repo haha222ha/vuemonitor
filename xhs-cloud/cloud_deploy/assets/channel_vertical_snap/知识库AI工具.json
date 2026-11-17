@@ -1,0 +1,410 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "知识库AI工具"
+    ],
+    "niche": "知识库AI工具"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "知识库AI工具电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "知识库AI工具电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 3,
+    "sku_n": 24,
+    "sum_delta": 3,
+    "median_price": 3.99,
+    "niche": "知识库AI工具",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 22,
+      "sum_delta": 3,
+      "sum_sold": 3097,
+      "top_title": "中小学生班级日志表电子版教师好物班主任班级管理日志电子资料包",
+      "top_delta": 2
+    },
+    {
+      "store_name": "Lento Studio",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 60,
+      "top_title": "5份员工请假条模版 word/excel电子版可编辑需自行打印",
+      "top_delta": 0
+    },
+    {
+      "store_name": "贝尔麻麻爱分享的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 3,
+      "top_title": "48个国际音标每日打卡小纸条｜含音频答案",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "68d0042924f1f80001131019",
+      "title": "中小学生班级日志表电子版教师好物班主任班级管理日志电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.95,
+      "sold": 154,
+      "delta": 2,
+      "actual_gr": 1.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "691363553b8fe80001b19ecd",
+      "title": "考试后复盘表格文件（可编辑）+PDF+图片版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 64,
+      "delta": 1,
+      "actual_gr": 1.59,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6975f0f343eb7600010fd1b6",
+      "title": "班级管理常用表格/座位表/值日表/作业检查表/家访表/学生情况表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 657,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ccb086d1f7b800015fc50a",
+      "title": "值班排班表值周排班表校历表模板Excel电子档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 523,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "692f24aceb0d800001fd9777",
+      "title": "最火表格模板： 班级小组积分表 、班级日志记录表等六款表格模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 302,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "674ea07accfbf90001d77f91",
+      "title": "【A-068】简单学生点名册-EXCEL-电子文件-A4打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 266,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "65f03d7dab9fce00014a2482",
+      "title": "班主任老师管理常用表格座位表值日表教师作业检查表学生情况表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 99.99,
+      "sold": 240,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "672dd4b6ec68d7000133eb09",
+      "title": "D54兴趣班培训课程考勤表excel表格模版自动统计",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 179,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "65ea919a49c39e00012eb2da",
+      "title": "班级管理常用表格，内容可自己改",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.99,
+      "sold": 148,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa0093b5152e5000114d74a",
+      "title": "作业消消乐PPT日日打卡清除气泡泡早读背书点名希沃课件管理神器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 137,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67f8e9ca04afe30001d94acd",
+      "title": "可编辑Word | 准考证 座位贴 考务工作常用模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.0,
+      "sold": 115,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6978d86feb0d9a0001e9d59b",
+      "title": "2026寒假学习计划 可编辑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 90,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68465bcb0da50d0001abfee0",
+      "title": "5份员工请假条模版 word/excel电子版可编辑需自行打印",
+      "store_name": "Lento Studio",
+      "store_id": "67f4dec8e1eb2900152bf3e5",
+      "price": 2.99,
+      "sold": 60,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68cd6bb7c278030001e23930",
+      "title": "作业完成情况登记表电子版10-80人中小学生学习进度追踪计划表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.95,
+      "sold": 59,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67ee565af0efe50001854a2f",
+      "title": "任选1款  第二版可编辑学习计划表格模板 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 46,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68cad798bf5d360001ee7136",
+      "title": "作业批改跟踪记录表中小学语数英政史地物化生学生学习进度计划表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 31,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69dc7dc38ca4f4000170caa8",
+      "title": "学生班级考勤表模板【Excel电子版】445",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 29,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6898d80be019f20001e5cb9b",
+      "title": "6份交接班记录表模板（电子版word文档可编辑W181）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "694e9a01bd92f50001709f8a",
+      "title": "百余款中小学生课程表｜Word电子版可编辑打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "690ac68cb96b160001b309e7",
+      "title": "大学生学籍证明模板word电子版可编辑可打印（非实物）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.5,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "686ca3c4a68675000176ac0e",
+      "title": "5份学生作业情况登记表模板（电子版word文档可编辑W085）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6914a8f2f168b90001ba0a3d",
+      "title": "作业批改跟踪记录表语数英政史地物化生中小学生作业批改登记表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.58,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a77e69a6e8d370001be8e21",
+      "title": "48个国际音标每日打卡小纸条｜含音频答案",
+      "store_name": "贝尔麻麻爱分享的店",
+      "store_id": "6a3a2e4de38dd8001538ad91",
+      "price": 2.46,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a93a5ffa553c30015b914e2",
+      "title": "The Genius Habit 英文原版 天才的习惯 根据自身优势寻求职业发",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 214.3,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI工具电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "知识库AI工具",
+  "slug": "知识库AI工具"
+}

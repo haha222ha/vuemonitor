@@ -1,0 +1,1626 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "行测"
+    ],
+    "niche": "行测"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 75,
+    "active_n": 3,
+    "drive_keywords": [
+      "行测笔记",
+      "行测职测笔记总结资料",
+      "行测全套速记技巧电子资料",
+      "行测",
+      "行测申",
+      "初级行测",
+      "公基行测",
+      "申论行测",
+      "行测讲义",
+      "行测试卷",
+      "行测资料包",
+      "教资行测押题",
+      "行测电子资料",
+      "行测考研押题",
+      "行测言语数量",
+      "电子档行测题库",
+      "高清版行测题库",
+      "更新版行测题库",
+      "教资行测模拟题",
+      "教资行测视频课",
+      "教资行测说课稿",
+      "考公行测模拟题",
+      "考研行测面试题",
+      "考研行测模拟题"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "行测笔记",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virt_kw_cross_opt_demote",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测职测笔记总结资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测全套速记技巧电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "日增Top1000清洗·虚拟方向词·去券去重|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "restored_exam_2char_after_broad_demote|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测申",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "初级行测",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公基行测",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论行测",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测讲义",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测试卷",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "教资行测押题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测考研押题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测言语数量",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "完整性复核后补短方向词",
+        "source": "virt_gap_stem_followup_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子档行测题库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "高清版行测题库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "更新版行测题库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "教资行测模拟题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "教资行测视频课",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "教资行测说课稿",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考公行测模拟题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研行测面试题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研行测模拟题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研行测说课稿",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "可打印行测题库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "网盘版行测题库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测技巧 下载",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测教资面试题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测教资视频课",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测教资资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测考研面试题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测考研说课稿",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测题库电子档",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测题库高清版",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测题库更新版",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测题库可打印",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子版公务员行测",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "二建行测复习资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 15,
+    "sku_n": 80,
+    "sum_delta": 27141,
+    "median_price": 9.9,
+    "niche": "行测",
+    "drive_kw_n": 24
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 65,
+      "sum_delta": 22865,
+      "sum_sold": 231484,
+      "top_title": "明日方舟初始号官服开局号自抽六星异格银灰陈望凛御维什戴尔号",
+      "top_delta": 3011
+    },
+    {
+      "store_name": "芦亦莘的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 33000,
+      "top_title": "可编辑word超实用技术路线图、研究思路图、框架图模版",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "拼豆工坊🥝的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 31000,
+      "top_title": "照片转拼豆图纸一键出图（下单自动发货发链接）",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "6846f25658fd850015aa7a1f",
+      "sku_n": 2,
+      "sum_delta": 486,
+      "sum_sold": 7690,
+      "top_title": "2027版超格行测+申论（五合一）夸夸刷题本【赠送配套网课】",
+      "top_delta": 247
+    },
+    {
+      "store_name": "星星要努力的店",
+      "sku_n": 1,
+      "sum_delta": 323,
+      "sum_sold": 6725,
+      "top_title": "27国考省考申论规范词（表格版&挖空版）电子版pdf版",
+      "top_delta": 323
+    },
+    {
+      "store_name": "云图图书旗舰店",
+      "sku_n": 1,
+      "sum_delta": 305,
+      "sum_sold": 7757,
+      "top_title": "【云图官方】真题考研2027考研英语数学政治管综真题实战详解",
+      "top_delta": 305
+    },
+    {
+      "store_name": "685683aa5c02210015bee9d0",
+      "sku_n": 1,
+      "sum_delta": 282,
+      "sum_sold": 4379,
+      "top_title": "全部滤镜有底片实况模板丨预设胶片拍照视频实况滤镜参数模板素材",
+      "top_delta": 282
+    },
+    {
+      "store_name": "苏卷卷的胶片日记的店",
+      "sku_n": 1,
+      "sum_delta": 187,
+      "sum_sold": 1375,
+      "top_title": "Dazz Fxnr胶片全部滤镜照片实况视频素材滤镜风格调色预设模板",
+      "top_delta": 187
+    },
+    {
+      "store_name": "设计达人",
+      "sku_n": 1,
+      "sum_delta": 148,
+      "sum_sold": 1484,
+      "top_title": "环艺景观规划建筑产品文创环境设计展板模板合集/分图层/可编辑",
+      "top_delta": 148
+    },
+    {
+      "store_name": "空白意识室的店",
+      "sku_n": 1,
+      "sum_delta": 113,
+      "sum_sold": 1103,
+      "top_title": "原生家庭恋爱模式趣味测试",
+      "top_delta": 113
+    },
+    {
+      "store_name": "三分钟热牛奶的店",
+      "sku_n": 1,
+      "sum_delta": 111,
+      "sum_sold": 2197,
+      "top_title": "网盘秒发）竞选大队委立体手绘海报线稿无实物组合不重样持续更新",
+      "top_delta": 111
+    },
+    {
+      "store_name": "Venus jiwellery珠宝的店",
+      "sku_n": 1,
+      "sum_delta": 105,
+      "sum_sold": 3686,
+      "top_title": "养号0.1元，可爱猫咪，手机壁纸 带图，自动发货！",
+      "top_delta": 105
+    },
+    {
+      "store_name": "大羊老师学习资料库的店",
+      "sku_n": 1,
+      "sum_delta": 105,
+      "sum_sold": 2113,
+      "top_title": "高中八科数英政史地物化生教材全册课本课后习题答案各版本电子版",
+      "top_delta": 105
+    },
+    {
+      "store_name": "黑马考证中的店",
+      "sku_n": 1,
+      "sum_delta": 63,
+      "sum_sold": 2133,
+      "top_title": "新26辅警招聘笔试各地考试法律行测公基直播课录播课实时授课",
+      "top_delta": 63
+    },
+    {
+      "store_name": "四海公考的店",
+      "sku_n": 1,
+      "sum_delta": 48,
+      "sum_sold": 3737,
+      "top_title": "【任选2套600题送思维导图】600题系列公考国省考事业单位行测",
+      "top_delta": 48
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "69ef73976eeaf70001384b3f",
+      "title": "公考申论学习笔记行测学习笔记公考学霸笔记汇总电子资料动态更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 694,
+      "delta": 38,
+      "actual_gr": 5.79,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测全套速记技巧电子资料",
+        "行测职测笔记总结资料"
+      ]
+    },
+    {
+      "goods_id": "6aa26f6e1b606400015d14a0",
+      "title": "2027新版国考省考行测高分必备（修正版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 3215,
+      "delta": 1700,
+      "actual_gr": 112.21,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a5530808c0a3e00019dbd3e",
+      "title": "2027版超格行测+申论（五合一）夸夸刷题本【赠送配套网课】",
+      "store_name": "6846f25658fd850015aa7a1f",
+      "store_id": "6846f25658fd850015aa7a1f",
+      "price": 21.8,
+      "sold": 4962,
+      "delta": 247,
+      "actual_gr": 5.24,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a5530808c0a3e00019dbd41",
+      "title": "2027版超格行测+申论（五合一）夸夸刷题本【赠送配套网课】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.8,
+      "sold": 4962,
+      "delta": 247,
+      "actual_gr": 5.24,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6969e58897279300012b0605",
+      "title": "【数量关系资料分析默写本】27国省考行测百化分定制默写本含答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 58.8,
+      "sold": 3983,
+      "delta": 225,
+      "actual_gr": 5.99,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6969e58897279300012b060e",
+      "title": "【数量关系资料分析默写本】27国省考行测百化分定制默写本含答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 78.8,
+      "sold": 4080,
+      "delta": 162,
+      "actual_gr": 4.13,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测全套速记技巧电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa7c82a68ec340001f78f18",
+      "title": "2026/2027版行测海海刷题2000题PDF+视频讲解/课件【持续更新】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.98,
+      "sold": 952,
+      "delta": 98,
+      "actual_gr": 11.48,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a6a314267db5700018e20a3",
+      "title": "2027国考近10年行测真题分类考点汇总及解析（包含2026年）电子资",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.88,
+      "sold": 321,
+      "delta": 94,
+      "actual_gr": 41.41,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69cdce037c7d12000124e4fa",
+      "title": "【数量关系资料分析默写本】27国省考行测百化分定制默写本含答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 58.8,
+      "sold": 3985,
+      "delta": 88,
+      "actual_gr": 2.26,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测职测笔记总结资料"
+      ]
+    },
+    {
+      "goods_id": "6a5d83bb05767800014e435b",
+      "title": "Memosup  是个资料库行测言语申论",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2538,
+      "delta": 85,
+      "actual_gr": 3.47,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测全套速记技巧电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5d83bb05767800014e4340",
+      "title": "Memosup  是个资料库行测言语申论",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2546,
+      "delta": 77,
+      "actual_gr": 3.12,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测全套速记技巧电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e9678ff9b6f10001519b74",
+      "title": "新26辅警招聘笔试各地考试法律行测公基直播课录播课实时授课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.8,
+      "sold": 2063,
+      "delta": 67,
+      "actual_gr": 3.36,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测全套速记技巧电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a56a668f8b2fa0001c18930",
+      "title": "27版上岸村行测+申论全家桶【专项提升】刷题本言语张弓资料唐宋",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 32.8,
+      "sold": 2976,
+      "delta": 66,
+      "actual_gr": 2.27,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "685c45fc9028340001e11106",
+      "title": "新26辅警招聘笔试各地考试法律行测公基直播课录播课实时授课",
+      "store_name": "黑马考证中的店",
+      "store_id": "669f4bffc3c7d60015b678af",
+      "price": 16.8,
+      "sold": 2133,
+      "delta": 63,
+      "actual_gr": 3.04,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6ab7c3178d2a3f0001859ab6",
+      "title": "国考历年真题考公国考真题简版中公2027版国家公务员行测申论真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.4,
+      "sold": 117,
+      "delta": 50,
+      "actual_gr": 74.63,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6901ac15e0f3b200011ccf27",
+      "title": "【任选2套600题送思维导图】600题系列公考国省考事业单位行测",
+      "store_name": "四海公考的店",
+      "store_id": "664ae528a57f5800010ebd8a",
+      "price": 72.0,
+      "sold": 3737,
+      "delta": 48,
+      "actual_gr": 1.3,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a06e08de1e1370001db5d35",
+      "title": "鹿小贝行测助手 - 资料分析速算提分小帮手",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 26.8,
+      "sold": 1218,
+      "delta": 43,
+      "actual_gr": 3.66,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测全套速记技巧电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab0a75fd01399000181552f",
+      "title": "2027甘肃定向常规选调生历年真题综合能力测试行测申论笔记课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 422,
+      "delta": 40,
+      "actual_gr": 10.47,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a06e08de1e1370001db5d32",
+      "title": "鹿小贝行测助手 - 资料分析速算提分小帮手",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.8,
+      "sold": 1218,
+      "delta": 39,
+      "actual_gr": 3.31,
+      "token_hits": 1,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a3788b48bca040001ef6dfe",
+      "title": "明日方舟初始号官服开局号自抽六星异格银灰陈望凛御维什戴尔号",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.46,
+      "sold": 8344,
+      "delta": 3011,
+      "actual_gr": 56.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "692ebfe4d4363c0001059744",
+      "title": "新版初一精品练习题电子资料包，最新教程版本，永久免费更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 13000,
+      "delta": 2000,
+      "actual_gr": 18.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a3e13bc1a14830001b8546c",
+      "title": "2026新版初一初二初三全科目暑假月考期中期末核心考点电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 6271,
+      "delta": 1107,
+      "actual_gr": 21.44,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "67ee9edf04afe30001a2975d",
+      "title": "可编辑word超实用技术路线图、研究思路图、框架图模版",
+      "store_name": "芦亦莘的店",
+      "store_id": "63959ae3d6c9400001b3fbb1",
+      "price": 2.5,
+      "sold": 33000,
+      "delta": 1000,
+      "actual_gr": 3.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a111758e6d02a0001472256",
+      "title": "照片转拼豆图纸一键出图（下单自动发货发链接）",
+      "store_name": "拼豆工坊🥝的店",
+      "store_id": "69bcd2f869ce0c0015542c6f",
+      "price": 1.99,
+      "sold": 31000,
+      "delta": 1000,
+      "actual_gr": 3.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测职测笔记总结资料"
+      ]
+    },
+    {
+      "goods_id": "67d2cdc152503c00017d3e77",
+      "title": "（初中/高中）英语教资面试/笔试（逐字稿+知识点+思维导图）PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "64102a91de439100019bb707",
+      "title": "26下全国教资面试小初高教师资格考试资料结构化试讲逐字稿真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 16000,
+      "delta": 1000,
+      "actual_gr": 6.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测言语数量"
+      ]
+    },
+    {
+      "goods_id": "6a11686d69ff6a0001681b5b",
+      "title": "小学1-6年级全科电子版教材辅导学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "692fc2a6b70fce000131f34b",
+      "title": "新版初一精品练习题电子资料包，最新教程版本，永久免费更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.0,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测全套速记技巧电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b9364a5e5f050001012598",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.6,
+      "sold": 6220,
+      "delta": 537,
+      "actual_gr": 9.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测全套速记技巧电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a72201484b8ee0001309708",
+      "title": "26秋--五上情境任务群公开课课件+教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1408,
+      "delta": 460,
+      "actual_gr": 48.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测职测笔记总结资料"
+      ]
+    },
+    {
+      "goods_id": "6abe375634911400018d995d",
+      "title": "2027版小黑国省考政治常识速学冲刺十套卷500题全家桶冲刺班公考",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 761,
+      "delta": 458,
+      "actual_gr": 151.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69e3702bca7f7f0001aea72b",
+      "title": "【初一初二初三上学期】开学/期中/期末家长会均含逐字稿＋教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2595,
+      "delta": 399,
+      "actual_gr": 18.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6ac1016ba285d300011d9d74",
+      "title": "【初一初二初三上学期】开学/期中/期末家长会均含逐字稿＋教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2592,
+      "delta": 388,
+      "actual_gr": 17.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a7ecb4384634f000158a5d1",
+      "title": "母题清单，24h内不合适可退教师招聘题本电子资料合集，可导pdf",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.9,
+      "sold": 1056,
+      "delta": 353,
+      "actual_gr": 50.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69b9364a5e5f05000101257a",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.6,
+      "sold": 6555,
+      "delta": 343,
+      "actual_gr": 5.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69189bfa43699b0001c6aaa6",
+      "title": "27国考省考申论规范词（表格版&挖空版）电子版pdf版",
+      "store_name": "星星要努力的店",
+      "store_id": "6835a8e1896cda0015516224",
+      "price": 3.9,
+      "sold": 6725,
+      "delta": 323,
+      "actual_gr": 5.05,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a6649ae84b8ee00018fe9f7",
+      "title": "【2026年秋季】小学数学单元月考期中期末试卷含答案【PDF版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 2655,
+      "delta": 311,
+      "actual_gr": 13.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a2acf20599c8700013f2037",
+      "title": "Y157 一～六年级上册语文1-8单元生字词默写PDF电子版，非实物",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 6836,
+      "delta": 310,
+      "actual_gr": 4.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a1fdb1cb9717f00015eb32b",
+      "title": "【云图官方】真题考研2027考研英语数学政治管综真题实战详解",
+      "store_name": "云图图书旗舰店",
+      "store_id": "656e9aa5e08915000165bbfb",
+      "price": 8.69,
+      "sold": 7757,
+      "delta": 305,
+      "actual_gr": 4.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测职测笔记总结资料"
+      ]
+    },
+    {
+      "goods_id": "6965fbc196239400010e3a71",
+      "title": "26秋人教pep小学英语1~6年级上下册资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.88,
+      "sold": 4062,
+      "delta": 285,
+      "actual_gr": 7.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6aa0f97708388400013dac8c",
+      "title": "（电子版）三四五六年级上册-外研版语法知识+练习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.98,
+      "sold": 2657,
+      "delta": 285,
+      "actual_gr": 12.02,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a6e874334eabf0001e35ecb",
+      "title": "电子版跟着课本去旅行亲子游手册 自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.8,
+      "sold": 3499,
+      "delta": 283,
+      "actual_gr": 8.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a4bc1c9a1b4360001f29cc8",
+      "title": "全部滤镜有底片实况模板丨预设胶片拍照视频实况滤镜参数模板素材",
+      "store_name": "685683aa5c02210015bee9d0",
+      "store_id": "685683aa5c02210015bee9d0",
+      "price": 5.98,
+      "sold": 4379,
+      "delta": 282,
+      "actual_gr": 6.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测言语数量"
+      ]
+    },
+    {
+      "goods_id": "6a969cb1758c2000012f2560",
+      "title": "海绵宝宝：大闹蟹堡王  电子资源PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 1827,
+      "delta": 282,
+      "actual_gr": 18.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6abaac207dbca2000143cba8",
+      "title": "27考研英语各题型课程 正在更新中 英一+英二",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 2901,
+      "delta": 265,
+      "actual_gr": 10.05,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测全套速记技巧电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4640e37d09bf0001a6fd9a",
+      "title": "22版25年修订义务教育英语课程标准选择题+简答题+全书挖空题库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 462,
+      "delta": 250,
+      "actual_gr": 117.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a364fd6963cbb00014bccaa",
+      "title": "长沙四大名校数学英语语文物理化学月考期中期末练习题试卷电子档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.41,
+      "sold": 1118,
+      "delta": 243,
+      "actual_gr": 27.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a3b965746109700014f0e8a",
+      "title": "华罗庚学校数学课本小学初中高中",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.99,
+      "sold": 2703,
+      "delta": 242,
+      "actual_gr": 9.83,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a6755a024f0440001133dc4",
+      "title": "2026高校教师资格证备考资料课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 1282,
+      "delta": 240,
+      "actual_gr": 23.03,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a33fdbe65e82f0001a02fbb",
+      "title": "27版上岸村张弓言语十二箭讲义言语200题课后习题【赠网课】",
+      "store_name": "6846f25658fd850015aa7a1f",
+      "store_id": "6846f25658fd850015aa7a1f",
+      "price": 42.8,
+      "sold": 2728,
+      "delta": 239,
+      "actual_gr": 9.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6aa800fe43b90c0001868be7",
+      "title": "星露谷物语-资料模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.28,
+      "sold": 1734,
+      "delta": 228,
+      "actual_gr": 15.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69a15f94b90bc50001a1df7a",
+      "title": "系列四 · 初中语文提升系列复习课件（持续更新）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 4617,
+      "delta": 218,
+      "actual_gr": 4.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a028f4622eb6500016f14a6",
+      "title": "2026春  ||  小学语文1-6年级生字词三轮默写【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 41.9,
+      "sold": 4063,
+      "delta": 215,
+      "actual_gr": 5.59,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69d35ceac94bfd0001234c7b",
+      "title": "27考公资料电子版｜资料分析+申论规范词+高频成语+常识+推理",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 7131,
+      "delta": 208,
+      "actual_gr": 3.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a62f313d8558500011586c7",
+      "title": "2026新改版初中重点知识梳理手绘版pdf电子版网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 3083,
+      "delta": 199,
+      "actual_gr": 6.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69c5fae37dd4a100016814a2",
+      "title": "Dazz Fxnr胶片全部滤镜照片实况视频素材滤镜风格调色预设模板",
+      "store_name": "苏卷卷的胶片日记的店",
+      "store_id": "6967351c619fda0015265c38",
+      "price": 4.89,
+      "sold": 1375,
+      "delta": 187,
+      "actual_gr": 15.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测言语数量"
+      ]
+    },
+    {
+      "goods_id": "6ab4e0fe018c6a0001f4a767",
+      "title": "27上教资笔试中小幼科一科二重点必备笔记+网课（27持续更新中）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 830,
+      "delta": 178,
+      "actual_gr": 27.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6905e0fb2fdb7c00018f061a",
+      "title": "2026初中语文数学英语物理化生物史地道法知识点总结多版本电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 2281,
+      "delta": 171,
+      "actual_gr": 8.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69d76ab6076df8000152c0fb",
+      "title": "大疆Pocket4P/4/3·Action·Nano后期滤镜 l 富士理光胶片电影感LUT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 4673,
+      "delta": 165,
+      "actual_gr": 3.66,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测言语数量"
+      ]
+    },
+    {
+      "goods_id": "6a9d1c4ca3924100014f15d1",
+      "title": "26版五年级上册语文单元复习知识点总结重点归纳PDF电子版 送默写",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.0,
+      "sold": 871,
+      "delta": 162,
+      "actual_gr": 22.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a58900b5705e10001e8c207",
+      "title": "小学常考阅读理解【答题模板】训练（PDF电子资料）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.88,
+      "sold": 2546,
+      "delta": 160,
+      "actual_gr": 6.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a8a86422e2aa800017f7b6d",
+      "title": "【羽尧课件】四年级上册语文  单元链接【禁止二传二售违者必究】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 140.0,
+      "sold": 6062,
+      "delta": 155,
+      "actual_gr": 2.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6abb60ec2c3f8b000105eee9",
+      "title": "初中英语写作练习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 773,
+      "delta": 150,
+      "actual_gr": 24.08,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69ec0cd43a4daf00018f2cde",
+      "title": "环艺景观规划建筑产品文创环境设计展板模板合集/分图层/可编辑",
+      "store_name": "设计达人",
+      "store_id": "66178f1ff0b53500018cf909",
+      "price": 4.99,
+      "sold": 1484,
+      "delta": 148,
+      "actual_gr": 11.08,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69d35ef1afbcbb0001f8f38d",
+      "title": "27教招教综三色笔记+默写+口诀+必背人物+思维导图+答论述辨析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 1056,
+      "delta": 137,
+      "actual_gr": 14.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6914ae2043699b0001a493b6",
+      "title": "浦发银行面试—群面+半结构化—两万字面经模版【27校招更新版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.66,
+      "sold": 551,
+      "delta": 136,
+      "actual_gr": 32.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6ac653f4b7031f0001c05eb8",
+      "title": "五上习作四《二十年后的家乡》",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 1061,
+      "delta": 133,
+      "actual_gr": 14.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "695f492ccf93e20001fa20d1",
+      "title": "图画捉迷藏高难度隐藏图片视觉挑战观察注意力训练亲子游戏电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.9,
+      "sold": 894,
+      "delta": 132,
+      "actual_gr": 17.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测职测笔记总结资料"
+      ]
+    },
+    {
+      "goods_id": "6a3bf4b21a14830001870365",
+      "title": "小学1-6年级数学思维训练动画含练习题 通用版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.0,
+      "sold": 723,
+      "delta": 128,
+      "actual_gr": 21.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测言语数量"
+      ]
+    },
+    {
+      "goods_id": "6a5206074f6fde00019703cd",
+      "title": "26秋外研三起丨新版三四五六年级上册考点梳理、配套练习[电子版]",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 3431,
+      "delta": 126,
+      "actual_gr": 3.81,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "67e13ec529b9f7000129aa7b",
+      "title": "26下高中体育教资面试教案技能汇总逐字稿答辩和结构化备考",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.98,
+      "sold": 1438,
+      "delta": 123,
+      "actual_gr": 9.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测笔记"
+      ]
+    },
+    {
+      "goods_id": "69dce3095ec0880001048301",
+      "title": "26下半年初中政治道法教案教资面试逐字稿和答辩电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.98,
+      "sold": 367,
+      "delta": 122,
+      "actual_gr": 49.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测职测笔记总结资料"
+      ]
+    },
+    {
+      "goods_id": "6a81c45dee44d900013e391b",
+      "title": "2027上教资笔试中小幼科一科二备考资料+网课（27持续更新中）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 1045,
+      "delta": 117,
+      "actual_gr": 12.61,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "6a68ca02eb49fe000114fddb",
+      "title": "英语专四专八真题＋答案＋解析＋听力音频（26年真题已更新）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 485,
+      "delta": 114,
+      "actual_gr": 30.73,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测全套速记技巧电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a68657bcef2250001590667",
+      "title": "原生家庭恋爱模式趣味测试",
+      "store_name": "空白意识室的店",
+      "store_id": "691bcd1ecda0b5001554ce12",
+      "price": 0.99,
+      "sold": 1103,
+      "delta": 113,
+      "actual_gr": 11.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "69082442c4f89100017681b5",
+      "title": "网盘秒发）竞选大队委立体手绘海报线稿无实物组合不重样持续更新",
+      "store_name": "三分钟热牛奶的店",
+      "store_id": "6899b056990ecc0015a7a6b9",
+      "price": 11.9,
+      "sold": 2197,
+      "delta": 111,
+      "actual_gr": 5.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测职测笔记总结资料"
+      ]
+    },
+    {
+      "goods_id": "6a87aa5f0db08d0001c35158",
+      "title": "2026秋RJ版初中各科早背晚默小纸条知识总结同步练习/7-9年级资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 1454,
+      "delta": 109,
+      "actual_gr": 8.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "68975dbc86c0df00019800eb",
+      "title": "语文教招分模块刷题练习，教招特岗学科语文练习题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.66,
+      "sold": 5221,
+      "delta": 108,
+      "actual_gr": 2.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    },
+    {
+      "goods_id": "67e17c66eb978c0001bcd821",
+      "title": "养号0.1元，可爱猫咪，手机壁纸 带图，自动发货！",
+      "store_name": "Venus jiwellery珠宝的店",
+      "store_id": "635ea28c83f0d000019db574",
+      "price": 0.1,
+      "sold": 3686,
+      "delta": 105,
+      "actual_gr": 2.93,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测职测笔记总结资料"
+      ]
+    },
+    {
+      "goods_id": "69e486f9cfc3750001f6715e",
+      "title": "高中八科数英政史地物化生教材全册课本课后习题答案各版本电子版",
+      "store_name": "大羊老师学习资料库的店",
+      "store_id": "687e068756257b001533628b",
+      "price": 1.0,
+      "sold": 2113,
+      "delta": 105,
+      "actual_gr": 5.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "行测"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "行测",
+  "slug": "行测"
+}

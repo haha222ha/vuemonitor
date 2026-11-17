@@ -1,0 +1,1258 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "大模型代理平台"
+    ],
+    "niche": "大模型代理平台"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "大模型代理平台电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "大模型代理平台电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 25,
+    "sku_n": 72,
+    "sum_delta": 282,
+    "median_price": 1.99,
+    "niche": "大模型代理平台",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "喜水。的店",
+      "sku_n": 1,
+      "sum_delta": 248,
+      "sum_sold": 9776,
+      "top_title": "趣味小测试更了解自己心理",
+      "top_delta": 248
+    },
+    {
+      "store_name": "（未知店）",
+      "sku_n": 47,
+      "sum_delta": 14,
+      "sum_sold": 2964,
+      "top_title": "【自动发货】SCL-90 线上专业抑郁焦虑全面心理测评 · 自动发货",
+      "top_delta": 9
+    },
+    {
+      "store_name": "E=mc²",
+      "sku_n": 1,
+      "sum_delta": 8,
+      "sum_sold": 202,
+      "top_title": "招投标书模板范本大全",
+      "top_delta": 8
+    },
+    {
+      "store_name": "家庭心理师馨悦的店",
+      "sku_n": 1,
+      "sum_delta": 7,
+      "sum_sold": 21,
+      "top_title": "【新版原创】心理年龄测试评估工具/你的心理年龄多少岁/自动发货",
+      "top_delta": 7
+    },
+    {
+      "store_name": "宝藏女孩琪琪的店",
+      "sku_n": 1,
+      "sum_delta": 4,
+      "sum_sold": 10,
+      "top_title": "【心理年龄测试30题可重复测试自动发货测出你的真实年龄】",
+      "top_delta": 4
+    },
+    {
+      "store_name": "恋爱诊疗室的店",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 26,
+      "top_title": "心理年龄测试：你的内心，到底几岁了？",
+      "top_delta": 1
+    },
+    {
+      "store_name": "夏sir的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 270,
+      "top_title": "你的心理年龄测试",
+      "top_delta": 0
+    },
+    {
+      "store_name": "拾心疗愈馆的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 104,
+      "top_title": "【原创】你的心理年龄多少岁？（专业版测试报告）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "土象研究生ens的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 94,
+      "top_title": "【自动发货】心理年龄测试报告",
+      "top_delta": 0
+    },
+    {
+      "store_name": "云朵在看花的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 66,
+      "top_title": "趣味小测试了解自己心理",
+      "top_delta": 0
+    },
+    {
+      "store_name": "小晴老师爱分享的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 54,
+      "top_title": "心理年龄测试30题｜拍下即得｜30秒出结果｜测出你真实内心年龄",
+      "top_delta": 0
+    },
+    {
+      "store_name": "小乔丁香结的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 29,
+      "top_title": "SCL-90 线上抑郁焦虑全面心理测评报告",
+      "top_delta": 0
+    },
+    {
+      "store_name": "林川的灵感岛的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 26,
+      "top_title": "九大维度全面心理测试报告定制分析",
+      "top_delta": 0
+    },
+    {
+      "store_name": "68d65815abd65900150c8d64",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 10,
+      "top_title": "三色心理心象测试入口整理｜结果解读服务｜非原创｜虚拟商品不退",
+      "top_delta": 0
+    },
+    {
+      "store_name": "小婕姐测评的店",
+      "sku_n": 2,
+      "sum_delta": 0,
+      "sum_sold": 15,
+      "top_title": "心理年龄测试真实年龄评估可视化分析报告",
+      "top_delta": 0
+    },
+    {
+      "store_name": "壹家筱店的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 7,
+      "top_title": "边缘性人格心理测试：测测你有没有边缘型特质",
+      "top_delta": 0
+    },
+    {
+      "store_name": "小家的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 6,
+      "top_title": "SCL-90综合心理测试56种心理抑郁症自测自测量表焦虑测试题电子版",
+      "top_delta": 0
+    },
+    {
+      "store_name": "念念林。的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 2,
+      "top_title": "【新版原创】你的心理年龄是几岁/心理年龄测试",
+      "top_delta": 0
+    },
+    {
+      "store_name": "695aa79bb1c2c30015b7101d",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1,
+      "top_title": "【原创】心理的安全感测试模版｜75道单选题模版｜仅供娱乐参考",
+      "top_delta": 0
+    },
+    {
+      "store_name": "68bfade8918910001575c935",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1,
+      "top_title": "人格气质情绪控制测试｜直达入口",
+      "top_delta": 0
+    },
+    {
+      "store_name": "68b5603612b19100154c9922",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "《国自然标书写作模板与中标案例拆解》",
+      "top_delta": 0
+    },
+    {
+      "store_name": "静宸的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "你的心理年龄到底几岁？｜原创24题心灵年龄测试",
+      "top_delta": 0
+    },
+    {
+      "store_name": "首尔漫匣子的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "500套常用心理学量表+300本心理学电子shu+1套心理专业测评电子版",
+      "top_delta": 0
+    },
+    {
+      "store_name": "6877693841e93d0015d8e878",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "2026大连辅警笔试面试资料历年真题行测公安基础知识法律心理测试",
+      "top_delta": 0
+    },
+    {
+      "store_name": "美一天XIAOMEI的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "天赋心理评估资料-人类十大天赋匹配",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a4b267ef7c8040001d9cd3f",
+      "title": "趣味小测试更了解自己心理",
+      "store_name": "喜水。的店",
+      "store_id": "682ecd0304d7b4001537e484",
+      "price": 1.99,
+      "sold": 9776,
+      "delta": 248,
+      "actual_gr": 2.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa22262d9bb89001535225a",
+      "title": "【自动发货】SCL-90 线上专业抑郁焦虑全面心理测评 · 自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.88,
+      "sold": 17,
+      "delta": 9,
+      "actual_gr": 112.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6805c9de15d2b000018025d7",
+      "title": "招投标书模板范本大全",
+      "store_name": "E=mc²",
+      "store_id": "64003ba1f9c21e0001e3e2d3",
+      "price": 12.0,
+      "sold": 202,
+      "delta": 8,
+      "actual_gr": 4.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7c302ea4f71c000156954a",
+      "title": "【新版原创】心理年龄测试评估工具/你的心理年龄多少岁/自动发货",
+      "store_name": "家庭心理师馨悦的店",
+      "store_id": "64d48b71f58f8b0001530c84",
+      "price": 0.99,
+      "sold": 21,
+      "delta": 7,
+      "actual_gr": 50.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6ca192f4c0ad00011b762e",
+      "title": "【心理年龄测试30题可重复测试自动发货测出你的真实年龄】",
+      "store_name": "宝藏女孩琪琪的店",
+      "store_id": "61fa4edbf816ad000134cc66",
+      "price": 0.9,
+      "sold": 10,
+      "delta": 4,
+      "actual_gr": 66.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f02800eee1ab00018b4023",
+      "title": "2026上海市教师招聘考试笔试综合测试心理测试真题电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 50,
+      "delta": 3,
+      "actual_gr": 6.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "698488b63067f40001767a92",
+      "title": "【正版测试】七大脉轮能量测评 | 身心疗愈与能量平衡指南",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 261,
+      "delta": 1,
+      "actual_gr": 0.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6b99e0def92a0001799534",
+      "title": "心理年龄测试：你的内心，到底几岁了？",
+      "store_name": "恋爱诊疗室的店",
+      "store_id": "6a54ce74ff72440015e23c4c",
+      "price": 1.99,
+      "sold": 26,
+      "delta": 1,
+      "actual_gr": 4.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9a34edef41870001d489e8",
+      "title": "你的心理年龄是多少岁？心理年龄测试 （专业版报告）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.99,
+      "sold": 5,
+      "delta": 1,
+      "actual_gr": 25.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "68679318afc5ca0001bfa7dd",
+      "title": "2026全国体育单招四科真题模拟冲刺押题卷电子版试卷文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.68,
+      "sold": 2116,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a38d5139cf0970001da10b0",
+      "title": "你的心理年龄测试",
+      "store_name": "夏sir的店",
+      "store_id": "681b42b4e462b700158ff840",
+      "price": 2.99,
+      "sold": 270,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a685aa434eabf00015715e9",
+      "title": "【原创】你的心理年龄多少岁？（专业版测试报告）",
+      "store_name": "拾心疗愈馆的店",
+      "store_id": "6a34c09570260f0015f0307a",
+      "price": 1.68,
+      "sold": 104,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5324a501c1af00011f18bb",
+      "title": "【自动发货】心理年龄测试报告",
+      "store_name": "土象研究生ens的店",
+      "store_id": "6a4a8b70877db80015d95c29",
+      "price": 0.99,
+      "sold": 94,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6926ff96d4363c0001b00d40",
+      "title": "心理能量测试清单",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 93,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "67cc4c4252503c000140f86c",
+      "title": "2025小升初数学【行程问题】专项练习复习资料电子文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 81,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5db3e971d24900013661ae",
+      "title": "趣味小测试了解自己心理",
+      "store_name": "云朵在看花的店",
+      "store_id": "69fd6435ba08570015223592",
+      "price": 1.99,
+      "sold": 66,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a85b954fa5d5c0001e2bab2",
+      "title": "【最新原创】来测试一下你的心理年龄 | 你比你想的更成熟",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 65,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4f4323b5de6c000174efc0",
+      "title": "超准贝姆心理测试模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 58,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "693959bc33f9b300014d7b1d",
+      "title": "心理年龄测试30题｜拍下即得｜30秒出结果｜测出你真实内心年龄",
+      "store_name": "小晴老师爱分享的店",
+      "store_id": "6917d07872b809001593afe5",
+      "price": 0.99,
+      "sold": 54,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7d91ff532d770001b6f6ff",
+      "title": "SCL-90 线上抑郁焦虑全面心理测评报告",
+      "store_name": "小乔丁香结的店",
+      "store_id": "6a5dca52cef20500156e077a",
+      "price": 0.99,
+      "sold": 29,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e262dd02be320001affe2d",
+      "title": "九大维度全面心理测试报告定制分析",
+      "store_name": "林川的灵感岛的店",
+      "store_id": "68a706e69eda55001542152f",
+      "price": 1.99,
+      "sold": 26,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a63591ef1ffda000149fde0",
+      "title": "【2.0版】趣味心理小测试PPT模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 23,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab1dbfedea5ea000127f8f4",
+      "title": "山外小楼主页同款三上单元梳理电子版资料PDF文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 22,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "690f758a2ffb610001ec29aa",
+      "title": "高考语文真题成语汇总251个/电子文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 22,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a32a6d38bca04000187d9fb",
+      "title": "2026兵检心理测试考试题库历年真题模拟自测章节练习解析培训资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.0,
+      "sold": 21,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa0cb086c13960001fcb137",
+      "title": "SCL90-心理健康测评九大维度全面测试焦虑抑郁",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b2cda128de740015d7ba41",
+      "title": "2026上海市教师招聘考试笔试综合测试心理测试真题电子资料 · 综",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9d2cdf4c56fb000139238f",
+      "title": "【原创】心理年龄测试  六维雷达图+深度解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.84,
+      "sold": 13,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a053bb8377d1700018e738a",
+      "title": "心理年龄测试PpT模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a885e9382e3190015822f72",
+      "title": "明尼苏达MMPI心理健康399题模拟测评在线 · 仅测试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 11,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ac40071166fe00019f9068",
+      "title": "三色心理心象测试入口整理｜结果解读服务｜非原创｜虚拟商品不退",
+      "store_name": "68d65815abd65900150c8d64",
+      "store_id": "68d65815abd65900150c8d64",
+      "price": 1.98,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69345a82ce3eb50001bf5e2c",
+      "title": "心理年龄测试真实年龄评估可视化分析报告",
+      "store_name": "小婕姐测评的店",
+      "store_id": "68a431e3c435bd00154cccf1",
+      "price": 0.99,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1bec0f40788700010d7b60",
+      "title": "你的性格颜色是什么｜40题深度心理娱乐测试｜超千字专属解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab48e9f57ccfc000190f0f0",
+      "title": "抑郁情绪自评 测试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.11,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a22a2a9a7cb0d00018fc03c",
+      "title": "边缘性人格心理测试：测测你有没有边缘型特质",
+      "store_name": "壹家筱店的店",
+      "store_id": "69ff44dcf6cb860015b4ff10",
+      "price": 0.95,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "67e91f573d0cf400017a6ffc",
+      "title": "SCL-90综合心理测试56种心理抑郁症自测自测量表焦虑测试题电子版",
+      "store_name": "小家的店",
+      "store_id": "6724d9608bc7b300165f481a",
+      "price": 3.88,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab48c9e2c3f8b0001a30d18",
+      "title": "焦虑自评量表测试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.11,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa9995dae72f0001654e37",
+      "title": "你的恋爱副作用-恋爱性格心理测验",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.98,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "687dbb22f9d7c800015cf501",
+      "title": "【高考数学】十大专题技巧训练高中提分必背精品电子资料word文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.41,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a353c1fcde0db000117c7ad",
+      "title": "18款心理测试合集｜趣味测评探索自我｜专业心理分析报告PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e1c6c5cfc3750001a3299f",
+      "title": "测试你的恋爱脑程度趣味心理分析报告等课件",
+      "store_name": "小婕姐测评的店",
+      "store_id": "68a431e3c435bd00154cccf1",
+      "price": 1.88,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a89786ef551f50001bba685",
+      "title": "【无需注册】智商测试20题真实计分心理评估益智游戏书",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3d27b01a14830001a45b58",
+      "title": "2026中小学心理教师基本功比赛个案辅导能力测试模拟课堂电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.83,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a70b2e6d528ea0015da5743",
+      "title": "【新版原创】你的心理年龄是几岁/心理年龄测试",
+      "store_name": "念念林。的店",
+      "store_id": "6a3a84830b28350015340c4c",
+      "price": 2.99,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a912f9a548298000153836e",
+      "title": "马基雅维利性格测试分析报告 快速生成心理测评结果",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a030058d500200001856a3d",
+      "title": "2026上海市教师招聘考试市考笔试综合测试心理测试真题电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.5,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6c6facdef92a00018ec66c",
+      "title": "【原创】心理的安全感测试模版｜75道单选题模版｜仅供娱乐参考",
+      "store_name": "695aa79bb1c2c30015b7101d",
+      "store_id": "695aa79bb1c2c30015b7101d",
+      "price": 0.99,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa57e9c50825c000156f69b",
+      "title": "【快速测试】你的心理年龄多少岁？",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8baec13ba4d60001b5eb6d",
+      "title": "趣味测试｜测一测你的个人心理形象",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa64a0aa0b6bb0001c003e2",
+      "title": "SCL-90 线上专业抑郁焦虑全面心理测评",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa764a35fb5860001300523",
+      "title": "【新版】心理年龄测试报告解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa93b0c15012e0001107662",
+      "title": "【自动发货】贝姆心理性别测试.深度解读版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b29624d9bb890015dbff0a",
+      "title": "中职心理健康与职业生涯课件PPT视频新版资料教案测试题设计素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.21,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a89625661bc110001e7ef5c",
+      "title": "你的心理年龄是几岁｜趣味测试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.88,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a673846ab4daa000161bd1c",
+      "title": "【9900+套】蕞全标书模板范本招投标文件工程施工技术标模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.51,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f9706633df700015250b44",
+      "title": "文学常识汇总作业pdf文档附答案1000题共154页 PDF及word电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.48,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69abeec9f6806b0001cf2495",
+      "title": "人格气质情绪控制测试｜直达入口",
+      "store_name": "68bfade8918910001575c935",
+      "store_id": "68bfade8918910001575c935",
+      "price": 3.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e3b3690775cd0015e7e5f3",
+      "title": "《国自然标书写作模板与中标案例拆解》",
+      "store_name": "68b5603612b19100154c9922",
+      "store_id": "68b5603612b19100154c9922",
+      "price": 9.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aadf06068ec3400015715ed",
+      "title": "趣味测评SCL-90心理测评自我认知心理状况",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.98,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f414a2a5715f00014fa97c",
+      "title": "心理健康测试 15题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a728e3d9fb4c8000186ff3c",
+      "title": "你的心理年龄到底几岁？｜原创24题心灵年龄测试",
+      "store_name": "静宸的店",
+      "store_id": "684ce5d7ee9d870015a8d67d",
+      "price": 1.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "697604ee39c8000001f6aeab",
+      "title": "新手小白招投标书文件制作课程电子标书排版视频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "695107e8be1ced0015b47894",
+      "title": "500套常用心理学量表+300本心理学电子shu+1套心理专业测评电子版",
+      "store_name": "首尔漫匣子的店",
+      "store_id": "68c7d3c6b78a3c001542a472",
+      "price": 2.02,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a87d90973bbe5000168e46f",
+      "title": "文学常识汇总作业pdf文档附答案1000题共154页PPT电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.02,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a715891eb49fe0001dc4e93",
+      "title": "2026大连辅警笔试面试资料历年真题行测公安基础知识法律心理测试",
+      "store_name": "6877693841e93d0015d8e878",
+      "store_id": "6877693841e93d0015d8e878",
+      "price": 1.88,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6c877f89d8ff0001dcd17f",
+      "title": "天赋心理评估资料-人类十大天赋匹配",
+      "store_name": "美一天XIAOMEI的店",
+      "store_id": "684fcde7e94311001571fc98",
+      "price": 1.98,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8d9dc67388ed00017c5ca9",
+      "title": "心理年龄测试报告+实际年龄对比",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9b71551b60640001077285",
+      "title": "2026新大纲导游证考试全套资料笔试面试问答电子资料（个人整理）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9d9e844c56fb000145e331",
+      "title": "心理测试量表全面测评职业能力分析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa14ba75152e50001354e88",
+      "title": "抑郁 焦虑 内耗 心理健康测试(秒出结果)【自动发货】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d32f521153580015fd17dd",
+      "title": "2026注册资产评估师网课视频电子讲义教材教程押题库相关知识赠25",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa637f37116f00001aa7198",
+      "title": "26四川单招资料合集 电子课件文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大模型代理平台电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "大模型代理平台",
+  "slug": "大模型代理平台"
+}

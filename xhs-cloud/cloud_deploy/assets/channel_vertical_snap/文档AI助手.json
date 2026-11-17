@@ -1,0 +1,1194 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "文档AI助手"
+    ],
+    "niche": "文档AI助手"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "文档AI助手电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "文档AI助手电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 3,
+    "sku_n": 80,
+    "sum_delta": 469,
+    "median_price": 6.9,
+    "niche": "文档AI助手",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 78,
+      "sum_delta": 467,
+      "sum_sold": 39157,
+      "top_title": "七八九年级人教版 每日一练 阅读理解核心考点 超快提分",
+      "top_delta": 84
+    },
+    {
+      "store_name": "微风未至的店",
+      "sku_n": 1,
+      "sum_delta": 2,
+      "sum_sold": 186,
+      "top_title": "KET阅读理解课件每日一篇小短文提升能力G1-G8共八册电子版",
+      "top_delta": 2
+    },
+    {
+      "store_name": "丁老师阅读精读（收徒中）的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 5473,
+      "top_title": "时文阅读每日1篇高效积累",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a8038e82f88c6000196364a",
+      "title": "七八九年级人教版 每日一练 阅读理解核心考点 超快提分",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 37.8,
+      "sold": 1261,
+      "delta": 84,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4e133a4034b800015ea0ef",
+      "title": "初中语文七八九年级阅读理解同步讲义教师版+学生版（电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 1140,
+      "delta": 81,
+      "actual_gr": 7.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a35f1236f59ca0001c79e06",
+      "title": "2026初中语文阅读理解文言文古诗词字词作文仿写专项训练每日一练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 578,
+      "delta": 70,
+      "actual_gr": 13.78,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a69d967e179b50001d45e3b",
+      "title": "2026秋季八上语文资料包模板电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 1612,
+      "delta": 64,
+      "actual_gr": 4.13,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d7afeff8d1f00001250f62",
+      "title": "初中语文资料【文言文·阅读理解·作文·名著·古诗·四大类阅读】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.49,
+      "sold": 1892,
+      "delta": 25,
+      "actual_gr": 1.34,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "671121ee56c6a60001c61a72",
+      "title": "八年级初中语文阅读理解答题技巧和方法模板书公式法专项训练书",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 42.33,
+      "sold": 931,
+      "delta": 18,
+      "actual_gr": 1.97,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "68e9b23253446d0001038f96",
+      "title": "初中语文文言文每日一练39篇课内外对比阅读基础知识练习 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 443,
+      "delta": 17,
+      "actual_gr": 3.99,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "690616d71b78790001cafc45",
+      "title": "初中七年级上册现代文分体裁阅读30篇【注解+练习】电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 311,
+      "delta": 14,
+      "actual_gr": 4.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b572741b6b3f00011076e4",
+      "title": "初中语文阅读理解专项训练（记叙文＋说明文＋议论文）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 99,
+      "delta": 14,
+      "actual_gr": 16.47,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6790a44975ca3a000138336d",
+      "title": "小学3-4年级晨读美文",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 1399,
+      "delta": 11,
+      "actual_gr": 0.79,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "69855c16f0c484000162f08f",
+      "title": "2026人教版初中语文文言文阅读对比训练巩固培优电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 456,
+      "delta": 9,
+      "actual_gr": 2.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a70d3bc24f04400011fe9bf",
+      "title": "2026KET/PET/FCE内部真卷电子版【私信客服可试看】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 438.0,
+      "sold": 155,
+      "delta": 9,
+      "actual_gr": 6.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "687a64984485460001039581",
+      "title": "初中阅读理解答题技巧每日一练电子版资料七八九年级适用（最新版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 334,
+      "delta": 8,
+      "actual_gr": 2.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "683aa5fb5d794100019b5679",
+      "title": "初中语文现代文阅读理解答题公式（PDF版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 1177,
+      "delta": 7,
+      "actual_gr": 0.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a18d9797a5d7000109ba86",
+      "title": "（2026）高一语文-现代文阅读真题训练50篇（含答案）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.0,
+      "sold": 199,
+      "delta": 7,
+      "actual_gr": 3.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "69606353c429e2000111ac6c",
+      "title": "2027年中考语文重点专项训练文言文说明文议论文阅读等题型电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 266,
+      "delta": 5,
+      "actual_gr": 1.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6869abde0838000188e361",
+      "title": "初中语文八大主题阅读理解精选训练合集电子版带答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 21.1,
+      "sold": 169,
+      "delta": 4,
+      "actual_gr": 2.42,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "693cf76665055f0001916eee",
+      "title": "初中语文七八九年级阅读理解答题模型+题型训练通用电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 66,
+      "delta": 4,
+      "actual_gr": 6.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c8ef70cf15230001aee88c",
+      "title": "初中语文：26年非连续性文本阅读带答案电子版文件56篇",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.85,
+      "sold": 272,
+      "delta": 3,
+      "actual_gr": 1.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e9c23a0511b50001f82ad1",
+      "title": "2027年初中语文现代文散文说明文记叙文阅读专项训练电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 149,
+      "delta": 3,
+      "actual_gr": 2.05,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a983e62d5867600014f8e14",
+      "title": "【电子版有答案】七上语文课外阅读理解专项练习30篇",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.99,
+      "sold": 34,
+      "delta": 3,
+      "actual_gr": 9.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "685b915f48753b0001e278f2",
+      "title": "KET阅读理解课件每日一篇小短文提升能力G1-G8共八册电子版",
+      "store_name": "微风未至的店",
+      "store_id": "6822a7d8c0168d00159f6109",
+      "price": 18.8,
+      "sold": 186,
+      "delta": 2,
+      "actual_gr": 1.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "689322df417c3f000110dbea",
+      "title": "小学语文阅读理解丨九大常考修辞手法训练【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.9,
+      "sold": 145,
+      "delta": 2,
+      "actual_gr": 1.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9af7861b9ae900018324e5",
+      "title": "初中语文现代文阅读理解每日一练50篇含答案解析电子版可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 12,
+      "delta": 2,
+      "actual_gr": 20.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "698df2de880da20001597fc3",
+      "title": "2026新版一年级语文阅读理解专项训练100篇（125页含答案）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 462,
+      "delta": 1,
+      "actual_gr": 0.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6867ada3c340d500012e99ed",
+      "title": "六上文言文阅读训练（共15篇）电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 198,
+      "delta": 1,
+      "actual_gr": 0.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8527b4d37c8900014b6f40",
+      "title": "人教版初中语文阅读理解答题模板120种PDF电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 58,
+      "delta": 1,
+      "actual_gr": 1.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "645dff67db9efc000119ef22",
+      "title": "送同步音频儿童暑假阅读记录自律古诗词小学生书架打卡本背诵表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 12000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6616601568c7360001ad0ab9",
+      "title": "时文阅读每日1篇高效积累",
+      "store_name": "丁老师阅读精读（收徒中）的店",
+      "store_id": "65217c137fa15200013b6a3d",
+      "price": 25.9,
+      "sold": 5473,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6728b421c09fe8000137bc4f",
+      "title": "初中文言文每日一练电子版（39篇课内外对比阅读、六册教材知识点",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.0,
+      "sold": 3006,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5733828c0a3e0001c96651",
+      "title": "2026小学语文升三四五六年级阅读理解衔接讲义+阅读题及答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.21,
+      "sold": 2243,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6981b601880da20001f81b16",
+      "title": "26人教版七年级下册英语单词短语句型语法每日练资料包电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 1405,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a49314b24d4bb00015301a5",
+      "title": "26秋三年级上册语文学习资料电子版（看选项选具体资料）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 1018,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6986035e5b50a30001e79021",
+      "title": "四年级下册语文阅读理解答题模版＋练习题专项训练每日一练电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.24,
+      "sold": 741,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a573928b5de6c0001242006",
+      "title": "2026新小学语文阅读理解暑假资料（三至六年级）电子版可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 626,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "694cb50a8ff5d400014099c1",
+      "title": "初中语文单元主题阅读知识梳理考点专项训练 【七八九年级全册】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 601,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "688349cae019f20001db0180",
+      "title": "电子资料！26新教材八上语文基础字词+古诗文理解默写练习小纸条",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.48,
+      "sold": 449,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e715e02e0045000128d38a",
+      "title": "初中语文阅读理解专项训练学生版教师版方法技巧答题模板每日一练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 396,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3facfc7d09bf0001176e17",
+      "title": "三升四暑假语文阅读理解每日一练60天（含答案96页）-四上语文",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 388,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c65f21e6196b0001299648",
+      "title": "小升初语文总复习文言文阅读理解每日一练修改病句模拟真题等资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 380,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "694cd62a8bd70d0001c58c25",
+      "title": "初中语文单元主题阅读七八九年级知识梳理专项练习方法技巧电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 246,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3773478bca040001ec966f",
+      "title": "【新】二年级语文上册资料【电子档】02",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 218,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6989879df0c4840001c288f7",
+      "title": "初中语文阅读理解全考点训练每日一练（教师版+学生版）电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 187,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "691ab12b1c5b2a0001e4965d",
+      "title": "小升初英语-阅读理解每日一练（30篇）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.24,
+      "sold": 142,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a90e12b4f1f1800014076e9",
+      "title": "新教材七年级上册现代文阅读理解考点汇编（学生版+教师版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.28,
+      "sold": 140,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f640a5ad046d000167ec49",
+      "title": "新版六年级上册六上语文课外阅读理解十大专题86篇每日一练有答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.9,
+      "sold": 140,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "68e8dbe4c67e470001796ec3",
+      "title": "小学语文丨非连续性文本阅读答题技巧+练习【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.35,
+      "sold": 139,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "67d113db29b9f7000152b75b",
+      "title": "（电子版）重庆初中阅读训练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.8,
+      "sold": 128,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b74d8b32508300018addfd",
+      "title": "中考语文现代文分体裁阅读真题训练30篇【注解+练习】电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 106,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a41b7f2085771000146b9f2",
+      "title": "暑假语文阅读打卡40天每日一练/123456年级/PDF电子版可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 105,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0f0d24859c5f00015c14f3",
+      "title": "五年级下册语文阅读理解答题技巧+专项练习附答案【PDF电子资料】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 99,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "690ee904ab65400001551ca9",
+      "title": "初中语文阅读理解全考点通用版阅读理解每日一练电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.31,
+      "sold": 92,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5c7f196cbefa00015c1d09",
+      "title": "六年级语文阅读写作秋季专题讲义（五四制）（电子版学生版教师版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 67,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a320d2a963cbb0001ee4593",
+      "title": "26秋人教版一二三四五六年级上册语文阅读理解每日一练（含答案）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 57,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6821bce780956a000161c0c1",
+      "title": "初中英语七八九年级阅读理解专项练习阅读理解解题技巧电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.86,
+      "sold": 47,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f1a115c192ac0001f398e1",
+      "title": "电子版外研版四年级上阅读理解每日一练30篇空白15页答案14页-75",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 41,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a749268e950980001aad11a",
+      "title": "【四年级上册整本书阅读】导读课/ 推进课/交流课三课型合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 33,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6dbc1a34eabf0001d5ad14",
+      "title": "2-6年级语文课外阅读理解拔高专项训练60篇每日练含答案PDF电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 14,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7e91960020da0001ed07cc",
+      "title": "2027年高考英语每日一练语法填空完型填空阅读理解ABCD篇电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.39,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4b0e8e55f46a0001244696",
+      "title": "2026小学语文阅读理解专项训练每日一练电子版可打印教案资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0f0e2548f8580001c67234",
+      "title": "六年级下册语文阅读理解答题技巧+专项练习附答案【PDF电子资料】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59ecf96cbefa000124915b",
+      "title": "2026新人教版小学语文暑假衔接阅读理解专项训练电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.67,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "68fc5d2a04ab190001aa3ab9",
+      "title": "北师大版一年级上册学霸作业本每日课后练习、思维导图、情境题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.6,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa6a64b06bc7500015372d3",
+      "title": "2026秋 七上语文全套资料 必背名著 习题试卷 写作素材电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a16617f3d3e4d00017d5811",
+      "title": "小学语文3-6年级阅读理解答题模板与解题技巧练习题（电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.66,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "699d42862ab5130001625693",
+      "title": "六年级下册语文《阅读理解 每日一练》含答案146页038",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.98,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "69df415179266200011cde71",
+      "title": "100电子资料:五年级语文阅读理解25篇每日一练含答案可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.8,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a58ac21d09fb60001dafd9c",
+      "title": "【三年级上册整本书阅读】导读课/ 推进课/交流课三课型合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0eb46f90bd1b0001b57847",
+      "title": "初中语文现代文阅读理解专项突破每日一练30篇含答案电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59c21724f0440001e012b1",
+      "title": "2026暑假小学语文升三四五六年级阅读理解衔接讲义【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.99,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "67712311966ebd000174312b",
+      "title": "初中现代文阅读答题方法+典型真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 23.0,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "68580f533970ba0001e1cfd6",
+      "title": "数字商品电子资料4下-64",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.68,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaf2c4768a9c10001a9e890",
+      "title": "新版1-6年级语文上册课内阅读理解每日一练【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a16673b61fef90001245d2f",
+      "title": "2026届华育中考语文阅读理解训练每日一练  答题思路  电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.8,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "698c3427265eb900014bf972",
+      "title": "初中语文阅读理解专项训练记叙文阅读答题技巧解题公式电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.66,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa4073677799d000186907a",
+      "title": "小升初语文：阅读理解精练！每日一练，含答案答题模板，电子版！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaf2c4768a9c10001a9e884",
+      "title": "新版1-6年级语文上册课内阅读理解每日一练【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa0dd5dd027a30001087e2b",
+      "title": "语文阅读理解满分答题模板&阅读理解考点每日一练全国通用电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.6,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9433dd28ea5900011e4f9b",
+      "title": "古风名言警句环创电子素材 阅读角班级文化墙",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.2,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a20203411535800159185ba",
+      "title": "小学语文三/四年级下阅读理解每日一练与解题技巧电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档AI助手电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "文档AI助手",
+  "slug": "文档AI助手"
+}

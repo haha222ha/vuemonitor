@@ -1,0 +1,1327 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "小学资料"
+    ],
+    "niche": "小学资料"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 6,
+    "active_n": 0,
+    "drive_keywords": [
+      "二宝小学资料",
+      "冯老师小学资料",
+      "小学资料程老师",
+      "许老师小学资料",
+      "春小学资料笔记同款",
+      "妍妍爱学习（小学资料铺）"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "二宝小学资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "冯老师小学资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "小学资料程老师",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "许老师小学资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "误判零产恢复：新词或未采过",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "春小学资料笔记同款",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "妍妍爱学习（小学资料铺）",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 14,
+    "sku_n": 80,
+    "sum_delta": 15770,
+    "median_price": 5.9,
+    "niche": "小学资料",
+    "drive_kw_n": 6
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 67,
+      "sum_delta": 9532,
+      "sum_sold": 122484,
+      "top_title": "Dazz全部滤镜胶片照片视频实况滤镜Fxnr底片调色预设素材滤镜模板",
+      "top_delta": 1511
+    },
+    {
+      "store_name": "小花妹妹MM的店",
+      "sku_n": 1,
+      "sum_delta": 2000,
+      "sum_sold": 57000,
+      "top_title": "海怪吹石东东全绘画软件通用",
+      "top_delta": 2000
+    },
+    {
+      "store_name": "小七修图的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 21000,
+      "top_title": "p掉路人消除背景路人去除路人p图修图路人消失术乱入镜头的路人",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "657a9c83e48da4000175fd93",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 18000,
+      "top_title": "全部胶片滤镜丨照片视频实况胶片滤镜氛围感调色预设素材模板",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "神奇 | 胶片的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 13000,
+      "top_title": "Dazz FxnR全部滤镜照片实况视频滤镜调色预设素材模板",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "桥头软件库的店",
+      "sku_n": 1,
+      "sum_delta": 529,
+      "sum_sold": 1222,
+      "top_title": "adobe红色弹窗问题远程解决Win/Mac",
+      "top_delta": 529
+    },
+    {
+      "store_name": "卷卷学习资源的店",
+      "sku_n": 1,
+      "sum_delta": 220,
+      "sum_sold": 1590,
+      "top_title": "50天日常生活英语情景口语速成教材视频EnglishforEverydayactivi",
+      "top_delta": 220
+    },
+    {
+      "store_name": "多多喜乐。的店",
+      "sku_n": 1,
+      "sum_delta": 149,
+      "sum_sold": 1023,
+      "top_title": "ADHD注意力缺陷自测量表·成人儿童青年适用·在线测试·秒出结果",
+      "top_delta": 149
+    },
+    {
+      "store_name": "小红薯ADE的店",
+      "sku_n": 1,
+      "sum_delta": 97,
+      "sum_sold": 1255,
+      "top_title": "27注会三大网校全家桶课件※高清无水印",
+      "top_delta": 97
+    },
+    {
+      "store_name": "沫妈英语启蒙驿站的店",
+      "sku_n": 1,
+      "sum_delta": 66,
+      "sum_sold": 2136,
+      "top_title": "一键云字体生成器（老师教案必备）",
+      "top_delta": 66
+    },
+    {
+      "store_name": "胖胖和哒哒的店",
+      "sku_n": 1,
+      "sum_delta": 64,
+      "sum_sold": 2088,
+      "top_title": "iOS26 图标包 三星 华为 荣耀 oppo 一加 努比亚红魔 苹果 iPhone",
+      "top_delta": 64
+    },
+    {
+      "store_name": "66168649af2daa0001627d5a",
+      "sku_n": 1,
+      "sum_delta": 42,
+      "sum_sold": 744,
+      "top_title": "笔记同款修图神器p图教程使用课件教案",
+      "top_delta": 42
+    },
+    {
+      "store_name": "Echo学姐吖～的店",
+      "sku_n": 1,
+      "sum_delta": 41,
+      "sum_sold": 3748,
+      "top_title": "高中化学41个工艺流程题答题套路",
+      "top_delta": 41
+    },
+    {
+      "store_name": "来碧来碧资料的店",
+      "sku_n": 1,
+      "sum_delta": 30,
+      "sum_sold": 69,
+      "top_title": "ImwageJ/Fiji 图像处理软件win/Mac送视频教程 一键安装",
+      "top_delta": 30
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a25944f34cb0200015ecb69",
+      "title": "海怪吹石东东全绘画软件通用",
+      "store_name": "小花妹妹MM的店",
+      "store_id": "69bf9a5086e31c0015b99fd7",
+      "price": 0.9,
+      "sold": 57000,
+      "delta": 2000,
+      "actual_gr": 3.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6aa957843a94950001f0da81",
+      "title": "Dazz全部滤镜胶片照片视频实况滤镜Fxnr底片调色预设素材滤镜模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.98,
+      "sold": 6120,
+      "delta": 1511,
+      "actual_gr": 32.78,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "69d5a1fbda5d200001a763a9",
+      "title": "p掉路人消除背景路人去除路人p图修图路人消失术乱入镜头的路人",
+      "store_name": "小七修图的店",
+      "store_id": "64c3b6c2421de40001126a60",
+      "price": 1.0,
+      "sold": 21000,
+      "delta": 1000,
+      "actual_gr": 5.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a1e78d9c40951000167f7d2",
+      "title": "全部胶片滤镜丨照片视频实况胶片滤镜氛围感调色预设素材模板",
+      "store_name": "657a9c83e48da4000175fd93",
+      "store_id": "657a9c83e48da4000175fd93",
+      "price": 5.99,
+      "sold": 18000,
+      "delta": 1000,
+      "actual_gr": 5.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "69cded3cca154800010e4f74",
+      "title": "Dazz FxnR全部滤镜照片实况视频滤镜调色预设素材模板",
+      "store_name": "神奇 | 胶片的店",
+      "store_id": "688dc1a86883220015ce1dc2",
+      "price": 2.98,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6aa9e70c2054db0001d40621",
+      "title": "音乐格式转换MP3电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.25,
+      "sold": 7962,
+      "delta": 650,
+      "actual_gr": 8.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a1fde2c65795a00010af7a1",
+      "title": "adobe红色弹窗问题远程解决Win/Mac",
+      "store_name": "桥头软件库的店",
+      "store_id": "68ed05f4f9c62d0015c1d140",
+      "price": 12.9,
+      "sold": 1222,
+      "delta": 529,
+      "actual_gr": 76.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a4e175811d5490001b2bf2a",
+      "title": "马斯克资产模版-花光马斯克的钱（点击即玩）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.88,
+      "sold": 1540,
+      "delta": 408,
+      "actual_gr": 36.04,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6aa43785a0b6bb00017e249d",
+      "title": "韦氏智力测评维度分析--网页测试模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 1587,
+      "delta": 407,
+      "actual_gr": 34.49,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a8bf826f1b2d60001228466",
+      "title": "小助手 苹果快捷指令",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1501,
+      "delta": 380,
+      "actual_gr": 33.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a7001ec24f04400010c9e5b",
+      "title": "老爹合集 电子资源模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 8011,
+      "delta": 365,
+      "actual_gr": 4.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6ab9c8b7a285d30001739f03",
+      "title": "《植物大战僵尸》电子资源模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.88,
+      "sold": 2868,
+      "delta": 350,
+      "actual_gr": 13.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a152dfc48f858000163cb6e",
+      "title": "拍下即可好物 高效必备同款 翻译校对11",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.5,
+      "sold": 5340,
+      "delta": 330,
+      "actual_gr": 6.59,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "69cb4786fcd43f0001a2161e",
+      "title": "中文数据库｜英文数据库医学数据库资料文献下载/手机电脑平板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 1849,
+      "delta": 312,
+      "actual_gr": 20.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a991f7432266200019ef3de",
+      "title": "迷你世界老版本【可联机】使用教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 808,
+      "delta": 297,
+      "actual_gr": 58.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a9fe6856c13960001eaa97a",
+      "title": "老师必备教师神器小喇叭远程喊话教室必备班主任必备日常喊话使用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 1391,
+      "delta": 249,
+      "actual_gr": 21.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "68ce064734db2a000179751d",
+      "title": "50天日常生活英语情景口语速成教材视频EnglishforEverydayactivi",
+      "store_name": "卷卷学习资源的店",
+      "store_id": "644017cf09cecd0001010f74",
+      "price": 149.0,
+      "sold": 1590,
+      "delta": 220,
+      "actual_gr": 16.06,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a5646cef8b2fa0001bb2294",
+      "title": "手机相机拍照摄影套餐参数预设包-拍照专业模式适配米系全系型号",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 40.0,
+      "sold": 7656,
+      "delta": 210,
+      "actual_gr": 2.82,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a56bbb524f04400019e4c3b",
+      "title": "27届求职网申AI自动化简历投递神器(自动发货)赠送秋招汇总表格",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 2773,
+      "delta": 204,
+      "actual_gr": 7.94,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a9b98678cb7b80001a5c6b8",
+      "title": "dazz全部滤镜复古相机底片实况预设调色素材模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.28,
+      "sold": 1414,
+      "delta": 154,
+      "actual_gr": 12.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a8d53462fe0cd0001b94bcb",
+      "title": "办公效率一键抠图万能提取抠出透明背景简易",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.88,
+      "sold": 833,
+      "delta": 152,
+      "actual_gr": 22.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a459cc09f3070000178feff",
+      "title": "ADHD注意力缺陷自测量表·成人儿童青年适用·在线测试·秒出结果",
+      "store_name": "多多喜乐。的店",
+      "store_id": "68e79e1f3ab26a0015141b20",
+      "price": 4.0,
+      "sold": 1023,
+      "delta": 149,
+      "actual_gr": 17.05,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6ac9c268a285d30001e49c6d",
+      "title": ".星露古电子资源模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 294,
+      "delta": 141,
+      "actual_gr": 92.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6aa56b96e6df320001b5b0da",
+      "title": "日系漫画勾线网点排线分镜音效对话框全套600支笔刷5款软件通用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 2924,
+      "delta": 136,
+      "actual_gr": 4.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6aa815e915012e0001e5ec7e",
+      "title": "2027届全国各地高三模拟卷 全科 每周更新 送历年真题卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 889,
+      "delta": 134,
+      "actual_gr": 17.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "68a405bf11247e000157b571",
+      "title": "电脑优化/C盘清理/新机开荒/桌面美化/深度优化/电脑调试ovo",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 1725,
+      "delta": 131,
+      "actual_gr": 8.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "68cbfec639f90c0001142ec4",
+      "title": "华为ICT大赛四大赛道复习题，2026最新版，可导入软件刷题有答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.97,
+      "sold": 1247,
+      "delta": 130,
+      "actual_gr": 11.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a54d1b601c1af000145ff15",
+      "title": "社恐娱乐模版【1600+PPT模板简约】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.89,
+      "sold": 3515,
+      "delta": 122,
+      "actual_gr": 3.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6ac79f00918e0300012cff3f",
+      "title": "SPSS/计算机设置网络安装服务",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 699,
+      "delta": 117,
+      "actual_gr": 20.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "687f2bf5f9d7c800017c24d3",
+      "title": "26年新版RJ版五上数学题型训练（电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 9465,
+      "delta": 112,
+      "actual_gr": 1.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a9188d8cc9be30001259fc7",
+      "title": "2026秋人音版小学音乐一二三四五六年级上下册核心素养教案全册",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.8,
+      "sold": 2734,
+      "delta": 111,
+      "actual_gr": 4.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a87c54781c7b60001875a33",
+      "title": "Apple Watch检测心率变异性健康手表壁纸苹果手表壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 622,
+      "delta": 110,
+      "actual_gr": 21.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "69e486f9cfc3750001f67149",
+      "title": "高中八科数英政史地物化生教材全册课本课后习题答案各版本电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 2112,
+      "delta": 104,
+      "actual_gr": 5.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a6334ef74bf000001f3bb82",
+      "title": "人教版高中全科同步讲义知识点梳理+例题精讲+课后巩固练习电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.6,
+      "sold": 803,
+      "delta": 102,
+      "actual_gr": 14.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a0dccdbbf25fa0001869062",
+      "title": "2026新人教版高中合格考学考会考重点知识点考点归纳精简版知识点",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 4465,
+      "delta": 101,
+      "actual_gr": 2.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6ac258f033abbd0001968118",
+      "title": "中级经济师考前押题及讲解 每科4套 有效期至2026年11月8日",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 69.0,
+      "sold": 1290,
+      "delta": 100,
+      "actual_gr": 8.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a583c1411bb870001435e6a",
+      "title": "27注会三大网校全家桶课件※高清无水印",
+      "store_name": "小红薯ADE的店",
+      "store_id": "69089de832e2110015624800",
+      "price": 0.1,
+      "sold": 1255,
+      "delta": 97,
+      "actual_gr": 8.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "69f2c95e9dea2d0001531f76",
+      "title": "电脑远程C盘清理D盘内存卡顿流氓软件弹窗广告磁盘分区扩容",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.98,
+      "sold": 938,
+      "delta": 93,
+      "actual_gr": 11.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a4e2dcf8cb63f0001f51fa5",
+      "title": "智能体 嵌入课件 数字人 赛课 可自定义 打电话 对话 批改作业",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 100.0,
+      "sold": 1577,
+      "delta": 92,
+      "actual_gr": 6.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a969db076db18000171ec11",
+      "title": "樱花校园  电子资源PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.88,
+      "sold": 214,
+      "delta": 86,
+      "actual_gr": 67.19,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "690ca65eab65400001438335",
+      "title": "2026新版 军队文职 网课+讲义+题库 公共科目+专业科目 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 3236,
+      "delta": 82,
+      "actual_gr": 2.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6aab63abfc71970001733cf9",
+      "title": "烹饪发烧友电子资源模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.98,
+      "sold": 524,
+      "delta": 81,
+      "actual_gr": 18.28,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a688e8d74bf0000016b6a16",
+      "title": "我的世界电子资源PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.88,
+      "sold": 231,
+      "delta": 73,
+      "actual_gr": 46.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6aa3980d2e7a110001d9b627",
+      "title": "苹果快捷指令小红书快捷指令模板图片live视频笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 579,
+      "delta": 71,
+      "actual_gr": 13.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "68496fd16d19100001853007",
+      "title": "高中知识点默写小纸条/默写版+答案版/必修+选修（秒发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2535,
+      "delta": 69,
+      "actual_gr": 2.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "68adbcc60c1e9b000153cdca",
+      "title": "新人教版高中知识点默写纸条巩固记忆查漏补缺",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 4384,
+      "delta": 68,
+      "actual_gr": 1.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6945136a9650820001e53ee4",
+      "title": "2026高中各科学考会考合格考总复习专题讲义真题汇编模拟卷.",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 2192,
+      "delta": 66,
+      "actual_gr": 3.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6910b92e49e46a0001a75d7b",
+      "title": "一键云字体生成器（老师教案必备）",
+      "store_name": "沫妈英语启蒙驿站的店",
+      "store_id": "68f1a9626a859600157d36a3",
+      "price": 2.8,
+      "sold": 2136,
+      "delta": 66,
+      "actual_gr": 3.19,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a8bd71fb2b3a3000153e6f0",
+      "title": "万物皆可蒸馏  第二大脑 含蒸馏语料库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 99.0,
+      "sold": 1062,
+      "delta": 66,
+      "actual_gr": 6.63,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6accb34833abbd00015c59b6",
+      "title": "2026税务师“税法二”三套卷刘丹高效实战精讲+冲刺直播课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 150,
+      "delta": 65,
+      "actual_gr": 76.47,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "68dbcfe67c1a030001282abe",
+      "title": "iOS26 图标包 三星 华为 荣耀 oppo 一加 努比亚红魔 苹果 iPhone",
+      "store_name": "胖胖和哒哒的店",
+      "store_id": "677a3dd2758bb80015bcd515",
+      "price": 9.9,
+      "sold": 2088,
+      "delta": 64,
+      "actual_gr": 3.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "68276831f073650015a0ed01",
+      "title": "导出VX聊天记录工具微信消息转文档备份打印电脑工具模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 1102,
+      "delta": 59,
+      "actual_gr": 5.66,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a6ab108d855850001e1bc1f",
+      "title": "2027高考总复习一轮二轮专项数学英语文生物理地化学政治历史资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 654,
+      "delta": 59,
+      "actual_gr": 9.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "67da3329ffa75800016187d7",
+      "title": "【北京专用】高考试题分类汇编一模二模试卷重难点抢分训练电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 1688,
+      "delta": 52,
+      "actual_gr": 3.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "691bdb81e8b9d40001789f04",
+      "title": "2027天津高考一轮二轮总复习资料【语数英物化生政史地】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.8,
+      "sold": 1245,
+      "delta": 52,
+      "actual_gr": 4.36,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a413489a1b43600013afdb5",
+      "title": "高中化学选修一知识点总结电子版（共32页）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 349,
+      "delta": 51,
+      "actual_gr": 17.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a141400c4095100017c0092",
+      "title": "2026高中高考化学复习知识点总结归纳梳理【347页word】通用版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 301,
+      "delta": 45,
+      "actual_gr": 17.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "692a656accb9e0000116a1cb",
+      "title": "智能排座丨班级座位表智能生成切换视角 可打印 设置职位更改过道",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 2689,
+      "delta": 44,
+      "actual_gr": 1.66,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a886004f1b2d60001c31631",
+      "title": "27高考高中一二三网课高中复习一二三轮英语文数化学生物资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 192,
+      "delta": 44,
+      "actual_gr": 29.73,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a6337f724f0440001bb0d15",
+      "title": "笔记同款修图神器p图教程使用课件教案",
+      "store_name": "66168649af2daa0001627d5a",
+      "store_id": "66168649af2daa0001627d5a",
+      "price": 15.88,
+      "sold": 744,
+      "delta": 42,
+      "actual_gr": 5.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "685f64d77590770001e06962",
+      "title": "高中化学41个工艺流程题答题套路",
+      "store_name": "Echo学姐吖～的店",
+      "store_id": "6833199ae462b70015900e87",
+      "price": 0.5,
+      "sold": 3748,
+      "delta": 41,
+      "actual_gr": 1.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6ab5cf9cc6ed5c0001655fc5",
+      "title": "CAD远程下载安装2007-2027室内机械画图工具包支持Win/Mac",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 168,
+      "delta": 40,
+      "actual_gr": 31.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa29fd15012e0001297166",
+      "title": "译妙蛙面试官线上视频模拟AI面试软件zoom会议实时提词翻译加密狗",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 80.0,
+      "sold": 223,
+      "delta": 39,
+      "actual_gr": 21.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a578abae9f0b1000143693d",
+      "title": "Roblox 罗布乐思 PPT高清PDF格式电子版 网盘速发",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 634,
+      "delta": 37,
+      "actual_gr": 6.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a86c63670b35600014ff42f",
+      "title": "2026高考真题分类汇编电子版可编辑打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 582,
+      "delta": 35,
+      "actual_gr": 6.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a776af679b57b0001b0cd27",
+      "title": "【秒发】iCost个人收支统计模版-苹果智能快捷记账指令电子教程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.5,
+      "sold": 245,
+      "delta": 35,
+      "actual_gr": 16.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a92a65317170900018e4e91",
+      "title": "备考2027高考十年zhen题分类汇编 语数英物化生政史地 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 99,
+      "delta": 35,
+      "actual_gr": 54.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6913d2a93b8fe80001b451ab",
+      "title": "备考2027高考十年zhen题分类精编教师学生版电子版可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 4078,
+      "delta": 34,
+      "actual_gr": 0.84,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6ad215fd0f3f3e000112afb7",
+      "title": "迷你世界老版本【可联机】使用教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 135,
+      "delta": 34,
+      "actual_gr": 33.66,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a2924ea599c8700011419f6",
+      "title": "电子作业情况登记统计、班级宠物世界设计",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 502,
+      "delta": 32,
+      "actual_gr": 6.81,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a3f9179a1b436000116524e",
+      "title": "（更新至2026）历年高考真题全国卷+地方卷全九科附带答案解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 453,
+      "delta": 32,
+      "actual_gr": 7.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a86d54070b3560001526739",
+      "title": "27高考高中一二三网课高中复习一二三轮英语文数化学生物资料电子",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 192,
+      "delta": 32,
+      "actual_gr": 20.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a54b29024f04400017138fa",
+      "title": "2027高考总复习高效培优讲义语文英语数学物理化学电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 750,
+      "delta": 31,
+      "actual_gr": 4.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a164f48e6d02a0001d02960",
+      "title": "2026高中各科新课程标准语数英物化生政史地新课标",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.8,
+      "sold": 691,
+      "delta": 31,
+      "actual_gr": 4.7,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "696c8038948abf0015cc09bc",
+      "title": "ImwageJ/Fiji 图像处理软件win/Mac送视频教程 一键安装",
+      "store_name": "来碧来碧资料的店",
+      "store_id": "69551ea5671053001501fdab",
+      "price": 10.24,
+      "sold": 69,
+      "delta": 30,
+      "actual_gr": 76.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6916d26faed1a40015bfff5e",
+      "title": "必刷题【高考真题周周练】2027版高考真题卷数学物化三年高考真卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.98,
+      "sold": 757,
+      "delta": 29,
+      "actual_gr": 3.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6ad09145c43f2d00016df1e4",
+      "title": "2026中级经济师考试数字类考点汇总",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.2,
+      "sold": 48,
+      "delta": 29,
+      "actual_gr": 152.63,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a89835ccc9be300018fae5c",
+      "title": "吊打新题！Viella歪雅思口语暴力急救",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 562,
+      "delta": 27,
+      "actual_gr": 5.05,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "694fe55096a9fa00018239f0",
+      "title": "原创-雅思单词真经课件 雅思词汇 背单词 电子资源点读课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 596.0,
+      "sold": 1380,
+      "delta": 26,
+      "actual_gr": 1.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    },
+    {
+      "goods_id": "6a87178f70b3560001598f4a",
+      "title": "27中级会计全家桶资料课件·高清无水印·同步更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 706,
+      "delta": 26,
+      "actual_gr": 3.82,
+      "token_hits": 0,
+      "touch_keywords": [
+        "许老师小学资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "小学资料",
+  "slug": "小学资料"
+}

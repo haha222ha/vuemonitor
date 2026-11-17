@@ -1,0 +1,1821 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "设计素材"
+    ],
+    "niche": "设计素材"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 39,
+    "active_n": 1,
+    "drive_keywords": [
+      "原创设计素材",
+      "设计素材",
+      "PS设计素材",
+      "模板设计素材",
+      "设计素材平面",
+      "PPT设计素材",
+      "PSD设计素材",
+      "高级感设计素材",
+      "可爱风设计素材",
+      "详情页设计素材",
+      "AI矢量设计素材",
+      "Ng窄门设计素材",
+      "OC服设设计素材",
+      "海报全套设计素材",
+      "设计素材PS模板",
+      "PSD分层设计素材",
+      "平面设计素材 推荐",
+      "AI格式矢量设计素材",
+      "AI设计素材电子资料",
+      "oc设计素材电子资料",
+      "PS设计素材电子资料",
+      "模板设计素材电子资料",
+      "设计素材笔刷电子资料",
+      "设计素材笔刷素材下载"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "原创设计素材",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "all_reports_dir_fill_20261009_185652",
+        "role": "candidate"
+      },
+      {
+        "keyword": "设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "冷库方向词探针底座·全品类优先采集",
+        "source": "virtual_direction_probe_top1000",
+        "role": "candidate"
+      },
+      {
+        "keyword": "PS设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "冷库方向词探针底座·全品类优先采集|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "模板设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "expand_batch:B20260721_225455 [force_suffix_old_0727]",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "设计素材平面",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "冷库方向词探针底座·全品类优先采集",
+        "source": "virtual_direction_probe_top1000",
+        "role": "candidate"
+      },
+      {
+        "keyword": "PPT设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "expand_batch:B20260721_224858 [force_suffix_old_0727]",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "PSD设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "冷库方向词探针底座·全品类优先采集",
+        "source": "virtual_direction_probe_top1000",
+        "role": "candidate"
+      },
+      {
+        "keyword": "高级感设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "可爱风设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "详情页设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "AI矢量设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "冷库方向词探针底座·全品类优先采集",
+        "source": "virtual_direction_probe_top1000",
+        "role": "candidate"
+      },
+      {
+        "keyword": "Ng窄门设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "OC服设设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "冷库方向词探针底座·全品类优先采集",
+        "source": "virtual_direction_probe_top1000",
+        "role": "candidate"
+      },
+      {
+        "keyword": "海报全套设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "设计素材PS模板",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "expand_batch:B20260721_225455 [force_suffix_old_0727]",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "PSD分层设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "冷库方向词探针底座·全品类优先采集",
+        "source": "virtual_direction_probe_top1000",
+        "role": "candidate"
+      },
+      {
+        "keyword": "平面设计素材 推荐",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "AI格式矢量设计素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "冷库方向词探针底座·全品类优先采集",
+        "source": "virtual_direction_probe_top1000",
+        "role": "candidate"
+      },
+      {
+        "keyword": "AI设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "oc设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "PS设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "模板设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "deactivated_outside_merged_probe_lock_20260812",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "设计素材笔刷电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "设计素材笔刷素材下载",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "专属爆发跟进·商城列表采热库|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "设计素材平面电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "cdr设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "PDF设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "PPT设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "deactivated_outside_merged_probe_lock_20260812",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "PSD设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "设计素材源文件电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "AI矢量设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "OC服设设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "设计素材PS模板电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "deactivated_outside_merged_probe_lock_20260812",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "贴图样机设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "样机提案设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "PSD分层设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_yield_opt_20260928_095452",
+        "role": "candidate"
+      },
+      {
+        "keyword": "AI格式矢量设计素材电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_20260928_100145",
+        "role": "candidate"
+      },
+      {
+        "keyword": "ppt设计素材源文件电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "deactivated_outside_merged_probe_lock_20260812",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "可下载设计素材学习资料课件电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "direction_opt_drop_l3",
+        "source": "suffix_calibrate",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 37,
+    "sku_n": 80,
+    "sum_delta": 81953,
+    "median_price": 5.0,
+    "niche": "设计素材",
+    "drive_kw_n": 24
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 43,
+      "sum_delta": 48869,
+      "sum_sold": 711748,
+      "top_title": "修图p图婚纱照精修摄影写真情侣旅游跟拍照专业人像精修psd模板",
+      "top_delta": 3000
+    },
+    {
+      "store_name": "拼豆工坊🥝的店",
+      "sku_n": 2,
+      "sum_delta": 4000,
+      "sum_sold": 62000,
+      "top_title": "照片转拼豆图纸一键出图（下单自动发货发链接）",
+      "top_delta": 3000
+    },
+    {
+      "store_name": "目屿修图的店",
+      "sku_n": 1,
+      "sum_delta": 3000,
+      "sum_sold": 104000,
+      "top_title": "修图p图婚纱照精修摄影写真情侣旅游跟拍照专业人像精修psd模板",
+      "top_delta": 3000
+    },
+    {
+      "store_name": "646d859c275ad100015c2c3f",
+      "sku_n": 1,
+      "sum_delta": 1347,
+      "sum_sold": 1941,
+      "top_title": "电脑修图PS个人写真修照片婚纱照修图全家福修图",
+      "top_delta": 1347
+    },
+    {
+      "store_name": "心晴成长站的店",
+      "sku_n": 1,
+      "sum_delta": 1183,
+      "sum_sold": 9761,
+      "top_title": "MBTI 16人格/正版电子资料｜模板/自动发货",
+      "top_delta": 1183
+    },
+    {
+      "store_name": "芦亦莘的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 33000,
+      "top_title": "可编辑word超实用技术路线图、研究思路图、框架图模版",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "像素蛋糕的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 26000,
+      "top_title": "AI修图｜月卡40张修图张数｜一次性到账｜不限设备使用不可结转",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "追梦笔刷的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 20000,
+      "top_title": "海怪吹石东东procreate笔刷 ps画世界pro天生会画 勾线素材二次元",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "绘画入门教学的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 13000,
+      "top_title": "毛笔书法笔刷画世界procreate笔刷ps古风书写水墨笔触草书素材",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "渡研择校规划的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 13000,
+      "top_title": "全国硕士院校拟录取名单复试名单分数线专业目录",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "神奇 | 胶片的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 13000,
+      "top_title": "Dazz FxnR全部滤镜照片实况视频滤镜调色预设素材模板",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "MULI 颜时实验室的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 12000,
+      "top_title": "四季型人色彩测试四季型人测试四季型色彩分析四季十六型色彩测试",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "婉清学姐冲冲冲的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 68000,
+      "top_title": "26届/27届秋招/春招/实习校招汇总表",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "笔刷库",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 36000,
+      "top_title": "2026新款海怪 吹石 东东 procreatePS画世界pro天生会画全套笔刷",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "今天拼豆了吗Pro的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 36000,
+      "top_title": "照片转拼豆图纸一键转换｜含色号/镜像｜下单自动发货",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "大麦的普通话小灶的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 26000,
+      "top_title": "26年全国普通话冲刺资料：视频课+真题100套+电子资料包+命题说话",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "657a9c83e48da4000175fd93",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 18000,
+      "top_title": "全部胶片滤镜丨照片视频实况胶片滤镜氛围感调色预设素材模板",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "瓜崽素材铺的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 17000,
+      "top_title": "画世界Pro专属版【边不清同款笔刷】勾线|上色|信息量笔刷合集！",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "元气小桃兔兔冲考研的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 17000,
+      "top_title": "28/29考研双非择校211择校择专业全程解析",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "上岸熊旗舰店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 16000,
+      "top_title": "26下全国教资面试小初高教师资格考试资料结构化试讲逐字稿真题",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "小艺素材库的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 14000,
+      "top_title": "大学生英语四六级CET46级核心1500词汇高频1000词汇pdf电子版",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "是玫瑰丫的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 13000,
+      "top_title": "相亲市场定位测试-测完才知道自己高估了多少教案模板",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "大学生信息差-相与文化的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 12000,
+      "top_title": "【更新版】大学英语四六级大纲高频真题单词词汇词组 电子版PDF",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "绘秋🍂的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 11000,
+      "top_title": "画世界笔刷漫画氛围厚涂勾线笔刷素材大合集6000+",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "Syi的ppt素材店的店",
+      "sku_n": 1,
+      "sum_delta": 512,
+      "sum_sold": 9235,
+      "top_title": "【凑单专用】1毛钱养号虚拟图片素材手机壁纸，虚拟无物流发货",
+      "top_delta": 512
+    },
+    {
+      "store_name": "一二在读研的店",
+      "sku_n": 1,
+      "sum_delta": 512,
+      "sum_sold": 3516,
+      "top_title": "27考研英语大小作文高分万能填词模板_英二英一通用_含主题词预测",
+      "top_delta": 512
+    },
+    {
+      "store_name": "LittleJoy拾光的店",
+      "sku_n": 1,
+      "sum_delta": 453,
+      "sum_sold": 3237,
+      "top_title": "Workbuddy 个人工作台搭建教程 l 含提示词 l 零基础打造AI工具",
+      "top_delta": 453
+    },
+    {
+      "store_name": "Romantics的店",
+      "sku_n": 1,
+      "sum_delta": 424,
+      "sum_sold": 2075,
+      "top_title": "r老师高中政治教资通关全家桶（所有资料）",
+      "top_delta": 424
+    },
+    {
+      "store_name": "朝影胶片日记的店",
+      "sku_n": 1,
+      "sum_delta": 417,
+      "sum_sold": 6116,
+      "top_title": "Dazz全部滤镜胶片照片视频实况滤镜Fxnr底片调色预设素材滤镜模板",
+      "top_delta": 417
+    },
+    {
+      "store_name": "贝栗子的店",
+      "sku_n": 1,
+      "sum_delta": 405,
+      "sum_sold": 7228,
+      "top_title": "27刘义恒图推笔记-基础课-pdf电子版已完结-下单看详情页",
+      "top_delta": 405
+    },
+    {
+      "store_name": "Cici壁纸设计的店",
+      "sku_n": 1,
+      "sum_delta": 392,
+      "sum_sold": 6657,
+      "top_title": "八大维度全面评测工作性价比测试速递报告",
+      "top_delta": 392
+    },
+    {
+      "store_name": "云图图书旗舰店",
+      "sku_n": 1,
+      "sum_delta": 287,
+      "sum_sold": 7757,
+      "top_title": "【云图官方】真题考研2027考研英语数学政治管综真题实战详解",
+      "top_delta": 287
+    },
+    {
+      "store_name": "procreate教程的店",
+      "sku_n": 1,
+      "sum_delta": 281,
+      "sum_sold": 1184,
+      "top_title": "基础图形图案/几何图案线稿 模板（108支）",
+      "top_delta": 281
+    },
+    {
+      "store_name": "潇潇小货铺的店",
+      "sku_n": 1,
+      "sum_delta": 248,
+      "sum_sold": 1385,
+      "top_title": "七天背完考研数学公式",
+      "top_delta": 248
+    },
+    {
+      "store_name": "英不emo的店",
+      "sku_n": 1,
+      "sum_delta": 228,
+      "sum_sold": 9638,
+      "top_title": "电子资料|27考研阅读逐词翻译",
+      "top_delta": 228
+    },
+    {
+      "store_name": "谢逅的店",
+      "sku_n": 1,
+      "sum_delta": 204,
+      "sum_sold": 6005,
+      "top_title": "生日九宫格朋友圈高级感图片 高清电子图片（年龄数字免费改）",
+      "top_delta": 204
+    },
+    {
+      "store_name": "MuZi设计的店",
+      "sku_n": 1,
+      "sum_delta": 191,
+      "sum_sold": 8837,
+      "top_title": "证件照p耳朵去眼镜嘴巴闭合修图ps精修改发色换衣服发型换底色",
+      "top_delta": 191
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a053f65f3ef8300017bf5c3",
+      "title": "生日九宫格朋友圈高级感图片 高清电子图片（年龄数字免费改）",
+      "store_name": "谢逅的店",
+      "store_id": "69060cb6ad9a9b0015f7a3f3",
+      "price": 2.99,
+      "sold": 6005,
+      "delta": 204,
+      "actual_gr": 3.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材",
+        "PSD分层设计素材",
+        "PSD设计素材",
+        "PS设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a4926718879a000015e6f4d",
+      "title": "照片转拼豆图纸一键出图（下单自动发货发链接）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 32.99,
+      "sold": 31000,
+      "delta": 2000,
+      "actual_gr": 6.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材",
+        "AI矢量设计素材",
+        "设计素材"
+      ]
+    },
+    {
+      "goods_id": "67ee9edf04afe30001a2975d",
+      "title": "可编辑word超实用技术路线图、研究思路图、框架图模版",
+      "store_name": "芦亦莘的店",
+      "store_id": "63959ae3d6c9400001b3fbb1",
+      "price": 2.5,
+      "sold": 33000,
+      "delta": 1000,
+      "actual_gr": 3.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材",
+        "AI矢量设计素材",
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "67f8c8472a334f0001e37a7b",
+      "title": "可商用ps/procreate/ppt中文英文手写毛笔书法艺术字体包下载素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.5,
+      "sold": 6395,
+      "delta": 257,
+      "actual_gr": 4.19,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材",
+        "AI矢量设计素材",
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "69d5c4fa10b42d000171cb9f",
+      "title": "修图p图婚纱照精修摄影写真情侣旅游跟拍照专业人像精修psd模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.5,
+      "sold": 104000,
+      "delta": 3000,
+      "actual_gr": 2.97,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材",
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a2e6a7b413f350001a8903a",
+      "title": "照片转拼豆图纸一键出图（下单自动发货发链接）",
+      "store_name": "拼豆工坊🥝的店",
+      "store_id": "69bcd2f869ce0c0015542c6f",
+      "price": 8.99,
+      "sold": 31000,
+      "delta": 3000,
+      "actual_gr": 10.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材",
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a2e6a7b413f350001a89037",
+      "title": "照片转拼豆图纸一键出图（下单自动发货发链接）",
+      "store_name": "拼豆工坊🥝的店",
+      "store_id": "69bcd2f869ce0c0015542c6f",
+      "price": 5.99,
+      "sold": 31000,
+      "delta": 1000,
+      "actual_gr": 3.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材",
+        "AI矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "695215c7ac83a200015bacf8",
+      "title": "AI修图｜月卡40张修图张数｜一次性到账｜不限设备使用不可结转",
+      "store_name": "像素蛋糕的店",
+      "store_id": "64f938853a3ec40001865069",
+      "price": 19.9,
+      "sold": 26000,
+      "delta": 1000,
+      "actual_gr": 4.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材",
+        "AI矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "69f9a589a978450001a12d2b",
+      "title": "海怪吹石东东procreate笔刷 ps画世界pro天生会画 勾线素材二次元",
+      "store_name": "追梦笔刷的店",
+      "store_id": "69e47dc14bd7e1001594dc07",
+      "price": 1.6,
+      "sold": 20000,
+      "delta": 1000,
+      "actual_gr": 5.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材",
+        "原创设计素材"
+      ]
+    },
+    {
+      "goods_id": "69ecd2e543360b00014b135e",
+      "title": "毛笔书法笔刷画世界procreate笔刷ps古风书写水墨笔触草书素材",
+      "store_name": "绘画入门教学的店",
+      "store_id": "69d278589f1eab0015bd02cc",
+      "price": 0.9,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PS设计素材",
+        "原创设计素材"
+      ]
+    },
+    {
+      "goods_id": "681d7c4e81f9bc0001469217",
+      "title": "全国硕士院校拟录取名单复试名单分数线专业目录",
+      "store_name": "渡研择校规划的店",
+      "store_id": "67c7cbf6295b0300157d1cc0",
+      "price": 3.0,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材",
+        "OC服设设计素材"
+      ]
+    },
+    {
+      "goods_id": "69cded3cca154800010e4f74",
+      "title": "Dazz FxnR全部滤镜照片实况视频滤镜调色预设素材模板",
+      "store_name": "神奇 | 胶片的店",
+      "store_id": "688dc1a86883220015ce1dc2",
+      "price": 2.98,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PS设计素材",
+        "设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a074e6f002a620001fcf887",
+      "title": "四季型人色彩测试四季型人测试四季型色彩分析四季十六型色彩测试",
+      "store_name": "MULI 颜时实验室的店",
+      "store_id": "69cbc39c3f173e0015317550",
+      "price": 1.98,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材",
+        "设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a8d94ae7388ed00017b798e",
+      "title": "27考研英一/英二大作文模板+七天训练计划（送小作文 5 天训练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.99,
+      "sold": 7702,
+      "delta": 667,
+      "actual_gr": 9.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材",
+        "OC服设设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a2c3488963cbb000151d966",
+      "title": "999套国赛金奖大学生创新创业赛竞比赛互联网+挑战杯职业ppt模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 5149,
+      "delta": 558,
+      "actual_gr": 12.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材",
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6aba271a0ff6d70001878195",
+      "title": "画世界pro-procreate褶皱笔刷褶皱细节刻画可商用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 1596,
+      "delta": 443,
+      "actual_gr": 38.42,
+      "token_hits": 0,
+      "touch_keywords": [
+        "模板设计素材电子资料",
+        "原创设计素材"
+      ]
+    },
+    {
+      "goods_id": "685b8bb23970ba0001075239",
+      "title": "【云图官方】真题考研2027考研英语数学政治管综真题实战详解",
+      "store_name": "云图图书旗舰店",
+      "store_id": "656e9aa5e08915000165bbfb",
+      "price": 8.69,
+      "sold": 7757,
+      "delta": 287,
+      "actual_gr": 3.84,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材",
+        "OC服设设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a75aa7579b57b00018b8fbf",
+      "title": "基础图形图案/几何图案线稿 模板（108支）",
+      "store_name": "procreate教程的店",
+      "store_id": "643677503a4a69000191ed1f",
+      "price": 1.99,
+      "sold": 1184,
+      "delta": 281,
+      "actual_gr": 31.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材",
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a5c3e286cbefa000154e41c",
+      "title": "七天背完考研数学公式",
+      "store_name": "潇潇小货铺的店",
+      "store_id": "68a81b0a2f634e001523f674",
+      "price": 8.99,
+      "sold": 1385,
+      "delta": 248,
+      "actual_gr": 21.81,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材",
+        "OC服设设计素材"
+      ]
+    },
+    {
+      "goods_id": "68c56e8f24f1f800011761be",
+      "title": "电子资料|27考研阅读逐词翻译",
+      "store_name": "英不emo的店",
+      "store_id": "66c6e8c9d550aa0015e1bb4b",
+      "price": 23.0,
+      "sold": 9638,
+      "delta": 228,
+      "actual_gr": 2.42,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OC服设设计素材",
+        "PSD分层设计素材"
+      ]
+    },
+    {
+      "goods_id": "69d867d7da5d20000118cf3b",
+      "title": "证件照p耳朵去眼镜嘴巴闭合修图ps精修改发色换衣服发型换底色",
+      "store_name": "MuZi设计的店",
+      "store_id": "66195e2caf2daa0001ab3e6b",
+      "price": 1.98,
+      "sold": 8837,
+      "delta": 191,
+      "actual_gr": 2.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材",
+        "PS设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a6221baad43e40001662d1b",
+      "title": "古风水印/古风题字/古风头像壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 3535,
+      "delta": 186,
+      "actual_gr": 5.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材",
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "68cf5777bf5d36000108bac1",
+      "title": "772号多图图文排版ppt素材8种色动静双版本(更新1007页啦)有版权",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 3929,
+      "delta": 178,
+      "actual_gr": 4.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材",
+        "AI矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "69d5c4fa10b42d000171cba5",
+      "title": "修图p图婚纱照精修摄影写真情侣旅游跟拍照专业人像精修psd模板",
+      "store_name": "目屿修图的店",
+      "store_id": "657b12afe48da4000176039b",
+      "price": 10.0,
+      "sold": 104000,
+      "delta": 3000,
+      "actual_gr": 2.97,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材"
+      ]
+    },
+    {
+      "goods_id": "68fdd225e0f3b20001f6e9e7",
+      "title": "2026大学生职业生涯规划书范文ppt模板pdf成品word成长赛道电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 58000,
+      "delta": 3000,
+      "actual_gr": 5.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6aa26f6e1b606400015d149a",
+      "title": "2027新版国考省考行测高分必备（修正版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 3295,
+      "delta": 2821,
+      "actual_gr": 595.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "69f9a55743360b0001ed5904",
+      "title": "上岸熊中小幼教资面试资料（题本+教案+逐字稿+答辩 不含视频音频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 3998,
+      "delta": 2776,
+      "actual_gr": 227.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材"
+      ]
+    },
+    {
+      "goods_id": "683580393d00ef0001dab015",
+      "title": "大学生职业生涯规划书成品范文Word+ppt职业生涯比赛成长赛道模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 36000,
+      "delta": 2000,
+      "actual_gr": 5.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "69ce4c6a3752710001ae9a49",
+      "title": "修图p图专业人像精修婚纱照写真精修修图结婚跟拍PS修图后期修图",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 31000,
+      "delta": 2000,
+      "actual_gr": 6.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PS设计素材"
+      ]
+    },
+    {
+      "goods_id": "6ab3e157918e030001b6fecb",
+      "title": "性格城市匹配趣味测试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 2583,
+      "delta": 1908,
+      "actual_gr": 282.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6aa94f705324600001ddb204",
+      "title": "2027考研英一英二大小作文模板_题型全覆盖最新版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.8,
+      "sold": 10000,
+      "delta": 1779,
+      "actual_gr": 21.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a60e5a88846460001b35892",
+      "title": "2027省考申论大作文-各省本土特色案例写作素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 6743,
+      "delta": 1601,
+      "actual_gr": 31.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a1473ff48f8580001547f02",
+      "title": "2026大学生职业生涯规划书范文ppt模板pdf成品word成长赛道电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 3382,
+      "delta": 1380,
+      "actual_gr": 68.93,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a4183859f3070000120fdac",
+      "title": "电脑修图PS个人写真修照片婚纱照修图全家福修图",
+      "store_name": "646d859c275ad100015c2c3f",
+      "store_id": "646d859c275ad100015c2c3f",
+      "price": 4.0,
+      "sold": 1941,
+      "delta": 1347,
+      "actual_gr": 226.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PS设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a75ddec79b57b00018f944a",
+      "title": "oc人设盲盒拼拼乐ppl模板眠羊牌（头像壁纸）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 4229,
+      "delta": 1254,
+      "actual_gr": 42.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OC服设设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a4255e7654b390001f6ae4d",
+      "title": "MBTI 16人格/正版电子资料｜模板/自动发货",
+      "store_name": "心晴成长站的店",
+      "store_id": "67fe32237c11be0015b2e77d",
+      "price": 1.0,
+      "sold": 9761,
+      "delta": 1183,
+      "actual_gr": 13.79,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a75be1ca52c1c00018c6079",
+      "title": "暗恋测试TA是否也在偷偷喜欢你",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 6664,
+      "delta": 1006,
+      "actual_gr": 17.78,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "68937ab5a7c1e300010859e5",
+      "title": "26届/27届秋招/春招/实习校招汇总表",
+      "store_name": "婉清学姐冲冲冲的店",
+      "store_id": "6892dedea9eac7001582160a",
+      "price": 9.9,
+      "sold": 68000,
+      "delta": 1000,
+      "actual_gr": 1.49,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PS设计素材"
+      ]
+    },
+    {
+      "goods_id": "65a22d134207d30001c83398",
+      "title": "2027考研英语真题英语一英语二历年真题试卷管综西综数学政治刷题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.8,
+      "sold": 55000,
+      "delta": 1000,
+      "actual_gr": 1.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "65a22d134207d30001c8339b",
+      "title": "2027考研英语真题英语一英语二历年真题试卷管综西综数学政治刷题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.8,
+      "sold": 55000,
+      "delta": 1000,
+      "actual_gr": 1.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OC服设设计素材"
+      ]
+    },
+    {
+      "goods_id": "66839c0e2ce8eb00014e1f7c",
+      "title": "赠网课】初级会计备考2027年教材书真题试卷考试习题库马勇知了26",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.8,
+      "sold": 41000,
+      "delta": 1000,
+      "actual_gr": 2.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "69a6d9162b49ce000162cdb2",
+      "title": "2026新款海怪 吹石 东东 procreatePS画世界pro天生会画全套笔刷",
+      "store_name": "笔刷库",
+      "store_id": "69a68f52bd117d001533402f",
+      "price": 6.9,
+      "sold": 36000,
+      "delta": 1000,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a202e67c2c13f0001ea41ee",
+      "title": "照片转拼豆图纸一键转换｜含色号/镜像｜下单自动发货",
+      "store_name": "今天拼豆了吗Pro的店",
+      "store_id": "6a1d9c5f8c8164001541abe3",
+      "price": 39.0,
+      "sold": 36000,
+      "delta": 1000,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a9019130c6e070001d5825b",
+      "title": "2026新款海怪 吹石 东东 procreatePS画世界pro天生会画全套笔刷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 36000,
+      "delta": 1000,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "模板设计素材电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59c5f77308b50001d89bf6",
+      "title": "【英硕自制】27考研英语作文模板（原创）（电子资料拍下不退不换",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 26000,
+      "delta": 1000,
+      "actual_gr": 4.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "69f6f0aaa5715f0001904aa2",
+      "title": "画世界Pro笔刷安卓苹果通用笔刷合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 26000,
+      "delta": 1000,
+      "actual_gr": 4.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "原创设计素材"
+      ]
+    },
+    {
+      "goods_id": "688736346d6054000192f7be",
+      "title": "26年全国普通话冲刺资料：视频课+真题100套+电子资料包+命题说话",
+      "store_name": "大麦的普通话小灶的店",
+      "store_id": "686c964d0580b20015ecb4b9",
+      "price": 4.78,
+      "sold": 26000,
+      "delta": 1000,
+      "actual_gr": 4.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PS设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a1e78d9c40951000167f7d2",
+      "title": "全部胶片滤镜丨照片视频实况胶片滤镜氛围感调色预设素材模板",
+      "store_name": "657a9c83e48da4000175fd93",
+      "store_id": "657a9c83e48da4000175fd93",
+      "price": 5.99,
+      "sold": 18000,
+      "delta": 1000,
+      "actual_gr": 5.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a2b8732e2a6040001f835f7",
+      "title": "画世界Pro专属版【边不清同款笔刷】勾线|上色|信息量笔刷合集！",
+      "store_name": "瓜崽素材铺的店",
+      "store_id": "66e303c6842cf10015450e58",
+      "price": 9.9,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "原创设计素材"
+      ]
+    },
+    {
+      "goods_id": "68006b41a7524b0001e4f7d5",
+      "title": "28/29考研双非择校211择校择专业全程解析",
+      "store_name": "元气小桃兔兔冲考研的店",
+      "store_id": "6784ce76a3b2f900153ae860",
+      "price": 4.0,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OC服设设计素材"
+      ]
+    },
+    {
+      "goods_id": "68006b41a7524b0001e4f7d8",
+      "title": "28/29考研双非择校211择校择专业全程解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "6614bbaad76156000152fa10",
+      "title": "（初中/高中）英语教资面试/笔试（逐字稿+知识点+思维导图）PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PS设计素材"
+      ]
+    },
+    {
+      "goods_id": "64102a8cde439100019bb395",
+      "title": "26下全国教资面试小初高教师资格考试资料结构化试讲逐字稿真题",
+      "store_name": "上岸熊旗舰店",
+      "store_id": "63b9487744351a00014495f5",
+      "price": 59.9,
+      "sold": 16000,
+      "delta": 1000,
+      "actual_gr": 6.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a11686d69ff6a0001681b61",
+      "title": "小学1-6年级全科电子版教材辅导学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "692ab01746e530000146fb8f",
+      "title": "大学生英语四六级CET46级核心1500词汇高频1000词汇pdf电子版",
+      "store_name": "小艺素材库的店",
+      "store_id": "692a8a8d272393001512256d",
+      "price": 0.5,
+      "sold": 14000,
+      "delta": 1000,
+      "actual_gr": 7.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a8fb491ea40330001fe39d5",
+      "title": "Dazz FxnR全部滤镜照片实况视频滤镜调色预设素材模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.98,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a6873dde179b50001b3ad6e",
+      "title": "相亲市场定位测试-测完才知道自己高估了多少教案模板",
+      "store_name": "是玫瑰丫的店",
+      "store_id": "652d098b02186a0001499880",
+      "price": 4.9,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "688b2c3999631f0001b9904b",
+      "title": "古风水墨质感笔刷280+适配古风人物画风",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "原创设计素材"
+      ]
+    },
+    {
+      "goods_id": "68d7b4acc7536100016dab15",
+      "title": "【更新版】大学英语四六级大纲高频真题单词词汇词组 电子版PDF",
+      "store_name": "大学生信息差-相与文化的店",
+      "store_id": "66bac903afee2200154269f2",
+      "price": 9.8,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "69442c596a3f3f0001d2d2e2",
+      "title": "画世界笔刷漫画氛围厚涂勾线笔刷素材大合集6000+",
+      "store_name": "绘秋🍂的店",
+      "store_id": "69428cefa402f4001616b1c2",
+      "price": 3.99,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "原创设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a8948032e2aa800015f2ce1",
+      "title": "英一94博主考研英语作文模板（含大小作文、英一英二通用）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 30.0,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "6961245281edf70001e53a34",
+      "title": "10000+套高清可编辑PPT模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "692acda12aa9d000010b5c67",
+      "title": "大学生职业生涯规划书成品电子版word+ppt职业规划大赛成长赛道",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 10000,
+      "delta": 918,
+      "actual_gr": 10.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "68e947a32990490001f68f7a",
+      "title": "大学生职业生涯规划书ppt模板  成长赛道&就业赛道职业规划书PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.68,
+      "sold": 2027,
+      "delta": 889,
+      "actual_gr": 78.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计素材平面"
+      ]
+    },
+    {
+      "goods_id": "6aab7274dae72f00017e6dea",
+      "title": "2027中国华能集团备考资料包秋招校招笔记考点电子版资料课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 987,
+      "delta": 848,
+      "actual_gr": 610.07,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI格式矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a3fb86dc4c16c0001ccd339",
+      "title": "生日九宫格朋友圈高级感图片 高清电子图片（年龄数字免费改）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 6322,
+      "delta": 705,
+      "actual_gr": 12.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6aa957843a94950001f0da7e",
+      "title": "Dazz全部滤镜胶片照片视频实况滤镜Fxnr底片调色预设素材滤镜模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.98,
+      "sold": 6104,
+      "delta": 693,
+      "actual_gr": 12.81,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OC服设设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a5f61a224f04400015e95e0",
+      "title": "白鹭申论扎马步破题阵大决战点将台80分绝技100题练习本",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 36.0,
+      "sold": 3012,
+      "delta": 642,
+      "actual_gr": 27.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计素材笔刷电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f1f0533f37a9000194f424",
+      "title": "区域自制教玩具素材 PDF电子版 非实物",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 2594,
+      "delta": 598,
+      "actual_gr": 29.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6985d5531b2000000166b8b0",
+      "title": "【凑单专用】1毛钱养号虚拟图片素材手机壁纸，虚拟无物流发货",
+      "store_name": "Syi的ppt素材店的店",
+      "store_id": "692c4b28b1fd1d0015e73434",
+      "price": 10.0,
+      "sold": 9235,
+      "delta": 512,
+      "actual_gr": 5.87,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a70a405de083800013dda74",
+      "title": "27考研英语大小作文高分万能填词模板_英二英一通用_含主题词预测",
+      "store_name": "一二在读研的店",
+      "store_id": "699dad9ff7d76900151fa4d1",
+      "price": 19.9,
+      "sold": 3516,
+      "delta": 512,
+      "actual_gr": 17.04,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "68e0addfc7536100019a1345",
+      "title": "小学【期中家长会】精品ppt送发言稿（含一到六年级）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 3990,
+      "delta": 494,
+      "actual_gr": 14.13,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计素材笔刷电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a677a4b3abfdc0001e8537d",
+      "title": "Workbuddy 个人工作台搭建教程 l 含提示词 l 零基础打造AI工具",
+      "store_name": "LittleJoy拾光的店",
+      "store_id": "6a0ecab868d5c00015351d01",
+      "price": 9.9,
+      "sold": 3237,
+      "delta": 453,
+      "actual_gr": 16.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI矢量设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a82af658bb06b000136d26e",
+      "title": "关系气场分析妹感姐感 测试ppt",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 6064,
+      "delta": 439,
+      "actual_gr": 7.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "69317bfedd329c0001266c1e",
+      "title": "26下半年小学语文教资面试教案逐字稿和答辩资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.98,
+      "sold": 1946,
+      "delta": 426,
+      "actual_gr": 28.03,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材"
+      ]
+    },
+    {
+      "goods_id": "69e880e0bd8c350001a07c0f",
+      "title": "r老师高中政治教资通关全家桶（所有资料）",
+      "store_name": "Romantics的店",
+      "store_id": "69df68b195875f00155fce72",
+      "price": 29.9,
+      "sold": 2075,
+      "delta": 424,
+      "actual_gr": 25.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材"
+      ]
+    },
+    {
+      "goods_id": "69e635aca9f81400011e8014",
+      "title": "Dazz全部滤镜胶片照片视频实况滤镜Fxnr底片调色预设素材滤镜模板",
+      "store_name": "朝影胶片日记的店",
+      "store_id": "69048e6f0c49a60015b7b6ba",
+      "price": 2.98,
+      "sold": 6116,
+      "delta": 417,
+      "actual_gr": 7.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD分层设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a0abdb47b0d9c0001dae559",
+      "title": "27刘义恒图推笔记-基础课-pdf电子版已完结-下单看详情页",
+      "store_name": "贝栗子的店",
+      "store_id": "681c9e6c04d7b4001537d477",
+      "price": 9.9,
+      "sold": 7228,
+      "delta": 405,
+      "actual_gr": 5.94,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a8bdb6bb50dcb00015605e2",
+      "title": "【自动发货】SCL-90 线上专业抑郁焦虑全面心理测评",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 3502,
+      "delta": 403,
+      "actual_gr": 13.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    },
+    {
+      "goods_id": "6a3bf2f524d4bb0001012c43",
+      "title": "八大维度全面评测工作性价比测试速递报告",
+      "store_name": "Cici壁纸设计的店",
+      "store_id": "68ed087a3ebbfc00156d8b6f",
+      "price": 2.0,
+      "sold": 6657,
+      "delta": 392,
+      "actual_gr": 6.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PSD设计素材"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "设计素材",
+  "slug": "设计素材"
+}

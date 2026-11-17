@@ -1,0 +1,1250 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "提示词共享平台"
+    ],
+    "niche": "提示词共享平台"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "提示词共享平台电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "提示词共享平台电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "report_dir_fill_20261009_175658",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 10,
+    "sku_n": 80,
+    "sum_delta": 2505,
+    "median_price": 7.88,
+    "niche": "提示词共享平台",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 71,
+      "sum_delta": 2484,
+      "sum_sold": 25410,
+      "top_title": "2026常识4600问 / 国考省考行测高分必背  修正版 115页电子版",
+      "top_delta": 2167
+    },
+    {
+      "store_name": "重生之在小红书开资料铺",
+      "sku_n": 1,
+      "sum_delta": 8,
+      "sum_sold": 581,
+      "top_title": "96-25年专四专八真题电子资料课件教案答案详解音频听力阅读写作",
+      "top_delta": 8
+    },
+    {
+      "store_name": "佳佳学姐English Lab的店",
+      "sku_n": 1,
+      "sum_delta": 5,
+      "sum_sold": 1117,
+      "top_title": "【9-12月】雅思口语考前突击独家方法论资料包",
+      "top_delta": 5
+    },
+    {
+      "store_name": "雅思上岸灯塔一旺的店",
+      "sku_n": 1,
+      "sum_delta": 4,
+      "sum_sold": 62,
+      "top_title": "【雅思自学必备】AI口语陪练官｜自主提分神器",
+      "top_delta": 4
+    },
+    {
+      "store_name": "依依资料库的店",
+      "sku_n": 1,
+      "sum_delta": 2,
+      "sum_sold": 115,
+      "top_title": "12月晓燕四六级词汇，不背单词导入码",
+      "top_delta": 2
+    },
+    {
+      "store_name": "66b4cf9a68165d0016699e9a",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 93,
+      "top_title": "KB0-4级单词闪卡 电子资源",
+      "top_delta": 1
+    },
+    {
+      "store_name": "狗蛋的快乐人生",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 8,
+      "top_title": "剑雅A类4-21题+雅思自学资料包",
+      "top_delta": 1
+    },
+    {
+      "store_name": "682a99f72df6d000150785e5",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 86,
+      "top_title": "【26版持续更新】自学雅思课程保姆级全套资料包备考资料电子版",
+      "top_delta": 0
+    },
+    {
+      "store_name": "66437c35a57f5800010e778f",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 83,
+      "top_title": "26上四六级资料  电子版PDF高清可打印资料电子版【15-25.12全】",
+      "top_delta": 0
+    },
+    {
+      "store_name": "685f8f227598f50015558cf7",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 22,
+      "top_title": "大学英语四级英语六级历年zhen题试卷含答案解析电子版资料",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a9afd206b399600016f9e0b",
+      "title": "2026常识4600问 / 国考省考行测高分必背  修正版 115页电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 6591,
+      "delta": 2167,
+      "actual_gr": 48.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2a8ef665e82f000152aa47",
+      "title": "PU0-4级单元测和阶段测练习电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 245,
+      "delta": 58,
+      "actual_gr": 31.02,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "692066bb14b5260001e837d1",
+      "title": "40篇短文记完3500词 四六级 专升本 AB级适用 电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 131,
+      "delta": 57,
+      "actual_gr": 77.03,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a38ab181dbcb80001e084eb",
+      "title": "追剧 生活圈优享联盟承包你的吃喝玩乐生活娱乐效率办公PDF权益",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 136.0,
+      "sold": 1333,
+      "delta": 55,
+      "actual_gr": 4.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4db64344362a00017408d7",
+      "title": "【六级】备考2026年12月六级真题黄皮书大学英语六级英语真题试卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 36.8,
+      "sold": 8203,
+      "delta": 47,
+      "actual_gr": 0.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa1fe70d027a3000126a6b5",
+      "title": "26新冀教版3-6年级英语知识点汇总",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.8,
+      "sold": 105,
+      "delta": 35,
+      "actual_gr": 50.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "693e66d34d5338000144a9b3",
+      "title": "Power Up(第一版）0-4级指引单/知识清单+习题 【电子版非实物】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.98,
+      "sold": 844,
+      "delta": 14,
+      "actual_gr": 1.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "696cfe749b2f2f0015677f85",
+      "title": "B347power up课后练习题电子版PU 0-4级同步练习PDF可打印带答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.68,
+      "sold": 79,
+      "delta": 9,
+      "actual_gr": 12.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "68e3e94c53446d0001e2b755",
+      "title": "96-25年专四专八真题电子资料课件教案答案详解音频听力阅读写作",
+      "store_name": "重生之在小红书开资料铺",
+      "store_id": "689c3d449aca010015995b76",
+      "price": 1.98,
+      "sold": 581,
+      "delta": 8,
+      "actual_gr": 1.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69fc4d4715602900011b742e",
+      "title": "power up 0-4级 知识点清单  电子版资料可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.99,
+      "sold": 149,
+      "delta": 7,
+      "actual_gr": 4.93,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7067459cef3200016c6f12",
+      "title": "四六级历年真题1990-2026.6",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 1208,
+      "delta": 5,
+      "actual_gr": 0.42,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6954a6c9a751dc00017f2658",
+      "title": "【9-12月】雅思口语考前突击独家方法论资料包",
+      "store_name": "佳佳学姐English Lab的店",
+      "store_id": "68fa215f5616300015258baa",
+      "price": 258.0,
+      "sold": 1117,
+      "delta": 5,
+      "actual_gr": 0.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab61c5d9eacf000010d3868",
+      "title": "26秋四上语文情境卷【1-4单元】（电子资源）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.5,
+      "sold": 202,
+      "delta": 4,
+      "actual_gr": 2.02,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "692be193e4338c00017fac8f",
+      "title": "【雅思自学必备】AI口语陪练官｜自主提分神器",
+      "store_name": "雅思上岸灯塔一旺的店",
+      "store_id": "6836c4d64e1eeb00156c7813",
+      "price": 39.9,
+      "sold": 62,
+      "delta": 4,
+      "actual_gr": 6.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8adbd8f1b2d600010585d4",
+      "title": "2026年更新·英语四六级历年作文专项真题答案解析教案·电子版PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 38,
+      "delta": 4,
+      "actual_gr": 11.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6972558916b37a001548a807",
+      "title": "Side By Side 朗文国际英语教程SBS全套音视频1-4级素材PDF电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.4,
+      "sold": 9,
+      "delta": 4,
+      "actual_gr": 80.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a245c5414e0a00001346f44",
+      "title": "自编适配于第二版Kid's Box学习资料PDF小学英语知识点清单电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.99,
+      "sold": 74,
+      "delta": 3,
+      "actual_gr": 4.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa2e26dea5ea00013c2319",
+      "title": "CPP第二版全套教学习资料电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 24,
+      "delta": 3,
+      "actual_gr": 14.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a57916124f0440001b3196b",
+      "title": "【资料合集】英语四级词汇闪过听力阅读翻译 9787519280673二手",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 220,
+      "delta": 2,
+      "actual_gr": 0.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "68caa97c39f90c00010ba6de",
+      "title": "12月晓燕四六级词汇，不背单词导入码",
+      "store_name": "依依资料库的店",
+      "store_id": "6785311c763cfd001585e2d7",
+      "price": 1.99,
+      "sold": 115,
+      "delta": 2,
+      "actual_gr": 1.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6942861e1f22d20001646868",
+      "title": "公共营养师课程视频基础教程电子版自学二三四级题库培训教材资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 7,
+      "delta": 2,
+      "actual_gr": 40.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f95617b113e40015c6f795",
+      "title": "Reading Ex第三版RE/F12345级测试题带答案 单元期中期末测试资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.0,
+      "sold": 5,
+      "delta": 2,
+      "actual_gr": 66.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "689498e147d5bd000143a8c9",
+      "title": "【PDF电子版】13天拿下中考英语高频短语720个（背诵+默写）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 838,
+      "delta": 1,
+      "actual_gr": 0.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d626a2a57e4e0001d2463e",
+      "title": "KB0-4级单词闪卡 电子资源",
+      "store_name": "66b4cf9a68165d0016699e9a",
+      "store_id": "66b4cf9a68165d0016699e9a",
+      "price": 7.9,
+      "sold": 93,
+      "delta": 1,
+      "actual_gr": 1.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2cfcb165e82f0001ecbdbe",
+      "title": "备考26年12月】刘晓艳英语四级听力阅读写作翻译这点事儿专项训练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.8,
+      "sold": 32,
+      "delta": 1,
+      "actual_gr": 3.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a70054b735026000139793a",
+      "title": "【秒发】HSK1-6级真题+听力音频+答案解析1/2/3/4/5/6级电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 20,
+      "delta": 1,
+      "actual_gr": 5.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f2e958213e27000130de12",
+      "title": "剑雅A类4-21题+雅思自学资料包",
+      "store_name": "狗蛋的快乐人生",
+      "store_id": "685a737433342700152c58bf",
+      "price": 9.9,
+      "sold": 8,
+      "delta": 1,
+      "actual_gr": 14.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d46152891c6a0015ec8a18",
+      "title": "Side By Side 朗文国际英语教程SBS全套音视频1-4级素材PDF电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 7,
+      "delta": 1,
+      "actual_gr": 16.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa913a768ec340001cb722b",
+      "title": "剑桥Power Up 文学思维导图 知识彩图（电子版资料，先看后买）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 5,
+      "delta": 1,
+      "actual_gr": 25.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b3b8bf08e3690001a5a0aa",
+      "title": "雅思自学备考资料超全资料合集雅思必备资料电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 89.98,
+      "sold": 4,
+      "delta": 1,
+      "actual_gr": 33.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d50596da5d20000195010e",
+      "title": "topik韩语1-6级单词、语法详细整理PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 1293,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6907695d7d4dcd000193617b",
+      "title": "2025年12月英语四六级模拟预测卷（题目+答案+听力）电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.44,
+      "sold": 845,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "67a0f2febac2510001ae51a3",
+      "title": "《HSK标准教程》系列1-6级教学PPT全套",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 822,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ec9965ed3b2f0001449a1b",
+      "title": "剑桥Power Up(第一版）0-4级彩图单词默写单【电子档非实物】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.98,
+      "sold": 405,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1d9c69a30a6600014485da",
+      "title": "剑桥英语Power Up 0-4 全套单元培优试 + 期末卷（PDF资料）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 50.0,
+      "sold": 381,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "671cbbe9deb6c200016d1593",
+      "title": "26英语四六级-重点笔记电子版 写作/听力/阅读/翻译/单词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 177,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6926c72add329c0001d4253c",
+      "title": "对外hsk汉语历年真题试卷考纲词汇1级2级3级4级5级6级PDF模拟真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.8,
+      "sold": 116,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "67b5705cdb1dc1000114de17",
+      "title": "HSK4级题库真题电子版32套，其中有两套缺音频，介意勿拍～",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.0,
+      "sold": 115,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a90ee86cc3e020001e47e52",
+      "title": "新版四六级备考资料包真题词汇听力阅读写作翻译技巧电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 103,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "68bfe0375c55f20001a44973",
+      "title": "新汉语水平考试标准教程HSK1-6课件PPT (共148课）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 101,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69af6a39befcbd000138ef7e",
+      "title": "A056-英文牛津自然拼读1+2级配套Sight Words高频词练习纸，电子",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 59.41,
+      "sold": 100,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f5e3ffb8a4f60001a52980",
+      "title": "【26版持续更新】自学雅思课程保姆级全套资料包备考资料电子版",
+      "store_name": "682a99f72df6d000150785e5",
+      "store_id": "682a99f72df6d000150785e5",
+      "price": 3.98,
+      "sold": 86,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6839e457791e940015503afe",
+      "title": "HSK真题电子版PDF试题答案听力音频听力原文1级2级3级4级5级6级HS",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 85,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6667c39eed6bc100010cde41",
+      "title": "26上四六级资料  电子版PDF高清可打印资料电子版【15-25.12全】",
+      "store_name": "66437c35a57f5800010e778f",
+      "store_id": "66437c35a57f5800010e778f",
+      "price": 2.13,
+      "sold": 83,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6ad9379fb4c80001e14f94",
+      "title": "【5-8月】雅思口语抖机灵Part123原创语料资料｜中英对照+音频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 59.9,
+      "sold": 70,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aace1e9dea5ea00018f6e43",
+      "title": "2027汉语言自考真题解析备考资料包电子版讲义",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.88,
+      "sold": 63,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "68bbcc81a50cd9000153dcdc",
+      "title": "自学雅思必备！雅思听力高分急救课/雅思听力录播课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2999.0,
+      "sold": 50,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69eed33d9dea2d0001e1b46b",
+      "title": "HSK真题电子版PDF试题答案听力音频听力原文1级2级3级4级5级6级",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.26,
+      "sold": 50,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a96c56a20796100015ce690",
+      "title": "英皇钢琴考级2027-2028初级-8级曲集谱/备选曲目/教师手册资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.6,
+      "sold": 47,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "67d286cd52503c0001789923",
+      "title": "白皮/绿皮单词书，进阶/日常积累/雅思词汇资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.66,
+      "sold": 39,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3e3dba834b0e00017a87a4",
+      "title": "【26新】HSK1-6级新对外交语考试历年真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 33,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1952883ce96d0001660491",
+      "title": "大学英语四六级电子资料课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 24,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "68b156af6f3f720001afbe1e",
+      "title": "大学英语四级英语六级历年zhen题试卷含答案解析电子版资料",
+      "store_name": "685f8f227598f50015558cf7",
+      "store_id": "685f8f227598f50015558cf7",
+      "price": 1.59,
+      "sold": 22,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b3bc249b4aae00011ffc1d",
+      "title": "刘晓艳英语四级你还在背单词吗33讲考频版四级词汇书核心词四级",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.8,
+      "sold": 14,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d8d85c8aa5760001667bc4",
+      "title": "英语四六级1990-2025.6真题库 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.0,
+      "sold": 13,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "698a9caac0b079001531e747",
+      "title": "2026英语四级六级备考资料真题词汇模拟试卷专项训练阅读作文翻译",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.96,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa5441f5fcb100010bbc03",
+      "title": "025冀教1-6年级上学期数学一课一练 电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6301c8f1ffda000141bc78",
+      "title": "KB1-4级单元测试电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.8,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a085997addc2c000112290d",
+      "title": "P U 0-4级课后作业纸全套电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a63081ab710e600011669ef",
+      "title": "KB1-4级语法专项练习电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.8,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "689080ee79bc4700013ea9eb",
+      "title": "雅思备考自学全套资料（超全）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a09a6e7addc2c000132f246",
+      "title": "英语四六级历年真题 PDF电子版 1990-2025.12 详细解析 听力音频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aae99bca0b6bb000153d4a2",
+      "title": "大学跨文化英语综合教程1234册答案welearn",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa57bb52693370001b3be24",
+      "title": "26下四六级备考资料包真题词汇听力阅读写作模版翻译技巧咨询服务",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e5dec1cf37170015da347d",
+      "title": "HSK真题1-6级电子版PDF题答案听力音频1级2级3级4级5级6级195套",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e6061457d5bd0001944e8c",
+      "title": "2026上四六级资料 电子版PDF高清可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ec7c6ef9b6f10001a68fc6",
+      "title": "升级版·雅思词汇漫画彩图逻辑记忆 法·雅思真经词汇速记/PPT资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2d7107e2951e00019fc653",
+      "title": "Power up 1-4级入门测+定级卷+定级测试电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7b4044e4acfe000156528b",
+      "title": "【笔记同款 自动发货】四六级资料包 PDF高清电子版课件类",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab1f605f660cd00017ad6c3",
+      "title": "2026豆包AI网红PS修图指令ai提示词无痕P图通用教程指南",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.88,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "67c7e885f6588900018fdffb",
+      "title": "51Talk0-9级电子资料英语启蒙用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "697e35ba4937e7000189efa0",
+      "title": "2026 雅思全能7分旗舰外教VIP全程班电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.98,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a97a83f4a1bdc0001105374",
+      "title": "27-28版英皇钢琴考级备选曲目1-8级资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.6,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "690b12e09509c100013ef3c1",
+      "title": "Pu 1-4级入门测+5册定级卷电子",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.2,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab5e38233abbd0001a618b2",
+      "title": "2026年成雪雯老师(七彩)《江雪》实录+课件+教案+逐字稿+说课稿",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.88,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6901f7ce3f37a900016a0fa9",
+      "title": "英语四级词汇3500词 词根分类图解 含音标考频星级",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.0,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "68e52b349176f50001192b22",
+      "title": "雅思资料自学大全（超级全）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.09,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a82709ea4f71c0001f8de8f",
+      "title": "雅思考场真题全套超高命中率",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "69df2a7b85199a000118bc77",
+      "title": "青少版新概念入门A B 1 2智慧精品课件PPT教师培训教学电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 98.0,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6d637782e3190015fbccda",
+      "title": "备考2026年6月英语四六级考试历年真题含2025年12月电子版PDFword",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词共享平台电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "提示词共享平台",
+  "slug": "提示词共享平台"
+}

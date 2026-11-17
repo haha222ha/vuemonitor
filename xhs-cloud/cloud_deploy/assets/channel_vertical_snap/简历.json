@@ -1,0 +1,1635 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "简历"
+    ],
+    "niche": "简历"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 68,
+    "active_n": 10,
+    "drive_keywords": [
+      "简历范文",
+      "个人简历模板",
+      "简历模板合集",
+      "简历网站模板",
+      "简历模板可编辑",
+      "AI简历电子资料",
+      "简历模板电子资料",
+      "设计简历电子资料",
+      "求职简历模板电子资料",
+      "简历优化提示词电子资料",
+      "人简历",
+      "法律简历",
+      "简历回答",
+      "简历技巧",
+      "简历制作",
+      "建筑简历",
+      "金融简历",
+      "人简历模",
+      "设计简历",
+      "社招简历",
+      "医疗简历",
+      "宝妈简历模板",
+      "暖暖简历制作",
+      "商用简历模板"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "简历范文",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": " [force_suffix_old_0727]",
+        "source": "value_mining_opt_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "个人简历模板",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "全量报告抽词精炼拓展（剔K12/PPT成品）|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "report_phys_restore_20260928_195325",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历模板合集",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "恢复831合规商品词·每日main合并周期|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_kw_cross_opt_demote",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历网站模板",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历模板可编辑",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "pg_high_yield_fill_20261013_183244",
+        "role": "candidate"
+      },
+      {
+        "keyword": "AI简历电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_outside_probe_yield_20260812|deact_yield_opt_20260928_095452",
+        "source": "virt_kw_cross_opt_demote",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历模板电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "方向词·课件教案手抄报模板·主搜索置顶|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_kw_cross_opt_demote",
+        "role": "candidate"
+      },
+      {
+        "keyword": "设计简历电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_saas_tier_delta_core_20260812",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "求职简历模板电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_saas_tier_delta_core_20260812",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历优化提示词电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "方向词·AI提示词·主搜索置顶|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "人简历",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "法律简历",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历回答",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历技巧",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "补齐每日主队列至3000·20260901|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历制作",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": " [force_suffix_old_0727]",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "建筑简历",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "金融简历",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "人简历模",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "dual:小红书选品监控关键词库_3000小红书合规版_v2.txt+虚拟关键词配置_2000.txt",
+        "role": "candidate"
+      },
+      {
+        "keyword": "设计简历",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "yield_top1000_15d|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "社招简历",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "医疗简历",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "宝妈简历模板",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "暖暖简历制作",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "商用简历模板",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "实习简历模板",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "热库全量48日报告抽词精炼（全库非近3日）",
+        "source": "report_full_warehouse_20260901",
+        "role": "candidate"
+      },
+      {
+        "keyword": "英文简历模板",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "电子资源|PPT/简历/其他模板|有趣简历原创A26·黑色中英文对照简历模板英文简历模板",
+        "source": "qianfan_electronic_resource",
+        "role": "candidate"
+      },
+      {
+        "keyword": "高清版简历优化",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历优化电子档",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历优化高清版",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历优化更新版",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历优化可打印",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历优化网盘版",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "小升初简历模板",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "电子资源|PPT/简历/其他模板|小升初简历模板有编号自选",
+        "source": "qianfan_electronic_resource",
+        "role": "candidate"
+      },
+      {
+        "keyword": "应届生简历模板",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "热库全量48日报告抽词精炼（全库非近3日）",
+        "source": "report_full_warehouse_20260901",
+        "role": "candidate"
+      },
+      {
+        "keyword": "法律简历电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "|deact_yield_opt_20260928_095452",
+        "source": "virtual_core_yield_opt_20260928_095530",
+        "role": "candidate"
+      },
+      {
+        "keyword": "个人简历电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "deactivated_saas_tier_delta_core_20260812|deact_yield_opt_20260928_095452",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "个人求职简历模板",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "热库全量48日报告抽词精炼（全库非近3日）",
+        "source": "report_full_warehouse_20260901",
+        "role": "candidate"
+      },
+      {
+        "keyword": "会计简历电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "deactivated_saas_tier_delta_core_20260812|deact_yield_opt_20260928_095452",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历PDF 教程",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "简历范文电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "deactivated_outside_probe_yield_20260812|deact_yield_opt_20260928_095452",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 16,
+    "sku_n": 80,
+    "sum_delta": 39832,
+    "median_price": 7.74,
+    "niche": "简历",
+    "drive_kw_n": 24
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 64,
+      "sum_delta": 33799,
+      "sum_sold": 375151,
+      "top_title": "27国考省考历年真题含答案解析电子版行测申论考试真题pdf套卷",
+      "top_delta": 3437
+    },
+    {
+      "store_name": "千帆丨图书的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 35000,
+      "top_title": "《公考特刊》27国省考事业编 人民时评 时政 热点 申论 合订本",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "木南说职的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 15000,
+      "top_title": "职场新人成长指南知识库+播客丨求职+入职+认知+方法SOP+逻辑模版",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "6846f25658fd850015aa7a1f",
+      "sku_n": 2,
+      "sum_delta": 572,
+      "sum_sold": 9474,
+      "top_title": "27超格六合一理论实战讲义行测申论高照资料分析数量关系送视频",
+      "top_delta": 380
+    },
+    {
+      "store_name": "学姐的资料库",
+      "sku_n": 1,
+      "sum_delta": 560,
+      "sum_sold": 6371,
+      "top_title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "top_delta": 560
+    },
+    {
+      "store_name": "小锦鲤快快游的店",
+      "sku_n": 1,
+      "sum_delta": 509,
+      "sum_sold": 8308,
+      "top_title": "【已更26年6月版】大学英语六级历年真题+答案+解析汇总",
+      "top_delta": 509
+    },
+    {
+      "store_name": "幸运晚风的店",
+      "sku_n": 1,
+      "sum_delta": 327,
+      "sum_sold": 4082,
+      "top_title": "笔记同款持续更新pdf全套定制",
+      "top_delta": 327
+    },
+    {
+      "store_name": "夏小小不打烊的店",
+      "sku_n": 1,
+      "sum_delta": 320,
+      "sum_sold": 3580,
+      "top_title": "考研历年真题考研英语考研数学考研政治199管综408计算机306西综",
+      "top_delta": 320
+    },
+    {
+      "store_name": "云图图书旗舰店",
+      "sku_n": 1,
+      "sum_delta": 289,
+      "sum_sold": 7753,
+      "top_title": "【云图官方】真题考研2027考研英语数学政治管综真题实战详解",
+      "top_delta": 289
+    },
+    {
+      "store_name": "星星要努力的店",
+      "sku_n": 1,
+      "sum_delta": 285,
+      "sum_sold": 6727,
+      "top_title": "27国考省考申论规范词（表格版&挖空版）电子版pdf版",
+      "top_delta": 285
+    },
+    {
+      "store_name": "小鱼考证资料库的店",
+      "sku_n": 1,
+      "sum_delta": 261,
+      "sum_sold": 5415,
+      "top_title": "百度网盘3秒快速扩容500G",
+      "top_delta": 261
+    },
+    {
+      "store_name": "谢逅的店",
+      "sku_n": 1,
+      "sum_delta": 204,
+      "sum_sold": 6005,
+      "top_title": "生日九宫格朋友圈高级感图片 高清电子图片（年龄数字免费改）",
+      "top_delta": 204
+    },
+    {
+      "store_name": "薯薯简历的店",
+      "sku_n": 1,
+      "sum_delta": 193,
+      "sum_sold": 2146,
+      "top_title": "04·通用简历模板 | 含简历封面+个人简历+自荐信（可编辑电子版）",
+      "top_delta": 193
+    },
+    {
+      "store_name": "6777a6c5a47ada001517244f",
+      "sku_n": 1,
+      "sum_delta": 182,
+      "sum_sold": 5478,
+      "top_title": "ipad板绘、素材模板",
+      "top_delta": 182
+    },
+    {
+      "store_name": "歆歆学姐💐的店",
+      "sku_n": 1,
+      "sum_delta": 180,
+      "sum_sold": 10000,
+      "top_title": "英语六级真题+听力+解析pdf电子资料包",
+      "top_delta": 180
+    },
+    {
+      "store_name": "小月素材的店",
+      "sku_n": 1,
+      "sum_delta": 151,
+      "sum_sold": 9633,
+      "top_title": "个人求职简历模板word电子版可编辑大学生简约高端精致大气简历",
+      "top_delta": 151
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a6eea64bf81ab000149a5a8",
+      "title": "2026大学生简历模板1000+PPT设计个人简历快速制作电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 3937,
+      "delta": 173,
+      "actual_gr": 4.6,
+      "token_hits": 1,
+      "touch_keywords": [
+        "简历模板电子资料",
+        "设计简历"
+      ]
+    },
+    {
+      "goods_id": "6a40bc657d09bf00012bb855",
+      "title": "26新版人教PEP丨三四五六年级单元考点梳理，单元练习 [电子版]",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 10000,
+      "delta": 276,
+      "actual_gr": 2.84,
+      "token_hits": 0,
+      "touch_keywords": [
+        "个人简历模板",
+        "简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a240e1449c677000190b069",
+      "title": "04·通用简历模板 | 含简历封面+个人简历+自荐信（可编辑电子版）",
+      "store_name": "薯薯简历的店",
+      "store_id": "69e61da85a9b97001529a2f8",
+      "price": 0.98,
+      "sold": 2146,
+      "delta": 193,
+      "actual_gr": 9.88,
+      "token_hits": 1,
+      "touch_keywords": [
+        "设计简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "68b858550d3d6200012adaa2",
+      "title": "四大简历网申、普华永道/安永/毕马威/德勤笔试测评！四大面试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 5838,
+      "delta": 158,
+      "actual_gr": 2.78,
+      "token_hits": 1,
+      "touch_keywords": [
+        "简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f310dc54fc7500017ee204",
+      "title": "个人求职简历模板word电子版可编辑大学生简约高端精致大气简历",
+      "store_name": "小月素材的店",
+      "store_id": "669143414bfe9e0001c476d8",
+      "price": 0.5,
+      "sold": 9633,
+      "delta": 151,
+      "actual_gr": 1.59,
+      "token_hits": 1,
+      "touch_keywords": [
+        "设计简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6acd91189543120001358740",
+      "title": "27国考省考历年真题含答案解析电子版行测申论考试真题pdf套卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 4060,
+      "delta": 3437,
+      "actual_gr": 551.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a054e365a83230001dfb60b",
+      "title": "2026初一初二初三学习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 48000,
+      "delta": 2000,
+      "actual_gr": 4.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aac161c15012e000167c4bd",
+      "title": "27高照理论3+2资料分析夸夸刷资料分析超大杯资料分析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.66,
+      "sold": 6834,
+      "delta": 1868,
+      "actual_gr": 37.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa26f6e1b606400015d1494",
+      "title": "2027新版国考省考行测高分必备（修正版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 3277,
+      "delta": 1762,
+      "actual_gr": 116.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8eea815946f40001ccdfa9",
+      "title": "【廖敏老师2026年秋季自制】四上语文希沃课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 8815,
+      "delta": 1084,
+      "actual_gr": 14.02,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "6986fb427db7d2000142d58b",
+      "title": "《公考特刊》27国省考事业编 人民时评 时政 热点 申论 合订本",
+      "store_name": "千帆丨图书的店",
+      "store_id": "686f28b1676f970015e5f06d",
+      "price": 36.0,
+      "sold": 35000,
+      "delta": 1000,
+      "actual_gr": 2.94,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "68bed47cf38f970001d8c4db",
+      "title": "2026电子版初一初二初三语文数学英语生物化史地道法知识点",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 46.7,
+      "sold": 26000,
+      "delta": 1000,
+      "actual_gr": 4.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历网站模板"
+      ]
+    },
+    {
+      "goods_id": "64102a90de439100019bb6ba",
+      "title": "26下全国教资面试小初高教师资格考试资料结构化试讲逐字稿真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.9,
+      "sold": 16000,
+      "delta": 1000,
+      "actual_gr": 6.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "求职简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c76ac755f59b000100fdad",
+      "title": "职场新人成长指南知识库+播客丨求职+入职+认知+方法SOP+逻辑模版",
+      "store_name": "木南说职的店",
+      "store_id": "68819ce9b6031a001549b3f6",
+      "price": 29.9,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "677f9534fb6ac0000181b402",
+      "title": "高中9科知识点电子档（语文数学英语物理化学生物地理历史政治）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "个人简历模板"
+      ]
+    },
+    {
+      "goods_id": "677f9534fb6ac0000181b3f9",
+      "title": "高中9科知识点电子档（语文数学英语物理化学生物地理历史政治）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历模板合集"
+      ]
+    },
+    {
+      "goods_id": "692fe207581ea200157b9b10",
+      "title": "初中小四门磨耳朵课件 I 史道地生7-9全套",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 69.9,
+      "sold": 14000,
+      "delta": 1000,
+      "actual_gr": 7.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "692ebfe4d4363c0001059771",
+      "title": "新版初一精品练习题电子资料包，最新教程版本，永久免费更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "683e925be0db0d001518b12e",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "697336a2b828e4000196c03c",
+      "title": "夸克网盘扩容教程1T内存扩容网盘扩容空间三端可用课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.0,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "690db00e5c4f1900010c6108",
+      "title": "一年级拼音专项练习电子版 不可编辑修改",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "6ac0fe1d2c3f8b00018089ff",
+      "title": "袁东2027申论领跑营冲刺预测班（有书/有ai批改）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.32,
+      "sold": 3590,
+      "delta": 974,
+      "actual_gr": 37.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aab7274dae72f00017e6dea",
+      "title": "2027中国华能集团备考资料包秋招校招笔记考点电子版资料课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 987,
+      "delta": 848,
+      "actual_gr": 610.07,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历模板合集"
+      ]
+    },
+    {
+      "goods_id": "68b469c895220f000199d421",
+      "title": "七彩课堂语数英1-6年级希沃课件（免下载）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 2568,
+      "delta": 744,
+      "actual_gr": 40.79,
+      "token_hits": 0,
+      "touch_keywords": [
+        "个人简历模板"
+      ]
+    },
+    {
+      "goods_id": "69b9364a5e5f050001012676",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.6,
+      "sold": 6551,
+      "delta": 573,
+      "actual_gr": 9.59,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "688128764f80eb00012cc76c",
+      "title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "store_name": "学姐的资料库",
+      "store_id": "66f59ab9a9bf3400163b0b7d",
+      "price": 1.99,
+      "sold": 6371,
+      "delta": 560,
+      "actual_gr": 9.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "个人简历模板"
+      ]
+    },
+    {
+      "goods_id": "69d923b82a1f200001feccfb",
+      "title": "【已更26年6月版】大学英语六级历年真题+答案+解析汇总",
+      "store_name": "小锦鲤快快游的店",
+      "store_id": "67d7e835891e3a00159b9e9a",
+      "price": 2.68,
+      "sold": 8308,
+      "delta": 509,
+      "actual_gr": 6.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6942607d63db6a0015d0cda4",
+      "title": "图书  2026初中语文英语满分作文 范文素材一本通 7-9年级",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 54.8,
+      "sold": 9067,
+      "delta": 444,
+      "actual_gr": 5.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "6a64668d24f0440001d5cf6a",
+      "title": "2027版小P老师上岸系列刷题讲义资料分析数量关系判断推理理论课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.8,
+      "sold": 2500,
+      "delta": 416,
+      "actual_gr": 19.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "692b35409562430001769b5f",
+      "title": "新版五上语文重点知识期中期末复习专项练习字词句古诗日积月累",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.99,
+      "sold": 6559,
+      "delta": 406,
+      "actual_gr": 6.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "696fae3d306dc500011a2f42",
+      "title": "备考2027深圳初中月考期中期末真题七八九年级各科真题合集电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 1408,
+      "delta": 397,
+      "actual_gr": 39.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历网站模板"
+      ]
+    },
+    {
+      "goods_id": "6a3e13bc1a14830001b8540c",
+      "title": "2026新版初一初二初三全科目暑假月考期中期末核心考点电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.5,
+      "sold": 6196,
+      "delta": 384,
+      "actual_gr": 6.61,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历网站模板"
+      ]
+    },
+    {
+      "goods_id": "69fc219954fc7500014c9ece",
+      "title": "27超格六合一理论实战讲义行测申论高照资料分析数量关系送视频",
+      "store_name": "6846f25658fd850015aa7a1f",
+      "store_id": "6846f25658fd850015aa7a1f",
+      "price": 53.8,
+      "sold": 5824,
+      "delta": 380,
+      "actual_gr": 6.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaea53efc71970001d92db5",
+      "title": "英语六级翻译高频词汇300词真题例句PDF电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.9,
+      "sold": 445,
+      "delta": 374,
+      "actual_gr": 526.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历模板合集"
+      ]
+    },
+    {
+      "goods_id": "6a4263b272cfc7000179b80b",
+      "title": "厦门初中月考期中期末真题七八九年级各科练习题试卷课件电子档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.74,
+      "sold": 1116,
+      "delta": 352,
+      "actual_gr": 46.07,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历网站模板"
+      ]
+    },
+    {
+      "goods_id": "69df56cecfc3750001d1b6c8",
+      "title": "【新版】行测重点笔记总结数量判断国考省考重点花生逻辑事业编",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 7682,
+      "delta": 335,
+      "actual_gr": 4.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a817bcf5ed32c0001a0c821",
+      "title": "27军队文职笔试历年真题考前冲刺模拟试卷教育求职刷题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 36.8,
+      "sold": 555,
+      "delta": 331,
+      "actual_gr": 147.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6905e0fb2fdb7c00018f06c2",
+      "title": "2026初中语文数学英语物理化生物史地道法知识点总结多版本电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 2272,
+      "delta": 330,
+      "actual_gr": 16.99,
+      "token_hits": 0,
+      "touch_keywords": [
+        "个人简历模板"
+      ]
+    },
+    {
+      "goods_id": "6a7949af0020da0001692c21",
+      "title": "资料分析提速手册（电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.0,
+      "sold": 1111,
+      "delta": 328,
+      "actual_gr": 41.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a676de43abfdc0001e7bf76",
+      "title": "笔记同款持续更新pdf全套定制",
+      "store_name": "幸运晚风的店",
+      "store_id": "68b831626aad9c00155f6ea0",
+      "price": 13.9,
+      "sold": 4082,
+      "delta": 327,
+      "actual_gr": 8.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d65471da5d200001c939eb",
+      "title": "考研历年真题考研英语考研数学考研政治199管综408计算机306西综",
+      "store_name": "夏小小不打烊的店",
+      "store_id": "693ced641d8c99001576ea05",
+      "price": 1.0,
+      "sold": 3580,
+      "delta": 320,
+      "actual_gr": 9.82,
+      "token_hits": 0,
+      "touch_keywords": [
+        "个人简历模板"
+      ]
+    },
+    {
+      "goods_id": "6a6649ae84b8ee00018fe9fa",
+      "title": "【2026年秋季】小学数学单元月考期中期末试卷含答案【PDF版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 2652,
+      "delta": 311,
+      "actual_gr": 13.28,
+      "token_hits": 0,
+      "touch_keywords": [
+        "个人简历模板"
+      ]
+    },
+    {
+      "goods_id": "6aa2cae9dcf5ff00014e980a",
+      "title": "新人教版七上英语Starter1-3&U1-U7单元考点练习全套资料含答案A",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 1223,
+      "delta": 309,
+      "actual_gr": 33.81,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "685b8bb23970ba0001075236",
+      "title": "【云图官方】真题考研2027考研英语数学政治管综真题实战详解",
+      "store_name": "云图图书旗舰店",
+      "store_id": "656e9aa5e08915000165bbfb",
+      "price": 8.69,
+      "sold": 7753,
+      "delta": 289,
+      "actual_gr": 3.87,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "69189bfa43699b0001c6aaaf",
+      "title": "27国考省考申论规范词（表格版&挖空版）电子版pdf版",
+      "store_name": "星星要努力的店",
+      "store_id": "6835a8e1896cda0015516224",
+      "price": 9.9,
+      "sold": 6727,
+      "delta": 285,
+      "actual_gr": 4.42,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a40bc657d09bf00012bb849",
+      "title": "26新版人教PEP丨三四五六年级单元考点梳理，单元练习 [电子版]",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.6,
+      "sold": 10000,
+      "delta": 284,
+      "actual_gr": 2.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4a2be73e43a0000134c174",
+      "title": "26新版人教PEP丨三四五六年级单元考点梳理，单元练习 [电子版]",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.6,
+      "sold": 10000,
+      "delta": 283,
+      "actual_gr": 2.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历模板合集"
+      ]
+    },
+    {
+      "goods_id": "69ee3e2f3aa96f00016d91bf",
+      "title": "（自动发货）卡通PPT模板/背景图",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 1495,
+      "delta": 272,
+      "actual_gr": 22.24,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "690b56192fdb7c0001c3f269",
+      "title": "小学期中家长会PPT课件完整版（可编辑，可修改）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 3928,
+      "delta": 270,
+      "actual_gr": 7.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "69cf7a7bca15480001686387",
+      "title": "百度网盘3秒快速扩容500G",
+      "store_name": "小鱼考证资料库的店",
+      "store_id": "68bf7704c069260015e2074b",
+      "price": 1.0,
+      "sold": 5415,
+      "delta": 261,
+      "actual_gr": 5.06,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "686636b0aeddd2001550bb64",
+      "title": "深圳初中七八九年级月考期中期末真题试卷各区部分名校【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.84,
+      "sold": 1349,
+      "delta": 257,
+      "actual_gr": 23.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历网站模板"
+      ]
+    },
+    {
+      "goods_id": "6a5877ff1a0aff0001a8ead1",
+      "title": "【PDF】26新版1-6年级语数英综合素养练习试卷（单元+期中期末）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 2609,
+      "delta": 246,
+      "actual_gr": 10.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa6a5560f06300001e33a6d",
+      "title": "（新版）五上语文单元选择题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 1876,
+      "delta": 246,
+      "actual_gr": 15.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "6aacb20b7116f00001c4109e",
+      "title": "26秋四年级上册数学人教版单元 期中 期末测试卷电子资料课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 1639,
+      "delta": 240,
+      "actual_gr": 17.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "68b826697675b40001f03757",
+      "title": "【2026秋新版】四上语文任务群课件+教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 124.0,
+      "sold": 6884,
+      "delta": 236,
+      "actual_gr": 3.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "69d89749d0151a0001ef2b46",
+      "title": "夸克网盘扩容1T秒到1000G教程手机平板电脑三端可用扩1T攻略",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 4572,
+      "delta": 236,
+      "actual_gr": 5.44,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "695fce447d28460001fd28da",
+      "title": "2027省考选岗必备-历年进面分+岗位表汇总数据整理 · 电子版模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.98,
+      "sold": 2308,
+      "delta": 223,
+      "actual_gr": 10.7,
+      "token_hits": 0,
+      "touch_keywords": [
+        "求职简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "6abe8aa1018c6a00019d646f",
+      "title": "中国邮政笔试2027邮政集团笔试面试招聘考试校招社招课程备考真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 38.9,
+      "sold": 482,
+      "delta": 222,
+      "actual_gr": 85.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "求职简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a053f65f3ef8300017bf5c3",
+      "title": "生日九宫格朋友圈高级感图片 高清电子图片（年龄数字免费改）",
+      "store_name": "谢逅的店",
+      "store_id": "69060cb6ad9a9b0015f7a3f3",
+      "price": 2.99,
+      "sold": 6005,
+      "delta": 204,
+      "actual_gr": 3.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "求职简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a81c45dee44d900013e394b",
+      "title": "2027上教资笔试中小幼科一科二备考资料+网课（27持续更新中）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 21.9,
+      "sold": 1041,
+      "delta": 198,
+      "actual_gr": 23.49,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历优化提示词电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa9722d2054db0001ca16b8",
+      "title": "26秋一年级上册数学人教版单元 期中 期末测试卷 pdf电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 1518,
+      "delta": 195,
+      "actual_gr": 14.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "个人简历模板"
+      ]
+    },
+    {
+      "goods_id": "6a6c411a7350260001ea0e73",
+      "title": "27版薛睿全家桶公考逻辑判断一拖五21天带刷论证形式678题库328",
+      "store_name": "6846f25658fd850015aa7a1f",
+      "store_id": "6846f25658fd850015aa7a1f",
+      "price": 63.8,
+      "sold": 3650,
+      "delta": 192,
+      "actual_gr": 5.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a703d2e9fb4c8000155f934",
+      "title": "【原创】课堂互动课件，趣味教学",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 4699,
+      "delta": 190,
+      "actual_gr": 4.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历模板合集"
+      ]
+    },
+    {
+      "goods_id": "6a71be68bf81ab000186557e",
+      "title": "26秋一年级上册语文PPT课件教案（七彩精华版）无水印好资料共享",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 2719,
+      "delta": 190,
+      "actual_gr": 7.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "6ac5ada732c3d20001a20c4c",
+      "title": "新人教版初中英语单词背诵表+默写表【7-8年级上下册】电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 339,
+      "delta": 190,
+      "actual_gr": 127.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "6a54fb1705767800019a5248",
+      "title": "2026新改版初中重点知识梳理手绘版pdf电子版网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2992,
+      "delta": 186,
+      "actual_gr": 6.63,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历网站模板"
+      ]
+    },
+    {
+      "goods_id": "6a71be68bf81ab0001865587",
+      "title": "26秋一年级上册语文PPT课件教案（七彩精华版）无水印好资料共享",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.8,
+      "sold": 2720,
+      "delta": 186,
+      "actual_gr": 7.34,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "6a623c6bd85585000107137b",
+      "title": "ipad板绘、素材模板",
+      "store_name": "6777a6c5a47ada001517244f",
+      "store_id": "6777a6c5a47ada001517244f",
+      "price": 2.88,
+      "sold": 5478,
+      "delta": 182,
+      "actual_gr": 3.44,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历网站模板"
+      ]
+    },
+    {
+      "goods_id": "6a6f2edd89d8ff0001169d4e",
+      "title": "2026五年级上册语文课件PPT+教学设计备课资料 更新中",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 98.9,
+      "sold": 2371,
+      "delta": 181,
+      "actual_gr": 8.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "690611419509c100010f58cd",
+      "title": "英语六级真题+听力+解析pdf电子资料包",
+      "store_name": "歆歆学姐💐的店",
+      "store_id": "67b856892822670015e8169e",
+      "price": 2.88,
+      "sold": 10000,
+      "delta": 180,
+      "actual_gr": 1.83,
+      "token_hits": 0,
+      "touch_keywords": [
+        "设计简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aca3e7f0f3f3e0001a37897",
+      "title": "系列四 · 初中语文提升系列复习课件（持续更新）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 4394,
+      "delta": 177,
+      "actual_gr": 4.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a69561e84b8ee00016b1007",
+      "title": "新教材人教版美术四年级上册课件+教案+逐字稿全套",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.0,
+      "sold": 627,
+      "delta": 174,
+      "actual_gr": 38.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "个人简历模板"
+      ]
+    },
+    {
+      "goods_id": "6a9bd7971b9ae900019d7185",
+      "title": "2027新版国考省考行测高分必背（修正版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 2948,
+      "delta": 171,
+      "actual_gr": 6.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a20f5e4c2c13f0001f9284c",
+      "title": "【启蒙英语】PPT课件 / 0基础学习 / 趣味教学/可编辑卡通PPT模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1520,
+      "delta": 169,
+      "actual_gr": 12.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "6a7d3b816e8d370001409703",
+      "title": "26秋季小学四年级上语文部编新课标丨含课件+逐字稿+教案+作业单",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 89.9,
+      "sold": 2614,
+      "delta": 167,
+      "actual_gr": 6.82,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历网站模板"
+      ]
+    },
+    {
+      "goods_id": "69c541845e5f0500015930c8",
+      "title": "【限时特价】课堂互动小游戏活跃气氛PPT课件（秒发百度网盘）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 6153,
+      "delta": 166,
+      "actual_gr": 2.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历范文"
+      ]
+    },
+    {
+      "goods_id": "6a9901dd09cb9300015a7f55",
+      "title": "2026税务师上岸笔记5科全套可打印 享2027版更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.8,
+      "sold": 472,
+      "delta": 159,
+      "actual_gr": 50.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历模板可编辑"
+      ]
+    },
+    {
+      "goods_id": "6a7b224f0020da00019b5096",
+      "title": "袁东2027申论领跑营全家桶申论方法实战班大作文专项国省考送网课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 5938,
+      "delta": 158,
+      "actual_gr": 2.73,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI简历电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c349677c9c8f00019c40e0",
+      "title": "26下半年高中数学教案教资面试逐字稿答辩资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 222,
+      "delta": 157,
+      "actual_gr": 241.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "求职简历模板电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a55298094aed00014710c7",
+      "title": "高中化学课件ppt教案教学设计试卷讲义新课标",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 1479,
+      "delta": 156,
+      "actual_gr": 11.79,
+      "token_hits": 0,
+      "touch_keywords": [
+        "简历优化提示词电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "简历",
+  "slug": "简历"
+}

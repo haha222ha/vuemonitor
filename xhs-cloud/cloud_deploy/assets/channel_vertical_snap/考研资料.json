@@ -1,0 +1,1601 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "考研资料"
+    ],
+    "niche": "考研资料"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 49,
+    "active_n": 1,
+    "drive_keywords": [
+      "控制原理考研资料",
+      "考研资料",
+      "地理考研资料包",
+      "公基考研资料包",
+      "化学考研资料包",
+      "结构化考研资料",
+      "历史考研资料包",
+      "面试考研资料包",
+      "申论考研资料包",
+      "生物考研资料包",
+      "数学考研资料包",
+      "无领导考研资料",
+      "物理考研资料包",
+      "行测考研资料包",
+      "英语考研资料包",
+      "语文考研资料包",
+      "政治考研资料包",
+      "职测考研资料包",
+      "综应考研资料包",
+      "最新考研资料包",
+      "大学期末考研资料",
+      "电子档考研资料包",
+      "高清版考研资料包",
+      "更新版考研资料包"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "控制原理考研资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "value_mining_opt_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "all_reports_dir_fill_20261009_185652",
+        "role": "candidate"
+      },
+      {
+        "keyword": "地理考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公基考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "化学考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "结构化考研资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "历史考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "面试考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "生物考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "数学考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "无领导考研资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "物理考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "行测考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "英语考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "语文考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "政治考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "职测考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "综应考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "最新考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "大学期末考研资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "未覆盖扩边 · uncovered_title | purged_bad_kw",
+        "source": "all_reports_dir_fill_20261009_185652",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子档考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "高清版考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "更新版考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料包PDF",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料包电子档",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料包更新版",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料包可打印",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料分析讲义",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料分析教案",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料分析课件",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料分析试卷",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料分析押题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研资料分析资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "可打印考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "判断推理考研资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "数量关系考研资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "网盘版考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "言语理解考研资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "资料分析考研资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 12,
+    "sku_n": 80,
+    "sum_delta": 2524,
+    "median_price": 6.9,
+    "niche": "考研资料",
+    "drive_kw_n": 24
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 69,
+      "sum_delta": 2316,
+      "sum_sold": 60716,
+      "top_title": "2027版小黑国省考政治常识速学冲刺十套卷500题全家桶冲刺班公考",
+      "top_delta": 685
+    },
+    {
+      "store_name": "68a8567f3e93a70015c7ace7",
+      "sku_n": 1,
+      "sum_delta": 38,
+      "sum_sold": 656,
+      "top_title": "全套英文翻译模板",
+      "top_delta": 38
+    },
+    {
+      "store_name": "慧慧学姐爱分享的店",
+      "sku_n": 1,
+      "sum_delta": 36,
+      "sum_sold": 513,
+      "top_title": "考研英语  英语一英语二历年真题及解析PDF版电子版高清无水印",
+      "top_delta": 36
+    },
+    {
+      "store_name": "四海公考的店",
+      "sku_n": 1,
+      "sum_delta": 28,
+      "sum_sold": 1914,
+      "top_title": "27国省事·考季四海公考国考系统班",
+      "top_delta": 28
+    },
+    {
+      "store_name": "追风不坠的店",
+      "sku_n": 1,
+      "sum_delta": 28,
+      "sum_sold": 1211,
+      "top_title": "公考雷达星钻vip代查相关岗位信息",
+      "top_delta": 28
+    },
+    {
+      "store_name": "Shi.6（努力日更版）的店",
+      "sku_n": 1,
+      "sum_delta": 22,
+      "sum_sold": 7146,
+      "top_title": "自制emoji素材｜100+张含教程｜发货看图二｜虚拟资料发出不退",
+      "top_delta": 22
+    },
+    {
+      "store_name": "小康Pro的店",
+      "sku_n": 1,
+      "sum_delta": 21,
+      "sum_sold": 488,
+      "top_title": "27考研数学思维导图笔记课件(知识点+题型方法+批注版例题)",
+      "top_delta": 21
+    },
+    {
+      "store_name": "猫七资料库的店",
+      "sku_n": 1,
+      "sum_delta": 11,
+      "sum_sold": 478,
+      "top_title": "B67 【拍下秒发】大学生2026年度志愿者实践汇报PPT26页+演讲稿",
+      "top_delta": 11
+    },
+    {
+      "store_name": "上岸熊旗舰店",
+      "sku_n": 1,
+      "sum_delta": 8,
+      "sum_sold": 1172,
+      "top_title": "2027国家公务员考试公考行测申论三色笔记教材题库真题练习本资料",
+      "top_delta": 8
+    },
+    {
+      "store_name": "语宙一站式写作的店",
+      "sku_n": 1,
+      "sum_delta": 7,
+      "sum_sold": 875,
+      "top_title": "一站式写作空间｜系统化写作工具｜全维度写作词典｜创作管理模版",
+      "top_delta": 7
+    },
+    {
+      "store_name": "摄影师林馆长的店",
+      "sku_n": 1,
+      "sum_delta": 5,
+      "sum_sold": 772,
+      "top_title": "林馆长阿勒泰仿色动漫风lut 调色【模板】3个",
+      "top_delta": 5
+    },
+    {
+      "store_name": "小猪&佩奇的店",
+      "sku_n": 1,
+      "sum_delta": 4,
+      "sum_sold": 173,
+      "top_title": "自动化控制原理考研复试保研面试资料电子版自动化题库整理备考精",
+      "top_delta": 4
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6984cc95eb0d9a00010a5eeb",
+      "title": "【序号1411-1700】大学期末考研资料合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 3854,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6abe375634911400018d9963",
+      "title": "2027版小黑国省考政治常识速学冲刺十套卷500题全家桶冲刺班公考",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 1156,
+      "delta": 685,
+      "actual_gr": 145.44,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6aa0f10d92e6c000018fa9d1",
+      "title": "2026高中政治必修四《哲学与文化》课件/教案/逐字稿",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.0,
+      "sold": 2396,
+      "delta": 267,
+      "actual_gr": 12.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a9fc11a493f2c0001e1d1b1",
+      "title": "2026常识4600问 国考省考行测高分必背 修正版 115页电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 395,
+      "delta": 247,
+      "actual_gr": 166.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6aa6cbfb50825c00017eef12",
+      "title": "【前1OOO单1.99】2027新版国考省考行测&申论高分必背（修正版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 863,
+      "delta": 141,
+      "actual_gr": 19.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69e0ad11ddd16500016069f3",
+      "title": "考研词汇宝典  27考研必背词汇大全",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.8,
+      "sold": 3823,
+      "delta": 122,
+      "actual_gr": 3.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a4db64344362a00017408e0",
+      "title": "【六级】备考2026年12月六级真题黄皮书大学英语六级英语真题试卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 145.0,
+      "sold": 8275,
+      "delta": 62,
+      "actual_gr": 0.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a9678d65e65130001d44205",
+      "title": "肖1000重点题带刷营，配套视频课程+答疑督学+刷题小程序",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 34.9,
+      "sold": 602,
+      "delta": 61,
+      "actual_gr": 11.28,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研资料"
+      ]
+    },
+    {
+      "goods_id": "6911a12c9de01f0001332271",
+      "title": "【秒发货】优秀班级支部评比汇报PPT，26页图文可编辑带滚动效果",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.8,
+      "sold": 1376,
+      "delta": 56,
+      "actual_gr": 4.24,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "695bc76d4e15d60001cef23b",
+      "title": "新编高教版中职思想政治四册均有PPT课件+视频+习题电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 942,
+      "delta": 54,
+      "actual_gr": 6.08,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a4cd87aaa62b500016e93d8",
+      "title": "全套英文翻译模板",
+      "store_name": "68a8567f3e93a70015c7ace7",
+      "store_id": "68a8567f3e93a70015c7ace7",
+      "price": 4.9,
+      "sold": 656,
+      "delta": 38,
+      "actual_gr": 6.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a8056a00020da0001230b74",
+      "title": "2026秋新中职思想中特哲学人生职业生涯心理四册课件PPT教学设计",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 454,
+      "delta": 38,
+      "actual_gr": 9.13,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69c22e1fd95b5a000108164f",
+      "title": "考研英语  英语一英语二历年真题及解析PDF版电子版高清无水印",
+      "store_name": "慧慧学姐爱分享的店",
+      "store_id": "",
+      "price": 1.34,
+      "sold": 513,
+      "delta": 36,
+      "actual_gr": 7.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a3de09cd4b9a6000166cbe7",
+      "title": "效率办公神器，多格式视频播放、直播录屏好搭档......",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.66,
+      "sold": 247,
+      "delta": 36,
+      "actual_gr": 17.06,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69197750e3156e00018af1c3",
+      "title": "英文早读任务打卡PPT模板高效英文早读任务打卡（拍下秒发）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.8,
+      "sold": 1770,
+      "delta": 34,
+      "actual_gr": 1.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "69e710ea39916f0001f9b465",
+      "title": "26秋人教部编版道法1-9上下课件PPT资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 32.88,
+      "sold": 1259,
+      "delta": 31,
+      "actual_gr": 2.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a70a40384b8ee00010f3e55",
+      "title": "大学生创业大赛文化传承非遗工艺扎染文化PPT模板路演展示设计",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 59,
+      "delta": 29,
+      "actual_gr": 96.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a0ead6ce6d02a00019f3c46",
+      "title": "27国省事·考季四海公考国考系统班",
+      "store_name": "四海公考的店",
+      "store_id": "664ae528a57f5800010ebd8a",
+      "price": 299.0,
+      "sold": 1914,
+      "delta": 28,
+      "actual_gr": 1.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "67b9902af6588900010bd2c6",
+      "title": "公考雷达星钻vip代查相关岗位信息",
+      "store_name": "追风不坠的店",
+      "store_id": "67b98b650108640015ec3f41",
+      "price": 1.0,
+      "sold": 1211,
+      "delta": 28,
+      "actual_gr": 2.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "68a48f113304730001bc2424",
+      "title": "思政课论持久战思考PPT模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 1013,
+      "delta": 25,
+      "actual_gr": 2.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a657c2a55f0ca0001e65099",
+      "title": "2026省考国考公务员考试行测申论刷题网课程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 95,
+      "delta": 24,
+      "actual_gr": 33.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "68d64de3002e7e0001c18361",
+      "title": "自制emoji素材｜100+张含教程｜发货看图二｜虚拟资料发出不退",
+      "store_name": "Shi.6（努力日更版）的店",
+      "store_id": "684a672ac7af4d0015642807",
+      "price": 267.0,
+      "sold": 7146,
+      "delta": 22,
+      "actual_gr": 0.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "69d99d9e6fc3520001bed353",
+      "title": "A173 | 大学生会主席团成员竞选，大学生干部竞选PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 435,
+      "delta": 22,
+      "actual_gr": 5.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69cd2cd21053a50001ddc218",
+      "title": "27考研数学思维导图笔记课件(知识点+题型方法+批注版例题)",
+      "store_name": "小康Pro的店",
+      "store_id": "68ce642bae8ba80015e050fb",
+      "price": 74.9,
+      "sold": 488,
+      "delta": 21,
+      "actual_gr": 4.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a69c21e2bf2dc0001a5f805",
+      "title": "PPT模板40｜拍下即得｜发百度网盘链接｜介意勿扰",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 85,
+      "delta": 20,
+      "actual_gr": 30.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6825b0ac7094210001ec99dc",
+      "title": "Q009高级感动态平滑切换效果旋转放大转盘轮播PPT模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.99,
+      "sold": 3659,
+      "delta": 17,
+      "actual_gr": 0.47,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "68f115868aa5760001f61840",
+      "title": "【非遗传承】大学生创新创业大赛湘绣非遗文化保护赛道PPT模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 712,
+      "delta": 17,
+      "actual_gr": 2.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "680122567fa4ac0001e7583c",
+      "title": "红色主题类型PPT模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.2,
+      "sold": 487,
+      "delta": 16,
+      "actual_gr": 3.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6aa3c88c06bc750001f97a19",
+      "title": "26新版议题式·高中思政必修1课件PPT+教案©️课件研究所",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 394,
+      "delta": 16,
+      "actual_gr": 4.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69f358e7e0e86e000125df2f",
+      "title": "红旗渠精神主题宣讲PPT模板红色文化思政课程演讲汇报通用模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 38.99,
+      "sold": 116,
+      "delta": 15,
+      "actual_gr": 14.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a9688441717090001844af2",
+      "title": "85分学姐推荐丨05-26年阅读真题词逐篇整理PDF，不用查字典",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 7885,
+      "delta": 14,
+      "actual_gr": 0.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "考研资料"
+      ]
+    },
+    {
+      "goods_id": "68f4b631becfcc00010401ae",
+      "title": "【1162】积极分子答辩PPT【赠发言稿】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.88,
+      "sold": 552,
+      "delta": 13,
+      "actual_gr": 2.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a7318e696c1ee0001825140",
+      "title": "HY.380 七根火柴PPT 成品16页+逐字稿+教案＋视频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.99,
+      "sold": 29,
+      "delta": 12,
+      "actual_gr": 70.59,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "66b631f32e2bf60001da8330",
+      "title": "PPT希沃微信聊天对话动画模板微信对话微信聊天ppt模板微信发消息",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 1219,
+      "delta": 11,
+      "actual_gr": 0.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "69266bd5eb0d8000019a2706",
+      "title": "转正/积极分子答辩PPT模板-编号：B**",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.7,
+      "sold": 864,
+      "delta": 11,
+      "actual_gr": 1.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69ed72dd43360b0001578af6",
+      "title": "高级屎盆子镶金边红色学生会干部竞选PPT模板17页",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 784,
+      "delta": 11,
+      "actual_gr": 1.42,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69bcc9fcec66640001ecb405",
+      "title": "B67 【拍下秒发】大学生2026年度志愿者实践汇报PPT26页+演讲稿",
+      "store_name": "猫七资料库的店",
+      "store_id": "6826d3d65770e000158911cd",
+      "price": 14.9,
+      "sold": 478,
+      "delta": 11,
+      "actual_gr": 2.36,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "64e6b2d2000b270001761503",
+      "title": "托管专用管理工具，下单后会有客服联系咨询费用非使用费用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.15,
+      "sold": 2709,
+      "delta": 10,
+      "actual_gr": 0.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "67fa32c304afe30001e706f6",
+      "title": "100-职业规划教育师范生涯发展展示求职综合展示PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 505,
+      "delta": 10,
+      "actual_gr": 2.02,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6819dd68c9e749000122139d",
+      "title": "法律”刑事案件“人肉搜索”主题班会讲座PPT模板【静态 15页】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 186,
+      "delta": 10,
+      "actual_gr": 5.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a82af2e0020da0001623eff",
+      "title": "【167】PPT扇子动画开场模板【可购买合集 一直更新更超值】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.41,
+      "sold": 65,
+      "delta": 10,
+      "actual_gr": 18.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "696da90ad69f5300013f1d8b",
+      "title": "25页高级招商银行年报动态PPT模板金融行业汇报素材工作总结汇报",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 30,
+      "delta": 10,
+      "actual_gr": 50.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "68f496fb0dfa750001b62809",
+      "title": "大学生T日活动红色PPT模板19页（附3700字文字稿）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 1181,
+      "delta": 9,
+      "actual_gr": 0.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "68bfddc1e2e2b90016d43800",
+      "title": "2027国家公务员考试公考行测申论三色笔记教材题库真题练习本资料",
+      "store_name": "上岸熊旗舰店",
+      "store_id": "63b9487744351a00014495f5",
+      "price": 59.9,
+      "sold": 1172,
+      "delta": 8,
+      "actual_gr": 0.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6890225579bc47000137ea34",
+      "title": "高中政治课件从《我的阿勒泰》看文化的内涵与功能",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.0,
+      "sold": 676,
+      "delta": 8,
+      "actual_gr": 1.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69242c5752eecb0001848992",
+      "title": "自动发货｜凯蒂猫-拥抱不完美的自己｜PPT成品｜17 页",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.5,
+      "sold": 533,
+      "delta": 8,
+      "actual_gr": 1.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6920970e95624300013cc594",
+      "title": "【0006】积极分子转发展对象思想汇报/答辩PPT附演讲稿-自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 170,
+      "delta": 8,
+      "actual_gr": 4.94,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69782fcbb828e4000138fd3c",
+      "title": "申博phd留学diy全套资料（包含CV+套磁+PS+RP+PL+PPT等电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 23.9,
+      "sold": 1208,
+      "delta": 7,
+      "actual_gr": 0.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "69790a0078d8d5000174c597",
+      "title": "一站式写作空间｜系统化写作工具｜全维度写作词典｜创作管理模版",
+      "store_name": "语宙一站式写作的店",
+      "store_id": "693994f9d8d6aa0015be77b2",
+      "price": 239.0,
+      "sold": 875,
+      "delta": 7,
+      "actual_gr": 0.81,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "68e957ac3f37a90001497ac9",
+      "title": "2026大学生职业生涯规划大赛成长就业赛道规划书word成品范文ppt",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.9,
+      "sold": 825,
+      "delta": 7,
+      "actual_gr": 0.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "6ac7b8ae7dbca2000163775e",
+      "title": "【医技岗】E类联考（2026下）综应大题万能模板全套备考材料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.88,
+      "sold": 409,
+      "delta": 7,
+      "actual_gr": 1.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a4e859a31d9b80001bff528",
+      "title": "新版中职语文新高教版基础模块职业拓展上下册课件PPT教案电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 400,
+      "delta": 7,
+      "actual_gr": 1.78,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6918a57960f59700015cf17a",
+      "title": "PPT共青团主题团日12页 砥砺青春不负韶华高级动态镶金边模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.99,
+      "sold": 267,
+      "delta": 7,
+      "actual_gr": 2.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69ca20ad4ae1e700019896ea",
+      "title": "788入团答辩PPT模板分享（下单自动发）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.25,
+      "sold": 189,
+      "delta": 7,
+      "actual_gr": 3.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "692a80f1dd329c0001fc5b8e",
+      "title": "公安专业知识7天速记保底85分高频考点！公安基础知识大全",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.88,
+      "sold": 56,
+      "delta": 7,
+      "actual_gr": 14.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "68e7d72c7d3b3f0001033fa8",
+      "title": "幼儿园游戏视频解读万能模板（全套资料PPT＋文档）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 838,
+      "delta": 6,
+      "actual_gr": 0.72,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a2a35aa4315c10001a526e4",
+      "title": "26页绿色版三下乡PPT模板加演讲稿",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 151,
+      "delta": 6,
+      "actual_gr": 4.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6518fdb502a7940001140d86",
+      "title": "林馆长阿勒泰仿色动漫风lut 调色【模板】3个",
+      "store_name": "摄影师林馆长的店",
+      "store_id": "62da34fe1f9e5f0001eb0a3e",
+      "price": 30.0,
+      "sold": 772,
+      "delta": 5,
+      "actual_gr": 0.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a9d72d51b60640001417ef9",
+      "title": "时事热点PPT-浙江葫芦娃爷爷（发后不退不换）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 145,
+      "delta": 5,
+      "actual_gr": 3.57,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6aa190695152e500013c3d7f",
+      "title": "时事热点PPT-女生赴港看演唱会被取消全家低保（发后不退不换）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 64,
+      "delta": 5,
+      "actual_gr": 8.47,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "692c6266b644e40001be164f",
+      "title": "自动化控制原理考研复试保研面试资料电子版自动化题库整理备考精",
+      "store_name": "小猪&佩奇的店",
+      "store_id": "663274707d1a50000103b8ad",
+      "price": 4.98,
+      "sold": 173,
+      "delta": 4,
+      "actual_gr": 2.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "68f8c4f8602b7c000183e948",
+      "title": "高中政治课件 社会主义制度在中国的确立",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.5,
+      "sold": 126,
+      "delta": 4,
+      "actual_gr": 3.28,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a5630b91a0aff000178504a",
+      "title": "144.时政PPT课件 广西平陆运河 （20页+1视频+演讲稿）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 66,
+      "delta": 4,
+      "actual_gr": 6.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69514f5191380100158f9bf5",
+      "title": "弘扬长征精神介绍学生班会教学课件PPT模板1",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.89,
+      "sold": 40,
+      "delta": 4,
+      "actual_gr": 11.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "67cec296e15c91000129418d",
+      "title": "【秒发货】团支部｜年级工作汇报叙职报告总结评比PPT~动画效果足",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 1283,
+      "delta": 3,
+      "actual_gr": 0.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "666684d1cd6d14000153783f",
+      "title": "73号乡村振兴项目ppt模板青振兴农ppt模板直播助农项目静态模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 257,
+      "delta": 3,
+      "actual_gr": 1.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69a19c6987daa00001ab8809",
+      "title": "615号毛概新民主主义革命理论动态PPT共22页附带演讲稿3216字",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.86,
+      "sold": 203,
+      "delta": 3,
+      "actual_gr": 1.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "693a37d47a38a60001ce5ee9",
+      "title": "我为人民群众办实事基层服务汇报多图排版ppt模板，19页，有动画",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 170,
+      "delta": 3,
+      "actual_gr": 1.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a8eb2b69811a80001d3c78c",
+      "title": "2026秋新版高教版中职思想政治课件PPT四册全套教案练习题备课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 120,
+      "delta": 3,
+      "actual_gr": 2.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "694622e9110a7f00013cff31",
+      "title": "701号马克思主义思政课说课演讲动态PPT共33页配有演讲稿4194字",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 73,
+      "delta": 3,
+      "actual_gr": 4.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "692727bd2aa9d00001e3208c",
+      "title": "赤心逐梦 红色领航 主题PPT模板｜24页静态+17页动态 内容可编辑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.88,
+      "sold": 69,
+      "delta": 3,
+      "actual_gr": 4.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a78872479e41000158a1e88",
+      "title": "2026超自然行动组小抄地图精绝古城全套保姆级教程包含昆仑后续",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.86,
+      "sold": 23,
+      "delta": 3,
+      "actual_gr": 15.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "6a07f25622eb6500018ea300",
+      "title": "使用A*i工具一键生成，科普动画/宣传片/课件视频生成",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.6,
+      "sold": 20,
+      "delta": 3,
+      "actual_gr": 17.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "69d68d3ac3604d0015856aee",
+      "title": "社群运营管理全套方案成品模板素材社群营销裂变规划步骤裂变增长",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 10,
+      "delta": 3,
+      "actual_gr": 42.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大学期末考研资料"
+      ]
+    },
+    {
+      "goods_id": "6ad70605c43f2d000106ca96",
+      "title": "重庆邮电大学805自动控制原理考研真题资料复习包合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 4,
+      "delta": 3,
+      "actual_gr": 300.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "684c4fa70da50d0001d97c65",
+      "title": "【秒发货】25页学生会社团班干竞选｜工作规划与思路汇报红色PPT~",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.8,
+      "sold": 931,
+      "delta": 2,
+      "actual_gr": 0.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "68760f1e8748d70001142d6a",
+      "title": "自动控制原理卢京潮讲稿教案PPT电子教案课后习题详解，送胡详解",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 376,
+      "delta": 2,
+      "actual_gr": 0.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6aa3bf69f6632a0001f11b4d",
+      "title": "27考季国省考两期笔试套题联报",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 532.0,
+      "sold": 346,
+      "delta": 2,
+      "actual_gr": 0.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "679598aebac25100019af9d2",
+      "title": "提升体制内工作的效率神器网盘发货全新，不会安装使用的不要拍",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 158,
+      "delta": 2,
+      "actual_gr": 1.28,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    },
+    {
+      "goods_id": "6926ce574977f30001127737",
+      "title": "团日活动PPT模板｜28页可编辑｜百度网盘秒发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 34,
+      "delta": 2,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "控制原理考研资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "考研资料",
+  "slug": "考研资料"
+}

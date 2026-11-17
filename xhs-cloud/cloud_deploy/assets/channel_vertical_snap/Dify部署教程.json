@@ -1,0 +1,1306 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "Dify部署教程"
+    ],
+    "niche": "Dify部署教程"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "Dify部署教程电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "Dify部署教程电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "cycle_kw_optimize_20261009_111339",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 17,
+    "sku_n": 80,
+    "sum_delta": 139,
+    "median_price": 7.9,
+    "niche": "Dify部署教程",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 64,
+      "sum_delta": 102,
+      "sum_sold": 64624,
+      "top_title": "电子版硬笔楷书练字系统书法教材小学生成人练字零基础A4打印",
+      "top_delta": 85
+    },
+    {
+      "store_name": "帕克资料馆的店",
+      "sku_n": 1,
+      "sum_delta": 33,
+      "sum_sold": 568,
+      "top_title": "优质服务基层行全套资料电子版乡镇村优质服务基层行资料",
+      "top_delta": 33
+    },
+    {
+      "store_name": "6764ead990511f00159661b6",
+      "sku_n": 1,
+      "sum_delta": 4,
+      "sum_sold": 255,
+      "top_title": "100个oh卡小游戏pdf欧卡团体活动破冰流程模板",
+      "top_delta": 4
+    },
+    {
+      "store_name": "夏星小酒馆的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 26000,
+      "top_title": "你和哪位天才作家灵魂相认",
+      "top_delta": 0
+    },
+    {
+      "store_name": "努力上岸的momo的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 7044,
+      "top_title": "【新版】110张毛选经典名段摘抄语录正能量卡片收藏小卡",
+      "top_delta": 0
+    },
+    {
+      "store_name": "今天测什么呢的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 2433,
+      "top_title": "HPTI 你的巫格是？棉花娃娃创意（下单后请联系客服）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "晗妈陪学成长记的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 823,
+      "top_title": "006-拼音拼读练习小卡片 共10页19天电子资料笔记同款",
+      "top_delta": 0
+    },
+    {
+      "store_name": "益珍定AI月的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 769,
+      "top_title": "精美镭射动漫人物卡片收藏礼品装饰",
+      "top_delta": 0
+    },
+    {
+      "store_name": "芯卡达高端会员卡定制的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 581,
+      "top_title": "卡片定制作设计高端黑拉丝VIP卡订制PVC会员卡定做黑卡磁条卡贵宾",
+      "top_delta": 0
+    },
+    {
+      "store_name": "moben的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 276,
+      "top_title": "启发式ai学问卡 墨水屏无干扰",
+      "top_delta": 0
+    },
+    {
+      "store_name": "知新记HR的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 161,
+      "top_title": "【培训课程】情景沙盘模拟教案+实体卡片、培训/讲师/授课/课程",
+      "top_delta": 0
+    },
+    {
+      "store_name": "黑白胖模玩的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 75,
+      "top_title": "正版三角洲启动卡金属总裁卡NFC行动游戏周边航天基地钥匙卡",
+      "top_delta": 0
+    },
+    {
+      "store_name": "688b8d52d80a470015e67dfc",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 67,
+      "top_title": "电子资料言语理解高频成语记忆卡片背诵记忆表课件教案",
+      "top_delta": 0
+    },
+    {
+      "store_name": "晓寒资料的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 62,
+      "top_title": "MB162-3款室内活动道具极速急速60秒电子卡片趣味游戏看图猜数字",
+      "top_delta": 0
+    },
+    {
+      "store_name": "🌿林果妈妈の教育百宝箱（可收徒）的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 31,
+      "top_title": "电子资料包4：定制版PDF趣味认字卡片儿童早教益智教材26页",
+      "top_delta": 0
+    },
+    {
+      "store_name": "教英语的Bella老师的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 21,
+      "top_title": "英文数字单词卡横版+竖版（电子资料，无实体卡）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "莉塔老师的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 21,
+      "top_title": "英文月份教学游戏卡片（电子资料模板",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "68427748213b6200010b7e78",
+      "title": "电子版硬笔楷书练字系统书法教材小学生成人练字零基础A4打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 65.9,
+      "sold": 8047,
+      "delta": 85,
+      "actual_gr": 1.07,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "686e08b780b7300001cebc68",
+      "title": "优质服务基层行全套资料电子版乡镇村优质服务基层行资料",
+      "store_name": "帕克资料馆的店",
+      "store_id": "6829eecb68c8ce001558b30e",
+      "price": 19.9,
+      "sold": 568,
+      "delta": 33,
+      "actual_gr": 6.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9db433f84c0900150ffcf1",
+      "title": "2025DeepSeek R1满血版国产高性能深度思考AI提示词本地部署教程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 68,
+      "delta": 8,
+      "actual_gr": 13.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ef93fc41333c0001debc5c",
+      "title": "咖啡厅设计平面图CAD|施工图|效果图|实景图合集|3D模型|咖啡店",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 114,
+      "delta": 6,
+      "actual_gr": 5.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6857c7c3f89aa500010f797a",
+      "title": "100个oh卡小游戏pdf欧卡团体活动破冰流程模板",
+      "store_name": "6764ead990511f00159661b6",
+      "store_id": "6764ead990511f00159661b6",
+      "price": 29.9,
+      "sold": 255,
+      "delta": 4,
+      "actual_gr": 1.59,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d6cf82ccba710001eb4951",
+      "title": "电子资源 |【U-EPBD001】CVC、Blends & Digraph 金字塔卡片 PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 118,
+      "delta": 1,
+      "actual_gr": 0.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e081fc8a78380015ebb7df",
+      "title": "青少版新概念入门A B 1 2全套精品课件PPT教师培训教学电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.25,
+      "sold": 30,
+      "delta": 1,
+      "actual_gr": 3.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "687ddde222713e0001a19926",
+      "title": "QRT qube research oa ot测试电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 35.0,
+      "sold": 13,
+      "delta": 1,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3a3aa73222c6000103d27d",
+      "title": "你和哪位天才作家灵魂相认",
+      "store_name": "夏星小酒馆的店",
+      "store_id": "69bbfd026eec720015001a53",
+      "price": 1.99,
+      "sold": 26000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "67b49f6aacc82c0001a6661b",
+      "title": "点读版·100张·幼儿英语启蒙高频词翻翻卡·英语启蒙好帮手·配音频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 18000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68cd12d539f90c00011a79c7",
+      "title": "听觉训练卡片语言句子故事理解益智幼儿园专注力提升亲子互动玩具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.8,
+      "sold": 14000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6804e278f1ef950001c2d984",
+      "title": "「风景明信片」冰岛/挪威/法罗群岛/伦敦浪漫礼物原创摄影明信片",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 32.9,
+      "sold": 7114,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68baf0af24d64a0001b4228f",
+      "title": "【新版】110张毛选经典名段摘抄语录正能量卡片收藏小卡",
+      "store_name": "努力上岸的momo的店",
+      "store_id": "68aeedff42ed7400155078e9",
+      "price": 24.8,
+      "sold": 7044,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a90ea6fcc3e020001e3df73",
+      "title": "吒芙娃心柳智敏金冬天张元英宋雨琦切膜贴纸书单页郑伊安现货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.5,
+      "sold": 4721,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6851263bb04805000194c674",
+      "title": "[盐选会员2年卡]730天盐选小说会员下单填手机号官方直充",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 192.0,
+      "sold": 3957,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0d92378bf65900014e731f",
+      "title": "HPTI 你的巫格是？棉花娃娃创意（下单后请联系客服）",
+      "store_name": "今天测什么呢的店",
+      "store_id": "69b22665f17c0000151b44dd",
+      "price": 4.99,
+      "sold": 2433,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "657bdafbf3c8240001c80a1b",
+      "title": "新年元宵猜灯谜高清素材图片 共100题  电子文档非实物",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 1288,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3aeea89cf09700010b0302",
+      "title": "剪映高级感字幕预设+卡片预设共400多套-孽徒预设-",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 43.0,
+      "sold": 1152,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa7c96df7917a0001789202",
+      "title": "【秘境卡社】简中宝可梦 30周年庆典补充包 卡牌盲盒【默认代拆】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 360.0,
+      "sold": 1133,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c81c67f9d8290001e4afe1",
+      "title": "ppt倒计时插件软件模板制作限时器比赛演讲定时器钟表计时器课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 972,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68009fc9abbc830001c26e70",
+      "title": "006-拼音拼读练习小卡片 共10页19天电子资料笔记同款",
+      "store_name": "晗妈陪学成长记的店",
+      "store_id": "67f30d7edc160b00154f30d5",
+      "price": 3.8,
+      "sold": 823,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a475df135beb1000100d1d2",
+      "title": "精美镭射动漫人物卡片收藏礼品装饰",
+      "store_name": "益珍定AI月的店",
+      "store_id": "6a3a68e9e8af7b001580534e",
+      "price": 153.0,
+      "sold": 769,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9b8833baea3b000142b589",
+      "title": "lr手机版 卡片lr手机高级版卡牌",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.88,
+      "sold": 711,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "67dccd561101af0001857ddb",
+      "title": "卡片定制作设计高端黑拉丝VIP卡订制PVC会员卡定做黑卡磁条卡贵宾",
+      "store_name": "芯卡达高端会员卡定制的店",
+      "store_id": "65fcedf0dbd5d900013473bd",
+      "price": 20.0,
+      "sold": 581,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa950b1820c4b000127a9bc",
+      "title": "Mu周边影视卡通动漫卡片",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.1,
+      "sold": 444,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab394139eacf00001f628e5",
+      "title": "明星卡片周边应援明信片",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.5,
+      "sold": 337,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6953b013bd92f50001e99049",
+      "title": "期末评语｜2026马年期末评语创意评语多款可选不重复电子版可修改",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 280,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f2c4776eeaf70001d5f817",
+      "title": "启发式ai学问卡 墨水屏无干扰",
+      "store_name": "moben的店",
+      "store_id": "69e4deda52c5970015816892",
+      "price": 499.0,
+      "sold": 276,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "691ad8e2581ea20015f95eb8",
+      "title": "爱奇艺黄金会员年卡12个月-不支持电视端【填写手机号直充】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 145.8,
+      "sold": 214,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a66056584b8ee00018bb201",
+      "title": "新品｜110张红色正能量经典语录文学语录励志小卡【铜版纸】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 207,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a927c1c45b7670001c6fa25",
+      "title": "《八仙！》电影正版授权收藏卡牌”衍藏版”",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 160.0,
+      "sold": 174,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "66fa986b75e23c00012eb442",
+      "title": "【培训课程】情景沙盘模拟教案+实体卡片、培训/讲师/授课/课程",
+      "store_name": "知新记HR的店",
+      "store_id": "65bc370c4fa7d0000118ae2f",
+      "price": 198.2,
+      "sold": 161,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "693f6e284f2ba2000111fd4c",
+      "title": "099自制英语教具-四季活动书旅行卡片（电子版非实物）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 157,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9325849811a800014cbe0b",
+      "title": "【原创】一年级新生姓名牌模板可打印电子版制作 开学必备",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 132,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6819540e7992330001b386b8",
+      "title": "电子资料包3：定制版方向与空间认知训练卡片幼儿园早教认知必备",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.91,
+      "sold": 114,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a532881b52bf00016eeab8",
+      "title": "打卡吧-学习打助手卡全功能",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.2,
+      "sold": 102,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "675d07e3ba056e0001deb6fe",
+      "title": "水吸收氨气填料塔设计化工原理课程设计含说明书cad图纸设计素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.54,
+      "sold": 77,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "697070bd26bf6e0001a74ef8",
+      "title": "正版三角洲启动卡金属总裁卡NFC行动游戏周边航天基地钥匙卡",
+      "store_name": "黑白胖模玩的店",
+      "store_id": "641ef3476fdda100018a35d5",
+      "price": 7.9,
+      "sold": 75,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68907ae679bc4700013e3738",
+      "title": "电子资料言语理解高频成语记忆卡片背诵记忆表课件教案",
+      "store_name": "688b8d52d80a470015e67dfc",
+      "store_id": "688b8d52d80a470015e67dfc",
+      "price": 7.89,
+      "sold": 67,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c22d9aa54cb60015090091",
+      "title": "MB162-3款室内活动道具极速急速60秒电子卡片趣味游戏看图猜数字",
+      "store_name": "晓寒资料的店",
+      "store_id": "68a91cf99350b30015e24813",
+      "price": 3.58,
+      "sold": 62,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "690c007d84cf420001966c30",
+      "title": "教培运营工具【协议、表格】（电子版，下单后自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.9,
+      "sold": 59,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a150a8fe6f8790001b542e2",
+      "title": "酒店大堂宾馆民宿客房家具平面CAD图库DWG格式施工图纸图块素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.1,
+      "sold": 57,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68af06ef8ec6fa00015262fc",
+      "title": "自动化教程电子资料模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.88,
+      "sold": 47,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "692578f2b644e4000171e339",
+      "title": "【电子版】英语panda大熊猫动物名片卡片介绍手抄报模板生物多样",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 44,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aae93c40e3e870001b748ab",
+      "title": "国庆节祝福语卡片电子素材 空白素材 需要打印剪裁再纯手写",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 43,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a268b9d20d7240001000638",
+      "title": "书店书咖装修设计平面图布局CAD方案CAD施工图书吧图库素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.1,
+      "sold": 41,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1e806daf69a40001e2b962",
+      "title": "【首年不限时免费转写】AI录音卡 磁吸轻薄便携 会议转写纪要",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 969.0,
+      "sold": 40,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "67665a125677c90001381d3b",
+      "title": "清水吸收丙酮填料塔设计化工原理课设含说明书及cad图纸设计素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.48,
+      "sold": 38,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a71a719bf81ab00018407b6",
+      "title": "男主精美动漫人物镭射卡片角色装饰收藏卡牌",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 153.0,
+      "sold": 37,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a71cab4eb49fe0001e8b12e",
+      "title": "纸质版演唱会纪念票 卡片定制 铜版纸 支持批量印刷量多优惠",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.0,
+      "sold": 34,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa3e6d6f6632a0001f7de14",
+      "title": "FDE实操手册（前沿部署工程师）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 32.6,
+      "sold": 33,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68259173d79c870001c14e7c",
+      "title": "大模型应用开发dify录播课＋dify学习笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 32,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "67c54dfc29b9f70001fc7669",
+      "title": "电子资料包4：定制版PDF趣味认字卡片儿童早教益智教材26页",
+      "store_name": "🌿林果妈妈の教育百宝箱（可收徒）的店",
+      "store_id": "677f5d254d076900153cf5fc",
+      "price": 2.31,
+      "sold": 31,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab20ecf7f340c0001d24133",
+      "title": "232国庆卡片电子素材，非实物不发快递，下单自动发送不退不换",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.98,
+      "sold": 28,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "66efa3c06471e600014e7f54",
+      "title": "史密斯无边Smith Waite Tarot英文卡片 百年经典纪念版无边",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.8,
+      "sold": 27,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3e5c10c4c16c0001af4375",
+      "title": "26秋人教PEP小学英语学习卡知识卡知识点归纳暑假预习 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 27,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "67a8f24a7e87ac0001c96114",
+      "title": "Dify应用实战录播课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 26,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa9f3e268ec340001e1833c",
+      "title": "《特立独行》电影官方收藏卡",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 198.0,
+      "sold": 24,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a140e0dc4095100017b37a3",
+      "title": "鲜花店花艺店CAD图库DWG格式施工图纸图块素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.1,
+      "sold": 23,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a15194448f858000160228d",
+      "title": "体育馆运动场馆CAD图库DWG格式施工图纸平面图块设计素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.1,
+      "sold": 22,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a140964017ffc00011955ec",
+      "title": "电影院影厅设计平面家具CAD图库DWG格式施工图纸图块素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.1,
+      "sold": 22,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "697069a8306dc50001327ccb",
+      "title": "英文数字单词卡横版+竖版（电子资料，无实体卡）",
+      "store_name": "教英语的Bella老师的店",
+      "store_id": "6934cf8fad540100156d1f52",
+      "price": 2.99,
+      "sold": 21,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "685a10466a2a83001559a33e",
+      "title": "看表情包猜成语ppt电子版看图猜成语结婚卡片表情猜猜乐卡片素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 21,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1508a7cfd67c000176fa73",
+      "title": "清吧酒馆音乐餐厅CAD图库DWG格式施工图纸平面图块设计素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.25,
+      "sold": 21,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "691538361c5b2a0001b33ea0",
+      "title": "幼儿园冬季节日活动电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 21,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "662e44f93bf0c5000142efe7",
+      "title": "英文月份教学游戏卡片（电子资料模板",
+      "store_name": "莉塔老师的店",
+      "store_id": "64a6bb776725df0001c258d4",
+      "price": 2.5,
+      "sold": 21,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a686fdf89d8ff00017cf315",
+      "title": "电子资料言语理解高频成语实词知识卡片课件教案笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.89,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5497288cb63f0001d11e20",
+      "title": "法式欧式奶油风护墙板雕花角花线条家装设计图库CAD施工图纸素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.1,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68259d8d13283d0001c7c0f3",
+      "title": "dify录播课＋dify实操学习笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6503f49cd7b6e5000184f268",
+      "title": "B379五年级语文上册《落花生》课文思维导图线稿电子图片手抄报",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.7,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "699d5ae27bbc820015b7cb87",
+      "title": "1616套化工过程设备CAD图纸反应釜反应塔精馏塔换热器储罐蒸发器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68345f2d0bed56000128342a",
+      "title": "018-虚拟定制 幼小衔接20天每日一练数学思维小卡片，pdf电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 14,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a360e8f6f59ca0001cb06ac",
+      "title": "吊顶工艺天花弧形悬浮做法节点大样详图家装室内设计CAD施工图纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.55,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "69dc706b4ab6d30015c9e8de",
+      "title": "韦氏儿童智力智商测评学龄测试电子版资料工具素材试题解析量表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68a161de60a5740001bf53e5",
+      "title": "压力容器图库cad图纸反应釜化工设备图集蒸发器换热器塔器图块",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "67c526843298ba000168b987",
+      "title": "电子资料包定10：自制视觉专注力训练卡片幼儿园幼小衔接提练习题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a267527d5e6e60001e74d3b",
+      "title": "网咖网吧装修设计室内CAD施工图电竞网络平面布置方案图库素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.1,
+      "sold": 11,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a140effae46040001e4f66c",
+      "title": "珠宝店黄金店CAD图库DWG格式施工图纸平面空具图块设计素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.1,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d2a8d50f6c7f000167a69a",
+      "title": "中秋节灯谜打印电子素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    },
+    {
+      "goods_id": "695c72a9b1e66600014472b7",
+      "title": "A063童弟周人物卡片/手抄报素材/人物介绍/人物资料/线稿图可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "Dify部署教程电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "Dify部署教程",
+  "slug": "Dify部署教程"
+}

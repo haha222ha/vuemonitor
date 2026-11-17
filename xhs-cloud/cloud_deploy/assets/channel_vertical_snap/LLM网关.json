@@ -1,0 +1,1234 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "LLM网关"
+    ],
+    "niche": "LLM网关"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "LLM网关电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "LLM网关电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 8,
+    "sku_n": 80,
+    "sum_delta": 20,
+    "median_price": 11.6,
+    "niche": "LLM网关",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 72,
+      "sum_delta": 19,
+      "sum_sold": 6046,
+      "top_title": "140:中班《数学区资源包》20套，电子版直接打印，非实物！",
+      "top_delta": 14
+    },
+    {
+      "store_name": "袋鼠艺术的店",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 100,
+      "top_title": "速写全体系课程+命题创作体系课程共179节【视频课】赠大纲+素材",
+      "top_delta": 1
+    },
+    {
+      "store_name": "小赵必上岸的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 146,
+      "top_title": "cg教育带背手册教育学心理学教育心理学带背教综带背pdf版",
+      "top_delta": 0
+    },
+    {
+      "store_name": "教画画的子绅的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 38,
+      "top_title": "素描课程教学大纲高清挂图＋可修改源文件",
+      "top_delta": 0
+    },
+    {
+      "store_name": "67bd39310108640015ec4264",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 9,
+      "top_title": "2026素描考级1-10级资料电子版（考级大纲+不同级别范画）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "68d7ed5f19044f0015340eaf",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 6,
+      "top_title": "繁體字視頻學習課程",
+      "top_delta": 0
+    },
+    {
+      "store_name": "67d52ea076e6540015d8cfda",
+      "sku_n": 2,
+      "sum_delta": 0,
+      "sum_sold": 4,
+      "top_title": "PJC Bridge资料（电子版）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "694e97b549e5440015cacb93",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1,
+      "top_title": "25年小说写作教程网文大纲模版课程完全手册电子版技巧玄幻素材",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a49163b8cb63f000114c275",
+      "title": "140:中班《数学区资源包》20套，电子版直接打印，非实物！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 212,
+      "delta": 14,
+      "actual_gr": 7.07,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "682eb842b6240c00159ab46a",
+      "title": "内科护理学教学ppt课件教案大纲试题呼吸循环消化泌尿资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 73,
+      "delta": 2,
+      "actual_gr": 2.82,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "686513b675650600015f4f22",
+      "title": "速写全体系课程+命题创作体系课程共179节【视频课】赠大纲+素材",
+      "store_name": "袋鼠艺术的店",
+      "store_id": "67cc06ea91a27600159b7689",
+      "price": 79.9,
+      "sold": 100,
+      "delta": 1,
+      "actual_gr": 1.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a881c2cb5514d0001544405",
+      "title": "教师职称全套参考资料，电子版适用初级一级副高级",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 19,
+      "delta": 1,
+      "actual_gr": 5.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68aa86db71b9e200010c49d0",
+      "title": "西方经济学课件ppt教案第二版备课教学大纲电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.8,
+      "sold": 16,
+      "delta": 1,
+      "actual_gr": 6.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa7a73e0838840001782d99",
+      "title": "2026新版思想道德与法治ppt课件教案视频大学思修备课电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 8,
+      "delta": 1,
+      "actual_gr": 14.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8c536952fed4000104ac1e",
+      "title": "2026人教版小学语文一二三四五六年级上下册核心素养教案（全册）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.18,
+      "sold": 3147,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ba6b61fed5490001707f3a",
+      "title": "小学语文知识点归纳1-6年级上下册课件ppt教案电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.9,
+      "sold": 573,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68be9663fed54900018bbefa",
+      "title": "新人教版七上英语词性转换+语篇练习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 523,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6870821be58d070001f7c02f",
+      "title": "对外汉语教学HSK电子版课件123456全教程汉语教师ppt课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 308,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2179b120d7240001cc17fd",
+      "title": "新改版2026小升初语文暑假预科讲通练透教师学生版全word电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.0,
+      "sold": 195,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a85b1fea52c1c000126545c",
+      "title": "2026七上秋季讲义（人教版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 48.0,
+      "sold": 190,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "67f719dfec137400011662e1",
+      "title": "cg教育带背手册教育学心理学教育心理学带背教综带背pdf版",
+      "store_name": "小赵必上岸的店",
+      "store_id": "6751b627c7fb40001506a26b",
+      "price": 15.9,
+      "sold": 146,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "66ed765429e6900001768705",
+      "title": "中职《舞蹈》基础课程教案 96课时含教学大纲 面试辅助",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.8,
+      "sold": 139,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69636bbfce1e9f0001c0ea58",
+      "title": "2026年14605幼儿园课程与教学精串讲视频真题笔记电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 27.9,
+      "sold": 131,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6935357c7a38a6000167c606",
+      "title": "六年级下册语文阅读技巧与模板电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.18,
+      "sold": 78,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6896f9279e8374000111d199",
+      "title": "中小学舞蹈校本资料舞蹈社团教案兴趣小组教学设计方案活动记录",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.99,
+      "sold": 63,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a800d6e532d770001f7e426",
+      "title": "GS爱ti分2026初中语文秋季班讲义教学案全Word可编辑电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 35.0,
+      "sold": 58,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a48d5a788d1c100018a3666",
+      "title": "2026武汉教师编真题+新大纲考点汇总课程课件电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 52,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68a935ef0c1e9b00013323ab",
+      "title": "新人教八年级上册英语电子教材pdf",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 41,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "64879d881bb9f600013cde54",
+      "title": "素描课程教学大纲高清挂图＋可修改源文件",
+      "store_name": "教画画的子绅的店",
+      "store_id": "62987b8342e33a0001827f3d",
+      "price": 25.0,
+      "sold": 38,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "694eab9ab249210001a59e74",
+      "title": "小学语文五年级上册秋季班衔接讲义PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.0,
+      "sold": 34,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68b2986f11843c0001da95d1",
+      "title": "简笔画兴趣社团资料课后延时课件PPT教案电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 29,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "695e30f5110a7f0001a2c067",
+      "title": "26社会工作者考试必背300句/口诀（含讲解）+题库plus+名师冲刺课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.0,
+      "sold": 22,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a986865feda090001f154a1",
+      "title": "100个非遗手工活动课丨50个教案+教学大纲丨美术社团活动电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 19,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a923acad9fb2900011b172f",
+      "title": "2026秋人美版四、五、六年级上册美术教学计划+课时教案+二次备课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c005f5ffa26d0001b0c11b",
+      "title": "原创2026新教材 一年级下册数学人教版 全套资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.5,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d10a24891c6a0015d47ccb",
+      "title": "2026年教师招聘【江江大默写】电子版 咨询",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.7,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "696b298b306dc500016f8892",
+      "title": "中华民族共同体概论课后习题答案课件ppt详细教案笔记资料电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.0,
+      "sold": 11,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69be6f69916f6b0001681d0e",
+      "title": "摄影摄像技术全套教案PPT课件备课讲课资料课程大纲电子版模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 11,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a919abecc9be30001270ae2",
+      "title": "教师节主题a4硬笔书法作品纸空白电子版小学生比赛专用方米田字格",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "687700fe4485460001c3a9af",
+      "title": "2026素描考级1-10级资料电子版（考级大纲+不同级别范画）",
+      "store_name": "67bd39310108640015ec4264",
+      "store_id": "67bd39310108640015ec4264",
+      "price": 16.99,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "696b29433067f40001c952a4",
+      "title": "繁體字視頻學習課程",
+      "store_name": "68d7ed5f19044f0015340eaf",
+      "store_id": "68d7ed5f19044f0015340eaf",
+      "price": 150.0,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "672b45395756d50001afa79f",
+      "title": "漫画体系课件丨大纲目录+PPT+解析图丨电子版（无实物）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "67dfa36be317a3000180b9f4",
+      "title": "自考04579中学语文教学法历年真题及试卷答案+大纲及资料电子",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.88,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3e1336d0e6f200010c0d0d",
+      "title": "PJC Bridge资料（电子版）",
+      "store_name": "67d52ea076e6540015d8cfda",
+      "store_id": "67d52ea076e6540015d8cfda",
+      "price": 19.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6805d493a548d00015665d8a",
+      "title": "上海沪教版初中地理初一二六七年级上下册同步课件PPT教案电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.8,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69243d1328a01200014c96aa",
+      "title": "2026年石河子大学805课程与教学论重点笔记+题库及答案+333教育综",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69534d397cad4e0001d52a09",
+      "title": "小学名著导读PPT课件课外书阅读教案教学指导视频资料电子版素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69302debbb767600154ff171",
+      "title": "MB010-小说写作教程网文大细纲模板课程完全手册电子版技巧素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.58,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68eb73bfd3eed200014c1bba",
+      "title": "折纸兴趣社团资料课后延时课件教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "689029660e13d5000164c24f",
+      "title": "2025年小学语文文学常识整理常识归纳训练强化百度网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6877b172e58d0700010eec62",
+      "title": "a2248#二年级数学上册(2025冀教版)课程纲要(教师用资料)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.0,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "685fa37c835e2500017c798d",
+      "title": "小学大语文体系读写体系PPT教案知识总结电子版一二三四五六年级",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68fbe1d1e0f3b20001e5b5ad",
+      "title": "跨境电子商务英语全套教案word课件ppt教学大纲概述电子商务平台",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0837feab42de0015eab475",
+      "title": "精神科护理学课件PPT知识点总结试习题答案教学大纲电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69fc44d198ac430001f2ae24",
+      "title": "幼小衔接幼升小全套资料教a视频练习试卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "695d9d8d0ba1a4000193cb36",
+      "title": "25年小说写作教程网文大纲模版课程完全手册电子版技巧玄幻素材",
+      "store_name": "694e97b549e5440015cacb93",
+      "store_id": "694e97b549e5440015cacb93",
+      "price": 5.99,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69dd01676ba40800010c6afa",
+      "title": "固定翼无人机技术知识PPT课件WORD教案设计ppt兴趣小组电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a90cf0ccc3e020001e12849",
+      "title": "《Python程序设计语言》电子课件+教学大纲+习题答案+实例源文件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.0,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5cfba901c1af0001f7893f",
+      "title": "小学综合实践活动校本课程电子版10课时45页Word可下载可编辑打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "693d6143040ad400152e6808",
+      "title": "大学中职艺术设计专业素描第二版教学课件PPT教案大纲Word · 标",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.66,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3e74cf654b390001a2bf82",
+      "title": "中国舞蹈史教学PPT课件大纲习题图片素材马工程版备课资料电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.61,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69717bb4b05f88000109d568",
+      "title": "网红爆款少儿爵士舞蹈教案2025版上线电子资料日常成长灵感1",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6923bd8d1b3cbb0015a8ab04",
+      "title": "2026考研日语203真题网课程考研公共日语203单词汇阅读作文电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.18,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "691b51ca16054d0015ed5529",
+      "title": "摄影摄像技术全套教案PPT课件备课讲课资料课程大纲电子版模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.03,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab0d4cdd01399000189777d",
+      "title": "《模拟电子技术基础》教学大纲+PPT课件+教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "687b4f14e58d0700014eca86",
+      "title": "老师教师备课本word电子版学科教学设计模板教案",
+      "store_name": "67d52ea076e6540015d8cfda",
+      "store_id": "67d52ea076e6540015d8cfda",
+      "price": 6.6,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "688816d4f9d7c800011f8876",
+      "title": "xindf小学国际音标教学资料包电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68b30382f38f970001e17ba6",
+      "title": "少儿美术课件创意美术绘画美术课程体系PPT课件+可编辑/课程大纲",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d1f67b3d237900012dc21e",
+      "title": "ICA国际汉语教师考试题库资料历年真题模拟试卷新大纲电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 70.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ea4994ed3b2f000135f2fc",
+      "title": "中华民族共同体概论PPT 教案课件教学大纲16讲电子资料汇总",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68ef9b3cf8d1f00001afce6d",
+      "title": "中小学武术社团教案兴趣小组活动PPT教学计划大纲课件电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68fbe5bae379430001812fe4",
+      "title": "中小学跳绳兴趣小组活动社团教案教学计划设计PPT课件电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68fc55d2ee3e410001b9336d",
+      "title": "大学生创新创业基础教学课件ppt教案word大纲题库思维电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "68feeff0e0f3b2000101a737",
+      "title": "电子学会C++青少年软件编程等级考试1-8级大纲习题历年真题库课程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.46,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "6949212db1e66600014d6b40",
+      "title": "书法练字硬笔机构教师教学大纲全套13",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.69,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69493d7dc3ae5b0001fa08b3",
+      "title": "素描教学课程课件PPT大纲教案素描体系入门到静物组合电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "696ae8bef7c59e000139944b",
+      "title": "幼儿园小学启蒙英语课件教案教学课件互动视频单词语法模板教程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a00ada87daa000017ee2b2",
+      "title": "铁道交通运营管理专业运输法律法规课程教学课件PPT 教案大纲Word",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bff0a315bd74000175cb54",
+      "title": "课程【3ds Max动画制作实例教程】全套PPT课件273页，教案，大纲",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.3,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c1fa2320b4e200018a9fd6",
+      "title": "水粉色彩静物系统初级手绘挂图课程24章节水粉系统初级课程电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.35,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c4b18146fe2a00015f4ea3",
+      "title": "跨境电子商务英语全套教案word课件ppt教学大纲概述电子商",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c5f24a4839a200018ada92",
+      "title": "中国舞蹈史教学PPT课件大纲习题图片素材马工程版备课资料电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.6,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cc9a401053a50001c3d757",
+      "title": "河北事业单位新大纲A/B/C/D/E类备考资料包课程讲义时政电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cf5d929347b100014f7575",
+      "title": "体能核心稳定性训练教学课件PPT含教案大纲Word 速度力量柔韧训练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.78,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d46792667ef500014054c0",
+      "title": "幼儿园教研记录表40/41页可修改电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69dbe2db8c8213000163c002",
+      "title": "hsk电子版真题合集ppt课件材料对外汉语教学课程教案word习题考级",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.18,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ddfee9130dde000181816c",
+      "title": "大学生就业指导双色版教学课件PPT 教案大纲Word形势心态准备技巧",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.18,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ef6a703a4daf0001e6d2a3",
+      "title": "河北事业单位新大纲A/B/C/D/E类备考资料包课程讲义时政电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "LLM网关电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "LLM网关",
+  "slug": "LLM网关"
+}

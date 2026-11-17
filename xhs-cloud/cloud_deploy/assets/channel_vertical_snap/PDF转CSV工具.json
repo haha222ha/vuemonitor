@@ -1,0 +1,917 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "PDF转CSV工具"
+    ],
+    "niche": "PDF转CSV工具"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 0,
+    "active_n": 0,
+    "drive_keywords": [
+      "PDF转CSV工具"
+    ],
+    "pinned": [],
+    "candidates": [],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 1,
+    "sku_n": 62,
+    "sum_delta": 22,
+    "median_price": 10.0,
+    "niche": "PDF转CSV工具",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 62,
+      "sum_delta": 22,
+      "sum_sold": 20019,
+      "top_title": "PDF编辑器会员拆分合并文件加去除水印签名加解密提取压缩工具",
+      "top_delta": 18
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a8a846e91917d0001ff85df",
+      "title": "PDF编辑器会员拆分合并文件加去除水印签名加解密提取压缩工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.98,
+      "sold": 244,
+      "delta": 18,
+      "actual_gr": 7.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69d871ac98fb930001582dfd",
+      "title": "翻译工具升级|PDF/PPT模板|",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 100.0,
+      "sold": 978,
+      "delta": 4,
+      "actual_gr": 0.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6895f6b56d605400013e898e",
+      "title": "全网地图标注店铺公司门店工厂新增定位高德百度腾讯导航位置标记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 16000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "667a25042fbb54000100d255",
+      "title": "零跑T03扩展娱乐功能自定义桌面主题壁纸升级地图导航看视频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.0,
+      "sold": 716,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "67c3338af65889000163345d",
+      "title": "高德百度腾讯全网地图标注商户标注门店商铺新增店铺定位导航位置",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 655,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a3f4ccd55f46a00012b57c2",
+      "title": "聊天记录转文档神器HTML/PDF/docx格式一键转换（仅win10/11）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.0,
+      "sold": 543,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "682d6a21a47eca00013dd660",
+      "title": "ArcGIS/Pro170个在线图源lyr文件地形交通影像标注任意搭配出图",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 250,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a8a846e91917d0001ff85e8",
+      "title": "PDF编辑器会员拆分合并文件加去除水印签名加解密提取压缩工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.98,
+      "sold": 203,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69d7419ce40908000132584f",
+      "title": "定制高德百度腾讯地图标注定位公司店铺工厂添加位置导航标记导航",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 109,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6aafaa95f660cd000137542b",
+      "title": "CAD转PDF图纸转换教学/CAD转图片/CAD转EPS",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.92,
+      "sold": 62,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a684b8784b8ee0001558659",
+      "title": "PDF文档转翻译ppt简历模板快速转换工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 150.0,
+      "sold": 41,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69846512f0c4840001486449",
+      "title": "图书报刊不拆书扫描服务PDF转word字画国画扫描 仿真扫描服务定制",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 25,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "689d783ebc668f00150fd176",
+      "title": "PDF编辑器PDF转Word软件修改拆分合并压缩阅读注释图片转换免费",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69528511dd184400011b944e",
+      "title": "陪孩子走过高中三年  妈妈必备的升学导航和时间规划地图",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 19,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6aa0c43d83882a0015c5357a",
+      "title": "poi数据下载工具支持高德地图爬取最全超多功能1.6版本下载工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.88,
+      "sold": 18,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a63332f90dd0f0001b15d20",
+      "title": "PDF编辑教程|pdf转图片、pdf文件合并|pdf转excel、pdf转word课程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69e5a4b49a289f0015b1b88c",
+      "title": "PDF图片转五线谱软件 乐谱识别转midi xml   支持windows",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6982d1b9b6ceb400011f9020",
+      "title": "PDF增效工具拼版插件Quite Imposing plus4.0/5.0 /5.3中文版永久",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.0,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a3e7d0ebf15d20001bbb999",
+      "title": "PDF软件 PDF拆分合并 PDF页数/页码统计 PDF压缩 PDF转图片",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 95.0,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "68695a2cb93f0e0015578a3e",
+      "title": "caj文件转换器阅读格式CAJ简单PDF转word转excel阅读器CAJ转换器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 13,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a60e6c99799e5001505897e",
+      "title": "poi数据下载工具 高德地图爬取 最全超多功能1.7版 · 默认",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "685a42678b7d6f0001f0312a",
+      "title": "全网地图标注地图标注定位",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 230.0,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "68de2ec67c1a030001325ae0",
+      "title": "苹果快捷方式一键PDF转图像",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "68bd916cf38f970001cfa3fc",
+      "title": "PPT批量转PDF工具-办公神器/支持苹果系统",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.81,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a3bc36ba5457000151289ee",
+      "title": "pdf转word文档软件转换pptexcel图片jpg迅捷修改合并压缩编辑器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.91,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69ab75cb91380100157d7df8",
+      "title": "Q153-傻瓜式地图编辑神器Aerialod 3D城市地图地图生成一键地图",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.41,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69e7775441333c00010cc4d3",
+      "title": "PDF转蓝图软件一键转蓝图插件保留红章转曲去底色动作打印广告店",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6936d87b81623200151b80cd",
+      "title": "文本编辑器 txt/csv大文件打开查看软体工具 使用 · 如图所示",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "698170dc5b50a300016862de",
+      "title": "【自动发货】PDF解密工具 去除PDF权限密码保护限制软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.77,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69957a52890dab0001bcdf0a",
+      "title": "苹果PDF转图片助手·快捷指令",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69d73707c4ccd9000156dd82",
+      "title": "csv大文件拆分工具 超百万行CSV表格拆分 直接下单使用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 85.0,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "687e30c1c34eef0015558d7d",
+      "title": "PDF文档盖章软件 快速批量添加电子盖 骑缝章图片水印工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6943be6e8bd70d0001e91db9",
+      "title": "陕西甘肃宁夏自驾游地图册导航轻松出行路线旅游攻略自驾交通指南",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.8,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "695db3b039b0d9000136be11",
+      "title": "WPS PDF无限制编辑转换｜文档转PDF｜PDF拆分合并｜",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.69,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "68d38aadb7d62b00016fc06d",
+      "title": "CAJ转PDF软件 CAJ转换器 CAJ阅读 CAJ转word CAJ转Excel电子软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a488762964c0f00155f035c",
+      "title": "繁体PDF转简体WORD 照片PDF转word电子版 · 默认",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a5f8212964c0f0015ac3270",
+      "title": "2025导航定位3d立体vr实景街景地图手机教程3D高清卫星",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.02,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "68ca4c03f71ffd0015d6815f",
+      "title": "地图标注商户商铺高德百度位置定位公司店铺商家导航地址认证标记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.0,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "695c71f8a35123000151a915",
+      "title": "舟山市地图 行政区域村镇县 高速国道路铁路 单面小尺寸51*37.5cm",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69576488110a7f0001c9c264",
+      "title": "Excel word格式转换xlsx xls csv txt xml html odt,docx doc pdf",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69e9101c6eeaf70001960fca",
+      "title": "PDF图纸尺寸分类软体识别页面大小数量统计金额设置单价印前工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69eeec7c6eeaf7000127b142",
+      "title": "PDF工具箱万能PDF转换多功能OCR识别PDF软体Word分割处理批量文件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a2819d3a553c30015563293",
+      "title": "PDF转Word软体 PDF编辑器 修改拆分合并压缩阅读注释图片转换pdf",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "692d8abcf71ffd00150d488e",
+      "title": "CAJ转WORD CAJ转PDF CAJ人工转换 WORD排版 PDF编辑 PDF转WORD",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6778fddee4ed1f00150df20a",
+      "title": "美规新款奔驰s级s500中规主机原厂原车主机改carplay实景地图导航",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5000.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a9ffda787c1860015f436b3",
+      "title": "pdf转换cad转换器转pdf转图纸转图片转dwg高版本转低版本软体插件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.88,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a3fa44cc016db0015f1c45c",
+      "title": "0.1块钱小玩意高清卫星地图3D立体导航定位旅游",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.02,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6aa0bf5b0828e600153da89a",
+      "title": "ofd转pdf格式转换软体ofd转换jpg png图片工具ofd阅读器文件工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.88,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a509c0d770495001582635b",
+      "title": "AR带你看国家版图 中国行政地图",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 30.6,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "69353926f1fe0f0015f0831b",
+      "title": "双层pdf制作工具 双层PDF转换工具识别率高 文档专用档案专用软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "694cded28bd70d0001c6ec47",
+      "title": "2024全新版 中国地图贴图 1.1*0.8米 覆膜防水 高清交通行政高清",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6944b6b1d96c450001321618",
+      "title": "义乌市祥图 义乌地图 义乌市地图 浙江省金华义乌交通图",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a68157211bb8700012ee5d5",
+      "title": "安全稳定地图API接口key密钥调用量及成本可控",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "694ca8a923d3ce00015d8292",
+      "title": "2024全新版西藏自治区地图贴图 1.1*0.8米 防水 高清交通行政",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a82681a79b57b0001c481e7",
+      "title": "PDF编辑工具PDF转wordpptexcel图片拆分组织页面永久版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6a870f92cc9be3000149fb5a",
+      "title": "PDF编辑器转word修改Excel拆分合并DC2025/2024软件PPT去水印图片",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 27.04,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6936d8ae9138010015fd01e0",
+      "title": "PDF工具箱pdf加密合并压缩编辑转换分割旋转图片PDF图片编辑软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6944c7969650820001daf6df",
+      "title": "2024全新版 北京 中国地图贴图 1.1*0.8米 覆膜防水 高清交通行政",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 21.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "6988bb728a783800157942a0",
+      "title": "2026版 北京城区图（超全开套封）(1.4M*1M) 中国行政地图",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.08,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "692d8ab65e3b9c00150c3e4a",
+      "title": "CAJ转PDF软件 CAJ转换器 CAJ阅读 CAJ转word CAJ转Excel电子软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "692d8ab2fe39ac0015717f3e",
+      "title": "CAJ转PDF软件 CAJ转word CAJ文件阅读格式转换器 CAJ转Excel工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    },
+    {
+      "goods_id": "692d8aaf4096550015011193",
+      "title": "CAJ转PDF软件 CAJ文件阅读格式转换器 CAJ转word CAJ转Excel工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF转CSV工具"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "PDF转CSV工具",
+  "slug": "PDF转CSV工具"
+}

@@ -1,0 +1,1625 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "申论"
+    ],
+    "niche": "申论"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 75,
+    "active_n": 2,
+    "drive_keywords": [
+      "申论全套答题模板",
+      "申论刷题集2电子资料",
+      "测申论",
+      "申论讲义",
+      "申论行测",
+      "申论资料",
+      "申论规范词",
+      "申论资料包",
+      "教资申论押题",
+      "申论答题模板",
+      "申论电子资料",
+      "申论范文素材",
+      "申论考研试卷",
+      "申论考研押题",
+      "申论历年真题",
+      "申论素材积累",
+      "教资申论面试题",
+      "教资申论模拟题",
+      "考研申论面试题",
+      "考研申论模拟题",
+      "申论笔记 资源",
+      "申论大作文专项",
+      "申论技巧 分享",
+      "申论教资面试题"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "申论全套答题模板",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "vm_sa_remain_20261013_224711",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论刷题集2电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_saas_tier_delta_core_20260812",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "测申论",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论讲义",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论行测",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论规范词",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "教资申论押题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论答题模板",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "|deact_yield_opt_20260928_095452",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论范文素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "恢复831拓展·每日main合并周期|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论考研试卷",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论考研押题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论历年真题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论素材积累",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "pg_high_yield_fill_20261013_183244",
+        "role": "candidate"
+      },
+      {
+        "keyword": "教资申论面试题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "教资申论模拟题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研申论面试题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考研申论模拟题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论笔记 资源",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论大作文专项",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "虚拟增量全量缺口+方向短词（含真题/K12/PPT）",
+        "source": "virt_gap_full_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论技巧 分享",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论教资面试题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论教资资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论考研面试题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论考研模拟题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论考研说课稿",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "申论考研资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "省考申论模拟题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子版公务员申论",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "二建申论复习资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考申论复习资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考申论素材积累",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "SaaS赛道·由saas_exam_literacy迁入合并周期 | restore831_exam_literacy|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "yield_rank_fill_20261009_114352",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公务员申论PDF",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公务员申论电子版",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公务员申论模拟题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公务员申论网盘版",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "国考申论复习资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "教师招聘申论课件",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 15,
+    "sku_n": 80,
+    "sum_delta": 16244,
+    "median_price": 6.9,
+    "niche": "申论",
+    "drive_kw_n": 24
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 66,
+      "sum_delta": 13980,
+      "sum_sold": 187874,
+      "top_title": "【2027国省考】花生笔记总结本逻辑判断推理数量资料分析笔记总结",
+      "top_delta": 1261
+    },
+    {
+      "store_name": "凑和开个店吧的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 36000,
+      "top_title": "2026新款海怪 吹石 东东 procreatePS画世界pro天生会画全套笔刷",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "背背备考的店",
+      "sku_n": 1,
+      "sum_delta": 289,
+      "sum_sold": 3446,
+      "top_title": "2027国省考申论规范词申论人物素材申论金句申论素材包",
+      "top_delta": 289
+    },
+    {
+      "store_name": "6899d1380281b20015dba2e3",
+      "sku_n": 1,
+      "sum_delta": 152,
+      "sum_sold": 1375,
+      "top_title": "2026浙江省时政知识点/时政习题/浙江省情知识/浙江省情习题",
+      "top_delta": 152
+    },
+    {
+      "store_name": "小智学姐（上岸版）的店",
+      "sku_n": 1,
+      "sum_delta": 137,
+      "sum_sold": 2462,
+      "top_title": "2026版公基6000题+三色笔记+高频考点+知识点（电子版）",
+      "top_delta": 137
+    },
+    {
+      "store_name": "晓晓柠檬的店",
+      "sku_n": 1,
+      "sum_delta": 97,
+      "sum_sold": 1903,
+      "top_title": "聂佳类比推理100题刷题乱序版题本+答案解析PDF电子版可下载打印",
+      "top_delta": 97
+    },
+    {
+      "store_name": "菜菜子～的店",
+      "sku_n": 1,
+      "sum_delta": 94,
+      "sum_sold": 8329,
+      "top_title": "30款包浆头像简笔画笔刷/画世界pro画世界/procreate/天生绘画/PS",
+      "top_delta": 94
+    },
+    {
+      "store_name": "张老师教钢琴电子琴的店",
+      "sku_n": 1,
+      "sum_delta": 87,
+      "sum_sold": 708,
+      "top_title": "钢学新手必选从零开始电子琴辅导教材",
+      "top_delta": 87
+    },
+    {
+      "store_name": "灿烂微光的店",
+      "sku_n": 1,
+      "sum_delta": 69,
+      "sum_sold": 845,
+      "top_title": "27最新党章全文划重点考点+试题",
+      "top_delta": 69
+    },
+    {
+      "store_name": "清柚学姐的资料库的店",
+      "sku_n": 1,
+      "sum_delta": 67,
+      "sum_sold": 755,
+      "top_title": "2026年教师招聘教师编备考课件资料包三色笔记思维导图口诀等",
+      "top_delta": 67
+    },
+    {
+      "store_name": "procreate绘画教程的店",
+      "sku_n": 1,
+      "sum_delta": 65,
+      "sum_sold": 6563,
+      "top_title": "200款·ins风可爱装饰小元素绘画素材 文创设计美工头像壁纸可商用",
+      "top_delta": 65
+    },
+    {
+      "store_name": "小红薯696B9DFC的店",
+      "sku_n": 1,
+      "sum_delta": 59,
+      "sum_sold": 6384,
+      "top_title": "可商用平铺背景纹理笔刷",
+      "top_delta": 59
+    },
+    {
+      "store_name": "69296465c26a090015a2a15b",
+      "sku_n": 1,
+      "sum_delta": 58,
+      "sum_sold": 446,
+      "top_title": "音乐格式转换ncm kgma mgg ogg mflac 转mp3歌曲格式转换器",
+      "top_delta": 58
+    },
+    {
+      "store_name": "半月谈公考",
+      "sku_n": 1,
+      "sum_delta": 50,
+      "sum_sold": 730,
+      "top_title": "伊一老师亲编 最新版三色申论金句卡片 素材积累【PDF文档交付】",
+      "top_delta": 50
+    },
+    {
+      "store_name": "星星要努力的店",
+      "sku_n": 1,
+      "sum_delta": 40,
+      "sum_sold": 6445,
+      "top_title": "27国考省考申论规范词（表格版&挖空版）电子版pdf版",
+      "top_delta": 40
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a59a2408846460001dca625",
+      "title": "2027袁东申论领跑营全家桶方法实战大作文超大杯刷题【送网课】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.9,
+      "sold": 3323,
+      "delta": 396,
+      "actual_gr": 13.53,
+      "token_hits": 1,
+      "touch_keywords": [
+        "申论大作文专项"
+      ]
+    },
+    {
+      "goods_id": "6a4a8313f764ee0001d13f51",
+      "title": "2027国省考申论规范词申论人物素材申论金句申论素材包",
+      "store_name": "背背备考的店",
+      "store_id": "6a2ac277bf130800158a46a5",
+      "price": 3.9,
+      "sold": 3446,
+      "delta": 289,
+      "actual_gr": 9.15,
+      "token_hits": 1,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "691c1a4699f0170015118fd7",
+      "title": "8本套送笔】行楷申论字帖新含政治理论27公务员考试练字帖国省考",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1853,
+      "delta": 233,
+      "actual_gr": 14.38,
+      "token_hits": 1,
+      "touch_keywords": [
+        "申论大作文专项"
+      ]
+    },
+    {
+      "goods_id": "6a3134bd590e610001dccf8e",
+      "title": "2027年国考省考申论规范词高频成语1000词4600问资料分析默写",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 343,
+      "delta": 57,
+      "actual_gr": 19.93,
+      "token_hits": 1,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "695cba86526d980001f39bb3",
+      "title": "伊一老师亲编 最新版三色申论金句卡片 素材积累【PDF文档交付】",
+      "store_name": "半月谈公考",
+      "store_id": "62cfe2e51f9e5f0001eaf253",
+      "price": 4.9,
+      "sold": 730,
+      "delta": 50,
+      "actual_gr": 7.35,
+      "token_hits": 1,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "69189bfa43699b0001c6aaac",
+      "title": "27国考省考申论规范词（表格版&挖空版）电子版pdf版",
+      "store_name": "星星要努力的店",
+      "store_id": "6835a8e1896cda0015516224",
+      "price": 7.9,
+      "sold": 6445,
+      "delta": 40,
+      "actual_gr": 0.62,
+      "token_hits": 1,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f63e077d3b3f0001565552",
+      "title": "行政执法申论高频考点整理及万用素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.9,
+      "sold": 504,
+      "delta": 37,
+      "actual_gr": 7.92,
+      "token_hits": 1,
+      "touch_keywords": [
+        "申论大作文专项"
+      ]
+    },
+    {
+      "goods_id": "6aa8f20ba0b6bb0001a2ff47",
+      "title": "【2027国省考】花生笔记总结本逻辑判断推理数量资料分析笔记总结",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.8,
+      "sold": 4813,
+      "delta": 1261,
+      "actual_gr": 35.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论大作文专项"
+      ]
+    },
+    {
+      "goods_id": "6a3afa2c5200e70001e56bbd",
+      "title": "初一初二初三秋季英语落地课程包（新人教版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 38.61,
+      "sold": 2514,
+      "delta": 1091,
+      "actual_gr": 76.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "69a6d9162b49ce000162cdac",
+      "title": "2026新款海怪 吹石 东东 procreatePS画世界pro天生会画全套笔刷",
+      "store_name": "凑和开个店吧的店",
+      "store_id": "69a68f52bd117d001533402f",
+      "price": 6.9,
+      "sold": 36000,
+      "delta": 1000,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "692fe207581ea200157b9b0e",
+      "title": "初中小四门磨耳朵课件 I 史道地生7-9全套",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 59.9,
+      "sold": 14000,
+      "delta": 1000,
+      "actual_gr": 7.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a13c2d1cfd67c000154b9bd",
+      "title": "2026秋小学语文阅读理解答题模板/技巧训练/配套练习/电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.9,
+      "sold": 14000,
+      "delta": 1000,
+      "actual_gr": 7.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "690db00e5c4f1900010c6108",
+      "title": "一年级拼音专项练习电子版 不可编辑修改",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa9db0dd013990001abe420",
+      "title": "【26秋新六上语文】原创~阅读理解考点强攻（电子档PDF）答题模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 1174,
+      "delta": 957,
+      "actual_gr": 441.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa9e70c2054db0001d40621",
+      "title": "音乐格式转换MP3电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.25,
+      "sold": 7962,
+      "delta": 650,
+      "actual_gr": 8.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a52256fb5de6c0001b50dc6",
+      "title": "音频格式处理模板 电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 5124,
+      "delta": 423,
+      "actual_gr": 9.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a44c4e6fcf4ce0001f74953",
+      "title": "音频格式处理模板 电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 5115,
+      "delta": 262,
+      "actual_gr": 5.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a3b965746109700014f0e90",
+      "title": "华罗庚学校数学课本小学初中高中",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.84,
+      "sold": 2449,
+      "delta": 250,
+      "actual_gr": 11.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6ac34323918e030001c7cfe3",
+      "title": "日语学习课件+学习物料+规划课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 327,
+      "delta": 210,
+      "actual_gr": 179.49,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论大作文专项"
+      ]
+    },
+    {
+      "goods_id": "6a858c5084634f000115e755",
+      "title": "海怪吹石东东全绘画软件通用.",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 4056,
+      "delta": 189,
+      "actual_gr": 4.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "684ae07157fa160001b60a40",
+      "title": "JLPT日语N1-N5真题PDF套卷（近30年答案解析、听力原文都有）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 3412,
+      "delta": 169,
+      "actual_gr": 5.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab0ca0d2054db0001b07851",
+      "title": "26教招教综三色笔记+默写+口诀+必背人物+思维导图+简答论述辨析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 777,
+      "delta": 164,
+      "actual_gr": 26.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "69abc8aa7c9c8f00015faafd",
+      "title": "中职语文高职高考单招对口升学百题大过关｜必刷2000题 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 1800,
+      "delta": 158,
+      "actual_gr": 9.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a6f31c52bf2dc0001226d6a",
+      "title": "2026年基金从业资料三色笔记考前12页数字总结等",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 1391,
+      "delta": 155,
+      "actual_gr": 12.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论大作文专项"
+      ]
+    },
+    {
+      "goods_id": "6a38b8105200e70001b0a9d4",
+      "title": "新人教PEP版英语1-6年级上下册课件知识点总结",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 5459,
+      "delta": 152,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "690b7ffe3f37a90001c835bb",
+      "title": "2026浙江省时政知识点/时政习题/浙江省情知识/浙江省情习题",
+      "store_name": "6899d1380281b20015dba2e3",
+      "store_id": "6899d1380281b20015dba2e3",
+      "price": 12.9,
+      "sold": 1375,
+      "delta": 152,
+      "actual_gr": 12.43,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "690a0726e379430001e0a562",
+      "title": "199管综论说文保命万能模板（27年新）电子pdf42页",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 30.9,
+      "sold": 1336,
+      "delta": 149,
+      "actual_gr": 12.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0065133eb97c00010f4257",
+      "title": "CSP/优动漫海怪40支万能笔刷破溃特孩子有福了装饰画布二创",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 5477,
+      "delta": 146,
+      "actual_gr": 2.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a47c532c0b079001577512d",
+      "title": "2026版公基6000题+三色笔记+高频考点+知识点（电子版）",
+      "store_name": "小智学姐（上岸版）的店",
+      "store_id": "6870df1541e93d0015d8e425",
+      "price": 5.88,
+      "sold": 2462,
+      "delta": 137,
+      "actual_gr": 5.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a69675b74bf0000017ab4b0",
+      "title": "2026小学英语语法课件专项训练资料电子版【自动发货】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 1310,
+      "delta": 135,
+      "actual_gr": 11.49,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论全套答题模板"
+      ]
+    },
+    {
+      "goods_id": "69cb6414450d060001929874",
+      "title": "电脑c盘清理空间满了爆红远程瘦身硬盘扩容内存优化弹窗广告清理",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 26.8,
+      "sold": 3543,
+      "delta": 134,
+      "actual_gr": 3.93,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论素材积累"
+      ]
+    },
+    {
+      "goods_id": "6953a448dd1844000135acdd",
+      "title": "画世界pro雪地刷2支［含5张底图］一支重叠一支不重叠",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 5910,
+      "delta": 132,
+      "actual_gr": 2.28,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a184c6e9a00d300015531c1",
+      "title": "procreate笔刷古风书法水墨写字手写瘦金体中文板写毛笔ipad字体",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 2107,
+      "delta": 130,
+      "actual_gr": 6.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9abb61ee83f2000101cfa1",
+      "title": "日系黑白漫画网点十字勾线笔刷 ps 天生会画 画世界pro procreate",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 1777,
+      "delta": 130,
+      "actual_gr": 7.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa05883e18b0e00013824bb",
+      "title": "23000+款常用笔刷合集画世界.procreate.ps.csp",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.98,
+      "sold": 687,
+      "delta": 129,
+      "actual_gr": 23.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5e6d784382e2000129a27f",
+      "title": "【2026年秋季】小学数学单元月考期中期末试卷含答案【PDF版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.8,
+      "sold": 2472,
+      "delta": 127,
+      "actual_gr": 5.42,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6885226cebefca00012c82f2",
+      "title": "2027届全国各地高三模拟卷 全科 每周更新 送历年真题卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 888,
+      "delta": 120,
+      "actual_gr": 15.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "69fd52e030d0860001ccb600",
+      "title": "高考必背60篇古诗文理解性默写情景默写训练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 2150,
+      "delta": 119,
+      "actual_gr": 5.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a85b9648bb06b00018c20ef",
+      "title": "音乐格式转换 支持mgg mflac ogg ncm kgg kgm kwm转mp3 批量操作",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 530,
+      "delta": 117,
+      "actual_gr": 28.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a06d844304f460001c3f7d8",
+      "title": "牛津自然拼读1-5级精品教学课件PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 3781,
+      "delta": 116,
+      "actual_gr": 3.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a924d09813005000187b2cc",
+      "title": "海怪吹石东东procreate画笔PS勾线人像动漫厚涂铅笔描边ipad绘画",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 1337,
+      "delta": 110,
+      "actual_gr": 8.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa3ee7a7a35e600018c64ef",
+      "title": "Procreate/pocket下载/电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.88,
+      "sold": 424,
+      "delta": 110,
+      "actual_gr": 35.03,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e3708e57d5bd00014bbc06",
+      "title": "26学士学位学位英语全套笔记冲刺课程资料练习！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 38.8,
+      "sold": 3533,
+      "delta": 108,
+      "actual_gr": 3.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c0de29e6196b00011f65f7",
+      "title": "2027中考英语复习高频词汇语法阅读理解写作模板讲义资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.99,
+      "sold": 2094,
+      "delta": 105,
+      "actual_gr": 5.28,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6aa78c4a5fb5860001378c9b",
+      "title": "2027考研硕士研究生考试课件习题 政治英语一二199管综 一年有效",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 126.8,
+      "sold": 714,
+      "delta": 102,
+      "actual_gr": 16.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论全套答题模板"
+      ]
+    },
+    {
+      "goods_id": "69cd27ec7dd4a100019e8a30",
+      "title": "初中英语专项训练- 70篇速记短文 | 语法卡片 | 词性转换|写作",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 26.9,
+      "sold": 1658,
+      "delta": 99,
+      "actual_gr": 6.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论全套答题模板"
+      ]
+    },
+    {
+      "goods_id": "6a88681b0db08d0001dd256b",
+      "title": "2026新人教小学英语课件PPT+教案+音视频文件（课件）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.8,
+      "sold": 3961,
+      "delta": 97,
+      "actual_gr": 2.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "68eb3d5fd3eed2000149d79c",
+      "title": "聂佳类比推理100题刷题乱序版题本+答案解析PDF电子版可下载打印",
+      "store_name": "晓晓柠檬的店",
+      "store_id": "6894680318c7e100150fdcd4",
+      "price": 3.99,
+      "sold": 1903,
+      "delta": 97,
+      "actual_gr": 5.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ac8b6a8c6ed5c0001ee0c0e",
+      "title": "组团工作学习生产力手抄报资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 65.0,
+      "sold": 245,
+      "delta": 95,
+      "actual_gr": 63.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0f1980e6f87900011f8018",
+      "title": "30款包浆头像简笔画笔刷/画世界pro画世界/procreate/天生绘画/PS",
+      "store_name": "菜菜子～的店",
+      "store_id": "69a68f52bd117d001533402f",
+      "price": 5.99,
+      "sold": 8329,
+      "delta": 94,
+      "actual_gr": 1.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "675be598ba1e9100014a0c3f",
+      "title": "蕾丝花纹理procreate笔刷ps画世界天生会画服装设计面料薄纱刺绣",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 4623,
+      "delta": 94,
+      "actual_gr": 2.08,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0c1f7e73fad00001dc69df",
+      "title": "新概念英语1-4册中英文对照课文方便背诵PDF高清可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.5,
+      "sold": 2843,
+      "delta": 93,
+      "actual_gr": 3.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "69bb7a9858e96300016890f5",
+      "title": "45天学完初中数学快速构建初中知识框架薛文彬主编学习辅导教材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 44.0,
+      "sold": 2341,
+      "delta": 93,
+      "actual_gr": 4.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a97f6ee8443c40001575fad",
+      "title": "procreate/pocket下载/电子资源模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 835,
+      "delta": 87,
+      "actual_gr": 11.63,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a41f818fcf4ce0001b87b06",
+      "title": "钢学新手必选从零开始电子琴辅导教材",
+      "store_name": "张老师教钢琴电子琴的店",
+      "store_id": "66a99fa6bd86ee0015319eac",
+      "price": 69.0,
+      "sold": 708,
+      "delta": 87,
+      "actual_gr": 14.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a1e8a2dc4095100016aa875",
+      "title": "【2027国省考】花生笔记总结本逻辑判断推理数量资料分析笔记总结",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 119.9,
+      "sold": 5350,
+      "delta": 86,
+      "actual_gr": 1.63,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论大作文专项"
+      ]
+    },
+    {
+      "goods_id": "68c03de55ad63d00017a231d",
+      "title": "​26成人高考专升本/高起专/高起本 课件精讲+习题+笔记 1年有效",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 701,
+      "delta": 80,
+      "actual_gr": 12.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a2cf48040cf2900013f73e0",
+      "title": "银行招聘考点背诵刷题练习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 4275,
+      "delta": 76,
+      "actual_gr": 1.81,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8ac12b2e2aa800018736ea",
+      "title": "blender 3dmax maya C4D四边形网格模型重拓扑工具 QuadRemesher",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.98,
+      "sold": 98,
+      "delta": 76,
+      "actual_gr": 345.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a93c2e4a9bd7700011410ba",
+      "title": "万能小水印-画世界pro笔刷procreate笔刷png可商素材水印素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 920,
+      "delta": 73,
+      "actual_gr": 8.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ea41e639916f000104141d",
+      "title": "可商用Q版笔刷280支懒人必备",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.9,
+      "sold": 1032,
+      "delta": 72,
+      "actual_gr": 7.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6875b352417c3f0001710944",
+      "title": "2026北京海淀区社区工作者考前冲刺直播课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 97,
+      "delta": 70,
+      "actual_gr": 259.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1147b25566b00001ef4231",
+      "title": "27最新党章全文划重点考点+试题",
+      "store_name": "灿烂微光的店",
+      "store_id": "675b9f2b4498fe0015d9a17c",
+      "price": 7.99,
+      "sold": 845,
+      "delta": 69,
+      "actual_gr": 8.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a633604c6180800011b5551",
+      "title": "27考研政治口诀大全，乘风口诀大全，999个高频干扰项电子版PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 94.0,
+      "sold": 286,
+      "delta": 69,
+      "actual_gr": 31.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b7ad35771a6700012ad479",
+      "title": "2026年教师招聘教师编备考课件资料包三色笔记思维导图口诀等",
+      "store_name": "清柚学姐的资料库的店",
+      "store_id": "691317c3c338fb0015629b77",
+      "price": 9.99,
+      "sold": 755,
+      "delta": 67,
+      "actual_gr": 9.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a2bd0608330830001b334ba",
+      "title": "小学26字母自然拼读+音标规则+国际音标练习题+音标思维导图资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 2330,
+      "delta": 66,
+      "actual_gr": 2.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6a043741304f46000182340b",
+      "title": "200款·ins风可爱装饰小元素绘画素材 文创设计美工头像壁纸可商用",
+      "store_name": "procreate绘画教程的店",
+      "store_id": "65fc0149caa0cb0001a14a2c",
+      "price": 4.99,
+      "sold": 6563,
+      "delta": 65,
+      "actual_gr": 1.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6932f90dbf0233000189a952",
+      "title": "马克思主义政治经济学·期末复习资料——考点/总结/笔记-128",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 975,
+      "delta": 63,
+      "actual_gr": 6.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论大作文专项"
+      ]
+    },
+    {
+      "goods_id": "68a1d67411247e0001455b4c",
+      "title": "【画世界软件专用】马铃鼠平涂笔刷 橱窗下滑有具体的导入教程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 7585,
+      "delta": 61,
+      "actual_gr": 0.81,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6932967114f9d800014f70d1",
+      "title": "可商用平铺背景纹理笔刷",
+      "store_name": "小红薯696B9DFC的店",
+      "store_id": "66fceb49ff158e0015b5a513",
+      "price": 3.0,
+      "sold": 6384,
+      "delta": 59,
+      "actual_gr": 0.93,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa7f9ea8a796600011ad88f",
+      "title": "50支·英文混排字体字素 插画头像美工拼贴可商用素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 581,
+      "delta": 59,
+      "actual_gr": 11.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4bb4c8f99fca0001779730",
+      "title": "音乐格式转换ncm kgma mgg ogg mflac 转mp3歌曲格式转换器",
+      "store_name": "69296465c26a090015a2a15b",
+      "store_id": "69296465c26a090015a2a15b",
+      "price": 8.88,
+      "sold": 446,
+      "delta": 58,
+      "actual_gr": 14.95,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "680adf9991d86000019c82c1",
+      "title": "【2027新高考】精华一轮+二轮复习资料专项练习九科知识点电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 3791,
+      "delta": 56,
+      "actual_gr": 1.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论范文素材"
+      ]
+    },
+    {
+      "goods_id": "6aa807810e3e870001e8a222",
+      "title": "人教精通版（三起）四五六上英语语法每日一练含答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.8,
+      "sold": 250,
+      "delta": 56,
+      "actual_gr": 28.87,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论全套答题模板"
+      ]
+    },
+    {
+      "goods_id": "695b0b07ac83a2000127fc29",
+      "title": "画世界pro包浆笔刷3支",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 9778,
+      "delta": 55,
+      "actual_gr": 0.57,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a141c32e6d02a00019f24d9",
+      "title": "26秋【沪教63制】七上英语U1-U8语法\\阅读\\作文\\提分练习题教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.98,
+      "sold": 680,
+      "delta": 55,
+      "actual_gr": 8.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论全套答题模板"
+      ]
+    },
+    {
+      "goods_id": "68e3a9d28aa57600019c385d",
+      "title": "2027考研政治英语数学专业课全程班资料汇总送26",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 560,
+      "delta": 55,
+      "actual_gr": 10.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3fd439bf15d20001d98a69",
+      "title": "27国考 近十年真题&解析 题型分类汇总（26真题已更新）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.99,
+      "sold": 74,
+      "delta": 55,
+      "actual_gr": 289.47,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8d2a0bb5514d0001d6ebbe",
+      "title": "N1语法笔记 · 多角度串联日语语法知识网 教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.9,
+      "sold": 324,
+      "delta": 53,
+      "actual_gr": 19.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论大作文专项"
+      ]
+    },
+    {
+      "goods_id": "6a990d0532266200019c6865",
+      "title": "新版九上可用电子资料/道法单元练习题/选择+大题/带解析pdf可打",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.5,
+      "sold": 215,
+      "delta": 53,
+      "actual_gr": 32.72,
+      "token_hits": 0,
+      "touch_keywords": [
+        "申论刷题集2电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "申论",
+  "slug": "申论"
+}

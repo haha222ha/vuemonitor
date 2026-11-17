@@ -1,17 +1,9 @@
 {
   "ok": true,
   "snap": true,
-  "snap_at": "2026-11-17T17:58:00",
-  "n": 25,
+  "snap_at": "2026-11-17T18:06:29",
+  "n": 49,
   "items": [
-    {
-      "niche": "测评",
-      "slug": "测评",
-      "ok": true,
-      "items_n": 80,
-      "sellers_n": 33,
-      "file": "vertical_snap/测评.json"
-    },
     {
       "niche": "拼豆",
       "slug": "拼豆",
@@ -203,6 +195,206 @@
       "items_n": 27,
       "sellers_n": 5,
       "file": "vertical_snap/提示词调试工具.json"
+    },
+    {
+      "niche": "提示词共享平台",
+      "slug": "提示词共享平台",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 10,
+      "file": "vertical_snap/提示词共享平台.json"
+    },
+    {
+      "niche": "提示词收藏工具",
+      "slug": "提示词收藏工具",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 22,
+      "file": "vertical_snap/提示词收藏工具.json"
+    },
+    {
+      "niche": "团队prompt共享",
+      "slug": "团队prompt共享",
+      "ok": true,
+      "items_n": 2,
+      "sellers_n": 2,
+      "file": "vertical_snap/团队prompt共享.json"
+    },
+    {
+      "niche": "文档AI助手",
+      "slug": "文档AI助手",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 3,
+      "file": "vertical_snap/文档AI助手.json"
+    },
+    {
+      "niche": "文档问答机器人",
+      "slug": "文档问答机器人",
+      "ok": true,
+      "items_n": 8,
+      "sellers_n": 5,
+      "file": "vertical_snap/文档问答机器人.json"
+    },
+    {
+      "niche": "知识库AI工具",
+      "slug": "知识库AI工具",
+      "ok": true,
+      "items_n": 24,
+      "sellers_n": 3,
+      "file": "vertical_snap/知识库AI工具.json"
+    },
+    {
+      "niche": "知识库AI收费",
+      "slug": "知识库AI收费",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 11,
+      "file": "vertical_snap/知识库AI收费.json"
+    },
+    {
+      "niche": "小学资料",
+      "slug": "小学资料",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 14,
+      "file": "vertical_snap/小学资料.json"
+    },
+    {
+      "niche": "考证资料",
+      "slug": "考证资料",
+      "ok": true,
+      "items_n": 26,
+      "sellers_n": 4,
+      "file": "vertical_snap/考证资料.json"
+    },
+    {
+      "niche": "设计素材",
+      "slug": "设计素材",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 37,
+      "file": "vertical_snap/设计素材.json"
+    },
+    {
+      "niche": "初中资料",
+      "slug": "初中资料",
+      "ok": true,
+      "items_n": 60,
+      "sellers_n": 1,
+      "file": "vertical_snap/初中资料.json"
+    },
+    {
+      "niche": "公考资料",
+      "slug": "公考资料",
+      "ok": true,
+      "items_n": 76,
+      "sellers_n": 5,
+      "file": "vertical_snap/公考资料.json"
+    },
+    {
+      "niche": "其他虚拟",
+      "slug": "其他虚拟",
+      "ok": true,
+      "items_n": 2,
+      "sellers_n": 2,
+      "file": "vertical_snap/其他虚拟.json"
+    },
+    {
+      "niche": "考研资料",
+      "slug": "考研资料",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 12,
+      "file": "vertical_snap/考研资料.json"
+    },
+    {
+      "niche": "高中资料",
+      "slug": "高中资料",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 4,
+      "file": "vertical_snap/高中资料.json"
+    },
+    {
+      "niche": "测评",
+      "slug": "测评",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 33,
+      "file": "vertical_snap/测评.json"
+    },
+    {
+      "niche": "心理测评",
+      "slug": "心理测评",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 40,
+      "file": "vertical_snap/心理测评.json"
+    },
+    {
+      "niche": "行测",
+      "slug": "行测",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 15,
+      "file": "vertical_snap/行测.json"
+    },
+    {
+      "niche": "申论",
+      "slug": "申论",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 15,
+      "file": "vertical_snap/申论.json"
+    },
+    {
+      "niche": "公考",
+      "slug": "公考",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 14,
+      "file": "vertical_snap/公考.json"
+    },
+    {
+      "niche": "考研",
+      "slug": "考研",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 26,
+      "file": "vertical_snap/考研.json"
+    },
+    {
+      "niche": "雅思",
+      "slug": "雅思",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 21,
+      "file": "vertical_snap/雅思.json"
+    },
+    {
+      "niche": "托福",
+      "slug": "托福",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 19,
+      "file": "vertical_snap/托福.json"
+    },
+    {
+      "niche": "简历",
+      "slug": "简历",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 16,
+      "file": "vertical_snap/简历.json"
+    },
+    {
+      "niche": "面试",
+      "slug": "面试",
+      "ok": true,
+      "items_n": 80,
+      "sellers_n": 23,
+      "file": "vertical_snap/面试.json"
     }
   ],
   "note": "垂类静态短名单 · 首屏读 vertical_snap；翻页/新词可降级 API"

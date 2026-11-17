@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "批量文案生成工具"
+    ],
+    "niche": "批量文案生成工具"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "批量文案生成工具电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "批量文案生成工具电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "title_fallback",
+  "summary": {
+    "seller_n": 0,
+    "sku_n": 0,
+    "sum_delta": 0,
+    "median_price": null,
+    "niche": "批量文案生成工具",
+    "drive_kw_n": 1
+  },
+  "sellers": [],
+  "items": [],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "批量文案生成工具",
+  "slug": "批量文案生成工具"
+}

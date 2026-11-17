@@ -1,0 +1,385 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "考证资料"
+    ],
+    "niche": "考证资料"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 0,
+    "active_n": 0,
+    "drive_keywords": [
+      "考证资料"
+    ],
+    "pinned": [],
+    "candidates": [],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords+title",
+  "summary": {
+    "seller_n": 4,
+    "sku_n": 26,
+    "sum_delta": 1,
+    "median_price": 9.9,
+    "niche": "考证资料",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 23,
+      "sum_delta": 1,
+      "sum_sold": 61,
+      "top_title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "top_delta": 1
+    },
+    {
+      "store_name": "67d9a46d8622af00159bf272",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 122,
+      "top_title": "【拍下不退】2025心理咨询师考证资料全套（包括历年学习资料）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "69635171dc83d70015bb42ed",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 4,
+      "top_title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "top_delta": 0
+    },
+    {
+      "store_name": "墨香丨小栈的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1,
+      "top_title": "021中医经典考证资料合集高清PDF网盘秒发",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a0e82d5cf3717001562a49d",
+      "title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 1,
+      "delta": 1,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "684021f33aaa1e000192454d",
+      "title": "【拍下不退】2025心理咨询师考证资料全套（包括历年学习资料）",
+      "store_name": "67d9a46d8622af00159bf272",
+      "store_id": "67d9a46d8622af00159bf272",
+      "price": 7.56,
+      "sold": 122,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "68367248f078780001cae486",
+      "title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 57,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "69a2a595b95d280015af47cc",
+      "title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "store_name": "69635171dc83d70015bb42ed",
+      "store_id": "69635171dc83d70015bb42ed",
+      "price": 8.41,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "69b4db19ab6d1e0001bee2b3",
+      "title": "021中医经典考证资料合集高清PDF网盘秒发",
+      "store_name": "墨香丨小栈的店",
+      "store_id": "69a83a7072327400155c4a07",
+      "price": 7.8,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "698724a3a60bac000111bad7",
+      "title": "American TESOL Advanced Certificate考证资料同时辅助拿证",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a35c7a139d60d0001c59f9e",
+      "title": "CDA数据分析师课程level1 level2考试题库视频教程考证资料2026",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 137.6,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a35c7a139d60d0001c59fa7",
+      "title": "CDA数据分析师课程level1 level2考试题库视频教程考证资料2026",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 179.0,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a097be0a54570001500daf1",
+      "title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.66,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a35c7a139d60d0001c59f98",
+      "title": "CDA数据分析师课程level1 level2考试题库视频教程考证资料2026",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 37.7,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a40d680a1b43600013261ae",
+      "title": "心理健康b/证考证资料大全",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a5585b3fb672a0015810846",
+      "title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.41,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a5e103dd528ea0015a15d3b",
+      "title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a82bb2b69cb0d0015f9ffaf",
+      "title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a9d5976ef956300010a727a",
+      "title": "导游考证资料合集网课讲义历年真题模拟考应变技能知识等",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6aaa1cf5f660cd00018a2452",
+      "title": "2026财会考证资料网课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.6,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6ab1cc4e7116f0000163587a",
+      "title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.05,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "676c075c37e09b00015f428a",
+      "title": "第三方人社补贴考证资料（职业等级证书）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6ad040a30fbd040015ed7683",
+      "title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "68ec99c9e0f3b20001330fe4",
+      "title": "中英文完整版北京故宫博物院全景详细简短导游解说词导游考证资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "69873d27d5afea0001587214",
+      "title": "American TESOL Children Certificate考证资料同时辅助拿证",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "699e74f7e30b940015d3960c",
+      "title": "北京故宫博物院中英文完整版全景详细简短导游解说词导游考证资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "69ba1d9df1fe0f0015d1511d",
+      "title": "【拍下不退】2025心理咨询师考证资料全套（包括历年学习资料）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "69d0bf5c10b42d00019bd775",
+      "title": "CDA数据分析师课程level1 level2考试题库视频教程考证资料2026",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 37.7,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "69d26c7f4ee72d000104144c",
+      "title": "CDA数据分析师课程level1 level2考试题库视频教程考证资料2026",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 37.7,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "69f6bdb487c18600153a98d9",
+      "title": "战舰解剖：日本大和号战列舰 模型考证资料 英语电子书195页",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "考证资料",
+  "slug": "考证资料"
+}

@@ -1,0 +1,81 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "其他虚拟"
+    ],
+    "niche": "其他虚拟"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 0,
+    "active_n": 0,
+    "drive_keywords": [
+      "其他虚拟"
+    ],
+    "pinned": [],
+    "candidates": [],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords+title",
+  "summary": {
+    "seller_n": 2,
+    "sku_n": 2,
+    "sum_delta": 0,
+    "median_price": 1.0,
+    "niche": "其他虚拟",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "杭州保障房安居人才服务的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 153,
+      "top_title": "A西红柿爱番茄其他虚拟定制第四弹如图",
+      "top_delta": 0
+    },
+    {
+      "store_name": "（未知店）",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 15,
+      "top_title": "番茄哥推荐西湖区3大人才公寓其他虚拟定制！持续更新！",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "69aea5fa7c9c8f0001b3a367",
+      "title": "A西红柿爱番茄其他虚拟定制第四弹如图",
+      "store_name": "杭州保障房安居人才服务的店",
+      "store_id": "69a17fd1c8d10300150ef508",
+      "price": 0.1,
+      "sold": 153,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "69c3a77ea20c21000131c9b4",
+      "title": "番茄哥推荐西湖区3大人才公寓其他虚拟定制！持续更新！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "其他虚拟",
+  "slug": "其他虚拟"
+}

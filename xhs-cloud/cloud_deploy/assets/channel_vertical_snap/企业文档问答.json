@@ -1,0 +1,986 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "企业文档问答"
+    ],
+    "niche": "企业文档问答"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "企业文档问答电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "企业文档问答电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 5,
+    "sku_n": 64,
+    "sum_delta": 105,
+    "median_price": 56.8,
+    "niche": "企业文档问答",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "69296465c26a090015a2a15b",
+      "sku_n": 1,
+      "sum_delta": 58,
+      "sum_sold": 446,
+      "top_title": "音乐格式转换ncm kgma mgg ogg mflac 转mp3歌曲格式转换器",
+      "top_delta": 58
+    },
+    {
+      "store_name": "（未知店）",
+      "sku_n": 60,
+      "sum_delta": 47,
+      "sum_sold": 18978,
+      "top_title": "mp3随身听蓝牙版高中生mp4学生听歌专用看小说触屏版电子书阅读器",
+      "top_delta": 35
+    },
+    {
+      "store_name": "梵沐旗舰店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 5819,
+      "top_title": "pa03wifi mp3学生党随身听可联网mp4推荐蓝牙听歌英语音乐播放器",
+      "top_delta": 0
+    },
+    {
+      "store_name": "啊哒哒的资料库的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 25,
+      "top_title": "音频转谱  AI扒谱神器软件一键扒谱神器 MP3转五线谱 win+mac",
+      "top_delta": 0
+    },
+    {
+      "store_name": "阳阳阳博士的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 17,
+      "top_title": "ncm格式批量无损转换mp3 flac不限次使用电脑win系统mac转",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a4bb4c8f99fca0001779730",
+      "title": "音乐格式转换ncm kgma mgg ogg mflac 转mp3歌曲格式转换器",
+      "store_name": "69296465c26a090015a2a15b",
+      "store_id": "69296465c26a090015a2a15b",
+      "price": 8.88,
+      "sold": 446,
+      "delta": 58,
+      "actual_gr": 14.95,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "65684ee47a4880000160678d",
+      "title": "mp3随身听蓝牙版高中生mp4学生听歌专用看小说触屏版电子书阅读器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 59.0,
+      "sold": 174,
+      "delta": 35,
+      "actual_gr": 25.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "66e28b1f17da7f00019d5f15",
+      "title": "BF12mp3mp4学生党推荐可上网初高中生随声听英语在线听歌拍照搜题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 399.0,
+      "sold": 307,
+      "delta": 8,
+      "actual_gr": 2.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "691c33e7603b4e0001b9bed5",
+      "title": "mp3随身听学生党推荐mp4高中学生专用英语听力音乐播放器蓝牙听歌",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 179.0,
+      "sold": 143,
+      "delta": 3,
+      "actual_gr": 2.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "68624298835e250001a9ded4",
+      "title": "触屏MP3播放器蓝牙mp4随身听英语听力高中生专用可插卡看电子书P5",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 65.9,
+      "sold": 49,
+      "delta": 1,
+      "actual_gr": 2.08,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "646ac809ef43dc0001cd0270",
+      "title": "pa03wifi mp3学生党随身听可联网mp4推荐蓝牙听歌英语音乐播放器",
+      "store_name": "梵沐旗舰店",
+      "store_id": "6458ba51b05b4d000198a721",
+      "price": 199.0,
+      "sold": 5819,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "66a1d28d4421480001d0ce7d",
+      "title": "数据线收纳包手机数码电子配件保护布袋旅行收纳袋子充电宝充电器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 3436,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "662e458c30b5ae0001580c29",
+      "title": "迪士尼行李寄存、一站式服务、省心省力",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 30.0,
+      "sold": 3223,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ad564dac2e1900012932c2",
+      "title": "新款 旅行包【牛津布-可套拉杆箱】 可折叠 登机包 大容量防水包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.0,
+      "sold": 2359,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6878e520071cdc00012340ab",
+      "title": "收纳包多功能数码配件包电子产品收纳袋旅行便携耳机充电器化妆包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.99,
+      "sold": 1343,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6590ed8160d1170001a4ea71",
+      "title": "全面屏蓝牙MP3随身听学生版MP4无损音乐播放器mp5超薄mp6录音笔",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 87.0,
+      "sold": 1292,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8950e216b37a001505124f",
+      "title": "#ININ海岛旅行袋手提文件袋上班通勤考试大容量试卷资料档案袋BF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.8,
+      "sold": 1046,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "67f5ed253d8f3800016ae3d5",
+      "title": "mp4推荐学生专用mp5触屏版高中生看小说mp3推荐随身听听歌连蓝牙",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 84.0,
+      "sold": 1030,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "64c0b75433763c0001fa6c37",
+      "title": "摩纳世「Packing Cubes」行李箱旅行抗菌压缩收纳袋",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 458.0,
+      "sold": 940,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "669f171a8dda1d00011afba4",
+      "title": "压缩旅行收纳套装行李箱分类整理内衣服鞋数码化妆洗漱防水收纳袋",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 77.0,
+      "sold": 735,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "66835ab1e401d60001c5e695",
+      "title": "mp3随身听学生版蓝牙听歌神器mp4学生专用款音乐播放器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 169.0,
+      "sold": 413,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a167b7c6e37310001ea17ac",
+      "title": "酷狗音乐转MP3 kgm kgma转mp3 flac无损批量 电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 325,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "686e3cc680b7300001d49030",
+      "title": "可外放学生随身听MP3听歌专用迷你便携播放器高中生英语听力运动",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 276,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6682618ba9c8b70001ed721b",
+      "title": "mp3随身听mp4学生党推荐可上网蓝牙听歌看视频设备神器播放器平价",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 271,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6721d89853432500017fbf77",
+      "title": "BF66 mp4mp5wifi可上网播放器听歌小说专用玩游戏安卓14看视频mp6",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 599.0,
+      "sold": 190,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6821619010039a0001275459",
+      "title": "mp3mp4学生党推荐vlog随身听可上网拍照听歌英语用wifi音乐播放器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 259.0,
+      "sold": 189,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a116117cfd67c000119d58f",
+      "title": "高保真无线音乐播放器便携HIFI音质MP3迷你音箱",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 200.0,
+      "sold": 170,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "67596627bdb5900001dfb851",
+      "title": "小圆听mp3mp4学生党推荐初高中生听歌英语听力蓝牙随身听平价好用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 229.0,
+      "sold": 168,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "68dbd59a702da1000160aefd",
+      "title": "mp4学生专用触屏版看小说听歌mp3随身听可连蓝牙学生版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 56.8,
+      "sold": 139,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2d1e1a413f3500018449d7",
+      "title": "迷你MP3播放器高保真无损音质便携式音乐播放设备",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 145.0,
+      "sold": 79,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "67c2603df2b3fa00152802ed",
+      "title": "外响mp3学生学习随身听简约卡通运动插卡播放器带内存卡全套",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.0,
+      "sold": 64,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0ee22e189a9c00017d70dd",
+      "title": "mp4wifi可上网mp5听歌播放器随身听mp3看电影小说阅读器mp6番茄小",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 408.0,
+      "sold": 44,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4cb296afb8db00015c01da",
+      "title": "影匠大屏蓝牙MP3随身听初高中专用听歌看小说学英语数码播放器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.2,
+      "sold": 43,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "677de3b89548e10001a2f92f",
+      "title": "蓝牙版MP3学生随身听带外放便携式运动跑步音乐播放器初高中听力",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 40.0,
+      "sold": 42,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a796ed079b57b0001e0819f",
+      "title": "MP3播放器WiFi可上网MP4蓝牙学生随身听",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 306.0,
+      "sold": 42,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6738df46b251a3000137b192",
+      "title": "卡通迷你饼干插卡式MP3播放器音乐随身听可爱学生跑步mp3听歌神器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.0,
+      "sold": 39,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "68453e4c801a240001a4d9e9",
+      "title": "蓝牙MP3听歌学生版可插卡无屏幕播放器超长续航便携式随身听高清",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 40.99,
+      "sold": 39,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "68e8c679403edf001517afec",
+      "title": "音频转谱mp3转五线谱AI扒谱神器软件一键扒谱神器win mac电脑midi",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.8,
+      "sold": 38,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6899e89caa1e7b001582c995",
+      "title": "音频转谱mp3转五线谱AI扒谱神器软件一键扒谱神器win mac电脑midi",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.8,
+      "sold": 37,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6831972cbc06d200017cfcb3",
+      "title": "mp3 mp4学生英语随身听用播放器有屏运动录音外放响自带内存迷你",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 57.75,
+      "sold": 34,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "687872050e13d50001e51da6",
+      "title": "墨水屏mp3电纸书阅读器学生党版随身听mp4看小说音乐蓝牙播放器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 279.0,
+      "sold": 30,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "683eb662f078780001ff9a1f",
+      "title": "mp3随身听学生兵哥mp4高中生专用WiFi可上网英语听力播放器蓝牙",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 220.0,
+      "sold": 27,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "69042615c1654800155efa35",
+      "title": "音频转谱  AI扒谱神器软件一键扒谱神器 MP3转五线谱 win+mac",
+      "store_name": "啊哒哒的资料库的店",
+      "store_id": "690211147f479e0015c7658a",
+      "price": 16.8,
+      "sold": 25,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e5c5e4933b030001d57940",
+      "title": "充电宝数据线收纳包移动电源布袋硬盘盒子手机保护套适可携式随身",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.5,
+      "sold": 25,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1ff657cd75c30001e98917",
+      "title": "影匠MP4全面屏学生专用随身听听歌看小说学英语播放器连蓝牙MP3",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 43.4,
+      "sold": 23,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "67c531a0eef18200014f8846",
+      "title": "实拍WiFi上网mp4学生专用蓝牙视频小说歌曲播放器mp5",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 237.0,
+      "sold": 22,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "694fb2357cad4e00018798f9",
+      "title": "ncm格式批量无损转换mp3 flac不限次使用电脑win系统mac转",
+      "store_name": "阳阳阳博士的店",
+      "store_id": "68c99c8396d41100154d9a1b",
+      "price": 8.41,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a69af277350260001af03c9",
+      "title": "人工提取MP4代转音频MP3 音乐",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "67e99a26a548d00015fd3cee",
+      "title": "音乐外放播放器学生专用听歌神器mp3随身听初高中生迷你便携运动",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.0,
+      "sold": 14,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "69eed6ea9dea2d0001e255e5",
+      "title": "mp4wifi可上网mp5全面屏mp3随身听学生版看小说超薄播放器mp6",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 174.0,
+      "sold": 13,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "69959b5d79e41000153f39e5",
+      "title": "mp3MP4可以看小说音乐播放器学生运动跑步听力有屏随身听包邮便宜",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.82,
+      "sold": 11,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0fcf96ccb0ab0001bc47ac",
+      "title": "外放无需网络学生随身听MP3听歌专用迷你便携播放器英语听力小说",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.5,
+      "sold": 11,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa3e0bdae72f00015872d5",
+      "title": "u盘mp3听歌推荐学生党便宜可外放随身听长续航触屏便携可连蓝牙",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 259.0,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6944b8aaae586c00016d49d4",
+      "title": "无线插卡MP3学生MP3随身听便携播放器高中生英语听力运动小型MP4",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.9,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0fd0ad0012710001a45663",
+      "title": "可外放学生随身听MP3听歌便携播放器高中生英语小说听力",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.5,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6841bf2e6aec03001512fa52",
+      "title": "跨境电商批发学生MP3蓝牙MP4电子书外放小说MP5播放器厂家",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.0,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "691a9fd293e3a600013b3782",
+      "title": "学生专用mp4全面屏mp5音乐视频播放器mp3随身听蓝牙mp6看小说神器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 99.0,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab1eee2dae72f000145081c",
+      "title": "刘善人便携挂脖随身听插卡MP3播放器播放机音乐机24小时循环播课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 159.0,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6926527a14b52600016f85c7",
+      "title": "wifi可上网mp4播放器随身听学生mp3高中生专用英语听力蓝牙MP5MP6",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 249.0,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "687e09713b9d4700152c4e53",
+      "title": "新版QQ音乐转mp3格式mgg ogg mflac mac音频解码下载转换器软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "67b01df1d61c3f001508c48b",
+      "title": "mp4看小说触屏版电子书阅读器p4MP5mp3听歌随身听可连蓝牙学批发",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 70.5,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a91b79945b7670001b1a7de",
+      "title": "q音乐转换mgg ogg转换mp3 flac mp3格式转换人工转码",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "69295e95c34eef0015a257b7",
+      "title": "学生版mp3随身听音乐播放器蓝牙迷你有屏英语看小说高中生",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 129.0,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "68b2b456f38f970001dec57c",
+      "title": "视频音频批量转字幕工具mp3录音mp4生成txt srt多语言转换windows",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a67a7ea24f044000117eb3a",
+      "title": "音频音乐格式转换kgm/ogg/flac/kwm/mgg/ncm转mp3音乐转换",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a97b07099f4120001fd0a74",
+      "title": "跨境新品火山数码收纳包旅行数据线充电宝电子产品设备硬盘保护包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 41.23,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3e2681c0c9a7000149af5d",
+      "title": "喜马拉雅音频下载xm转mp3 格式转换器软件录音文件有声小说",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.87,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aabc13ed528ea0015be5d81",
+      "title": "轻量化旅行收纳袋行李箱衣物脏衣服分装整理包防泼水旅游出差便携",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 124.88,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    },
+    {
+      "goods_id": "6980bb0d4937e70001d123d2",
+      "title": "格式工厂电脑版视频音频图片格式转换软件mp3转midi工具拼接截取",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "企业文档问答电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "企业文档问答",
+  "slug": "企业文档问答"
+}

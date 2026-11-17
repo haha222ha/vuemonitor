@@ -1,0 +1,1553 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "心理测评"
+    ],
+    "niche": "心理测评"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 7,
+    "active_n": 1,
+    "drive_keywords": [
+      "心理测评电子资料",
+      "心理测评",
+      "焦虑躯体化心理测评",
+      "MBTI测试 / 心理测评",
+      "90抑郁焦虑专业线上心理测评",
+      "测试词根+心理=心理测评虚拟产品",
+      "专业抑郁焦虑全面心理测评电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "心理测评电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_saas_tier_delta_core_20260812|deact_yield_opt_20260928_095452",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "心理测评",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virt_kw_cross_opt_demote",
+        "role": "candidate"
+      },
+      {
+        "keyword": "焦虑躯体化心理测评",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "补齐每日主队列至3000·20260901|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "MBTI测试 / 心理测评",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "90抑郁焦虑专业线上心理测评",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "误判零产恢复：新词或未采过",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "测试词根+心理=心理测评虚拟产品",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "专业抑郁焦虑全面心理测评电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "deactivated_saas_tier_delta_core_20260812",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 45,
+    "sku_n": 80,
+    "sum_delta": 28434,
+    "median_price": 5.98,
+    "niche": "心理测评",
+    "drive_kw_n": 7
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 35,
+      "sum_delta": 12647,
+      "sum_sold": 204670,
+      "top_title": "【自动发货】SCL-90 线上专业抑郁焦虑全面心理测评",
+      "top_delta": 4000
+    },
+    {
+      "store_name": "小兔的知心研究所的店",
+      "sku_n": 1,
+      "sum_delta": 3000,
+      "sum_sold": 62000,
+      "top_title": "SCL心理健康自测问卷-专业报告",
+      "top_delta": 3000
+    },
+    {
+      "store_name": "宁铄心理的店",
+      "sku_n": 2,
+      "sum_delta": 2048,
+      "sum_sold": 20231,
+      "top_title": "抑郁焦虑躯体化在线测试slc90线上专业心理自测scl90测评量表",
+      "top_delta": 2000
+    },
+    {
+      "store_name": "小盏Nice~的店",
+      "sku_n": 1,
+      "sum_delta": 2000,
+      "sum_sold": 44000,
+      "top_title": "【笔记同款】简历模板-个人简历丨拍下秒发 手机/平板/电脑可制作",
+      "top_delta": 2000
+    },
+    {
+      "store_name": "Eva学姐（上岸版）的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 20000,
+      "top_title": "2027考研英语大小作文专用模板高分模版PDF电子版",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "大学生信息差-相与文化的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 12000,
+      "top_title": "【更新版】大学英语四六级大纲高频真题单词词汇词组 电子版PDF",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "PuffKitten的店",
+      "sku_n": 1,
+      "sum_delta": 487,
+      "sum_sold": 8968,
+      "top_title": "【自动发货】线上专业情绪自评",
+      "top_delta": 487
+    },
+    {
+      "store_name": "桃桃Lucky的店",
+      "sku_n": 1,
+      "sum_delta": 403,
+      "sum_sold": 3014,
+      "top_title": "SCL-90 抑郁焦虑专业线上心理测评【自动发货】",
+      "top_delta": 403
+    },
+    {
+      "store_name": "小雪的社会化指南的店",
+      "sku_n": 1,
+      "sum_delta": 364,
+      "sum_sold": 364,
+      "top_title": "【社会化指南】20万字原创文档-练社交练口才-人情世故全攻略",
+      "top_delta": 364
+    },
+    {
+      "store_name": "爱吃芝士titi的店",
+      "sku_n": 1,
+      "sum_delta": 361,
+      "sum_sold": 9817,
+      "top_title": "26+27年超格资料分析3+2超详细笔记 pdf版（赠送夸夸刷复盘笔记）",
+      "top_delta": 361
+    },
+    {
+      "store_name": "ajack（上岸版）的店",
+      "sku_n": 1,
+      "sum_delta": 341,
+      "sum_sold": 6346,
+      "top_title": "公考实战手记（电子版）",
+      "top_delta": 341
+    },
+    {
+      "store_name": "椰奶冻冻子的店",
+      "sku_n": 1,
+      "sum_delta": 330,
+      "sum_sold": 3279,
+      "top_title": "2026入党积极分子+发展对象全题型题库文档+刷题小程序",
+      "top_delta": 330
+    },
+    {
+      "store_name": "番茄🍅财税笔记的店",
+      "sku_n": 1,
+      "sum_delta": 313,
+      "sum_sold": 4870,
+      "top_title": "26年周靖磨眼睛口诀  pdf版电子资料，发货后不退款，介意勿拍",
+      "top_delta": 313
+    },
+    {
+      "store_name": "喜水。的店",
+      "sku_n": 1,
+      "sum_delta": 248,
+      "sum_sold": 9776,
+      "top_title": "趣味小测试更了解自己心理",
+      "top_delta": 248
+    },
+    {
+      "store_name": "Better Living的店",
+      "sku_n": 1,
+      "sum_delta": 246,
+      "sum_sold": 4530,
+      "top_title": "用1年时间改变自己-BetterLiving成长计划",
+      "top_delta": 246
+    },
+    {
+      "store_name": "田～学长tian的店",
+      "sku_n": 1,
+      "sum_delta": 242,
+      "sum_sold": 4500,
+      "top_title": "【全国通用】-学科辅导普通话水平测试2026新考纲备考资料电子版",
+      "top_delta": 242
+    },
+    {
+      "store_name": "游的店",
+      "sku_n": 1,
+      "sum_delta": 242,
+      "sum_sold": 4193,
+      "top_title": "游的四六级十页纸精粹语料",
+      "top_delta": 242
+    },
+    {
+      "store_name": "小草心理的店",
+      "sku_n": 1,
+      "sum_delta": 208,
+      "sum_sold": 2987,
+      "top_title": "【自动发货】SCL-90 抑郁/焦虑/躯体化/九大维度全面心理健康测评",
+      "top_delta": 208
+    },
+    {
+      "store_name": "风晴资料铺的店",
+      "sku_n": 1,
+      "sum_delta": 192,
+      "sum_sold": 3218,
+      "top_title": "文化概况电子版复习资料",
+      "top_delta": 192
+    },
+    {
+      "store_name": "驾考小李老师的店",
+      "sku_n": 1,
+      "sum_delta": 183,
+      "sum_sold": 7864,
+      "top_title": "科一科四速记口诀+精简500题带解析(赠讲解视频）26年新版",
+      "top_delta": 183
+    },
+    {
+      "store_name": "小小怡学姐的店",
+      "sku_n": 1,
+      "sum_delta": 175,
+      "sum_sold": 3832,
+      "top_title": "2026新高中生物重点知识点期末复习笔记总结电子版（填空+背诵）",
+      "top_delta": 175
+    },
+    {
+      "store_name": "家庭心理师馨悦的店",
+      "sku_n": 1,
+      "sum_delta": 136,
+      "sum_sold": 1499,
+      "top_title": "SCL-90线上心理状态自测/焦虑/抑郁/全面评估工具自动发",
+      "top_delta": 136
+    },
+    {
+      "store_name": "知光小塔库的店",
+      "sku_n": 1,
+      "sum_delta": 135,
+      "sum_sold": 5320,
+      "top_title": "2026婚礼备婚清单电子版模板·自动发货·EXCEL格式",
+      "top_delta": 135
+    },
+    {
+      "store_name": "心屿映光的店",
+      "sku_n": 1,
+      "sum_delta": 135,
+      "sum_sold": 4066,
+      "top_title": "【原创正版】他有多喜欢你丨暗恋·暧昧期指数评估模板",
+      "top_delta": 135
+    },
+    {
+      "store_name": "Linda外贸实战日记的店",
+      "sku_n": 1,
+      "sum_delta": 132,
+      "sum_sold": 4062,
+      "top_title": "【外贸跟单新人必备】笔记同款模板资料！",
+      "top_delta": 132
+    },
+    {
+      "store_name": "瓜瓜不吃瓜的店",
+      "sku_n": 1,
+      "sum_delta": 121,
+      "sum_sold": 1519,
+      "top_title": "马克公基常识系统课-电子版笔记（已完结）",
+      "top_delta": 121
+    },
+    {
+      "store_name": "i人的社会化指南（实操版）的店",
+      "sku_n": 1,
+      "sum_delta": 119,
+      "sum_sold": 5500,
+      "top_title": "【社会化指南】17万字原创文档-i人社交技巧-人情世故保姆级.",
+      "top_delta": 119
+    },
+    {
+      "store_name": "早睡早起妙妙的店",
+      "sku_n": 1,
+      "sum_delta": 119,
+      "sum_sold": 3045,
+      "top_title": "27刘义恒图推笔记理论基础-pdf已完结（教案）",
+      "top_delta": 119
+    },
+    {
+      "store_name": "驾考易点通的店",
+      "sku_n": 1,
+      "sum_delta": 119,
+      "sum_sold": 2728,
+      "top_title": "【新规版】2026驾考全科速记口诀答题技巧秘籍宝典",
+      "top_delta": 119
+    },
+    {
+      "store_name": "杨学长科研小栈(读研版)的店",
+      "sku_n": 1,
+      "sum_delta": 118,
+      "sum_sold": 2998,
+      "top_title": "智能阅读笔记表格模板",
+      "top_delta": 118
+    },
+    {
+      "store_name": "68c50634ec2d110015bdc27f",
+      "sku_n": 1,
+      "sum_delta": 114,
+      "sum_sold": 2373,
+      "top_title": "新版26英文字母描红字贴手写电子版A4纸大小",
+      "top_delta": 114
+    },
+    {
+      "store_name": "芝士学姐a的店",
+      "sku_n": 1,
+      "sum_delta": 113,
+      "sum_sold": 5500,
+      "top_title": "2026医院招聘护理三基护士考试考点笔记汇总",
+      "top_delta": 113
+    },
+    {
+      "store_name": "空白意识室的店",
+      "sku_n": 1,
+      "sum_delta": 113,
+      "sum_sold": 1103,
+      "top_title": "原生家庭恋爱模式趣味测试",
+      "top_delta": 113
+    },
+    {
+      "store_name": "真题伴侣的店",
+      "sku_n": 1,
+      "sum_delta": 100,
+      "sum_sold": 8286,
+      "top_title": "【真题伴侣】考研英语/四六级高效刷题/长难句学习/写作批改",
+      "top_delta": 100
+    },
+    {
+      "store_name": "跑赢兔子的蜗牛🐌🏆的店",
+      "sku_n": 1,
+      "sum_delta": 97,
+      "sum_sold": 1723,
+      "top_title": "【自动发货】SCL-90抑郁焦虑专业线上心理测评|在线测试",
+      "top_delta": 97
+    },
+    {
+      "store_name": "心安小栈的店",
+      "sku_n": 1,
+      "sum_delta": 96,
+      "sum_sold": 1380,
+      "top_title": "SCL-90在线心理测评/焦虑抑郁躯体化/【自动发货】",
+      "top_delta": 96
+    },
+    {
+      "store_name": "柚见资料社的店",
+      "sku_n": 1,
+      "sum_delta": 93,
+      "sum_sold": 4650,
+      "top_title": "【对女方有利离婚协议书模板】全面保护女方最新电子版可编辑修改",
+      "top_delta": 93
+    },
+    {
+      "store_name": "东东小屋的店",
+      "sku_n": 1,
+      "sum_delta": 90,
+      "sum_sold": 5941,
+      "top_title": "001虚拟定制:拼音天天练57页PDF电子版，非实物",
+      "top_delta": 90
+    },
+    {
+      "store_name": "满满讲公考(上岸版)的店",
+      "sku_n": 1,
+      "sum_delta": 83,
+      "sum_sold": 1204,
+      "top_title": "跟着新闻学申论·资料库/国考省考公务员/遴选/事业单位/三支一扶",
+      "top_delta": 83
+    },
+    {
+      "store_name": "小熊学长（专本硕）的店",
+      "sku_n": 1,
+      "sum_delta": 80,
+      "sum_sold": 3467,
+      "top_title": "27广东专升本英语政治高数语文管理民法教育艺术生理电子资料",
+      "top_delta": 80
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "69451d2430effa0001168cb0",
+      "title": "首单价限1次线上1v1情绪陪伴疏导抑郁焦虑情绪人际情感咨询",
+      "store_name": "壹心理精选的店",
+      "store_id": "6576c9328411900001f8f776",
+      "price": 37.8,
+      "sold": 4961,
+      "delta": 60,
+      "actual_gr": 1.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "90抑郁焦虑专业线上心理测评",
+        "心理测评",
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3fb702bf15d20001d650de",
+      "title": "SCL-90 抑郁焦虑专业线上心理测评【自动发货】",
+      "store_name": "桃桃Lucky的店",
+      "store_id": "68eb76f9078e6f001528f54b",
+      "price": 1.99,
+      "sold": 3014,
+      "delta": 403,
+      "actual_gr": 15.43,
+      "token_hits": 1,
+      "touch_keywords": [
+        "心理测评",
+        "专业抑郁焦虑全面心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4250c38cb63f0001854d0a",
+      "title": "SCL心理健康自测问卷-专业报告",
+      "store_name": "小兔的知心研究所的店",
+      "store_id": "6930ffdf35de270015436651",
+      "price": 0.98,
+      "sold": 62000,
+      "delta": 3000,
+      "actual_gr": 5.08,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评",
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6dab3474bf000001df50d6",
+      "title": "SCL-90线上心理状态自测/焦虑/抑郁/全面评估工具自动发",
+      "store_name": "家庭心理师馨悦的店",
+      "store_id": "64d48b71f58f8b0001530c84",
+      "price": 0.49,
+      "sold": 1499,
+      "delta": 136,
+      "actual_gr": 9.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评",
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5b072d4382e20001de4e8f",
+      "title": "《中医心理学》重新印本 纸质实物 发快递",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 26.99,
+      "sold": 5370,
+      "delta": 100,
+      "actual_gr": 1.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评",
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6842a4e99d4a5500011ac3b1",
+      "title": "【心理疏导】初级线上匿名倾诉情感咨询婚恋家庭职场情绪人际树洞",
+      "store_name": "壹心理即时倾诉的店",
+      "store_id": "682d8712cdd1cb0015f63537",
+      "price": 19.9,
+      "sold": 3970,
+      "delta": 64,
+      "actual_gr": 1.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评",
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ba32fc99f8fe000115a495",
+      "title": "2026版决战公基6000题事业单位公基  电子版",
+      "store_name": "公考路飞的店",
+      "store_id": "6891f6fde2c8750015df7bb4",
+      "price": 10.8,
+      "sold": 3496,
+      "delta": 36,
+      "actual_gr": 1.04,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评",
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "691f264bccb9e00001d7f136",
+      "title": "中小学心理，安全督导各类迎检检查资料75份",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 678,
+      "delta": 33,
+      "actual_gr": 5.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评",
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9a8db6ef95630001bf8c06",
+      "title": "【自动发货】SCL-90 线上专业抑郁焦虑全面心理测评",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.96,
+      "sold": 62000,
+      "delta": 4000,
+      "actual_gr": 6.9,
+      "token_hits": 1,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a8a6f2670b3560001b18c5e",
+      "title": "【自动发货】SCL-90 线上专业抑郁焦虑全面心理测评",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.97,
+      "sold": 60000,
+      "delta": 2000,
+      "actual_gr": 3.45,
+      "token_hits": 1,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6abcb0a797c4e80001a4c588",
+      "title": "【自动发货】SCL-90 线上专业抑郁焦虑全面心理测评",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.98,
+      "sold": 1173,
+      "delta": 290,
+      "actual_gr": 32.84,
+      "token_hits": 1,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a732b3bb3a69b0001a0da41",
+      "title": "【自动发货】SCL-90抑郁焦虑专业线上心理测评|在线测试",
+      "store_name": "跑赢兔子的蜗牛🐌🏆的店",
+      "store_id": "6a5ac0043dd0520015f93f40",
+      "price": 1.99,
+      "sold": 1723,
+      "delta": 97,
+      "actual_gr": 5.97,
+      "token_hits": 1,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a69fd54bf81ab0001dae9a6",
+      "title": "SCL-90在线心理测评/焦虑抑郁躯体化/【自动发货】",
+      "store_name": "心安小栈的店",
+      "store_id": "6855220494c1d20015b3f0d2",
+      "price": 2.0,
+      "sold": 1380,
+      "delta": 96,
+      "actual_gr": 7.48,
+      "token_hits": 1,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a37ecb45200e70001a2b26a",
+      "title": "【自动发货】SCL-90抑郁焦虑躯体化在线测评专业线上心理测评",
+      "store_name": "果果素材的店",
+      "store_id": "655dcb502e77070001b1d7de",
+      "price": 1.99,
+      "sold": 5944,
+      "delta": 68,
+      "actual_gr": 1.16,
+      "token_hits": 1,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a5f8d0eb5de6c0001dc7ded",
+      "title": "【自动发货】SCL-90 线上专业抑郁焦虑全面心理测评",
+      "store_name": "知心疗愈馆的店",
+      "store_id": "6a5ef5ba96222200154bac25",
+      "price": 1.68,
+      "sold": 3066,
+      "delta": 63,
+      "actual_gr": 2.1,
+      "token_hits": 1,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a67796988464600013f436e",
+      "title": "可重复测试抑郁焦虑自测在线测试slc90线上心理测评",
+      "store_name": "宁铄心理的店",
+      "store_id": "6a0075e1b5a0bc001590a7a2",
+      "price": 4.9,
+      "sold": 231,
+      "delta": 48,
+      "actual_gr": 26.23,
+      "token_hits": 1,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a9facf2ef41870001701a5c",
+      "title": "【自动发货】SCL-90线上专业抑郁焦虑全面心理测评",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.98,
+      "sold": 76,
+      "delta": 39,
+      "actual_gr": 105.41,
+      "token_hits": 1,
+      "touch_keywords": [
+        "90抑郁焦虑专业线上心理测评"
+      ]
+    },
+    {
+      "goods_id": "69fc6df59dea2d00013719d7",
+      "title": "【笔记同款】简历模板-个人简历丨拍下秒发 手机/平板/电脑可制作",
+      "store_name": "小盏Nice~的店",
+      "store_id": "699e9a338ab5a80015f6211b",
+      "price": 0.98,
+      "sold": 44000,
+      "delta": 2000,
+      "actual_gr": 4.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a311129963cbb0001d86392",
+      "title": "抑郁焦虑躯体化在线测试slc90线上专业心理自测scl90测评量表",
+      "store_name": "宁铄心理的店",
+      "store_id": "6a0075e1b5a0bc001590a7a2",
+      "price": 0.99,
+      "sold": 20000,
+      "delta": 2000,
+      "actual_gr": 11.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6aa8f20ba0b6bb0001a2ff32",
+      "title": "【2027国省考】花生笔记总结本逻辑判断推理数量资料分析笔记总结",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 4823,
+      "delta": 1279,
+      "actual_gr": 36.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "69131671f735ce0015404a87",
+      "title": "2027考研英语大小作文专用模板高分模版PDF电子版",
+      "store_name": "Eva学姐（上岸版）的店",
+      "store_id": "68e123376733f40015eba9cf",
+      "price": 9.9,
+      "sold": 20000,
+      "delta": 1000,
+      "actual_gr": 5.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "68d7b4acc7536100016dab15",
+      "title": "【更新版】大学英语四六级大纲高频真题单词词汇词组 电子版PDF",
+      "store_name": "大学生信息差-相与文化的店",
+      "store_id": "66bac903afee2200154269f2",
+      "price": 9.8,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "69ce2ad65dab9a00015a65ba",
+      "title": "27考研英语速成笔记电子版pdf（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.99,
+      "sold": 3964,
+      "delta": 828,
+      "actual_gr": 26.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a27e5f22055620001aa52a8",
+      "title": "【自动发货】线上专业情绪自评",
+      "store_name": "PuffKitten的店",
+      "store_id": "69f4a45f426ebe001588fae8",
+      "price": 2.99,
+      "sold": 8968,
+      "delta": 487,
+      "actual_gr": 5.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a32a9903222c600015f6386",
+      "title": "编号公 个性化妆教服务  客服12小时在线咨询妆教",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.51,
+      "sold": 3996,
+      "delta": 418,
+      "actual_gr": 11.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "专业抑郁焦虑全面心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e82dcb3a4daf0001287ecb",
+      "title": "【社会化指南】20万字原创文档-练社交练口才-人情世故全攻略",
+      "store_name": "小雪的社会化指南的店",
+      "store_id": "69d3241516f769001526c9a5",
+      "price": 2.99,
+      "sold": 364,
+      "delta": 364,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e5f3e8ddd1650001f85eed",
+      "title": "26+27年超格资料分析3+2超详细笔记 pdf版（赠送夸夸刷复盘笔记）",
+      "store_name": "爱吃芝士titi的店",
+      "store_id": "698d555f3f215800151438f0",
+      "price": 9.9,
+      "sold": 9817,
+      "delta": 361,
+      "actual_gr": 3.82,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a056ebe721fd30001792e81",
+      "title": "公考实战手记（电子版）",
+      "store_name": "ajack（上岸版）的店",
+      "store_id": "66ee436e0a76990016dfcb60",
+      "price": 69.0,
+      "sold": 6346,
+      "delta": 341,
+      "actual_gr": 5.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a1c29e2b6178b0001e9301d",
+      "title": "2026入党积极分子+发展对象全题型题库文档+刷题小程序",
+      "store_name": "椰奶冻冻子的店",
+      "store_id": "68dfc8d85a855c0014af47a3",
+      "price": 9.9,
+      "sold": 3279,
+      "delta": 330,
+      "actual_gr": 11.19,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "68e84195b56f160001f6c003",
+      "title": "26年周靖磨眼睛口诀  pdf版电子资料，发货后不退款，介意勿拍",
+      "store_name": "番茄🍅财税笔记的店",
+      "store_id": "68d9f89aed6c7900155b1ac6",
+      "price": 6.99,
+      "sold": 4870,
+      "delta": 313,
+      "actual_gr": 6.87,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "691dd8a701312b0001deb88e",
+      "title": "【066】一年级上册数学思维奥数专项练习 PDF格式无实物",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 2006,
+      "delta": 283,
+      "actual_gr": 16.42,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a981e68d5867600014d4ab4",
+      "title": "心理课/心理社团/心理班会课 教案课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 1996,
+      "delta": 250,
+      "actual_gr": 14.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a4b267ef7c8040001d9cd3f",
+      "title": "趣味小测试更了解自己心理",
+      "store_name": "喜水。的店",
+      "store_id": "682ecd0304d7b4001537e484",
+      "price": 1.99,
+      "sold": 9776,
+      "delta": 248,
+      "actual_gr": 2.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "69ec1b0ebd8c350001fb9cb9",
+      "title": "用1年时间改变自己-BetterLiving成长计划",
+      "store_name": "Better Living的店",
+      "store_id": "67106b70576178001576a90a",
+      "price": 199.0,
+      "sold": 4530,
+      "delta": 246,
+      "actual_gr": 5.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b971bd7c9c8f0001811813",
+      "title": "【全国通用】-学科辅导普通话水平测试2026新考纲备考资料电子版",
+      "store_name": "田～学长tian的店",
+      "store_id": "68b99e39586ec800153bae83",
+      "price": 2.9,
+      "sold": 4500,
+      "delta": 242,
+      "actual_gr": 5.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a1fe32b4610970001fcc7eb",
+      "title": "游的四六级十页纸精粹语料",
+      "store_name": "游的店",
+      "store_id": "68496dd8f398c900159aeca4",
+      "price": 9.6,
+      "sold": 4193,
+      "delta": 242,
+      "actual_gr": 6.13,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7fd083532d770001ed8346",
+      "title": "新人教版七上英语全套资料合集（全版本）（电子版pdf可打印）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.98,
+      "sold": 4131,
+      "delta": 223,
+      "actual_gr": 5.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ad34611b7c6090001979835",
+      "title": "2026秋新版九上语文期中知识点42页 word版和pdf版都发 电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.5,
+      "sold": 464,
+      "delta": 223,
+      "actual_gr": 92.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6329f2b710e6000119ed2f",
+      "title": "【自动发货】SCL-90 抑郁/焦虑/躯体化/九大维度全面心理健康测评",
+      "store_name": "小草心理的店",
+      "store_id": "695239033f35ee0015771293",
+      "price": 1.98,
+      "sold": 2987,
+      "delta": 208,
+      "actual_gr": 7.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a9bd7971b9ae900019d7179",
+      "title": "2027新版国考省考行测高分必背（修正版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 2946,
+      "delta": 195,
+      "actual_gr": 7.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "691d911e14b5260001c64edf",
+      "title": "文化概况电子版复习资料",
+      "store_name": "风晴资料铺的店",
+      "store_id": "67f4eb34b455320015b5e48c",
+      "price": 0.98,
+      "sold": 3218,
+      "delta": 192,
+      "actual_gr": 6.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e04b9464c86a0015e563dd",
+      "title": "科一科四速记口诀+精简500题带解析(赠讲解视频）26年新版",
+      "store_name": "驾考小李老师的店",
+      "store_id": "64b60f740cd5910001fcf608",
+      "price": 5.9,
+      "sold": 7864,
+      "delta": 183,
+      "actual_gr": 2.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a8bc3a191917d00011eeba3",
+      "title": "【原创】测试你的心理年龄多少岁？",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 791,
+      "delta": 181,
+      "actual_gr": 29.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "693ed89ea454e80001a52410",
+      "title": "2026新高中生物重点知识点期末复习笔记总结电子版（填空+背诵）",
+      "store_name": "小小怡学姐的店",
+      "store_id": "671672b3463e7a0015f43229",
+      "price": 6.99,
+      "sold": 3832,
+      "delta": 175,
+      "actual_gr": 4.79,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a0ec2a04ef63c00018053e3",
+      "title": "中国近现代史纲要期末重点笔记-选择题简答题库-考点导图【合集】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 8133,
+      "delta": 145,
+      "actual_gr": 1.82,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a79cbd50020da00017a6fb2",
+      "title": "2026导游资格证备考笔记答题模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 1879,
+      "delta": 143,
+      "actual_gr": 8.24,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "68f9dbd0ee3e410001a2e1a2",
+      "title": "【PDF电子版】小学（1-3年级）英语语法作业纸300页（有答案）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 5018,
+      "delta": 142,
+      "actual_gr": 2.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "90抑郁焦虑专业线上心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a97e3d46b399600016c1950",
+      "title": "笔记同款商品噢！！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 1290,
+      "delta": 141,
+      "actual_gr": 12.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6d481a34eabf0001c56c5b",
+      "title": "红色喜庆结婚请柬PPT模版 可自己编辑 可帮做",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 2754,
+      "delta": 140,
+      "actual_gr": 5.36,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5c9eba8c0a3e00013facef",
+      "title": "2027小黑政治理论+常识判断全家桶公考事业编三支一扶【送网课】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 42.8,
+      "sold": 6685,
+      "delta": 136,
+      "actual_gr": 2.08,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ddd45b4dd26e00012e95f1",
+      "title": "2026婚礼备婚清单电子版模板·自动发货·EXCEL格式",
+      "store_name": "知光小塔库的店",
+      "store_id": "68edbaf69623bb00157ec2cb",
+      "price": 5.21,
+      "sold": 5320,
+      "delta": 135,
+      "actual_gr": 2.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a16ceb07125f70001a60dc4",
+      "title": "【原创正版】他有多喜欢你丨暗恋·暧昧期指数评估模板",
+      "store_name": "心屿映光的店",
+      "store_id": "6a15a23ddd7fde0015c841a4",
+      "price": 5.98,
+      "sold": 4066,
+      "delta": 135,
+      "actual_gr": 3.43,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cdff8f2fb62900012c43ef",
+      "title": "【外贸跟单新人必备】笔记同款模板资料！",
+      "store_name": "Linda外贸实战日记的店",
+      "store_id": "69a657f249561b0016b2938f",
+      "price": 39.9,
+      "sold": 4062,
+      "delta": 132,
+      "actual_gr": 3.36,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6ac0657ff8ac7e00018f7c5d",
+      "title": "作文微型训练32次小练笔（word版含答案）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 568,
+      "delta": 129,
+      "actual_gr": 29.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8d9dde2fe0cd00011f0e8d",
+      "title": "考研数学公式大全 数一/数二/数三 |笔记同款课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.5,
+      "sold": 783,
+      "delta": 123,
+      "actual_gr": 18.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a30dd1528ad2700014b1afd",
+      "title": "马克公基常识系统课-电子版笔记（已完结）",
+      "store_name": "瓜瓜不吃瓜的店",
+      "store_id": "6a1fb0b876c4de00150d5f11",
+      "price": 23.2,
+      "sold": 1519,
+      "delta": 121,
+      "actual_gr": 8.66,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a04322330d0860001ea7e16",
+      "title": "【社会化指南】17万字原创文档-i人社交技巧-人情世故保姆级.",
+      "store_name": "i人的社会化指南（实操版）的店",
+      "store_id": "696affa0c2fdec0015b79dbc",
+      "price": 19.9,
+      "sold": 5500,
+      "delta": 119,
+      "actual_gr": 2.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0c32c1002a62000124aed2",
+      "title": "27刘义恒图推笔记理论基础-pdf已完结（教案）",
+      "store_name": "早睡早起妙妙的店",
+      "store_id": "684e5412f8c41c00153449ae",
+      "price": 8.9,
+      "sold": 3045,
+      "delta": 119,
+      "actual_gr": 4.07,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bab463ffa26d0001357735",
+      "title": "【新规版】2026驾考全科速记口诀答题技巧秘籍宝典",
+      "store_name": "驾考易点通的店",
+      "store_id": "69b806435cae4a00157d5c53",
+      "price": 9.9,
+      "sold": 2728,
+      "delta": 119,
+      "actual_gr": 4.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6aa0cd2d167d3d0001bc0cb1",
+      "title": "27江苏省考历年真题A卷B卷C卷行测申论含答案电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 614,
+      "delta": 119,
+      "actual_gr": 24.04,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a41f4c088d1c10001f2c0e7",
+      "title": "智能阅读笔记表格模板",
+      "store_name": "杨学长科研小栈(读研版)的店",
+      "store_id": "69bbf72ce5811a001575c321",
+      "price": 19.9,
+      "sold": 2998,
+      "delta": 118,
+      "actual_gr": 4.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "69be821aec666400010aaa4d",
+      "title": "26下半年小学美术教资面试真题教案逐字稿和答辩资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.98,
+      "sold": 489,
+      "delta": 116,
+      "actual_gr": 31.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5f6fb6aa62b50001564dcb",
+      "title": "新版26英文字母描红字贴手写电子版A4纸大小",
+      "store_name": "68c50634ec2d110015bdc27f",
+      "store_id": "68c50634ec2d110015bdc27f",
+      "price": 0.99,
+      "sold": 2373,
+      "delta": 114,
+      "actual_gr": 5.05,
+      "token_hits": 0,
+      "touch_keywords": [
+        "90抑郁焦虑专业线上心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a87227881c7b6000178e90d",
+      "title": "考研/雅思/四六级 玄幻、悬疑、霸总爽文故事带背英语单词可发音",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 26.9,
+      "sold": 1301,
+      "delta": 114,
+      "actual_gr": 9.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a152be65566b00001544de3",
+      "title": "2026医院招聘护理三基护士考试考点笔记汇总",
+      "store_name": "芝士学姐a的店",
+      "store_id": "693d107072b8090015b7a2d7",
+      "price": 18.0,
+      "sold": 5500,
+      "delta": 113,
+      "actual_gr": 2.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a68657bcef2250001590667",
+      "title": "原生家庭恋爱模式趣味测试",
+      "store_name": "空白意识室的店",
+      "store_id": "691bcd1ecda0b5001554ce12",
+      "price": 0.99,
+      "sold": 1103,
+      "delta": 113,
+      "actual_gr": 11.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa64d4af6632a000141fc14",
+      "title": "大模型&  Agent 大模型后端资料文档，PDF&在线阅读，含多项目",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 657,
+      "delta": 107,
+      "actual_gr": 19.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "68efc2e9ce94ee000168d994",
+      "title": "2026新人教版高中合格考学考会考重点知识点考点归纳精简版知识点",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 4472,
+      "delta": 105,
+      "actual_gr": 2.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a697a7589d8ff000192cbfe",
+      "title": "《化学老师的笔记》学霸养成初中知识总结期中期末中考考试教辅书",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 298.0,
+      "sold": 2901,
+      "delta": 101,
+      "actual_gr": 3.61,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6aa7eb04f660cd0001451dfc",
+      "title": "立体手抄报2电子版素材，自行打印不快递",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 1575,
+      "delta": 101,
+      "actual_gr": 6.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "668cb0467221e100010e9809",
+      "title": "【真题伴侣】考研英语/四六级高效刷题/长难句学习/写作批改",
+      "store_name": "真题伴侣的店",
+      "store_id": "627b3d4281b56f0001c022cd",
+      "price": 59.9,
+      "sold": 8286,
+      "delta": 100,
+      "actual_gr": 1.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6a18efc7cfe57500019caa5d",
+      "title": "2027年初中考语数英物化生政史地考点知识点归纳整理电子版可编辑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 2761,
+      "delta": 97,
+      "actual_gr": 3.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6ac0ecc90ff6d7000123dff9",
+      "title": "Hot100手撕速通笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 1019,
+      "delta": 94,
+      "actual_gr": 10.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "68bff0accdabcd0001ca5e40",
+      "title": "【对女方有利离婚协议书模板】全面保护女方最新电子版可编辑修改",
+      "store_name": "柚见资料社的店",
+      "store_id": "6821692470683b0015f8127d",
+      "price": 2.66,
+      "sold": 4650,
+      "delta": 93,
+      "actual_gr": 2.04,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "685ff700b93d4100012d78c5",
+      "title": "001虚拟定制:拼音天天练57页PDF电子版，非实物",
+      "store_name": "东东小屋的店",
+      "store_id": "685d0b13a8202d001511bdcd",
+      "price": 3.8,
+      "sold": 5941,
+      "delta": 90,
+      "actual_gr": 1.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "682478b838a9a60001cc7f4a",
+      "title": "英语AB级历年真题+2026.6模拟题+词汇 电子模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 3366,
+      "delta": 88,
+      "actual_gr": 2.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "68faf9bbbecfcc00013cc96d",
+      "title": "2027广东省考/选调/事业单位，本土精选面试/申论素材电子教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.9,
+      "sold": 2404,
+      "delta": 84,
+      "actual_gr": 3.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a58b190b5de6c0001461ea3",
+      "title": "跟着新闻学申论·资料库/国考省考公务员/遴选/事业单位/三支一扶",
+      "store_name": "满满讲公考(上岸版)的店",
+      "store_id": "687310fb5bb5eb0015854d3a",
+      "price": 15.8,
+      "sold": 1204,
+      "delta": 83,
+      "actual_gr": 7.4,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b377cb771a6700018d9047",
+      "title": "27广东专升本英语政治高数语文管理民法教育艺术生理电子资料",
+      "store_name": "小熊学长（专本硕）的店",
+      "store_id": "68d6417f1b5c050015d6a437",
+      "price": 18.9,
+      "sold": 3467,
+      "delta": 80,
+      "actual_gr": 2.36,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评"
+      ]
+    },
+    {
+      "goods_id": "6906a10245459000019ba434",
+      "title": "26教师资格证面试小学数学逐字稿结构化答辩真题试讲视频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 1587,
+      "delta": 80,
+      "actual_gr": 5.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "心理测评电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "心理测评",
+  "slug": "心理测评"
+}

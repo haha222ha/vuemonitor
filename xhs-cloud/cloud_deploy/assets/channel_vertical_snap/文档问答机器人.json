@@ -1,0 +1,202 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "文档问答机器人"
+    ],
+    "niche": "文档问答机器人"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "文档问答机器人电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "文档问答机器人电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 5,
+    "sku_n": 8,
+    "sum_delta": 0,
+    "median_price": 1.99,
+    "niche": "文档问答机器人",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "皮皮老师ing的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 13,
+      "top_title": "最新版 腹黑人格解读",
+      "top_delta": 0
+    },
+    {
+      "store_name": "米虫心理的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 8,
+      "top_title": "腹黑指数人格测试速测分析趣味测评50题",
+      "top_delta": 0
+    },
+    {
+      "store_name": "林阳心理研究所的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 7,
+      "top_title": "腹黑鉴定人格/寻找真实的自己",
+      "top_delta": 0
+    },
+    {
+      "store_name": "答案折叠联络处的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1,
+      "top_title": "腹黑鉴定人格解读",
+      "top_delta": 0
+    },
+    {
+      "store_name": "（未知店）",
+      "sku_n": 4,
+      "sum_delta": 0,
+      "sum_sold": 1,
+      "top_title": "【升级版】腹黑鉴定人格解读分析自测ppt",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a646083d855850001377480",
+      "title": "最新版 腹黑人格解读",
+      "store_name": "皮皮老师ing的店",
+      "store_id": "6a41e37a075cbf0015b6b9af",
+      "price": 1.99,
+      "sold": 13,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档问答机器人电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a58664a11bb87000147f681",
+      "title": "腹黑指数人格测试速测分析趣味测评50题",
+      "store_name": "米虫心理的店",
+      "store_id": "6a4a4b2995888e001572754d",
+      "price": 0.99,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档问答机器人电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7d1d97a52c1c0001362528",
+      "title": "腹黑鉴定人格/寻找真实的自己",
+      "store_name": "林阳心理研究所的店",
+      "store_id": "6a3e2ddb1f195a0015cd1946",
+      "price": 1.9,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档问答机器人电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a784e500020da000154cacd",
+      "title": "腹黑鉴定人格解读",
+      "store_name": "答案折叠联络处的店",
+      "store_id": "69365ef09e186a0015dae3af",
+      "price": 0.99,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档问答机器人电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a642e6724f0440001cf7022",
+      "title": "【升级版】腹黑鉴定人格解读分析自测ppt",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档问答机器人电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9d4239e54fd70001af5687",
+      "title": "【原创】你内心深处的腹黑人格解读",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.98,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档问答机器人电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a647762d09fb600016dfe37",
+      "title": "腹黑鉴定人格测试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档问答机器人电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6477cd84b8ee00016bc49c",
+      "title": "[升级版]腹黑鉴定人格解读分析自测ppt",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档问答机器人电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "文档问答机器人",
+  "slug": "文档问答机器人"
+}

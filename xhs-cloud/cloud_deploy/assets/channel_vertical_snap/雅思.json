@@ -1,0 +1,1678 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "雅思"
+    ],
+    "niche": "雅思"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 64,
+    "active_n": 15,
+    "drive_keywords": [
+      "雅思听力",
+      "雅思写作",
+      "雅思复习计划",
+      "雅思写作素材",
+      "冲刺雅思电子资料",
+      "雅思备考电子资料",
+      "雅思全科备考资料20",
+      "雅思日常商务面试对练",
+      "雅思思维导图电子资料",
+      "雅思7000词电子资料",
+      "雅思7000词作文模板",
+      "2025雅思阅读电子资料",
+      "2027雅思听力备考指南",
+      "2h速通雅思写作7分模板",
+      "雅思资料全套自学学习计划",
+      "雅思",
+      "雅思5",
+      "冲刺雅思",
+      "大全雅思",
+      "押题雅思",
+      "雅思笔记",
+      "雅思地理",
+      "雅思讲义",
+      "雅思口语"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "雅思听力",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "电子资源|课件/教案/手抄报|雅思听力｜7天突破雅思听力教师版（8月新）",
+        "source": "vm_sa_remain_20261013_224711",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思写作",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思复习计划",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "恢复831拓展·每日main合并周期|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "yield_rank_fill_20261009_114352",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思写作素材",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "恢复831拓展·每日main合并周期|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "冲刺雅思电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "|deact_yield_opt_20260928_095452",
+        "source": "cycle_kw_optimize_20261009_111339",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思备考电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思全科备考资料20",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "补齐每日主队列至3000·20260901|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思日常商务面试对练",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思思维导图电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思7000词电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思7000词作文模板",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "longtail_from:雅思7000词|exam_cet|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "2025雅思阅读电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_outside_probe_yield_20260812",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "2027雅思听力备考指南",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "2h速通雅思写作7分模板",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思资料全套自学学习计划",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "补齐每日主队列至3000·20260901|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "恢复831拓展·每日main合并周期|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "yield_rank_fill_20261009_114352",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思5",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "restore_scan_overpurge_1010b",
+        "role": "candidate"
+      },
+      {
+        "keyword": "冲刺雅思",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "补齐每日主队列至3000·20260901|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "大全雅思",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "yield_top1000_15d|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "押题雅思",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思笔记",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "恢复831拓展·每日main合并周期|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_kw_cross_opt_demote",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思地理",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思讲义",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思口语",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "热库全量48日报告抽词精炼（全库非近3日）|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "report_full_warehouse_20260901",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思生物",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思题库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思网课",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": " | scrub_wangke_20260902",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思真题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "value_mining_opt_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "最新雅思",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "value_mining_opt_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思口语素材",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "恢复831拓展·每日main合并周期|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "雅思口语题库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "report_dir_fill_20261009_175658",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子档雅思笔记",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子档雅思题库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子档雅思网课",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": " | scrub_wangke_20260902",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "高清版雅思笔记",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "高清版雅思冲刺",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "高清版雅思写作",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "高清版雅思阅读",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "更新版雅思题库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 21,
+    "sku_n": 80,
+    "sum_delta": 76131,
+    "median_price": 9.8,
+    "niche": "雅思",
+    "drive_kw_n": 24
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 60,
+      "sum_delta": 59383,
+      "sum_sold": 528968,
+      "top_title": "27全新大小作文速成模板&翻译指南（小众，原创，旱区高分）",
+      "top_delta": 3266
+    },
+    {
+      "store_name": "宝藏女孩琪琪的店",
+      "sku_n": 1,
+      "sum_delta": 1183,
+      "sum_sold": 10000,
+      "top_title": "性格匹配城市测试课件资料包",
+      "top_delta": 1183
+    },
+    {
+      "store_name": "62651dfa82ea840001cee907",
+      "sku_n": 1,
+      "sum_delta": 1116,
+      "sum_sold": 2894,
+      "top_title": "靳焕一老师一心刷考点讲义",
+      "top_delta": 1116
+    },
+    {
+      "store_name": "元气小桃兔兔冲考研的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 17000,
+      "top_title": "28/29考研双非择校211择校择专业全程解析",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "Moopuffy的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 59000,
+      "top_title": "天赋测试-挖掘自身天赋领域教案（秒发货，地址手机随便填）",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "v查单清粉的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 44000,
+      "top_title": "智能定制实体其他微信查单删小工具",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "华图的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 31000,
+      "top_title": "27年新版李梦娇11.0常识速记口诀88条公务员事业单位考试专用书",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "炒粉炒面翻译的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 26000,
+      "top_title": "【英硕自制】27考研英语作文模板（原创）（电子资料拍下不退不换",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "CATO的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 19000,
+      "top_title": "CATO·提醒猫 l 日程管理+日记备忘+理财记账丨适配所有机型",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "梨子资源铺的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 17000,
+      "top_title": "MBTI16人格测试最新版",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "四海公考的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 13000,
+      "top_title": "【仅题本无解析】逻辑判断600题 | 公考国省考事业单位行测",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "扶文图书的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 12000,
+      "top_title": "好快!10天背完3000英语单词 图解单词形象记忆轻松快速背单词",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "可可乖猫的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 11000,
+      "top_title": "班级打卡养宠物/教学·课件",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "心灵疗愈观测站的店",
+      "sku_n": 1,
+      "sum_delta": 736,
+      "sum_sold": 3007,
+      "top_title": "社会化程度匹配趣味测试|自动发货",
+      "top_delta": 736
+    },
+    {
+      "store_name": "Claire澳洲学姐（雅思口语9分）的店",
+      "sku_n": 1,
+      "sum_delta": 635,
+      "sum_sold": 7856,
+      "top_title": "雅思写作冲7分速成模板+高分语料库  （预售，后涨价为299）",
+      "top_delta": 635
+    },
+    {
+      "store_name": "12341ue的店",
+      "sku_n": 1,
+      "sum_delta": 608,
+      "sum_sold": 1943,
+      "top_title": "MBTI16+64型人格测试 · 拍下即测 · 可重复测试 · 可分享给朋友",
+      "top_delta": 608
+    },
+    {
+      "store_name": "学姐的资料库的店",
+      "sku_n": 1,
+      "sum_delta": 545,
+      "sum_sold": 6378,
+      "top_title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "top_delta": 545
+    },
+    {
+      "store_name": "月月希的店",
+      "sku_n": 1,
+      "sum_delta": 497,
+      "sum_sold": 3111,
+      "top_title": "2026四川省时政知识点/时政习题/四川省情知识/四川省情习题",
+      "top_delta": 497
+    },
+    {
+      "store_name": "土象研究生ens的店",
+      "sku_n": 1,
+      "sum_delta": 496,
+      "sum_sold": 8106,
+      "top_title": "【自动发货】天赋能力测试报告",
+      "top_delta": 496
+    },
+    {
+      "store_name": "小水的漂亮东西（微博装扮）的店",
+      "sku_n": 1,
+      "sum_delta": 494,
+      "sum_sold": 5318,
+      "top_title": "白菜价个位数微博装扮合集·全套vip永久可用  主页壁纸装扮",
+      "top_delta": 494
+    },
+    {
+      "store_name": "糖果老师学霸启蒙的店",
+      "sku_n": 1,
+      "sum_delta": 438,
+      "sum_sold": 5450,
+      "top_title": "【儿童数学数感】3-10岁趣味数学数感思维启蒙兴趣学科辅导",
+      "top_delta": 438
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a5f08ab8c0a3e000174177d",
+      "title": "27年新版李梦娇11.0常识速记口诀88条公务员事业单位考试专用书",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 46.8,
+      "sold": 31000,
+      "delta": 1000,
+      "actual_gr": 3.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练",
+        "雅思资料全套自学学习计划"
+      ]
+    },
+    {
+      "goods_id": "6a8bb9dd70b3560001d22b5c",
+      "title": "2027考研英语大小作文专用模板高分模版PDF电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 20000,
+      "delta": 1000,
+      "actual_gr": 5.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "冲刺雅思电子资料",
+        "雅思全科备考资料20"
+      ]
+    },
+    {
+      "goods_id": "68006b41a7524b0001e4f7d5",
+      "title": "28/29考研双非择校211择校择专业全程解析",
+      "store_name": "元气小桃兔兔冲考研的店",
+      "store_id": "6784ce76a3b2f900153ae860",
+      "price": 4.0,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大全雅思",
+        "雅思写作素材"
+      ]
+    },
+    {
+      "goods_id": "694101154d53380001a15710",
+      "title": "数量关系蒙题秘籍.七上八不下",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 7740,
+      "delta": 404,
+      "actual_gr": 5.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思5",
+        "雅思资料全套自学学习计划"
+      ]
+    },
+    {
+      "goods_id": "6aa815e915012e0001e5ec7b",
+      "title": "2027届全国各地高三模拟卷 全科 每周更新 送历年真题卷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 882,
+      "delta": 214,
+      "actual_gr": 32.04,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2027雅思听力备考指南",
+        "雅思全科备考资料20"
+      ]
+    },
+    {
+      "goods_id": "67809715a03f41000177e61b",
+      "title": "雅思写作冲7分速成模板+高分语料库  （预售，后涨价为299）",
+      "store_name": "Claire澳洲学姐（雅思口语9分）的店",
+      "store_id": "66191f88f641fa000196dd68",
+      "price": 69.0,
+      "sold": 7856,
+      "delta": 635,
+      "actual_gr": 8.79,
+      "token_hits": 1,
+      "touch_keywords": [
+        "2025雅思阅读电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0978a1304f460001c7001b",
+      "title": "9-12月雅思口语串题题库（实时更新）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 119.0,
+      "sold": 738,
+      "delta": 218,
+      "actual_gr": 41.92,
+      "token_hits": 1,
+      "touch_keywords": [
+        "大全雅思"
+      ]
+    },
+    {
+      "goods_id": "6abd0673bb8a9a00015c9ae3",
+      "title": "27全新大小作文速成模板&翻译指南（小众，原创，旱区高分）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 4569,
+      "delta": 3266,
+      "actual_gr": 250.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思7000词作文模板"
+      ]
+    },
+    {
+      "goods_id": "6a5c9eba8c0a3e00013facf8",
+      "title": "2027小黑政治理论+常识判断全家桶公考事业编三支一扶【送网课】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.8,
+      "sold": 8216,
+      "delta": 3061,
+      "actual_gr": 59.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思"
+      ]
+    },
+    {
+      "goods_id": "6aa0d16aa1588c00012db0ac",
+      "title": "相亲市场定位测试-测完才知道自己高估了多少 秒出结果",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 9105,
+      "delta": 2706,
+      "actual_gr": 42.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "6ab4293b57ccfc00018d4fd5",
+      "title": "26年12月四六级备考资料  四六级真题+解析+听力+词汇+作文+翻译",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 6239,
+      "delta": 2399,
+      "actual_gr": 62.47,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思资料全套自学学习计划"
+      ]
+    },
+    {
+      "goods_id": "6a0595d2213e27000158d2b3",
+      "title": "2026秋小学语文阅读理解答题模板/技巧训练/配套练习/电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 14000,
+      "delta": 2000,
+      "actual_gr": 16.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思笔记"
+      ]
+    },
+    {
+      "goods_id": "6a54a84e7308b50001684cd0",
+      "title": "27版考研英语词汇资料包（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 12000,
+      "delta": 2000,
+      "actual_gr": 20.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "冲刺雅思电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9ae47eef95630001c80b1d",
+      "title": "OC人设拼拼乐盲盒（栀）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 6666,
+      "delta": 1934,
+      "actual_gr": 40.87,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思思维导图电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aac161c15012e000167c4f3",
+      "title": "27高照理论3+2资料分析夸夸刷资料分析超大杯资料分析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.7,
+      "sold": 6791,
+      "delta": 1876,
+      "actual_gr": 38.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2027雅思听力备考指南"
+      ]
+    },
+    {
+      "goods_id": "6a60e5a88846460001b35898",
+      "title": "2027省考申论大作文-各省本土特色案例写作素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 6743,
+      "delta": 1584,
+      "actual_gr": 30.7,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思全科备考资料20"
+      ]
+    },
+    {
+      "goods_id": "6a83271e2f88c60001e5a7b4",
+      "title": "2027省考申论大作文-各省本土特色案例写作素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 6742,
+      "delta": 1512,
+      "actual_gr": 28.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思写作"
+      ]
+    },
+    {
+      "goods_id": "69aac7cac125ae0001a3bd68",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 8669,
+      "delta": 1383,
+      "actual_gr": 18.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思听力"
+      ]
+    },
+    {
+      "goods_id": "6a6c9d2c74bf000001c8b499",
+      "title": "性格匹配城市测试课件资料包",
+      "store_name": "宝藏女孩琪琪的店",
+      "store_id": "61fa4edbf816ad000134cc66",
+      "price": 0.99,
+      "sold": 10000,
+      "delta": 1183,
+      "actual_gr": 13.42,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "6a66b6ce11bb87000113145a",
+      "title": "靳焕一老师一心刷考点讲义",
+      "store_name": "62651dfa82ea840001cee907",
+      "store_id": "62651dfa82ea840001cee907",
+      "price": 0.1,
+      "sold": 2894,
+      "delta": 1116,
+      "actual_gr": 62.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2025雅思阅读电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3e13bc1a14830001b8546c",
+      "title": "2026新版初一初二初三全科目暑假月考期中期末核心考点电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 6271,
+      "delta": 1107,
+      "actual_gr": 21.44,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思写作"
+      ]
+    },
+    {
+      "goods_id": "6a7acab8b7d66f0001287fcc",
+      "title": "天赋测试-挖掘自身天赋领域教案（秒发货，地址手机随便填）",
+      "store_name": "Moopuffy的店",
+      "store_id": "69df9a9f0c80ec001511c24a",
+      "price": 1.88,
+      "sold": 59000,
+      "delta": 1000,
+      "actual_gr": 1.72,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "6a91b9d928ea590001da5513",
+      "title": "(新年福利)FYS未拆超值福袋 官方正品 默认出厂瑕 不支持退换",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 35.9,
+      "sold": 48000,
+      "delta": 1000,
+      "actual_gr": 2.13,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2025雅思阅读电子资料"
+      ]
+    },
+    {
+      "goods_id": "69db52d37015750001725604",
+      "title": "智能定制实体其他微信查单删小工具",
+      "store_name": "v查单清粉的店",
+      "store_id": "680e6eb30b8f9f0015b2e503",
+      "price": 2.86,
+      "sold": 44000,
+      "delta": 1000,
+      "actual_gr": 2.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思7000词作文模板"
+      ]
+    },
+    {
+      "goods_id": "656e988fa34f28000132d952",
+      "title": "27年新版李梦娇11.0常识速记口诀88条公务员事业单位考试专用书",
+      "store_name": "华图的店",
+      "store_id": "6565b2c44a0cd60001ab5214",
+      "price": 9.9,
+      "sold": 31000,
+      "delta": 1000,
+      "actual_gr": 3.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思笔记"
+      ]
+    },
+    {
+      "goods_id": "6a8cdc3d2fe0cd0001a877d8",
+      "title": "性格城市cp匹配测试趣味测试",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 28000,
+      "delta": 1000,
+      "actual_gr": 3.7,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "6925b96cb70fce0001c26436",
+      "title": "【英硕自制】27考研英语作文模板（原创）（电子资料拍下不退不换",
+      "store_name": "炒粉炒面翻译的店",
+      "store_id": "66b1f4e868165d001669782c",
+      "price": 9.99,
+      "sold": 26000,
+      "delta": 1000,
+      "actual_gr": 4.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思资料全套自学学习计划"
+      ]
+    },
+    {
+      "goods_id": "68bed47cf38f970001d8c48a",
+      "title": "2026电子版初一初二初三语文数学英语生物化史地道法知识点",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.7,
+      "sold": 26000,
+      "delta": 1000,
+      "actual_gr": 4.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思听力"
+      ]
+    },
+    {
+      "goods_id": "69d61e3e61bf4900013b793a",
+      "title": "初、高中语文PPT课件教案（必修选修）+高考8个专题课件教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.88,
+      "sold": 21000,
+      "delta": 1000,
+      "actual_gr": 5.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2025雅思阅读电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2cf8d89cf0970001ba893c",
+      "title": "CATO·提醒猫 l 日程管理+日记备忘+理财记账丨适配所有机型",
+      "store_name": "CATO的店",
+      "store_id": "66e4484767c6600015e31c86",
+      "price": 79.9,
+      "sold": 19000,
+      "delta": 1000,
+      "actual_gr": 5.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思备考电子资料"
+      ]
+    },
+    {
+      "goods_id": "68a456ea1745f6000118eaa8",
+      "title": "（初中/高中）英语教资面试/笔试（逐字稿+知识点+思维导图）PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 66.88,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思备考电子资料"
+      ]
+    },
+    {
+      "goods_id": "67b97d9c49f1f10001445703",
+      "title": "（初中/高中）英语教资面试/笔试（逐字稿+知识点+思维导图）PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思听力"
+      ]
+    },
+    {
+      "goods_id": "6a55bed05705e10001a9d059",
+      "title": "MBTI16人格测试最新版",
+      "store_name": "梨子资源铺的店",
+      "store_id": "67cf2a6653b10900152b20ad",
+      "price": 1.98,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "677f9534fb6ac0000181b3ff",
+      "title": "高中9科知识点电子档（语文数学英语物理化学生物地理历史政治）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2027雅思听力备考指南"
+      ]
+    },
+    {
+      "goods_id": "6a13c2d1cfd67c000154b9bd",
+      "title": "2026秋小学语文阅读理解答题模板/技巧训练/配套练习/电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.9,
+      "sold": 14000,
+      "delta": 1000,
+      "actual_gr": 7.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思备考电子资料"
+      ]
+    },
+    {
+      "goods_id": "692ebfe4d4363c000105974d",
+      "title": "新版初一精品练习题电子资料包，最新教程版本，永久免费更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思写作"
+      ]
+    },
+    {
+      "goods_id": "683e925ba006060015629486",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2027雅思听力备考指南"
+      ]
+    },
+    {
+      "goods_id": "68f59157c67e470001251f59",
+      "title": "【仅题本无解析】逻辑判断600题 | 公考国省考事业单位行测",
+      "store_name": "四海公考的店",
+      "store_id": "664ae528a57f5800010ebd8a",
+      "price": 13.2,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "冲刺雅思电子资料"
+      ]
+    },
+    {
+      "goods_id": "692ebfe4d4363c000105977a",
+      "title": "新版初一精品练习题电子资料包，最新教程版本，永久免费更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思备考电子资料"
+      ]
+    },
+    {
+      "goods_id": "669875633d78c1000154222b",
+      "title": "好快!10天背完3000英语单词 图解单词形象记忆轻松快速背单词",
+      "store_name": "扶文图书的店",
+      "store_id": "656c83779665fd00016e0f9d",
+      "price": 16.8,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思全科备考资料20"
+      ]
+    },
+    {
+      "goods_id": "695b4ead23d3ce0001d2f8c2",
+      "title": "2026【精品主题班会】课件200+持续更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 69.9,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思备考电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59eea71a0aff0001c8ef54",
+      "title": "27考研政治刷题小程序  含肖1000徐腿苏米孔张等18位名师习题笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "大全雅思"
+      ]
+    },
+    {
+      "goods_id": "6929997601312b000179f7e4",
+      "title": "2026幼小衔接拼音数学英语古诗识字阅读PPT课件教案资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.8,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思全科备考资料20"
+      ]
+    },
+    {
+      "goods_id": "69b4ec85cdd36c000114b515",
+      "title": "班级打卡养宠物/教学·课件",
+      "store_name": "可可乖猫的店",
+      "store_id": "68f73c183f07de00154d79eb",
+      "price": 19.9,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思全科备考资料20"
+      ]
+    },
+    {
+      "goods_id": "6936943b02483f0001246936",
+      "title": "考研历年真题考研英语考研数学考研政治199管综408计算机等",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.8,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思资料全套自学学习计划"
+      ]
+    },
+    {
+      "goods_id": "6ac0fe1d2c3f8b00018089ff",
+      "title": "袁东2027申论领跑营冲刺预测班（有书/有ai批改）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.32,
+      "sold": 3590,
+      "delta": 974,
+      "actual_gr": 37.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思写作"
+      ]
+    },
+    {
+      "goods_id": "6a90ea294f1f18000141d81f",
+      "title": "【原创】MBTI测谎版-撒谎也能精准判定",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.98,
+      "sold": 8087,
+      "delta": 940,
+      "actual_gr": 13.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "6a01747ddd034c00014af665",
+      "title": "【秒发】DeepSeek苹果iOS旁白4.0智能问答助手-电子资料模版教学",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 3166,
+      "delta": 857,
+      "actual_gr": 37.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思备考电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a169b4e5566b000017bba12",
+      "title": "北京华罗庚学校奥林匹克系列丛书华罗庚学校数学课本小学 初中 高",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 5558,
+      "delta": 845,
+      "actual_gr": 17.93,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思笔记"
+      ]
+    },
+    {
+      "goods_id": "6a93f84628ea59000118bbe2",
+      "title": "27考研英语速成笔记电子版pdf（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 3956,
+      "delta": 822,
+      "actual_gr": 26.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "冲刺雅思电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa42b4108388400010acc9c",
+      "title": "网盘互转百度网盘转夸克网盘自助转存教程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.5,
+      "sold": 2126,
+      "delta": 811,
+      "actual_gr": 61.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思笔记"
+      ]
+    },
+    {
+      "goods_id": "6aaa79416f8d960001544c59",
+      "title": "老爹26电子资源模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 5226,
+      "delta": 803,
+      "actual_gr": 18.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思7000词作文模板"
+      ]
+    },
+    {
+      "goods_id": "6ad22680cb0c01000182959c",
+      "title": "2027袁东申论领跑营全家桶方法实战大作文超大杯刷题【送网课】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 72.8,
+      "sold": 3306,
+      "delta": 794,
+      "actual_gr": 31.61,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思写作"
+      ]
+    },
+    {
+      "goods_id": "6a3e13bc1a14830001b85415",
+      "title": "2026新版初一初二初三全科目暑假月考期中期末核心考点电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 6583,
+      "delta": 788,
+      "actual_gr": 13.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思听力"
+      ]
+    },
+    {
+      "goods_id": "6a7b14ca09b4f20001f84d3d",
+      "title": "社会化程度匹配趣味测试|自动发货",
+      "store_name": "心灵疗愈观测站的店",
+      "store_id": "6982d4bbc857a00016307b1f",
+      "price": 2.99,
+      "sold": 3007,
+      "delta": 736,
+      "actual_gr": 32.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思笔记"
+      ]
+    },
+    {
+      "goods_id": "6a71be68bf81ab00018655ba",
+      "title": "26秋一年级上册语文PPT课件教案（七彩精华版）无水印好资料共享",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.2,
+      "sold": 2503,
+      "delta": 651,
+      "actual_gr": 35.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思全科备考资料20"
+      ]
+    },
+    {
+      "goods_id": "6a65f4e96cbefa00018d86a5",
+      "title": "MBTI16+64型人格测试 · 拍下即测 · 可重复测试 · 可分享给朋友",
+      "store_name": "12341ue的店",
+      "store_id": "6a6490f2567d0a0015a7e633",
+      "price": 1.98,
+      "sold": 1943,
+      "delta": 608,
+      "actual_gr": 45.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "6aa66c857116f00001b2f275",
+      "title": "26秋一年级上册语文单元测试卷 期中测试卷 期末测试卷pdf电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 4025,
+      "delta": 571,
+      "actual_gr": 16.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "2027雅思听力备考指南"
+      ]
+    },
+    {
+      "goods_id": "6a83f1915ed32c0001e58dce",
+      "title": "2026初中全科知识点汇总冲刺同步练习资料七至九年级必备",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 1412,
+      "delta": 564,
+      "actual_gr": 66.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思7000词作文模板"
+      ]
+    },
+    {
+      "goods_id": "6a6221b255f0ca0001a05c3f",
+      "title": "电子版跟着课本去旅行亲子游手册 自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.8,
+      "sold": 3972,
+      "delta": 550,
+      "actual_gr": 16.07,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思备考电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3a2121e503360001eb91e6",
+      "title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "store_name": "学姐的资料库的店",
+      "store_id": "66f59ab9a9bf3400163b0b7d",
+      "price": 1.99,
+      "sold": 6378,
+      "delta": 545,
+      "actual_gr": 9.34,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思资料全套自学学习计划"
+      ]
+    },
+    {
+      "goods_id": "69ad4445970f000001f4c717",
+      "title": "2026四川省时政知识点/时政习题/四川省情知识/四川省情习题",
+      "store_name": "月月希的店",
+      "store_id": "6899d1380281b20015dba2e3",
+      "price": 12.9,
+      "sold": 3111,
+      "delta": 497,
+      "actual_gr": 19.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思笔记"
+      ]
+    },
+    {
+      "goods_id": "6a53255905767800016fc825",
+      "title": "【自动发货】天赋能力测试报告",
+      "store_name": "土象研究生ens的店",
+      "store_id": "6a4a8b70877db80015d95c29",
+      "price": 0.99,
+      "sold": 8106,
+      "delta": 496,
+      "actual_gr": 6.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "69ceb5859347b100013a8f24",
+      "title": "白菜价个位数微博装扮合集·全套vip永久可用  主页壁纸装扮",
+      "store_name": "小水的漂亮东西（微博装扮）的店",
+      "store_id": "67ce2d0002b00c001567adb1",
+      "price": 9.9,
+      "sold": 5318,
+      "delta": 494,
+      "actual_gr": 10.24,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思复习计划"
+      ]
+    },
+    {
+      "goods_id": "6a96da74d58676000102a0f9",
+      "title": "27花生逻辑判断片段阅读资料分析数量关系600题PDF 带视频讲解",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 1569,
+      "delta": 493,
+      "actual_gr": 45.82,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思"
+      ]
+    },
+    {
+      "goods_id": "6aa25a3be2f91c00018af75d",
+      "title": "MBTI人格16型测评",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 4133,
+      "delta": 479,
+      "actual_gr": 13.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "6a94e19745b767000101f739",
+      "title": "【自动发货】SCL-90 抑郁/焦虑/躯体化/九大维度全面心理健康测评",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.98,
+      "sold": 2101,
+      "delta": 472,
+      "actual_gr": 28.97,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思思维导图电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7d3b816e8d370001409709",
+      "title": "26秋季小学四年级上语文部编新课标丨含课件+逐字稿+教案+作业单",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 2611,
+      "delta": 469,
+      "actual_gr": 21.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思笔记"
+      ]
+    },
+    {
+      "goods_id": "69424f92b049690001d5f35a",
+      "title": "2026人民日报作文宝藏素材 时事热点考点素材中考作文押题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 98.0,
+      "sold": 9220,
+      "delta": 461,
+      "actual_gr": 5.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "69a3fd9ecabb460001f1fc6b",
+      "title": "数量关系蒙题秘籍.七上八不下",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 7781,
+      "delta": 456,
+      "actual_gr": 6.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思"
+      ]
+    },
+    {
+      "goods_id": "692f065a2cf0ca0001430374",
+      "title": "四六级作文模板四级作文万能模板大学英语四级作文模板英语六级",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.98,
+      "sold": 1151,
+      "delta": 449,
+      "actual_gr": 63.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思7000词作文模板"
+      ]
+    },
+    {
+      "goods_id": "6942607d63db6a0015d0cda4",
+      "title": "图书  2026初中语文英语满分作文 范文素材一本通 7-9年级",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 54.8,
+      "sold": 9067,
+      "delta": 444,
+      "actual_gr": 5.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "6ab939767dbca2000120f887",
+      "title": "2026新版初一小四门电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.9,
+      "sold": 1999,
+      "delta": 441,
+      "actual_gr": 28.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思听力"
+      ]
+    },
+    {
+      "goods_id": "6a9d53acb993210001f76c27",
+      "title": "2026法院书记员备考资料课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.9,
+      "sold": 867,
+      "delta": 441,
+      "actual_gr": 103.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思全科备考资料20"
+      ]
+    },
+    {
+      "goods_id": "6a0f0df1d0fde60001ac4a4c",
+      "title": "【儿童数学数感】3-10岁趣味数学数感思维启蒙兴趣学科辅导",
+      "store_name": "糖果老师学霸启蒙的店",
+      "store_id": "6875d6298ee0fc0015a4931d",
+      "price": 25.9,
+      "sold": 5450,
+      "delta": 438,
+      "actual_gr": 8.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思备考电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa014dbe0f32f0001d95927",
+      "title": "麋鹿心理怪癖测试光遇荣格八维mbti心理测试心理测评工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 773,
+      "delta": 435,
+      "actual_gr": 128.7,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    },
+    {
+      "goods_id": "6ac0c14833abbd0001764eea",
+      "title": "星露谷物语-资料模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.5,
+      "sold": 2030,
+      "delta": 432,
+      "actual_gr": 27.03,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思7000词作文模板"
+      ]
+    },
+    {
+      "goods_id": "6ad2d1e9ac6a50000156be1c",
+      "title": "27新版考研英语词汇资料包 包更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 1134,
+      "delta": 432,
+      "actual_gr": 61.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "冲刺雅思电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a885bb9a6006900017f6899",
+      "title": "2026九年级上册道德与法治道法新教材PPT课件教学设计学案逐字稿",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 2085,
+      "delta": 424,
+      "actual_gr": 25.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思全科备考资料20"
+      ]
+    },
+    {
+      "goods_id": "6aa27750e6df3200015cc464",
+      "title": "Destiny Colour·你的本命色是什么？——性格测试模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 1566,
+      "delta": 421,
+      "actual_gr": 36.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "雅思日常商务面试对练"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "雅思",
+  "slug": "雅思"
+}

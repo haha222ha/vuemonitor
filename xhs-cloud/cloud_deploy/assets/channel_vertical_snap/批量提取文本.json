@@ -1,0 +1,1117 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "批量提取文本"
+    ],
+    "niche": "批量提取文本"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 0,
+    "active_n": 0,
+    "drive_keywords": [
+      "批量提取文本"
+    ],
+    "pinned": [],
+    "candidates": [],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 5,
+    "sku_n": 74,
+    "sum_delta": 47,
+    "median_price": 19.0,
+    "niche": "批量提取文本",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "普通人社会化攻略的店",
+      "sku_n": 1,
+      "sum_delta": 41,
+      "sum_sold": 3043,
+      "top_title": "i人社会化攻略成长指南-i人社交技巧-人情世故保姆级攻略",
+      "top_delta": 41
+    },
+    {
+      "store_name": "（未知店）",
+      "sku_n": 70,
+      "sum_delta": 6,
+      "sum_sold": 1562,
+      "top_title": "【纪猫问道】笔记同款好物-AI文本分析教育咨询服务",
+      "top_delta": 4
+    },
+    {
+      "store_name": "开悟思维锦囊的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 227,
+      "top_title": "开悟 · 职场晋升成长六板斧 | 成长思维模型(附PDF手册SOP模板)",
+      "top_delta": 0
+    },
+    {
+      "store_name": "金锋书店的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 3,
+      "top_title": "职场避坑指南1职场晋升指南职场干货职场沟通高情商",
+      "top_delta": 0
+    },
+    {
+      "store_name": "优逸学姐的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "职场新人全周期成长指南7篇全套（PDF+表格模板版）",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "69be9c7dd95b5a0001acdb40",
+      "title": "i人社会化攻略成长指南-i人社交技巧-人情世故保姆级攻略",
+      "store_name": "普通人社会化攻略的店",
+      "store_id": "69b40a96c4520a0015d6bcdb",
+      "price": 19.9,
+      "sold": 3043,
+      "delta": 41,
+      "actual_gr": 1.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69e2e9d18370010001c8da69",
+      "title": "【纪猫问道】笔记同款好物-AI文本分析教育咨询服务",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 27,
+      "delta": 4,
+      "actual_gr": 17.39,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69bb08231ea1a80001526c1a",
+      "title": "Word内容批量提取工具-办公神器/支持苹果系统",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.06,
+      "sold": 16,
+      "delta": 1,
+      "actual_gr": 6.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6aa0059bf70dec0015ccd3bc",
+      "title": "影片提取文案字幕影片转文字音频提取工具 字幕识别语音转写工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.88,
+      "sold": 9,
+      "delta": 1,
+      "actual_gr": 12.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "62cbb2d73801e10001a6d58b",
+      "title": "职场女性别让这些细节绊住你 国际知名高管教练 避坑宝典晋升指南",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 569,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "67f5e3878c17470001de53ba",
+      "title": "电商图片视频批量下载提取教程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.0,
+      "sold": 564,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "66f078aec1ece600016d231f",
+      "title": "开悟 · 职场晋升成长六板斧 | 成长思维模型(附PDF手册SOP模板)",
+      "store_name": "开悟思维锦囊的店",
+      "store_id": "66f01624162d1100168863b1",
+      "price": 38.0,
+      "sold": 227,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a0c0ee409bd620001efbc2f",
+      "title": "职场全场景指南  晋升+嫡系+新人+汇报+求职面试+SOP 干货PPT模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.0,
+      "sold": 76,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6822d3d49653670001043118",
+      "title": "职场晋升、个人成长",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 388.0,
+      "sold": 49,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69b93aac7bbc820015fcca1e",
+      "title": "1号位思维 刘向东 直击职场晋升核心痛点提供管理者思维蜕变方案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 71.6,
+      "sold": 28,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "682c56c9bd112700013da95c",
+      "title": "（原创免安装）批量提取文件信息（包括类型、大小、日期等）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 27,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6787c0fb7772b000016f36ea",
+      "title": "职场39个重要场景应对话术公式/教会你如何应对如何说",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 78.9,
+      "sold": 24,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69aba4ae7c9c8f00015a5397",
+      "title": "网页图片批量提取工具Windows版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "68982e8a4f80eb000153ad32",
+      "title": "办公产品/职场晋升指南提拔重用指南",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "693696e57ca5630001095466",
+      "title": "D108Excel批量生成控件条形码 (WPS用户请勿下单,自动发货,不退）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.0,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a0beb5571d8c300015b1b6d",
+      "title": "视频帧图片提取工具 | 支持批量提取指定帧或者所有帧图片",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a85b0f9ee44d90001ac9fca",
+      "title": "【社会化指南S229】原创16万字电子书-i人轻松社交人情世故模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 11,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69d8a28b613bea00010e0b49",
+      "title": "【职场晋升】90分钟1v1专业指导*深圳、上海线下（其他城市可线上",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 128.0,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a64745084b8ee00016b64d3",
+      "title": "36W字向上管理手册·领导相处+汇报+晋升+被边缘化+被甩锅全场景实",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a0bebdeefd40a0001a8d645",
+      "title": "专业级图片色彩提取工具 | 支持批量提取配色方案及自由吸取配色",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.9,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "696fa9b9eb2ffb0001110d5d",
+      "title": "华为内部员工职业发展咨询：深谙华为职场晋升之道，欢迎找我沟通",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 198.0,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6aabab833a949500013a8101",
+      "title": "歌尔股份 · A股深交所上市职级 · 薪酬·福利·晋升发展全拆解",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.0,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a4b2e319f30700001ec0bb9",
+      "title": "PPT图片提取器 一键批量提取PPT无水印原图和音视频文件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6982e98aa5576f0001f16bb6",
+      "title": "电商图片视频下载助手1688淘宝主图详情图一键批量保存存图宝",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "68efb19a7d3b3f00013a39bb",
+      "title": "OCR图片识别提取文本工具 | 支持生成到excel及截图识别复制",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a0ecfec189a9c00017b18f1",
+      "title": "【职场晋升指南】管理职场提升技巧",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 67.0,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "682ff15cbeccb1001525d664",
+      "title": "老A新书《单位晋升教科书》单位生存法则单位晋升书全册纸质书",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.8,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69025cfe1b78790001a61d65",
+      "title": "批量视频逐帧截图工具一键视频转jpg图片提取mp4连续画面清晰软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.95,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a633e966cbefa0001513bcc",
+      "title": "语音视频录音提取文字文本工具 准确率高 专业识别 文案提取神器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.88,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69f455d143360b000177c9db",
+      "title": "职场晋升发展1对1",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3500.0,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a409b9e654b390001ccca16",
+      "title": "PDF快递单号批量提取工具 邮政/USPS/SSCC面单识别 一键导出表格",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.0,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a8ee41fcc9be30001da4c73",
+      "title": "【前100名体验价】职场新人通关全指南PDF版0-3年经验必看原创",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "697a02c18dc4b30001b0ec8d",
+      "title": "网页工具一键编辑替换转为文本",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.8,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69afeb4414149e000152dfe0",
+      "title": "职场避坑指南1职场晋升指南职场干货职场沟通高情商",
+      "store_name": "金锋书店的店",
+      "store_id": "69afdda818d5d40015fb5a56",
+      "price": 99.0,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69a2aab87922fa0001edc930",
+      "title": "专业级Word图片提取替换工具 | 批量替换图片支持多文件一键操作",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a5862d87308b50001bb6656",
+      "title": "社会化与职场生存晋升全体系指南",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 99.6,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a75cad0a52c1c00018d1862",
+      "title": "华为海思 · 职级体系 · 薪酬结构 · 股权激励 · 晋升通道全拆解",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.0,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a64751124f0440001d79650",
+      "title": "UVR5汉化中文版人声伴奏分离软件背景音乐免费提取工具音轨降噪",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.88,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6aa004da87c1860015f4564f",
+      "title": "音频转换文字软体语音影片转换文本录音识别永久提取解说音频软体",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.88,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "696c8aa5d69f5300011bcb0b",
+      "title": "图片截图批量转换文字OCR文字识别提取文本TXT PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69f86842b8ecfa0015cfcb5e",
+      "title": "微信公众号历史文章批量导出wordpdf图片下载抓爬取采集打印软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a2a9380e2a6040001e32f17",
+      "title": "职场高手系统化养成手册7合1完整套装 覆盖站队/晋升/黑话/反内耗",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.99,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6aaf35c3f5fcb100019f2099",
+      "title": "职场新人成长指南-在线文档+工具包+复盘打卡+表达力训练系统",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.8,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69d724b5c3604d00158a8570",
+      "title": "批量修改名图片文件时间重命名编号替换更名文本档属性删除",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a00262dca011e00013e1bdb",
+      "title": "TXT Excel WordDOCX替换字符串文字文本内容批量替换修改工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a1052865566b00001d86cb4",
+      "title": "几何文本批量替换处理器，v1.0 对指定文件夹里的wo",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "66b09aa207479700012f69b9",
+      "title": "职场晋升手册 写给每个职场人的晋升宝典有效努力才能走得长远",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69393b95470eed0015f8ea3c",
+      "title": "txt文本合并分割批量处理软件删除合并拆分添加数据工具字符去重",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a4f2b8b33a5710001f68960",
+      "title": "职场新人全周期成长指南7篇全套（PDF+表格模板版）",
+      "store_name": "优逸学姐的店",
+      "store_id": "69c12e8f4381e900157386bd",
+      "price": 28.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a547b55913801001560395a",
+      "title": "txt文本处理批量删除重复空白行指定替换字符前后缀添加工具软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69328f410d75890001c751e9",
+      "title": "Win10系统腾讯POI数据抓取神器-批量提取地理坐标信息",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "68edeb9e1b3cbb0015b48aa3",
+      "title": "Shp和Txt数据转换工具 10.2版本支持文本批量转换 Arcgis10.2环境",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 42.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a7bf6fb95cfc00001d9c29a",
+      "title": "职场新人成长指南（HR揭秘·求职认知+入职生存+绩效晋升+SOP）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.41,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "680319cd97430600016430e4",
+      "title": "《职场实用宝典》玩转权力晋升之道/升职加薪/成功谋略资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a8860febb5596001562b9db",
+      "title": "批量修改名图片文件时间重命名编号替换更名文本档属性删除 · 默",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a8afcef81c7b60001e252dc",
+      "title": "跳槽薪资谈判全攻略：职场晋升必备资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a8b020b61bc11000111d126",
+      "title": "晋升不能等手册！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6a9ed038a3924100018044ed",
+      "title": "《职场新人快速成长指南》 转正谈薪_人际关系_职业规划",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6801ab9b6ee2320001e91296",
+      "title": "《职场晋升心计》职场生存/晋升升职方法/心理学人际交往资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.6,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6aa75a9c7116f00001ca8852",
+      "title": "批量文件名提取软件文件名批量编号文件名批量课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6aa7f5986f8d96000101bf62",
+      "title": "发票管家 发票批量提取导出 Excel 智能改名 本地运行 可选云端",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6aa0bd6c45441600152e4c2c",
+      "title": "录音转文字软体提取语音影片助手vip会议转换文本人工神器永久",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6966965af89e9d0015128624",
+      "title": "52本职场宝典，为职场人每周解读一本，助你完成职场晋升加薪",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69c761de2fb6290001aa4bf6",
+      "title": "界址点批量提取座标到CAD表格CASS界址点编号生成表格插件cad插件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 35.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "696695f9c13d0f0015d6c5fa",
+      "title": "7种高效时间管理法，助你自我提升职场晋升精品课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.98,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69df32b2c41f7e00013fbb9b",
+      "title": "Word文本图片批量替换生成多文件 | 支持文本图片一对一替换",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "695cf124fe4ff50015546616",
+      "title": "职场晋升指南职场晋升指南",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.11,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69e916919dea2d0001529b79",
+      "title": "批量影片逐帧截图工具一键影片转jpg图片提取mp4连续画面清晰软体",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "69f079e99a289f00150620d7",
+      "title": "PC电脑微信dat批量转jpg图片格式转换器Wechat解码提取ab10 · 默",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.86,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "6aaacdcb0e3e8700014334fa",
+      "title": "产品老曾课程6套L1职场课L2晋升课大厂面试攻略向上管理阿里P96",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "695a27dd4e15d600013b6352",
+      "title": "职场晋升密钥 -拿资源！带团队！打江山！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1000.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "695536456fadb70001e22e87",
+      "title": "2026年职场晋升攻略共计21页",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "695247f408cd9000012e2b62",
+      "title": "正版二手 职场晋升101 读客文化 出品 江苏凤凰文艺",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.1,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    },
+    {
+      "goods_id": "693baed7266b950001317144",
+      "title": "职场晋升指南（提拔重用指南）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "批量提取文本"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "批量提取文本",
+  "slug": "批量提取文本"
+}

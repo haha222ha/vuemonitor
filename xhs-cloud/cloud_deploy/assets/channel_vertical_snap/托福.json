@@ -1,0 +1,1659 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "托福"
+    ],
+    "niche": "托福"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 70,
+    "active_n": 2,
+    "drive_keywords": [
+      "托福写作电子资料",
+      "托福思维导图电子资料",
+      "托福",
+      "必备托福",
+      "冲刺托福",
+      "初级托福",
+      "精选托福",
+      "托福笔记",
+      "托福地理",
+      "托福法学",
+      "托福化学",
+      "托福讲义",
+      "托福历史",
+      "托福生物",
+      "托福试卷",
+      "托福数学",
+      "托福题库",
+      "托福网课",
+      "托福线代",
+      "托福押题",
+      "托福药学",
+      "托福真题",
+      "押题托福",
+      "和托福牵手"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "托福写作电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "deactivated_outside_probe_yield_20260812|deact_yield_opt_20260928_095452",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福思维导图电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "gap_fill_SA_20261013",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "pg_high_yield_fill_20261013_183244",
+        "role": "candidate"
+      },
+      {
+        "keyword": "必备托福",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "补齐每日主队列至3000·20260901|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "冲刺托福",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "初级托福",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "精选托福",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "补齐每日主队列至3000·20260901|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福笔记",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "恢复831拓展·每日main合并周期|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福地理",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福法学",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "dual:小红书选品监控关键词库_3000小红书合规版_v2.txt+虚拟关键词配置_2000.txt",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福化学",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福讲义",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福历史",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "dual:小红书选品监控关键词库_3000小红书合规版_v2.txt+虚拟关键词配置_2000.txt",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福生物",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "dual:小红书选品监控关键词库_3000小红书合规版_v2.txt+虚拟关键词配置_2000.txt",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福试卷",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福数学",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福题库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "yield_top1000_15d",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福网课",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": " | scrub_wangke_20260902",
+        "source": "dual:小红书选品监控关键词库_3000小红书合规版_v2.txt+虚拟关键词配置_2000.txt",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福线代",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福押题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福药学",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "dual:小红书选品监控关键词库_3000小红书合规版_v2.txt+虚拟关键词配置_2000.txt",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福真题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "押题托福",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "和托福牵手",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "卡拉咪托福",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福面试题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福模拟题",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福你好吖",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福说课稿",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福资料包",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "小吖小托福",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "小萝卜托福",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "2025托福",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "全套托福词汇",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": " [force_suffix_old_0727]",
+        "source": "virtual_core_yield_opt_20260928_095452",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "托福思维导图",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "恢复831拓展·每日main合并周期|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_kw_cross_opt_demote",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子档托福冲刺",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子档托福词汇",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子档托福听力",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "电子档托福阅读",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 19,
+    "sku_n": 80,
+    "sum_delta": 12367,
+    "median_price": 7.99,
+    "niche": "托福",
+    "drive_kw_n": 24
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 62,
+      "sum_delta": 10449,
+      "sum_sold": 128494,
+      "top_title": "卡通可爱Q版定制情侣头像壁纸",
+      "top_delta": 1537
+    },
+    {
+      "store_name": "课堂内外旗舰店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 103000,
+      "top_title": "健康人报·青少年心理报纸8-15岁适读 强大内心 情绪管理",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "cici是我的店",
+      "sku_n": 1,
+      "sum_delta": 157,
+      "sum_sold": 3884,
+      "top_title": "精准狙击 | 95个高频观点库8大话题提升写作技巧",
+      "top_delta": 157
+    },
+    {
+      "store_name": "这是一家手绘的店",
+      "sku_n": 1,
+      "sum_delta": 120,
+      "sum_sold": 1469,
+      "top_title": "newmasus代画手绘头像油画棒蜡笔情侣照片转漫画卡通形象设计",
+      "top_delta": 120
+    },
+    {
+      "store_name": "知我网络的店",
+      "sku_n": 1,
+      "sum_delta": 112,
+      "sum_sold": 5830,
+      "top_title": "剪映 ·VIP会员/SVIP会员周卡月卡年卡·视频剪辑模版素材",
+      "top_delta": 112
+    },
+    {
+      "store_name": "张老师教钢琴电子琴的店",
+      "sku_n": 1,
+      "sum_delta": 87,
+      "sum_sold": 708,
+      "top_title": "钢学新手必选从零开始电子琴辅导教材",
+      "top_delta": 87
+    },
+    {
+      "store_name": "6846ae5f4f17170015bec2ef",
+      "sku_n": 1,
+      "sum_delta": 86,
+      "sum_sold": 627,
+      "top_title": "EnglishPilot英语听说读写宝藏学习工具|雅思托福口语写作批改",
+      "top_delta": 86
+    },
+    {
+      "store_name": "Eason在学英语的店",
+      "sku_n": 1,
+      "sum_delta": 58,
+      "sum_sold": 5919,
+      "top_title": "外企职场英语语料库【听力跟读电子课件】国外5年总结【持续更新",
+      "top_delta": 58
+    },
+    {
+      "store_name": "Cathy学姐（上岸版）的店",
+      "sku_n": 1,
+      "sum_delta": 46,
+      "sum_sold": 1919,
+      "top_title": "2026年医疗事业编E类医学基础知识必刷1000题知识点大全高频考点",
+      "top_delta": 46
+    },
+    {
+      "store_name": "Lijee（雅思口语努力练习版的店",
+      "sku_n": 1,
+      "sum_delta": 43,
+      "sum_sold": 2808,
+      "top_title": "Part 1 素材+Part 2串题素材（9~12月适用）",
+      "top_delta": 43
+    },
+    {
+      "store_name": "杨姐主管通的店",
+      "sku_n": 1,
+      "sum_delta": 41,
+      "sum_sold": 3274,
+      "top_title": "主管/初级/护士/副高/正高口诀资料电子文档",
+      "top_delta": 41
+    },
+    {
+      "store_name": "魔仙堡在逃卷王的店",
+      "sku_n": 1,
+      "sum_delta": 38,
+      "sum_sold": 2626,
+      "top_title": "卷王26年9-12月最新雅思口语+听力阅读+作文全科极速上岸大礼包",
+      "top_delta": 38
+    },
+    {
+      "store_name": "65eaf9a9bf7fb60001fcbdad",
+      "sku_n": 1,
+      "sum_delta": 36,
+      "sum_sold": 119,
+      "top_title": "16|简历模板-应届生无经验简历模板电子版word大学生三无简历模板",
+      "top_delta": 36
+    },
+    {
+      "store_name": "LUT商城的店",
+      "sku_n": 1,
+      "sum_delta": 31,
+      "sum_sold": 3271,
+      "top_title": "【自动发货】【即将恢复原价】剪映LUT 终极整理版 capcut 模板",
+      "top_delta": 31
+    },
+    {
+      "store_name": "外研社旗舰店",
+      "sku_n": 1,
+      "sum_delta": 21,
+      "sum_sold": 3150,
+      "top_title": "新概念英语智慧版 扫码得概述课+跟读+音频",
+      "top_delta": 21
+    },
+    {
+      "store_name": "HUGE留学备考专家的店",
+      "sku_n": 1,
+      "sum_delta": 11,
+      "sum_sold": 246,
+      "top_title": "新托福阅读Missing letters（完形填空）视频串讲",
+      "top_delta": 11
+    },
+    {
+      "store_name": "666058f0dd221800012eb918",
+      "sku_n": 1,
+      "sum_delta": 11,
+      "sum_sold": 223,
+      "top_title": "新托福口语 Listen & Repeat 串讲资料",
+      "top_delta": 11
+    },
+    {
+      "store_name": "Alice辣拉蓝德的店",
+      "sku_n": 1,
+      "sum_delta": 10,
+      "sum_sold": 733,
+      "top_title": "新托福写作万能语料库(学术+邮件)10大高频主题思路30+高分范文",
+      "top_delta": 10
+    },
+    {
+      "store_name": "小梦toefl的店的店",
+      "sku_n": 1,
+      "sum_delta": 10,
+      "sum_sold": 200,
+      "top_title": "托福1v1基础诊断课 | 托福全套复习备考资料",
+      "top_delta": 10
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "698890bbf0c4840001acfa47",
+      "title": "新托福写作万能语料库(学术+邮件)10大高频主题思路30+高分范文",
+      "store_name": "Alice辣拉蓝德的店",
+      "store_id": "67a86338d0ac5b0015e457b8",
+      "price": 294.0,
+      "sold": 733,
+      "delta": 10,
+      "actual_gr": 1.38,
+      "token_hits": 1,
+      "touch_keywords": [
+        "托福笔记",
+        "托福题库"
+      ]
+    },
+    {
+      "goods_id": "62ff60459897120001e0270b",
+      "title": "新概念英语智慧版 扫码得概述课+跟读+音频",
+      "store_name": "外研社旗舰店",
+      "store_id": "620ca262860ab20001cb236c",
+      "price": 83.0,
+      "sold": 3150,
+      "delta": 21,
+      "actual_gr": 0.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福题库",
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6074f8e9f0b1000108bb9c",
+      "title": "EnglishPilot英语听说读写宝藏学习工具|雅思托福口语写作批改",
+      "store_name": "6846ae5f4f17170015bec2ef",
+      "store_id": "6846ae5f4f17170015bec2ef",
+      "price": 1.0,
+      "sold": 627,
+      "delta": 86,
+      "actual_gr": 15.9,
+      "token_hits": 1,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a461e1d6370dc0001c889e7",
+      "title": "卡片单词速记-听说读写-雅思托福考研四六级高中初中词汇",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 445,
+      "delta": 61,
+      "actual_gr": 15.89,
+      "token_hits": 1,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "650d2762f08fd50001a59260",
+      "title": "100个句子记单词系列 小学/中考/高考/四级/六级/考研/托福/雅思/",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 34.8,
+      "sold": 2501,
+      "delta": 28,
+      "actual_gr": 1.13,
+      "token_hits": 1,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6a719af4eb49fe0001e4205e",
+      "title": "下次托福考试可能考啥？",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 26.6,
+      "sold": 130,
+      "delta": 12,
+      "actual_gr": 10.17,
+      "token_hits": 1,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6a53603b0576780001773daa",
+      "title": "新托福阅读Missing letters（完形填空）视频串讲",
+      "store_name": "HUGE留学备考专家的店",
+      "store_id": "666058f0dd221800012eb918",
+      "price": 199.0,
+      "sold": 246,
+      "delta": 11,
+      "actual_gr": 4.68,
+      "token_hits": 1,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6a190bb294d58300019c15c8",
+      "title": "新托福口语 Listen & Repeat 串讲资料",
+      "store_name": "666058f0dd221800012eb918",
+      "store_id": "666058f0dd221800012eb918",
+      "price": 199.0,
+      "sold": 223,
+      "delta": 11,
+      "actual_gr": 5.19,
+      "token_hits": 1,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "68d4eb68ce94ee0001ca1382",
+      "title": "托福1v1基础诊断课 | 托福全套复习备考资料",
+      "store_name": "小梦toefl的店的店",
+      "store_id": "68d3bdbd4345bd00155247e5",
+      "price": 3.99,
+      "sold": 200,
+      "delta": 10,
+      "actual_gr": 5.26,
+      "token_hits": 1,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6a58858d4f6fde00012490ac",
+      "title": "卡通可爱Q版定制情侣头像壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 5240,
+      "delta": 1537,
+      "actual_gr": 41.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6a269805d5e6e60001ec7305",
+      "title": "小鼻噶头像可爱卡通明星应援物料周边高清大图图纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 7772,
+      "delta": 1207,
+      "actual_gr": 18.39,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6a8976f12fe0cd0001560d0a",
+      "title": "LPI恋爱压力指数情侣压力指数测试情侣压力分析报告社交心理",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.95,
+      "sold": 5299,
+      "delta": 1107,
+      "actual_gr": 26.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "671afc60fe8531000117cb3f",
+      "title": "健康人报·青少年心理报纸8-15岁适读 强大内心 情绪管理",
+      "store_name": "课堂内外旗舰店",
+      "store_id": "64f1d4e08265a10001b1fe12",
+      "price": 49.8,
+      "sold": 103000,
+      "delta": 1000,
+      "actual_gr": 0.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6851a00ae874f2000195ba72",
+      "title": "【序号201-500】大学资料合集【自动发货】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6aa9e70c2054db0001d40621",
+      "title": "音乐格式转换MP3电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.25,
+      "sold": 7962,
+      "delta": 650,
+      "actual_gr": 8.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa25a3be2f91c00018af75d",
+      "title": "MBTI人格16型测评",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 4133,
+      "delta": 479,
+      "actual_gr": 13.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6a9d140ebaea3b00016da0a7",
+      "title": "英文水印.原创定制.头像壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.5,
+      "sold": 2435,
+      "delta": 267,
+      "actual_gr": 12.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6a8bd34c0db08d00013577f0",
+      "title": "照片去路人P图旅游打卡照合照删人消除游客无痕修图怎么p掉路人",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 850,
+      "delta": 252,
+      "actual_gr": 42.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0dc1b788ed2e0001febaf6",
+      "title": "A002 学术汇报 论文答辩|开题报告|组会文献汇报通用PPT模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 1866,
+      "delta": 204,
+      "actual_gr": 12.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6a72fbaec8e41500015c19b1",
+      "title": "RQ牌正比空壳oc人设图片头像壁纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.5,
+      "sold": 2960,
+      "delta": 188,
+      "actual_gr": 6.78,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6a97e15459b822000199cf65",
+      "title": "26全国会计继续教育服务【会计业务咨询服务】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.0,
+      "sold": 943,
+      "delta": 186,
+      "actual_gr": 24.57,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a085c8f22eb6500019d4dea",
+      "title": "newmasus手绘头像动漫卡通q版动漫定制画专属情侣约稿蜡笔画图纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 62.75,
+      "sold": 957,
+      "delta": 180,
+      "actual_gr": 23.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6a59e78be9f0b10001760298",
+      "title": "q版手绘头像制作卡通形象设计动漫画人物绘画头像情侣照片",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 1061,
+      "delta": 173,
+      "actual_gr": 19.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "684ae07157fa160001b60a40",
+      "title": "JLPT日语N1-N5真题PDF套卷（近30年答案解析、听力原文都有）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 3412,
+      "delta": 169,
+      "actual_gr": 5.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福题库"
+      ]
+    },
+    {
+      "goods_id": "69cf80ef069e7b00017dcfeb",
+      "title": "精准狙击 | 95个高频观点库8大话题提升写作技巧",
+      "store_name": "cici是我的店",
+      "store_id": "682165a78122f80015c47673",
+      "price": 27.9,
+      "sold": 3884,
+      "delta": 157,
+      "actual_gr": 4.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "68a8605c8f5313000158573f",
+      "title": "三大运营商简历网申：中国移动/中国联通/中国电信笔试、面试备考",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 1148,
+      "delta": 149,
+      "actual_gr": 14.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "69c250a5e6196b0001535585",
+      "title": "学习资料电子资料（同款课件资源）01",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 1668,
+      "delta": 130,
+      "actual_gr": 8.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6a3268d3413f350001125d1b",
+      "title": "newmasus代画手绘头像油画棒蜡笔情侣照片转漫画卡通形象设计",
+      "store_name": "这是一家手绘的店",
+      "store_id": "6926a2cdec9d9a001545f337",
+      "price": 23.0,
+      "sold": 1469,
+      "delta": 120,
+      "actual_gr": 8.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6aa3ec917a35e600018c1c16",
+      "title": "公考2027国考历年真题试卷申论行测真题狂刷40套省考真题资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 79.0,
+      "sold": 3517,
+      "delta": 117,
+      "actual_gr": 3.44,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "68428892802c620001b93bb0",
+      "title": "剪映 ·VIP会员/SVIP会员周卡月卡年卡·视频剪辑模版素材",
+      "store_name": "知我网络的店",
+      "store_id": "68243d402e0d130015825f52",
+      "price": 188.0,
+      "sold": 5830,
+      "delta": 112,
+      "actual_gr": 1.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ff4d70a0130600014e9415",
+      "title": "初中数学辅导教材110个大招高分提分学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 54.4,
+      "sold": 589,
+      "delta": 105,
+      "actual_gr": 21.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa7bfb768ec340001f650ad",
+      "title": "oc人设拼拼乐盲盒头像壁纸（梦羊）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.46,
+      "sold": 677,
+      "delta": 98,
+      "actual_gr": 16.93,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "681ac27b605b3a0001bab6f9",
+      "title": "自动秒发货！高级感PPT模板电子版3（版式看主页笔记，已勾选）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 3656,
+      "delta": 97,
+      "actual_gr": 2.73,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6acd28b8d11b2d0001c04c30",
+      "title": "2027公安专业知识课程资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.99,
+      "sold": 171,
+      "delta": 93,
+      "actual_gr": 119.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4488a23e43a00001bb8905",
+      "title": "（无畏契约系列）图大全带色号高清 头像壁纸 自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.99,
+      "sold": 2108,
+      "delta": 91,
+      "actual_gr": 4.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6a41f818fcf4ce0001b87b06",
+      "title": "钢学新手必选从零开始电子琴辅导教材",
+      "store_name": "张老师教钢琴电子琴的店",
+      "store_id": "66a99fa6bd86ee0015319eac",
+      "price": 69.0,
+      "sold": 708,
+      "delta": 87,
+      "actual_gr": 14.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a82d7abb7d66f000100ca0d",
+      "title": "英语口语听力素材  英语口语影子跟读练习课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.0,
+      "sold": 807,
+      "delta": 81,
+      "actual_gr": 11.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福题库"
+      ]
+    },
+    {
+      "goods_id": "6aaae97a53246000010d6629",
+      "title": "【出模板】唱片（头像壁纸）（拍下自动发网盘链接）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 330,
+      "delta": 81,
+      "actual_gr": 32.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6888c9b40e13d5000111d1c5",
+      "title": "土豆鼠 第一期 画世界／画世界pro专用 头像例图 含 6支",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.8,
+      "sold": 6029,
+      "delta": 79,
+      "actual_gr": 1.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "691805f9e78d990001635f06",
+      "title": "【客服自动发货】73页6色高校答辩学术风ppt模板，教师&学生通用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.99,
+      "sold": 2507,
+      "delta": 78,
+      "actual_gr": 3.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9fbb63e18b0e0001291543",
+      "title": "27 考研刷题题库电子资源 政治专业课真题模拟题备考资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 320,
+      "delta": 77,
+      "actual_gr": 31.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6a8ea80d17e10e00013785bd",
+      "title": "2026新教材小学数学从课本到奥数培优讲义（苏教版）电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 37.8,
+      "sold": 839,
+      "delta": 73,
+      "actual_gr": 9.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a670dad5b7eff00011a7797",
+      "title": "官方速发】2027张宇考研8+4冲刺八套卷四套卷临门一脚数学一二三",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 50.7,
+      "sold": 1277,
+      "delta": 71,
+      "actual_gr": 5.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "69ce2e6e7c7d120001365b95",
+      "title": "（Hello Kitty图系列）像素风带色号 高清头像壁纸自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.99,
+      "sold": 826,
+      "delta": 65,
+      "actual_gr": 8.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "653a588aa28ddb0001fd4d32",
+      "title": "PPT模板一份/拍下后发送编号",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.0,
+      "sold": 9977,
+      "delta": 60,
+      "actual_gr": 0.61,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "69f370758c2c23000189489a",
+      "title": "浮雕天使翅膀小水印定制头像通用防盗水印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 3398,
+      "delta": 59,
+      "actual_gr": 1.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "675eea55faaaf300017cbe7c",
+      "title": "外企职场英语语料库【听力跟读电子课件】国外5年总结【持续更新",
+      "store_name": "Eason在学英语的店",
+      "store_id": "673dd3f9a4b92f00157171fc",
+      "price": 69.0,
+      "sold": 5919,
+      "delta": 58,
+      "actual_gr": 0.99,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福题库"
+      ]
+    },
+    {
+      "goods_id": "68cf9bd0d1f7b8000171eb5f",
+      "title": "2026中级经济师 - AI考点随身听/学/练/背",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 972,
+      "delta": 57,
+      "actual_gr": 6.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福思维导图电子资料"
+      ]
+    },
+    {
+      "goods_id": "69902cff5f567d000120a731",
+      "title": "PPT模板任选一份(下单后请告知客服编号或截图给客服)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 1093,
+      "delta": 55,
+      "actual_gr": 5.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6a7dafa7d37c8900018284df",
+      "title": "【课件】咩咩扬仔九上历史新课课件（无教案，逐字稿需另外下单）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 188.0,
+      "sold": 3454,
+      "delta": 53,
+      "actual_gr": 1.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6980b932ab9b88000128fc7b",
+      "title": "【Carrie的雅思写作宝库】一套模版搞定大小作文",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 2345,
+      "delta": 52,
+      "actual_gr": 2.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa29f60e3e8700012dcbdf",
+      "title": "2027中级备考资料+网课（27持续更新）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.0,
+      "sold": 709,
+      "delta": 52,
+      "actual_gr": 7.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "69c2a7ccff00dc00011c2f23",
+      "title": "2026经济师考试武小唐网课初级经济师庄欣中级经济师网课精讲冲刺",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 30.0,
+      "sold": 115,
+      "delta": 52,
+      "actual_gr": 82.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福思维导图电子资料"
+      ]
+    },
+    {
+      "goods_id": "69806290eb0d9a00018e38d5",
+      "title": "2027中考总复习语数英物化生道史地一轮+二轮专项训练电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 4239,
+      "delta": 51,
+      "actual_gr": 1.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福思维导图电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f4a5cce0e86e000141b2a6",
+      "title": "动态静态｜能量头像背景图｜喜火土 自我蜕变｜原创高清 自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.4,
+      "sold": 488,
+      "delta": 51,
+      "actual_gr": 11.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "69a4624b85eac80001f15f35",
+      "title": "大学生职业生涯规划书成品范文word＋ppt职业生涯比赛成长赛道",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.88,
+      "sold": 109,
+      "delta": 50,
+      "actual_gr": 84.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2d30108bca040001f7ac5c",
+      "title": "2026年医疗事业编E类医学基础知识必刷1000题知识点大全高频考点",
+      "store_name": "Cathy学姐（上岸版）的店",
+      "store_id": "6a0541a34ed403001597aa28",
+      "price": 13.9,
+      "sold": 1919,
+      "delta": 46,
+      "actual_gr": 2.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6a6b560824f0440001aa40be",
+      "title": "高一高二高三全套网课电子学习资料高三总复习资料包课件电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 89.0,
+      "sold": 533,
+      "delta": 46,
+      "actual_gr": 9.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6a9922231b9ae900014fd25d",
+      "title": "【冲鸭自研】韩语TOPIK全套资料 零基础自学单词语法字帖口语课程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.95,
+      "sold": 311,
+      "delta": 46,
+      "actual_gr": 17.36,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a30e056e5033600011abb19",
+      "title": "英语科普阅读短文&英语脑科学思维养成电子版可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 89.0,
+      "sold": 2045,
+      "delta": 45,
+      "actual_gr": 2.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福题库"
+      ]
+    },
+    {
+      "goods_id": "6a91cabcc61bcd00019b4022",
+      "title": "【万能模板皆可用】幼儿园秋学期家长会邀请函电子版可编辑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 337,
+      "delta": 45,
+      "actual_gr": 15.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6816ee5c3366f100018bc453",
+      "title": "Part 1 素材+Part 2串题素材（9~12月适用）",
+      "store_name": "Lijee（雅思口语努力练习版的店",
+      "store_id": "64f74f2457eb8e0001df0163",
+      "price": 19.46,
+      "sold": 2808,
+      "delta": 43,
+      "actual_gr": 1.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "691e5a0328a0120001087ef7",
+      "title": "03大学生职业生涯规划大赛PPT（300套简约可编辑，秒拍秒发）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 545,
+      "delta": 43,
+      "actual_gr": 8.57,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a574aad8c0a3e0001cc314c",
+      "title": "金水生财 能量头像 喜金水 #165",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.99,
+      "sold": 244,
+      "delta": 42,
+      "actual_gr": 20.79,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "67ebd82d9b41340001572153",
+      "title": "主管/初级/护士/副高/正高口诀资料电子文档",
+      "store_name": "杨姐主管通的店",
+      "store_id": "653b1ade0ade5700013875f9",
+      "price": 0.9,
+      "sold": 3274,
+      "delta": 41,
+      "actual_gr": 1.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a72c66234eabf00013f15d4",
+      "title": "抱盒200张 摄入芝士扭蛋周年庆情侣动漫插画头像原创圈高清无水印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 440,
+      "delta": 40,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "69f8684b6eeaf7000157f14a",
+      "title": "50支·破型过渡增加画面信息量完成度绘画素材 头像壁纸可商用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 2692,
+      "delta": 38,
+      "actual_gr": 1.43,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "67f25282b2c30c00019c4d46",
+      "title": "卷王26年9-12月最新雅思口语+听力阅读+作文全科极速上岸大礼包",
+      "store_name": "魔仙堡在逃卷王的店",
+      "store_id": "675564130c95070015c63e06",
+      "price": 129.9,
+      "sold": 2626,
+      "delta": 38,
+      "actual_gr": 1.47,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福题库"
+      ]
+    },
+    {
+      "goods_id": "6a004ed3a0130600016592a7",
+      "title": "27上半年教师资格证笔试【网课】幼儿小学初中高中真题电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 1615,
+      "delta": 37,
+      "actual_gr": 2.34,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福思维导图电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8d47c871204c000132f2ea",
+      "title": "32支·褶皱细节刻画 插画头像可商用绘画素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 1034,
+      "delta": 37,
+      "actual_gr": 3.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "69399667f994e6000152dcbd",
+      "title": "16|简历模板-应届生无经验简历模板电子版word大学生三无简历模板",
+      "store_name": "65eaf9a9bf7fb60001fcbdad",
+      "store_id": "65eaf9a9bf7fb60001fcbdad",
+      "price": 3.99,
+      "sold": 119,
+      "delta": 36,
+      "actual_gr": 43.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0b135e9cd5530001897eb7",
+      "title": "剑桥 Power Up 第1版 单元测试PDF资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 30.0,
+      "sold": 441,
+      "delta": 34,
+      "actual_gr": 8.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福思维导图电子资料"
+      ]
+    },
+    {
+      "goods_id": "691f264bccb9e00001d7f136",
+      "title": "中小学心理，安全督导各类迎检检查资料75份",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 678,
+      "delta": 33,
+      "actual_gr": 5.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "6a2502ce34cb0200014db722",
+      "title": "高端乔迁之喜模板 乔迁大吉素材 乔迁大气请帖素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.99,
+      "sold": 335,
+      "delta": 33,
+      "actual_gr": 10.93,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "693e76e751b8c000017f31a2",
+      "title": "ppt模板任选一份 （下单后告知客服需要的模板编号或截图）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 1748,
+      "delta": 32,
+      "actual_gr": 1.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福笔记"
+      ]
+    },
+    {
+      "goods_id": "68d4a2efe0f3b20001aab0c4",
+      "title": "【自动发货】【即将恢复原价】剪映LUT 终极整理版 capcut 模板",
+      "store_name": "LUT商城的店",
+      "store_id": "68c377f25927c50015ccafc7",
+      "price": 29.0,
+      "sold": 3271,
+      "delta": 31,
+      "actual_gr": 0.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ac8e6b27dbca2000184275a",
+      "title": "Mac虚拟机win双系统一次安装终身使用 虚拟机模板 电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.99,
+      "sold": 188,
+      "delta": 31,
+      "actual_gr": 19.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福写作电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a085a7e3eb97c0001273b40",
+      "title": "小鼻嘎qq人Q版高清手绘头像图纸卡通明星应援可爱动漫头像图纸",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 1416,
+      "delta": 30,
+      "actual_gr": 2.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6a9d0ec1ee83f200013e4fb5",
+      "title": "(自动发货)AI制作 OC灵感盲盒",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 1166,
+      "delta": 30,
+      "actual_gr": 2.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    },
+    {
+      "goods_id": "6a94db3d5482980001b0cc2f",
+      "title": "英文水印头像壁纸 当天出图 邱千千",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 392,
+      "delta": 30,
+      "actual_gr": 8.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "托福"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "托福",
+  "slug": "托福"
+}

@@ -1,0 +1,1249 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "知识库AI收费"
+    ],
+    "niche": "知识库AI收费"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 0,
+    "active_n": 0,
+    "drive_keywords": [
+      "知识库AI收费"
+    ],
+    "pinned": [],
+    "candidates": [],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 11,
+    "sku_n": 80,
+    "sum_delta": 58,
+    "median_price": 29.9,
+    "niche": "知识库AI收费",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 70,
+      "sum_delta": 33,
+      "sum_sold": 1420,
+      "top_title": "0-6岁育儿知识库新手爸妈必备永久版送蒙氏PDF学习资料课件",
+      "top_delta": 31
+    },
+    {
+      "store_name": "明天接offer的店",
+      "sku_n": 1,
+      "sum_delta": 15,
+      "sum_sold": 4985,
+      "top_title": "日更：27届秋招信息汇总",
+      "top_delta": 15
+    },
+    {
+      "store_name": "硕士妈妈的养育日记的店",
+      "sku_n": 1,
+      "sum_delta": 10,
+      "sum_sold": 413,
+      "top_title": "口袋育儿知识库,持续更新含蒙氏育儿PDF学习资料新手爸妈必备音频",
+      "top_delta": 10
+    },
+    {
+      "store_name": "草莓师姐的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 974,
+      "top_title": "大模型面试笔记|大模型+多模态全面知识库（持续更新）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "云沐的碎碎念的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 361,
+      "top_title": "职场新人系统化成长|原创知识库实习/社招/应届生新人职场规划",
+      "top_delta": 0
+    },
+    {
+      "store_name": "乙伴欣林的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 115,
+      "top_title": "全球100本育儿必读书｜AI博客知识库｜大量阅读提升育儿认知",
+      "top_delta": 0
+    },
+    {
+      "store_name": "弘略财研的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 99,
+      "top_title": "财研咖啡Bar财务知识库|财务×AI|财务BP财务分析",
+      "top_delta": 0
+    },
+    {
+      "store_name": "十六的育儿知识库的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 74,
+      "top_title": "0-1岁蒙氏育儿分月龄知识库·新手爸妈必读的宝宝早教发展干货指南",
+      "top_delta": 0
+    },
+    {
+      "store_name": "海口龙华逮的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 33,
+      "top_title": "0-3岁蒙氏育儿分月龄知识库新手爸妈必读指南蒙氏教育",
+      "top_delta": 0
+    },
+    {
+      "store_name": "UX探索者的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 12,
+      "top_title": "产品设计师的超级大脑·AI加持·会思考的知识库",
+      "top_delta": 0
+    },
+    {
+      "store_name": "云端资料小铺的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1,
+      "top_title": "dankoe知识库一人公司指导AI知识教案",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a75dcdc79b57b00018f7c26",
+      "title": "0-6岁育儿知识库新手爸妈必备永久版送蒙氏PDF学习资料课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.8,
+      "sold": 787,
+      "delta": 31,
+      "actual_gr": 4.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69a9962df209ba000175ea02",
+      "title": "日更：27届秋招信息汇总",
+      "store_name": "明天接offer的店",
+      "store_id": "666ebb185d874700016fabda",
+      "price": 47.0,
+      "sold": 4985,
+      "delta": 15,
+      "actual_gr": 0.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a4bd3630857710001a2294e",
+      "title": "口袋育儿知识库,持续更新含蒙氏育儿PDF学习资料新手爸妈必备音频",
+      "store_name": "硕士妈妈的养育日记的店",
+      "store_id": "6a0dcf18f703b300159b83e6",
+      "price": 199.0,
+      "sold": 413,
+      "delta": 10,
+      "actual_gr": 2.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "697ccc125b50a30001e48ef8",
+      "title": "【知识库】AI产品超全自学知识库+必刷面经*5(26最新限时特惠秒发",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 197.0,
+      "sold": 7,
+      "delta": 1,
+      "actual_gr": 16.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6aa198285fb5860001595b58",
+      "title": "2026Codex全域AI办公实战课视频剪辑PPT生成知识库搭建飞书自动化",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.95,
+      "sold": 1,
+      "delta": 1,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "67ac69fe6082e1000195b67a",
+      "title": "大模型面试笔记|大模型+多模态全面知识库（持续更新）",
+      "store_name": "草莓师姐的店",
+      "store_id": "67ac51d49a36f80015c7065b",
+      "price": 93.0,
+      "sold": 974,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69bc1404180bf40001f9aa4b",
+      "title": "职场新人系统化成长|原创知识库实习/社招/应届生新人职场规划",
+      "store_name": "云沐的碎碎念的店",
+      "store_id": "68d24bacc095d90015b6d2c8",
+      "price": 9.9,
+      "sold": 361,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69736456a1496d0001411cc0",
+      "title": "Cherry学姐AI文创新手知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 116,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "697f56a578d8d50001756579",
+      "title": "全球100本育儿必读书｜AI博客知识库｜大量阅读提升育儿认知",
+      "store_name": "乙伴欣林的店",
+      "store_id": "6899ce36a587f0001504d3aa",
+      "price": 15.9,
+      "sold": 115,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a19b1c73ce96d00016e9f9f",
+      "title": "004-Excel模板 2026年月计划复盘表（2027年通用）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 114,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69d112a18a7da800017e569d",
+      "title": "财研咖啡Bar财务知识库|财务×AI|财务BP财务分析",
+      "store_name": "弘略财研的店",
+      "store_id": "69c54d31dfb5e60015dde5ad",
+      "price": 299.0,
+      "sold": 99,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69e6e2749475ed0001b825b7",
+      "title": "0-1岁蒙氏育儿分月龄知识库·新手爸妈必读的宝宝早教发展干货指南",
+      "store_name": "十六的育儿知识库的店",
+      "store_id": "",
+      "price": 39.0,
+      "sold": 74,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "68ac0f9dfba5440001b25c3d",
+      "title": "表格Excel定制搭建WPS表格搭建自动化职能模板优化表格",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 51,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "679651fd75ca3a00014a1b77",
+      "title": "企业管理人力资源HR招聘计划跟进分析excel模板看板模板HAA010",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 50,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a2d43cb1dbcb80001d44978",
+      "title": "0-3岁蒙氏育儿分月龄知识库新手爸妈必读指南蒙氏教育",
+      "store_name": "海口龙华逮的店",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 33,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6590266a60d1170001a349a8",
+      "title": "0-7岁育儿知识库，育儿不迷路",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 149.0,
+      "sold": 31,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a30eb5e3222c60001313fb4",
+      "title": "0-3岁育儿不焦虑知识库新手父母分龄发育参考",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 24,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6710d17dc432ef000133f67c",
+      "title": "个人成长知识库｜职场技能｜AI学习｜48个思维模型PPT｜永久访问",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 249.0,
+      "sold": 24,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "685a9eb68774170001d978ba",
+      "title": "2025进销存管理表格excel仓库出入管理系统单机版盘点库存预警",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 23,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a25e5aba7cb0d0001e17484",
+      "title": "Nova AI产品经理知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 99.0,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6833ae1fc5b52b000143f990",
+      "title": "AI产品知识库（持续更新中）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a22eb02e42cc40001a41c24",
+      "title": "值钱的HR进阶套装知识库+人事行政资料包+社群答疑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 599.0,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "699338df06f9da000137f3de",
+      "title": "人工智能训练师（三级）备考全套资料知识库（理论+实操题库）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a301cc339d60d00014866ff",
+      "title": "读完不亏！30本人生宝藏书单｜AI智能知识库｜可听可看｜深度解读",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.8,
+      "sold": 14,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "68bc3d485e5b2f000122da26",
+      "title": "1V1语音辅导+知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 899.0,
+      "sold": 13,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6900263ac074c500014f11ac",
+      "title": "EXCEL计时计件工资表格软件工厂车间加工工人员工临时工管理系统",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 13,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "699f127ab90bc5000165790c",
+      "title": "产品设计师的超级大脑·AI加持·会思考的知识库",
+      "store_name": "UX探索者的店",
+      "store_id": "6943cf870f82380015b0344a",
+      "price": 415.0,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "689c622bb2c16b0015db7b80",
+      "title": "2025电商直播带货管理excel表格排班期选品清单流程脚本分工统计",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a58a9c18c0a3e0001eb81e6",
+      "title": "纳瓦尔思想体系AI知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69438fbcf489e40001ac14f0",
+      "title": "行政事业单位财务·AI知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.9,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "68c140ed24f1f8000169f602",
+      "title": "【超哥的视界】【AI教育学习圈 】辅导实操课知识库AI辅导",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 299.0,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a43609aa1b4360001693675",
+      "title": "AI新手影视创作全年进化知识库+专属交流社群",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 8,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a05da00273c7d00015b879d",
+      "title": "轩廷求职Lab AI产品入门知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 220.0,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a8e6aec61bc1100018cdb0f",
+      "title": "全案知识库&0-1起步实操.",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 159.0,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6949015e8bd70d00015e6b02",
+      "title": "油管百万博主AI知识库Huberman科学健康",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69b5ef536edd34000110a102",
+      "title": "个人任务管理系统 - 基础版｜Excel模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a4be2494ffccd0015839fb9",
+      "title": "[中英双语+内容提炼]马斯克访谈演讲影片合集|知识库版 实时更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6aa9293215012e00010dea40",
+      "title": "高敏感养育指南：从频繁崩溃到真正读懂他",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 99.0,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a1db43794d58300010cc5e8",
+      "title": "AI Agent大模型工程师知识库(持续更新)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.41,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a5325bb1a0aff00013112af",
+      "title": "冰醋酸 Ai+答疑知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 199.0,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69d469b4c8c733000162afb4",
+      "title": "【持续更新·会员知识库】10w字战略咨询+AI产品上岸笔记&个人成长",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 298.0,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "698dcdf8a87a4d0001944b92",
+      "title": "海淀原创老师和家长的专属AI社群和知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 189.0,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a52670cab42de00150d45dd",
+      "title": "AI创作知识卡片实战教程+知识库+豆包即梦Banana通用+电子版教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a204d5bc0b0790015273e2e",
+      "title": "dankoe知识库一人公司指导AI知识教案",
+      "store_name": "云端资料小铺的店",
+      "store_id": "69cfb34762bb640015786d24",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a79a1eab7d66f00010e6f8a",
+      "title": "AI数据分析知识库（附完整书籍资料赠品）- 课件PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 119.0,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a6ed1b2acfd2d00156d211e",
+      "title": "AI大模型面试八股知识库（含可运行代码+案例解析）教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.5,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69b2c041166bc600013752cd",
+      "title": "2023-2026 AI赋能知识库，3T资料合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a845e12bbfeef00156496ab",
+      "title": "用 AI 从0到1做电商设计 零基础 AI 电商课件！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.2,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a8857b08f920f0015ec036b",
+      "title": "机器学习、深度学习、大模型 三合一AI系统知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.89,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a8878d1b5514d00015d66be",
+      "title": "战略养娃丨智能育儿知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a8d495170b3560001fe8bfb",
+      "title": "AI绘画收费的经济学原理  经济学主题PPT课件 20251207233639",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a912e8e7860a40001275a8e",
+      "title": "Obsidian视频知识库模板|B站收藏整理模板|个人AI知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 129.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a96829c71010d0001df7a40",
+      "title": "workbuddy&ima知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a99a3ff5152e50001c26967",
+      "title": "育儿全案 & AI在线问答知识库-78位核心育儿专家在线解答",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 79.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a9fe74e1b60640001ec3a3d",
+      "title": "AI视觉设计实战知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6aacfb0643b90c00012712ba",
+      "title": "职场新人成长手册AI知识库  大学生秋招+面试+求职+升职+提效方法",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6ab1027a3a94950001e1a70c",
+      "title": "Ai大模型企业知识资产本地部署定制智能体知识库调试办公设备配件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1980.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "67ca3b3875422f0001e58066",
+      "title": "DeepSeek搭建个人知识库使用手册 保姆级教程文档+视频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6874c99475ae0c0001e5a8ba",
+      "title": "2025新客户管理excel表格系统客户登记销售订单统计跟进拜访投诉",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "68776f24417c3f00015a34ac",
+      "title": "2025客户跟进及交易订单管理系统excel表格沟通订单数据统计分析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "68f7b609c67e4700013c2d27",
+      "title": "外贸管理Excel表格系统英文报价单财务收支跟进出口报送关税",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69324838c0b0790015471f60",
+      "title": "销售订单跟进管理台账excel表格出入库数量订单日期交期汇总统计",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69819eb9a5576f0001cd46ba",
+      "title": "银发经济知识库1年VIP｜认知+图谱+政策+研报+项目+方法",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 99.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69a3322c85eac80001d0e0ac",
+      "title": "AI大模型面试八股知识库（含可运行代码案例解析）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69a795c562c5c000158dbf38",
+      "title": "人力资源AI知识库使用教程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69b9fed0ffa26d000110eedb",
+      "title": "0-1岁育儿知识库｜科学育儿新手必备指南",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 69.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69ca4dd6040ad40015c50a64",
+      "title": "2026版财务会计收支记账exce表格管理系统小企业收支明细记录模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69d2500501e19300010b8257",
+      "title": "科学育儿实操手册 新手妈妈专属智能育儿知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69e75afde4ac61000139fc53",
+      "title": "陈厂长AI智能体2026年1月陈厂长线下课程高清录像+智能体知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69e79ab387c18600156932d8",
+      "title": "Excel欠款管理软件欠款提醒预警跟进明细统计进度分析登记表格",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "69ecce1c21e0870001229857",
+      "title": "客户订单管理系统 Excel表格录入查询 建档维护跟进销售跟踪分析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a05b3ad22eb650001c1fd1f",
+      "title": "销售业绩统计分析表Excel可编辑修改",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a0d5b83475cc60001e113dd",
+      "title": "AI 应用开发知识库手册-2026最新版，持续更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 299.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a127ccce6f87900016fd37c",
+      "title": "大学英语六级AI知识库真题详解听力音频作文模板词汇ima搭子私教",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a15d1f5ca8f410001d4eb37",
+      "title": "crm客户管理系统Excel表订单跟踪跟进统计汇总拜访档案资料登记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a167bd4df36740001eca138",
+      "title": "最新亚慧AI产品课程+真题库+知识库最新亚慧AI产品课程+真题库+",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 51.6,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a242ae64ab6d300154f526d",
+      "title": "机器学习、深度学习、大模型 三合一AI系统知识库",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a277f3c20d724000113659f",
+      "title": "AI产品经理知识库（精编版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 69.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a3634e4e2951e00016da922",
+      "title": "AI大模型超全体系知识库含可运行代码+面试八股",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    },
+    {
+      "goods_id": "6a3827a546109700010153b0",
+      "title": "AI个人知识库认知课知识管理方法论信息整理思维电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "知识库AI收费"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "知识库AI收费",
+  "slug": "知识库AI收费"
+}

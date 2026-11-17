@@ -1,0 +1,1537 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "拼豆"
+    ],
+    "niche": "拼豆"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 18,
+    "candidate_n": 12,
+    "active_n": 18,
+    "drive_keywords": [
+      "AI拼豆图纸电子资料",
+      "拼豆壁纸生成",
+      "拼豆电子资料",
+      "拼豆模板",
+      "拼豆模板电子版",
+      "拼豆色号生成电子资料",
+      "拼豆图纸",
+      "拼豆图纸PDF导出电子资料",
+      "拼豆图纸按色号分包",
+      "拼豆图纸订阅电子资料",
+      "拼豆图纸去背景",
+      "拼豆图纸生成",
+      "拼豆图纸生成电子资料",
+      "拼豆图纸小程序",
+      "拼豆转换软件",
+      "头像转拼豆图纸",
+      "照片转拼豆带色号",
+      "照片转拼豆电子资料"
+    ],
+    "pinned": [
+      {
+        "keyword": "AI拼豆图纸电子资料",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆壁纸生成",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆电子资料",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆模板",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆模板电子版",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆色号生成电子资料",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆图纸",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆图纸PDF导出电子资料",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆图纸按色号分包",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆图纸订阅电子资料",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆图纸去背景",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆图纸生成",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆图纸生成电子资料",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆图纸小程序",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "拼豆转换软件",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "头像转拼豆图纸",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "照片转拼豆带色号",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      },
+      {
+        "keyword": "照片转拼豆电子资料",
+        "is_active": 1,
+        "pin_group": "vertical_niche_probe",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "pinned"
+      }
+    ],
+    "candidates": [
+      {
+        "keyword": "宠物照转拼豆",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "candidate"
+      },
+      {
+        "keyword": "拼豆壁纸生成电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "niche=拼豆|垂类产品搜索词",
+        "source": "vertical_niche_拼豆",
+        "role": "candidate"
+      },
+      {
+        "keyword": "拼豆转换软件电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "拼豆图纸去背景电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "拼豆图纸小程序电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "拼豆图纸转换器电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "拼豆像素画转换电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "拼豆图纸批量生成电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "照片转拼豆带色号电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "耐高温不搓泥拼豆包边烘焙布",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "虚拟轨扩边 · uncovered_title",
+        "source": "virtual_lane_expand",
+        "role": "candidate"
+      },
+      {
+        "keyword": "拼豆图纸AI生成器电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      },
+      {
+        "keyword": "拼豆图纸按色号分包电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 14,
+    "sku_n": 80,
+    "sum_delta": 44289,
+    "median_price": 6.6,
+    "niche": "拼豆",
+    "drive_kw_n": 18
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 67,
+      "sum_delta": 36968,
+      "sum_sold": 512960,
+      "top_title": "【廖敏老师2026年秋季自制】四上语文希沃课件",
+      "top_delta": 3569
+    },
+    {
+      "store_name": "午閲書创集的店",
+      "sku_n": 1,
+      "sum_delta": 1090,
+      "sum_sold": 1249,
+      "top_title": "【情绪夯包】MBTI·16型人格书盲盒",
+      "top_delta": 1090
+    },
+    {
+      "store_name": "萌趣英语慢速跟读的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 61000,
+      "top_title": "少儿英语启蒙短文100篇 英语绘本 小学英语 配音频 支持点读笔",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "小艺素材库的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 14000,
+      "top_title": "大学生英语四六级CET46级核心1500词汇高频1000词汇pdf电子版",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "陈陈学长chen的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 11000,
+      "top_title": "【26年12月】六级翻译与预测-电子版",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "心灵疗愈观测站的店",
+      "sku_n": 1,
+      "sum_delta": 736,
+      "sum_sold": 3007,
+      "top_title": "社会化程度匹配趣味测试|自动发货",
+      "top_delta": 736
+    },
+    {
+      "store_name": "学姐的资料库的店",
+      "sku_n": 1,
+      "sum_delta": 545,
+      "sum_sold": 6378,
+      "top_title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "top_delta": 545
+    },
+    {
+      "store_name": "小小幼教人的店",
+      "sku_n": 1,
+      "sum_delta": 370,
+      "sum_sold": 577,
+      "top_title": "幼儿园中大班健康公开课单节课件",
+      "top_delta": 370
+    },
+    {
+      "store_name": "夏小小不打烊的店",
+      "sku_n": 1,
+      "sum_delta": 327,
+      "sum_sold": 3587,
+      "top_title": "考研历年真题考研英语考研数学考研政治199管综408计算机306西综",
+      "top_delta": 327
+    },
+    {
+      "store_name": "云图图书旗舰店",
+      "sku_n": 1,
+      "sum_delta": 305,
+      "sum_sold": 7757,
+      "top_title": "【云图官方】真题考研2027考研英语数学政治管综真题实战详解",
+      "top_delta": 305
+    },
+    {
+      "store_name": "Mango95958的店",
+      "sku_n": 1,
+      "sum_delta": 274,
+      "sum_sold": 2107,
+      "top_title": "幼儿园小中大班艺术音乐优质公开课《西兰花先生的理发店》",
+      "top_delta": 274
+    },
+    {
+      "store_name": "小怡Sylvia的店",
+      "sku_n": 1,
+      "sum_delta": 240,
+      "sum_sold": 1876,
+      "top_title": "【六级翻译】26年12月小怡的六级翻译攻略/预测/真题讲解 课件",
+      "top_delta": 240
+    },
+    {
+      "store_name": "MAMAHAHA的店",
+      "sku_n": 1,
+      "sum_delta": 233,
+      "sum_sold": 9222,
+      "top_title": "3天在家玩具早教规划训练营",
+      "top_delta": 233
+    },
+    {
+      "store_name": "是小柠檬呀～的店",
+      "sku_n": 1,
+      "sum_delta": 201,
+      "sum_sold": 4571,
+      "top_title": "【原创】幼儿启蒙300张培养数感快乐学习益智早教专注力游戏",
+      "top_delta": 201
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a1aef3a06b18e00018a5ae0",
+      "title": "暗黑像素蛋糕图纸 104豆扳 电子拼豆图纸  无实物 网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 7102,
+      "delta": 184,
+      "actual_gr": 2.66,
+      "token_hits": 1,
+      "touch_keywords": [
+        "拼豆图纸",
+        "拼豆图纸PDF导出电子资料",
+        "拼豆图纸按色号分包"
+      ]
+    },
+    {
+      "goods_id": "6a2d81968bca040001ff68f7",
+      "title": "庆生蛋糕系列｜20色丨电子拼豆图纸｜无实物｜网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.0,
+      "sold": 5569,
+      "delta": 319,
+      "actual_gr": 6.08,
+      "token_hits": 1,
+      "touch_keywords": [
+        "拼豆模板电子版",
+        "拼豆图纸"
+      ]
+    },
+    {
+      "goods_id": "6a911ec7e1ea8c000137e8e8",
+      "title": "照片转拼豆图纸（带色号）自助工具-自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 1729,
+      "delta": 92,
+      "actual_gr": 5.62,
+      "token_hits": 1,
+      "touch_keywords": [
+        "拼豆图纸去背景",
+        "头像转拼豆图纸"
+      ]
+    },
+    {
+      "goods_id": "672aefa64868bd0001dce225",
+      "title": "【原创】幼儿启蒙300张培养数感快乐学习益智早教专注力游戏",
+      "store_name": "是小柠檬呀～的店",
+      "store_id": "66e0e6cbed67830015bea04a",
+      "price": 23.8,
+      "sold": 4571,
+      "delta": 201,
+      "actual_gr": 4.6,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆壁纸生成",
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "6a2d81968bca040001ff68c4",
+      "title": "庆生蛋糕系列｜20色丨电子拼豆图纸｜无实物｜网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 5561,
+      "delta": 1545,
+      "actual_gr": 38.47,
+      "token_hits": 1,
+      "touch_keywords": [
+        "头像转拼豆图纸"
+      ]
+    },
+    {
+      "goods_id": "6a6c5a27bf81ab00011138db",
+      "title": "萌豆子拼豆图纸  节日&季节限定主题  自动发货 其他模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.8,
+      "sold": 470,
+      "delta": 407,
+      "actual_gr": 646.03,
+      "token_hits": 1,
+      "touch_keywords": [
+        "拼豆模板电子版"
+      ]
+    },
+    {
+      "goods_id": "6a5d777f05767800014d48a5",
+      "title": "照片转拼豆图纸（带色号）—自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 4648,
+      "delta": 254,
+      "actual_gr": 5.78,
+      "token_hits": 1,
+      "touch_keywords": [
+        "拼豆模板电子版"
+      ]
+    },
+    {
+      "goods_id": "6a2d81968bca040001ff68d0",
+      "title": "庆生蛋糕系列｜20色丨电子拼豆图纸｜无实物｜网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 5569,
+      "delta": 174,
+      "actual_gr": 3.23,
+      "token_hits": 1,
+      "touch_keywords": [
+        "拼豆图纸去背景"
+      ]
+    },
+    {
+      "goods_id": "6a2d81968bca040001ff68df",
+      "title": "庆生蛋糕系列｜20色丨电子拼豆图纸｜无实物｜网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 5567,
+      "delta": 158,
+      "actual_gr": 2.92,
+      "token_hits": 1,
+      "touch_keywords": [
+        "拼豆图纸"
+      ]
+    },
+    {
+      "goods_id": "6a5d777f05767800014d48a8",
+      "title": "照片转拼豆图纸（带色号）—自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 4649,
+      "delta": 109,
+      "actual_gr": 2.4,
+      "token_hits": 1,
+      "touch_keywords": [
+        "拼豆转换软件"
+      ]
+    },
+    {
+      "goods_id": "6a8eea815946f40001ccdfb5",
+      "title": "【廖敏老师2026年秋季自制】四上语文希沃课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 8832,
+      "delta": 3569,
+      "actual_gr": 67.81,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸按色号分包"
+      ]
+    },
+    {
+      "goods_id": "6a78955ec9a36100015f6049",
+      "title": "【情绪夯包】MBTI·16型人格书盲盒",
+      "store_name": "午閲書创集的店",
+      "store_id": "64b522e48008200001b9f4b8",
+      "price": 56.0,
+      "sold": 1249,
+      "delta": 1090,
+      "actual_gr": 685.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "687b5778417c3f0001a0dc12",
+      "title": "泡泡机玩具泡中泡好玩的玩具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 96000,
+      "delta": 1000,
+      "actual_gr": 1.05,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "685e223d47fd8b0001244076",
+      "title": "少儿英语启蒙短文100篇 英语绘本 小学英语 配音频 支持点读笔",
+      "store_name": "萌趣英语慢速跟读的店",
+      "store_id": "666eb0835d874700016fab69",
+      "price": 26.8,
+      "sold": 61000,
+      "delta": 1000,
+      "actual_gr": 1.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成"
+      ]
+    },
+    {
+      "goods_id": "65a22d134207d30001c8339b",
+      "title": "2027考研英语真题英语一英语二历年真题试卷管综西综数学政治刷题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.8,
+      "sold": 55000,
+      "delta": 1000,
+      "actual_gr": 1.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸去背景"
+      ]
+    },
+    {
+      "goods_id": "6a9019130c6e070001d58261",
+      "title": "2026新款海怪 吹石 东东 procreatePS画世界pro天生会画全套笔刷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 36000,
+      "delta": 1000,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸按色号分包"
+      ]
+    },
+    {
+      "goods_id": "695c0538cf93e20001930f20",
+      "title": "新款拼音字母麻将玩具儿童趣味拼读幼儿园小学学前教育益智桌游",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 24000,
+      "delta": 1000,
+      "actual_gr": 4.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆壁纸生成"
+      ]
+    },
+    {
+      "goods_id": "69537385b24921000114cba4",
+      "title": "不八岁四期肌无力全能组*仅支持procreate/画世界Pro百度网盘发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.99,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6735bbce6602d700015a833c",
+      "title": "60款课堂互动小游戏PPT课件  (拍下秒发网盘链接)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 17000,
+      "delta": 1000,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "677f9534fb6ac0000181b3f9",
+      "title": "高中9科知识点电子档（语文数学英语物理化学生物地理历史政治）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆壁纸生成"
+      ]
+    },
+    {
+      "goods_id": "65ce355b43c0d000012e72be",
+      "title": "幼儿园大中小五大领域公开课资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 22.88,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c4f1f2de0f070001463d61",
+      "title": "大学生英语四六级CET46级核心1500词汇高频1000词汇pdf电子版",
+      "store_name": "小艺素材库的店",
+      "store_id": "692a8a8d272393001512256d",
+      "price": 0.88,
+      "sold": 14000,
+      "delta": 1000,
+      "actual_gr": 7.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "681622b615a1180015f9a6b4",
+      "title": "【新版三合一】磁吸十格阵数字分解10/20以内加减凑十法启蒙教具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 23.8,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆壁纸生成"
+      ]
+    },
+    {
+      "goods_id": "6741a44917e95f0001f72c12",
+      "title": "【更新版】大学英语四六级大纲高频真题单词词汇词组 电子版PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "照片转拼豆带色号"
+      ]
+    },
+    {
+      "goods_id": "6741a44917e95f0001f72c06",
+      "title": "【更新版】大学英语四六级大纲高频真题单词词汇词组 电子版PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成"
+      ]
+    },
+    {
+      "goods_id": "6a54a84e7308b50001684ce8",
+      "title": "27版考研英语词汇资料包（自动发货）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸去背景"
+      ]
+    },
+    {
+      "goods_id": "6a60420801c1af00013f7593",
+      "title": "不八岁*第五期低压感摸鱼组*可商用手抄报模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 13.99,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆模板"
+      ]
+    },
+    {
+      "goods_id": "6933df2f69110000016d3b21",
+      "title": "【26年12月】六级翻译与预测-电子版",
+      "store_name": "陈陈学长chen的店",
+      "store_id": "6881cfd95fa60a00153b43bb",
+      "price": 1.99,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "照片转拼豆带色号"
+      ]
+    },
+    {
+      "goods_id": "6aa2b9a91e46ae0001734f96",
+      "title": "oc盲盒ppl拼拼乐白菜设子盲盒人设",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 7743,
+      "delta": 989,
+      "actual_gr": 14.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "6a7d237f0020da0001c76500",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.6,
+      "sold": 6573,
+      "delta": 912,
+      "actual_gr": 16.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "照片转拼豆带色号"
+      ]
+    },
+    {
+      "goods_id": "6a9d53acb993210001f76c30",
+      "title": "2026法院书记员备考资料课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.9,
+      "sold": 866,
+      "delta": 743,
+      "actual_gr": 604.07,
+      "token_hits": 0,
+      "touch_keywords": [
+        "照片转拼豆电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7b14ca09b4f20001f84d3d",
+      "title": "社会化程度匹配趣味测试|自动发货",
+      "store_name": "心灵疗愈观测站的店",
+      "store_id": "6982d4bbc857a00016307b1f",
+      "price": 2.99,
+      "sold": 3007,
+      "delta": 736,
+      "actual_gr": 32.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸按色号分包"
+      ]
+    },
+    {
+      "goods_id": "6aa8f6c17f340c0001bc338e",
+      "title": "「3D 按键对对碰」直播专享",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 27.9,
+      "sold": 1521,
+      "delta": 653,
+      "actual_gr": 75.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "6ac5f7ed7e10730001c57f42",
+      "title": "2026秋五套期中测试卷/语文数学英语/PDF电子版可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.5,
+      "sold": 790,
+      "delta": 643,
+      "actual_gr": 437.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "照片转拼豆带色号"
+      ]
+    },
+    {
+      "goods_id": "6a7c4e360020da0001b831ee",
+      "title": "2026新款【海怪+吹石+东东】合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 6417,
+      "delta": 631,
+      "actual_gr": 10.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0d7a454d102c0001458174",
+      "title": "26新版人教PEP丨三四五六年级单元考点梳理，单元练习 [电子版]",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 10000,
+      "delta": 613,
+      "actual_gr": 6.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "照片转拼豆带色号"
+      ]
+    },
+    {
+      "goods_id": "6aa2cae9dcf5ff00014e9807",
+      "title": "新人教版七上英语Starter1-3&U1-U7单元考点练习全套资料含答案A",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 1235,
+      "delta": 580,
+      "actual_gr": 88.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸PDF导出电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3a2121e503360001eb91e6",
+      "title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "store_name": "学姐的资料库的店",
+      "store_id": "66f59ab9a9bf3400163b0b7d",
+      "price": 1.99,
+      "sold": 6378,
+      "delta": 545,
+      "actual_gr": 9.34,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸订阅电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7bf7fa8bb06b0001821efe",
+      "title": "【oc盲盒】甜品小动物可爱拼拼乐",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.56,
+      "sold": 2069,
+      "delta": 545,
+      "actual_gr": 35.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "670f92ed81a2170001ff9e3a",
+      "title": "幼儿园中大班益智区角语言区域自制玩教具大中国人个别化操作材料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 3878,
+      "delta": 533,
+      "actual_gr": 15.93,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "6adcc169608fc30001a1d102",
+      "title": "2026中级经济师资料包/三色笔记/历年真题/高频考点电子版课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.99,
+      "sold": 647,
+      "delta": 523,
+      "actual_gr": 421.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI拼豆图纸电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a103d8261fef9000186d8a4",
+      "title": "小初高背单词课堂操练游戏 ppt ‖ 持续更新 包售后 ‖ 22款",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 3351,
+      "delta": 514,
+      "actual_gr": 18.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸PDF导出电子资料"
+      ]
+    },
+    {
+      "goods_id": "69df8d71933b030001271307",
+      "title": "区域自制教玩具素材 PDF电子版 非实物",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 2595,
+      "delta": 506,
+      "actual_gr": 24.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "68b024400c85cc00019bfa3d",
+      "title": "【2026新】三上语文任务群课件ppt+教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 124.0,
+      "sold": 8578,
+      "delta": 499,
+      "actual_gr": 6.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "照片转拼豆带色号"
+      ]
+    },
+    {
+      "goods_id": "6a1166720012710001d35c22",
+      "title": "他山破型笔刷2.0procreate笔刷画世界pro笔刷pa天生绘画csp",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 3914,
+      "delta": 470,
+      "actual_gr": 13.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "695f295844a502000145f829",
+      "title": "procreate蕾丝笔刷专辑拉条蕾丝边框花边纸procreate笔刷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 7892,
+      "delta": 450,
+      "actual_gr": 6.05,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸按色号分包"
+      ]
+    },
+    {
+      "goods_id": "6a832985d37c89000117f935",
+      "title": "26秋六年级上册语文PPT课件教案（七彩精华版）无水印好资料共享",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.2,
+      "sold": 1805,
+      "delta": 410,
+      "actual_gr": 29.39,
+      "token_hits": 0,
+      "touch_keywords": [
+        "照片转拼豆带色号"
+      ]
+    },
+    {
+      "goods_id": "6a3d3380c0c9a70001346b84",
+      "title": "DIY萌粒盲盒娱乐玩区，",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 3221,
+      "delta": 403,
+      "actual_gr": 14.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "68a943ac71b9e2000103ae84",
+      "title": "【笔记同款】幼儿园大班优质公开课_课件教案_百度网盘自动发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 1834,
+      "delta": 381,
+      "actual_gr": 26.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ae57fbfbdff60001644b64",
+      "title": "幼儿园中大班健康公开课单节课件",
+      "store_name": "小小幼教人的店",
+      "store_id": "6818e425336f1f001588c263",
+      "price": 1.99,
+      "sold": 577,
+      "delta": 370,
+      "actual_gr": 178.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d65471da5d200001c93a0c",
+      "title": "考研历年真题考研英语考研数学考研政治199管综408计算机306西综",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 3587,
+      "delta": 342,
+      "actual_gr": 10.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸去背景"
+      ]
+    },
+    {
+      "goods_id": "6a99179de54fd70001eae312",
+      "title": "2026吹石老师全套procreate-画世界pro-ps-天生会画",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 1402,
+      "delta": 341,
+      "actual_gr": 32.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a06fcc23c8e6e000122b2a2",
+      "title": "盲盒代拆滴溜款 正版萌粒DIY手工链挂件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 6108,
+      "delta": 332,
+      "actual_gr": 5.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "69d65471da5d200001c939f1",
+      "title": "考研历年真题考研英语考研数学考研政治199管综408计算机306西综",
+      "store_name": "夏小小不打烊的店",
+      "store_id": "693ced641d8c99001576ea05",
+      "price": 1.0,
+      "sold": 3587,
+      "delta": 327,
+      "actual_gr": 10.03,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸订阅电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c21001bd760600011527a3",
+      "title": "幼儿园图书区环创幼儿表征黑白和彩色(可打印)电子素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 2407,
+      "delta": 321,
+      "actual_gr": 15.39,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆模板"
+      ]
+    },
+    {
+      "goods_id": "6a94082d4ddf6d0001371f41",
+      "title": "动漫二次元甜美栀牌少女oc拼拼乐盲盒设",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 807,
+      "delta": 310,
+      "actual_gr": 62.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "6a1fdb1cb9717f00015eb32b",
+      "title": "【云图官方】真题考研2027考研英语数学政治管综真题实战详解",
+      "store_name": "云图图书旗舰店",
+      "store_id": "656e9aa5e08915000165bbfb",
+      "price": 8.69,
+      "sold": 7757,
+      "delta": 305,
+      "actual_gr": 4.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸订阅电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a26d921242ad60001b1a26b",
+      "title": "小学主题班会课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 1809,
+      "delta": 298,
+      "actual_gr": 19.72,
+      "token_hits": 0,
+      "touch_keywords": [
+        "AI拼豆图纸电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa802343a94950001c1e32b",
+      "title": "【羽尧课件】五年级上册语文课件教案 单课链接",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.0,
+      "sold": 3013,
+      "delta": 292,
+      "actual_gr": 10.73,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸按色号分包"
+      ]
+    },
+    {
+      "goods_id": "69ad63fc4a35340001f311f7",
+      "title": "幼儿园小中大班艺术音乐优质公开课《西兰花先生的理发店》",
+      "store_name": "Mango95958的店",
+      "store_id": "6650000da2758800011119f3",
+      "price": 5.88,
+      "sold": 2107,
+      "delta": 274,
+      "actual_gr": 14.95,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ba06e1e60de2000124237f",
+      "title": "幼儿园优质公开课合集，大中小班，PPT课件教案等",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 4348,
+      "delta": 264,
+      "actual_gr": 6.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59d621057678000103b840",
+      "title": "笔记同款丨新1彩色超清精美笔记教案 电子版赠高清课本/音频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 477,
+      "delta": 262,
+      "actual_gr": 121.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成"
+      ]
+    },
+    {
+      "goods_id": "6a9ee82ad67f97000167c9a7",
+      "title": "22. 初中七八九年级单词默写表正序/乱序 原创5个排版 每学期更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 697,
+      "delta": 249,
+      "actual_gr": 55.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成"
+      ]
+    },
+    {
+      "goods_id": "6a55abc24382e200016866ad",
+      "title": "考研历年真题考研英语真题考研数学考研政治199管综396经综311课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 3337,
+      "delta": 243,
+      "actual_gr": 7.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸订阅电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aab4fecdea5ea00015d89bb",
+      "title": "心理课/心理社团/心理班会课 教案课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 1987,
+      "delta": 240,
+      "actual_gr": 13.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸按色号分包"
+      ]
+    },
+    {
+      "goods_id": "6a1147643d3e4d0001fac242",
+      "title": "【六级翻译】26年12月小怡的六级翻译攻略/预测/真题讲解 课件",
+      "store_name": "小怡Sylvia的店",
+      "store_id": "68d54543426de50015fd7021",
+      "price": 6.9,
+      "sold": 1876,
+      "delta": 240,
+      "actual_gr": 14.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "照片转拼豆带色号"
+      ]
+    },
+    {
+      "goods_id": "672af00718193500011e39bb",
+      "title": "3天在家玩具早教规划训练营",
+      "store_name": "MAMAHAHA的店",
+      "store_id": "6720b2ab45465d00153b0a7b",
+      "price": 39.9,
+      "sold": 9222,
+      "delta": 233,
+      "actual_gr": 2.59,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "6a24cc0e93291f0001d5a544",
+      "title": "初中七年级上册历史教学课件ppt含逐字稿+教学设计+教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1092,
+      "delta": 229,
+      "actual_gr": 26.54,
+      "token_hits": 0,
+      "touch_keywords": [
+        "照片转拼豆带色号"
+      ]
+    },
+    {
+      "goods_id": "69b2d37308e369000187d214",
+      "title": "幼儿园小班公开课单节课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 500,
+      "delta": 226,
+      "actual_gr": 82.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a851f02a4f71c000143d5a5",
+      "title": "可商用62支百搭波点素材刷procreat/画世界pro/ps/爱笔思画x",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 1166,
+      "delta": 216,
+      "actual_gr": 22.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸按色号分包"
+      ]
+    },
+    {
+      "goods_id": "6a379a438bca040001f1fbb7",
+      "title": "考研历年真题-答案-解析|数学英语政治408 199 333 396等等等",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 2168,
+      "delta": 214,
+      "actual_gr": 10.95,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸PDF导出电子资料"
+      ]
+    },
+    {
+      "goods_id": "69db278846d60b0001b133d5",
+      "title": ".bru格式 画世界pro氛围十字星装饰笔刷描边星星黑白网点",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.9,
+      "sold": 7833,
+      "delta": 207,
+      "actual_gr": 2.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9a77b1e6802f0001945f2c",
+      "title": "奶豆tcg-宝可梦集换式卡牌口子盲盒",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 51.9,
+      "sold": 1385,
+      "delta": 206,
+      "actual_gr": 17.47,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "6a40ea33f764ee000106b99a",
+      "title": "青岛初中月考期中期末真题七八九年级各科练习题试卷课件电子档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.74,
+      "sold": 826,
+      "delta": 204,
+      "actual_gr": 32.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸PDF导出电子资料"
+      ]
+    },
+    {
+      "goods_id": "693a6f83a1f9210001887493",
+      "title": "27考研政治预测资料包（零基础 直接背）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.42,
+      "sold": 1900,
+      "delta": 199,
+      "actual_gr": 11.7,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸订阅电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6c007584b8ee0001a8a79f",
+      "title": "7天秒背小学初中高中英语重点基础知识汇总积累基础词汇夯实语法",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 605,
+      "delta": 199,
+      "actual_gr": 49.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸生成"
+      ]
+    },
+    {
+      "goods_id": "6a9d53acb993210001f76c12",
+      "title": "2026法院书记员备考资料课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.9,
+      "sold": 865,
+      "delta": 195,
+      "actual_gr": 29.1,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆模板电子版"
+      ]
+    },
+    {
+      "goods_id": "6a2beab48bca040001d4677b",
+      "title": "三角洲行动戳戳乐盲盒 生日礼物 纪念日礼物圣诞礼盒大号",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 45.0,
+      "sold": 1906,
+      "delta": 191,
+      "actual_gr": 11.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸小程序"
+      ]
+    },
+    {
+      "goods_id": "6ac5ada732c3d20001a20c4c",
+      "title": "新人教版初中英语单词背诵表+默写表【7-8年级上下册】电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 339,
+      "delta": 190,
+      "actual_gr": 127.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸PDF导出电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa5c5715012e0001320738",
+      "title": "27届求职网申AI自动化简历投递神器(自动发货)赠送秋招汇总表格",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 98.9,
+      "sold": 2771,
+      "delta": 189,
+      "actual_gr": 7.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "拼豆图纸订阅电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "拼豆",
+  "slug": "拼豆"
+}

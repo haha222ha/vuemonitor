@@ -1,0 +1,1298 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "PDF表格提取工具"
+    ],
+    "niche": "PDF表格提取工具"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 1,
+    "drive_keywords": [
+      "PDF表格提取工具电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "PDF表格提取工具电子资料",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "cycle_kw_optimize_20261009_111339",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 16,
+    "sku_n": 80,
+    "sum_delta": 4552,
+    "median_price": 9.9,
+    "niche": "PDF表格提取工具",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 63,
+      "sum_delta": 3740,
+      "sum_sold": 55199,
+      "top_title": "26教师结构化姜姜新版8页纸+王老师已读乱回课件（电子版）",
+      "top_delta": 844
+    },
+    {
+      "store_name": "芋泥雪贝mnp的店",
+      "sku_n": 1,
+      "sum_delta": 156,
+      "sum_sold": 1680,
+      "top_title": "oc盲盒｜ai盲盒 人设oc oc人设盲盒  ai头像壁纸",
+      "top_delta": 156
+    },
+    {
+      "store_name": "多多喜乐。的店",
+      "sku_n": 1,
+      "sum_delta": 149,
+      "sum_sold": 1023,
+      "top_title": "ADHD注意力缺陷自测量表·成人儿童青年适用·在线测试·秒出结果",
+      "top_delta": 149
+    },
+    {
+      "store_name": "芋泥芝士🧀的店",
+      "sku_n": 2,
+      "sum_delta": 106,
+      "sum_sold": 1589,
+      "top_title": "高中数学教资面试/教招面试/试讲逐字稿/结构化试讲答辩/电子资料",
+      "top_delta": 77
+    },
+    {
+      "store_name": "奶油酥酥糖🎉的店",
+      "sku_n": 1,
+      "sum_delta": 67,
+      "sum_sold": 6201,
+      "top_title": "26上教资结构化面试姜姜8页纸+王老师已读乱回电子版",
+      "top_delta": 67
+    },
+    {
+      "store_name": "6801ba521df61000157c1603",
+      "sku_n": 1,
+      "sum_delta": 61,
+      "sum_sold": 220,
+      "top_title": "高中地理教资面试/教招面试/试讲逐字稿/结构化试讲答辩/电子资料",
+      "top_delta": 61
+    },
+    {
+      "store_name": "筱南歆的店",
+      "sku_n": 1,
+      "sum_delta": 47,
+      "sum_sold": 1506,
+      "top_title": "中职教资面试结构化资料包+各学科教案试讲逐字稿",
+      "top_delta": 47
+    },
+    {
+      "store_name": "晚～澄的店",
+      "sku_n": 1,
+      "sum_delta": 43,
+      "sum_sold": 217,
+      "top_title": "中医九种体质自测表",
+      "top_delta": 43
+    },
+    {
+      "store_name": "68bf7704c069260015e2074b",
+      "sku_n": 1,
+      "sum_delta": 41,
+      "sum_sold": 159,
+      "top_title": "26年下教资面试中小幼结构化试讲逐字稿答辩全套资料",
+      "top_delta": 41
+    },
+    {
+      "store_name": "爱吃虾条",
+      "sku_n": 1,
+      "sum_delta": 37,
+      "sum_sold": 605,
+      "top_title": "平安银行面试真题（AI面/无领导/半结构/演讲）",
+      "top_delta": 37
+    },
+    {
+      "store_name": "柠檬精工具铺的店",
+      "sku_n": 2,
+      "sum_delta": 31,
+      "sum_sold": 828,
+      "top_title": "可编辑PDF文件处理模板 电子签章 表单填写 标准排版",
+      "top_delta": 21
+    },
+    {
+      "store_name": "珞珞Y资料库的店",
+      "sku_n": 1,
+      "sum_delta": 28,
+      "sum_sold": 1382,
+      "top_title": "上岸熊·26下幼儿园教资面试/教招面试/结构化试讲逐字稿",
+      "top_delta": 28
+    },
+    {
+      "store_name": "68aee57bfab7f30015fff736",
+      "sku_n": 1,
+      "sum_delta": 19,
+      "sum_sold": 70,
+      "top_title": "即梦AI基础标准即梦ai高级会员周卡/月卡/年卡梦ai会员送积分",
+      "top_delta": 19
+    },
+    {
+      "store_name": "余老师爱分享的店",
+      "sku_n": 1,
+      "sum_delta": 9,
+      "sum_sold": 3981,
+      "top_title": "幼儿识字1300字 通关检测表【电子版】",
+      "top_delta": 9
+    },
+    {
+      "store_name": "646f5f35ebbcb20001ba18d8",
+      "sku_n": 1,
+      "sum_delta": 9,
+      "sum_sold": 664,
+      "top_title": "英语教师结构化面试（新课标+教育热点）",
+      "top_delta": 9
+    },
+    {
+      "store_name": "余溪知创云阁的店",
+      "sku_n": 1,
+      "sum_delta": 9,
+      "sum_sold": 362,
+      "top_title": "全新！少儿硬笔书法资料辅导字帖视频合集，适用3-18岁学习提升",
+      "top_delta": 9
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a7806f8c9a36100014f3e06",
+      "title": "26教师结构化姜姜新版8页纸+王老师已读乱回课件（电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.82,
+      "sold": 1355,
+      "delta": 844,
+      "actual_gr": 165.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6746dd5851c5ca0001a4f350",
+      "title": "高中睡前5分钟考点暗记语文数学英语物理化学生物历史地理政治",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 2172,
+      "delta": 235,
+      "actual_gr": 12.13,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "65431174c8ece70001fa2046",
+      "title": "上岸熊·26下小学各科目教资面试/结构化/试讲教案逐字稿/纸质发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.9,
+      "sold": 5357,
+      "delta": 216,
+      "actual_gr": 4.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f440b77d3b3f000140cb4d",
+      "title": "高中美术教资面试/教招面试/结构化试讲答辩/试讲逐字稿262篇",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 722,
+      "delta": 201,
+      "actual_gr": 38.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa12ce7167d3d0001cb58cc",
+      "title": "2027届高考语文英语数学物理化学生物地理历史政治五年真题汇编",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 1006,
+      "delta": 185,
+      "actual_gr": 22.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a998b3666362e0001c0ba7c",
+      "title": "MDQ双相情感障碍测试量表/双相情感障碍在线测",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.29,
+      "sold": 1311,
+      "delta": 182,
+      "actual_gr": 16.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1734ea47477200016cec77",
+      "title": "oc盲盒｜ai盲盒 人设oc oc人设盲盒  ai头像壁纸",
+      "store_name": "芋泥雪贝mnp的店",
+      "store_id": "68baace9bc035200153d4b9d",
+      "price": 25.22,
+      "sold": 1680,
+      "delta": 156,
+      "actual_gr": 10.24,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a459cc09f3070000178feff",
+      "title": "ADHD注意力缺陷自测量表·成人儿童青年适用·在线测试·秒出结果",
+      "store_name": "多多喜乐。的店",
+      "store_id": "68e79e1f3ab26a0015141b20",
+      "price": 4.0,
+      "sold": 1023,
+      "delta": 149,
+      "actual_gr": 17.05,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69100346427261000131be79",
+      "title": "26下小初高中心理健康教育面试资料最新课程结构化高频逐字稿培训",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 3054,
+      "delta": 122,
+      "actual_gr": 4.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a033a490d16a0001103d9e",
+      "title": "软笔书法电子版教材合集字帖高清PDF无水印百度网盘链接",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 585,
+      "delta": 108,
+      "actual_gr": 22.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6833fa39c5b52b0001460954",
+      "title": "二年级课本同步14首必备古诗书法作品纸【高清电子版/A4/自打印】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.99,
+      "sold": 979,
+      "delta": 98,
+      "actual_gr": 11.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e735940511b50001afd6d6",
+      "title": "26教资面试《小学数学》，268篇题目+教案+逐字稿",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 299,
+      "delta": 98,
+      "actual_gr": 48.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "691bcc1fb4ceb500014206f7",
+      "title": "小学语文教资面试/教招面试/结构化试讲答辩/试讲逐字稿413篇",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 564,
+      "delta": 82,
+      "actual_gr": 17.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69be7758ffa26d00019865ec",
+      "title": "26下半年初中语文教案教资面试逐字稿答辩资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.98,
+      "sold": 203,
+      "delta": 81,
+      "actual_gr": 66.39,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bf5d570ac79f0001c9ca44",
+      "title": "高中数学教资面试/教招面试/试讲逐字稿/结构化试讲答辩/电子资料",
+      "store_name": "芋泥芝士🧀的店",
+      "store_id": "6801ba521df61000157c1603",
+      "price": 16.9,
+      "sold": 1178,
+      "delta": 77,
+      "actual_gr": 6.99,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68e2438853446d0001daa902",
+      "title": "高中心理健康教资面试/教招面试/试讲逐字稿/结构化/答辩/教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.9,
+      "sold": 188,
+      "delta": 73,
+      "actual_gr": 63.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ef7e54eee1ab00017d9d1d",
+      "title": "26上教资结构化面试姜姜8页纸+王老师已读乱回电子版",
+      "store_name": "奶油酥酥糖🎉的店",
+      "store_id": "67de1ffb07f21c00151eded8",
+      "price": 1.49,
+      "sold": 6201,
+      "delta": 67,
+      "actual_gr": 1.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "698492299814200001c6ed7b",
+      "title": "1-6年级小学生同步生字练字书法用纸（电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.98,
+      "sold": 1137,
+      "delta": 66,
+      "actual_gr": 6.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f795b3602b7c000178f7ff",
+      "title": "小学道法教资面试/教招面试/结构化试讲答辩/试讲逐字稿349篇",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 206,
+      "delta": 63,
+      "actual_gr": 44.06,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a467d05d0e6f20001fae65d",
+      "title": "2026年小学书法国家级省级优质课公开课合集（持续更新）北师西泠",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 49.0,
+      "sold": 92,
+      "delta": 62,
+      "actual_gr": 206.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d5eb59d0151a00017f696a",
+      "title": "高中地理教资面试/教招面试/试讲逐字稿/结构化试讲答辩/电子资料",
+      "store_name": "6801ba521df61000157c1603",
+      "store_id": "6801ba521df61000157c1603",
+      "price": 16.9,
+      "sold": 220,
+      "delta": 61,
+      "actual_gr": 38.36,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f99d547d3b3f000173fe76",
+      "title": "高中政治教资面试/教招面试/结构化试讲答辩/试讲教案逐字稿460篇",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 178,
+      "delta": 61,
+      "actual_gr": 52.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7f3314a4f71c0001a60bd5",
+      "title": "2026中职教资面试各专业逐字稿结构化120题电子版资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 88,
+      "delta": 58,
+      "actual_gr": 193.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e2ec3db7a2ed000107225a",
+      "title": "26下教资面试结构化试讲答辩资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 79,
+      "delta": 53,
+      "actual_gr": 203.85,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8553bfee44d900019fd8ef",
+      "title": "2026人教版初中物理同步讲义练习八九年级 （可做教案参考）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.2,
+      "sold": 735,
+      "delta": 52,
+      "actual_gr": 7.61,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "680495e31374670001c7f558",
+      "title": "高中体育面试逐字稿69篇+真题100篇答辩+技能汇总-教资-招教均可",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 750,
+      "delta": 51,
+      "actual_gr": 7.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f97db3e379430001696a52",
+      "title": "高中历史教资面试/教招面试/结构化试讲答辩/试讲教案逐字稿329篇",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 264,
+      "delta": 49,
+      "actual_gr": 22.79,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "680ba0fb1e075b0001557b4d",
+      "title": "中职教资面试结构化资料包+各学科教案试讲逐字稿",
+      "store_name": "筱南歆的店",
+      "store_id": "67fcb00298e7350015f6ebfa",
+      "price": 11.9,
+      "sold": 1506,
+      "delta": 47,
+      "actual_gr": 3.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a74ad95b3a69b000125dba9",
+      "title": "2026年沪科版高中化学同步讲义专项强化训练习题资料电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.5,
+      "sold": 92,
+      "delta": 46,
+      "actual_gr": 100.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a94f1edc58e8b0001559d4a",
+      "title": "26教资面试资料包+网课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 51,
+      "delta": 46,
+      "actual_gr": 920.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a004ed3a0130600016592fb",
+      "title": "27上半年教师资格证笔试【网课】幼儿小学初中高中真题电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1615,
+      "delta": 45,
+      "actual_gr": 2.87,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a66e35d84b8ee000199a7c6",
+      "title": "中医九种体质自测表",
+      "store_name": "晚～澄的店",
+      "store_id": "6a579194874a19001532f88a",
+      "price": 1.99,
+      "sold": 217,
+      "delta": 43,
+      "actual_gr": 24.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6919afb9937b98000121e943",
+      "title": "26年下教资面试中小幼结构化试讲逐字稿答辩全套资料",
+      "store_name": "68bf7704c069260015e2074b",
+      "store_id": "68bf7704c069260015e2074b",
+      "price": 9.99,
+      "sold": 159,
+      "delta": 41,
+      "actual_gr": 34.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67e4b02860845d0001b256f0",
+      "title": "平安银行面试真题（AI面/无领导/半结构/演讲）",
+      "store_name": "爱吃虾条",
+      "store_id": "6541ac2cf616ed000143e5f8",
+      "price": 9.9,
+      "sold": 605,
+      "delta": 37,
+      "actual_gr": 6.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67c00a7b4a593600016295e6",
+      "title": "上岸熊·26下初中各科目教资面试/结构化/试讲教案逐字稿/纸质发货",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.9,
+      "sold": 1268,
+      "delta": 31,
+      "actual_gr": 2.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "688c1b8599631f0001c14585",
+      "title": "2026秋人教版初中数学同步讲义知识点练习题七八九年级含答案Word",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 4728,
+      "delta": 30,
+      "actual_gr": 0.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bf8cf3180bf4000133960a",
+      "title": "高中英语教资面试/教招面试/试讲逐字稿/结构化试讲答辩/电子资料",
+      "store_name": "芋泥芝士🧀的店",
+      "store_id": "6801ba521df61000157c1603",
+      "price": 16.9,
+      "sold": 411,
+      "delta": 29,
+      "actual_gr": 7.59,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6839671df9ad050001200d58",
+      "title": "古风书法毛笔字体ps字体包下载PPT中文手写ai设计procreate艺术字",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 2059,
+      "delta": 28,
+      "actual_gr": 1.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "66e7a3ac280d740001573dd0",
+      "title": "上岸熊·26下幼儿园教资面试/教招面试/结构化试讲逐字稿",
+      "store_name": "珞珞Y资料库的店",
+      "store_id": "65279542cf35640001a67efa",
+      "price": 28.9,
+      "sold": 1382,
+      "delta": 28,
+      "actual_gr": 2.07,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "692fa490ccb9e0000151deb6",
+      "title": "2027高考高三总复习一轮二轮语文数学英语物化生政史地电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 460,
+      "delta": 25,
+      "actual_gr": 5.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a57b1564be370001fa9740",
+      "title": "笔记同款-书法视频资料书法家PPT课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 384,
+      "delta": 24,
+      "actual_gr": 6.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a924758813005000186bea1",
+      "title": "26教资面试中职专项【结构化丨试讲丨答辩通用】精选资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 28,
+      "delta": 23,
+      "actual_gr": 460.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "686b79587565060001bec82c",
+      "title": "2027上美术教师资格证科三初中高中学科知识与教学能力核心笔记",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 5436,
+      "delta": 22,
+      "actual_gr": 0.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bf606d265269000129aa1d",
+      "title": "初中数学教资面试/教招面试/试讲逐字稿/结构化试讲答辩/电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 1467,
+      "delta": 21,
+      "actual_gr": 1.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0c008ed4cee9000165c15f",
+      "title": "可编辑PDF文件处理模板 电子签章 表单填写 标准排版",
+      "store_name": "柠檬精工具铺的店",
+      "store_id": "680e0dd229f9620015ced8e7",
+      "price": 6.9,
+      "sold": 362,
+      "delta": 21,
+      "actual_gr": 6.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e4e6788c762b0001d91a28",
+      "title": "2026下小学教资面试题本+教案+逐字稿+答辩",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 81,
+      "delta": 21,
+      "actual_gr": 35.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f06e8f3a4daf0001ff83e2",
+      "title": "即梦AI基础标准即梦ai高级会员周卡/月卡/年卡梦ai会员送积分",
+      "store_name": "68aee57bfab7f30015fff736",
+      "store_id": "68aee57bfab7f30015fff736",
+      "price": 29.8,
+      "sold": 70,
+      "delta": 19,
+      "actual_gr": 37.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "699e76925be6c100012b4edf",
+      "title": "2026上海中考各区一模真题语文数学英语物理化学电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 991,
+      "delta": 17,
+      "actual_gr": 1.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a619a8e480b5a00012dccde",
+      "title": "2026新湘教版初中数学 优质课件教案备课首选（7-9年级上下册）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.7,
+      "sold": 281,
+      "delta": 17,
+      "actual_gr": 6.44,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7728930020da00013c1053",
+      "title": "人教版26新版九上化学必刷题PDF电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 30,
+      "delta": 16,
+      "actual_gr": 114.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68cfc2b5bf5d3600010bd604",
+      "title": "小学科学教资教招面试/试讲逐字稿207篇+结构化+答辩",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 170,
+      "delta": 15,
+      "actual_gr": 9.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7add2b79b57b0001037040",
+      "title": "人教版高中化学同步培优讲练重难突破必修选修全套电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 54,
+      "delta": 15,
+      "actual_gr": 38.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6b224feb49fe00014e8491",
+      "title": "【电子资源】2026中职/教资面试专项/逐字稿/结构化/精选资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.99,
+      "sold": 43,
+      "delta": 15,
+      "actual_gr": 53.57,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6909646de0dd1700014c7933",
+      "title": "初中英语教资面试/教招面试/结构化试讲答辩/试讲逐字稿337篇",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.9,
+      "sold": 158,
+      "delta": 14,
+      "actual_gr": 9.72,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8691058bb06b0001a013fb",
+      "title": "2026年沪科版初中物理知识点清单含填空版PDF电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 152,
+      "delta": 13,
+      "actual_gr": 9.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a58b2865705e10001ec5fc6",
+      "title": "2027鲁科版五四制小学英语音频课文朗读MP3单词听力三四五年级全",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 26,
+      "delta": 13,
+      "actual_gr": 100.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67aeb17929b9f70001b88f09",
+      "title": "笔记同款 按编号下单A41-A80",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.6,
+      "sold": 595,
+      "delta": 12,
+      "actual_gr": 2.06,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a87f58852fed400018f9d14",
+      "title": "顺丰活页2027国省考精讲桶六合一理论讲义高照资料数量图推申论",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.7,
+      "sold": 339,
+      "delta": 12,
+      "actual_gr": 3.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a86bb3891917d000199a651",
+      "title": "画世界pro【洛阳纸贵】书法•笔刷•8支",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.5,
+      "sold": 200,
+      "delta": 12,
+      "actual_gr": 6.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a014aab273c7d0001e85ec5",
+      "title": "26上教资面试姜姜8页纸+王老师已读乱回2.0",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 104,
+      "delta": 12,
+      "actual_gr": 13.04,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "67e5236e79c93d000135b506",
+      "title": "初高中英语教资面试 - 八大课型模版笔记（PDF版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 56.0,
+      "sold": 763,
+      "delta": 11,
+      "actual_gr": 1.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f31e9b4a00000001556b6f",
+      "title": "初中物理电学作图练习三个部分共15页pdf文档",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 503,
+      "delta": 11,
+      "actual_gr": 2.24,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68dd00bdce94ee0001f9f406",
+      "title": "初中科学教资面试/校招面试/试讲逐字稿/结构化专题/答辩",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.9,
+      "sold": 112,
+      "delta": 11,
+      "actual_gr": 10.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c5fe41a20c2100011d9204",
+      "title": "26下初中心理教资面试试讲考题题本+教案+逐字稿+答辩+结构化资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 94,
+      "delta": 11,
+      "actual_gr": 13.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ac5c87e34911400011f6d2e",
+      "title": "2026年CFA一级资料全套PDF电子版大合集～",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 54,
+      "delta": 11,
+      "actual_gr": 25.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59b546e371ff0001ae4dd4",
+      "title": "2027北京版小学英语音频课文朗读MP3单词听力一二三四五六年级全",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 37,
+      "delta": 11,
+      "actual_gr": 42.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69eb6a1f933b03000124eca1",
+      "title": "教资面试结构化全套资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 671,
+      "delta": 10,
+      "actual_gr": 1.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a15bfe65bfaa6000120bbdd",
+      "title": "自定义编辑 PNG格式 电子图章模板",
+      "store_name": "柠檬精工具铺的店",
+      "store_id": "680e0dd229f9620015ced8e7",
+      "price": 9.9,
+      "sold": 466,
+      "delta": 10,
+      "actual_gr": 2.19,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68fdba1fc67e47000173c27c",
+      "title": "【课堂导入】书法小故事合集16个视频，发网盘",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.99,
+      "sold": 171,
+      "delta": 10,
+      "actual_gr": 6.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "683eb4ac9111390001ebc9c0",
+      "title": "幼儿识字1300字 通关检测表【电子版】",
+      "store_name": "余老师爱分享的店",
+      "store_id": "683d35815fb9c500152bc634",
+      "price": 2.9,
+      "sold": 3981,
+      "delta": 9,
+      "actual_gr": 0.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a61ce706cbefa00013329b7",
+      "title": "2027上教资科三资料包/学霸笔记/历年真题/必背重点/主观简答题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 2896,
+      "delta": 9,
+      "actual_gr": 0.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6971e15dd07ba000018d7581",
+      "title": "【化学】高考化学核心方法：必刷100讲（2027版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 1740,
+      "delta": 9,
+      "actual_gr": 0.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6759b0b7ccfbf9000136a58a",
+      "title": "英语教师结构化面试（新课标+教育热点）",
+      "store_name": "646f5f35ebbcb20001ba18d8",
+      "store_id": "646f5f35ebbcb20001ba18d8",
+      "price": 24.9,
+      "sold": 664,
+      "delta": 9,
+      "actual_gr": 1.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d748ed613bea0001d7ad49",
+      "title": "中小幼教资面试结构化真题/试讲模板逐字稿/教案教材资料包答辩",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.99,
+      "sold": 439,
+      "delta": 9,
+      "actual_gr": 2.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c21d122988860001cc5248",
+      "title": "全新！少儿硬笔书法资料辅导字帖视频合集，适用3-18岁学习提升",
+      "store_name": "余溪知创云阁的店",
+      "store_id": "6801d65b31ebc10015001662",
+      "price": 2.88,
+      "sold": 362,
+      "delta": 9,
+      "actual_gr": 2.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9526999811a800017ff0a0",
+      "title": "2026秋最新人教版九年级上册化学每课一练+试卷 有答案 电子版pdf",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 54,
+      "delta": 9,
+      "actual_gr": 20.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "697306c5f1fe0f00158aab5f",
+      "title": "26下教资面试小学初高中幼儿教师资格证考试教材结构化逐字稿",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 59.9,
+      "sold": 54,
+      "delta": 9,
+      "actual_gr": 20.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3d201840cf2900017f0a74",
+      "title": "2027上教资笔试重点资料/中小幼重点必背/学霸笔记/教资资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 2836,
+      "delta": 8,
+      "actual_gr": 0.28,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b3a05d7c9c8f0001686f37",
+      "title": "超软油画棒套装 艺术家软性蜡笔 儿童可用油性水溶性蜡笔",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.2,
+      "sold": 2545,
+      "delta": 8,
+      "actual_gr": 0.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d10317c88e9f00018b0be5",
+      "title": "26下初中体育教资面试/教招面试/试讲逐字稿232篇/结构化试讲答辩",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.9,
+      "sold": 94,
+      "delta": 8,
+      "actual_gr": 9.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "PDF表格提取工具电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "PDF表格提取工具",
+  "slug": "PDF表格提取工具"
+}

@@ -1,0 +1,1298 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "表格批量AI处理"
+    ],
+    "niche": "表格批量AI处理"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "表格批量AI处理电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "表格批量AI处理电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "cycle_kw_optimize_20261009_111339",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 16,
+    "sku_n": 80,
+    "sum_delta": 534,
+    "median_price": 3.88,
+    "niche": "表格批量AI处理",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 39,
+      "sum_delta": 371,
+      "sum_sold": 15446,
+      "top_title": "2026最新版电子课标中小学义务教育课程标准PDF",
+      "top_delta": 74
+    },
+    {
+      "store_name": "白得分的店",
+      "sku_n": 1,
+      "sum_delta": 35,
+      "sum_sold": 1821,
+      "top_title": "（电子pdf）白得分店铺新学年资料预订（包年）活动",
+      "top_delta": 35
+    },
+    {
+      "store_name": "打本艺术家的店",
+      "sku_n": 2,
+      "sum_delta": 29,
+      "sum_sold": 2594,
+      "top_title": "三人剧本杀电子版，朋友聚会无需dm主持人高清可打印可直接玩",
+      "top_delta": 25
+    },
+    {
+      "store_name": "我爱剧本杀～的店",
+      "sku_n": 10,
+      "sum_delta": 25,
+      "sum_sold": 1053,
+      "top_title": "【兵临城下】秒发剧本杀电子版【复盘解析】桌游DM手册",
+      "top_delta": 7
+    },
+    {
+      "store_name": "688da5da748bb90015d8c036",
+      "sku_n": 9,
+      "sum_delta": 16,
+      "sum_sold": 624,
+      "top_title": "叫爸爸剧本杀电子版复盘解析可打印7人 现代情感欢乐开放新手进阶",
+      "top_delta": 4
+    },
+    {
+      "store_name": "留心彩虹的店",
+      "sku_n": 2,
+      "sum_delta": 14,
+      "sum_sold": 381,
+      "top_title": "《流氓叙事》剧本杀6人电子版剧本手册线索卡复盘资料完整版",
+      "top_delta": 11
+    },
+    {
+      "store_name": "乌傻奇小卖铺的店",
+      "sku_n": 3,
+      "sum_delta": 10,
+      "sum_sold": 836,
+      "top_title": "醉凌云剧本杀电子版情感6人组织者手册DM复盘解析高清版完整版",
+      "top_delta": 6
+    },
+    {
+      "store_name": "剧本杀攻略社的店",
+      "sku_n": 4,
+      "sum_delta": 10,
+      "sum_sold": 1042,
+      "top_title": "【秒发】 一点半剧本杀电子高清完整版6人本 推理|现代|恐怖|还",
+      "top_delta": 5
+    },
+    {
+      "store_name": "688ca58eb15bae001574275e",
+      "sku_n": 3,
+      "sum_delta": 9,
+      "sum_sold": 146,
+      "top_title": "【窥镜】欧美惊悚推理本4人电子版剧本杀完整资料秒开团",
+      "top_delta": 5
+    },
+    {
+      "store_name": "淼金金的店",
+      "sku_n": 1,
+      "sum_delta": 4,
+      "sum_sold": 284,
+      "top_title": "秒发《璃火》剧本杀电子版高清手册剧本线索卡复盘可打印完整资料",
+      "top_delta": 4
+    },
+    {
+      "store_name": "安安小世界的店",
+      "sku_n": 1,
+      "sum_delta": 4,
+      "sum_sold": 147,
+      "top_title": "班主任老师必备班级积分管理系统软件Ai智能电子资料包",
+      "top_delta": 4
+    },
+    {
+      "store_name": "乌傻奇小卖铺",
+      "sku_n": 1,
+      "sum_delta": 2,
+      "sum_sold": 137,
+      "top_title": "王不见王剧本杀电子版推理6人组织者手册DM复盘高清版完整版",
+      "top_delta": 2
+    },
+    {
+      "store_name": "684ee81919eb1d0015bd5cf7",
+      "sku_n": 1,
+      "sum_delta": 2,
+      "sum_sold": 65,
+      "top_title": "同归剧本杀6人情感电子版组织者手册DM复盘高清版完整版",
+      "top_delta": 2
+    },
+    {
+      "store_name": "68a9b8dec91e6b00157bc849",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 851,
+      "top_title": "2026成人高考专升本/高起本/高起专成考备考重点资料电子资料",
+      "top_delta": 1
+    },
+    {
+      "store_name": "sssssuij的店",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 377,
+      "top_title": "《雨夜感染者》四人剧本杀模版无需dm",
+      "top_delta": 1
+    },
+    {
+      "store_name": "6953e8b5c9ee560015ca4aa5",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 41,
+      "top_title": "《中彩票》剧本杀电子版高清版6人本欢乐爆笑本",
+      "top_delta": 1
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "68d6522f7d3b3f0001a7e449",
+      "title": "2026最新版电子课标中小学义务教育课程标准PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 1066,
+      "delta": 74,
+      "actual_gr": 7.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5db4bee9f0b10001c3a6f0",
+      "title": "2026新版十年高考真题分类汇编语数英物化生史地政电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.6,
+      "sold": 599,
+      "delta": 55,
+      "actual_gr": 10.11,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a073bfaa0ff6f000125f90b",
+      "title": "高中高考英语提分资料包|电子版可打印(全国通用不分版本)",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.9,
+      "sold": 1398,
+      "delta": 54,
+      "actual_gr": 4.02,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3b976cdb862b0001dc2953",
+      "title": "（电子pdf）白得分店铺新学年资料预订（包年）活动",
+      "store_name": "白得分的店",
+      "store_id": "653df8febffe73000155ac25",
+      "price": 108.0,
+      "sold": 1821,
+      "delta": 35,
+      "actual_gr": 1.96,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a86d54070b356000152672d",
+      "title": "27高考高中一二三网课高中复习一二三轮英语文数化学生物资料电子",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.9,
+      "sold": 191,
+      "delta": 26,
+      "actual_gr": 15.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68b133eaec7fed0001046c9f",
+      "title": "三人剧本杀电子版，朋友聚会无需dm主持人高清可打印可直接玩",
+      "store_name": "打本艺术家的店",
+      "store_id": "688ca58eb15bae001574275e",
+      "price": 3.99,
+      "sold": 2319,
+      "delta": 25,
+      "actual_gr": 1.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a855ab3c9142a00018006f6",
+      "title": "2027高考九科题型专项训练语数英物化生政史地电子版可打印",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 178,
+      "delta": 24,
+      "actual_gr": 15.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d648c47d3b3f0001a762b9",
+      "title": "2026年历年全国高考真题＋解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 965,
+      "delta": 22,
+      "actual_gr": 2.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6736b2635ce0330001738cdf",
+      "title": "初、高中语文课本快速梳理/请阅读购买须知后再下单/皎皎白驹",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.0,
+      "sold": 2273,
+      "delta": 13,
+      "actual_gr": 0.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0537f664eb410001879a7f",
+      "title": "《流氓叙事》剧本杀6人电子版剧本手册线索卡复盘资料完整版",
+      "store_name": "留心彩虹的店",
+      "store_id": "6953e8b5c9ee560015ca4aa5",
+      "price": 2.99,
+      "sold": 311,
+      "delta": 11,
+      "actual_gr": 3.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b37d33e17516000113a5a8",
+      "title": "2027高中英语应用文+读后续写专项训练【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 792,
+      "delta": 7,
+      "actual_gr": 0.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "698ecc5006f9da000104e0d7",
+      "title": "高中语文多套资料合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.99,
+      "sold": 354,
+      "delta": 7,
+      "actual_gr": 2.02,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a432ed635beb10001a510ca",
+      "title": "《上路》剧本杀电子版全员剧本开本手册售后线索复盘完整版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 100,
+      "delta": 7,
+      "actual_gr": 7.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6963c20d8510c0000155de18",
+      "title": "【兵临城下】秒发剧本杀电子版【复盘解析】桌游DM手册",
+      "store_name": "我爱剧本杀～的店",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 80,
+      "delta": 7,
+      "actual_gr": 9.59,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bea73315bd7400016230ad",
+      "title": "醉凌云剧本杀电子版情感6人组织者手册DM复盘解析高清版完整版",
+      "store_name": "乌傻奇小卖铺的店",
+      "store_id": "684ee81919eb1d0015bd5cf7",
+      "price": 2.88,
+      "sold": 656,
+      "delta": 6,
+      "actual_gr": 0.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a48d19088d1c1000189ac84",
+      "title": "《三人本剧本杀合集》无需主持人电子版复盘解析售后复盘完整版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 184,
+      "delta": 6,
+      "actual_gr": 3.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59b08f437d34000122b357",
+      "title": "2026新版高中语文文言文翻译全解电子版可打印【网盘发货】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.6,
+      "sold": 130,
+      "delta": 6,
+      "actual_gr": 4.84,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa956810e3e870001177ebf",
+      "title": "【破茧】秒发剧本杀电子版【复盘解析】桌游DM手册个人剧本",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 44,
+      "delta": 6,
+      "actual_gr": 15.79,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68270a5f0e103800018b9c7a",
+      "title": "2025新版初中语文七八九年级常考考点汇总早背晚默小纸条电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 1686,
+      "delta": 5,
+      "actual_gr": 0.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68e1cd95c7536100019ef9dd",
+      "title": "2026新高考语数英政史地生物化五年真题汇编考情分析考点专练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 752,
+      "delta": 5,
+      "actual_gr": 0.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "67a6b648f4fe140001704ca7",
+      "title": "【秒发】 一点半剧本杀电子高清完整版6人本 推理|现代|恐怖|还",
+      "store_name": "剧本杀攻略社的店",
+      "store_id": "65fcdfe7f0b5350001c8126e",
+      "price": 3.88,
+      "sold": 589,
+      "delta": 5,
+      "actual_gr": 0.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5456365705e10001873a04",
+      "title": "【窥镜】欧美惊悚推理本4人电子版剧本杀完整资料秒开团",
+      "store_name": "688ca58eb15bae001574275e",
+      "store_id": "688ca58eb15bae001574275e",
+      "price": 3.99,
+      "sold": 89,
+      "delta": 5,
+      "actual_gr": 5.95,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a324e693222c600015587ef",
+      "title": "《猫岛谋杀循环》剧本杀电子版剧本开本手册线索复盘完整版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 89,
+      "delta": 5,
+      "actual_gr": 5.95,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa01ebf167d3d0001af972c",
+      "title": "【出逃连体村】秒发剧本杀电子版【复盘解析】桌游DM手册个人剧本",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 44,
+      "delta": 5,
+      "actual_gr": 12.82,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69197a07b94f260015ea9987",
+      "title": "秒发《璃火》剧本杀电子版高清手册剧本线索卡复盘可打印完整资料",
+      "store_name": "淼金金的店",
+      "store_id": "67798a4f5afea70015f2436f",
+      "price": 3.99,
+      "sold": 284,
+      "delta": 4,
+      "actual_gr": 1.43,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cb25f18e770e00016af664",
+      "title": "【办公室谋杀案】悬疑推凶本4-5人剧本杀电子版完整资料秒开团",
+      "store_name": "打本艺术家的店",
+      "store_id": "688ca58eb15bae001574275e",
+      "price": 3.99,
+      "sold": 275,
+      "delta": 4,
+      "actual_gr": 1.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6931b62999c0b80001146893",
+      "title": "班主任老师必备班级积分管理系统软件Ai智能电子资料包",
+      "store_name": "安安小世界的店",
+      "store_id": "68db589260d1a4001504e470",
+      "price": 8.9,
+      "sold": 147,
+      "delta": 4,
+      "actual_gr": 2.8,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68e520eb7d3b3f0001f284d3",
+      "title": "【第七号嫌疑人】秒发剧本杀电子版【复盘解析】桌游DM手册答案",
+      "store_name": "我爱剧本杀～的店",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 1.88,
+      "sold": 143,
+      "delta": 4,
+      "actual_gr": 2.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4dab995705e10001fc4ed6",
+      "title": "【山鬼母】豪门46民国还原悬疑本3男2女剧本杀电子版可复盘解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 77,
+      "delta": 4,
+      "actual_gr": 5.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "690823205c4f19000185e909",
+      "title": "叫爸爸剧本杀电子版复盘解析可打印7人 现代情感欢乐开放新手进阶",
+      "store_name": "688da5da748bb90015d8c036",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 48,
+      "delta": 4,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "677f74db627fd900019ed266",
+      "title": "高中知识点电子版必修选修语文数学英语物理化学生物历史地理政治",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 1350,
+      "delta": 3,
+      "actual_gr": 0.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a04f643e3af99001566eab4",
+      "title": "秒发《再见黎明2暗夜降至》剧本杀电子版全员剧本DM手册线索售后",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 221,
+      "delta": 3,
+      "actual_gr": 1.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68945fa7a7c1e300010fc937",
+      "title": "【流氓叙事】秒发剧本杀电子版【复盘解析】桌游DM手册答案",
+      "store_name": "我爱剧本杀～的店",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 1.88,
+      "sold": 167,
+      "delta": 3,
+      "actual_gr": 1.83,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "67da3c1129b9f70001a78d25",
+      "title": "秒发【剧本杀】捉小三剧本杀电子版民国欢乐本6-10人本可复盘测评",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 163,
+      "delta": 3,
+      "actual_gr": 1.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68e5d9fce0f3b20001053364",
+      "title": "130套儿童剧本杀电子版合集高清可打印小学生聚会推理益智游戏",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 138,
+      "delta": 3,
+      "actual_gr": 2.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0ecf12189a9c00017af8f0",
+      "title": "《无相人考古奇案》剧本杀电子版完整剧本手册线索卡复盘资料售后",
+      "store_name": "留心彩虹的店",
+      "store_id": "6953e8b5c9ee560015ca4aa5",
+      "price": 2.99,
+      "sold": 70,
+      "delta": 3,
+      "actual_gr": 4.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a43716c7d09bf0001686df4",
+      "title": "deepseek文游指令精选合集文字游戏 · 100种电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 24,
+      "delta": 3,
+      "actual_gr": 14.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a453259654b390001340f74",
+      "title": "海龟汤微剧版剧本杀游戏自玩乌龟汤面底休闲聚会智力桌游团建",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.88,
+      "sold": 13,
+      "delta": 3,
+      "actual_gr": 30.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69955ee27db7d200012314b7",
+      "title": "2027新中考一轮二轮复习资料语数英物化生政历地电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.86,
+      "sold": 357,
+      "delta": 2,
+      "actual_gr": 0.56,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "67a958d396b36c00015b7e65",
+      "title": "【秒发】告别诗剧本杀高清完整电子版6人本情感本校园青春",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 274,
+      "delta": 2,
+      "actual_gr": 0.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "694357f5c3ae5b000172b12a",
+      "title": "剧本杀【秒发】甜蜜的家剧本杀电子版高清惊悚恐怖本5人可复盘",
+      "store_name": "剧本杀攻略社的店",
+      "store_id": "65fcdfe7f0b5350001c8126e",
+      "price": 3.88,
+      "sold": 274,
+      "delta": 2,
+      "actual_gr": 0.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d274ecc94bfd00010e2609",
+      "title": "【暗夜将至】秒发剧本杀电子版【复盘解析】桌游DM手册",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 175,
+      "delta": 2,
+      "actual_gr": 1.16,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "698337c48c608e0001dc199d",
+      "title": "王不见王剧本杀电子版推理6人组织者手册DM复盘高清版完整版",
+      "store_name": "乌傻奇小卖铺",
+      "store_id": "684ee81919eb1d0015bd5cf7",
+      "price": 2.88,
+      "sold": 137,
+      "delta": 2,
+      "actual_gr": 1.48,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68dd45bd2990490001b7b909",
+      "title": "【科举】秒发剧本杀电子版【复盘解析】桌游DM手册答案",
+      "store_name": "我爱剧本杀～的店",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 1.28,
+      "sold": 100,
+      "delta": 2,
+      "actual_gr": 2.04,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d27a61c03a930001b732a3",
+      "title": "双人剧本杀电子版合集组织者手册DM推理情侣高清版完整版",
+      "store_name": "乌傻奇小卖铺的店",
+      "store_id": "684ee81919eb1d0015bd5cf7",
+      "price": 5.88,
+      "sold": 93,
+      "delta": 2,
+      "actual_gr": 2.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d29f5952686e0001b486ce",
+      "title": "继承者剧本杀电子版情感6人组织者手册DM复盘解析高清版完整版",
+      "store_name": "乌傻奇小卖铺的店",
+      "store_id": "684ee81919eb1d0015bd5cf7",
+      "price": 2.88,
+      "sold": 87,
+      "delta": 2,
+      "actual_gr": 2.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "692ae8e2137a3b00014b7ab0",
+      "title": "下课后剧本杀电子完整版4-5人推理本",
+      "store_name": "剧本杀攻略社的店",
+      "store_id": "65fcdfe7f0b5350001c8126e",
+      "price": 3.88,
+      "sold": 85,
+      "delta": 2,
+      "actual_gr": 2.41,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cd203e1e3a1a0001f229e3",
+      "title": "【牛鬼蛇神】民国宅院欢乐本3男2女电子版剧本杀完整资料秒开团",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 84,
+      "delta": 2,
+      "actual_gr": 2.44,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f5f1f9c8f8b800015cd6a9",
+      "title": "【风林火山】秒发剧本杀电子版【复盘解析】桌游DM手册答案",
+      "store_name": "688da5da748bb90015d8c036",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 83,
+      "delta": 2,
+      "actual_gr": 2.47,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f5f2edc192ac0001849b08",
+      "title": "【叫父】秒发剧本杀电子版【复盘解析】桌游DM手册答案",
+      "store_name": "我爱剧本杀～的店",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 5.88,
+      "sold": 77,
+      "delta": 2,
+      "actual_gr": 2.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6968b9ab9c8a6a0001b6f40b",
+      "title": "同归剧本杀6人情感电子版组织者手册DM复盘高清版完整版",
+      "store_name": "684ee81919eb1d0015bd5cf7",
+      "store_id": "684ee81919eb1d0015bd5cf7",
+      "price": 1.88,
+      "sold": 65,
+      "delta": 2,
+      "actual_gr": 3.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f5f251cdf9d60001036384",
+      "title": "【三国封神】秒发剧本杀电子版【复盘解析】桌游DM手册答案",
+      "store_name": "688da5da748bb90015d8c036",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 48,
+      "delta": 2,
+      "actual_gr": 4.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69caa094069e7b0001e86715",
+      "title": "【关于Y的奇迹】推理悬疑6人剧本杀高清完整电子版可复盘解析",
+      "store_name": "688ca58eb15bae001574275e",
+      "store_id": "688ca58eb15bae001574275e",
+      "price": 3.99,
+      "sold": 40,
+      "delta": 2,
+      "actual_gr": 5.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c265072988860001ce6141",
+      "title": "【血腥爱情故事】中式还原悬疑本3男3女人物剧本复盘资料齐全",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 35,
+      "delta": 2,
+      "actual_gr": 6.06,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a140c6a017ffc000119d01a",
+      "title": "【琳琅】秒发剧本杀电子版【复盘解析】桌游DM手册",
+      "store_name": "688da5da748bb90015d8c036",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 18,
+      "delta": 2,
+      "actual_gr": 12.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a470cafc4c16c000165abe4",
+      "title": "【家有儿女】5人家庭温情推理剧本杀3男2女电子版完整资料秒开团",
+      "store_name": "688ca58eb15bae001574275e",
+      "store_id": "688ca58eb15bae001574275e",
+      "price": 3.99,
+      "sold": 17,
+      "delta": 2,
+      "actual_gr": 13.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6957f316110a7f0001d84044",
+      "title": "【多多】秒发剧本杀电子版【复盘解析】桌游DM手册",
+      "store_name": "我爱剧本杀～的店",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 13,
+      "delta": 2,
+      "actual_gr": 18.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1c47c6cd75c30001487fc2",
+      "title": "【粉灯】秒发剧本杀电子版【复盘解析】桌游DM手册",
+      "store_name": "我爱剧本杀～的店",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 1.88,
+      "sold": 10,
+      "delta": 2,
+      "actual_gr": 25.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a42840b24d4bb0001c61d26",
+      "title": "【蝶溯】5人日式设定推理本2男3女剧本杀电子版完整资料秒开团",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 10,
+      "delta": 2,
+      "actual_gr": 25.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a89588881c7b60001b7494c",
+      "title": "AI辅助教学资料创作工具包高质量·5分钟生成一份原创教学辅导教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 187.0,
+      "sold": 7,
+      "delta": 2,
+      "actual_gr": 40.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6908b7549de01f00013ca592",
+      "title": "罪恶演绎剧本杀电子版复盘解析可打印本电子本 6人欢乐推理还原",
+      "store_name": "688da5da748bb90015d8c036",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 7,
+      "delta": 2,
+      "actual_gr": 40.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2982e88bca040001103196",
+      "title": "2026成人高考专升本/高起本/高起专成考备考重点资料电子资料",
+      "store_name": "68a9b8dec91e6b00157bc849",
+      "store_id": "68a9b8dec91e6b00157bc849",
+      "price": 15.9,
+      "sold": 851,
+      "delta": 1,
+      "actual_gr": 0.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68cc26710201ec00017cf75d",
+      "title": "【无相人考古奇案】秒发剧本杀电子版【复盘解析】桌游DM手册答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.88,
+      "sold": 576,
+      "delta": 1,
+      "actual_gr": 0.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6989b03ba5576f0001968365",
+      "title": "《雨夜感染者》四人剧本杀模版无需dm",
+      "store_name": "sssssuij的店",
+      "store_id": "6946637b58732c00152b39a2",
+      "price": 3.88,
+      "sold": 377,
+      "delta": 1,
+      "actual_gr": 0.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6942151ede03f40001711690",
+      "title": "最新教师招聘语文备考资料包汇总（电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 340,
+      "delta": 1,
+      "actual_gr": 0.29,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c199c9721a4700010ed1b3",
+      "title": "【安美纳斯的DE死亡推想】秒发剧本杀电子版【复盘解析】桌游DM",
+      "store_name": "688da5da748bb90015d8c036",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 1.88,
+      "sold": 310,
+      "delta": 1,
+      "actual_gr": 0.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a408ac972cfc700014ccb9e",
+      "title": "成人高考-专升本/电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 238,
+      "delta": 1,
+      "actual_gr": 0.42,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "696fa9445d156300019b9104",
+      "title": "【王不见王】秒发剧本杀电子版【复盘解析】桌游DM手册",
+      "store_name": "我爱剧本杀～的店",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 223,
+      "delta": 1,
+      "actual_gr": 0.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a53078d11bb870001cdd84a",
+      "title": "2027高考总复习语数英物化生史地政电子版可打印【网盘发货】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 193,
+      "delta": 1,
+      "actual_gr": 0.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "689eff0fdc73de00010b57f5",
+      "title": "双人剧本杀2两人电子版复盘解析打印无需主持人新手册答案桌游",
+      "store_name": "我爱剧本杀～的店",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 8.88,
+      "sold": 157,
+      "delta": 1,
+      "actual_gr": 0.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f0fde229904900012dcb3c",
+      "title": "请君入瓮剧本杀6人情感电子版复盘解析高清版组织者手册完整版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.88,
+      "sold": 150,
+      "delta": 1,
+      "actual_gr": 0.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "694bf0fdc3ae5b000141c141",
+      "title": "【秒发】窥镜剧本杀电子高清完整版微恐推理4人",
+      "store_name": "剧本杀攻略社的店",
+      "store_id": "65fcdfe7f0b5350001c8126e",
+      "price": 3.88,
+      "sold": 94,
+      "delta": 1,
+      "actual_gr": 1.08,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "689460f5eab7930001b51fa8",
+      "title": "【豪门42双影共秀】秒发剧本杀电子版【复盘解析】桌游DM手册答案",
+      "store_name": "我爱剧本杀～的店",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 1.88,
+      "sold": 83,
+      "delta": 1,
+      "actual_gr": 1.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a70dbcbefcbd000111c037",
+      "title": "【醉凌云】秒发剧本杀电子版【复盘解析】桌游DM手册",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 82,
+      "delta": 1,
+      "actual_gr": 1.23,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68a46cb90991b400016e0400",
+      "title": "东京恐怖故事加藤病院 剧本杀组织者手册完整电子版 真相复盘解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 50,
+      "delta": 1,
+      "actual_gr": 2.04,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68a2f7b411247e00014f7fab",
+      "title": "诅家庄剧本杀电子版复盘解析高清版组织者手册完整版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.88,
+      "sold": 44,
+      "delta": 1,
+      "actual_gr": 2.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5c3fc57308b500010ee9df",
+      "title": "《中彩票》剧本杀电子版高清版6人本欢乐爆笑本",
+      "store_name": "6953e8b5c9ee560015ca4aa5",
+      "store_id": "6953e8b5c9ee560015ca4aa5",
+      "price": 2.99,
+      "sold": 41,
+      "delta": 1,
+      "actual_gr": 2.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f5eb96ce94ee000146a457",
+      "title": "【永不褪色的山楂林】秒发剧本杀电子版【复盘解析】桌游DM手册",
+      "store_name": "688da5da748bb90015d8c036",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 39,
+      "delta": 1,
+      "actual_gr": 2.63,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c3b463e8b4ad00013e68a7",
+      "title": "【命藏町的白雪姬】秒发剧本杀电子版【复盘解析】桌游DM手册答案",
+      "store_name": "688da5da748bb90015d8c036",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 36,
+      "delta": 1,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f87b69c8f8b8000173ff90",
+      "title": "【千佛梦】秒发剧本杀电子版【复盘解析】桌游DM手册答案",
+      "store_name": "688da5da748bb90015d8c036",
+      "store_id": "688da5da748bb90015d8c036",
+      "price": 3.88,
+      "sold": 35,
+      "delta": 1,
+      "actual_gr": 2.94,
+      "token_hits": 0,
+      "touch_keywords": [
+        "表格批量AI处理电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "表格批量AI处理",
+  "slug": "表格批量AI处理"
+}

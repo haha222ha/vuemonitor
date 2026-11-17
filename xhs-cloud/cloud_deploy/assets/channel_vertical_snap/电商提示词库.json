@@ -1,0 +1,254 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "电商提示词库"
+    ],
+    "niche": "电商提示词库"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "电商提示词库电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "电商提示词库电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords+title",
+  "summary": {
+    "seller_n": 3,
+    "sku_n": 15,
+    "sum_delta": 0,
+    "median_price": 8.84,
+    "niche": "电商提示词库",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "拾光素材小店的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 5,
+      "top_title": "AI电商提示词库主图详情页海报反推图片生图指令模板合集",
+      "top_delta": 0
+    },
+    {
+      "store_name": "（未知店）",
+      "sku_n": 13,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "top_delta": 0
+    },
+    {
+      "store_name": "696c4e67671f7200152539df",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a51d1e21a0aff0001167334",
+      "title": "AI电商提示词库主图详情页海报反推图片生图指令模板合集",
+      "store_name": "拾光素材小店的店",
+      "store_id": "6836d0c169e8400015008834",
+      "price": 4.8,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a4aec3d87c1860015b96231",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.97,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a57a3ba5705e10001d5097a",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.48,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a5b4d98aa62b50001fa42bb",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.91,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a5e30674382e200012493e4",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "696c4e67671f7200152539df",
+      "store_id": "696c4e67671f7200152539df",
+      "price": 27.96,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a60957fd855850001e56806",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.44,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a6099179b233b00011d7757",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 27.96,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a61602565f3a80001eafd90",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.56,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a61602565f3a80001eafd93",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.56,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a61602565f3a80001eafd96",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.64,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a63616774bf000001f6f0d8",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.64,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a7dfd6f5bea4e00012abf89",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.84,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a87f2710db08d0001ce1d43",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.29,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a310cc1b81403001526e5ae",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.98,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    },
+    {
+      "goods_id": "6a88e30c52fed40001a73226",
+      "title": "AI电商提示词库整理反推图片提示词详情页提示词合集生图提示词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.84,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 1,
+      "touch_keywords": []
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "电商提示词库",
+  "slug": "电商提示词库"
+}

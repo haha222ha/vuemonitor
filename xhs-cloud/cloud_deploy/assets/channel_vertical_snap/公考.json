@@ -1,0 +1,1617 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "公考"
+    ],
+    "niche": "公考"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 76,
+    "active_n": 1,
+    "drive_keywords": [
+      "公考",
+      "公考国",
+      "毕上公考",
+      "瞪哥公考",
+      "公道公考",
+      "公考阿秋",
+      "公考艾琳",
+      "公考必过",
+      "公考讲义",
+      "公考雷达",
+      "公考路飞",
+      "公考甜妈",
+      "公考土哥",
+      "公考兮晨",
+      "公考小五",
+      "公考知行",
+      "公考志家",
+      "公考智库",
+      "公考资料",
+      "国岸公考",
+      "华智公考",
+      "考公考编",
+      "明月公考",
+      "启公公考"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "公考",
+        "is_active": 1,
+        "pin_group": "",
+        "pin_notes": "restored_exam_2char_after_broad_demote|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "aug_report_restore_20260930",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考国",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "补齐每日主队列至3000·20260901|deactivated_for_virtual_core_restore_20260928_094932",
+        "source": "virt_gap_restore_false_pause_20261021",
+        "role": "candidate"
+      },
+      {
+        "keyword": "毕上公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "瞪哥公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公道公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考阿秋",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考艾琳",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考必过",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考讲义",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考雷达",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考路飞",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考甜妈",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考土哥",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考兮晨",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考小五",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考知行",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考志家",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考智库",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": " [force_suffix_old_0727]",
+        "source": "all_reports_dir_fill_20261009_185652",
+        "role": "candidate"
+      },
+      {
+        "keyword": "国岸公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "华智公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "考公考编",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "明月公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "启公公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "青春公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "四海公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "星光公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "永岸公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "云端公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "岸上见公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考百宝箱",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "ai_filter",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考蔡文姬",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考大魔王",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考李清照",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考刷题舍",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "公考研究院",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "上岸官公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "摘星兔公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "程屹锦讲公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      },
+      {
+        "keyword": "粉笔教育公考",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "backup_virtual:20260708_060125",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 14,
+    "sku_n": 80,
+    "sum_delta": 48201,
+    "median_price": 6.8,
+    "niche": "公考",
+    "drive_kw_n": 24
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 67,
+      "sum_delta": 38868,
+      "sum_sold": 518248,
+      "top_title": "上岸熊中小幼教资面试资料（题本+教案+逐字稿+答辩 不含视频音频",
+      "top_delta": 2953
+    },
+    {
+      "store_name": "橙子爱学习.的店",
+      "sku_n": 1,
+      "sum_delta": 2710,
+      "sum_sold": 4001,
+      "top_title": "上岸熊中小幼教资面试资料（题本+教案+逐字稿+答辩 不含视频音频",
+      "top_delta": 2710
+    },
+    {
+      "store_name": "夏小小不打烊的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 18000,
+      "top_title": "2026年考英语四六级（真题+解析+音频）电子PDF百度网盘",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "上岸熊旗舰店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 16000,
+      "top_title": "26下全国教资面试小初高教师资格考试资料结构化试讲逐字稿真题",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "amy老师资料库的店",
+      "sku_n": 1,
+      "sum_delta": 1000,
+      "sum_sold": 12000,
+      "top_title": "2026【精品主题班会】课件200+持续更新",
+      "top_delta": 1000
+    },
+    {
+      "store_name": "奇怪耶耶的店",
+      "sku_n": 1,
+      "sum_delta": 939,
+      "sum_sold": 10000,
+      "top_title": "【面试电子版】26下高中语文教资面试备考资料逐字稿教案真题解析",
+      "top_delta": 939
+    },
+    {
+      "store_name": "学姐的资料库的店",
+      "sku_n": 1,
+      "sum_delta": 545,
+      "sum_sold": 6378,
+      "top_title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "top_delta": 545
+    },
+    {
+      "store_name": "考百分教育的店",
+      "sku_n": 1,
+      "sum_delta": 399,
+      "sum_sold": 4659,
+      "top_title": "2026年大学英语四六级历史真题词汇听力阅读音频冲刺电子版资料包",
+      "top_delta": 399
+    },
+    {
+      "store_name": "吉祥如意上岸版的店",
+      "sku_n": 1,
+      "sum_delta": 367,
+      "sum_sold": 8035,
+      "top_title": "27省考电子版资料~资料分析+申论规范词+高频成语+常识+推理",
+      "top_delta": 367
+    },
+    {
+      "store_name": "椰奶冻冻子的店",
+      "sku_n": 1,
+      "sum_delta": 330,
+      "sum_sold": 3279,
+      "top_title": "2026入党积极分子+发展对象全题型题库文档+刷题小程序",
+      "top_delta": 330
+    },
+    {
+      "store_name": "小椿日语的店",
+      "sku_n": 1,
+      "sum_delta": 308,
+      "sum_sold": 7347,
+      "top_title": "日语学习课件+学习物料",
+      "top_delta": 308
+    },
+    {
+      "store_name": "背背备考的店",
+      "sku_n": 1,
+      "sum_delta": 295,
+      "sum_sold": 3452,
+      "top_title": "2027国省考申论规范词申论人物素材申论金句申论素材包",
+      "top_delta": 295
+    },
+    {
+      "store_name": "上岸福团团的店",
+      "sku_n": 1,
+      "sum_delta": 256,
+      "sum_sold": 6232,
+      "top_title": "（秒发+日更）26/27考公考编/教师/医疗/国央企信息汇总表模板",
+      "top_delta": 256
+    },
+    {
+      "store_name": "浙大周老师（学习宝藏）的店",
+      "sku_n": 1,
+      "sum_delta": 184,
+      "sum_sold": 6020,
+      "top_title": "高中地理66个综合题答题模板Word+PDF 78页",
+      "top_delta": 184
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a1465cac4095100018486dd",
+      "title": "（秒发+日更）26/27考公考编/教师/医疗/国央企信息汇总表模板",
+      "store_name": "上岸福团团的店",
+      "store_id": "6a106fe9f676150015b2846e",
+      "price": 8.9,
+      "sold": 6232,
+      "delta": 256,
+      "actual_gr": 4.28,
+      "token_hits": 1,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6aa3ec917a35e600018c1c04",
+      "title": "公考2027国考历年真题试卷申论行测真题狂刷40套省考真题资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 45.0,
+      "sold": 3660,
+      "delta": 167,
+      "actual_gr": 4.78,
+      "token_hits": 1,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a68a1dc89d8ff0001835a20",
+      "title": "公考万能蒙题技巧大法",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 164,
+      "delta": 102,
+      "actual_gr": 164.52,
+      "token_hits": 1,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69ea0eb467d4b20001d0f421",
+      "title": "上岸熊中小幼教资面试资料（题本+教案+逐字稿+答辩 不含视频音频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 4003,
+      "delta": 2953,
+      "actual_gr": 281.24,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a75edcfa52c1c00018fe383",
+      "title": "通用人教和上海初中160个文言文实词艾宾浩斯默写本5词15词6循环",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 3220,
+      "delta": 2879,
+      "actual_gr": 844.28,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69f9a55743360b0001ed5901",
+      "title": "上岸熊中小幼教资面试资料（题本+教案+逐字稿+答辩 不含视频音频",
+      "store_name": "橙子爱学习.的店",
+      "store_id": "6908427332e2110015624777",
+      "price": 9.99,
+      "sold": 4001,
+      "delta": 2710,
+      "actual_gr": 209.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a9afd206b399600016f9e05",
+      "title": "2026常识4600问 / 国考省考行测高分必背  修正版 115页电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 6604,
+      "delta": 2267,
+      "actual_gr": 52.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a9afd206b399600016f9e08",
+      "title": "2026常识4600问 / 国考省考行测高分必背  修正版 115页电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.99,
+      "sold": 6591,
+      "delta": 2181,
+      "actual_gr": 49.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a054e365a83230001dfb611",
+      "title": "2026初一初二初三学习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 48000,
+      "delta": 2000,
+      "actual_gr": 4.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6ac527fabb8a9a0001ff6322",
+      "title": "【2026秋】四上第六单元课件+教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 2507,
+      "delta": 1158,
+      "actual_gr": 85.84,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6aadf3dbdea5ea0001a91f2f",
+      "title": "天赋测试-挖掘自身天赋领域教案（秒发货，地址手机随便填）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.98,
+      "sold": 71000,
+      "delta": 1000,
+      "actual_gr": 1.43,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68416d84e9389a0001486733",
+      "title": "2026秋季新版一二三四五六上语文单元专项期中期末复习课件资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.8,
+      "sold": 36000,
+      "delta": 1000,
+      "actual_gr": 2.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68adc8abd60c330001c91ad6",
+      "title": "大学本科生研究生毕业论文开题答辩简约高级PPT模板+答辩技巧word",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.98,
+      "sold": 20000,
+      "delta": 1000,
+      "actual_gr": 5.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69bff1dc99f8fe0001a98648",
+      "title": "2026年考英语四六级（真题+解析+音频）电子PDF百度网盘",
+      "store_name": "夏小小不打烊的店",
+      "store_id": "693ced641d8c99001576ea05",
+      "price": 3.88,
+      "sold": 18000,
+      "delta": 1000,
+      "actual_gr": 5.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "64102b0cde439100019c02d8",
+      "title": "26下全国教资面试小初高教师资格考试资料结构化试讲逐字稿真题",
+      "store_name": "上岸熊旗舰店",
+      "store_id": "63b9487744351a00014495f5",
+      "price": 59.9,
+      "sold": 16000,
+      "delta": 1000,
+      "actual_gr": 6.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "677f9534fb6ac0000181b408",
+      "title": "高中9科知识点电子档（语文数学英语物理化学生物地理历史政治）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "677f9534fb6ac0000181b411",
+      "title": "高中9科知识点电子档（语文数学英语物理化学生物地理历史政治）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 15000,
+      "delta": 1000,
+      "actual_gr": 7.14,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68ad563d5ce8aa00013d6120",
+      "title": "混子哥边画边讲初中小四门早知道·小学生提前启蒙小升初预习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 75.8,
+      "sold": 14000,
+      "delta": 1000,
+      "actual_gr": 7.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69a6550746055a0001739289",
+      "title": "初中小四门磨耳朵课件 I 史道地生7-9全套",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 169.9,
+      "sold": 14000,
+      "delta": 1000,
+      "actual_gr": 7.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "692ebfe4d4363c000105977a",
+      "title": "新版初一精品练习题电子资料包，最新教程版本，永久免费更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "692fc2a6b70fce000131f348",
+      "title": "新版初一精品练习题电子资料包，最新教程版本，永久免费更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.0,
+      "sold": 13000,
+      "delta": 1000,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "676f5c72d048b700017405b3",
+      "title": "PPT模板 商务述职汇报 500页 支持win/mac 无水印 下载后永久可用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68dfa3c853446d0001ce7408",
+      "title": "2026新版小豆同学秒记政史地物化生语数英高中答题模板知识点复习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 32.8,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68d3a3fd9176f50001d68b28",
+      "title": "2026【精品主题班会】课件200+持续更新",
+      "store_name": "amy老师资料库的店",
+      "store_id": "67a9a6cfb3738b0015c79194",
+      "price": 69.9,
+      "sold": 12000,
+      "delta": 1000,
+      "actual_gr": 9.09,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6961245281edf70001e53a34",
+      "title": "10000+套高清可编辑PPT模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 11000,
+      "delta": 1000,
+      "actual_gr": 10.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "691dd78095624300011c420b",
+      "title": "【面试电子版】26下高中语文教资面试备考资料逐字稿教案真题解析",
+      "store_name": "奇怪耶耶的店",
+      "store_id": "6864afe7be1c230015b8aa6d",
+      "price": 39.0,
+      "sold": 10000,
+      "delta": 939,
+      "actual_gr": 10.36,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68a2a11c33fcf800017922f7",
+      "title": "27花生大神国省考事业编行测职测笔记总结资料分析数量图推逻辑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 79.9,
+      "sold": 8658,
+      "delta": 643,
+      "actual_gr": 8.02,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a2c3488963cbb000151d966",
+      "title": "999套国赛金奖大学生创新创业赛竞比赛互联网+挑战杯职业ppt模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 5149,
+      "delta": 558,
+      "actual_gr": 12.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a3a2121e503360001eb91e6",
+      "title": "【秒发】考研真题合集历年真题+解析各科都有已更26年下单选科目",
+      "store_name": "学姐的资料库的店",
+      "store_id": "66f59ab9a9bf3400163b0b7d",
+      "price": 1.99,
+      "sold": 6378,
+      "delta": 545,
+      "actual_gr": 9.34,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68b024400c85cc00019bfa3d",
+      "title": "【2026新】三上语文任务群课件ppt+教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 124.0,
+      "sold": 8578,
+      "delta": 499,
+      "actual_gr": 6.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a4a8313f764ee0001d13f48",
+      "title": "2027国省考申论规范词申论人物素材申论金句申论素材包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.55,
+      "sold": 3096,
+      "delta": 422,
+      "actual_gr": 15.78,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "690335559de01f0001059a7e",
+      "title": "2026年大学英语四六级历史真题词汇听力阅读音频冲刺电子版资料包",
+      "store_name": "考百分教育的店",
+      "store_id": "6790fdc89ce1c50015cef6cb",
+      "price": 2.98,
+      "sold": 4659,
+      "delta": 399,
+      "actual_gr": 9.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69e3702bca7f7f0001aea72b",
+      "title": "【初一初二初三上学期】开学/期中/期末家长会均含逐字稿＋教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2595,
+      "delta": 399,
+      "actual_gr": 18.17,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a66fe9e3abfdc0001dcc52a",
+      "title": "星露谷物语-资料模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 9856,
+      "delta": 395,
+      "actual_gr": 4.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a0448f20283e20001cbb87e",
+      "title": "2026秋人音版小学音乐一二三四五六年级上下册核心素养教案全册",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 41.41,
+      "sold": 2625,
+      "delta": 390,
+      "actual_gr": 17.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "692e28eb14b5260001c5c08e",
+      "title": "各种照片改尺寸改格式改10k审核照片国考省考事业编考试报名改Kb",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 3205,
+      "delta": 369,
+      "actual_gr": 13.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "698ddf6b0775cd001527e0cb",
+      "title": "27省考电子版资料~资料分析+申论规范词+高频成语+常识+推理",
+      "store_name": "吉祥如意上岸版的店",
+      "store_id": "698dc2437365d90015f4d13d",
+      "price": 2.58,
+      "sold": 8035,
+      "delta": 367,
+      "actual_gr": 4.79,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a5899f84f6fde00012704cc",
+      "title": "26秋新版七年级上册语文课文必背内容古诗词文言文模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 806,
+      "delta": 344,
+      "actual_gr": 74.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a1c29e2b6178b0001e9301d",
+      "title": "2026入党积极分子+发展对象全题型题库文档+刷题小程序",
+      "store_name": "椰奶冻冻子的店",
+      "store_id": "68dfc8d85a855c0014af47a3",
+      "price": 9.9,
+      "sold": 3279,
+      "delta": 330,
+      "actual_gr": 11.19,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "693d046b266b95000149d4d5",
+      "title": "【期中】试后分析家长会：家校携手同心，共育繁花39页ppt+讲稿",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 2927,
+      "delta": 325,
+      "actual_gr": 12.49,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a06e4b8e1e1370001dc18a2",
+      "title": "日语学习课件+学习物料",
+      "store_name": "小椿日语的店",
+      "store_id": "6964f683ecc17f0015c8f199",
+      "price": 0.5,
+      "sold": 7347,
+      "delta": 308,
+      "actual_gr": 4.38,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a71f426d855850001844156",
+      "title": "【小学一至六年级上学期】开学期中期末家长会均含逐字稿+教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 6985,
+      "delta": 301,
+      "actual_gr": 4.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69201598e1740800013420f9",
+      "title": "红色主题PPT模板-X建/X课/红色教育-工作汇报ppt模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.88,
+      "sold": 6732,
+      "delta": 299,
+      "actual_gr": 4.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a991f7432266200019ef3de",
+      "title": "迷你世界老版本【可联机】使用教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.99,
+      "sold": 808,
+      "delta": 297,
+      "actual_gr": 58.12,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a3e13bc1a14830001b85466",
+      "title": "2026新版初一初二初三全科目暑假月考期中期末核心考点电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 6578,
+      "delta": 296,
+      "actual_gr": 4.71,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69e1a1b3a1dd7800016338b7",
+      "title": "初中【期中家长会】精品ppt送发言稿（含初一初二初三各科）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 129.0,
+      "sold": 4049,
+      "delta": 296,
+      "actual_gr": 7.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a4a8313f764ee0001d13f4b",
+      "title": "2027国省考申论规范词申论人物素材申论金句申论素材包",
+      "store_name": "背背备考的店",
+      "store_id": "6a2ac277bf130800158a46a5",
+      "price": 0.9,
+      "sold": 3452,
+      "delta": 295,
+      "actual_gr": 9.34,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6ab132b443b90c0001aefba0",
+      "title": "课件: 锈湖全系列资料1",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.88,
+      "sold": 2516,
+      "delta": 293,
+      "actual_gr": 13.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6aa0f2e608388400013c95e1",
+      "title": "16页八年级上册人教版道德与法治知识点总结电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.49,
+      "sold": 1744,
+      "delta": 285,
+      "actual_gr": 19.53,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6906a10245459000019ba437",
+      "title": "26教师资格证面试小学数学逐字稿结构化答辩真题试讲视频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1879,
+      "delta": 283,
+      "actual_gr": 17.73,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a969cb1758c2000012f2560",
+      "title": "海绵宝宝：大闹蟹堡王  电子资源PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 1827,
+      "delta": 282,
+      "actual_gr": 18.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a40bc657d09bf00012bb855",
+      "title": "26新版人教PEP丨三四五六年级单元考点梳理，单元练习 [电子版]",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 10000,
+      "delta": 276,
+      "actual_gr": 2.84,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a7c4c2409b4f20001165b8c",
+      "title": "照片工具处理照片10k报名照片改尺寸大小背景照片 国考省考事业编",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.66,
+      "sold": 2151,
+      "delta": 276,
+      "actual_gr": 14.72,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69d35ceac94bfd0001234c6f",
+      "title": "27考公资料电子版｜资料分析+申论规范词+高频成语+常识+推理",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.9,
+      "sold": 7131,
+      "delta": 272,
+      "actual_gr": 3.97,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a5cb13eaa62b50001179026",
+      "title": "26年小升初英语全套资料合集（全版本）（电子版pdf可打印）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.98,
+      "sold": 3144,
+      "delta": 265,
+      "actual_gr": 9.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68a6d57e2eb6de00017ef7d9",
+      "title": "小学1-6年级道德与法治知识点汇总/课件/教案/PPT/一课一练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 8226,
+      "delta": 261,
+      "actual_gr": 3.28,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a2d996f8bca040001019a0c",
+      "title": "26年小升初英语全套资料合集（全版本）（电子版pdf可打印）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.98,
+      "sold": 3159,
+      "delta": 258,
+      "actual_gr": 8.89,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69b9364a5e5f05000101261c",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.6,
+      "sold": 6530,
+      "delta": 255,
+      "actual_gr": 4.06,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69fffa577b710e0001ae788d",
+      "title": "人教版7-9年级英语（含知识点总结）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 69.9,
+      "sold": 6438,
+      "delta": 243,
+      "actual_gr": 3.92,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69d462b79bbf240001de27be",
+      "title": "aa90致不容易的家长 通用家长会PPT模板 静态模板32页+发言稿",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 2198,
+      "delta": 241,
+      "actual_gr": 12.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68a6d57e2eb6de00017ef7d3",
+      "title": "小学1-6年级道德与法治知识点汇总/课件/教案/PPT/一课一练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 8226,
+      "delta": 240,
+      "actual_gr": 3.01,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68b826697675b40001f03757",
+      "title": "【2026秋新版】四上语文任务群课件+教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 124.0,
+      "sold": 6884,
+      "delta": 236,
+      "actual_gr": 3.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6ac906bd6996d90001e1235d",
+      "title": "大学生职业生涯规划书Word+PPT成品 职规赛成长赛道1000+专业可用",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 1685,
+      "delta": 235,
+      "actual_gr": 16.21,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68a6d57e2eb6de00017ef7d6",
+      "title": "小学1-6年级道德与法治知识点汇总/课件/教案/PPT/一课一练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 8208,
+      "delta": 229,
+      "actual_gr": 2.87,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a89a9e5cc9be300019362ea",
+      "title": "2026秋季四年级上册道德与法治新教材课件、配套教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.99,
+      "sold": 2198,
+      "delta": 212,
+      "actual_gr": 10.67,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a310dd6963cbb0001d7dfe1",
+      "title": "2026幼儿园数学领域优质课小中大班数学公开课PPT课件教案视频",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.0,
+      "sold": 1318,
+      "delta": 208,
+      "actual_gr": 18.74,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a469ad36370dc0001d337cc",
+      "title": "持续更新｜通用PPT模板大合集99999套｜各行业各种风格｜任你挑选",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 2697,
+      "delta": 207,
+      "actual_gr": 8.31,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a451f16d0e6f20001dc54a4",
+      "title": "26年人教版六上数学题型专项训练（电子版）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 2481,
+      "delta": 199,
+      "actual_gr": 8.72,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6aa39c43f5fcb10001b846b4",
+      "title": "2026秋小学道德与法治课件ppt+教案+试卷练习知识点备课资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.63,
+      "sold": 2086,
+      "delta": 199,
+      "actual_gr": 10.55,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a8da9433c010e00018278e8",
+      "title": "初中古诗文汇总（详细注释+译文）电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.8,
+      "sold": 258,
+      "delta": 197,
+      "actual_gr": 322.95,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "68cd45a555f59b000129f8df",
+      "title": "人教版小学劳动1-6年级精美课件、教案、素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 4132,
+      "delta": 196,
+      "actual_gr": 4.98,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69aac1671166fe000176b9ba",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 8669,
+      "delta": 191,
+      "actual_gr": 2.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a71be68bf81ab000186557e",
+      "title": "26秋一年级上册语文PPT课件教案（七彩精华版）无水印好资料共享",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 2719,
+      "delta": 190,
+      "actual_gr": 7.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a5c89568c0a3e00013d820b",
+      "title": "（26秋开学）1-6年级道德法治核心素养全册教案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.66,
+      "sold": 2656,
+      "delta": 189,
+      "actual_gr": 7.66,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a6f753d34eabf0001fa607a",
+      "title": "女生社恐娱乐模版【1500+PPT模板简约】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.89,
+      "sold": 6690,
+      "delta": 187,
+      "actual_gr": 2.88,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69d0ba95667ef50001d4f67e",
+      "title": "高中地理66个综合题答题模板Word+PDF 78页",
+      "store_name": "浙大周老师（学习宝藏）的店",
+      "store_id": "67f8684f5a9a4500169b369c",
+      "price": 1.0,
+      "sold": 6020,
+      "delta": 184,
+      "actual_gr": 3.15,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6aa39f7650825c00011a4e5f",
+      "title": "26初中全科目资料：知识梳理+高频考点+同步提升+月考期中期末",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1111,
+      "delta": 183,
+      "actual_gr": 19.72,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6ab78fa37dbca2000105b39d",
+      "title": "行测言语救星】网友红领巾实战",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.6,
+      "sold": 214,
+      "delta": 182,
+      "actual_gr": 568.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "6a1037d361fef9000186366e",
+      "title": "小初高背单词课堂操练游戏 ppt ‖ 持续更新 包售后 ‖ 22款",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.99,
+      "sold": 3351,
+      "delta": 179,
+      "actual_gr": 5.64,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    },
+    {
+      "goods_id": "69a6e83cbefcbd00010f074d",
+      "title": "2026年最新版 七年级上册道德与法治26页知识点总结电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.49,
+      "sold": 2326,
+      "delta": 179,
+      "actual_gr": 8.34,
+      "token_hits": 0,
+      "touch_keywords": [
+        "公考"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "公考",
+  "slug": "公考"
+}

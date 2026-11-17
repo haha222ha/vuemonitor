@@ -1,0 +1,267 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "OpenRouter"
+    ],
+    "niche": "OpenRouter"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 0,
+    "active_n": 0,
+    "drive_keywords": [
+      "OpenRouter"
+    ],
+    "pinned": [],
+    "candidates": [],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 2,
+    "sku_n": 15,
+    "sum_delta": 7,
+    "median_price": 5.9,
+    "niche": "OpenRouter",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 14,
+      "sum_delta": 7,
+      "sum_sold": 478,
+      "top_title": "windows电脑提词器软体自媒体解说演讲录音提示字幕直播题词软体",
+      "top_delta": 5
+    },
+    {
+      "store_name": "684a8d4c5f0e360015795383",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 34,
+      "top_title": "视频转字幕软件srt字幕生成提取制作多种语言选择不限时长win电脑",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "699ff024e30b940015da9af9",
+      "title": "windows电脑提词器软体自媒体解说演讲录音提示字幕直播题词软体",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 148,
+      "delta": 5,
+      "actual_gr": 3.5,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "65af47db4207d3000162d9f0",
+      "title": "影视频字幕提取word txt文档 srt时间戳 画面识别提取文案 单双语",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 234,
+      "delta": 2,
+      "actual_gr": 0.86,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "6a029843891c6a0016224cfd",
+      "title": "实时翻译软件字幕翻译同声传译（不支持苹果）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 40,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "68b2b41e82bd7100013d4862",
+      "title": "视频转字幕软件srt字幕生成提取制作多种语言选择不限时长win电脑",
+      "store_name": "684a8d4c5f0e360015795383",
+      "store_id": "684a8d4c5f0e360015795383",
+      "price": 7.9,
+      "sold": 34,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "6963a74437ec110001b2741d",
+      "title": "硬字幕提取软件视频字幕转文字画面区域文字识别文案提取word",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 18,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "69aba4ae7c9c8f00015a5397",
+      "title": "网页图片批量提取工具Windows版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "6948b35b6a3f3f00013197c5",
+      "title": "视频音频转字幕软件自动字幕生成提取制作多种语言翻译转字幕srt",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "6a633e966cbefa0001513bcf",
+      "title": "语音视频录音提取文字文本工具 准确率高 专业识别 文案提取神器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "69e5a4d1e3af990015b282ad",
+      "title": "电脑桌面提词器工具自媒体解说演讲提示字幕直播题词播音主持屏幕",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "6a61e949c61808000100291d",
+      "title": "VideOCR 硬字幕提取神器｜开源免费｜AI OCR识别 win版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.0,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "69f9917f64c86a0015f7736b",
+      "title": "Getdata软件安装2.26中文版图片取点 图形数据提取工具神器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.86,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "69e98f2616b37a0015a09691",
+      "title": "scratch图形化素材提取工具sb2sb3bcm转换EXE执行文件转换成HTML",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "69e9158d3aa96f0001eb87d2",
+      "title": "影片字幕转文字硬字幕提取软体画面区域文字识别文案提取工具word",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "6a3fad1ff7c8040001e9e800",
+      "title": "视频提取PPT转换MP4视频提取图片字幕剪辑文档合并人工在线代处理",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 98.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    },
+    {
+      "goods_id": "69a3d2f1a39d6500016e386c",
+      "title": "断网离线版录音转文字软件语音视频翻译音乐会议转换歌词字幕工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "OpenRouter"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "OpenRouter",
+  "slug": "OpenRouter"
+}

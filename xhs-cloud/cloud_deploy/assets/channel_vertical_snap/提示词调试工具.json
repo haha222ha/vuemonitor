@@ -1,0 +1,459 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "提示词调试工具"
+    ],
+    "niche": "提示词调试工具"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 0,
+    "active_n": 0,
+    "drive_keywords": [
+      "提示词调试工具"
+    ],
+    "pinned": [],
+    "candidates": [],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 5,
+    "sku_n": 27,
+    "sum_delta": 8,
+    "median_price": 16.91,
+    "niche": "提示词调试工具",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "语宙一站式写作的店",
+      "sku_n": 1,
+      "sum_delta": 7,
+      "sum_sold": 875,
+      "top_title": "一站式写作空间｜系统化写作工具｜全维度写作词典｜创作管理模版",
+      "top_delta": 7
+    },
+    {
+      "store_name": "（未知店）",
+      "sku_n": 23,
+      "sum_delta": 1,
+      "sum_sold": 1073,
+      "top_title": "断网离线版录音转文字软件语音视频翻译音乐会议转换歌词字幕工具",
+      "top_delta": 1
+    },
+    {
+      "store_name": "68024749e67e280015d12de4",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 9,
+      "top_title": "英语单词速记神器—提升学习效率的智能工具！",
+      "top_delta": 0
+    },
+    {
+      "store_name": "毛蛋小馍王的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 2,
+      "top_title": "好莱坞电影级达芬奇调色工具包（中文字幕）",
+      "top_delta": 0
+    },
+    {
+      "store_name": "69706d7bc08d9e001571c7b6",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "【秋招网申神器】海投高效率自动填写插件",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "69790a0078d8d5000174c597",
+      "title": "一站式写作空间｜系统化写作工具｜全维度写作词典｜创作管理模版",
+      "store_name": "语宙一站式写作的店",
+      "store_id": "693994f9d8d6aa0015be77b2",
+      "price": 239.0,
+      "sold": 875,
+      "delta": 7,
+      "actual_gr": 0.81,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "692a68d0f71ffd0015ea43c2",
+      "title": "断网离线版录音转文字软件语音视频翻译音乐会议转换歌词字幕工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 5,
+      "delta": 1,
+      "actual_gr": 25.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "67a9c066f4d65700012587c9",
+      "title": "realtimecopilot面试辅助（头像授权）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 126.0,
+      "sold": 302,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "672efad16a6c1800019f11b6",
+      "title": "排考场 考场编排 最简便的软件工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 88.0,
+      "sold": 202,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "6a5cd276d09fb6000134cd04",
+      "title": "【一机一码】（TX）会议视频资料整理助手",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 16.91,
+      "sold": 168,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "649cf9caed18fa0001d660ef",
+      "title": "ambitful-提词器小型便携直播口播手机单反通用桌面大屏幕记词器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 416.0,
+      "sold": 151,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "6a0cb3948c464100016a5fdf",
+      "title": "红绿字汉字完型汉字完形读写障碍成语词语诗词迷宫生成工具软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 169.15,
+      "sold": 64,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "69cd1b591e3a1a0001f18233",
+      "title": "五线谱转简谱工具简谱打谱制作歌词软件图片音频移调自动导入模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 52,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "689bece199f01700152121f2",
+      "title": "电脑桌面提词器工具自媒体解说演讲提示字幕直播题词播音主持屏幕",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.8,
+      "sold": 30,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "682be90ba045210001d8ace1",
+      "title": "专业提词器大屏幕手机题词主播专用抖音口播直播间提词板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 242.25,
+      "sold": 23,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "6a7feda15bea4e00015c8925",
+      "title": "英语单词音频生成工具 - 灵活配置选项 - 批量处理 - 下载mp3文件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 20,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "665be7323e1f3e0001a38e60",
+      "title": "PH60D5平板电脑大屏幕提词器轻便双夹子适用4.7-12.9寸手机和平板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 202.83,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "67d3cb605fc3f70001009c6e",
+      "title": "RT-02蓝牙遥控单反相机提词器视频录制拍摄提字器直播主播板字幕",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 229.0,
+      "sold": 13,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "6874a7f5ba5a830015bc4ae1",
+      "title": "电脑提词器软件口播主播直播提词器win/mac自媒体工具滚动字幕",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.9,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "6846be0a801a240001ae34ac",
+      "title": "英语单词速记神器—提升学习效率的智能工具！",
+      "store_name": "68024749e67e280015d12de4",
+      "store_id": "68024749e67e280015d12de4",
+      "price": 11.66,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "6a538c487308b50001508b9a",
+      "title": "新版适配乐奇眼镜戒指支持Rokid glasses支持提词器ai快捷指令等",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 259.0,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "6948b2461f22d20001e6e1db",
+      "title": "词云图制作设计软件词云图工具透明背景文章可视化关键词提取工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "68b58a9bf38f970001f0382f",
+      "title": "手机提词器软件自媒体解说演讲录音提示字幕直播题词工具安卓软件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "6a1517965566b0000150e474",
+      "title": "好莱坞电影级达芬奇调色工具包（中文字幕）",
+      "store_name": "毛蛋小馍王的店",
+      "store_id": "68abe3d3a90d6e00152fc04c",
+      "price": 29.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "6a91b318a4957100150eabe8",
+      "title": "标题关键词组合软体工具自动精准生成全排列长尾词语标题排列组合",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "68db46d75cb6350015df9c37",
+      "title": "网页文字复制粘贴神器强制复制工具图片文字解决右键无法复制粘贴",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "69b70a847c9c8f0001e57aa0",
+      "title": "【秋招网申神器】海投高效率自动填写插件",
+      "store_name": "69706d7bc08d9e001571c7b6",
+      "store_id": "69706d7bc08d9e001571c7b6",
+      "price": 9.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "69ad32ce7c9c8f000187e525",
+      "title": "安卓手机直播提词神器滚动字幕辅助工具自媒体解说演讲提示词录音",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "69a9a9171b42610015853059",
+      "title": "工具箱电脑版软件调试工具支持手机/电视",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.28,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "667d36cfad064e0001871a46",
+      "title": "Js-s20 广播级提词器大屏幕专业  播音员提字器 提示器 题词器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7980.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "6a8bfabcb50dcb00015bb6d1",
+      "title": "光猫调试神器！全品牌超级账号一键查，运维改参必备工具包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    },
+    {
+      "goods_id": "689a7dad99f01700155edd46",
+      "title": "电脑提词器工具自媒体解说演讲录音提示windows字幕直播题词工具",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "提示词调试工具"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "提示词调试工具",
+  "slug": "提示词调试工具"
+}

@@ -1,0 +1,920 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "文档结构化解析"
+    ],
+    "niche": "文档结构化解析"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "文档结构化解析电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "文档结构化解析电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 9,
+    "sku_n": 57,
+    "sum_delta": 84,
+    "median_price": 5.99,
+    "niche": "文档结构化解析",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 49,
+      "sum_delta": 77,
+      "sum_sold": 18219,
+      "top_title": "百度网盘VIP会员一个月3个月年卡 百度云盘会员 直充到账",
+      "top_delta": 56
+    },
+    {
+      "store_name": "刘老师的教学资料库的店",
+      "sku_n": 1,
+      "sum_delta": 6,
+      "sum_sold": 2221,
+      "top_title": "百度网盘容量扩容自己网盘空间30天一直可用500G转存上传存储资料",
+      "top_delta": 6
+    },
+    {
+      "store_name": "夸克会员旗舰店",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 217,
+      "top_title": "【618特惠】网盘空间扩容200G有效期12个月",
+      "top_delta": 1
+    },
+    {
+      "store_name": "技术狂的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 40000,
+      "top_title": "系统磁盘存储减负优化",
+      "top_delta": 0
+    },
+    {
+      "store_name": "猫猫要上岸的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 30,
+      "top_title": "百度网盘永久容量扩容自己网盘空间一直可用500G转存上传存储资料",
+      "top_delta": 0
+    },
+    {
+      "store_name": "素笺知书的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 5,
+      "top_title": "水果奶酪麻糍配方教程技术创业夏日开店夜市教学电子资料",
+      "top_delta": 0
+    },
+    {
+      "store_name": "68c939f26ed9e700155353df",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 3,
+      "top_title": "大学生商业项目策划书创新创业计划书wordPPT模板范文成品资料",
+      "top_delta": 0
+    },
+    {
+      "store_name": "小琳0mf",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "意大利面配方教程技术创业夏日开店夜市摆摊小吃电子资料 · 默认",
+      "top_delta": 0
+    },
+    {
+      "store_name": "69290db7fdb3f10015ebef9b",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "十二款美式热狗配方教程技术创业夏日开店夜市教学电子资料",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "69bbadd111534f0001c87570",
+      "title": "百度网盘VIP会员一个月3个月年卡 百度云盘会员 直充到账",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.8,
+      "sold": 1428,
+      "delta": 56,
+      "actual_gr": 4.08,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8137f779b57b0001a341c4",
+      "title": "创新创业第七章：创业项目书（31页+100份项目书+9千字逐字稿）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 90,
+      "delta": 19,
+      "actual_gr": 26.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d73d8a002e7e0001c622c2",
+      "title": "百度网盘容量扩容自己网盘空间30天一直可用500G转存上传存储资料",
+      "store_name": "刘老师的教学资料库的店",
+      "store_id": "68bea2d60425b60015c4b9df",
+      "price": 2.99,
+      "sold": 2221,
+      "delta": 6,
+      "actual_gr": 0.27,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "665135d350ce0e0001de97cd",
+      "title": "大学生创新创业计划书成品&范文word＋ppt",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.1,
+      "sold": 48,
+      "delta": 2,
+      "actual_gr": 4.35,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6912ea8f4a25b700014efff7",
+      "title": "【618特惠】网盘空间扩容200G有效期12个月",
+      "store_name": "夸克会员旗舰店",
+      "store_id": "672473c691ee7d0014850621",
+      "price": 14.0,
+      "sold": 217,
+      "delta": 1,
+      "actual_gr": 0.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "661f8ad838213e0001b32045",
+      "title": "系统磁盘存储减负优化",
+      "store_name": "技术狂的店",
+      "store_id": "65ffc3dea57f580001f618bd",
+      "price": 24.8,
+      "sold": 40000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c5d18f15bd7400013566ef",
+      "title": "清理c盘空间满了红了内存优化扩容硬盘",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 31.8,
+      "sold": 14000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cb709fadd7e50001c224ed",
+      "title": "处理 C 盘空间占用过高问题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.0,
+      "sold": 1455,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "66f4092b1f6804000137efcb",
+      "title": "商业计划书/创业计划书『word或PPT』电子文档完整版可编辑",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 318,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aab9d9a68ec3400011a6334",
+      "title": "电子资源 资料模板",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.0,
+      "sold": 240,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7410edccf3dd00016dfb00",
+      "title": "27齐麟全套刷题资料合集（完整版）附赠25全套资料，阅读详情再拍",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.89,
+      "sold": 178,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab0cf20d0139900018876cf",
+      "title": "电子资源（苹果/安卓）.",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 133,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a812d7ba52c1c0001a2d4d7",
+      "title": "创新创业第二章：用创新思维玩转创业",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 120,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b0d29e10392d0001436092",
+      "title": "全店资料打包+幼小【1-6年级电子版】上千份资源打包+永久更新",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.41,
+      "sold": 65,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69acdca5f209ba0001c99dd3",
+      "title": "115云盘空间扩容 1TB",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 75.0,
+      "sold": 37,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a183e1447477200018a5ea5",
+      "title": "自动发货！！ppt.57大学生零食驿站创新创业计划书PPT+配套计划书",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.5,
+      "sold": 31,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69fc655615602900011e5a16",
+      "title": "百度网盘永久容量扩容自己网盘空间一直可用500G转存上传存储资料",
+      "store_name": "猫猫要上岸的店",
+      "store_id": "685273a18f7c750015aa294e",
+      "price": 2.99,
+      "sold": 30,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a368f109cf0970001a8d68c",
+      "title": "创新创业商业计划书Word+PPT可编辑-百度网盘秒发（JHS:1-50）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.2,
+      "sold": 24,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69dbc0066ba4080001e62e66",
+      "title": "夸克网盘永久扩容1T~80T容量扩容 夸克盘1000G扩容教程方法教学",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.56,
+      "sold": 15,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69295eb75cb6350015587cb8",
+      "title": "123云盘VIP3天月季年SVIP会员12个月年卡下载上传不限速安全私密*",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 868.0,
+      "sold": 7,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "695ab817a751dc0001086e34",
+      "title": "食养创业全套资料药食同源电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68a3432b4dbac20001e3c14d",
+      "title": "剑桥雅思真题4-12电子版，PDF精讲 百度网盘 夸克网盘 阿里云盘",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.5,
+      "sold": 6,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c8fa10e3af990015ba9d35",
+      "title": "水果奶酪麻糍配方教程技术创业夏日开店夜市教学电子资料",
+      "store_name": "素笺知书的店",
+      "store_id": "696a47cff7d76900151f7ce4",
+      "price": 3.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "68d9e8abc75361000178c220",
+      "title": "高级感商业投资计划创业计划主题PPT模板 p807",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 4,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6930ed8ec13d0f0015d120b7",
+      "title": "大学生商业项目策划书创新创业计划书wordPPT模板范文成品资料",
+      "store_name": "68c939f26ed9e700155353df",
+      "store_id": "68c939f26ed9e700155353df",
+      "price": 3.01,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a30f54865e82f0001575898",
+      "title": "创新创业导论期末复习考试知识点重难点考点试题题库电子资料合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.88,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "683ff2472b69e80001561be2",
+      "title": "20款大学生创新创业项目计划书商业策划案PPT模板Word范文电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.99,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c0fe70964c0f0015401ff2",
+      "title": "韩式寿司卷紫菜包饭配方技术教程小吃创业夜市摆摊开店电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5f7ed24fda750015f395fe",
+      "title": "学创杯创业之星行销理财之道表格手技能培训",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69dd925249c41d0001351421",
+      "title": "三创赛获奖作品大学生电子商务创新创意创业挑战赛PPT模板计划书",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.2,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5ddc14b5de6c0001b1d6c4",
+      "title": "学创杯创业之星营销表格手环手机电子资料空气净化器玩具表格方案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.2,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa94ea85324600001dd9c1e",
+      "title": "甜品糖水糖水刨冰店运营管理手册甜品创业SOP指南+电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.99,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a6475d36986d000147695f",
+      "title": "寒假逆袭必备！作业规划打卡工具使用指南，自律学习计划表神器",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aac34cf7f340c000120f8f3",
+      "title": "OH卡创业秘籍电子课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab253d6f5fcb1000101b63e",
+      "title": "100份精美排版大学生商业&创业计划书word封面设计模板休闲娱乐",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.86,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b61f2c19f8df0015d23be9",
+      "title": "24款口味贝果配方教程技术创业夏日开店夜市教学电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c5fdb115bd7400013c2f43",
+      "title": "大学生创新创业计划书三创赛挑战杯syb互联网ppt模板word电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69ce00bda219810001e09e67",
+      "title": "厚切三明治全套配方教程 低成本摆摊创业电子模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d6312798fb930001009fa8",
+      "title": "ppt模板宠物店可爱创意卡通宠物公司产品商业计划书创业营销计划",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.5,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d8a09061bf490001a11cea",
+      "title": "大学生零食驿站创业计划书ppt+word",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.04,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f0d363a545700015565985",
+      "title": "意大利面配方教程技术创业夏日开店夜市摆摊小吃电子资料 · 默认",
+      "store_name": "小琳0mf",
+      "store_id": "69440360e3f545001526b622",
+      "price": 5.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f434781153580015fc1004",
+      "title": "大学生零食驿站创业计划书ppt+word网盘资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.81,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69fd89be33df70001540be31",
+      "title": "大学生挑战杯创新创业大赛项目计划书商业策划国赛获奖互联网+ppt",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.56,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "69fee06f9799e500151c6d05",
+      "title": "麻辣烫创业计划模板促销方案加盟流程选址技巧市场分析电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a08420e32834800017fc792",
+      "title": "64款泰国菜料理配方泰式菜教程技术小吃制作开店创业餐饮电子资",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a11c683ab3c850015e1479f",
+      "title": "食养创业全套资料药食同源电子版 · 默认",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a22547120d7240001ddde22",
+      "title": "天翼云盘铂金会员『1个月』",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a250128b113e40015dbe6f2",
+      "title": "大学生创业计划书word成品syb三创大赛ppt模板商业策划书",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 11.46,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a37f389eb8eff00155eb5d8",
+      "title": "十二款美式热狗配方教程技术创业夏日开店夜市教学电子资料",
+      "store_name": "69290db7fdb3f10015ebef9b",
+      "store_id": "69290db7fdb3f10015ebef9b",
+      "price": 5.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a48ff54c13d0f0015f3986f",
+      "title": "网红七彩虹水果糯米糕配方摆摊商用技术视频教程泰国小吃创业",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.2,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6c9feb9fb4c800010c17a5",
+      "title": "临榆炸鸡腿技术配方教程甘梅地瓜鸡叉骨鸡翅腌料制作小吃摆摊创业",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.02,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a81d0cba4f71c0001e9fef3",
+      "title": "女生一人可做创业小项目！糖水铺商用配方线上电子资源课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa5a5cf7116f00001989129",
+      "title": "建材市场建筑材料门店创业筹备经营员工培训管理制度活动方案资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.43,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aad49ddd0139900011961fc",
+      "title": "《大学生创新创业计划书》电子版文档可编辑模板word+PPT",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aae4c3d8a79660001df46ce",
+      "title": "艾灸馆会所创业选址策略销售养生话术营销运营活动策划方案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.02,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab0a78468a9c10001dad50d",
+      "title": "2026大学生创业创新项目计划书商业策划案PPT模板word范文成品",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.24,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab21c4dd013990001ab5900",
+      "title": "100份精美排版大学生商业&创业计划书word封面设计模板休闲娱乐",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.86,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "文档结构化解析电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "文档结构化解析",
+  "slug": "文档结构化解析"
+}

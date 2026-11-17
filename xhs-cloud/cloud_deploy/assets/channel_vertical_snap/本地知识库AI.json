@@ -1,0 +1,768 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "本地知识库AI"
+    ],
+    "niche": "本地知识库AI"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "本地知识库AI电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "本地知识库AI电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 4,
+    "sku_n": 49,
+    "sum_delta": 16,
+    "median_price": 9.9,
+    "niche": "本地知识库AI",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 46,
+      "sum_delta": 16,
+      "sum_sold": 14285,
+      "top_title": "自动生成现金流量表模版",
+      "top_delta": 15
+    },
+    {
+      "store_name": "689492db6166320015819736",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 34,
+      "top_title": "2026 备考MCAT必备资料·7本·PDF+EPUB格式",
+      "top_delta": 0
+    },
+    {
+      "store_name": "柒柒的阅读日记～的店",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 10,
+      "top_title": "《钝感力》 电子资料 epub",
+      "top_delta": 0
+    },
+    {
+      "store_name": "682f2606ad6a0300150c46e6",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 0,
+      "top_title": "拍照秘籍PDF电子版，70页，内容丰富，适合拍照、摄影、拍照姿",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "66a0a9fc4ce240000120bed1",
+      "title": "自动生成现金流量表模版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 38.9,
+      "sold": 5078,
+      "delta": 15,
+      "actual_gr": 0.3,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa7edef0e3e870001e57dc4",
+      "title": "学生反思记录表模板 违纪登记表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.98,
+      "sold": 5,
+      "delta": 1,
+      "actual_gr": 25.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a2ba2fa37a8c00001c94da3",
+      "title": "手机相机拍照摄影套餐参数预设包-拍照专业模式适配米系全系型号",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 40.0,
+      "sold": 7108,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8d58363ba4d60001e5fb66",
+      "title": "第四季多风格摄影（8位人气摄影师梦幻联动）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 69.9,
+      "sold": 1305,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "680b820708e3700001d1fa3c",
+      "title": "2025年度中科院分区表完整版 excel电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.99,
+      "sold": 304,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f84debc074c500010424ca",
+      "title": "亚马逊产品主图摄影拍摄专业主图详情图片精修视频制作服务",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.0,
+      "sold": 105,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "64e21a2f229dec00016ca77d",
+      "title": "形象照换衣服处理换发型女士工作职业照片西装合成修图",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 35.0,
+      "sold": 59,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9d61bc7ece3500017061af",
+      "title": "男士时尚杂志封面潮流型男摄影作品",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 36.39,
+      "sold": 54,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "67e94533c90d830001ca0864",
+      "title": "7 个人写真艺术摄影室内拍摄服务",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.88,
+      "sold": 49,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a90ef84cc3e020001e4b627",
+      "title": "62 个人写真艺术摄影室内拍摄服务",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.88,
+      "sold": 39,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a08b6287b0d9c0001acdb88",
+      "title": "2026 备考MCAT必备资料·7本·PDF+EPUB格式",
+      "store_name": "689492db6166320015819736",
+      "store_id": "689492db6166320015819736",
+      "price": 19.9,
+      "sold": 34,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0ac593002a6200015113d8",
+      "title": "制片—影视制片三宝（筹备、执行、表格）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.88,
+      "sold": 29,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa8b1ffc719700015b707f",
+      "title": "78 个人写真艺术摄影室内拍摄服务",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.88,
+      "sold": 25,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d0d5bf1e3a1a0001bea00a",
+      "title": "高级小众复古摄影工作室宣传摄影写真价格表价目表模板2张",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 19,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a88406b71204c0001ad9151",
+      "title": "63 个人写真艺术摄影室内拍摄服务",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.88,
+      "sold": 19,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "68c2e435e8b4ad00013b48df",
+      "title": "77 个人写真艺术摄影室内拍摄服务",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.88,
+      "sold": 17,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "668e17571202a200016d2dc3",
+      "title": "肖像艺术摄影情侣写真闺蜜套餐价格表价目表模版178",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.0,
+      "sold": 16,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c38b5d58e9630001444bb1",
+      "title": "强哥棚拍用光第三期【已完结灯位图】“强哥摄影 棚拍用光第三期",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 14,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8af51b79e4100015fdaa68",
+      "title": "100+位日本摄影大师合集纪实筱山奥山由之纪信摄影经典学习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.34,
+      "sold": 12,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6985d5b0ab9b880001b7a9d3",
+      "title": "《钝感力》 电子资料 epub",
+      "store_name": "柒柒的阅读日记～的店",
+      "store_id": "69031b88d835ac0015760341",
+      "price": 2.99,
+      "sold": 10,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "67f695a8e8f2430001c1c71a",
+      "title": "关键词库表（AI自动分类&打标）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.99,
+      "sold": 9,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a91cb9f9811a8000128550f",
+      "title": "制片表—剧组统筹表—影视剧组统筹表合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.88,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cf6eefa4db7c0001852e6b",
+      "title": "200套新婚礼跟拍客片摄影宣传接单全套样片素材学习婚庆高端jpg",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.9,
+      "sold": 5,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a69f963cef22500017e15e7",
+      "title": "拍照穿搭潮流灵感 艺术时尚课件教程",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 3,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9db423f52a89001543f500",
+      "title": "书籍全集全套24经典 pdf电子资料 mobii epub整理 · 默认",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6949281c0775cd0015a7ca2e",
+      "title": "全球近300位国外摄影大咖摄影作品合集资料全套图集网盘电子素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.02,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0333f822eb65000182864d",
+      "title": "王楚然高清摄影作品生图合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 2,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a74445a6cbefa00012ab99a",
+      "title": "AI订阅选择与安全检查表 电子模板资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.1,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7885a1a4f71c0001fd52f2",
+      "title": "100位国外摄影大师作品合集参考资料审美提升摄影学习电子版素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a797babeb8eff0015823049",
+      "title": "外贸公司部门采购英文报价单excel表格企业销售报价表电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.86,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e87739287cd500156bc99e",
+      "title": "学生单科多次考试成绩分析表-成绩升降分析excel记录表",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.23,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8aef01cf3717001517b2b4",
+      "title": "南怀瑾书籍全集全套24经典 pdf电子资料 mobii epub整理 · 默认",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d74b8b8a78380015c6ce3b",
+      "title": "员工排班表员工值班表excel图表自动排班考勤表电子版模板素材",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.81,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "69c3e1edff00dc00014ecd35",
+      "title": "千部照片采集标准蓝白渐变色3492C4分辨率1600x1280大小200KB至2M",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.0,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "69a9aa7afb672a001542aaa9",
+      "title": "康复评定量表电子版康复科各类检查评定表模板资料包300张合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.3,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "697f35a9ab9b880001008797",
+      "title": "拍照秘籍PDF电子版，70页，内容丰富，适合拍照、摄影、拍照姿",
+      "store_name": "682f2606ad6a0300150c46e6",
+      "store_id": "682f2606ad6a0300150c46e6",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9c0247ee83f20001257f3b",
+      "title": "电子资料包2026课程表打印版可编辑高清无水印 夸克网盘",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.69,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9d7d29fd1bd60001076bed",
+      "title": "2026/2027超全备婚资料结婚筹备清单表流程指南大全电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6940077d0a900600017c236f",
+      "title": "新婚礼服跟拍客片摄影宣传接单全套样片素材学习婚庆高端电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 10.8,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "68eefd4b17d8080001b51550",
+      "title": "资治通鉴华杉讲透共31册全PDF/epub/mobi高清电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 24.98,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaba3a6dae72f000186ba2b",
+      "title": "商业经典类电子版mobi全高清管理营销书战略经济传记必读自学140",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.24,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaba4cc5324600001255d59",
+      "title": "儿童英语学习知识资料大全合集启蒙拼读词汇歌谣等PDF电子版202",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 20.24,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab0115b79e4100015c32f64",
+      "title": "电子版julianimke旅游随拍摄影大师作品电子版摄影素材学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 12.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab221e1f660cd00018012e6",
+      "title": "彩纸金箔纸碎纸片亮片PNG人像婚纱儿童摄影后期PS素材模板礼花",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.02,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab24f7e820c4b0001398ca1",
+      "title": "银河系列薇拉星空光影婚纱照背景素材摄影后期设计PSD模板ps合成",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 0.86,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab2fbd1b847760015757834",
+      "title": "三十位中国时尚摄影大师作品合集人像摄影杂志时尚大片电子图片",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.35,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f9754afe4ff50015fc6283",
+      "title": "日本摄影大师泷本干也摄影集作品合集参考学习素材电子合集 · 泷",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f86efd30d08600015b6cef",
+      "title": "精选文学作品mobi epub pdf电子书版合集资料整理kindle电子书资",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.31,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3150078bca04000167fc28",
+      "title": "哈波利特7本英文版中文版epub.pdf.mobi.azw3默认默认",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 0,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "本地知识库AI电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "本地知识库AI",
+  "slug": "本地知识库AI"
+}

@@ -1,0 +1,1258 @@
+{
+  "ok": true,
+  "seed": {
+    "q": "",
+    "goods_id": "",
+    "title": "",
+    "tokens": [
+      "FastGPT搭建"
+    ],
+    "niche": "FastGPT搭建"
+  },
+  "search_keywords": {
+    "pin_group": "vertical_niche_probe",
+    "pinned_n": 0,
+    "candidate_n": 1,
+    "active_n": 0,
+    "drive_keywords": [
+      "FastGPT搭建电子资料"
+    ],
+    "pinned": [],
+    "candidates": [
+      {
+        "keyword": "FastGPT搭建电子资料",
+        "is_active": 0,
+        "pin_group": "",
+        "pin_notes": "",
+        "source": "virtual_core_full_audit_final_20260928_100436",
+        "role": "candidate"
+      }
+    ],
+    "note": "主路径=垂类搜词→goods_keywords；未挂词时用词库同主干候选/标题兜底。挂词: python tools/pin_vertical_niche_keywords.py --niche … --apply"
+  },
+  "via": "goods_keywords",
+  "summary": {
+    "seller_n": 11,
+    "sku_n": 80,
+    "sum_delta": 1011,
+    "median_price": 7.8,
+    "niche": "FastGPT搭建",
+    "drive_kw_n": 1
+  },
+  "sellers": [
+    {
+      "store_name": "（未知店）",
+      "sku_n": 70,
+      "sum_delta": 967,
+      "sum_sold": 99907,
+      "top_title": "2026成人高考专升本/高起本/高起专成考备考重点资料电子资料",
+      "top_delta": 251
+    },
+    {
+      "store_name": "剑桥KPF备考站的店",
+      "sku_n": 1,
+      "sum_delta": 16,
+      "sum_sold": 2758,
+      "top_title": "KET写作｜30道高频考题+思路拆解（26年最新版）",
+      "top_delta": 16
+    },
+    {
+      "store_name": "68468b2da0b1ce0015a9ab4e",
+      "sku_n": 1,
+      "sum_delta": 15,
+      "sum_sold": 237,
+      "top_title": "26年公共英语等级考试（PETS）一/二/三/四级考试题库APP",
+      "top_delta": 15
+    },
+    {
+      "store_name": "66cd5afcdc38c500153cad65",
+      "sku_n": 1,
+      "sum_delta": 4,
+      "sum_sold": 443,
+      "top_title": "自考英语二背诵干货/刷题练习",
+      "top_delta": 4
+    },
+    {
+      "store_name": "专升本英语Molly老师的店",
+      "sku_n": 1,
+      "sum_delta": 3,
+      "sum_sold": 655,
+      "top_title": "专升本英语万能答题技巧",
+      "top_delta": 3
+    },
+    {
+      "store_name": "依依资料库的店",
+      "sku_n": 1,
+      "sum_delta": 2,
+      "sum_sold": 115,
+      "top_title": "12月晓燕四六级词汇，不背单词导入码",
+      "top_delta": 2
+    },
+    {
+      "store_name": "小何素材的店",
+      "sku_n": 1,
+      "sum_delta": 2,
+      "sum_sold": 60,
+      "top_title": "英语四六级真题电子版 1990-2026.6月 PDF版 历年真题 解析音频",
+      "top_delta": 2
+    },
+    {
+      "store_name": "学苑资料",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 17,
+      "top_title": "2026年全国大学生英语竞赛A/B/C/D类备考资料",
+      "top_delta": 1
+    },
+    {
+      "store_name": "研途小友学姐的店",
+      "sku_n": 1,
+      "sum_delta": 1,
+      "sum_sold": 2,
+      "top_title": "六级英语资料包（全面！真题+模拟题+备考攻略+词汇手册）",
+      "top_delta": 1
+    },
+    {
+      "store_name": "68aa9eb11ee52c001554337a",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 1082,
+      "top_title": "2026成人高考专升本重点资料包＆知识点【电子版＆全国通用】",
+      "top_delta": 0
+    },
+    {
+      "store_name": "685cc06f5f5b840015016f30",
+      "sku_n": 1,
+      "sum_delta": 0,
+      "sum_sold": 56,
+      "top_title": "2027教师招聘英语学科备考资料包电子版",
+      "top_delta": 0
+    }
+  ],
+  "items": [
+    {
+      "goods_id": "6a2982e88bca04000110318d",
+      "title": "2026成人高考专升本/高起本/高起专成考备考重点资料电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 25.9,
+      "sold": 850,
+      "delta": 251,
+      "actual_gr": 41.9,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab252366f8d96000145666b",
+      "title": "27年中考英语备考资料单词短语语法专项训练每日一练阅读理解",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 493,
+      "delta": 178,
+      "actual_gr": 56.51,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "697633e13d52b20001a04db8",
+      "title": "备考2027成都初中月考期中期末真题七八九年级各科真题合集电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 1549,
+      "delta": 98,
+      "actual_gr": 6.75,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a6ef5cf84b8ee0001ee8a0b",
+      "title": "26学士学位英语全套冲刺视频课程资料练习等！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.99,
+      "sold": 313,
+      "delta": 80,
+      "actual_gr": 34.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a81ed37289c21000130b349",
+      "title": "2027年中考英语核心688词汇（通用版本）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.31,
+      "sold": 4208,
+      "delta": 63,
+      "actual_gr": 1.52,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa17b57ee83f200012d6e68",
+      "title": "26小学五年级英语上册人教版资料合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.98,
+      "sold": 503,
+      "delta": 45,
+      "actual_gr": 9.83,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6881eb2586c0df000180c072",
+      "title": "人教版PEP小学英语3-6年级上下册习题试卷电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.99,
+      "sold": 2400,
+      "delta": 39,
+      "actual_gr": 1.65,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a004ed3a0130600016592bf",
+      "title": "27上半年教师资格证笔试【网课】幼儿小学初中高中真题电子资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 1615,
+      "delta": 35,
+      "actual_gr": 2.22,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "699d07e7880da20001fa3dbe",
+      "title": "2026新课标教师业务水平考试初高中数学语文英语题库教资考编课件",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.8,
+      "sold": 2046,
+      "delta": 34,
+      "actual_gr": 1.69,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a942b14e1ea8c00018ab62e",
+      "title": "英语四六级备考资料丨历年真题带听力音频阅读词汇翻译写作训练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.99,
+      "sold": 122,
+      "delta": 29,
+      "actual_gr": 31.18,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69f2ec9fa97845000109c9e9",
+      "title": "27考研英语一英语二历年真题+备考资料汇总",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 238,
+      "delta": 19,
+      "actual_gr": 8.68,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "681ad64a0e004a00010767eb",
+      "title": "上岸熊·26下教资笔试中学科三重点笔记/精讲课",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 4749,
+      "delta": 16,
+      "actual_gr": 0.34,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6914482c34256f0001692207",
+      "title": "KET写作｜30道高频考题+思路拆解（26年最新版）",
+      "store_name": "剑桥KPF备考站的店",
+      "store_id": "68ecb21ace1f010015befe77",
+      "price": 29.9,
+      "sold": 2758,
+      "delta": 16,
+      "actual_gr": 0.58,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a49adea72cfc700010fdcf8",
+      "title": "学位英语刷题练习、背诵干货、电子资源",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.8,
+      "sold": 589,
+      "delta": 15,
+      "actual_gr": 2.61,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6886402ae58d070001207b65",
+      "title": "26年公共英语等级考试（PETS）一/二/三/四级考试题库APP",
+      "store_name": "68468b2da0b1ce0015a9ab4e",
+      "store_id": "68468b2da0b1ce0015a9ab4e",
+      "price": 5.12,
+      "sold": 237,
+      "delta": 15,
+      "actual_gr": 6.76,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a92ca06c5ab050001576acc",
+      "title": "历年英语A级B级真题电子版 2013-2026.06 PDF 试题解析听力资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 1517,
+      "delta": 11,
+      "actual_gr": 0.73,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69db241d6ba4080001d444a4",
+      "title": "情景背单词-霸总小说背六级大纲5500+扩展高频2500词（共8000词）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 814,
+      "delta": 11,
+      "actual_gr": 1.37,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a282a816222ed000157328a",
+      "title": "幼小衔接电子资料数学语文拼音英语专注力识字字母描红每日一练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.8,
+      "sold": 761,
+      "delta": 6,
+      "actual_gr": 0.79,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a53aa1b8cb63f0001be875d",
+      "title": "（已更新25年）成人高考专升本历年真题及答案解析汇总",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 1143,
+      "delta": 5,
+      "actual_gr": 0.44,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a8deb352e2aa800017bcfae",
+      "title": "【仁爱版】七上英语全套资料 （电子版pdf可打印）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.89,
+      "sold": 132,
+      "delta": 5,
+      "actual_gr": 3.94,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "666b0331ed6bc10001249860",
+      "title": "备考2027广东专升本插本教材必刷2000题小红本英政治网课历年真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 329.0,
+      "sold": 1197,
+      "delta": 4,
+      "actual_gr": 0.34,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e977ec933b030001ed967c",
+      "title": "自考英语二背诵干货/刷题练习",
+      "store_name": "66cd5afcdc38c500153cad65",
+      "store_id": "66cd5afcdc38c500153cad65",
+      "price": 6.9,
+      "sold": 443,
+      "delta": 4,
+      "actual_gr": 0.91,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e99ff2294caa0001a26835",
+      "title": "60个情景带背六级5500词汇，沉浸式学习大学英语四六级词汇学习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 29.9,
+      "sold": 307,
+      "delta": 4,
+      "actual_gr": 1.32,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69beba53180bf400012b7ba7",
+      "title": "26北京学位英语备考资料大全历年真题高频词汇专项突破",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 18.9,
+      "sold": 43,
+      "delta": 4,
+      "actual_gr": 10.26,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69822a908dc4b30001162e5f",
+      "title": "专升本英语万能答题技巧",
+      "store_name": "专升本英语Molly老师的店",
+      "store_id": "67d3f8d7f0d5600015385ef6",
+      "price": 0.5,
+      "sold": 655,
+      "delta": 3,
+      "actual_gr": 0.46,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d23749c8c7330001255cca",
+      "title": "2026小学四年级国测英语备考英语国测模拟题试卷资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 39,
+      "delta": 3,
+      "actual_gr": 8.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9e25a4a3924100016a860b",
+      "title": "小学1-6年级语数英学习电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.98,
+      "sold": 15,
+      "delta": 3,
+      "actual_gr": 25.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9d8ab4baea3b00017b742a",
+      "title": "英语教师招聘300考点【英语专业基础知识+英语课程与教学论】PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.9,
+      "sold": 7,
+      "delta": 3,
+      "actual_gr": 75.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "690b6fc93f37a90001c7c80b",
+      "title": "2026中考英语必背1600词正乱序表+英汉互译+音频新课标pdf电子版",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.99,
+      "sold": 325,
+      "delta": 2,
+      "actual_gr": 0.62,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "68caa97c39f90c00010ba6de",
+      "title": "12月晓燕四六级词汇，不背单词导入码",
+      "store_name": "依依资料库的店",
+      "store_id": "6785311c763cfd001585e2d7",
+      "price": 1.99,
+      "sold": 115,
+      "delta": 2,
+      "actual_gr": 1.77,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69132df0f168b900014977f4",
+      "title": "英语四六级真题电子版 1990-2026.6月 PDF版 历年真题 解析音频",
+      "store_name": "小何素材的店",
+      "store_id": "69130e62a0f8db001598ad21",
+      "price": 2.88,
+      "sold": 60,
+      "delta": 2,
+      "actual_gr": 3.45,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa841fa0b6bb0001d62b28",
+      "title": "2026成人学位英语备考考试资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.9,
+      "sold": 17,
+      "delta": 2,
+      "actual_gr": 13.33,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4f66a0d09fb6000137c375",
+      "title": "26上教资笔试真题 教师资格证历年真题（幼儿/小学/初中/高中全）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 508,
+      "delta": 1,
+      "actual_gr": 0.2,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d50ed6888f920001211fc3",
+      "title": "2026年全国大学生英语竞赛A/B/C/D类备考资料",
+      "store_name": "学苑资料",
+      "store_id": "68e7ce184383a000156cd61c",
+      "price": 3.9,
+      "sold": 17,
+      "delta": 1,
+      "actual_gr": 6.25,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a87fc8ca60069000173a893",
+      "title": "2026秋季新版小学语数英1-6年级辅导资料电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 3,
+      "delta": 1,
+      "actual_gr": 50.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a1eb19918376c0001a4e886",
+      "title": "六级英语资料包（全面！真题+模拟题+备考攻略+词汇手册）",
+      "store_name": "研途小友学姐的店",
+      "store_id": "69aa95b01f455500154895ac",
+      "price": 0.99,
+      "sold": 2,
+      "delta": 1,
+      "actual_gr": 100.0,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6607d2b65c3c5a000156f289",
+      "title": "高中高三高考总复习知识解题技巧归纳总结教程资料提分课程重点",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.8,
+      "sold": 21000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "683e925cf073650015ddd10c",
+      "title": "初中练习单元期中期末月考检测卷初一初二初三多版本【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.6,
+      "sold": 13000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "693e1e4cbd92f50001f56de7",
+      "title": "2026学士学位英语纸质词汇/试卷/名师课程/刷题/各个省份版本均有",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 39.8,
+      "sold": 10000,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "692fa491b70fce000130353d",
+      "title": "新版2027年高职单招考试复习资料书中职生对口升学考试总复习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 87.57,
+      "sold": 3960,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a23ca0434cb0200012ff7ef",
+      "title": "周思成秋季雅思全科高分班（即报即听，适用11月考/27fall申请）",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3299.0,
+      "sold": 3561,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a3a38e96f59ca00012db09d",
+      "title": "2026人教版初中英语暑假衔接辅导资料七八九年级【电子版】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.6,
+      "sold": 3242,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "694be9ce1d450d00013c9f35",
+      "title": "2027年高考总复习资料电子版 高三 新高考复习 一轮二轮讲义",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.98,
+      "sold": 2418,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6947582de40d430001147eb9",
+      "title": "小学1-6年级上下册语文数学英语全套知识点练习题电子版资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 40.8,
+      "sold": 1760,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a5a23284f6fde0001489d91",
+      "title": "27教招chao家课程成人教育其他咨询",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 14.61,
+      "sold": 1596,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69175640d4669a000178cd6f",
+      "title": "50个小故事记住5500考研单词",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 1.99,
+      "sold": 1383,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6846f455a89f4f00019b4550",
+      "title": "pte_纠音/考试技巧攻略/题目精练",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 328.0,
+      "sold": 1280,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a18ececdf36740001c5f668",
+      "title": "26秋新九年级上册英语译林版预习复习备考备课资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 7.8,
+      "sold": 1185,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69d4e8fd01e19300012d850e",
+      "title": "27中考英语复习资料大全|词汇语法阅读完形作文等一站式备考",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.98,
+      "sold": 1128,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a59fcc424f0440001e83522",
+      "title": "2026成人高考专升本重点资料包＆知识点【电子版＆全国通用】",
+      "store_name": "68aa9eb11ee52c001554337a",
+      "store_id": "68aa9eb11ee52c001554337a",
+      "price": 14.9,
+      "sold": 1082,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a0f1a32bd63a30001081c51",
+      "title": "【2026中考英语】考前最后一卷（模拟卷）电子版、无水印、含解析",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.9,
+      "sold": 859,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bcb20315bd7400013e6a77",
+      "title": "2027届北京中考英语听口考试模拟题听说考试最新题型音频原文资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 63.8,
+      "sold": 804,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a781756c9142a0001261505",
+      "title": "2026年12月备考大学英语a级b级真题考试历年库试卷三级AB复习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 35.8,
+      "sold": 640,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6886f609f9d7c800010bd369",
+      "title": "2027年大学生英语竞赛C类历年真题试卷全教材指南本科abd类专本科",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 28.8,
+      "sold": 612,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa157586c13960001111b4d",
+      "title": "2026年新疆教师中小学各学科测评真题解析+课标备考资料课件合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 17.8,
+      "sold": 541,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69aac81814149e00015b33ad",
+      "title": "2026年中考英语备考虚拟资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.99,
+      "sold": 420,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa93bee202ba200151e38f8",
+      "title": "英语四级备考教案资料 前100名 新品特惠6折",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 395,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aa645f61e46ae0001dfb777",
+      "title": "英语老师招聘上岸必备 l 27版刷题资料整理出来了",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.99,
+      "sold": 352,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a9008dee3af9900151f6f93",
+      "title": "27 专升本英语复习教案备考资料 新品特惠 前200名4折",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 15.0,
+      "sold": 334,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "664ef33850ce0e0001d07300",
+      "title": "备考2027英语新课标 全新试题+要点+心得一本通· 英语教师招聘",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 19.9,
+      "sold": 309,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a7843bda4f71c0001f56af5",
+      "title": "26仁爱八上英语同步讲义练习（电子版)   附答案",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.98,
+      "sold": 304,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f05d7c002e7e0001c60176",
+      "title": "2026中考英语真题汇编总复习资料电子版中考一轮二轮三轮专项复习",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 289,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a74526a95cfc000014be3d3",
+      "title": "2026成人高考｜高起专｜专升本｜历年真题｜备考资料｜电子版PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 6.8,
+      "sold": 283,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f988bdce94ee00018a485c",
+      "title": "2027教师招聘英语学科备考资料包电子",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 2.9,
+      "sold": 225,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a4c56580857710001a86ca8",
+      "title": "小学1-6年级全科电子版学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 208,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a730569ccf3dd00015557f7",
+      "title": "2026秋科普版三四五六年级英语上册知识大全一课一练提优教材全解",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.98,
+      "sold": 194,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6869f17149783c00015e2fbf",
+      "title": "2026年教招英语学科备考资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 8.33,
+      "sold": 143,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69bbcb20ffa26d0001628160",
+      "title": "2026全国大学生英语竞赛A/B/C/D类备考资料含历年真题答案PDF",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.9,
+      "sold": 125,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6aaa561c6f8d9600014fadea",
+      "title": "备考2027中考英语真题分类汇编电子版各省专用版按专题分类汇编",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 117,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "68f736bbf5d04800010cf2c4",
+      "title": "英语A级B级学习资料包电子版 历年真题+解析+听力+备考资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 4.8,
+      "sold": 117,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a959aadc61bcd0001ffcd22",
+      "title": "KET剑桥英语备考高效复习资料精选专项汇总训练真题辅导",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 5.9,
+      "sold": 93,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6a225e3b3e80020001d4ccc0",
+      "title": "26 广州中考英语书面表达｜一站式备考资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.88,
+      "sold": 92,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6976094aeb0d9a00018428e1",
+      "title": "【笔记同款】2026年大英赛ABCD类备考资料 · 2012-2025历年真题",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 3.8,
+      "sold": 81,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69cb9513a122150001838ced",
+      "title": "2027年中考英语全套资料合集",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 77,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "682c1e0519fa0c0001ab9876",
+      "title": "全店原创资料持续更新【1-6年级语文、数学、英语】",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 124.0,
+      "sold": 68,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69b15aad3026640001f938f0",
+      "title": "26学位英语总复习课件精讲习题（成考/自考/函授/国开/专升本",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 66,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "68efbde8c192ac0001e541de",
+      "title": "2027教师招聘英语学科备考资料包电子版",
+      "store_name": "685cc06f5f5b840015016f30",
+      "store_id": "685cc06f5f5b840015016f30",
+      "price": 1.5,
+      "sold": 56,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "6ab0e10a7f340c0001b3fad6",
+      "title": "26年新1-6年级语、数、英、学习资料",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 9.9,
+      "sold": 54,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "69e994e51560290001ad2e9f",
+      "title": "【新版】小学1-6年级语数英电子资料包",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 46.9,
+      "sold": 47,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    },
+    {
+      "goods_id": "686a0c0ba455ca00010f3632",
+      "title": "高考英语原创备考资料，全面冲击2027！",
+      "store_name": "（未知店）",
+      "store_id": "",
+      "price": 399.0,
+      "sold": 42,
+      "delta": 0,
+      "actual_gr": null,
+      "token_hits": 0,
+      "touch_keywords": [
+        "FastGPT搭建电子资料"
+      ]
+    }
+  ],
+  "snap": true,
+  "snap_at": "2026-11-17T18:06:29",
+  "niche": "FastGPT搭建",
+  "slug": "FastGPT搭建"
+}
