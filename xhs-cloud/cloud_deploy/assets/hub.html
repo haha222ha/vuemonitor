@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>选品作战台 · 四看板</title>
+  <!--
+    四看板统一壳：一门入口 + 原生菜单切换（iframe 懒加载；不依赖外网 Vue CDN）。
+    比货为全量静态分片（非瘦包）；点到再载，避免堵死其它标签。
+  -->
+  <style>
+    :root{
+      --bg:#eef3f8;--elev:#fff;--text:#101828;--muted:#3d4f63;--line:#c5d0dc;
+      --accent:#14708f;--accent-soft:#e2f3f8;--accent-deep:#0a4f66;
+      --v1:#0a4f66;--v2:#14708f;--v3:#0d7a5f;--v4:#8a5a12;
+      --ease:cubic-bezier(.4,0,.2,1);
+      --dur:180ms;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;overflow:hidden}
+    body{
+      font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+      color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased;
+    }
+    #app{display:flex;flex-direction:column;height:100%}
+    .topbar{
+      flex-shrink:0;padding:8px 16px 8px;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      border-bottom:1px solid var(--line);z-index:10;
+    }
+    .top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+    .brand{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;min-width:0}
+    .brand .eyebrow{
+      font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);
+      text-transform:uppercase;margin:0;
+    }
+    .brand h1{margin:0;font-size:1.05rem;letter-spacing:-.02em;font-weight:780}
+    .kbd-hint{font-size:11px;color:var(--muted);white-space:nowrap}
+    .kbd-hint kbd{
+      display:inline-block;padding:1px 5px;margin:0 1px;border:1px solid var(--line);
+      border-radius:4px;background:#f4f7fb;font-size:10px;font-family:ui-monospace,Consolas,monospace;
+    }
+    .view-menu{
+      display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;
+      background:#e4ebf3;border:1px solid var(--line);border-radius:12px;
+      max-width:100%;
+    }
+    .view-menu button{
+      appearance:none;border:1px solid transparent;background:transparent;
+      color:var(--muted);padding:7px 14px;font-size:13px;font-weight:650;
+      cursor:pointer;border-radius:9px;font-family:inherit;white-space:nowrap;
+      transition:color var(--dur) var(--ease),background var(--dur) var(--ease),
+        border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);
+    }
+    .view-menu button:hover{color:var(--text);background:rgba(255,255,255,.55)}
+    .view-menu button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    .view-menu button.active{
+      background:var(--elev);color:var(--accent-deep);font-weight:780;
+      border-color:rgba(20,112,143,.22);
+      box-shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.04);
+    }
+    .view-menu button[data-view="workbench"].active{color:var(--v3);border-color:rgba(13,122,95,.28)}
+    .view-menu button[data-view="ops"].active{color:var(--v2);border-color:rgba(20,112,143,.28)}
+    .view-menu button[data-view="vertical"].active{color:var(--v1);border-color:rgba(10,79,102,.28)}
+    .view-menu button[data-view="cycle"].active{color:var(--v4);border-color:rgba(138,90,18,.28)}
+    .hint{font-size:11px;color:var(--muted);padding:6px 0 0;line-height:1.4}
+    .frame-wrap{flex:1;min-height:0;position:relative;background:#e8eef5}
+    .frame-wrap iframe{
+      position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--elev);
+      opacity:0;pointer-events:none;transition:opacity var(--dur) var(--ease);
+    }
+    .frame-wrap iframe.is-active{opacity:1;pointer-events:auto}
+    .boot-mask{
+      position:absolute;inset:0;z-index:2;display:none;align-items:center;justify-content:center;
+      background:rgba(238,243,248,.92);color:var(--accent-deep);text-align:center;padding:24px;
+      font:13px/1.5 "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    }
+    .boot-mask.on{display:flex}
+    .boot-mask b{display:block;font-size:15px;margin-bottom:6px}
+    .boot-mask .sub{color:var(--muted);font-size:12px}
+    @media (prefers-reduced-motion:reduce){
+      .view-menu button,.frame-wrap iframe{transition:none}
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div class="top-row">
+      <div class="brand">
+        <div class="eyebrow">一门入口</div>
+        <h1>选品作战台</h1>
+      </div>
+      <div class="kbd-hint" title="焦点在页面内也可用">快捷 <kbd>1</kbd>–<kbd>4</kbd> · <kbd>←</kbd><kbd>→</kbd></div>
+    </div>
+    <div class="view-menu" role="tablist" aria-label="四看板菜单" id="viewMenu"></div>
+    <div class="hint" id="hint"></div>
+  </div>
+  <div class="frame-wrap" id="frameWrap">
+    <div class="boot-mask" id="bootMask" aria-live="polite">
+      <div>
+        <b id="bootTitle">载入中</b>
+        <div class="sub" id="bootSub">本机全量静态包 · 非瘦包 · 小服务器只吐文件</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function () {
+  // 云 /channel/hub/ 必须走 /channel/*；本机仍用 /ops /vertical
+  var CLOUD = /\/channel\//.test(location.pathname || "");
+  var PATHS = CLOUD
+    ? {
+        workbench: "/channel/workbench/?embed=1",
+        ops: "/channel/board/?embed=1",
+        // 垂类：直开 vertical_niche（云 /channel/vertical/ 旧空壳已废弃）
+        vertical: "/channel/board/vertical_niche.html?embed=1",
+        // 周期：轻包可扫；完整 data.js 在轻包内深链 / 会员预览
+        cycle: "/channel/board/cycle_static/hub.html?embed=1"
+      }
+    : {
+        workbench: "/?embed=1",
+        ops: "/ops/?embed=1",
+        vertical: "/vertical/?embed=1",
+        cycle: "/ops/cycle_static/hub.html?embed=1"
+      };
+  var TABS = [
+    { id: "workbench", label: "1 任务台", hint: "今日拍板 → 锁大类 → 分类榜 · 读 home_snap 静态" },
+    { id: "ops", label: "2 比货", hint: CLOUD ? "云端全量分片一次载入" : "全量静态分片 · 一次载入齐" },
+    { id: "vertical", label: "3 垂类", hint: "原独立垂类页 · 任意搜词 · 多卖家对照" },
+    { id: "cycle", label: "4 周期包", hint: "cycle_static 轻包 · 完整报告深链" }
+  ];
+  var TAB_IDS = TABS.map(function (t) { return t.id; });
+  var ALIAS = {
+    workbench: "workbench", home: "workbench", task: "workbench",
+    ops: "ops", board: "ops", matrix: "ops",
+    vertical: "vertical", niche: "vertical",
+    cycle: "cycle", report: "cycle",
+    "1": "workbench", "2": "ops", "3": "vertical", "4": "cycle"
+  };
+  var LIGHT = { workbench: true, vertical: true, cycle: true };
+  var loaded = {};
+  var view = "workbench";
+  var menu = document.getElementById("viewMenu");
+  var wrap = document.getElementById("frameWrap");
+  var hintEl = document.getElementById("hint");
+  var bootMask = document.getElementById("bootMask");
+  var bootTitle = document.getElementById("bootTitle");
+  var bootSub = document.getElementById("bootSub");
+  var buttons = {};
+  var frames = {};
+
+  function resolveView(raw) {
+    var k = String(raw || "").replace(/^#/, "").toLowerCase();
+    return ALIAS[k] || null;
+  }
+  function initialView() {
+    try {
+      var sp = new URLSearchParams(location.search);
+      var fromQ = resolveView(sp.get("view") || sp.get("tab"));
+      if (fromQ) return fromQ;
+      var fromHash = resolveView(location.hash);
+      if (fromHash) return fromHash;
+    } catch (e) {}
+    return "workbench";
+  }
+  function isTypingTarget(el) {
+    if (!el || !el.tagName) return false;
+    var tag = el.tagName.toUpperCase();
+    return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || !!el.isContentEditable;
+  }
+  function setBoot(on, title, sub) {
+    if (!bootMask) return;
+    bootMask.classList.toggle("on", !!on);
+    if (bootTitle && title) bootTitle.textContent = title;
+    if (bootSub && sub) bootSub.textContent = sub;
+  }
+  function ensureFrame(id) {
+    if (frames[id]) return frames[id];
+    var iframe = document.createElement("iframe");
+    iframe.setAttribute("data-view", id);
+    iframe.title = (TABS.find(function (t) { return t.id === id; }) || {}).label || id;
+    iframe.src = "about:blank";
+    iframe.addEventListener("load", function () {
+      if (iframe.getAttribute("data-pending") === "1") {
+        iframe.removeAttribute("data-pending");
+        if (view === id) setBoot(false);
+      }
+      try {
+        var win = iframe.contentWindow;
+        if (win && !win.__hubKeysBound) {
+          win.addEventListener("keydown", onHubKey);
+          win.__hubKeysBound = true;
+        }
+      } catch (e) {}
+    });
+    wrap.insertBefore(iframe, bootMask || null);
+    frames[id] = iframe;
+    return iframe;
+  }
+  function switchView(id) {
+    if (!PATHS[id]) id = "workbench";
+    view = id;
+    if (!loaded[id]) {
+      loaded[id] = true;
+      var fr = ensureFrame(id);
+      fr.setAttribute("data-pending", "1");
+      if (id === "ops") {
+        setBoot(true, "比货 · 全量一次载入中", "分片全部就绪后再出表 · 非边载边刷");
+      } else {
+        setBoot(true, "载入 " + ((TABS.find(function (t) { return t.id === id; }) || {}).label || id), "静态页直读 · 无远程动态查库");
+      }
+      fr.src = PATHS[id];
+    } else {
+      ensureFrame(id);
+      setBoot(false);
+    }
+    TAB_IDS.forEach(function (tid) {
+      var btn = buttons[tid];
+      var fr = frames[tid];
+      if (btn) {
+        var on = tid === id;
+        btn.classList.toggle("active", on);
+        btn.setAttribute("aria-selected", on ? "true" : "false");
+      }
+      if (fr) fr.classList.toggle("is-active", tid === id);
+    });
+    var tab = TABS.find(function (t) { return t.id === id; });
+    if (hintEl) hintEl.textContent = tab ? tab.hint : "";
+    try {
+      var url = new URL(location.href);
+      url.searchParams.set("view", id);
+      url.hash = "";
+      history.replaceState(null, "", url.toString());
+    } catch (e) {}
+  }
+  function stepView(delta) {
+    var i = TAB_IDS.indexOf(view);
+    if (i < 0) i = 0;
+    switchView(TAB_IDS[(i + delta + TAB_IDS.length) % TAB_IDS.length]);
+  }
+  function onHubKey(e) {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || isTypingTarget(e.target)) return;
+    var k = e.key;
+    if (k >= "1" && k <= "4") {
+      var id = ALIAS[k];
+      if (id) { e.preventDefault(); switchView(id); }
+      return;
+    }
+    if (k === "ArrowLeft") { e.preventDefault(); stepView(-1); return; }
+    if (k === "ArrowRight") { e.preventDefault(); stepView(1); }
+  }
+  function preloadLight() {
+    TAB_IDS.forEach(function (id) {
+      if (!LIGHT[id] || loaded[id] || id === view) return;
+      loaded[id] = true;
+      var fr = ensureFrame(id);
+      fr.src = PATHS[id];
+    });
+  }
+
+  TABS.forEach(function (t) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.setAttribute("role", "tab");
+    btn.setAttribute("data-view", t.id);
+    btn.textContent = t.label;
+    btn.addEventListener("click", function () { switchView(t.id); });
+    menu.appendChild(btn);
+    buttons[t.id] = btn;
+  });
+  window.addEventListener("keydown", onHubKey);
+  window.addEventListener("hashchange", function () {
+    var v = resolveView(location.hash);
+    if (v) switchView(v);
+  });
+  switchView(initialView());
+  // 轻量页后台预热；比货点到再整包载入
+  setTimeout(preloadLight, 800);
+})();
+</script>
+</body>
+</html>
