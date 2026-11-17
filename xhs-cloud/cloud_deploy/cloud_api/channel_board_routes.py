@@ -568,15 +568,18 @@ async def sync_channel_board_upload(
 
         report_dir = ""
         for root, _dirs, files in os.walk(extract_root):
-            if (
-                "index.html" in files
-                and "channel_board.json" in files
-                and "channel_board_data.js" in files
-            ):
+            # 全量分片主路径：index + marker + (boot js 或 shards/manifest)
+            has_marker = "index.html" in files and "channel_board.json" in files
+            has_boot_js = "channel_board_data.js" in files
+            has_shards = os.path.isfile(os.path.join(root, "shards", "manifest.json"))
+            if has_marker and (has_boot_js or has_shards):
                 report_dir = root
                 break
         if not report_dir:
-            raise HTTPException(status_code=400, detail="zip 内未找到增量商品库看板目录")
+            raise HTTPException(
+                status_code=400,
+                detail="zip 内未找到增量商品库看板目录（需 index.html + channel_board.json + boot js 或 shards/）",
+            )
 
         with open(os.path.join(report_dir, "channel_board.json"), encoding="utf-8") as f:
             marker = json.load(f)
