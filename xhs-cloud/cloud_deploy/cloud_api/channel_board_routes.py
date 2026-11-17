@@ -8,8 +8,9 @@ import json
 import os
 import shutil
 import tempfile
+import uuid
 import zipfile
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from typing import Any
 
@@ -27,12 +28,25 @@ router = APIRouter(tags=["channel-board"])
 
 _NO_STORE = {"Cache-Control": "no-store, no-cache, must-revalidate", "Pragma": "no-cache"}
 
+# Cloudflare Free/Pro 单请求约 100MB；分片默认 16MB，留足余量
+_DEFAULT_CHUNK_SIZE = 16 * 1024 * 1024
+_MAX_CHUNK_SIZE = 32 * 1024 * 1024
+_SESSION_TTL_HOURS = 24
+
 
 class BoardInventoryUpsertBody(BaseModel):
     batch_id: str = ""
     rows: list[dict[str, Any]] = Field(default_factory=list)
     meta: dict[str, Any] = Field(default_factory=dict)
     final_batch: bool = False
+
+
+class UploadSessionInitBody(BaseModel):
+    kind: str = "channel_board"  # channel_board | channel_workbench
+    filename: str = "channel_board.zip"
+    size: int = Field(..., ge=1)
+    sha256: str = ""
+    chunk_size: int = Field(default=_DEFAULT_CHUNK_SIZE, ge=1024 * 1024, le=_MAX_CHUNK_SIZE)
 
 
 def _password() -> str:
@@ -542,25 +556,102 @@ summary{cursor:pointer;color:var(--muted);font-size:12px;font-weight:600}
 </body></html>"""
 
 
-@router.post("/api/v1/sync/channel-board-upload")
-async def sync_channel_board_upload(
-    file: UploadFile = File(...),
-    _: None = Depends(verify_sync_key),
-):
+def _sessions_root() -> str:
+    from cloud_deploy.cloud_api.config import get_settings
+
+    return os.path.join(get_settings().xhs_data_dir, "upload_sessions")
+
+
+def _session_dir(upload_id: str) -> str:
+    safe = "".join(c for c in (upload_id or "") if c.isalnum() or c in "-_")
+    if not safe or safe != upload_id:
+        raise HTTPException(status_code=400, detail="invalid upload_id")
+    return os.path.join(_sessions_root(), safe)
+
+
+def _read_session_meta(upload_id: str) -> dict[str, Any]:
+    meta_path = os.path.join(_session_dir(upload_id), "meta.json")
+    if not os.path.isfile(meta_path):
+        raise HTTPException(status_code=404, detail="upload session 不存在或已过期")
+    with open(meta_path, encoding="utf-8") as f:
+        meta = json.load(f)
+    if not isinstance(meta, dict):
+        raise HTTPException(status_code=400, detail="session meta 损坏")
+    return meta
+
+
+def _write_session_meta(upload_id: str, meta: dict[str, Any]) -> None:
+    meta_path = os.path.join(_session_dir(upload_id), "meta.json")
+    tmp = meta_path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(meta, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, meta_path)
+
+
+def _list_received_chunks(upload_id: str, chunk_count: int) -> list[int]:
+    root = _session_dir(upload_id)
+    got: list[int] = []
+    for i in range(int(chunk_count)):
+        if os.path.isfile(os.path.join(root, "chunks", f"{i:06d}.part")):
+            got.append(i)
+    return got
+
+
+def _assemble_session_zip(upload_id: str, meta: dict[str, Any]) -> str:
+    root = _session_dir(upload_id)
+    chunk_count = int(meta.get("chunk_count") or 0)
+    size = int(meta.get("size") or 0)
+    want_sha = str(meta.get("sha256") or "").strip().lower()
+    missing = [i for i in range(chunk_count) if i not in set(_list_received_chunks(upload_id, chunk_count))]
+    if missing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"缺分片 {len(missing)} 个，首个 index={missing[0]}",
+        )
+    out_zip = os.path.join(root, meta.get("filename") or "assembled.zip")
+    h = hashlib.sha256()
+    written = 0
+    with open(out_zip, "wb") as out:
+        for i in range(chunk_count):
+            part = os.path.join(root, "chunks", f"{i:06d}.part")
+            with open(part, "rb") as inp:
+                while True:
+                    buf = inp.read(1024 * 1024)
+                    if not buf:
+                        break
+                    out.write(buf)
+                    h.update(buf)
+                    written += len(buf)
+    if written != size:
+        raise HTTPException(
+            status_code=400,
+            detail=f"拼装大小不符：got={written} want={size}",
+        )
+    digest = h.hexdigest()
+    if want_sha and want_sha != digest:
+        raise HTTPException(
+            status_code=400,
+            detail=f"sha256 不符：got={digest} want={want_sha}",
+        )
+    meta["assembled_sha256"] = digest
+    meta["assembled_at"] = datetime.now().isoformat(timespec="seconds")
+    _write_session_meta(upload_id, meta)
+    return out_zip
+
+
+def _ingest_channel_board_zip(zip_path: str) -> dict[str, Any]:
+    """解压全量看板 zip → channel_boards/{date} + latest + archive（与单次 upload 同口径）。"""
     from cloud_deploy.cloud_api import database as db
     from cloud_deploy.cloud_api.config import get_settings
     from cloud_deploy.reporting.constants import ARCHIVE_CHANNEL_BOARD
 
-    filename = os.path.basename(file.filename or "channel-board.zip")
-    if not filename.lower().endswith(".zip"):
+    if not str(zip_path).lower().endswith(".zip"):
         raise HTTPException(status_code=400, detail="仅支持 zip")
+    if not os.path.isfile(zip_path):
+        raise HTTPException(status_code=400, detail="zip 不存在")
 
     tmp_dir = tempfile.mkdtemp(prefix="xhs-channel-board-")
-    zip_path = os.path.join(tmp_dir, filename)
     try:
-        with open(zip_path, "wb") as out:
-            shutil.copyfileobj(file.file, out)
-
         extract_root = os.path.join(tmp_dir, "extract")
         os.makedirs(extract_root, exist_ok=True)
         with zipfile.ZipFile(zip_path, "r") as zf:
@@ -568,7 +659,6 @@ async def sync_channel_board_upload(
 
         report_dir = ""
         for root, _dirs, files in os.walk(extract_root):
-            # 全量分片主路径：index + marker + (boot js 或 shards/manifest)
             has_marker = "index.html" in files and "channel_board.json" in files
             has_boot_js = "channel_board_data.js" in files
             has_shards = os.path.isfile(os.path.join(root, "shards", "manifest.json"))
@@ -588,7 +678,6 @@ async def sync_channel_board_upload(
         report_date = str(marker.get("report_date") or "")[:10]
         if not report_date:
             report_date = datetime.now().strftime("%Y-%m-%d")
-        # 云端导入时间（服务器钟）：写入标记，供 hub / 面板展示
         server_imported = datetime.now().isoformat(timespec="seconds")
         marker["imported_at"] = server_imported
         marker["cloud_imported_at"] = server_imported
@@ -656,9 +745,168 @@ async def sync_channel_board_upload(
             "row_count": int(marker.get("items_exported") or 0),
             "cycle_window": marker.get("cycle_window") or "",
             "funnel_kind": marker.get("funnel_kind") or "",
+            "sha256": h.hexdigest(),
         }
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+@router.post("/api/v1/sync/channel-board-upload")
+async def sync_channel_board_upload(
+    file: UploadFile = File(...),
+    _: None = Depends(verify_sync_key),
+):
+    """兼容旧客户端：单次整包上传（≤CF 限额时可用）。大包请走 upload-session 分片。"""
+    filename = os.path.basename(file.filename or "channel-board.zip")
+    if not filename.lower().endswith(".zip"):
+        raise HTTPException(status_code=400, detail="仅支持 zip")
+
+    tmp_dir = tempfile.mkdtemp(prefix="xhs-channel-board-")
+    zip_path = os.path.join(tmp_dir, filename)
+    try:
+        with open(zip_path, "wb") as out:
+            shutil.copyfileobj(file.file, out)
+        return _ingest_channel_board_zip(zip_path)
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+@router.post("/api/v1/sync/upload-session")
+async def sync_upload_session_init(
+    body: UploadSessionInitBody,
+    _: None = Depends(verify_sync_key),
+):
+    """开分片续传会话（绕过 Cloudflare 单请求 100MB 上限）。"""
+    kind = (body.kind or "channel_board").strip()
+    if kind not in ("channel_board", "channel_workbench"):
+        raise HTTPException(status_code=400, detail="kind 仅支持 channel_board|channel_workbench")
+    filename = os.path.basename(body.filename or f"{kind}.zip")
+    if not filename.lower().endswith(".zip"):
+        raise HTTPException(status_code=400, detail="仅支持 zip")
+    chunk_size = int(body.chunk_size or _DEFAULT_CHUNK_SIZE)
+    chunk_size = max(1024 * 1024, min(chunk_size, _MAX_CHUNK_SIZE))
+    size = int(body.size)
+    chunk_count = (size + chunk_size - 1) // chunk_size
+    upload_id = uuid.uuid4().hex
+    root = _session_dir(upload_id)
+    os.makedirs(os.path.join(root, "chunks"), exist_ok=True)
+    meta = {
+        "ok": True,
+        "upload_id": upload_id,
+        "kind": kind,
+        "filename": filename,
+        "size": size,
+        "sha256": str(body.sha256 or "").strip().lower(),
+        "chunk_size": chunk_size,
+        "chunk_count": chunk_count,
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+        "expires_at": (datetime.now() + timedelta(hours=_SESSION_TTL_HOURS)).isoformat(
+            timespec="seconds"
+        ),
+        "received": [],
+    }
+    _write_session_meta(upload_id, meta)
+    return {
+        "ok": True,
+        "upload_id": upload_id,
+        "kind": kind,
+        "chunk_size": chunk_size,
+        "chunk_count": chunk_count,
+        "size": size,
+        "expires_at": meta["expires_at"],
+    }
+
+
+@router.put("/api/v1/sync/upload-session/{upload_id}/chunk/{index}")
+async def sync_upload_session_chunk(
+    upload_id: str,
+    index: int,
+    request: Request,
+    _: None = Depends(verify_sync_key),
+):
+    """上传第 index 片（0-based）；body=原始字节。"""
+    meta = _read_session_meta(upload_id)
+    chunk_count = int(meta.get("chunk_count") or 0)
+    chunk_size = int(meta.get("chunk_size") or _DEFAULT_CHUNK_SIZE)
+    if index < 0 or index >= chunk_count:
+        raise HTTPException(status_code=400, detail=f"index 越界 0..{chunk_count-1}")
+    raw = await request.body()
+    if not raw:
+        raise HTTPException(status_code=400, detail="空分片")
+    is_last = index == chunk_count - 1
+    if not is_last and len(raw) != chunk_size:
+        raise HTTPException(
+            status_code=400,
+            detail=f"非末片长度须={chunk_size}，got={len(raw)}",
+        )
+    if is_last:
+        expect = int(meta["size"]) - chunk_size * (chunk_count - 1)
+        if len(raw) != expect:
+            raise HTTPException(
+                status_code=400,
+                detail=f"末片长度须={expect}，got={len(raw)}",
+            )
+    part_path = os.path.join(_session_dir(upload_id), "chunks", f"{index:06d}.part")
+    tmp = part_path + ".tmp"
+    with open(tmp, "wb") as f:
+        f.write(raw)
+    os.replace(tmp, part_path)
+    received = _list_received_chunks(upload_id, chunk_count)
+    meta["received"] = received
+    meta["updated_at"] = datetime.now().isoformat(timespec="seconds")
+    _write_session_meta(upload_id, meta)
+    return {
+        "ok": True,
+        "upload_id": upload_id,
+        "index": index,
+        "bytes": len(raw),
+        "received_n": len(received),
+        "chunk_count": chunk_count,
+    }
+
+
+@router.get("/api/v1/sync/upload-session/{upload_id}")
+async def sync_upload_session_status(
+    upload_id: str,
+    _: None = Depends(verify_sync_key),
+):
+    meta = _read_session_meta(upload_id)
+    chunk_count = int(meta.get("chunk_count") or 0)
+    received = _list_received_chunks(upload_id, chunk_count)
+    missing = [i for i in range(chunk_count) if i not in set(received)]
+    return {
+        "ok": True,
+        "upload_id": upload_id,
+        "kind": meta.get("kind"),
+        "size": meta.get("size"),
+        "chunk_size": meta.get("chunk_size"),
+        "chunk_count": chunk_count,
+        "received": received,
+        "missing": missing,
+        "complete": not missing,
+    }
+
+
+@router.post("/api/v1/sync/upload-session/{upload_id}/commit")
+async def sync_upload_session_commit(
+    upload_id: str,
+    _: None = Depends(verify_sync_key),
+):
+    """拼装分片并按 kind 落盘（channel_board → /channel/）。"""
+    meta = _read_session_meta(upload_id)
+    kind = str(meta.get("kind") or "channel_board")
+    zip_path = _assemble_session_zip(upload_id, meta)
+    if kind != "channel_board":
+        raise HTTPException(
+            status_code=400,
+            detail=f"kind={kind} 暂请用对应单次 upload；channel_board 已支持分片 commit",
+        )
+    result = _ingest_channel_board_zip(zip_path)
+    result["upload_id"] = upload_id
+    result["via"] = "upload-session"
+    # 成功才清会话；失败保留分片便于续传/重 commit
+    shutil.rmtree(_session_dir(upload_id), ignore_errors=True)
+    return result
 
 
 @router.post("/api/v1/sync/channel-workbench-upload")
