@@ -255,7 +255,7 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
   var TABS=[
     {id:"workbench",label:"1 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
     {id:"ops",label:"2 比货",hint:"增量名单 · 销量时间矩阵"},
-    {id:"vertical",label:"3 垂类",hint:"vertical_snap 静态 · 多卖家对照"},
+    {id:"vertical",label:"3 垂类",hint:"原独立垂类页 · 任意搜词"},
     {id:"cycle",label:"4 周期包",hint:"cycle_static 轻包 · 完整 data.js 深链/预览"}
   ];
   var TAB_IDS=TABS.map(function(t){return t.id});
@@ -1292,14 +1292,45 @@ def channel_workbench_files(request: Request, path: str = ""):
     )
 
 
+@router.get("/channel/api/vertical-niche")
+def channel_vertical_niche_api(
+    request: Request,
+    q: str = "",
+    niche: str = "",
+    goods_id: str = "",
+    limit: int = 80,
+):
+    """原独立垂类看板合同：任意搜词 → PG。hub 只做导航，业务不另起炉灶。"""
+    if not _cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录")
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        raise HTTPException(status_code=503, detail="未配置 XHS_DATABASE_URL")
+    try:
+        from cloud_deploy.cloud_api.database_pg import init_db
+        from cloud_deploy.cloud_api.vertical_niche_query import query_vertical_niche
+
+        init_db()
+        payload = query_vertical_niche(
+            q=q or "",
+            niche=niche or "",
+            goods_id=goods_id or "",
+            limit=int(limit or 80),
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"vertical-niche 失败: {e}") from e
+    code = 200 if (payload or {}).get("ok", True) else 400
+    return JSONResponse(payload, status_code=code, headers={**_NO_STORE, "X-Channel-Board": "1"})
+
+
 @router.get("/channel/vertical")
 @router.get("/channel/vertical/")
 @router.get("/channel/vertical/{path:path}")
 def channel_vertical_landing(request: Request, path: str = ""):
-    """四看板①：垂类多卖家 — 优先最新 vertical_niche.html + vertical_snap。"""
+    """四看板①：导航到原 vertical_niche 页（不另做空壳业务页）。"""
     if not _cookie_ok(request):
         return RedirectResponse(url="/channel/", status_code=302)
-    # 兼容旧链：直接 302 到看板静态页（带 snap，不再空壳）
     rel = (path or "").strip().lstrip("/")
     if not rel or rel.endswith("/"):
         target = "/channel/board/vertical_niche.html"
@@ -1309,7 +1340,6 @@ def channel_vertical_landing(request: Request, path: str = ""):
         elif (request.query_params.get("embed") or "") == "1":
             target = f"{target}?embed=1"
         return RedirectResponse(url=target, status_code=302)
-    # 其余子路径若有人误链，仍回垂类页
     return RedirectResponse(url="/channel/board/vertical_niche.html", status_code=302)
 
 

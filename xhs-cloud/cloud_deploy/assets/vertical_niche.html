@@ -382,15 +382,21 @@ async function loadVerticalStatic(q){
   }catch(_){}
   return null;
 }
+function verticalApiPath(){
+  // 原合同：本机 /api/vertical-niche；云走 /channel/api/（nginx 只反代 /channel/）
+  return window.__BOARD_CLOUD ? '/channel/api/vertical-niche' : '/api/vertical-niche';
+}
 async function bootCatalogChips(){
+  // 导航壳对接原页：空态保持「任意搜词」示例；静包仅作可选快捷，不喧宾夺主
   const box=document.getElementById('emptyHome');
+  if(!box) return;
   try{
     const cat=await fetchJsonSafe(vertSnapBase()+'/catalog.json');
-    const items=(cat.items||[]).filter(x=>x && x.ok!==false);
-    if(!items.length || !box) return;
-    const chips=items.map(x=>`<button type="button" onclick="quickQ('${esc(x.niche)}')">${esc(x.niche)}<small style="opacity:.65;margin-left:4px">${Number(x.items_n||0)}</small></button>`).join('');
-    box.innerHTML=`<b>垂类静态包已就绪 · ${items.length} 个</b><br/>覆盖 pin 全量 + 虚资大类 + 常用种子；点词直读，云端零 PG。<div class="ex">${chips}</div>`;
-    box.style.display='block';
+    const items=(cat.items||[]).filter(x=>x && x.ok!==false).slice(0,12);
+    if(!items.length) return;
+    const chips=items.map(x=>`<button type="button" onclick="quickQ('${esc(x.niche)}')">${esc(x.niche)}</button>`).join('');
+    const ex=box.querySelector('.ex');
+    if(ex) ex.insertAdjacentHTML('beforeend', chips);
   }catch(_){}
 }
 async function run(){
@@ -408,27 +414,25 @@ async function run(){
   document.getElementById('kw').style.display='none';
   document.getElementById('sellers').innerHTML='';
   document.getElementById('table').innerHTML='';
+  // 原设计：任意搜词走 API；静包只作离线兜底
   let data=null;
   try{
-    data=await loadVerticalStatic(q);
+    const u=new URL(verticalApiPath(), location.origin);
+    u.searchParams.set('q', q);
+    u.searchParams.set('niche', q);
+    u.searchParams.set('limit','80');
+    data=await fetchJsonSafe(u.toString());
   }catch(_){ data=null; }
   if(!data){
-    try{
-      const u=new URL('/api/vertical-niche', location.origin);
-      u.searchParams.set('q', q);
-      u.searchParams.set('niche', q);
-      u.searchParams.set('limit','80');
-      data=await fetchJsonSafe(u.toString());
-    }catch(e){
-      msg.innerHTML='<span class="err">静态 snap 与 API 均失败 · 云端请确认已发布 vertical_snap</span>';
-      document.getElementById('sum').innerHTML='';
-      if(emptyHome){
-        emptyHome.style.display='block';
-        emptyHome.innerHTML='<b>这个词还没有静态包</b><br/>请点下方已发布短名单，或本机补导 vertical_snap 后再推云。<div class="ex"><button type="button" onclick="quickQ(\'拼豆\')">拼豆</button></div>';
-      }
-      bootCatalogChips();
-      return;
+    try{ data=await loadVerticalStatic(q); }catch(_){ data=null; }
+  }
+  if(!data){
+    msg.innerHTML='<span class="err">垂类 API 失败 · 本机请确认 8765 /api/vertical-niche；云端请部署 /channel/api/vertical-niche</span>';
+    document.getElementById('sum').innerHTML='';
+    if(emptyHome){
+      emptyHome.style.display='block';
     }
+    return;
   }
   if(!data.ok){
     msg.innerHTML='<span class="err">'+esc(data.error||'失败')+'</span>';
