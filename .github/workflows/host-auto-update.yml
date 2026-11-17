@@ -29,8 +29,19 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             bash scripts/host-update.sh
+            # 选品云端（看板分片上传 upload-session 等）与主站并行更新
+            if [ -d /opt/xhs-cloud ] && [ -d /opt/vuemonitor/xhs-cloud ]; then
+              rsync -a /opt/vuemonitor/xhs-cloud/ /opt/xhs-cloud/ \
+                --delete --exclude data --exclude venv --exclude .env \
+                --exclude '*.pyc' --exclude '__pycache__'
+              cd /opt/xhs-cloud
+              bash cloud_deploy/scripts/host-update.sh || true
+              curl -sS -o /dev/null -w "upload-session=%{http_code}\n" \
+                -X POST http://127.0.0.1:8080/api/v1/sync/upload-session \
+                -H 'Content-Type: application/json' -d '{}' || true
+            fi
             bash scripts/verify_production.sh || true
-            cd server && source .venv/bin/activate
+            cd /opt/vuemonitor/server && source .venv/bin/activate
             export PYTHONPATH=/opt/vuemonitor/server
             python ../scripts/e2e_api_flow.py --base-url http://127.0.0.1:8000 --skip-ai || true
 
