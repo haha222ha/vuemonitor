@@ -251,12 +251,12 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
 </div>
 <script>
 (function(){
-  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1",vertical:"/channel/board/vertical_niche.html?embed=1",cycle:"/channel/board/cycle_static/hub.html?embed=1"};
+  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1",vertical:"/channel/board/vertical_niche.html?embed=1",cycle:"/channel/report/?embed=1"};
   var TABS=[
     {id:"workbench",label:"1 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
     {id:"ops",label:"2 比货",hint:"展示包 facets（类 data.js）· 底账分片按需"},
     {id:"vertical",label:"3 垂类",hint:"原独立垂类页 · 任意搜词"},
-    {id:"cycle",label:"4 周期包",hint:"cycle_static 轻包 · 完整 data.js 深链/预览"}
+    {id:"cycle",label:"4 周期包",hint:"选品报告 zip · 服务器解压直接打开"}
   ];
   var TAB_IDS=TABS.map(function(t){return t.id});
   var ALIAS={workbench:"workbench",home:"workbench",task:"workbench",ops:"ops",board:"ops",matrix:"ops",vertical:"vertical",niche:"vertical",cycle:"cycle",report:"cycle","1":"workbench","2":"ops","3":"vertical","4":"cycle"};
@@ -1365,37 +1365,114 @@ def channel_vertical_landing(request: Request, path: str = ""):
     return RedirectResponse(url="/channel/board/vertical_niche.html", status_code=302)
 
 
+def _latest_member_custom_report() -> tuple[str, str] | None:
+    """最新已上传的选品报告 zip（member_custom_zip）。返回 (report_date, archive_type)。"""
+    from cloud_deploy.cloud_api import database as db
+    from cloud_deploy.reporting.constants import ARCHIVE_CUSTOM
+
+    db.init_db()
+    rows = db.list_archives(archive_type=ARCHIVE_CUSTOM) or []
+    if not rows:
+        return None
+    row = rows[0] if isinstance(rows[0], dict) else {}
+    date = str(row.get("report_date") or "")[:10]
+    if not date:
+        return None
+    return date, ARCHIVE_CUSTOM
+
+
+def _resolve_cycle_report_root() -> tuple[str, str]:
+    """优先：member_custom_zip 解压缓存（真·选品报告）；否则 cycle_report/latest 落地页。"""
+    # 1) 选品报告整包（上传 zip → 服务器解压打开）
+    try:
+        hit = _latest_member_custom_report()
+        if hit:
+            report_date, archive_type = hit
+            from cloud_deploy.cloud_api.member_report_preview import ensure_member_report_dir
+
+            root = ensure_member_report_dir(report_date, archive_type)
+            if os.path.isfile(os.path.join(root, "data.js")) and (
+                os.path.isfile(os.path.join(root, "index.html"))
+                or os.path.isfile(os.path.join(root, "index_with_gr.html"))
+                or os.path.isfile(os.path.join(root, "index_vue.html"))
+            ):
+                return root, f"member_custom_zip:{report_date}"
+    except Exception:
+        pass
+    # 2) 兼容旧落地 / 轻包
+    root = os.path.join(_cycle_report_root(), "latest")
+    return root, "cycle_report_latest"
+
+
 @router.get("/channel/report/{path:path}")
 @router.get("/channel/report")
 @router.get("/channel/report/")
 def channel_cycle_report_files(request: Request, path: str = ""):
-    """周期选品报告云浏览瘦包：同套报告 HTML，TopN data.js + zip 下载。"""
+    """④ 周期包 = 选品报告系统：读已上传 member_custom_zip，服务器解压后直接打开。
+
+    与 /member/preview 同套解压逻辑；鉴权用作战台 cookie（无需再登会员 token）。
+    """
     if not _cookie_ok(request):
         return RedirectResponse(url="/channel/", status_code=302)
     if request.url.path == "/channel/report" and not (path or "").strip():
         return RedirectResponse(url="/channel/report/", status_code=302)
-    root = os.path.join(_cycle_report_root(), "latest")
+
+    root, source = _resolve_cycle_report_root()
     if not os.path.isdir(root):
         return HTMLResponse(
-            "<h3>周期报告浏览包尚未上传</h3>"
-            "<p>请本机运行 <code>python tools/publish_cycle_report_cloud.py</code>（全量数据包 → ProductAnalyzer）</p>"
-            "<p><a href='/channel/hub/'>返回入口</a></p>",
+            "<h3>周期选品报告尚未上传</h3>"
+            "<p>请本机运行 <code>python tools/publish_cycle_report_cloud.py</code>："
+            "打选品报告 zip → 上传 → 服务器解压，本页即可打开整包（含 data.js）。</p>"
+            "<p><a href='/channel/hub/'>返回入口</a> · "
+            "<a href='/member#datapacks'>会员数据包库</a></p>",
             status_code=404,
         )
+
     rel = (path or "").strip().lstrip("/")
     if not rel or rel.endswith("/"):
-        rel = "index.html"
-    target = _safe_file(root, rel)
-    if not os.path.isfile(target):
-        raise HTTPException(status_code=404, detail="not found")
+        # 选品报告入口优先顺序（与 member_report_preview 一致）
+        for name in ("index.html", "index_with_gr.html", "index_vue.html"):
+            if os.path.isfile(os.path.join(root, name)):
+                rel = name
+                break
+        else:
+            rel = "index.html"
+
+    # 安全拼接（禁止 ..）
+    try:
+        target = _safe_file(root, rel)
+    except Exception:
+        target = ""
+    if not target or not os.path.isfile(target):
+        # 兼容旧包入口名
+        alt_map = {
+            "index.html": ("index_with_gr.html", "index_vue.html"),
+            "_view_table.html": ("index_with_gr.html",),
+            "_view_cards.html": ("index_vue.html",),
+        }
+        found = ""
+        for name in alt_map.get(rel, ()):
+            cand = os.path.join(root, name)
+            if os.path.isfile(cand):
+                found = cand
+                rel = name
+                break
+        if not found:
+            raise HTTPException(status_code=404, detail="not found")
+        target = found
+
     low = rel.lower()
     media = _media_type(rel)
     if low.endswith(".zip"):
         media = "application/zip"
-    headers = {**_NO_STORE, "X-Channel-Board": "1"}
+    headers = {
+        **_NO_STORE,
+        "X-Channel-Board": "1",
+        "X-Cycle-Report-Source": source[:80],
+    }
     if low.endswith(".zip"):
         headers["Content-Disposition"] = f'attachment; filename="{os.path.basename(target)}"'
-    # hub iframe ?embed=1：报告壳藏顶栏标签，避免双导航
+
     embed = (request.query_params.get("embed") or "") == "1"
     if embed and low.endswith((".html", ".htm")):
         try:
