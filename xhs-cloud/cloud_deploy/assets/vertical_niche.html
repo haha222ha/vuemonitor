@@ -414,7 +414,7 @@ async function run(){
   document.getElementById('kw').style.display='none';
   document.getElementById('sellers').innerHTML='';
   document.getElementById('table').innerHTML='';
-  // 原设计：任意搜词走 API；静包只作离线兜底
+  // 原设计：任意搜词走 API；静包只作离线兜底（API 空结果也回落）
   let data=null;
   try{
     const u=new URL(verticalApiPath(), location.origin);
@@ -423,8 +423,12 @@ async function run(){
     u.searchParams.set('limit','80');
     data=await fetchJsonSafe(u.toString());
   }catch(_){ data=null; }
-  if(!data){
-    try{ data=await loadVerticalStatic(q); }catch(_){ data=null; }
+  const apiEmpty=!data || data.ok===false || !((data.items&&data.items.length)||(data.sellers&&data.sellers.length));
+  if(apiEmpty){
+    try{
+      const snap=await loadVerticalStatic(q);
+      if(snap && snap.ok && ((snap.items&&snap.items.length)||(snap.sellers&&snap.sellers.length))) data=snap;
+    }catch(_){}
   }
   if(!data){
     msg.innerHTML='<span class="err">垂类 API 失败 · 本机请确认 8765 /api/vertical-niche；云端请部署 /channel/api/vertical-niche</span>';
