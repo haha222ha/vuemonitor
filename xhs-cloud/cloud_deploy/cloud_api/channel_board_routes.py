@@ -251,10 +251,10 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
 </div>
 <script>
 (function(){
-  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1",vertical:"/channel/board/vertical_niche.html?embed=1",cycle:"/channel/board/cycle_static/hub.html?embed=1"};
+  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1&ledger=1",vertical:"/channel/board/vertical_niche.html?embed=1",cycle:"/channel/board/cycle_static/hub.html?embed=1"};
   var TABS=[
     {id:"workbench",label:"1 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
-    {id:"ops",label:"2 比货",hint:"增量名单 · 销量时间矩阵"},
+    {id:"ops",label:"2 比货",hint:"全量静态分片一次载入 · 非边载边刷"},
     {id:"vertical",label:"3 垂类",hint:"原独立垂类页 · 任意搜词"},
     {id:"cycle",label:"4 周期包",hint:"cycle_static 轻包 · 完整 data.js 深链/预览"}
   ];
@@ -713,16 +713,38 @@ def _ingest_channel_board_zip(zip_path: str) -> dict[str, Any]:
                     json.dump(funnel_obj, f, ensure_ascii=False, indent=2)
 
         boards_root = _boards_root()
-        dest_live = os.path.join(boards_root, report_date)
-        os.makedirs(boards_root, exist_ok=True)
-        if os.path.isdir(dest_live):
-            shutil.rmtree(dest_live)
-        shutil.copytree(report_dir, dest_live)
-
         latest = os.path.join(boards_root, "latest")
-        if os.path.isdir(latest):
-            shutil.rmtree(latest)
-        shutil.copytree(dest_live, latest)
+        overlay = bool(marker.get("overlay"))
+        # overlay=true：只覆盖 zip 内文件，保留已有 shards/facets（修壳/JS 不必重传 500MB+）
+        if overlay and os.path.isdir(latest):
+            for root, _dirs, files in os.walk(report_dir):
+                for name in files:
+                    src = os.path.join(root, name)
+                    rel = os.path.relpath(src, report_dir)
+                    dst = os.path.join(latest, rel)
+                    os.makedirs(os.path.dirname(dst), exist_ok=True)
+                    shutil.copy2(src, dst)
+            dest_live = latest
+            # 同步一份到日期目录（有则合并，无则跳过）
+            dest_date = os.path.join(boards_root, report_date)
+            if os.path.isdir(dest_date):
+                for root, _dirs, files in os.walk(report_dir):
+                    for name in files:
+                        src = os.path.join(root, name)
+                        rel = os.path.relpath(src, report_dir)
+                        dst = os.path.join(dest_date, rel)
+                        os.makedirs(os.path.dirname(dst), exist_ok=True)
+                        shutil.copy2(src, dst)
+        else:
+            dest_live = os.path.join(boards_root, report_date)
+            os.makedirs(boards_root, exist_ok=True)
+            if os.path.isdir(dest_live):
+                shutil.rmtree(dest_live)
+            shutil.copytree(report_dir, dest_live)
+
+            if os.path.isdir(latest):
+                shutil.rmtree(latest)
+            shutil.copytree(dest_live, latest)
 
         archive_dir = get_settings().xhs_report_archive_dir
         os.makedirs(archive_dir, exist_ok=True)
