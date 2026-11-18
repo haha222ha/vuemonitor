@@ -186,6 +186,18 @@ def _safe_file(root: str, rel: str) -> str:
     return target
 
 
+def _header_ascii(value: str, *, limit: int = 120) -> str:
+    """HTTP 响应头必须 latin-1；中文包名改成百分号编码，避免 500。"""
+    from urllib.parse import quote
+
+    s = str(value or "").strip() or "cycle"
+    try:
+        s.encode("latin-1")
+        return s[:limit]
+    except UnicodeEncodeError:
+        return quote(s, safe=":/._-+=@")[:limit]
+
+
 def _media_type(rel: str) -> str | None:
     low = (rel or "").lower()
     if low.endswith(".js"):
@@ -1927,10 +1939,16 @@ def _serve_cycle_pack_file(
     headers = {
         **_NO_STORE,
         "X-Channel-Board": "1",
-        "X-Cycle-Report-Source": source[:80],
+        "X-Cycle-Report-Source": _header_ascii(source, limit=80),
     }
     if low.endswith(".zip"):
-        headers["Content-Disposition"] = f'attachment; filename="{os.path.basename(target)}"'
+        from urllib.parse import quote as _q
+
+        fname = os.path.basename(target)
+        ascii_name = "cycle_report.zip"
+        headers["Content-Disposition"] = (
+            f"attachment; filename=\"{ascii_name}\"; filename*=UTF-8''{_q(fname)}"
+        )
 
     embed = (request.query_params.get("embed") or "") == "1"
     if embed and low.endswith((".html", ".htm")):
