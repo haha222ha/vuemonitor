@@ -1818,17 +1818,23 @@ def agent_task_submit(body: AgentTaskSubmitBody, request: Request):
     """手机页提交任务（cookie 鉴权）；可指定 target_device_id。"""
     if not _agent_task_cookie_ok(request):
         raise HTTPException(status_code=401, detail="未登录遥控台")
-    from cloud_deploy.cloud_api import agent_task_store as ats
-
     try:
+        from cloud_deploy.cloud_api import agent_task_store as ats
+
         out = ats.submit(
             body.prompt,
             source="web",
             target_device_id=body.target_device_id,
             target_label=body.target_label,
         )
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"提交写队列失败: {e}") from e
+        # 必须 JSON detail，避免 nginx/CF 泛成「500 Internal Server Error」白页
+        raise HTTPException(
+            status_code=500,
+            detail=f"提交写队列失败: {type(e).__name__}: {e}",
+        ) from e
     if not out.get("ok"):
         raise HTTPException(status_code=400, detail=out.get("error") or "submit failed")
     return out
@@ -1891,17 +1897,22 @@ def agent_task_cancel(task_id: str, request: Request):
 @app.post("/api/v1/sync/agent-task-submit")
 def sync_agent_task_submit(body: AgentTaskSubmitBody, _: None = Depends(verify_sync_key)):
     """本机/脚本用 Sync Key 代提交（网页 500 时的兜底通道）。"""
-    from cloud_deploy.cloud_api import agent_task_store as ats
-
     try:
+        from cloud_deploy.cloud_api import agent_task_store as ats
+
         out = ats.submit(
             body.prompt,
             source="sync",
             target_device_id=body.target_device_id,
             target_label=body.target_label,
         )
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"提交写队列失败: {e}") from e
+        raise HTTPException(
+            status_code=500,
+            detail=f"提交写队列失败: {type(e).__name__}: {e}",
+        ) from e
     if not out.get("ok"):
         raise HTTPException(status_code=400, detail=out.get("error") or "submit failed")
     return out
@@ -2005,7 +2016,17 @@ async def agent_task_login(request: Request):
     if not expect or pw != expect:
         return RedirectResponse(url="/agent-task/?e=1", status_code=302)
     resp = RedirectResponse(url="/agent-task/app/", status_code=302)
-    resp.set_cookie("xhs_agent_task", expect, httponly=True, max_age=7 * 86400)
+    # path=/ 才能带到 /api/v1/agent-task/*；HTTPS 下带 Secure，防丢 cookie 后误显示成提交失败
+    secure = (request.headers.get("x-forwarded-proto") or request.url.scheme or "").lower() == "https"
+    resp.set_cookie(
+        "xhs_agent_task",
+        expect,
+        httponly=True,
+        max_age=7 * 86400,
+        path="/",
+        samesite="lax",
+        secure=secure,
+    )
     return resp
 
 

@@ -97,24 +97,38 @@ def save(data: dict[str, Any]) -> None:
     path = _path()
     tmp = path + ".tmp"
     lock_path = path + ".lock"
-    with open(lock_path, "a+", encoding="utf-8") as lf:
-        _flock_exclusive(lf)
+    last_err: Exception | None = None
+    # 磁盘忙 / 瞬时 flock 冲突时短重试，避免网页提交直接 500
+    for attempt in range(3):
         try:
-            with open(tmp, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-                f.flush()
-                os.fsync(f.fileno())
-            # 成功后留一份 bak，坏文件时可回滚
-            if os.path.isfile(path):
+            with open(lock_path, "a+", encoding="utf-8") as lf:
+                _flock_exclusive(lf)
                 try:
-                    import shutil
+                    with open(tmp, "w", encoding="utf-8") as f:
+                        json.dump(data, f, ensure_ascii=False, indent=2)
+                        f.flush()
+                        os.fsync(f.fileno())
+                    # 成功后留一份 bak，坏文件时可回滚
+                    if os.path.isfile(path):
+                        try:
+                            import shutil
 
-                    shutil.copy2(path, path + ".bak")
-                except Exception:
-                    pass
-            os.replace(tmp, path)
-        finally:
-            _flock_unlock(lf)
+                            shutil.copy2(path, path + ".bak")
+                        except Exception:
+                            pass
+                    os.replace(tmp, path)
+                    return
+                finally:
+                    _flock_unlock(lf)
+        except Exception as e:
+            last_err = e
+            try:
+                if os.path.isfile(tmp):
+                    os.remove(tmp)
+            except Exception:
+                pass
+            time.sleep(0.05 * (attempt + 1))
+    raise RuntimeError(f"queue save failed after retries: {last_err}") from last_err
 
 
 def _trim(data: dict[str, Any]) -> None:
