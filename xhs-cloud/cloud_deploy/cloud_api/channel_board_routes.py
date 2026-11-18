@@ -1642,27 +1642,98 @@ def _consolidate_cycle_packs() -> None:
             pass
 
 
+def _peek_cycle_data_meta(root: str) -> dict[str, Any]:
+    """轻量读 data.js 头部 meta：出报时刻 / 周期窗口说明。"""
+    path = os.path.join(root, "data.js")
+    if not os.path.isfile(path):
+        return {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            head = f.read(131072)
+    except Exception:
+        return {}
+    out: dict[str, Any] = {}
+    m = re.search(r'"date"\s*:\s*"([^"]+)"', head)
+    if m:
+        out["date"] = m.group(1)[:10]
+    m = re.search(r'"time"\s*:\s*"([^"]+)"', head)
+    if m:
+        out["time"] = m.group(1).strip()[:19]
+    m = re.search(r'"count"\s*:\s*(\d+)', head)
+    if m:
+        out["count"] = int(m.group(1))
+    def _unquote_js(s: str) -> str:
+        return (
+            s.replace(r"\/", "/")
+            .replace(r"\"", '"')
+            .replace(r"\n", "\n")
+            .replace(r"\\", "\\")
+        )
+
+    m = re.search(r'"filter_label"\s*:\s*"((?:\\.|[^"\\])*)"', head)
+    if m:
+        out["filter_label"] = _unquote_js(m.group(1))
+    m = re.search(r'"scan_label"\s*:\s*"((?:\\.|[^"\\])*)"', head)
+    if m:
+        out["scan_label"] = _unquote_js(m.group(1))
+    # 「近39日」/「周期#13075」等窗口线索
+    blob = str(out.get("filter_label") or "") + " " + str(out.get("scan_label") or "")
+    wm = re.search(r"近\s*(\d+)\s*日", blob)
+    if wm:
+        out["window_days"] = int(wm.group(1))
+        out["period_label"] = f"近{wm.group(1)}日销量增量窗口"
+    cm = re.search(r"周期#?\s*(\d+)", blob)
+    if cm:
+        out["cycle_no"] = cm.group(1)
+    return out
+
+
 def _cycle_pack_list_item(name: str, root: str, marker: dict[str, Any] | None = None) -> dict[str, Any]:
     marker = marker if isinstance(marker, dict) else _read_cycle_pack_marker(root)
     pack_id = _cycle_pack_id(marker, dir_name=name)
     src = str(marker.get("source_name") or "").strip()
-    title = _cycle_canonical_source_name(src) or pack_id
-    count = int(marker.get("full_count") or marker.get("cloud_count") or 0)
-    if count <= 0:
-        try:
-            with open(os.path.join(root, "data.js"), encoding="utf-8") as f:
-                head = f.read(65536)
-            m = re.search(r'"count"\s*:\s*(\d+)', head)
-            if m:
-                count = int(m.group(1))
-        except Exception:
-            pass
+    cycle_name = _cycle_canonical_source_name(src) or pack_id
+    meta = _peek_cycle_data_meta(root)
+
+    report_date = (
+        str(meta.get("date") or marker.get("report_date") or "")[:10]
+    )
+    report_time = str(meta.get("time") or "").strip()
+    if not report_time and report_date:
+        built = str(marker.get("built_at") or "")[:19].replace("T", " ")
+        report_time = built or report_date
+
+    count = int(marker.get("full_count") or marker.get("cloud_count") or meta.get("count") or 0)
+    period_label = str(meta.get("period_label") or "").strip()
+    if not period_label:
+        fl = str(meta.get("filter_label") or marker.get("filter_label") or "")
+        wm = re.search(r"近\s*(\d+)\s*日", fl)
+        period_label = f"近{wm.group(1)}日销量增量窗口" if wm else "关键词周期累计增量"
+    cycle_no = str(meta.get("cycle_no") or "")
+    if not cycle_no:
+        cm = re.search(r"(\d+)", cycle_name)
+        cycle_no = cm.group(1) if cm else ""
+
+    # 展示名：出报时间优先，方便对照哪天的包
+    if report_date:
+        title = f"{report_date} 出报 · 周期#{cycle_no or cycle_name}"
+    else:
+        title = f"周期#{cycle_no or cycle_name}"
+
+    summary = period_label
+    if report_time:
+        summary = f"{period_label} · 出报 {report_time}"
+
     return {
         "pack_id": pack_id,
         "dir_name": name,
         "title": title,
-        "source_name": src or title,
-        "report_date": str(marker.get("report_date") or "")[:10],
+        "summary": summary,
+        "period_label": period_label,
+        "cycle_no": cycle_no,
+        "source_name": src or cycle_name,
+        "report_date": report_date,
+        "report_time": report_time,
         "full_count": count,
         "imported_at": str(marker.get("imported_at") or marker.get("cloud_imported_at") or ""),
         "view_url": f"/channel/report/p/{pack_id}/",
@@ -1731,14 +1802,19 @@ def _cycle_report_catalog_html(*, embed: bool = False) -> str:
         n = int(it.get("full_count") or 0)
         count_s = f"{n:,}" if n else "—"
         date_s = it.get("report_date") or "—"
+        time_s = (it.get("report_time") or date_s or "")[:19]
+        period = it.get("period_label") or "关键词周期累计增量"
         imported = (it.get("imported_at") or "")[:19].replace("T", " ")
         open_url = it["view_url"] + ("?embed=1" if embed else "")
         rows.append(
             "<article class='card'>"
-            f"<div class='tag'>周期选品报告</div>"
+            f"<div class='tag'>出报 {_html_escape(date_s)}</div>"
             f"<h2>{_html_escape(it.get('title') or it['pack_id'])}</h2>"
-            f"<div class='meta'>日期 <b>{_html_escape(date_s)}</b> · 入选 <b>{count_s}</b>"
-            f"{(' · 入库 ' + _html_escape(imported)) if imported else ''}</div>"
+            f"<p class='desc'>{_html_escape(period)}"
+            f"{(' · 出报时刻 ' + _html_escape(time_s)) if time_s else ''}</p>"
+            f"<div class='meta'>入选 <b>{count_s}</b>"
+            f"{(' · 入库 ' + _html_escape(imported)) if imported else ''}"
+            f" · 包名 {_html_escape(it.get('source_name') or it['pack_id'])}</div>"
             f"<a class='btn' href='{_html_escape(open_url)}'>打开报告</a>"
             "</article>"
         )
@@ -1771,8 +1847,9 @@ h1{{margin:0 0 8px;font-size:1.45rem;letter-spacing:-.02em}}
 .grid{{display:grid;gap:12px}}
 .card{{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;box-shadow:0 1px 2px rgba(16,24,40,.04)}}
 .tag{{display:inline-block;font-size:11px;font-weight:700;color:var(--accent-deep);background:var(--accent-soft);border:1px solid rgba(20,112,143,.22);border-radius:999px;padding:3px 10px;margin-bottom:8px}}
-.card h2{{margin:0 0 8px;font-size:1.05rem}}
-.meta{{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.45}}
+.card h2{{margin:0 0 6px;font-size:1.08rem;letter-spacing:-.01em}}
+.desc{{margin:0 0 10px;font-size:13px;color:var(--muted);line-height:1.5}}
+.meta{{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.45}}
 .meta b{{color:var(--text);font-variant-numeric:tabular-nums}}
 .btn{{display:inline-block;padding:9px 14px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;font-size:13px}}
 .btn:hover{{background:var(--accent-deep)}}
@@ -1788,7 +1865,7 @@ code{{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:#f0f
 <div class="wrap">
   <div class="eyebrow">选品作战台 · ④</div>
   <h1>周期包列表</h1>
-  <p class="sub">按周期包文件名合并：同名/续传分片只保留最新一份，点开即可查看。</p>
+  <p class="sub">按出报时间命名；同周期包名自动合并为最新一份，并标注数据时间窗口。</p>
   <div class="grid">{body_cards}</div>
   <div class="foot"><a href="/channel/hub/">返回四看板</a> · 共 {len(items)} 份</div>
 </div>
