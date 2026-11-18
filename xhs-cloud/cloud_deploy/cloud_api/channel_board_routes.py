@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import shutil
 import tempfile
 import uuid
@@ -258,7 +259,7 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
     {id:"workbench",label:"1 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
     {id:"ops",label:"2 比货",hint:"展示包 facets（类 data.js）· 底账分片按需"},
     {id:"vertical",label:"3 垂类",hint:"原独立垂类页 · 任意搜词"},
-    {id:"cycle",label:"4 周期包",hint:"选品报告 zip · 服务器解压直接打开"}
+    {id:"cycle",label:"4 周期包",hint:"周期包列表 · 点开选品报告"}
   ];
   var TAB_IDS=TABS.map(function(t){return t.id});
   var ALIAS={workbench:"workbench",home:"workbench",task:"workbench",ops:"ops",board:"ops",matrix:"ops",vertical:"vertical",niche:"vertical",cycle:"cycle",report:"cycle","1":"workbench","2":"ops","3":"vertical","4":"cycle"};
@@ -1093,10 +1094,12 @@ def _ingest_cycle_report_zip(zip_path: str) -> dict[str, Any]:
         if not report_date:
             report_date = datetime.now().strftime("%Y-%m-%d")
         server_imported = datetime.now().isoformat(timespec="seconds")
+        pack_id = _cycle_pack_id({**marker, "report_date": report_date})
         marker["imported_at"] = server_imported
         marker["cloud_imported_at"] = server_imported
         marker["report_date"] = report_date
-        marker["view_path"] = "/channel/report/"
+        marker["pack_id"] = pack_id
+        marker["view_path"] = f"/channel/report/p/{pack_id}/"
         marker["product"] = marker.get("product") or "productanalyzer_full_pack"
         marker["pack_kind"] = marker.get("pack_kind") or "selection_report_full"
         with open(marker_path, "w", encoding="utf-8") as f:
@@ -1113,7 +1116,7 @@ def _ingest_cycle_report_zip(zip_path: str) -> dict[str, Any]:
             shutil.copy2(zip_path, fallback_zip)
 
         cr_root = _cycle_report_root()
-        dest_live = os.path.join(cr_root, report_date)
+        dest_live = os.path.join(cr_root, pack_id)
         os.makedirs(cr_root, exist_ok=True)
         if os.path.isdir(dest_live):
             shutil.rmtree(dest_live)
@@ -1151,19 +1154,23 @@ def _ingest_cycle_report_zip(zip_path: str) -> dict[str, Any]:
             meta={
                 "report_kind": "cycle_report_full_pack",
                 "private": True,
-                "view_path": "/channel/report/",
+                "view_path": f"/channel/report/p/{pack_id}/",
                 "product": "productanalyzer_full_pack",
                 **marker,
             },
         )
-        download_url = f"/channel/report/{dl_name}" if os.path.isfile(
-            os.path.join(dest_live, dl_name)
-        ) else "/channel/report/cycle_report_cloud.zip"
+        download_url = (
+            f"/channel/report/p/{pack_id}/{dl_name}"
+            if os.path.isfile(os.path.join(dest_live, dl_name))
+            else f"/channel/report/p/{pack_id}/cycle_report_cloud.zip"
+        )
         return {
             "ok": True,
             "report_date": report_date,
+            "pack_id": pack_id,
             "imported_at": server_imported,
-            "view_url": "/channel/report/",
+            "view_url": f"/channel/report/p/{pack_id}/",
+            "list_url": "/channel/report/",
             "hub_url": "/channel/hub/",
             "download_url": download_url,
             "live_dir": dest_live,
@@ -1413,72 +1420,214 @@ def channel_vertical_landing(request: Request, path: str = ""):
     return RedirectResponse(url="/channel/board/vertical_niche.html", status_code=302)
 
 
-def _latest_member_custom_report() -> tuple[str, str] | None:
-    """最新已上传的选品报告 zip（member_custom_zip）。返回 (report_date, archive_type)。"""
-    from cloud_deploy.cloud_api import database as db
-    from cloud_deploy.reporting.constants import ARCHIVE_CUSTOM
-
-    db.init_db()
-    rows = db.list_archives(archive_type=ARCHIVE_CUSTOM) or []
-    if not rows:
-        return None
-    row = rows[0] if isinstance(rows[0], dict) else {}
-    date = str(row.get("report_date") or "")[:10]
-    if not date:
-        return None
-    return date, ARCHIVE_CUSTOM
+def _cycle_pack_id(marker: dict[str, Any] | None = None) -> str:
+    """周期包目录名：优先 source_name（周期13075），否则 report_date。"""
+    marker = marker or {}
+    name = str(marker.get("source_name") or marker.get("title") or "").strip()
+    date = str(marker.get("report_date") or "")[:10]
+    raw = name or date or "cycle"
+    slug = re.sub(r"[^\w\u4e00-\u9fff\-]+", "_", raw, flags=re.UNICODE).strip("._")
+    slug = slug[:80] or "cycle"
+    if slug.lower() in {"latest", "p", "api", "list"}:
+        slug = f"pack_{slug}"
+    return slug
 
 
-def _resolve_cycle_report_root() -> tuple[str, str]:
-    """优先：member_custom_zip 解压缓存（真·选品报告）；否则 cycle_report/latest 落地页。"""
-    # 1) 选品报告整包（上传 zip → 服务器解压打开）
-    try:
-        hit = _latest_member_custom_report()
-        if hit:
-            report_date, archive_type = hit
-            from cloud_deploy.cloud_api.member_report_preview import ensure_member_report_dir
-
-            root = ensure_member_report_dir(report_date, archive_type)
-            if os.path.isfile(os.path.join(root, "data.js")) and (
-                os.path.isfile(os.path.join(root, "index.html"))
-                or os.path.isfile(os.path.join(root, "index_with_gr.html"))
-                or os.path.isfile(os.path.join(root, "index_vue.html"))
-            ):
-                return root, f"member_custom_zip:{report_date}"
-    except Exception:
-        pass
-    # 2) 兼容旧落地 / 轻包
-    root = os.path.join(_cycle_report_root(), "latest")
-    return root, "cycle_report_latest"
-
-
-@router.get("/channel/report/{path:path}")
-@router.get("/channel/report")
-@router.get("/channel/report/")
-def channel_cycle_report_files(request: Request, path: str = ""):
-    """④ 周期包 = 选品报告系统：读已上传 member_custom_zip，服务器解压后直接打开。
-
-    与 /member/preview 同套解压逻辑；鉴权用作战台 cookie（无需再登会员 token）。
-    """
-    if not _cookie_ok(request):
-        return RedirectResponse(url="/channel/", status_code=302)
-    if request.url.path == "/channel/report" and not (path or "").strip():
-        return RedirectResponse(url="/channel/report/", status_code=302)
-
-    root, source = _resolve_cycle_report_root()
+def _cycle_pack_is_openable(root: str) -> bool:
     if not os.path.isdir(root):
-        return HTMLResponse(
-            "<h3>周期选品报告尚未上传</h3>"
-            "<p>请本机运行 <code>python tools/publish_cycle_report_cloud.py</code>："
-            "打选品报告 zip → 上传 → 服务器解压，本页即可打开整包（含 data.js）。</p>"
-            "<p><a href='/channel/hub/'>返回入口</a> · "
-            "<a href='/member#datapacks'>会员数据包库</a></p>",
-            status_code=404,
-        )
+        return False
+    if not os.path.isfile(os.path.join(root, "data.js")):
+        return False
+    return any(
+        os.path.isfile(os.path.join(root, name))
+        for name in ("index.html", "index_with_gr.html", "index_vue.html")
+    )
 
-    rel = (path or "").strip().lstrip("/")
+
+def _read_cycle_pack_marker(root: str) -> dict[str, Any]:
+    for name in ("cycle_report_full_cloud.json", "cycle_report_cloud.json"):
+        path = os.path.join(root, name)
+        if not os.path.isfile(path):
+            continue
+        try:
+            with open(path, encoding="utf-8") as f:
+                obj = json.load(f) or {}
+            if isinstance(obj, dict):
+                return obj
+        except Exception:
+            continue
+    return {}
+
+
+def _list_cycle_report_packs() -> list[dict[str, Any]]:
+    """扫描已上传周期选品报告（cycle_report/*，不含 latest）。"""
+    cr_root = _cycle_report_root()
+    if not os.path.isdir(cr_root):
+        return []
+    items: list[dict[str, Any]] = []
+    for name in os.listdir(cr_root):
+        if name in {"latest", "p", "api"} or name.startswith("."):
+            continue
+        root = os.path.join(cr_root, name)
+        if not _cycle_pack_is_openable(root):
+            continue
+        marker = _read_cycle_pack_marker(root)
+        pack_id = str(marker.get("pack_id") or name)
+        title = (
+            str(marker.get("title") or marker.get("filter_label") or marker.get("source_name") or pack_id)
+            .strip()
+        )
+        count = int(marker.get("full_count") or marker.get("cloud_count") or 0)
+        if count <= 0:
+            # 轻量读 data.js 头
+            try:
+                with open(os.path.join(root, "data.js"), encoding="utf-8") as f:
+                    head = f.read(65536)
+                m = re.search(r'"count"\s*:\s*(\d+)', head)
+                if m:
+                    count = int(m.group(1))
+            except Exception:
+                pass
+        mtime = 0.0
+        try:
+            mtime = os.path.getmtime(os.path.join(root, "data.js"))
+        except OSError:
+            try:
+                mtime = os.path.getmtime(root)
+            except OSError:
+                mtime = 0.0
+        items.append(
+            {
+                "pack_id": pack_id,
+                "dir_name": name,
+                "title": title,
+                "source_name": str(marker.get("source_name") or ""),
+                "report_date": str(marker.get("report_date") or "")[:10],
+                "full_count": count,
+                "imported_at": str(marker.get("imported_at") or marker.get("cloud_imported_at") or ""),
+                "view_url": f"/channel/report/p/{pack_id}/",
+                "mtime": mtime,
+            }
+        )
+    items.sort(key=lambda x: (x.get("mtime") or 0), reverse=True)
+    return items
+
+
+def _resolve_cycle_pack_root(pack_id: str) -> tuple[str, str]:
+    """按 pack_id 解析报告目录。兼容旧目录名=日期。"""
+    pack_id = (pack_id or "").strip().strip("/")
+    if not pack_id or ".." in pack_id or "/" in pack_id or "\\" in pack_id:
+        raise HTTPException(status_code=400, detail="无效 pack_id")
+    cr_root = _cycle_report_root()
+    for cand in (pack_id,):
+        root = os.path.join(cr_root, cand)
+        if _cycle_pack_is_openable(root):
+            return root, f"cycle_report:{cand}"
+    # marker.pack_id 与目录名不一致时扫一遍
+    if os.path.isdir(cr_root):
+        for name in os.listdir(cr_root):
+            if name in {"latest", "p", "api"}:
+                continue
+            root = os.path.join(cr_root, name)
+            if not _cycle_pack_is_openable(root):
+                continue
+            marker = _read_cycle_pack_marker(root)
+            if str(marker.get("pack_id") or "") == pack_id or name == pack_id:
+                return root, f"cycle_report:{name}"
+    raise HTTPException(status_code=404, detail=f"周期包不存在: {pack_id}")
+
+
+def _cycle_report_catalog_html(*, embed: bool = False) -> str:
+    items = _list_cycle_report_packs()
+    rows = []
+    for it in items:
+        n = int(it.get("full_count") or 0)
+        count_s = f"{n:,}" if n else "—"
+        date_s = it.get("report_date") or "—"
+        imported = (it.get("imported_at") or "")[:19].replace("T", " ")
+        open_url = it["view_url"] + ("?embed=1" if embed else "")
+        rows.append(
+            "<article class='card'>"
+            f"<div class='tag'>周期选品报告</div>"
+            f"<h2>{_html_escape(it.get('title') or it['pack_id'])}</h2>"
+            f"<div class='meta'>日期 <b>{_html_escape(date_s)}</b> · 入选 <b>{count_s}</b>"
+            f"{(' · 入库 ' + _html_escape(imported)) if imported else ''}</div>"
+            f"<a class='btn' href='{_html_escape(open_url)}'>打开报告</a>"
+            "</article>"
+        )
+    body_cards = (
+        "".join(rows)
+        if rows
+        else (
+            "<div class='empty'><h2>还没有周期包</h2>"
+            "<p>本机运行 <code>python tools/publish_cycle_report_cloud.py</code> "
+            "上传选品报告 zip 后，会出现在这里。</p></div>"
+        )
+    )
+    embed_cls = " hub-embed" if embed else ""
+    return f"""<!DOCTYPE html>
+<html lang="zh-CN" class="{embed_cls.strip()}">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>周期包列表</title>
+<style>
+:root{{--bg:#eef3f8;--card:#fff;--text:#101828;--muted:#3d4f63;--line:#c5d0dc;--accent:#14708f;--accent-soft:#e2f3f8;--accent-deep:#0a4f66}}
+*{{box-sizing:border-box}}
+body{{margin:0;font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--text);background:linear-gradient(180deg,#f7fafc,#eef3f8);min-height:100vh}}
+.wrap{{max-width:920px;margin:0 auto;padding:28px 20px 48px}}
+.hub-embed .wrap{{padding:12px 14px 28px}}
+.eyebrow{{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin:0 0 6px}}
+h1{{margin:0 0 8px;font-size:1.45rem;letter-spacing:-.02em}}
+.hub-embed h1{{font-size:1.15rem}}
+.sub{{margin:0 0 18px;color:var(--muted);font-size:13px;line-height:1.5}}
+.grid{{display:grid;gap:12px}}
+.card{{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;box-shadow:0 1px 2px rgba(16,24,40,.04)}}
+.tag{{display:inline-block;font-size:11px;font-weight:700;color:var(--accent-deep);background:var(--accent-soft);border:1px solid rgba(20,112,143,.22);border-radius:999px;padding:3px 10px;margin-bottom:8px}}
+.card h2{{margin:0 0 8px;font-size:1.05rem}}
+.meta{{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.45}}
+.meta b{{color:var(--text);font-variant-numeric:tabular-nums}}
+.btn{{display:inline-block;padding:9px 14px;border-radius:10px;background:var(--accent);color:#fff;text-decoration:none;font-weight:700;font-size:13px}}
+.btn:hover{{background:var(--accent-deep)}}
+.empty{{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:28px 20px;text-align:center}}
+.empty h2{{margin:0 0 8px;font-size:1.05rem}}
+.empty p{{margin:0;color:var(--muted);font-size:13px;line-height:1.55}}
+code{{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:#f0f5f8;padding:1px 6px;border-radius:6px}}
+.foot{{margin-top:18px;font-size:12px;color:var(--muted)}}
+.foot a{{color:var(--accent);font-weight:650;text-decoration:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">选品作战台 · ④</div>
+  <h1>周期包列表</h1>
+  <p class="sub">选择一份已上传的选品报告整包，服务器已解压，点开即可查看。</p>
+  <div class="grid">{body_cards}</div>
+  <div class="foot"><a href="/channel/hub/">返回四看板</a> · 共 {len(items)} 份</div>
+</div>
+</body>
+</html>"""
+
+
+def _html_escape(s: str) -> str:
+    return (
+        str(s or "")
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
+
+
+def _serve_cycle_pack_file(
+    request: Request,
+    *,
+    root: str,
+    source: str,
+    rel: str,
+) -> FileResponse | HTMLResponse:
+    rel = (rel or "").strip().lstrip("/")
     if not rel or rel.endswith("/"):
-        # 选品报告入口优先顺序（与 member_report_preview 一致）
         for name in ("index.html", "index_with_gr.html", "index_vue.html"):
             if os.path.isfile(os.path.join(root, name)):
                 rel = name
@@ -1486,13 +1635,11 @@ def channel_cycle_report_files(request: Request, path: str = ""):
         else:
             rel = "index.html"
 
-    # 安全拼接（禁止 ..）
     try:
         target = _safe_file(root, rel)
     except Exception:
         target = ""
     if not target or not os.path.isfile(target):
-        # 兼容旧包入口名
         alt_map = {
             "index.html": ("index_with_gr.html", "index_vue.html"),
             "_view_table.html": ("index_with_gr.html",),
@@ -1534,3 +1681,55 @@ def channel_cycle_report_files(request: Request, path: str = ""):
         except Exception:
             pass
     return FileResponse(target, media_type=media, headers=headers)
+
+
+@router.get("/channel/report/{path:path}")
+@router.get("/channel/report")
+@router.get("/channel/report/")
+def channel_cycle_report_files(request: Request, path: str = ""):
+    """④ 周期包：先列表自选；/p/{pack_id}/ 打开对应选品报告整包。"""
+    if not _cookie_ok(request):
+        return RedirectResponse(url="/channel/", status_code=302)
+    if request.url.path == "/channel/report" and not (path or "").strip():
+        return RedirectResponse(url="/channel/report/", status_code=302)
+
+    rel = (path or "").strip().lstrip("/")
+    embed = (request.query_params.get("embed") or "") == "1"
+
+    # JSON 列表
+    if rel in {"api/list", "api/list.json", "list.json"}:
+        return JSONResponse(
+            {"ok": True, "items": _list_cycle_report_packs()},
+            headers=_NO_STORE,
+        )
+
+    # 目录页
+    if not rel or rel in {"list", "index", "index.html"}:
+        return HTMLResponse(
+            _cycle_report_catalog_html(embed=embed),
+            headers={**_NO_STORE, "X-Channel-Board": "1", "X-Cycle-Report-Source": "catalog"},
+        )
+
+    # /p/{pack_id}/...
+    if rel == "p" or rel.startswith("p/"):
+        rest = rel[1:].lstrip("/") if rel.startswith("p") else ""
+        if not rest:
+            return RedirectResponse(url="/channel/report/", status_code=302)
+        pack_id, _, file_rel = rest.partition("/")
+        root, source = _resolve_cycle_pack_root(pack_id)
+        return _serve_cycle_pack_file(request, root=root, source=source, rel=file_rel)
+
+    # 兼容：旧直链 /channel/report/data.js → 最新包
+    latest = os.path.join(_cycle_report_root(), "latest")
+    if _cycle_pack_is_openable(latest):
+        return _serve_cycle_pack_file(
+            request, root=latest, source="cycle_report_latest", rel=rel
+        )
+
+    return HTMLResponse(
+        "<h3>周期选品报告尚未上传</h3>"
+        "<p>请本机运行 <code>python tools/publish_cycle_report_cloud.py</code> 上传后，"
+        "本页会列出可选周期包。</p>"
+        "<p><a href='/channel/hub/'>返回入口</a></p>",
+        status_code=404,
+    )
