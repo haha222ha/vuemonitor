@@ -28,6 +28,8 @@ from cloud_deploy.cloud_api.auth import (
 router = APIRouter(tags=["channel-board"])
 
 _NO_STORE = {"Cache-Control": "no-store, no-cache, must-revalidate", "Pragma": "no-cache"}
+# data.js 动辄上百 MB；禁止再对静态资源套 no-store，否则每次点开都整包重下
+_STATIC_CACHE = {"Cache-Control": "private, max-age=86400"}
 
 # Cloudflare Free/Pro 单请求约 100MB；分片默认 16MB，留足余量
 _DEFAULT_CHUNK_SIZE = 16 * 1024 * 1024
@@ -1881,6 +1883,31 @@ code{{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:#f0f
   <div class="grid">{body_cards}</div>
   <div class="foot"><a href="/channel/hub/">返回四看板</a> · 共 {len(items)} 份</div>
 </div>
+<script>
+(function(){{
+  // 鼠标悬停/触摸「打开报告」时预热 data.js（约百兆）；配合可缓存头，点开更快
+  function warm(href){{
+    try{{
+      var u=new URL(href, location.href);
+      u.search="";
+      if(!/\\/p\\//.test(u.pathname)) return;
+      u.pathname=u.pathname.replace(/\\/?$/,"/")+"data.js";
+      if(window.__cycleWarm===u.href) return;
+      window.__cycleWarm=u.href;
+      fetch(u.href, {{credentials:"same-origin", cache:"force-cache", priority:"low"}}).catch(function(){{}});
+    }}catch(_){{}}
+  }}
+  document.querySelectorAll("a.btn").forEach(function(a){{
+    a.addEventListener("mouseenter", function(){{ warm(a.href); }}, {{once:true}});
+    a.addEventListener("touchstart", function(){{ warm(a.href); }}, {{once:true, passive:true}});
+  }});
+  // 只有一份时：列表出现后稍候自动预热，接近以前「进④就加载」的体感
+  var only=document.querySelectorAll("a.btn");
+  if(only.length===1){{
+    setTimeout(function(){{ warm(only[0].href); }}, 400);
+  }}
+}})();
+</script>
 </body>
 </html>"""
 
@@ -1936,11 +1963,32 @@ def _serve_cycle_pack_file(
     media = _media_type(rel)
     if low.endswith(".zip"):
         media = "application/zip"
+    is_html = low.endswith((".html", ".htm"))
     headers = {
-        **_NO_STORE,
         "X-Channel-Board": "1",
         "X-Cycle-Report-Source": _header_ascii(source, limit=80),
     }
+    if is_html:
+        headers.update(_NO_STORE)
+    else:
+        # data.js / 静态资源：按文件 mtime 做 ETag，浏览器可复用，避免每次点开重下百兆
+        headers.update(_STATIC_CACHE)
+        try:
+            st = os.stat(target)
+            headers["ETag"] = f'W/"{int(st.st_mtime)}-{st.st_size}"'
+            headers["Last-Modified"] = (
+                __import__("email.utils", fromlist=["formatdate"]).formatdate(
+                    st.st_mtime, usegmt=True
+                )
+            )
+        except OSError:
+            pass
+        # 条件请求：未变更直接 304，秒开
+        inm = (request.headers.get("if-none-match") or "").strip()
+        if inm and headers.get("ETag") and inm == headers["ETag"]:
+            from fastapi.responses import Response
+
+            return Response(status_code=304, headers=headers)
     if low.endswith(".zip"):
         from urllib.parse import quote as _q
 
@@ -1951,7 +1999,7 @@ def _serve_cycle_pack_file(
         )
 
     embed = (request.query_params.get("embed") or "") == "1"
-    if embed and low.endswith((".html", ".htm")):
+    if embed and is_html:
         try:
             with open(target, "rb") as f:
                 raw = f.read()
