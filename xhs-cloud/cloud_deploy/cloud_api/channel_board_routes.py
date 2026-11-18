@@ -268,10 +268,10 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
 </div>
 <script>
 (function(){
-  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1",vertical:"/channel/board/vertical_niche.html?embed=1",cycle:"/channel/report/?embed=1"};
+  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1&ledger=1",vertical:"/channel/board/vertical_niche.html?embed=1",cycle:"/channel/report/?embed=1"};
   var TABS=[
     {id:"workbench",label:"1 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
-    {id:"ops",label:"2 比货",hint:"展示包 facets（类 data.js）· 底账分片按需"},
+    {id:"ops",label:"2 比货",hint:"全量静态分片 · 非瘦包 · 约 34 万底账"},
     {id:"vertical",label:"3 垂类",hint:"原独立垂类页 · 任意搜词"},
     {id:"cycle",label:"4 周期包",hint:"周期包列表 · 点开选品报告"}
   ];
