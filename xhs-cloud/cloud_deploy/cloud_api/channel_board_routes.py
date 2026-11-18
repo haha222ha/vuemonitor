@@ -42,11 +42,13 @@ class BoardInventoryUpsertBody(BaseModel):
 
 
 class UploadSessionInitBody(BaseModel):
-    kind: str = "channel_board"  # channel_board | channel_workbench
+    # channel_board | channel_workbench | cycle_report | member_custom_zip
+    kind: str = "channel_board"
     filename: str = "channel_board.zip"
     size: int = Field(..., ge=1)
     sha256: str = ""
-    chunk_size: int = Field(default=_DEFAULT_CHUNK_SIZE, ge=1024 * 1024, le=_MAX_CHUNK_SIZE)
+    # 线上 nginx 默认约 12MB；未拉高 client_max_body_size 前分片用 8MB
+    chunk_size: int = Field(default=8 * 1024 * 1024, ge=1024 * 1024, le=_MAX_CHUNK_SIZE)
 
 
 def _password() -> str:
@@ -815,8 +817,16 @@ async def sync_upload_session_init(
 ):
     """开分片续传会话（绕过 Cloudflare 单请求 100MB 上限）。"""
     kind = (body.kind or "channel_board").strip()
-    if kind not in ("channel_board", "channel_workbench"):
-        raise HTTPException(status_code=400, detail="kind 仅支持 channel_board|channel_workbench")
+    if kind not in (
+        "channel_board",
+        "channel_workbench",
+        "cycle_report",
+        "member_custom_zip",
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="kind 仅支持 channel_board|channel_workbench|cycle_report|member_custom_zip",
+        )
     filename = os.path.basename(body.filename or f"{kind}.zip")
     if not filename.lower().endswith(".zip"):
         raise HTTPException(status_code=400, detail="仅支持 zip")
@@ -929,18 +939,35 @@ async def sync_upload_session_commit(
     upload_id: str,
     _: None = Depends(verify_sync_key),
 ):
-    """拼装分片并按 kind 落盘（channel_board → /channel/）。"""
+    """拼装分片并按 kind 落盘。
+
+    - channel_board → /channel/board/
+    - cycle_report → /channel/report/（选品报告整包解压打开）
+    - member_custom_zip → report_archives + 会员预览解压缓存
+    """
     meta = _read_session_meta(upload_id)
     kind = str(meta.get("kind") or "channel_board")
     zip_path = _assemble_session_zip(upload_id, meta)
-    if kind != "channel_board":
+    if kind == "channel_board":
+        result = _ingest_channel_board_zip(zip_path)
+    elif kind == "cycle_report":
+        result = _ingest_cycle_report_zip(zip_path)
+    elif kind == "member_custom_zip":
+        from cloud_deploy.cloud_api.report_upload_service import ingest_report_zip_file
+
+        result = ingest_report_zip_file(zip_path, force=True)
+        if isinstance(result, dict):
+            result["ok"] = True
+            result["view_url"] = "/channel/report/"
+            result["archive_type"] = result.get("archive_type") or "member_custom_zip"
+    else:
         raise HTTPException(
             status_code=400,
-            detail=f"kind={kind} 暂请用对应单次 upload；channel_board 已支持分片 commit",
+            detail=f"kind={kind} 暂请用对应单次 upload",
         )
-    result = _ingest_channel_board_zip(zip_path)
     result["upload_id"] = upload_id
     result["via"] = "upload-session"
+    result["kind"] = kind
     # 成功才清会话；失败保留分片便于续传/重 commit
     shutil.rmtree(_session_dir(upload_id), ignore_errors=True)
     return result
@@ -1010,30 +1037,19 @@ async def sync_channel_workbench_upload(
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
 
-@router.post("/api/v1/sync/channel-cycle-report-upload")
-async def sync_channel_cycle_report_upload(
-    file: UploadFile = File(...),
-    _: None = Depends(verify_sync_key),
-):
-    """周期全量数据包落地页 → /channel/report/（下载 zip；对接 ProductAnalyzer）。
-
-    zip 根下 cycle_report/：index.html + data.js + cycle_report_full_cloud.json
-    （或兼容 cycle_report_cloud.json）+ 可选全量 *.zip。
-    """
+def _ingest_cycle_report_zip(zip_path: str) -> dict[str, Any]:
+    """选品报告整包 → /channel/report/（解压打开；同套 index.html + data.js）。"""
     from cloud_deploy.cloud_api import database as db
     from cloud_deploy.cloud_api.config import get_settings
     from cloud_deploy.reporting.constants import ARCHIVE_CYCLE_REPORT
 
-    filename = os.path.basename(file.filename or "cycle_report_cloud.zip")
-    if not filename.lower().endswith(".zip"):
+    if not str(zip_path).lower().endswith(".zip"):
         raise HTTPException(status_code=400, detail="仅支持 zip")
+    if not os.path.isfile(zip_path):
+        raise HTTPException(status_code=400, detail="zip 不存在")
 
     tmp_dir = tempfile.mkdtemp(prefix="xhs-cycle-report-")
-    zip_path = os.path.join(tmp_dir, filename)
     try:
-        with open(zip_path, "wb") as out:
-            shutil.copyfileobj(file.file, out)
-
         extract_root = os.path.join(tmp_dir, "extract")
         os.makedirs(extract_root, exist_ok=True)
         with zipfile.ZipFile(zip_path, "r") as zf:
@@ -1047,17 +1063,25 @@ async def sync_channel_cycle_report_upload(
             if "index.html" in files and "data.js" in files and has_marker:
                 report_dir = root
                 break
+        # 兼容：顶层就是选品报告目录（无 marker 时补写）
+        if not report_dir:
+            for root, _dirs, files in os.walk(extract_root):
+                if "index.html" in files and "data.js" in files:
+                    report_dir = root
+                    break
         if not report_dir:
             raise HTTPException(
                 status_code=400,
-                detail="zip 内未找到全量包落地（需 index.html + data.js + cycle_report_*cloud.json）",
+                detail="zip 内未找到选品报告（需 index.html + data.js）",
             )
 
         marker_path = os.path.join(report_dir, "cycle_report_full_cloud.json")
         if not os.path.isfile(marker_path):
             marker_path = os.path.join(report_dir, "cycle_report_cloud.json")
-        with open(marker_path, encoding="utf-8") as f:
-            marker = json.load(f) or {}
+        marker: dict[str, Any] = {}
+        if os.path.isfile(marker_path):
+            with open(marker_path, encoding="utf-8") as f:
+                marker = json.load(f) or {}
         if not isinstance(marker, dict):
             marker = {}
         report_date = str(marker.get("report_date") or "")[:10]
@@ -1069,9 +1093,9 @@ async def sync_channel_cycle_report_upload(
         marker["report_date"] = report_date
         marker["view_path"] = "/channel/report/"
         marker["product"] = marker.get("product") or "productanalyzer_full_pack"
+        marker["pack_kind"] = marker.get("pack_kind") or "selection_report_full"
         with open(marker_path, "w", encoding="utf-8") as f:
             json.dump(marker, f, ensure_ascii=False, indent=2)
-        # 双写兼容
         compat = os.path.join(report_dir, "cycle_report_cloud.json")
         if os.path.abspath(compat) != os.path.abspath(marker_path):
             with open(compat, "w", encoding="utf-8") as f:
@@ -1097,7 +1121,6 @@ async def sync_channel_cycle_report_upload(
 
         archive_dir = get_settings().xhs_report_archive_dir
         os.makedirs(archive_dir, exist_ok=True)
-        # hub 私有归档（落地 zip）；真正 PA 用的 member_custom 走 report-upload
         dest_zip = os.path.join(
             archive_dir, f"cycle_report_hub_{report_date.replace('-', '')}.zip"
         )
@@ -1144,6 +1167,26 @@ async def sync_channel_cycle_report_upload(
             "source_name": marker.get("source_name") or "",
             "product": "productanalyzer_full_pack",
         }
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+@router.post("/api/v1/sync/channel-cycle-report-upload")
+async def sync_channel_cycle_report_upload(
+    file: UploadFile = File(...),
+    _: None = Depends(verify_sync_key),
+):
+    """周期/选品报告整包 → /channel/report/（小包直传；大包请走 upload-session kind=cycle_report）。"""
+    filename = os.path.basename(file.filename or "cycle_report_cloud.zip")
+    if not filename.lower().endswith(".zip"):
+        raise HTTPException(status_code=400, detail="仅支持 zip")
+
+    tmp_dir = tempfile.mkdtemp(prefix="xhs-cycle-report-")
+    zip_path = os.path.join(tmp_dir, filename)
+    try:
+        with open(zip_path, "wb") as out:
+            shutil.copyfileobj(file.file, out)
+        return _ingest_cycle_report_zip(zip_path)
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
