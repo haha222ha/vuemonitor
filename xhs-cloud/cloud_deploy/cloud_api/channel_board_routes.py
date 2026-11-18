@@ -1427,6 +1427,114 @@ def channel_vertical_niche_api(
     return JSONResponse(payload, status_code=code, headers={**_NO_STORE, "X-Channel-Board": "1"})
 
 
+def _cycle_index_prefix(gid: str) -> str:
+    g = str(gid or "").strip()
+    if len(g) >= 2:
+        return g[:2].lower()
+    return g.lower() or "_"
+
+
+def _load_cycle_hits_from_board(goods_id: str) -> list[dict[str, Any]]:
+    """只读看板静态 goods_cycle_index；禁止连 sold_history。"""
+    gid = str(goods_id or "").strip()
+    if not gid:
+        return []
+    root = os.path.join(_boards_root(), "latest", "goods_cycle_index", "by_prefix")
+    path = os.path.join(root, f"{_cycle_index_prefix(gid)}.json")
+    if not os.path.isfile(path):
+        return []
+    try:
+        with open(path, encoding="utf-8") as f:
+            obj = json.load(f)
+    except Exception:
+        return []
+    hits = obj.get(gid) if isinstance(obj, dict) else None
+    if not isinstance(hits, list):
+        return []
+    return [h for h in hits if isinstance(h, dict)]
+
+
+def _board_row_from_pg(goods_id: str) -> dict[str, Any] | None:
+    gid = str(goods_id or "").strip()
+    if not gid:
+        return None
+    if not os.environ.get("XHS_DATABASE_URL", "").startswith("postgres"):
+        return None
+    try:
+        from cloud_deploy.cloud_api.database_pg import _conn, init_db
+
+        init_db()
+        conn = _conn()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT goods_id, COALESCE(title,''), COALESCE(scene_l2,''), COALESCE(scene_l3,''),
+                           COALESCE(abc_class,''), COALESCE(sum_delta_7d,0), COALESCE(sum_delta_30d,0),
+                           COALESCE(sum_delta_all,0), COALESCE(sold_num,0), COALESCE(deal_price,0)
+                    FROM board_inventory_goods
+                    WHERE goods_id=%s
+                    LIMIT 1
+                    """,
+                    (gid,),
+                )
+                row = cur.fetchone()
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
+        if not row:
+            return None
+        return {
+            "goods_id": str(row[0]),
+            "title": str(row[1] or ""),
+            "scene_l2": str(row[2] or ""),
+            "scene_l3": str(row[3] or ""),
+            "abc_class": str(row[4] or ""),
+            "sum_delta_7d": float(row[5] or 0),
+            "sum_delta_30d": float(row[6] or 0),
+            "sum_delta_all": float(row[7] or 0),
+            "sold": float(row[8] or 0),
+            "price": float(row[9] or 0),
+        }
+    except Exception:
+        return None
+
+
+@router.get("/channel/api/goods-dossier")
+def channel_goods_dossier_api(
+    request: Request,
+    id: str = "",
+    goods_id: str = "",
+    days: int = 90,
+):
+    """切片㊿：云端商品档案（周期命中索引 + 可选底账行；无 sold_history 长轴）。"""
+    if not _cookie_ok(request):
+        raise HTTPException(status_code=401, detail="未登录")
+    gid = str(id or goods_id or "").strip()
+    if not gid:
+        return JSONResponse(
+            {"ok": False, "error": "缺少 goods_id", "goods_id": ""},
+            status_code=400,
+            headers={**_NO_STORE, "X-Channel-Board": "1"},
+        )
+    hits = _load_cycle_hits_from_board(gid)
+    board = _board_row_from_pg(gid)
+    payload = {
+        "ok": True,
+        "goods_id": gid,
+        "board": board,
+        "spark": {},
+        "cycle_hits": hits,
+        "cycle_hits_n": len(hits),
+        "served_from": "cycle_index+board_pg",
+        "note": "云端无 sold_history；日序回落包内 GROWTH_CURVES / axis",
+        "days": max(14, min(int(days or 90), 120)),
+    }
+    return JSONResponse(payload, headers={**_NO_STORE, "X-Channel-Board": "1"})
+
+
 @router.get("/channel/vertical")
 @router.get("/channel/vertical/")
 @router.get("/channel/vertical/{path:path}")
