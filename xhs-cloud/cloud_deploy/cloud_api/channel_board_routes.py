@@ -948,23 +948,28 @@ async def sync_upload_session_commit(
     meta = _read_session_meta(upload_id)
     kind = str(meta.get("kind") or "channel_board")
     zip_path = _assemble_session_zip(upload_id, meta)
-    if kind == "channel_board":
-        result = _ingest_channel_board_zip(zip_path)
-    elif kind == "cycle_report":
-        result = _ingest_cycle_report_zip(zip_path)
-    elif kind == "member_custom_zip":
-        from cloud_deploy.cloud_api.report_upload_service import ingest_report_zip_file
+    try:
+        if kind == "channel_board":
+            result = _ingest_channel_board_zip(zip_path)
+        elif kind == "cycle_report":
+            result = _ingest_cycle_report_zip(zip_path)
+        elif kind == "member_custom_zip":
+            from cloud_deploy.cloud_api.report_upload_service import ingest_report_zip_file
 
-        result = ingest_report_zip_file(zip_path, force=True)
-        if isinstance(result, dict):
-            result["ok"] = True
-            result["view_url"] = "/channel/report/"
-            result["archive_type"] = result.get("archive_type") or "member_custom_zip"
-    else:
-        raise HTTPException(
-            status_code=400,
-            detail=f"kind={kind} 暂请用对应单次 upload",
-        )
+            result = ingest_report_zip_file(zip_path, force=True)
+            if isinstance(result, dict):
+                result["ok"] = True
+                result["view_url"] = "/channel/report/"
+                result["archive_type"] = result.get("archive_type") or "member_custom_zip"
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=f"kind={kind} 暂请用对应单次 upload",
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"commit ingest 失败 kind={kind}: {e}") from e
     result["upload_id"] = upload_id
     result["via"] = "upload-session"
     result["kind"] = kind
