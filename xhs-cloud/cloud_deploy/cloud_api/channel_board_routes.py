@@ -1136,6 +1136,9 @@ def _ingest_cycle_report_zip(zip_path: str) -> dict[str, Any]:
             shutil.rmtree(latest)
         shutil.copytree(dest_live, latest)
 
+        # 同逻辑包名的旧日期目录 / 续传分片目录一并清掉，只留这一份
+        _prune_cycle_pack_siblings(pack_id, keep_dirs={pack_id, "latest"})
+
         archive_dir = get_settings().xhs_report_archive_dir
         os.makedirs(archive_dir, exist_ok=True)
         dest_zip = os.path.join(
@@ -1429,17 +1432,49 @@ def channel_vertical_landing(request: Request, path: str = ""):
     return RedirectResponse(url="/channel/board/vertical_niche.html", status_code=302)
 
 
-def _cycle_pack_id(marker: dict[str, Any] | None = None) -> str:
-    """周期包目录名：优先 source_name（周期13075），否则 report_date。"""
-    marker = marker or {}
-    name = str(marker.get("source_name") or marker.get("title") or "").strip()
-    date = str(marker.get("report_date") or "")[:10]
-    raw = name or date or "cycle"
-    slug = re.sub(r"[^\w\u4e00-\u9fff\-]+", "_", raw, flags=re.UNICODE).strip("._")
-    slug = slug[:80] or "cycle"
+_CYCLE_DATE_DIR_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+_CYCLE_CORE_NAME_RE = re.compile(r"(周期\d+)", re.UNICODE)
+_CYCLE_PART_SUFFIX_RE = re.compile(
+    r"(_部分|_partial|_part|_chunk|_续传|_分片)\d*$",
+    re.IGNORECASE | re.UNICODE,
+)
+
+
+def _cycle_slug(raw: str) -> str:
+    slug = re.sub(r"[^\w\u4e00-\u9fff\-]+", "_", (raw or "").strip(), flags=re.UNICODE)
+    slug = slug.strip("._")[:80] or "cycle"
     if slug.lower() in {"latest", "p", "api", "list"}:
         slug = f"pack_{slug}"
     return slug
+
+
+def _cycle_canonical_source_name(raw: str) -> str:
+    """把续传/分片文件名收成同一逻辑包：周期13075_部分2341 → 周期13075。"""
+    s = str(raw or "").strip()
+    if not s:
+        return ""
+    # 标题里常带「周期全量 · 周期13075」
+    m = _CYCLE_CORE_NAME_RE.search(s)
+    if m:
+        return m.group(1)
+    s = _CYCLE_PART_SUFFIX_RE.sub("", s).strip("._")
+    return s or str(raw or "").strip()
+
+
+def _cycle_pack_id(marker: dict[str, Any] | None = None, *, dir_name: str = "") -> str:
+    """周期包目录名：按源文件名合并（同周期=同一包），不用上传日期拆多份。"""
+    marker = marker or {}
+    src = str(marker.get("source_name") or "").strip()
+    title = str(marker.get("title") or marker.get("filter_label") or "").strip()
+    raw = _cycle_canonical_source_name(src) or _cycle_canonical_source_name(title)
+    if not raw:
+        # 旧目录名若是日期，不要当 pack_id；交给调用方用 marker/date 兜底
+        if dir_name and not _CYCLE_DATE_DIR_RE.match(dir_name) and dir_name != "latest":
+            raw = _cycle_canonical_source_name(dir_name) or dir_name
+    if not raw:
+        date = str(marker.get("report_date") or "")[:10]
+        raw = date or dir_name or "cycle"
+    return _cycle_slug(raw)
 
 
 def _cycle_pack_is_openable(root: str) -> bool:
@@ -1468,16 +1503,150 @@ def _read_cycle_pack_marker(root: str) -> dict[str, Any]:
     return {}
 
 
+def _cycle_pack_mtime(root: str) -> float:
+    try:
+        return float(os.path.getmtime(os.path.join(root, "data.js")))
+    except OSError:
+        try:
+            return float(os.path.getmtime(root))
+        except OSError:
+            return 0.0
+
+
+def _iter_cycle_pack_dirs(*, include_latest: bool = True) -> list[tuple[str, str, dict[str, Any]]]:
+    """返回 [(dir_name, root, marker), ...]。"""
+    cr_root = _cycle_report_root()
+    if not os.path.isdir(cr_root):
+        return []
+    out: list[tuple[str, str, dict[str, Any]]] = []
+    for name in os.listdir(cr_root):
+        if name in {"p", "api"} or name.startswith("."):
+            continue
+        if name == "latest" and not include_latest:
+            continue
+        root = os.path.join(cr_root, name)
+        if not _cycle_pack_is_openable(root):
+            continue
+        out.append((name, root, _read_cycle_pack_marker(root)))
+    return out
+
+
+def _prune_cycle_pack_siblings(pack_id: str, *, keep_dirs: set[str] | None = None) -> None:
+    """删除同一逻辑包名下的多余目录（旧按日归档 / 续传分片）。"""
+    pack_id = (pack_id or "").strip()
+    if not pack_id:
+        return
+    keep = set(keep_dirs or set()) | {pack_id, "latest", "p", "api"}
+    cr_root = _cycle_report_root()
+    if not os.path.isdir(cr_root):
+        return
+    for name, root, marker in _iter_cycle_pack_dirs(include_latest=True):
+        if name in keep:
+            continue
+        logical = _cycle_pack_id(marker, dir_name=name)
+        if logical != pack_id and name != pack_id:
+            continue
+        try:
+            shutil.rmtree(root)
+        except OSError:
+            pass
+
+
+def _consolidate_cycle_packs() -> None:
+    """把旧「按日期目录」迁到包名目录；同名只留最新，续传分片按文件名合并。"""
+    cr_root = _cycle_report_root()
+    if not os.path.isdir(cr_root):
+        return
+    groups: dict[str, list[tuple[float, str, str, dict[str, Any]]]] = {}
+    for name, root, marker in _iter_cycle_pack_dirs(include_latest=False):
+        pid = _cycle_pack_id(marker, dir_name=name)
+        groups.setdefault(pid, []).append((_cycle_pack_mtime(root), name, root, marker))
+
+    # 已是「一包一名目录」且无旁支时跳过，避免列表请求反复搬文件
+    dirty = False
+    for pack_id, rows in groups.items():
+        if len(rows) > 1 or rows[0][1] != pack_id:
+            dirty = True
+            break
+    if not dirty:
+        return
+
+    newest_overall: tuple[float, str] | None = None
+    for pack_id, rows in groups.items():
+        rows.sort(key=lambda x: x[0], reverse=True)
+        mtime, keep_name, keep_root, keep_marker = rows[0]
+        dest = os.path.join(cr_root, pack_id)
+        try:
+            keep_marker = dict(keep_marker or {})
+            keep_marker["pack_id"] = pack_id
+            if not keep_marker.get("source_name"):
+                keep_marker["source_name"] = pack_id
+            mk_path = os.path.join(keep_root, "cycle_report_full_cloud.json")
+            if not os.path.isfile(mk_path):
+                mk_path = os.path.join(keep_root, "cycle_report_cloud.json")
+            with open(mk_path, "w", encoding="utf-8") as f:
+                json.dump(keep_marker, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+        if os.path.abspath(keep_root) != os.path.abspath(dest):
+            if os.path.isdir(dest):
+                try:
+                    if _cycle_pack_mtime(dest) <= mtime:
+                        shutil.rmtree(dest)
+                    else:
+                        keep_root = dest
+                        keep_name = pack_id
+                        mtime = _cycle_pack_mtime(dest)
+                except OSError:
+                    shutil.rmtree(dest, ignore_errors=True)
+            if os.path.abspath(keep_root) != os.path.abspath(dest) and not os.path.isdir(dest):
+                try:
+                    shutil.move(keep_root, dest)
+                    keep_root = dest
+                    keep_name = pack_id
+                except OSError:
+                    try:
+                        shutil.copytree(keep_root, dest)
+                        shutil.rmtree(keep_root, ignore_errors=True)
+                        keep_root = dest
+                        keep_name = pack_id
+                    except OSError:
+                        pass
+
+        for _, name, root, _marker in rows[1:]:
+            if name in {"latest", pack_id}:
+                continue
+            if os.path.abspath(root) == os.path.abspath(keep_root):
+                continue
+            try:
+                shutil.rmtree(root)
+            except OSError:
+                pass
+
+        if _cycle_pack_is_openable(dest if os.path.isdir(dest) else keep_root):
+            use_root = dest if os.path.isdir(dest) else keep_root
+            use_mtime = _cycle_pack_mtime(use_root)
+            if newest_overall is None or use_mtime >= newest_overall[0]:
+                newest_overall = (use_mtime, use_root)
+
+    # 只在发生合并时刷新 latest（整包复制成本高，不做无谓刷新）
+    if newest_overall and dirty:
+        src_latest = newest_overall[1]
+        latest = os.path.join(cr_root, "latest")
+        try:
+            if os.path.isdir(latest):
+                shutil.rmtree(latest)
+            shutil.copytree(src_latest, latest)
+        except OSError:
+            pass
+
+
 def _cycle_pack_list_item(name: str, root: str, marker: dict[str, Any] | None = None) -> dict[str, Any]:
     marker = marker if isinstance(marker, dict) else _read_cycle_pack_marker(root)
-    if name == "latest":
-        pack_id = str(marker.get("pack_id") or _cycle_pack_id(marker) or "latest")
-    else:
-        pack_id = str(marker.get("pack_id") or name)
-    title = (
-        str(marker.get("title") or marker.get("filter_label") or marker.get("source_name") or pack_id)
-        .strip()
-    )
+    pack_id = _cycle_pack_id(marker, dir_name=name)
+    src = str(marker.get("source_name") or "").strip()
+    title = _cycle_canonical_source_name(src) or pack_id
     count = int(marker.get("full_count") or marker.get("cloud_count") or 0)
     if count <= 0:
         try:
@@ -1488,62 +1657,50 @@ def _cycle_pack_list_item(name: str, root: str, marker: dict[str, Any] | None = 
                 count = int(m.group(1))
         except Exception:
             pass
-    mtime = 0.0
-    try:
-        mtime = os.path.getmtime(os.path.join(root, "data.js"))
-    except OSError:
-        try:
-            mtime = os.path.getmtime(root)
-        except OSError:
-            mtime = 0.0
     return {
         "pack_id": pack_id,
         "dir_name": name,
         "title": title,
-        "source_name": str(marker.get("source_name") or ""),
+        "source_name": src or title,
         "report_date": str(marker.get("report_date") or "")[:10],
         "full_count": count,
         "imported_at": str(marker.get("imported_at") or marker.get("cloud_imported_at") or ""),
         "view_url": f"/channel/report/p/{pack_id}/",
-        "mtime": mtime,
+        "mtime": _cycle_pack_mtime(root),
     }
 
 
 def _list_cycle_report_packs() -> list[dict[str, Any]]:
-    """扫描已上传周期选品报告；latest 仅在无具名包时兜底进列表。"""
-    cr_root = _cycle_report_root()
-    if not os.path.isdir(cr_root):
-        return []
-    items: list[dict[str, Any]] = []
-    seen_ids: set[str] = set()
-    for name in os.listdir(cr_root):
-        if name in {"latest", "p", "api"} or name.startswith("."):
-            continue
-        root = os.path.join(cr_root, name)
-        if not _cycle_pack_is_openable(root):
-            continue
-        it = _cycle_pack_list_item(name, root)
-        items.append(it)
-        seen_ids.add(str(it.get("pack_id") or ""))
-        seen_ids.add(name)
+    """按逻辑包名去重：同周期/同文件名只展示最新一份。"""
+    try:
+        _consolidate_cycle_packs()
+    except Exception:
+        pass
 
-    latest = os.path.join(cr_root, "latest")
-    if _cycle_pack_is_openable(latest):
-        marker = _read_cycle_pack_marker(latest)
-        lid = str(marker.get("pack_id") or _cycle_pack_id(marker) or "latest")
-        # 旧包只有 latest、或 marker 指向尚未落盘的 pack_id 时，仍要能在列表里点开
-        if lid not in seen_ids and not items:
+    items_by_id: dict[str, dict[str, Any]] = {}
+    for name, root, marker in _iter_cycle_pack_dirs(include_latest=False):
+        it = _cycle_pack_list_item(name, root, marker)
+        pid = str(it.get("pack_id") or "")
+        if not pid:
+            continue
+        prev = items_by_id.get(pid)
+        if not prev or float(it.get("mtime") or 0) >= float(prev.get("mtime") or 0):
+            items_by_id[pid] = it
+
+    if not items_by_id:
+        latest = os.path.join(_cycle_report_root(), "latest")
+        if _cycle_pack_is_openable(latest):
+            marker = _read_cycle_pack_marker(latest)
             it = _cycle_pack_list_item("latest", latest, marker)
-            it["pack_id"] = lid
-            it["view_url"] = f"/channel/report/p/{lid}/"
-            items.append(it)
+            items_by_id[str(it["pack_id"])] = it
 
+    items = list(items_by_id.values())
     items.sort(key=lambda x: (x.get("mtime") or 0), reverse=True)
     return items
 
 
 def _resolve_cycle_pack_root(pack_id: str) -> tuple[str, str]:
-    """按 pack_id 解析报告目录。兼容旧目录名=日期 / 仅有 latest。"""
+    """按逻辑包名解析；兼容旧日期目录，同名多份取最新。"""
     pack_id = (pack_id or "").strip().strip("/")
     if not pack_id or ".." in pack_id or "/" in pack_id or "\\" in pack_id:
         raise HTTPException(status_code=400, detail="无效 pack_id")
@@ -1551,22 +1708,19 @@ def _resolve_cycle_pack_root(pack_id: str) -> tuple[str, str]:
     root = os.path.join(cr_root, pack_id)
     if _cycle_pack_is_openable(root):
         return root, f"cycle_report:{pack_id}"
-    # marker.pack_id 与目录名不一致时扫一遍（含 latest）
-    if os.path.isdir(cr_root):
-        for name in os.listdir(cr_root):
-            if name in {"p", "api"}:
-                continue
-            cand = os.path.join(cr_root, name)
-            if not _cycle_pack_is_openable(cand):
-                continue
-            marker = _read_cycle_pack_marker(cand)
-            mid = str(marker.get("pack_id") or "")
-            if mid == pack_id or name == pack_id:
-                return cand, f"cycle_report:{name}"
-            if name == "latest" and (
-                pack_id == "latest" or pack_id == _cycle_pack_id(marker)
-            ):
-                return cand, "cycle_report:latest"
+
+    candidates: list[tuple[float, str, str]] = []
+    for name, cand, marker in _iter_cycle_pack_dirs(include_latest=True):
+        logical = _cycle_pack_id(marker, dir_name=name)
+        mid = str(marker.get("pack_id") or "")
+        if name == pack_id or mid == pack_id or logical == pack_id:
+            candidates.append((_cycle_pack_mtime(cand), name, cand))
+        elif name == "latest" and pack_id == "latest":
+            candidates.append((_cycle_pack_mtime(cand), name, cand))
+    if candidates:
+        candidates.sort(key=lambda x: x[0], reverse=True)
+        _mt, name, cand = candidates[0]
+        return cand, f"cycle_report:{name}"
     raise HTTPException(status_code=404, detail=f"周期包不存在: {pack_id}")
 
 
@@ -1634,7 +1788,7 @@ code{{font-family:ui-monospace,Consolas,monospace;font-size:12px;background:#f0f
 <div class="wrap">
   <div class="eyebrow">选品作战台 · ④</div>
   <h1>周期包列表</h1>
-  <p class="sub">选择一份已上传的选品报告整包，服务器已解压，点开即可查看。</p>
+  <p class="sub">按周期包文件名合并：同名/续传分片只保留最新一份，点开即可查看。</p>
   <div class="grid">{body_cards}</div>
   <div class="foot"><a href="/channel/hub/">返回四看板</a> · 共 {len(items)} 份</div>
 </div>
