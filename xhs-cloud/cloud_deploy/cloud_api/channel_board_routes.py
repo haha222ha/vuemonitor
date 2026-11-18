@@ -322,9 +322,18 @@ try{
     'html.hub-embed header{padding:8px 16px!important}',
     'html.hub-embed header h1,.hub-embed .topbar h1{font-size:1.05rem!important}',
     'html.hub-embed header .sub,html.hub-embed .topbar .lead,html.hub-embed .view-tabs,html.hub-embed .hint{display:none!important}',
-    'html.hub-embed .topbar{padding:6px 12px 0!important}'
+    'html.hub-embed .topbar{padding:6px 12px 0!important}',
+    '.cycle-back-list{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(238,243,248,.96);border-bottom:1px solid #c5d0dc;font:650 12px/1.4 Segoe UI,PingFang SC,Microsoft YaHei,sans-serif}',
+    '.cycle-back-list a{color:#0a4f66;text-decoration:none}',
+    '.cycle-back-list a:hover{text-decoration:underline}'
   ].join('');
   document.head.appendChild(css);
+  if(/\\/channel\\/report\\/p\\//.test(location.pathname||'')){
+    var bar=document.createElement('div');
+    bar.className='cycle-back-list';
+    bar.innerHTML='<a href=\"/channel/report/?embed=1\">← 周期包列表</a><span style=\"color:#3d4f63\">当前报告</span>';
+    document.body.insertBefore(bar, document.body.firstChild);
+  }
 }catch(_){}
 })();</script>"""
 
@@ -1459,81 +1468,105 @@ def _read_cycle_pack_marker(root: str) -> dict[str, Any]:
     return {}
 
 
+def _cycle_pack_list_item(name: str, root: str, marker: dict[str, Any] | None = None) -> dict[str, Any]:
+    marker = marker if isinstance(marker, dict) else _read_cycle_pack_marker(root)
+    if name == "latest":
+        pack_id = str(marker.get("pack_id") or _cycle_pack_id(marker) or "latest")
+    else:
+        pack_id = str(marker.get("pack_id") or name)
+    title = (
+        str(marker.get("title") or marker.get("filter_label") or marker.get("source_name") or pack_id)
+        .strip()
+    )
+    count = int(marker.get("full_count") or marker.get("cloud_count") or 0)
+    if count <= 0:
+        try:
+            with open(os.path.join(root, "data.js"), encoding="utf-8") as f:
+                head = f.read(65536)
+            m = re.search(r'"count"\s*:\s*(\d+)', head)
+            if m:
+                count = int(m.group(1))
+        except Exception:
+            pass
+    mtime = 0.0
+    try:
+        mtime = os.path.getmtime(os.path.join(root, "data.js"))
+    except OSError:
+        try:
+            mtime = os.path.getmtime(root)
+        except OSError:
+            mtime = 0.0
+    return {
+        "pack_id": pack_id,
+        "dir_name": name,
+        "title": title,
+        "source_name": str(marker.get("source_name") or ""),
+        "report_date": str(marker.get("report_date") or "")[:10],
+        "full_count": count,
+        "imported_at": str(marker.get("imported_at") or marker.get("cloud_imported_at") or ""),
+        "view_url": f"/channel/report/p/{pack_id}/",
+        "mtime": mtime,
+    }
+
+
 def _list_cycle_report_packs() -> list[dict[str, Any]]:
-    """扫描已上传周期选品报告（cycle_report/*，不含 latest）。"""
+    """扫描已上传周期选品报告；latest 仅在无具名包时兜底进列表。"""
     cr_root = _cycle_report_root()
     if not os.path.isdir(cr_root):
         return []
     items: list[dict[str, Any]] = []
+    seen_ids: set[str] = set()
     for name in os.listdir(cr_root):
         if name in {"latest", "p", "api"} or name.startswith("."):
             continue
         root = os.path.join(cr_root, name)
         if not _cycle_pack_is_openable(root):
             continue
-        marker = _read_cycle_pack_marker(root)
-        pack_id = str(marker.get("pack_id") or name)
-        title = (
-            str(marker.get("title") or marker.get("filter_label") or marker.get("source_name") or pack_id)
-            .strip()
-        )
-        count = int(marker.get("full_count") or marker.get("cloud_count") or 0)
-        if count <= 0:
-            # 轻量读 data.js 头
-            try:
-                with open(os.path.join(root, "data.js"), encoding="utf-8") as f:
-                    head = f.read(65536)
-                m = re.search(r'"count"\s*:\s*(\d+)', head)
-                if m:
-                    count = int(m.group(1))
-            except Exception:
-                pass
-        mtime = 0.0
-        try:
-            mtime = os.path.getmtime(os.path.join(root, "data.js"))
-        except OSError:
-            try:
-                mtime = os.path.getmtime(root)
-            except OSError:
-                mtime = 0.0
-        items.append(
-            {
-                "pack_id": pack_id,
-                "dir_name": name,
-                "title": title,
-                "source_name": str(marker.get("source_name") or ""),
-                "report_date": str(marker.get("report_date") or "")[:10],
-                "full_count": count,
-                "imported_at": str(marker.get("imported_at") or marker.get("cloud_imported_at") or ""),
-                "view_url": f"/channel/report/p/{pack_id}/",
-                "mtime": mtime,
-            }
-        )
+        it = _cycle_pack_list_item(name, root)
+        items.append(it)
+        seen_ids.add(str(it.get("pack_id") or ""))
+        seen_ids.add(name)
+
+    latest = os.path.join(cr_root, "latest")
+    if _cycle_pack_is_openable(latest):
+        marker = _read_cycle_pack_marker(latest)
+        lid = str(marker.get("pack_id") or _cycle_pack_id(marker) or "latest")
+        # 旧包只有 latest、或 marker 指向尚未落盘的 pack_id 时，仍要能在列表里点开
+        if lid not in seen_ids and not items:
+            it = _cycle_pack_list_item("latest", latest, marker)
+            it["pack_id"] = lid
+            it["view_url"] = f"/channel/report/p/{lid}/"
+            items.append(it)
+
     items.sort(key=lambda x: (x.get("mtime") or 0), reverse=True)
     return items
 
 
 def _resolve_cycle_pack_root(pack_id: str) -> tuple[str, str]:
-    """按 pack_id 解析报告目录。兼容旧目录名=日期。"""
+    """按 pack_id 解析报告目录。兼容旧目录名=日期 / 仅有 latest。"""
     pack_id = (pack_id or "").strip().strip("/")
     if not pack_id or ".." in pack_id or "/" in pack_id or "\\" in pack_id:
         raise HTTPException(status_code=400, detail="无效 pack_id")
     cr_root = _cycle_report_root()
-    for cand in (pack_id,):
-        root = os.path.join(cr_root, cand)
-        if _cycle_pack_is_openable(root):
-            return root, f"cycle_report:{cand}"
-    # marker.pack_id 与目录名不一致时扫一遍
+    root = os.path.join(cr_root, pack_id)
+    if _cycle_pack_is_openable(root):
+        return root, f"cycle_report:{pack_id}"
+    # marker.pack_id 与目录名不一致时扫一遍（含 latest）
     if os.path.isdir(cr_root):
         for name in os.listdir(cr_root):
-            if name in {"latest", "p", "api"}:
+            if name in {"p", "api"}:
                 continue
-            root = os.path.join(cr_root, name)
-            if not _cycle_pack_is_openable(root):
+            cand = os.path.join(cr_root, name)
+            if not _cycle_pack_is_openable(cand):
                 continue
-            marker = _read_cycle_pack_marker(root)
-            if str(marker.get("pack_id") or "") == pack_id or name == pack_id:
-                return root, f"cycle_report:{name}"
+            marker = _read_cycle_pack_marker(cand)
+            mid = str(marker.get("pack_id") or "")
+            if mid == pack_id or name == pack_id:
+                return cand, f"cycle_report:{name}"
+            if name == "latest" and (
+                pack_id == "latest" or pack_id == _cycle_pack_id(marker)
+            ):
+                return cand, "cycle_report:latest"
     raise HTTPException(status_code=404, detail=f"周期包不存在: {pack_id}")
 
 
