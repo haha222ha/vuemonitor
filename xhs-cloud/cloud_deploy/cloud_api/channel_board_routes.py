@@ -268,7 +268,8 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
 </div>
 <script>
 (function(){
-  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1&ledger=1",vertical:"/channel/board/vertical_niche.html?embed=1",cycle:"/channel/report/?embed=1"};
+  // 比货默认 shards=1：云端无分页 API 时禁止掉进 Top200 展示包冒充全量
+  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1&shards=1",vertical:"/channel/board/vertical_niche.html?embed=1",cycle:"/channel/report/?embed=1"};
   var TABS=[
     {id:"workbench",label:"1 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
     {id:"ops",label:"2 比货",hint:"全量静态分片 · 非瘦包 · 约 34 万底账"},
