@@ -1,0 +1,52 @@
+{
+  "ok": true,
+  "apps": [
+    {
+      "slug": "psy",
+      "name": "心象测",
+      "description": "心理测评报告、分销后台与额度兑换。可站内开通，分销额度亦可闲鱼发码履约。",
+      "category": "saas",
+      "is_free": false,
+      "is_saas": true,
+      "cta_label": "打开心象测",
+      "cta_url": "https://psy.xhs365.cn",
+      "external_url": "https://psy.xhs365.cn",
+      "sort_order": 10,
+      "highlights": [
+        "自己测",
+        "分销充值",
+        "闲鱼发码"
+      ],
+      "default_plan_code": "assess_monthly",
+      "xy_item_url": "https://www.goofish.com/item?id=1080140241473",
+      "badge": "SaaS",
+      "shop_anchor": "/psy/c",
+      "secondary_cta_label": "买家购买",
+      "secondary_cta_url": "/psy/c",
+      "landing_url": "/psy/c",
+      "distributor_url": "/psy/b"
+    },
+    {
+      "slug": "caifu",
+      "name": "财富决策中心",
+      "description": "财富决策看板与会员服务。登录后使用完整能力。",
+      "category": "saas",
+      "is_free": false,
+      "is_saas": true,
+      "cta_label": "打开财富中心",
+      "cta_url": "https://caifu.xhs365.cn",
+      "external_url": "https://caifu.xhs365.cn",
+      "sort_order": 20,
+      "highlights": [
+        "决策看板",
+        "会员服务"
+      ],
+      "default_plan_code": "",
+      "xy_item_url": "",
+      "badge": "SaaS",
+      "shop_anchor": "/shop#caifu",
+      "secondary_cta_label": "开通说明",
+      "secondary_cta_url": "/shop#caifu"
+    }
+  ]
+}

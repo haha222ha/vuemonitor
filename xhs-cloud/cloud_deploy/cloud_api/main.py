@@ -50,6 +50,8 @@ from cloud_deploy.cloud_api.advisor_member_routes import router as advisor_membe
 from cloud_deploy.cloud_api.advisor_routes import router as advisor_internal_router
 from cloud_deploy.cloud_api.takeon_board_routes import router as takeon_board_router
 from cloud_deploy.cloud_api.channel_board_routes import router as channel_board_router
+from cloud_deploy.cloud_api.portal_admin import router as portal_admin_router
+from cloud_deploy.cloud_api.public_catalog import router as public_catalog_router
 from cloud_deploy.cloud_api.member_entitlements import (
     assert_legacy_zip_allowed,
     enrich_member_profile,
@@ -63,6 +65,8 @@ app.include_router(advisor_member_router)
 app.include_router(advisor_internal_router)
 app.include_router(takeon_board_router)
 app.include_router(channel_board_router)
+app.include_router(portal_admin_router)
+app.include_router(public_catalog_router)
 
 
 @app.on_event("startup")
@@ -348,6 +352,20 @@ def member_portal_page():
     path = os.path.join(_ASSETS, "member_portal.html")
     if not os.path.isfile(path):
         raise HTTPException(status_code=404, detail="会员看板未部署")
+    return FileResponse(
+        path,
+        media_type="text/html; charset=utf-8",
+        headers={"Cache-Control": "no-store, must-revalidate"},
+    )
+
+
+@app.get("/admin", response_class=HTMLResponse)
+@app.get("/admin/", response_class=HTMLResponse)
+@app.get("/admin/index.html", response_class=HTMLResponse)
+def admin_portal_page():
+    path = os.path.join(_ASSETS, "admin_portal", "index.html")
+    if not os.path.isfile(path):
+        raise HTTPException(status_code=404, detail="运营后台未部署")
     return FileResponse(
         path,
         media_type="text/html; charset=utf-8",

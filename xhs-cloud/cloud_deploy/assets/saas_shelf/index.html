@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XHS365 · SaaS 货架</title>
+<meta name="description" content="XHS365 对外 SaaS：心象测、财富决策中心。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0b1f1c;
+  --ink-soft: #2a403c;
+  --muted: #5c726d;
+  --paper: #f3f6f4;
+  --paper-2: #e8efec;
+  --line: #c9d6d1;
+  --accent: #0f766e;
+  --white: #ffffff;
+  --shadow: 0 20px 50px rgba(11, 31, 28, 0.07);
+  --font-display: "Syne", "PingFang SC", sans-serif;
+  --font-body: "Source Sans 3", "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse 80% 50% at 90% -10%, rgba(15, 118, 110, 0.12), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 0% 100%, rgba(15, 118, 110, 0.06), transparent 50%),
+    var(--paper);
+  min-height: 100vh;
+  line-height: 1.55;
+}
+a { color: inherit; text-decoration: none; }
+
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 6vw; gap: 12px; flex-wrap: wrap;
+}
+.brand {
+  font-family: var(--font-display);
+  font-weight: 800; font-size: 24px; letter-spacing: -0.02em;
+}
+.brand span { color: var(--accent); }
+.nav-links { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.nav-links a {
+  font-size: 13px; font-weight: 700; color: var(--ink-soft);
+  padding: 8px 12px;
+}
+.nav-links a.primary {
+  background: var(--ink); color: var(--white);
+  border-radius: 999px; padding: 8px 16px;
+}
+.nav-links a.primary:hover { background: var(--accent); }
+
+.hero {
+  padding: 28px 6vw 8px;
+  max-width: 1100px;
+}
+.hero-brand {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(42px, 7vw, 72px);
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  margin-bottom: 14px;
+}
+.hero-brand span { color: var(--accent); }
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(22px, 3vw, 32px);
+  letter-spacing: -0.03em;
+  max-width: 18ch;
+  margin-bottom: 10px;
+}
+.hero p {
+  color: var(--muted);
+  font-size: 16px;
+  max-width: 42ch;
+  margin-bottom: 22px;
+}
+.cta-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 18px; border-radius: 999px;
+  font-weight: 700; font-size: 14px;
+  border: 1.5px solid transparent;
+}
+.btn-primary { background: var(--accent); color: var(--white); }
+.btn-primary:hover { background: #0d5f59; }
+.btn-ghost { border-color: var(--ink); color: var(--ink); }
+.btn-ghost:hover { background: var(--ink); color: var(--white); }
+
+.section {
+  padding: 36px 6vw 56px;
+  max-width: 1100px;
+}
+.section-head {
+  display: flex; justify-content: space-between; align-items: end;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
+}
+.section-head h2 {
+  font-family: var(--font-display);
+  font-size: 26px; letter-spacing: -0.03em;
+}
+.section-head p { color: var(--muted); font-size: 14px; }
+
+.shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px 20px;
+  display: flex; flex-direction: column;
+  min-height: 200px;
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+}
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+.badge {
+  display: inline-block;
+  font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: 8px;
+}
+.card h3 {
+  font-family: var(--font-display);
+  font-size: 19px; margin-bottom: 8px;
+}
+.card p {
+  font-size: 13px; color: var(--muted); line-height: 1.55;
+  flex: 1; margin-bottom: 14px;
+}
+.card .meta {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 8px; flex-wrap: wrap;
+}
+.card .url {
+  font-size: 12px; color: var(--accent); font-weight: 600;
+}
+.card .actions {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;
+}
+.card .actions a {
+  font-size: 12px; font-weight: 700;
+  padding: 6px 10px; border-radius: 999px;
+  border: 1px solid var(--line);
+}
+.card .actions a.main {
+  background: var(--ink); color: var(--white); border-color: var(--ink);
+}
+.card .actions a.main:hover { background: var(--accent); border-color: var(--accent); }
+.card .actions a.sub:hover { border-color: var(--accent); color: var(--accent); }
+
+.footer {
+  padding: 24px 6vw 40px;
+  border-top: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 16px;
+  justify-content: space-between; align-items: center;
+  max-width: 1100px; margin: 0 auto;
+}
+.footer-brand {
+  font-family: var(--font-display); font-weight: 800; font-size: 16px;
+}
+.footer-brand span { color: var(--accent); }
+.footer-links { display: flex; gap: 16px; flex-wrap: wrap; }
+.footer-links a { font-size: 13px; color: var(--muted); font-weight: 600; }
+.footer-copy { width: 100%; font-size: 12px; color: var(--muted); }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.hero, .card { animation: rise .55s ease both; }
+.card:nth-child(2) { animation-delay: .04s; }
+.card:nth-child(3) { animation-delay: .08s; }
+.card:nth-child(4) { animation-delay: .12s; }
+.card:nth-child(5) { animation-delay: .16s; }
+.card:nth-child(6) { animation-delay: .2s; }
+
+@media (max-width: 640px) {
+  .hero { padding-top: 12px; }
+}
+
+.team-entry{font-size:13px;font-weight:700;color:var(--ink-soft);padding:8px 12px}
+.team-entry:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="nav">
+  <a class="brand" href="/">XHS<span>365</span></a>
+  <nav class="nav-links">
+    <a class="team-entry" id="team-entry" href="https://admin.xhs365.cn/admin/">工作台</a>
+    <a href="#shelf">货架</a>
+    <a href="/shop">购买</a>
+    
+    <a class="primary" id="nav-member" href="/member">登录 / 会员</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-brand">XHS<span>365</span></div>
+  <h1>对外 SaaS</h1>
+  <p>目前对外开放的产品是<strong>心象测</strong>与<strong>财富决策中心</strong>。登录、开通与续费走会员中心。</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="#shelf">查看产品</a>
+    <a class="btn btn-ghost" href="/go">小红书开通入口</a>
+    <a class="btn btn-ghost" href="/shop">购买 / 开通</a>
+    <a class="btn btn-ghost" href="/member">会员登录</a>
+  </div>
+</section>
+
+<section class="section" id="shelf">
+  <div class="section-head">
+    <div>
+      <h2>产品货架</h2>
+      <p>仅展示可对外售卖的 SaaS。仅展示可对外售卖的产品。</p>
+    </div>
+  </div>
+  <div class="shelf" id="apps-grid">
+    <div class="card"><h3>加载中…</h3><p>正在拉取产品目录</p></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-brand">XHS<span>365</span></div>
+  <div class="footer-links">
+    <a href="/member">会员中心</a>
+    <a href="/shop">购买</a>
+    <a href="https://psy.xhs365.cn">心象测</a>
+    <a href="https://caifu.xhs365.cn">财富决策</a>
+    
+  </div>
+  <div class="footer-copy">© XHS365 · 对外 SaaS：心象测 · 财富决策中心</div>
+</footer>
+
+<script>
+(function () {
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  function cookieGet(name) {
+    var m = document.cookie.match(new RegExp("(?:^|; )" + name + "=([^;]*)"));
+    return m ? decodeURIComponent(m[1]) : "";
+  }
+  function cookieSet(name, value, days) {
+    document.cookie = name + "=" + encodeURIComponent(value) +
+      (days ? "; max-age=" + days * 86400 : "") + "; path=/; samesite=lax";
+  }
+  var params = new URLSearchParams(location.search);
+  var refQ = (params.get("ref") || "").trim();
+  if (refQ) cookieSet("saas_aff_ref", refQ, 30);
+  var affRef = refQ || cookieGet("saas_aff_ref") || "";
+
+  function withRef(url) {
+    if (!affRef || !url) return url;
+    if (/^https?:/i.test(url) && url.indexOf("xhs365.cn") < 0) return url;
+    try {
+      var u = new URL(url, location.origin);
+      u.searchParams.set("ref", affRef);
+      if (u.origin === location.origin) return u.pathname + u.search + u.hash;
+      return u.toString();
+    } catch (e) {
+      return url;
+    }
+  }
+
+  var navM = document.getElementById("nav-member");
+  if (navM) navM.href = withRef("/member");
+
+  fetch("/api/v1/public/apps")
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      var grid = document.getElementById("apps-grid");
+      if (!grid || !data || !data.apps) return;
+      grid.innerHTML = data.apps.map(function (a) {
+        var href = a.cta_url || a.external_url || "/member";
+        if (href.indexOf("/") === 0) href = withRef(href);
+        var sub = a.external_url || a.cta_url || "";
+        if (sub.indexOf("http") === 0) {
+          try { sub = new URL(sub).host; } catch (e) {}
+        }
+        var shop = a.shop_anchor || a.secondary_cta_url || "/shop";
+        if (shop.indexOf("/") === 0) shop = withRef(shop);
+        var shopLabel = a.secondary_cta_label || "购买 / 开通";
+        return '<div class="card">' +
+          '<div class="badge">' + esc(a.badge || "SaaS") + "</div>" +
+          "<h3>" + esc(a.name) + "</h3>" +
+          "<p>" + esc(a.description || "") + "</p>" +
+          '<div class="meta"><span class="url">' + esc(sub) + "</span></div>" +
+          '<div class="actions">' +
+          '<a class="main" href="' + esc(href) + '">' + esc(a.cta_label || "进入") + "</a>" +
+          '<a class="sub" href="' + esc(shop) + '">' + esc(shopLabel) + "</a>" +
+          "</div></div>";
+      }).join("");
+    })
+    .catch(function () {
+      document.getElementById("apps-grid").innerHTML =
+        '<div class="card"><h3>目录暂时不可用</h3><p>请稍后刷新，或直接进入 <a href="/member">会员中心</a></p></div>';
+    });
+})();
+</script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"18f34820d6c0459f880fbbd1f6605488","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body>
+</html>
