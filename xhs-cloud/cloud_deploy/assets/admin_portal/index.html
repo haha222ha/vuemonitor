@@ -86,16 +86,23 @@
     <div id="topMsg" class="msg hidden"></div>
 
     <div class="nav" id="mainNav">
+      <button type="button" data-panel="ops">自用运营栈</button>
       <button type="button" class="on" data-panel="codes">授权码</button>
       <button type="button" data-panel="dist">心理分销</button>
       <button type="button" data-panel="feedback">用户反馈</button>
       <button type="button" data-panel="contact">客服微信</button>
-      <button type="button" data-panel="ops">自用运营栈</button>
       <button type="button" data-panel="status">系统状态</button>
     </div>
 
     <!-- 授权码（PickMemberView 能力） -->
     <div id="panel-codes" class="panel on">
+      <div class="card" style="margin-bottom:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+        <div>
+          <strong>网站集合 / 自用运营栈</strong>
+          <div class="sub" style="margin:6px 0 0">闲鱼矩阵、Monitor、上架审核、Hub 等入口（登录后可见）</div>
+        </div>
+        <button type="button" id="gotoOpsBtn">打开运营栈</button>
+      </div>
       <div class="grid card">
         <div class="stat"><span>有效会员</span><b id="stMembers">—</b></div>
         <div class="stat"><span>未用授权码</span><b id="stUnused">—</b></div>
@@ -645,6 +652,8 @@
       await soft(loadProducts, "产品");
       await soft(loadCodes, "授权码");
     }
+
+    $("gotoOpsBtn").onclick = () => showPanel("ops");
 
     $("loginBtn").onclick = async () => {
       showMsg($("loginMsg"), "");
