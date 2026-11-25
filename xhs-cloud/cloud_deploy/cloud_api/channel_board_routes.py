@@ -68,6 +68,20 @@ def _token(password: str = "") -> str:
     return hashlib.sha256(f"xhs-channel-board|{raw}".encode("utf-8")).hexdigest()
 
 
+def _is_channel_host(request: Request) -> bool:
+    """独立子域 channel.* 用根路径；旧 monitor/channel 仍走 /channel 前缀。"""
+    host = (request.headers.get("host") or "").split(":")[0].lower()
+    if host == "channel.xhs365.cn" or host.startswith("channel."):
+        return True
+    flag = (os.environ.get("XHS_CHANNEL_ROOT_URLS") or "").strip().lower()
+    return flag in ("1", "true", "yes", "on")
+
+
+def _ui_prefix(request: Request) -> str:
+    """浏览器可见前缀：子域为 ''，同域旧链为 '/channel'。"""
+    return "" if _is_channel_host(request) else "/channel"
+
+
 def _ops_cookie_ok(request: Request) -> bool:
     """运维一门一密（兼容旧 cookie）。"""
     got = request.cookies.get("channel_board_auth") or ""
@@ -269,7 +283,7 @@ body{font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var
 <script>
 (function(){
   // 比货默认 shards=1：云端无分页 API 时禁止掉进 Top200 展示包冒充全量
-  var PATHS={workbench:"/channel/workbench/?embed=1",ops:"/channel/board/?embed=1&shards=1",vertical:"/channel/board/vertical_niche.html?embed=1",cycle:"/channel/report/?embed=1"};
+  var PATHS={workbench:"__PREFIX__/workbench/?embed=1",ops:"__PREFIX__/board/?embed=1&shards=1",vertical:"__PREFIX__/board/vertical_niche.html?embed=1",cycle:"__PREFIX__/report/?embed=1"};
   var TABS=[
     {id:"workbench",label:"1 任务台",hint:"今日拍板 · 云端只读；人判/可搬请回本机 8765"},
     {id:"ops",label:"2 比货",hint:"全量静态分片 · 非瘦包 · 约 34 万底账"},
@@ -442,27 +456,35 @@ def _hub_stamp_html() -> str:
     return f'<div class="stamp">{" · ".join(bits)}</div>'
 
 
-def _hub_html() -> str:
+def _hub_html(prefix: str = "/channel") -> str:
     """优先读看板 latest/hub.html（本机 publish 即可改入口）；缺则用内置模板。"""
+    p = prefix or ""
+
+    def _apply(text: str) -> str:
+        stamp = _hub_stamp_html()
+        if stamp and "__STAMP__" in text:
+            text = text.replace("__STAMP__", stamp)
+        text = text.replace("__PREFIX__", p)
+        if p == "":
+            # 子域根路径：旧绝对链 /channel/xxx → /xxx
+            text = text.replace('"/channel/', '"/').replace("'/channel/", "'/")
+            text = text.replace("=/channel/", "=/").replace("(/channel/", "(/")
+        return text
+
     latest_hub = os.path.join(_boards_root(), "latest", "hub.html")
     if os.path.isfile(latest_hub):
         try:
             with open(latest_hub, encoding="utf-8") as f:
                 text = f.read()
-            stamp = _hub_stamp_html()
-            if stamp and "__STAMP__" in text:
-                text = text.replace("__STAMP__", stamp)
-            elif stamp and 'id="hint"' in text and "stamp" not in text[:800].lower():
-                # 静态 hub 无 stamp 槽时不硬塞，避免破坏布局
-                pass
-            return text
+            return _apply(text)
         except Exception:
             pass
-    return _HUB_HTML_TMPL.replace("__STAMP__", _hub_stamp_html())
+    return _apply(_HUB_HTML_TMPL)
 
 
-def _gate_html() -> str:
-    return """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
+def _gate_html(prefix: str = "/channel") -> str:
+    p = prefix or ""
+    html = """<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>选品作战台</title>
 <style>
@@ -511,7 +533,7 @@ summary{cursor:pointer;color:var(--muted);font-size:12px;font-weight:600}
 <p class="hint">没有账号？可先到 <a href="/member" target="_blank" rel="noopener">会员中心</a> 开通；客服发的授权码也可直接在此登录。</p>
 <details>
   <summary>运维密码（本机内部兜底）</summary>
-  <form method="post" action="/channel/login" style="margin-top:12px">
+  <form method="post" action="__PREFIX__/login" style="margin-top:12px">
     <label for="opsPassword">访问密码</label>
     <input id="opsPassword" name="password" type="password" placeholder="运维一门一密" autocomplete="off"/>
     <button class="btn" type="submit">密码进入</button>
@@ -576,7 +598,7 @@ summary{cursor:pointer;color:var(--muted);font-size:12px;font-weight:600}
         if(Array.isArray(detail)) detail=detail.map(function(x){return x.msg||JSON.stringify(x);}).join('; ');
         throw new Error(String(detail));
       }
-      location.href='/channel/hub/';
+      location.href='__PREFIX__/hub/';
     }catch(e){
       showErr(e&&e.message?e.message:'登录失败');
       setBusy(btn, false);
@@ -596,6 +618,7 @@ summary{cursor:pointer;color:var(--muted);font-size:12px;font-weight:600}
 })();
 </script>
 </body></html>"""
+    return html.replace("__PREFIX__", p)
 
 
 def _sessions_root() -> str:
@@ -685,7 +708,10 @@ def _ingest_channel_board_zip(zip_path: str) -> dict[str, Any]:
     """解压全量看板 zip → channel_boards/{date} + latest + archive（与单次 upload 同口径）。"""
     from cloud_deploy.cloud_api import database as db
     from cloud_deploy.cloud_api.config import get_settings
-    from cloud_deploy.reporting.constants import ARCHIVE_CHANNEL_BOARD
+    try:
+        from cloud_deploy.reporting.constants import ARCHIVE_CHANNEL_BOARD
+    except ImportError:  # 旧机 constants 未含此符号时兜底，避免 commit 500
+        ARCHIVE_CHANNEL_BOARD = "private_channel_board_zip"
 
     if not str(zip_path).lower().endswith(".zip"):
         raise HTTPException(status_code=400, detail="仅支持 zip")
@@ -1071,7 +1097,10 @@ def _ingest_cycle_report_zip(zip_path: str) -> dict[str, Any]:
     """选品报告整包 → /channel/report/（解压打开；同套 index.html + data.js）。"""
     from cloud_deploy.cloud_api import database as db
     from cloud_deploy.cloud_api.config import get_settings
-    from cloud_deploy.reporting.constants import ARCHIVE_CYCLE_REPORT
+    try:
+        from cloud_deploy.reporting.constants import ARCHIVE_CYCLE_REPORT
+    except ImportError:
+        ARCHIVE_CYCLE_REPORT = "private_cycle_report_zip"
 
     if not str(zip_path).lower().endswith(".zip"):
         raise HTTPException(status_code=400, detail="仅支持 zip")
@@ -1274,24 +1303,34 @@ def sync_board_inventory_stats(_: None = Depends(verify_sync_key)):
         conn.close()
 
 
+@router.get("/", response_class=HTMLResponse)
 @router.get("/channel", response_class=HTMLResponse)
 @router.get("/channel/", response_class=HTMLResponse)
 def channel_gate(request: Request):
+    # 根路径 / 仅服务 channel.* 子域，避免抢其它 Host 的首页
+    if request.url.path in ("/", "") and not _is_channel_host(request):
+        raise HTTPException(status_code=404, detail="Not Found")
+    p = _ui_prefix(request)
     if _cookie_ok(request):
-        return RedirectResponse(url="/channel/hub/", status_code=302)
-    return HTMLResponse(_gate_html(), headers={**_NO_STORE, "X-Channel-Board": "1"})
+        return RedirectResponse(url=f"{p}/hub/", status_code=302)
+    return HTMLResponse(_gate_html(p), headers={**_NO_STORE, "X-Channel-Board": "1"})
 
 
+@router.get("/hub", response_class=HTMLResponse)
+@router.get("/hub/", response_class=HTMLResponse)
 @router.get("/channel/hub", response_class=HTMLResponse)
 @router.get("/channel/hub/", response_class=HTMLResponse)
 def channel_hub(request: Request):
+    p = _ui_prefix(request)
     if not _cookie_ok(request):
-        return RedirectResponse(url="/channel/", status_code=302)
-    return HTMLResponse(_hub_html(), headers={**_NO_STORE, "X-Channel-Board": "1"})
+        return RedirectResponse(url=f"{p}/", status_code=302)
+    return HTMLResponse(_hub_html(p), headers={**_NO_STORE, "X-Channel-Board": "1"})
 
 
+@router.post("/login")
 @router.post("/channel/login")
 async def channel_login(request: Request):
+    p = _ui_prefix(request)
     ctype = (request.headers.get("content-type") or "").lower()
     password = ""
     if "application/json" in ctype:
@@ -1307,10 +1346,10 @@ async def channel_login(request: Request):
     if not hmac.compare_digest(_token(password), _token()):
         return HTMLResponse(
             "<h3 style='font-family:sans-serif;color:#b12e3c'>密码错误</h3>"
-            "<a href='/channel/'>返回</a>",
+            f"<a href='{p}/'>返回</a>",
             status_code=401,
         )
-    resp = RedirectResponse(url="/channel/hub/", status_code=302)
+    resp = RedirectResponse(url=f"{p}/hub/", status_code=302)
     resp.set_cookie(
         key="channel_board_auth",
         value=_token(),
@@ -1321,14 +1360,19 @@ async def channel_login(request: Request):
     return resp
 
 
+@router.get("/board/{path:path}")
+@router.get("/board")
+@router.get("/board/")
 @router.get("/channel/board/{path:path}")
 @router.get("/channel/board")
 @router.get("/channel/board/")
 def channel_board_files(request: Request, path: str = ""):
+    p = _ui_prefix(request)
     if not _cookie_ok(request):
-        return RedirectResponse(url="/channel/", status_code=302)
-    if request.url.path == "/channel/board" and not (path or "").strip():
-        return RedirectResponse(url="/channel/board/", status_code=302)
+        return RedirectResponse(url=f"{p}/", status_code=302)
+    path_l = (request.url.path or "").rstrip("/")
+    if path_l in (f"{p}/board", "/board", "/channel/board") and not (path or "").strip():
+        return RedirectResponse(url=f"{p}/board/", status_code=302)
     root = os.path.join(_boards_root(), "latest")
     if not os.path.isdir(root):
         return HTMLResponse(
@@ -1348,12 +1392,15 @@ def channel_board_files(request: Request, path: str = ""):
     )
 
 
+@router.api_route("/workbench/api/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
+@router.api_route("/workbench/api", methods=["GET", "POST"])
 @router.api_route("/channel/workbench/api/{path:path}", methods=["GET", "POST", "PUT", "DELETE"])
 @router.api_route("/channel/workbench/api", methods=["GET", "POST"])
 def channel_workbench_api_stub(request: Request, path: str = ""):
     """云端任务台只读：动态写/钻 API 一律 stub，避免假绿。"""
+    p = _ui_prefix(request)
     if not _cookie_ok(request):
-        return RedirectResponse(url="/channel/", status_code=302)
+        return RedirectResponse(url=f"{p}/", status_code=302)
     return JSONResponse(
         {
             "ok": False,
@@ -1367,20 +1414,25 @@ def channel_workbench_api_stub(request: Request, path: str = ""):
     )
 
 
+@router.get("/workbench/{path:path}")
+@router.get("/workbench")
+@router.get("/workbench/")
 @router.get("/channel/workbench/{path:path}")
 @router.get("/channel/workbench")
 @router.get("/channel/workbench/")
 def channel_workbench_files(request: Request, path: str = ""):
+    p = _ui_prefix(request)
     if not _cookie_ok(request):
-        return RedirectResponse(url="/channel/", status_code=302)
-    if request.url.path == "/channel/workbench" and not (path or "").strip():
-        return RedirectResponse(url="/channel/workbench/", status_code=302)
+        return RedirectResponse(url=f"{p}/", status_code=302)
+    path_l = (request.url.path or "").rstrip("/")
+    if path_l in (f"{p}/workbench", "/workbench", "/channel/workbench") and not (path or "").strip():
+        return RedirectResponse(url=f"{p}/workbench/", status_code=302)
     root = os.path.join(_workbench_root(), "latest")
     if not os.path.isdir(root):
         return HTMLResponse(
             "<h3>任务台尚未上传</h3>"
             "<p>请本机运行 <code>python tools/publish_channel_workbench_cloud.py</code></p>"
-            "<p><a href='/channel/hub/'>返回入口</a></p>",
+            f"<p><a href='{p}/hub/'>返回入口</a></p>",
             status_code=404,
         )
     rel = (path or "").strip().lstrip("/")
@@ -1536,23 +1588,27 @@ def channel_goods_dossier_api(
     return JSONResponse(payload, headers={**_NO_STORE, "X-Channel-Board": "1"})
 
 
+@router.get("/vertical")
+@router.get("/vertical/")
+@router.get("/vertical/{path:path}")
 @router.get("/channel/vertical")
 @router.get("/channel/vertical/")
 @router.get("/channel/vertical/{path:path}")
 def channel_vertical_landing(request: Request, path: str = ""):
     """四看板①：导航到原 vertical_niche 页（不另做空壳业务页）。"""
+    p = _ui_prefix(request)
     if not _cookie_ok(request):
-        return RedirectResponse(url="/channel/", status_code=302)
+        return RedirectResponse(url=f"{p}/", status_code=302)
     rel = (path or "").strip().lstrip("/")
     if not rel or rel.endswith("/"):
-        target = "/channel/board/vertical_niche.html"
+        target = f"{p}/board/vertical_niche.html"
         q = request.url.query
         if q:
             target = f"{target}?{q}"
         elif (request.query_params.get("embed") or "") == "1":
             target = f"{target}?embed=1"
         return RedirectResponse(url=target, status_code=302)
-    return RedirectResponse(url="/channel/board/vertical_niche.html", status_code=302)
+    return RedirectResponse(url=f"{p}/board/vertical_niche.html", status_code=302)
 
 
 _CYCLE_DATE_DIR_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
@@ -2122,15 +2178,20 @@ def _serve_cycle_pack_file(
     return FileResponse(target, media_type=media, headers=headers)
 
 
+@router.get("/report/{path:path}")
+@router.get("/report")
+@router.get("/report/")
 @router.get("/channel/report/{path:path}")
 @router.get("/channel/report")
 @router.get("/channel/report/")
 def channel_cycle_report_files(request: Request, path: str = ""):
     """④ 周期包：先列表自选；/p/{pack_id}/ 打开对应选品报告整包。"""
+    p = _ui_prefix(request)
     if not _cookie_ok(request):
-        return RedirectResponse(url="/channel/", status_code=302)
-    if request.url.path == "/channel/report" and not (path or "").strip():
-        return RedirectResponse(url="/channel/report/", status_code=302)
+        return RedirectResponse(url=f"{p}/", status_code=302)
+    path_l = (request.url.path or "").rstrip("/")
+    if path_l in (f"{p}/report", "/report", "/channel/report") and not (path or "").strip():
+        return RedirectResponse(url=f"{p}/report/", status_code=302)
 
     rel = (path or "").strip().lstrip("/")
     embed = (request.query_params.get("embed") or "") == "1"
@@ -2153,7 +2214,7 @@ def channel_cycle_report_files(request: Request, path: str = ""):
     if rel == "p" or rel.startswith("p/"):
         rest = rel[1:].lstrip("/") if rel.startswith("p") else ""
         if not rest:
-            return RedirectResponse(url="/channel/report/", status_code=302)
+            return RedirectResponse(url=f"{p}/report/", status_code=302)
         pack_id, _, file_rel = rest.partition("/")
         root, source = _resolve_cycle_pack_root(pack_id)
         return _serve_cycle_pack_file(request, root=root, source=source, rel=file_rel)
@@ -2169,6 +2230,6 @@ def channel_cycle_report_files(request: Request, path: str = ""):
         "<h3>周期选品报告尚未上传</h3>"
         "<p>请本机运行 <code>python tools/publish_cycle_report_cloud.py</code> 上传后，"
         "本页会列出可选周期包。</p>"
-        "<p><a href='/channel/hub/'>返回入口</a></p>",
+        f"<p><a href='{p}/hub/'>返回入口</a></p>",
         status_code=404,
     )
