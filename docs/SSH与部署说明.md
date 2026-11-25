@@ -35,12 +35,19 @@ git fetch origin main && git reset --hard origin/main
 bash scripts/host-update.sh
 ```
 
-### 4. 选品云端会员页
+### 4. Plan A 安全同步（推荐，禁止全量 rsync --delete）
+
+全量 `rsync … --delete` 会冲掉生产独有模块（如 sync/upload-session）并导致 admin HTML / portal_admin 丢失。请用白名单脚本：
 
 ```bash
-rsync -a /opt/vuemonitor/xhs-cloud/cloud_deploy/ /opt/xhs-cloud/cloud_deploy/
-cd /opt/xhs-cloud && bash cloud_deploy/scripts/host-update.sh
+cd /opt/vuemonitor
+git fetch origin main && git reset --hard origin/main
+sudo bash xhs-cloud/cloud_deploy/scripts/safe-sync-plan-a.sh
+# 可选验收
+bash xhs-cloud/cloud_deploy/scripts/verify-plan-a.sh
 ```
+
+仅当确认目标树与 git 完全一致、且了解生产独有文件时，才考虑手工拷贝个别资源。
 
 ---
 
