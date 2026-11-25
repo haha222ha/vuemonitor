@@ -45,6 +45,11 @@ echo "dest=$DEST"
 echo "commit=$(cd "$REPO" && git log -1 --oneline 2>/dev/null || echo unknown)"
 
 # —— 白名单 ——
+
+# channel board ingest：constants / routes（缺 ARCHIVE_CHANNEL_BOARD 会导致 commit 500）
+copy_one "/xhs-cloud/cloud_deploy/reporting/constants.py" "/cloud_deploy/reporting/constants.py"
+copy_one "/channel_board_routes.py" "/channel_board_routes.py"
+
 copy_one "$SRC_API/portal_admin.py" "$DST_API/portal_admin.py"
 copy_one "$SRC_API/public_catalog.py" "$DST_API/public_catalog.py"
 # main.py 含 admin 静态路由与 portal_admin include；若生产有独有补丁，先备份再覆盖
